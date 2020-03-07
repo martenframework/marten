@@ -6,6 +6,7 @@ module Marten
 
         def call(context : ::HTTP::Server::Context)
           process(context)
+          call_next(context)
         end
 
         private def process(context)
@@ -13,15 +14,7 @@ module Marten
           return if matched_rule.nil?
 
           view = matched_rule.view.new
-          response = view.dispatch(context.marten.request)
-
-          unless response.nil?
-            context.response.status_code = response.status
-            context.response.content_type = response.content_type.to_s
-            context.response.print(response.content)
-          end
-
-          context
+          context.marten.response = view.dispatch(context.marten.request).as(HTTP::Response)
         end
       end
     end

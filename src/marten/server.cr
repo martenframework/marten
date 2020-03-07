@@ -5,6 +5,7 @@ module Marten
         [
           ::HTTP::ErrorHandler.new,
           Handlers::Routing.new,
+          Handlers::Response.new,
         ]
       )
       server.bind_tcp("0.0.0.0", 8000)

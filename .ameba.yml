@@ -1,0 +1,49 @@
+Layout/LineLength:
+  Description: Disallows lines longer than `MaxLength` number of symbols
+  Enabled: true
+  MaxLength: 100
+
+Metrics/CyclomaticComplexity:
+  Description: Disallows methods with a cyclomatic complexity higher than `MaxComplexity`
+  MaxComplexity: 12
+  Enabled: true
+  Severity: Convention
+
+Lint/ShadowingOuterLocalVar:
+  Description: Disallows the usage of the same name as outer local variables for block
+    or proc arguments.
+  Enabled: true
+  Severity: Warning
+
+Style/ConstantNames:
+  Description: Enforces constant names to be in screaming case
+  Enabled: False
+  Severity: Convention
+
+Style/UnlessElse:
+  Description: Disallows the use of an `else` block with the `unless`
+  Enabled: true
+  Severity: Convention
+
+Lint/UnusedArgument:
+  Description: Disallows unused arguments
+  IgnoreDefs: true
+  IgnoreBlocks: false
+  IgnoreProcs: false
+  Enabled: true
+  Severity: Warning
+
+Lint/UselessAssign:
+  Description: Disallows useless variable assignments
+  Enabled: true
+  Severity: Warning
+
+Lint/UnreachableCode:
+  Description: Reports unreachable code
+  Enabled: true
+  Severity: Warning
+
+Style/VariableNames:
+  Description: Enforces variable names to be in underscored case
+  Enabled: true
+  Severity: Convention

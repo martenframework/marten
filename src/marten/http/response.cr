@@ -3,6 +3,7 @@ module Marten
     class Response
       getter content
       getter content_type
+      getter headers
       getter status
 
       def initialize(
@@ -10,6 +11,11 @@ module Marten
         @content_type : String | Symbol = "text/html",
         @status : Int32 = 200
       )
+        @headers = {} of String => String
+      end
+
+      def []=(header : String | Symbol, value : Int32 | String | Symbol)
+        @headers[header.to_s] = value.to_s
       end
     end
   end

@@ -13,6 +13,7 @@ module Marten
             return context if response.nil?
 
             context.response.status_code = response.status
+            context.response.headers.merge!(response.headers)
             context.response.content_type = response.content_type.to_s
             context.response.print(response.content)
 

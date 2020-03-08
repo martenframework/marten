@@ -1,7 +1,7 @@
 module Marten
   module Views
     class Base
-      HTTP_METHOD_NAMES = %(get post put patch delete head options trace)
+      HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 
       @@http_method_names : Array(String)?
 
@@ -46,7 +46,11 @@ module Marten
       end
 
       def options(request, *args, **kwargs)
-        handle_http_method_not_allowed
+        # Responds to requests for the OPTIONS HTTP verb.
+        response = HTTP::Response.new
+        response["Allow"] = self.class.http_method_names.map(&.upcase).join(", ")
+        response["Content-Length"] = "0"
+        response
       end
 
       def trace(request, *args, **kwargs)

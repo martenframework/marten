@@ -1,1 +1,5 @@
 .ideas/
+.vscode/
+/bin/
+/.shards/
+.icr_*

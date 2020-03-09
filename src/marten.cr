@@ -3,13 +3,10 @@
 require "http"
 
 require "./marten/*"
-require "./marten/conf/*"
-require "./marten/conf/routing/*"
-require "./marten/conf/settings/*"
-require "./marten/http/*"
-require "./marten/server/*"
-require "./marten/server/handlers/*"
-require "./marten/views/*"
+require "./marten/conf/**"
+require "./marten/http/**"
+require "./marten/server/**"
+require "./marten/views/**"
 
 module Marten
   @@env : Conf::Env?

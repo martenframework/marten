@@ -8,7 +8,7 @@ module Marten
 
       def initialize(
         @content : String = "",
-        @content_type : String | Symbol = "text/html",
+        @content_type : String = "text/html",
         @status : Int32 = 200
       )
         @headers = {} of String => String

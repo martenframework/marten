@@ -58,7 +58,7 @@ module Marten
       end
 
       private def handle_http_method_not_allowed
-        HTTP::ResponseNotAllowed.new(self.class.http_method_names)
+        HTTP::Response::NotAllowed.new(self.class.http_method_names)
       end
 
       private def call_http_method(request, *args, **kwargs)

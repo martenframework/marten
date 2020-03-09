@@ -1,10 +1,8 @@
 require "../../src/marten"
 
-require "./apps/admin/*"
-require "./apps/blog/*"
-require "./apps/blog/views/*"
+require "./apps/admin/**"
+require "./apps/blog/**"
 
-require "../config/routes"
-require "../config/settings/*"
+require "../config/**"
 
 Marten.start

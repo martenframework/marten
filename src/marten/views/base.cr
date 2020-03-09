@@ -9,7 +9,7 @@ module Marten
         @@http_method_names = method_names.to_a.map(&.to_s)
       end
 
-      def self.http_method_names
+      def self.http_method_names : Array(String)
         @@http_method_names || HTTP_METHOD_NAMES
       end
 
@@ -58,7 +58,7 @@ module Marten
       end
 
       private def handle_http_method_not_allowed
-        raise Exception.new("HTTP method not allowed")
+        HTTP::ResponseNotAllowed.new(self.class.http_method_names)
       end
 
       private def call_http_method(request, *args, **kwargs)

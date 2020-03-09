@@ -41,8 +41,14 @@ module Marten
         handle_http_method_not_allowed
       end
 
-      def head(request, *args, **kwargs)
+      def trace(request, *args, **kwargs)
         handle_http_method_not_allowed
+      end
+
+      def head(request, *args, **kwargs)
+        # By default HEAD requests are delegated to the get handler - which will result in a not
+        # allowed response if the latest is not defined.
+        get(request, *args, **kwargs)
       end
 
       def options(request, *args, **kwargs)
@@ -51,10 +57,6 @@ module Marten
         response["Allow"] = self.class.http_method_names.map(&.upcase).join(", ")
         response["Content-Length"] = "0"
         response
-      end
-
-      def trace(request, *args, **kwargs)
-        handle_http_method_not_allowed
       end
 
       private def handle_http_method_not_allowed

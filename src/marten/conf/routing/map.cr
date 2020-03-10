@@ -4,16 +4,30 @@ module Marten
       class Map
         getter rules
 
-        def initialize
+        def self.draw
+          map = new
+          with map yield map
+          map
+        end
+
+        def initialize(@name : Symbol | String = "")
           @rules = [] of Rule
         end
 
         def draw
-          yield self
+          with self yield self
         end
 
-        def path(path : String, view : Marten::Views::Base.class, name : String | Symbol)
-          @rules << Rule.new(path, view, name)
+        def path(path : String, target : Marten::Views::Base.class | Map, name : String | Symbol)
+          if target.is_a?(Marten::Views::Base.class)
+            @rules << Rule.new(path, target, name.to_s)
+            return
+          end
+
+          # Process nested routes map.
+          target.rules.each do |rule|
+            @rules << Rule.new(path + rule.path, rule.view, "#{name}:#{rule.name}")
+          end
         end
       end
     end

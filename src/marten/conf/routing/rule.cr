@@ -4,6 +4,7 @@ module Marten
       class Rule
         getter path
         getter view
+        getter name
 
         def initialize(@path : String, @view : Marten::Views::Base.class, @name : String | Symbol)
         end

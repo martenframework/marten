@@ -10,10 +10,10 @@ module Marten
         end
 
         private def process(context)
-          matched_rule = Marten.routes.rules.find { |r| r.path == context.request.path }
-          return if matched_rule.nil?
+          matched = Marten.routes.resolve(context.request.path)
+          return if matched.nil?
 
-          view = matched_rule.view.new
+          view = matched.view.new
           context.marten.response = view.dispatch(context.marten.request).as(HTTP::Response)
         end
       end

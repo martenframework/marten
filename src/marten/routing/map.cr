@@ -28,6 +28,13 @@ module Marten
           @rules << Rule.new(path + rule.path, rule.view, "#{name}:#{rule.name}")
         end
       end
+
+      def resolve(path)
+        rule = @rules.find { |r| r.path == path }
+        return if rule.nil?
+
+        Match.new(rule.view)
+      end
     end
   end
 end

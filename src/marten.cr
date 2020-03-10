@@ -5,12 +5,13 @@ require "http"
 require "./marten/*"
 require "./marten/conf/**"
 require "./marten/http/**"
+require "./marten/routing/**"
 require "./marten/server/**"
 require "./marten/views/**"
 
 module Marten
   @@env : Conf::Env?
-  @@routes : Conf::Routing::Map?
+  @@routes : Routing::Map?
   @@settings : Conf::Settings?
 
   def self.start
@@ -31,6 +32,6 @@ module Marten
   end
 
   def self.routes
-    @@routes ||= Conf::Routing::Map.new
+    @@routes ||= Routing::Map.new
   end
 end

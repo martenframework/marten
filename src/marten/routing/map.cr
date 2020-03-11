@@ -28,10 +28,13 @@ module Marten
       end
 
       def resolve(path : String) : Nil | Match
-        @rules.each do |r|
+        match = @rules.each do |r|
           matched = r.resolve(path)
           break matched unless matched.nil?
         end
+
+        raise Errors::NoResolveMatch.new if match.nil?
+        match
       end
     end
   end

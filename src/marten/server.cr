@@ -4,6 +4,7 @@ module Marten
       server = ::HTTP::Server.new(
         [
           ::HTTP::ErrorHandler.new,
+          Handlers::Error.new,
           Handlers::Routing.new,
           Handlers::Response.new,
         ]

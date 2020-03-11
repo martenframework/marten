@@ -10,7 +10,7 @@ module Marten
       end
 
       def initialize(@name : Symbol | String = "")
-        @rules = [] of Rule
+        @rules = [] of Rule::Base
       end
 
       def draw
@@ -19,21 +19,19 @@ module Marten
 
       def path(path : String, target : Marten::Views::Base.class | Map, name : String | Symbol)
         if target.is_a?(Marten::Views::Base.class)
-          @rules << Rule.new(path, target, name.to_s)
+          @rules << Rule::Path.new(path, target, name.to_s)
           return
         end
 
         # Process nested routes map.
-        target.rules.each do |rule|
-          @rules << Rule.new(path + rule.path, rule.view, "#{name}:#{rule.name}")
-        end
+        @rules << Rule::Map.new(path, target, name.to_s)
       end
 
-      def resolve(path)
-        rule = @rules.find { |r| r.path == path }
-        return if rule.nil?
-
-        Match.new(rule.view)
+      def resolve(path : String) : Nil | Match
+        @rules.each do |r|
+          matched = r.resolve(path)
+          break matched unless matched.nil?
+        end
       end
     end
   end

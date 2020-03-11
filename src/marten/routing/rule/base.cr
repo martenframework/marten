@@ -1,10 +1,8 @@
 module Marten
   module Routing
     module Rule
-      class Base
-        def resolve(path : String) : Nil | Match
-          nil
-        end
+      abstract class Base
+        abstract def resolve(path : String) : Nil | Match
       end
     end
   end

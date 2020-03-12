@@ -3,9 +3,10 @@ module Marten
     module Rule
       class Map < Base
         @regex : Regex
+        @parameters : Hash(String, Parameter::Base)
 
         def initialize(@path : String, @map : Marten::Routing::Map, @name : String | Symbol)
-          @regex = path_to_regex(@path)
+          @regex, @parameters = path_to_regex(@path)
         end
 
         def resolve(path : String) : Nil | Match
@@ -19,10 +20,10 @@ module Marten
           end
         end
 
-        private def path_to_regex(path)
-          parts = ["^", path]
-          Regex.new(parts.join(""))
-        end
+        # private def path_to_regex(path)
+        #   parts = ["^", path]
+        #   Regex.new(parts.join(""))
+        # end
       end
     end
   end

@@ -3,9 +3,10 @@ module Marten
     module Rule
       class Path < Base
         @regex : Regex
+        @parameters : Hash(String, Parameter::Base)
 
         def initialize(@path : String, @view : Marten::Views::Base.class, @name : String | Symbol)
-          @regex = path_to_regex(@path)
+          @regex, @parameters = path_to_regex(@path)
         end
 
         def resolve(path : String) : Nil | Match
@@ -15,9 +16,9 @@ module Marten
           Match.new(@view)
         end
 
-        private def path_to_regex(path)
-          parts = ["^", path, "$"]
-          Regex.new(parts.join(""))
+        private def path_to_regex(_path)
+          regex, parameters = super
+          { Regex.new("#{regex.source}$"), parameters }
         end
       end
     end

@@ -12,11 +12,12 @@ module Marten
           regex_parts = ["^"]
           parameters = {} of String => Parameter::Base
 
-          while true
+          while processed_path.size > 0
             param_match = PARAMETER_RE.match(processed_path)
             if param_match.nil?
               regex_parts << processed_path
-              break
+              processed_path = ""
+              next
             end
 
             regex_parts << processed_path[...param_match.begin]

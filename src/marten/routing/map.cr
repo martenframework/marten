@@ -27,7 +27,7 @@ module Marten
         @rules << Rule::Map.new(path, target, name.to_s)
       end
 
-      def resolve(path : String) : Nil | Match
+      def resolve(path : String) : Match
         match = @rules.each do |r|
           matched = r.resolve(path)
           break matched unless matched.nil?

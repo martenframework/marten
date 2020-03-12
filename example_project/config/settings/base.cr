@@ -1,7 +1,7 @@
-Marten.configure do |settings|
-  settings.secret_key = "dummy"
+Marten.configure do
+  secret_key = "dummy"
 
-  settings.installed_apps = [
+  installed_apps = [
     # Marten::Contrib::Admin,
     # ExampleProject,
     # ExampleProject::Apps::Blog,
@@ -10,8 +10,8 @@ Marten.configure do |settings|
     Blog::App,
   ]
 
-  settings.database do |config|
-    config.backend = :sqlite
-    config.name = "development.db"
+  database do
+    backend = :sqlite
+    name = "development.db"
   end
 end

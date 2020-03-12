@@ -20,7 +20,7 @@ module Marten
 
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
-    yield settings
+    with settings yield settings
   end
 
   def self.env

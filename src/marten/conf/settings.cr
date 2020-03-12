@@ -21,7 +21,7 @@ module Marten
 
       def database(id = :default)
         db_config = Database.new
-        yield db_config
+        with db_config yield db_config
       end
     end
   end

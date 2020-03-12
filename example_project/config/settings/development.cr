@@ -1,3 +1,3 @@
-Marten.configure :development do
-  debug = true
+Marten.configure :development do |config|
+  config.debug = true
 end

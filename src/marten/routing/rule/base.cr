@@ -41,7 +41,7 @@ module Marten
               )
             end
 
-            regex_parts << "(?P<#{parameter_name}>#{parameter_handler.class.regex})"
+            regex_parts << "(?P<#{parameter_name}>#{parameter_handler.regex})"
           end
 
           {Regex.new(regex_parts.join("")), parameters}

@@ -1,6 +1,8 @@
 module Marten
   module Routing
     module Parameter
+      DEFAULT_TYPE = "str"
+
       @@registry = {} of ::String => Base
 
       def self.register(id : ::String | Symbol, parameter_klass : Base.class)
@@ -11,7 +13,7 @@ module Marten
         @@registry
       end
 
-      register :string, String
+      register DEFAULT_TYPE, String
     end
   end
 end

@@ -8,11 +8,11 @@ module Marten
           REGEX
         end
 
-        def loads(value : String) : String
+        def loads(value : ::String) : ::String
           value
         end
 
-        def dumps(value : String) : String
+        def dumps(value : ::String) : ::String
           value
         end
       end

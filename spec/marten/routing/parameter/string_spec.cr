@@ -6,6 +6,12 @@ describe Marten::Routing::Parameter::String do
       parameter = Marten::Routing::Parameter::String.new
       parameter.regex.should eq /[^\/]+/
     end
+
+    it "matches valid path strings" do
+      parameter = Marten::Routing::Parameter::String.new
+      parameter.regex.match("hello").should be_truthy
+      parameter.regex.match("this-is-a-string").should be_truthy
+    end
   end
 
   describe "#loads" do

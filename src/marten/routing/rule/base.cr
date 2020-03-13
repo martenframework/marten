@@ -41,6 +41,7 @@ module Marten
               )
             end
 
+            parameters[parameter_name] = parameter_handler
             regex_parts << "(?P<#{parameter_name}>#{parameter_handler.regex})"
           end
 

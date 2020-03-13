@@ -19,11 +19,6 @@ module Marten
             break matched unless matched.nil?
           end
         end
-
-        # private def path_to_regex(path)
-        #   parts = ["^", path]
-        #   Regex.new(parts.join(""))
-        # end
       end
     end
   end

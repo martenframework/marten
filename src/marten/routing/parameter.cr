@@ -17,6 +17,7 @@ module Marten
 
       register DEFAULT_TYPE, String
       register "int", Integer
+      register "slug", Slug
     end
   end
 end

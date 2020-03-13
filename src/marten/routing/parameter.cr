@@ -3,6 +3,8 @@ module Marten
     module Parameter
       DEFAULT_TYPE = "str"
 
+      alias Types = ::String | Int16 | Int32 | Int64
+
       @@registry = {} of ::String => Base
 
       def self.register(id : ::String | Symbol, parameter_klass : Base.class)
@@ -14,6 +16,7 @@ module Marten
       end
 
       register DEFAULT_TYPE, String
+      register "int", Integer
     end
   end
 end

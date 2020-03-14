@@ -13,7 +13,13 @@ module Marten
           match = @regex.match(path)
           return if match.nil?
 
-          Match.new(@view)
+          kwargs = {} of String => Parameter::Types
+          match.named_captures.each do |name, value|
+            param_handler = @parameters[name]
+            kwargs[name] = param_handler.loads(value.to_s)
+          end
+
+          Match.new(@view, kwargs)
         end
 
         private def path_to_regex(_path)

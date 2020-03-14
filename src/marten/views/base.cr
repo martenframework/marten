@@ -5,9 +5,6 @@ module Marten
 
       @@http_method_names : Array(String)?
 
-      private getter request
-      private getter params
-
       def self.http_method_names(*method_names : String | Symbol)
         @@http_method_names = method_names.to_a.map(&.to_s)
       end
@@ -64,6 +61,9 @@ module Marten
         response["Content-Length"] = "0"
         response
       end
+
+      private getter request
+      private getter params
 
       private def handle_http_method_not_allowed
         HTTP::Response::NotAllowed.new(self.class.http_method_names)

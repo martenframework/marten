@@ -31,7 +31,7 @@ describe Marten::Routing::Parameter::Integer do
   describe "#dumps" do
     it "dumps an integer parameter" do
       parameter = Marten::Routing::Parameter::Integer.new
-      parameter.dumps(123456).should eq "123456"
+      parameter.dumps(123_456).should eq "123456"
     end
   end
 end

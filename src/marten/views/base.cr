@@ -5,6 +5,9 @@ module Marten
 
       @@http_method_names : Array(String)?
 
+      private getter request
+      private getter params
+
       def self.http_method_names(*method_names : String | Symbol)
         @@http_method_names = method_names.to_a.map(&.to_s)
       end
@@ -13,45 +16,48 @@ module Marten
         @@http_method_names || HTTP_METHOD_NAMES
       end
 
-      def dispatch(request : HTTP::Request, *args, **kwargs)
+      def initialize(@request : HTTP::Request, @params : Hash(String, Routing::Parameter::Types))
+      end
+
+      def dispatch
         if self.class.http_method_names.includes?(request.method.downcase)
-          call_http_method(request, *args, **kwargs)
+          call_http_method
         else
           handle_http_method_not_allowed
         end
       end
 
-      def get(request, *args, **kwargs)
+      def get
         handle_http_method_not_allowed
       end
 
-      def post(request, *args, **kwargs)
+      def post
         handle_http_method_not_allowed
       end
 
-      def put(request, *args, **kwargs)
+      def put
         handle_http_method_not_allowed
       end
 
-      def patch(request, *args, **kwargs)
+      def patch
         handle_http_method_not_allowed
       end
 
-      def delete(request, *args, **kwargs)
+      def delete
         handle_http_method_not_allowed
       end
 
-      def trace(request, *args, **kwargs)
+      def trace
         handle_http_method_not_allowed
       end
 
-      def head(request, *args, **kwargs)
+      def head
         # By default HEAD requests are delegated to the get handler - which will result in a not
         # allowed response if the latest is not defined.
-        get(request, *args, **kwargs)
+        get
       end
 
-      def options(request, *args, **kwargs)
+      def options
         # Responds to requests for the OPTIONS HTTP verb.
         response = HTTP::Response.new
         response["Allow"] = self.class.http_method_names.map(&.upcase).join(", ")
@@ -63,24 +69,24 @@ module Marten
         HTTP::Response::NotAllowed.new(self.class.http_method_names)
       end
 
-      private def call_http_method(request, *args, **kwargs)
+      private def call_http_method
         case request.method.downcase
         when "get"
-          get(request, *args, **kwargs)
+          get
         when "post"
-          post(request, *args, **kwargs)
+          post
         when "put"
-          put(request, *args, **kwargs)
+          put
         when "patch"
-          patch(request, *args, **kwargs)
+          patch
         when "delete"
-          delete(request, *args, **kwargs)
+          delete
         when "head"
-          head(request, *args, **kwargs)
+          head
         when "options"
-          options(request, *args, **kwargs)
+          options
         when "trace"
-          trace(request, *args, **kwargs)
+          trace
         end
       end
     end

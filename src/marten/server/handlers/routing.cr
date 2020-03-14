@@ -12,8 +12,8 @@ module Marten
         private def process(context)
           matched = Marten.routes.resolve(context.request.path)
 
-          view = matched.view.new
-          context.marten.response = view.dispatch(context.marten.request).as(HTTP::Response)
+          view = matched.view.new(context.marten.request, matched.kwargs)
+          context.marten.response = view.dispatch.as(HTTP::Response)
         end
       end
     end

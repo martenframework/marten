@@ -3,4 +3,7 @@
 /bin/
 /lib/
 /.shards/
+/coverage/
+/run_tests
+*.dwarf
 .icr_*

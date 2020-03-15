@@ -1,6 +1,7 @@
 # Marten - The pragmatic web framework.
 
 require "http"
+require "uuid"
 
 require "./marten/*"
 require "./marten/conf/**"

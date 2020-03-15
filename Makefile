@@ -6,6 +6,18 @@ init:
 	@printf "\n\n${YELLOW}---------------- Done.${RESET}\n\n"
 
 
+# DEVELOPMENT
+# ~~~~~~~~~~~
+# The following rules can be used during development in order to compile things, generate locales,
+# build documentation, etc.
+# --------------------------------------------------------------------------------------------------
+
+.PHONY: docs
+## Builds the documentation.
+docs:
+	crystal docs
+
+
 # QUALITY ASSURANCE
 # ~~~~~~~~~~~~~~~~~
 # The following rules can be used to check code quality and perform sanity checks.

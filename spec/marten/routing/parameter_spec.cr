@@ -3,14 +3,18 @@ require "./spec_helper"
 describe Marten::Routing::Parameter do
   describe "::register" do
     it "allows to register a new path parameter implementation" do
-      Marten::Routing::Parameter.register("foo", FooParameter)
-      Marten::Routing::Parameter.registry["foo"].should be_a FooParameter
+      Marten::Routing::Parameter.register("foo", Marten::Routing::ParameterSpec::FooParameter)
+      Marten::Routing::Parameter.registry["foo"].should(
+        be_a(Marten::Routing::ParameterSpec::FooParameter)
+      )
       Marten::Routing::Parameter.registry.delete("foo")
     end
 
     it "allows to register a new path parameter implementation using a symbol identifier" do
-      Marten::Routing::Parameter.register(:foo, FooParameter)
-      Marten::Routing::Parameter.registry["foo"].should be_a FooParameter
+      Marten::Routing::Parameter.register(:foo, Marten::Routing::ParameterSpec::FooParameter)
+      Marten::Routing::Parameter.registry["foo"].should(
+        be_a(Marten::Routing::ParameterSpec::FooParameter)
+      )
       Marten::Routing::Parameter.registry.delete("foo")
     end
   end
@@ -25,16 +29,22 @@ describe Marten::Routing::Parameter do
   end
 end
 
-class FooParameter < Marten::Routing::Parameter::Base
-  def regex : Regex
-    /.+/
-  end
+module Marten
+  module Routing
+    module ParameterSpec
+      class FooParameter < Marten::Routing::Parameter::Base
+        def regex : Regex
+          /.+/
+        end
 
-  def loads(value : String) : String
-    value
-  end
+        def loads(value : String) : String
+          value
+        end
 
-  def dumps(value : String) : String
-    value
+        def dumps(value : String) : String
+          value
+        end
+      end
+    end
   end
 end

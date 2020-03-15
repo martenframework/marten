@@ -1,6 +1,7 @@
 .ideas/
 .vscode/
 /bin/
+/docs/
 /lib/
 /.shards/
 /coverage/

@@ -5,6 +5,8 @@ module Marten
         @regex : Regex
         @parameters : Hash(String, Parameter::Base)
 
+        getter name
+
         def initialize(@path : String, @view : Marten::Views::Base.class, @name : String | Symbol)
           @regex, @parameters = path_to_regex(@path)
         end

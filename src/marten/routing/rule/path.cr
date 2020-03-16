@@ -7,7 +7,7 @@ module Marten
 
         getter name
 
-        def initialize(@path : String, @view : Marten::Views::Base.class, @name : String | Symbol)
+        def initialize(@path : String, @view : Marten::Views::Base.class, @name : String)
           @regex, @parameters = path_to_regex(@path)
         end
 

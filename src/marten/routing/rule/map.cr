@@ -7,7 +7,7 @@ module Marten
 
         getter name
 
-        def initialize(@path : String, @map : Marten::Routing::Map, @name : String | Symbol)
+        def initialize(@path : String, @map : Marten::Routing::Map, @name : String)
           @regex, @parameters = path_to_regex(@path)
         end
 

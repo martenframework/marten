@@ -33,5 +33,10 @@ describe Marten::Routing::Parameter::Integer do
       parameter = Marten::Routing::Parameter::Integer.new
       parameter.dumps(123_456).should eq "123456"
     end
+
+    it "returns nil if the input is not an integer" do
+      parameter = Marten::Routing::Parameter::Integer.new
+      parameter.dumps({ foo: "bar" }).should be_nil
+    end
   end
 end

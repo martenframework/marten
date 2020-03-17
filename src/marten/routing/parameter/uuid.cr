@@ -12,8 +12,8 @@ module Marten
           ::UUID.new(value)
         end
 
-        def dumps(value : ::UUID) : ::String
-          value.to_s
+        def dumps(value) : Nil | ::String
+          value.as?(::UUID) ? value.to_s : nil
         end
       end
     end

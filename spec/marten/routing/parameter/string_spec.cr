@@ -26,5 +26,10 @@ describe Marten::Routing::Parameter::String do
       parameter = Marten::Routing::Parameter::String.new
       parameter.dumps("my-slug").should eq "my-slug"
     end
+
+    it "returns nil if the input is not a string" do
+      parameter = Marten::Routing::Parameter::String.new
+      parameter.dumps({ foo: "bar" }).should be_nil
+    end
   end
 end

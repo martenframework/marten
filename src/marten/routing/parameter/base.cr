@@ -4,7 +4,7 @@ module Marten
       abstract class Base
         abstract def regex : Regex
         abstract def loads(value : ::String)
-        abstract def dumps(value) : ::String
+        abstract def dumps(value) : Nil | ::String
       end
     end
   end

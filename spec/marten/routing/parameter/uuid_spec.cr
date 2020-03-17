@@ -28,6 +28,11 @@ describe Marten::Routing::Parameter::UUID do
         eq(::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3"))
       )
     end
+
+    it "returns nil if the input is not a UUID" do
+      parameter = Marten::Routing::Parameter::UUID.new
+      parameter.dumps({ foo: "bar" }).should be_nil
+    end
   end
 
   describe "#dumps" do

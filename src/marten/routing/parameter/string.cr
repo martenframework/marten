@@ -12,8 +12,8 @@ module Marten
           value
         end
 
-        def dumps(value : ::String) : ::String
-          value
+        def dumps(value) : Nil | ::String
+          value.as?(::String) ? value.to_s : nil
         end
       end
     end

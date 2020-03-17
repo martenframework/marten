@@ -12,8 +12,8 @@ module Marten
           value.to_i64
         end
 
-        def dumps(value : Int16 | Int32 | Int64) : ::String
-          value.to_s
+        def dumps(value) : Nil | ::String
+          value.as?(Int16 | Int32 | Int64) ? value.to_s : nil
         end
       end
     end

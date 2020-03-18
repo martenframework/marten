@@ -5,7 +5,7 @@ module Marten
         @regex : Regex
         @path_for_interpolation : String
         @parameters : Hash(String, Parameter::Base)
-        @endpoint_reversers : Nil | Array(EndpointReverser)
+        @reversers : Nil | Array(Reverser)
 
         getter name
 
@@ -34,9 +34,9 @@ module Marten
           Match.new(sub_match.view, kwargs.merge(sub_match.kwargs))
         end
 
-        def endpoint_reversers : Array(EndpointReverser)
-          @endpoint_reversers ||= @map.endpoint_reversers.values.map do |reverser|
-            EndpointReverser.new(
+        def reversers : Array(Reverser)
+          @reversers ||= @map.reversers.values.map do |reverser|
+            Reverser.new(
               "#{@name}:#{reverser.name}",
               @path_for_interpolation + reverser.path_for_interpolation,
               @parameters.merge(reverser.parameters)

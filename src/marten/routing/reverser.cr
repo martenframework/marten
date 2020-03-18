@@ -1,6 +1,6 @@
 module Marten
   module Routing
-    class EndpointReverser
+    class Reverser
       getter name
       getter path_for_interpolation
       getter parameters

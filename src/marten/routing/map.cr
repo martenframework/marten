@@ -2,7 +2,7 @@ module Marten
   module Routing
     class Map
       getter rules
-      getter endpoint_reversers
+      getter reversers
 
       def self.draw
         map = new
@@ -12,7 +12,7 @@ module Marten
 
       def initialize(@name : Symbol | String = "")
         @rules = [] of Rule::Base
-        @endpoint_reversers = {} of String => EndpointReverser
+        @reversers = {} of String => Reverser
       end
 
       def draw
@@ -27,8 +27,8 @@ module Marten
         end
 
         @rules << rule
-        rule.endpoint_reversers.each do |reverser|
-          @endpoint_reversers[reverser.name] = reverser
+        rule.reversers.each do |reverser|
+          @reversers[reverser.name] = reverser
         end
       end
 
@@ -46,7 +46,7 @@ module Marten
         reversed = nil
 
         begin
-          reverser = @endpoint_reversers[name]
+          reverser = @reversers[name]
           reversed = reverser.reverse(**kwargs)
         rescue KeyError
           raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")

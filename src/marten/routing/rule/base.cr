@@ -3,7 +3,7 @@ module Marten
     module Rule
       abstract class Base
         abstract def resolve(path : String) : Nil | Match
-        abstract def endpoint_reversers : Array(EndpointReverser)
+        abstract def reversers : Array(Reverser)
 
         private PARAMETER_RE = /<(?P<name>\w+)(?::(?P<type>[^>:]+))?>/
         private PARAMETER_NAME_RE = /^[a-z_][a-zA-Z_0-9]*$/

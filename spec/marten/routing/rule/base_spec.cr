@@ -59,8 +59,8 @@ module Marten::Routing::Rule::BaseSpec
       nil
     end
 
-    def endpoint_reversers : Array(Marten::Routing::EndpointReverser)
-      [] of Marten::Routing::EndpointReverser
+    def reversers : Array(Marten::Routing::Reverser)
+      [] of Marten::Routing::Reverser
     end
   end
 end

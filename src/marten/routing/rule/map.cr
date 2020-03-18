@@ -3,12 +3,14 @@ module Marten
     module Rule
       class Map < Base
         @regex : Regex
+        @path_for_interpolation : String
         @parameters : Hash(String, Parameter::Base)
+        @endpoint_reversers : Nil | Array(EndpointReverser)
 
         getter name
 
         def initialize(@path : String, @map : Marten::Routing::Map, @name : String)
-          @regex, @parameters = path_to_regex(@path)
+          @regex, @path_for_interpolation, @parameters = path_to_regex(@path)
         end
 
         def resolve(path : String) : Nil | Match
@@ -30,6 +32,16 @@ module Marten
           return if sub_match.nil?
 
           Match.new(sub_match.view, kwargs.merge(sub_match.kwargs))
+        end
+
+        def endpoint_reversers : Array(EndpointReverser)
+          @endpoint_reversers ||= @map.endpoint_reversers.values.map do |reverser|
+            EndpointReverser.new(
+              "#{@name}:#{reverser.name}",
+              @path_for_interpolation + reverser.path_for_interpolation,
+              @parameters.merge(reverser.parameters)
+            )
+          end
         end
       end
     end

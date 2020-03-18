@@ -3,6 +3,7 @@ module Marten
     module Rule
       abstract class Base
         abstract def resolve(path : String) : Nil | Match
+        abstract def endpoint_reversers : Array(EndpointReverser)
 
         private PARAMETER_RE = /<(?P<name>\w+)(?::(?P<type>[^>:]+))?>/
         private PARAMETER_NAME_RE = /^[a-z_][a-zA-Z_0-9]*$/
@@ -10,17 +11,20 @@ module Marten
         private def path_to_regex(path : String)
           processed_path = path.dup
           regex_parts = ["^"]
+          path_for_interpolation = ""
           parameters = {} of String => Parameter::Base
 
           while processed_path.size > 0
             param_match = PARAMETER_RE.match(processed_path)
             if param_match.nil?
               regex_parts << processed_path
+              path_for_interpolation += processed_path
               processed_path = ""
               next
             end
 
             regex_parts << processed_path[...param_match.begin]
+            path_for_interpolation += processed_path[...param_match.begin]
             processed_path = processed_path[param_match.end..]
             parameter_name = param_match["name"]
 
@@ -43,9 +47,10 @@ module Marten
 
             parameters[parameter_name] = parameter_handler
             regex_parts << "(?P<#{parameter_name}>#{parameter_handler.regex})"
+            path_for_interpolation += "%{#{parameter_name}}"
           end
 
-          {Regex.new(regex_parts.join("")), parameters}
+          {Regex.new(regex_parts.join("")), path_for_interpolation, parameters}
         end
       end
     end

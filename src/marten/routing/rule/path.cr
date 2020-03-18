@@ -3,12 +3,14 @@ module Marten
     module Rule
       class Path < Base
         @regex : Regex
+        @path_for_interpolation : String
         @parameters : Hash(String, Parameter::Base)
+        @endpoint_reversers : Nil | Array(EndpointReverser)
 
         getter name
 
         def initialize(@path : String, @view : Marten::Views::Base.class, @name : String)
-          @regex, @parameters = path_to_regex(@path)
+          @regex, @path_for_interpolation, @parameters = path_to_regex(@path)
         end
 
         def resolve(path : String) : Nil | Match
@@ -24,9 +26,15 @@ module Marten
           Match.new(@view, kwargs)
         end
 
+        def endpoint_reversers : Array(EndpointReverser)
+          @endpoint_reversers ||= [
+            EndpointReverser.new(@name, @path_for_interpolation, @parameters),
+          ]
+        end
+
         private def path_to_regex(_path)
-          regex, parameters = super
-          { Regex.new("#{regex.source}$"), parameters }
+          regex, path_for_interpolation, parameters = super
+          { Regex.new("#{regex.source}$"), path_for_interpolation, parameters }
         end
       end
     end

@@ -26,6 +26,12 @@ module Marten
       # maps). Each <path, target> pair must be given a name that will be used to uniquely identify
       # the route.
       def path(path : String, target : Marten::Views::Base.class | Map, name : String | Symbol)
+        unless RULE_NAME_RE.match(name)
+          raise Errors::InvalidRuleName.new(
+            "A rule name can only contain letters, numbers, dashes or underscores"
+          )
+        end
+
         if target.is_a?(Marten::Views::Base.class)
           rule = Rule::Path.new(path, target, name.to_s)
         else  # Nested routes map
@@ -33,6 +39,9 @@ module Marten
         end
 
         @rules << rule
+
+        # Inserts the reversers associated with the newly added rule to the local list of reversers
+        # in order to ease later reverse operations.
         rule.reversers.each do |reverser|
           @reversers[reverser.name] = reverser
         end
@@ -75,6 +84,8 @@ module Marten
 
         reversed
       end
+
+      private RULE_NAME_RE = /^[a-zA-Z_0-9]+$/
     end
   end
 end

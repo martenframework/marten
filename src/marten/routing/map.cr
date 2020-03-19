@@ -10,7 +10,7 @@ module Marten
         map
       end
 
-      def initialize(@name : Symbol | String = "")
+      def initialize
         @rules = [] of Rule::Base
         @reversers = {} of String => Reverser
       end

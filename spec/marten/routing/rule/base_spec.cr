@@ -62,5 +62,9 @@ module Marten::Routing::Rule::BaseSpec
     def reversers : Array(Marten::Routing::Reverser)
       [] of Marten::Routing::Reverser
     end
+
+    def name : String
+      "test"
+    end
   end
 end

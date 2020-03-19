@@ -2,6 +2,7 @@ module Marten
   module Routing
     module Rule
       abstract class Base
+        abstract def name
         abstract def resolve(path : String) : Nil | Match
         abstract def reversers : Array(Reverser)
 

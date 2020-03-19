@@ -32,6 +32,10 @@ module Marten
           )
         end
 
+        unless @rules.find { |r| r.name == name }.nil?
+          raise Errors::InvalidRuleName.new("A '#{name}' route already exists")
+        end
+
         if target.is_a?(Marten::Views::Base.class)
           rule = Rule::Path.new(path, target, name.to_s)
         else  # Nested routes map

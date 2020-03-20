@@ -7,6 +7,10 @@ module Marten
       def method
         @request.method
       end
+
+      def path
+        @request.path
+      end
     end
   end
 end

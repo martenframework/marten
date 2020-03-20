@@ -18,4 +18,13 @@ describe Marten::HTTP::Request do
       request.method.should eq "GET"
     end
   end
+
+  describe "#path" do
+    it "retursn the request path" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+      )
+      request.path.should eq "/test/xyz"
+    end
+  end
 end

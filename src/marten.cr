@@ -1,5 +1,6 @@
 # Marten - The pragmatic web framework.
 
+require "logger"
 require "http"
 require "uuid"
 
@@ -15,7 +16,12 @@ module Marten
   @@routes : Routing::Map?
   @@settings : Conf::Settings?
 
+  def self.setup
+    settings.setup
+  end
+
   def self.start
+    setup
     Marten::Server.run
   end
 
@@ -26,6 +32,10 @@ module Marten
 
   def self.env
     @@env ||= Conf::Env.new
+  end
+
+  def self.logger
+    settings.logger
   end
 
   def self.settings

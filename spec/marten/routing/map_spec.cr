@@ -23,5 +23,22 @@ describe Marten::Routing::Match do
         map.path("/bis", Marten::Views::Base, name: "home")
       end
     end
+
+    it "raises if the inserted rule is a path that contains duplicated parameter names" do
+      map = Marten::Routing::Map.new
+      expect_raises(Marten::Routing::Errors::InvalidRulePath) do
+        map.path("/path/xyz/<id:int>/test<id:slug>/bad", Marten::Views::Base, name: "home")
+      end
+    end
+
+    it "raises if the inserted rule is a map that contains duplicated parameter names" do
+      map = Marten::Routing::Map.new
+      expect_raises(Marten::Routing::Errors::InvalidRulePath) do
+        sub_map = Marten::Routing::Map.draw do
+          path("/bad/<id:int>/foobar", Marten::Views::Base, name: "home")
+        end
+        map.path("/path/xyz/<id:int>", sub_map, name: "included")
+      end
+    end
   end
 end

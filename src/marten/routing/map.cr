@@ -45,8 +45,15 @@ module Marten
         @rules << rule
 
         # Inserts the reversers associated with the newly added rule to the local list of reversers
-        # in order to ease later reverse operations.
+        # in order to ease later reverse operations. No paths with duplicated params are allowed.
         rule.reversers.each do |reverser|
+          if path_with_duplicated_parameters?(reverser.path_for_interpolation)
+            raise Errors::InvalidRulePath.new(
+              "The '#{reverser.name}' route contains duplicated parameters: " \
+              "#{reverser.path_for_interpolation}"
+            )
+          end
+
           @reversers[reverser.name] = reverser
         end
       end
@@ -90,6 +97,13 @@ module Marten
       end
 
       private RULE_NAME_RE = /^[a-zA-Z_0-9]+$/
+      private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
+
+      private def path_with_duplicated_parameters?(path_for_interpolation)
+        matches = path_for_interpolation.scan(INTERPOLATION_PARAMETER_RE)
+        parameter_names = matches.reduce([] of String) { |acc, match| acc + match.captures }
+        parameter_names.size != parameter_names.uniq.size
+      end
     end
   end
 end

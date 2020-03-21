@@ -16,7 +16,7 @@ module Marten
 
   @@env : Conf::Env?
   @@routes : Routing::Map?
-  @@settings : Conf::Settings?
+  @@settings : Conf::GlobalSettings?
 
   def self.setup
     settings.setup
@@ -29,7 +29,7 @@ module Marten
 
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
-    with settings yield settings
+    yield settings
   end
 
   def self.env
@@ -41,7 +41,7 @@ module Marten
   end
 
   def self.settings
-    @@settings ||= Conf::Settings.new
+    @@settings ||= Conf::GlobalSettings.new
   end
 
   def self.routes

@@ -14,4 +14,6 @@ Marten.configure do |config|
     db.backend = :sqlite
     db.name = "development.db"
   end
+
+  config.blog.foo = "bar"
 end

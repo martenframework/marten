@@ -10,7 +10,10 @@ module Marten
           Handlers::Response.new,
         ]
       )
-      server.bind_tcp("0.0.0.0", 8000)
+
+      server.bind_tcp(Marten.settings.host, Marten.settings.port, Marten.settings.port_reuse)
+      # TODO: add support for TLS.
+
       server.listen
     end
   end

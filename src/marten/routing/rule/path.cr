@@ -26,7 +26,7 @@ module Marten
           Match.new(@view, kwargs)
         end
 
-        def reversers : Array(Reverser)
+        protected def reversers : Array(Reverser)
           @reversers ||= [Reverser.new(@name, @path_for_interpolation, @parameters)]
         end
 

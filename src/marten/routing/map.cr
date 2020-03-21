@@ -2,7 +2,6 @@ module Marten
   module Routing
     class Map
       getter rules
-      getter reversers
 
       def self.draw
         map = new
@@ -95,6 +94,8 @@ module Marten
 
         reversed
       end
+
+      protected getter reversers
 
       private RULE_NAME_RE = /^[a-zA-Z_0-9]+$/
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/

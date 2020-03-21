@@ -34,7 +34,7 @@ module Marten
           Match.new(sub_match.view, kwargs.merge(sub_match.kwargs))
         end
 
-        def reversers : Array(Reverser)
+        protected def reversers : Array(Reverser)
           @reversers ||= @map.reversers.values.map do |reverser|
             Reverser.new(
               "#{@name}:#{reverser.name}",

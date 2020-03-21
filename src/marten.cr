@@ -12,6 +12,8 @@ require "./marten/server/**"
 require "./marten/views/**"
 
 module Marten
+  VERSION = "0.1.0.dev0"
+
   @@env : Conf::Env?
   @@routes : Routing::Map?
   @@settings : Conf::Settings?

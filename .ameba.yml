@@ -1,6 +1,6 @@
 Layout/LineLength:
   Enabled: true
-  MaxLength: 100
+  MaxLength: 120
 
 Layout/TrailingBlankLines:
   Enabled: true

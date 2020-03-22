@@ -49,8 +49,8 @@ module Marten
       end
 
       def head
-        # By default HEAD requests are delegated to the get handler - which will result in a not
-        # allowed response if the latest is not defined.
+        # By default HEAD requests are delegated to the get handler - which will result in a not allowed response if the
+        # latest is not defined.
         get
       end
 

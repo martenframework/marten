@@ -31,8 +31,7 @@ module Marten
 
             unless PARAMETER_NAME_RE.match(parameter_name)
               raise Errors::InvalidParameterName.new(
-                %(Route "#{path}" contains parameter name "#{parameter_name}" which isn't a ) \
-                %(valid Crystal variable name)
+                %(Route "#{path}" contains parameter name "#{parameter_name}" which isn't a valid Crystal variable name)
               )
             end
 
@@ -41,8 +40,7 @@ module Marten
               parameter_handler = Parameter.registry[parameter_type]
             rescue KeyError
               raise Errors::UnknownParameterType.new(
-                %(Route "#{path}" contains parameter type "#{parameter_type}" which isn't a ) \
-                %(valid route parameter type)
+                %(Route "#{path}" contains parameter type "#{parameter_type}" which isn't a valid route parameter type)
               )
             end
 

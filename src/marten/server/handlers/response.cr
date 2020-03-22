@@ -1,8 +1,11 @@
+require "./concerns/view_response_converter"
+
 module Marten
   module Server
     module Handlers
       class Response
         include ::HTTP::Handler
+        include ViewResponseConverter
 
         def call(context : ::HTTP::Server::Context)
           process(context)
@@ -12,10 +15,7 @@ module Marten
           response = context.marten.response
           return context if response.nil?
 
-          context.response.status_code = response.status
-          context.response.headers.merge!(response.headers)
-          context.response.content_type = response.content_type.to_s
-          context.response.print(response.content)
+          convert_view_response(context, response)
 
           context
         end

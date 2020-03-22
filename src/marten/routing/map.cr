@@ -23,7 +23,7 @@ module Marten
       # The target associated with the considered path must be either a view (subclass of `Marten::Views::Base`) or
       # another `Marten::Routing::Map` instance (in case of nested routes maps). Each <path, target> pair must be given
       # a name that will be used to uniquely identify the route.
-      def path(path : String, target : Marten::Views::Base.class | Map, name : String | Symbol)
+      def path(path : String, target : Marten::Views::Base.class | Map, name : String | Symbol) : Nil
         unless RULE_NAME_RE.match(name)
           raise Errors::InvalidRuleName.new(
             "A rule name can only contain letters, numbers, dashes or underscores"

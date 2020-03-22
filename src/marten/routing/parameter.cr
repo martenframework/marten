@@ -17,6 +17,7 @@ module Marten
 
       register DEFAULT_TYPE, String
       register "int", Integer
+      register "path", Path
       register "slug", Slug
       register "uuid", UUID
     end

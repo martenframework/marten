@@ -16,6 +16,10 @@ module Marten
       def initialize(@request : HTTP::Request, @params : Hash(String, Routing::Parameter::Types))
       end
 
+      def initialize(@request : HTTP::Request)
+        @params = {} of String => Routing::Parameter::Types
+      end
+
       def dispatch
         if self.class.http_method_names.includes?(request.method.downcase)
           call_http_method

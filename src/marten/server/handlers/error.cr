@@ -10,8 +10,8 @@ module Marten
         def call(context : ::HTTP::Server::Context)
           call_next(context)
         rescue Marten::Routing::Errors::NoResolveMatch
-          context.response.status_code = 404
-          context.response.print("The requested resource was not found.")
+          view = Views::Defaults::PageNotFound.new(context.marten.request)
+          convert_view_response(context, view.dispatch)
         rescue e : Exception
           Marten.logger.error("Internal Server Error: #{context.request.path}\n#{e.inspect_with_backtrace}")
           view = Views::Defaults::ServerError.new(context.marten.request)

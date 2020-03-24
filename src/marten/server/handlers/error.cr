@@ -10,12 +10,12 @@ module Marten
         def call(context : ::HTTP::Server::Context)
           call_next(context)
         rescue Marten::Routing::Errors::NoResolveMatch
-          view = Views::Defaults::PageNotFound.new(context.marten.request)
-          convert_view_response(context, view.dispatch)
+          view = Marten.settings.view404.new(context.marten.request)
+          convert_view_response(context, view.dispatch.as(HTTP::Response))
         rescue e : Exception
           Marten.logger.error("Internal Server Error: #{context.request.path}\n#{e.inspect_with_backtrace}")
-          view = Views::Defaults::ServerError.new(context.marten.request)
-          convert_view_response(context, view.dispatch)
+          view = Marten.settings.view500.new(context.marten.request)
+          convert_view_response(context, view.dispatch.as(HTTP::Response))
         end
       end
     end

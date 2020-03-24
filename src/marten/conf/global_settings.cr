@@ -1,7 +1,11 @@
 module Marten
   module Conf
+    # Defines the global settings of a Marten web application.
     class GlobalSettings
       class UnknownSettingsNamespace < Exception; end
+
+      @view404 : Views::Base.class
+      @view500 : Views::Base.class
 
       getter databases
       getter debug
@@ -10,12 +14,16 @@ module Marten
       getter port
       getter port_reuse
       getter secret_key
+      getter view404
+      getter view500
 
       setter debug
       setter host
       setter port
       setter port_reuse
       setter secret_key
+      setter view404
+      setter view500
 
       def initialize
         @debug = false
@@ -25,6 +33,8 @@ module Marten
         @port = 8000
         @port_reuse = true
         @secret_key = ""
+        @view404 = Views::Defaults::PageNotFound
+        @view500 = Views::Defaults::ServerError
       end
 
       def database(id = :default)

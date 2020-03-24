@@ -3,7 +3,7 @@ module Marten
     module Defaults
       class ServerError < Base
         def dispatch
-          HTTP::Response::ServerError.new(content: "Internal Server Error")
+          HTTP::Response::ServerError.new(content: "Internal Server Error", content_type: "text/plain")
         end
       end
     end

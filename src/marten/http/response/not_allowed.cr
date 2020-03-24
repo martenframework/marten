@@ -5,7 +5,7 @@ module Marten
         def initialize(
           allowed_methods : Array(String),
           content : String = "",
-          content_type : String = "text/html"
+          content_type : String = DEFAULT_CONTENT_TYPE
         )
           super(content: content, content_type: content_type, status: 405)
           self["Allow"] = allowed_methods.map(&.upcase).join(", ")

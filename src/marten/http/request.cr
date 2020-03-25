@@ -8,6 +8,11 @@ module Marten
       def initialize(@request : ::HTTP::Request)
       end
 
+      # Returns the raw body of the request as a string.
+      def body : String
+        @body ||= @request.body.nil? ? "" : @request.body.as(IO).gets_to_end
+      end
+
       # Returns a string representation of HTTP method that was used in the request.
       #
       # The returned method name (eg. "GET" or "POST") is completely uppercase.

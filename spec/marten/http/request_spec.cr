@@ -10,6 +10,22 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#body" do
+    it "returns the request body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "/test/xyz", body: "foo=bar")
+      )
+      request.body.should eq "foo=bar"
+    end
+
+    it "returns an empty string if the request has no body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+      )
+      request.body.should eq ""
+    end
+  end
+
   describe "#method" do
     it "returns the request method" do
       request = Marten::HTTP::Request.new(
@@ -20,7 +36,7 @@ describe Marten::HTTP::Request do
   end
 
   describe "#path" do
-    it "retursn the request path" do
+    it "returns the request path" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
       )

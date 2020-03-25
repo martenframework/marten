@@ -13,7 +13,7 @@ module Marten
         @content_type : String = DEFAULT_CONTENT_TYPE,
         @status : Int32 = 200
       )
-        @headers = {} of String => String
+        @headers = ::HTTP::Headers.new
       end
 
       def []=(header : String | Symbol, value : Int32 | String | Symbol)

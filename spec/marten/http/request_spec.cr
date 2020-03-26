@@ -26,6 +26,16 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#headers" do
+    it "returns the request headers" do
+      headers = ::HTTP::Headers{"Content-Type" => "application/json"}
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "/test/xyz", headers: headers)
+      )
+      request.headers.should eq headers
+    end
+  end
+
   describe "#method" do
     it "returns the request method" do
       request = Marten::HTTP::Request.new(

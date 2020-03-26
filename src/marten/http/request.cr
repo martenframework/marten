@@ -13,6 +13,11 @@ module Marten
         @body ||= @request.body.nil? ? "" : @request.body.as(IO).gets_to_end
       end
 
+      # Returns the HTTP headers embedded in the request.
+      def headers : ::HTTP::Headers
+        @request.headers
+      end
+
       # Returns a string representation of HTTP method that was used in the request.
       #
       # The returned method name (eg. "GET" or "POST") is completely uppercase.

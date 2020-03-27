@@ -31,6 +31,10 @@ module Marten
       def path : String
         @request.path
       end
+
+      def query_params
+        QueryParams.new(@request.query_params)
+      end
     end
   end
 end

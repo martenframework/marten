@@ -14,7 +14,7 @@ module Marten
       end
 
       # Returns the path including the GET parameters if applicable.
-      def full_path
+      def full_path : String
         @full_path ||= (path + (query_params.empty? ? "" : "?#{query_params}")).as(String)
       end
 

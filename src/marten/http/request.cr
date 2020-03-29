@@ -32,6 +32,7 @@ module Marten
         @request.path
       end
 
+      # Returns the HTTP GET parameters embedded in the request.
       def query_params : QueryParams
         @query_parans ||= QueryParams.new(@request.query_params)
       end

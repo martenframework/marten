@@ -4,8 +4,12 @@ module Marten
       class ImmutableStateError < Exception; end
 
       def initialize(@query : ::HTTP::Params, @mutable = false)
-        # TODO: raise if the number of query parameters is greater than a given setting
-        # eg. request_data_max_number_fields
+        if !Marten.settings.request_max_parameters &&
+          @query.size > Marten.settings.request_max_parameters.as(Int32)
+          raise Errors::TooManyParametersReceived.new(
+            "The number of GET/POST parameters that were received is too large"
+          )
+        end
       end
 
       # Returns the first value associated with the passed parameter name.
@@ -43,7 +47,9 @@ module Marten
 
       # Sets all the values associated with a specific parameter name.
       def set_all(name : String | Symbol, values)
-        @query.set_all(name.to_s, values)
+        with_ensured_mutability do
+          @query.set_all(name.to_s, values)
+        end
       end
 
       # Returns the number of parameters.

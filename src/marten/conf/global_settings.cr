@@ -4,6 +4,7 @@ module Marten
     class GlobalSettings
       class UnknownSettingsNamespace < Exception; end
 
+      @request_max_parameters : Nil | Int32
       @view404 : Views::Base.class
       @view500 : Views::Base.class
 
@@ -13,6 +14,7 @@ module Marten
       getter logger
       getter port
       getter port_reuse
+      getter request_max_parameters
       getter secret_key
       getter view404
       getter view500
@@ -21,6 +23,7 @@ module Marten
       setter host
       setter port
       setter port_reuse
+      setter request_max_parameters
       setter secret_key
       setter view404
       setter view500
@@ -32,6 +35,7 @@ module Marten
         @logger = Logger.new(STDOUT)
         @port = 8000
         @port_reuse = true
+        @request_max_parameters = 1000
         @secret_key = ""
         @view404 = Views::Defaults::PageNotFound
         @view500 = Views::Defaults::ServerError

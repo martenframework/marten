@@ -49,6 +49,12 @@ module Marten
       # Returns the number of parameters.
       delegate size, to: @query
 
+      # Returns `true` if no parameters are present.
+      delegate empty?, to: @query
+
+      # Returns the serialized version of the parameters.
+      delegate to_s, to: @query
+
       private def mutable?
         @mutable
       end

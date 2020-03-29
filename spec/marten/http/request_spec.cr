@@ -32,7 +32,9 @@ describe Marten::HTTP::Request do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(method: "GET", resource: "/test/xyz", headers: headers)
       )
-      request.headers.should eq headers
+      request.headers.should be_a Marten::HTTP::Headers
+      request.headers.size.should eq 1
+      request.headers["Content-Type"].should eq "application/json"
     end
   end
 

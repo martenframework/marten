@@ -13,6 +13,11 @@ module Marten
         @body ||= @request.body.nil? ? "" : @request.body.as(IO).gets_to_end
       end
 
+      # Returns the path including the GET parameters if applicable.
+      def full_path
+        @full_path ||= (path + (query_params.empty? ? "" : "?#{query_params}")).as(String)
+      end
+
       # Returns the HTTP headers embedded in the request.
       def headers : Headers
         @headers ||= Headers.new(@request.headers)

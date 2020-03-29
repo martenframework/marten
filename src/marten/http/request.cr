@@ -14,8 +14,8 @@ module Marten
       end
 
       # Returns the HTTP headers embedded in the request.
-      def headers : ::HTTP::Headers
-        @request.headers
+      def headers : Headers
+        @headers ||= Headers.new(@request.headers)
       end
 
       # Returns a string representation of HTTP method that was used in the request.
@@ -32,8 +32,8 @@ module Marten
         @request.path
       end
 
-      def query_params
-        QueryParams.new(@request.query_params)
+      def query_params : QueryParams
+        @query_parans ||= QueryParams.new(@request.query_params)
       end
     end
   end

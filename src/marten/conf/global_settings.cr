@@ -8,6 +8,7 @@ module Marten
       @view404 : Views::Base.class
       @view500 : Views::Base.class
 
+      getter allowed_hosts
       getter databases
       getter debug
       getter host
@@ -16,19 +17,23 @@ module Marten
       getter port_reuse
       getter request_max_parameters
       getter secret_key
+      getter use_x_forwarded_host
       getter view404
       getter view500
 
+      setter allowed_hosts
       setter debug
       setter host
       setter port
       setter port_reuse
       setter request_max_parameters
       setter secret_key
+      setter use_x_forwarded_host
       setter view404
       setter view500
 
       def initialize
+        @allowed_hosts = [] of String
         @debug = false
         @host = "localhost"
         @installed_apps = Array(Marten::App.class).new
@@ -37,6 +42,7 @@ module Marten
         @port_reuse = true
         @request_max_parameters = 1000
         @secret_key = ""
+        @use_x_forwarded_host = false
         @view404 = Views::Defaults::PageNotFound
         @view500 = Views::Defaults::ServerError
       end

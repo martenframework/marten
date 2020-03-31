@@ -1,26 +1,218 @@
 require "./spec_helper"
 
 describe Marten::HTTP::Request do
+  before_each do
+    Marten.settings.allowed_hosts = ["example.com"]
+  end
+
+  after_each do
+    Marten.settings.allowed_hosts = [] of String
+    Marten.settings.debug = false
+    Marten.settings.use_x_forwarded_host = false
+  end
+
   describe "::new" do
     it "allows to initialize a request by specifying a standard HTTP::Request object" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.nil?.should be_false
+    end
+
+    it "raises UnexpectedHost if no host is specified in the headers" do
+      expect_raises(Marten::HTTP::Errors::UnexpectedHost) do
+        Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: ""))
+      end
+    end
+
+    it "raises UnexpectedHost if the Host header value does not match one of the allowed hosts" do
+      expect_raises(Marten::HTTP::Errors::UnexpectedHost) do
+        Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "foobar.com"}
+          )
+        )
+      end
+    end
+
+    it "raises UnexpectedHost if the X-Forwarded-Host header matches allowed hosts but the behaviour is disabled" do
+      expect_raises(Marten::HTTP::Errors::UnexpectedHost) do
+        Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"X-Forwarded-Host" => "example.com"}
+          )
+        )
+      end
+    end
+
+    it "raises UnexpectedHost if the X-Forwarded-Host header don't match allowed hosts and the behaviour is enabled" do
+      Marten.settings.use_x_forwarded_host = true
+      expect_raises(Marten::HTTP::Errors::UnexpectedHost) do
+        Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"X-Forwarded-Host" => "foobar.com"}
+          )
+        )
+      end
+    end
+
+    it "does not raise if the X-Forwarded-Host header matches allowed hosts and the behaviour is enabled" do
+      Marten.settings.use_x_forwarded_host = true
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"X-Forwarded-Host" => "example.com"}
+        )
+      )
+      request.host.should eq "example.com"
+    end
+
+    it "is able to process hosts containing ports" do
+      Marten.settings.allowed_hosts = ["example.com", "127.0.0.1"]
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "example.com:8080"})
+      )
+      request_1.host.should eq "example.com:8080"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "127.0.0.1:8000"})
+      )
+      request_2.host.should eq "127.0.0.1:8000"
+    end
+
+    it "allows hosts that correspond to subdomains of configured wildcard domains" do
+      Marten.settings.allowed_hosts = [".example.com"]
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "foo.example.com"})
+      )
+      request_1.host.should eq "foo.example.com"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "bar.xyz.example.com:8080"})
+      )
+      request_2.host.should eq "bar.xyz.example.com:8080"
+
+      request_3 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "example.com"})
+      )
+      request_3.host.should eq "example.com"
+    end
+
+    it "allows all hosts if a match all hosts is configured" do
+      Marten.settings.allowed_hosts = ["*"]
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "foo.example.com"})
+      )
+      request_1.host.should eq "foo.example.com"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "dummy.com"})
+      )
+      request_2.host.should eq "dummy.com"
+    end
+
+    it "allows IPv4 addresses as hosts if configured" do
+      Marten.settings.allowed_hosts = ["192.168.12.46"]
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "192.168.12.46"})
+      )
+      request_1.host.should eq "192.168.12.46"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "192.168.12.46:8000"})
+      )
+      request_2.host.should eq "192.168.12.46:8000"
+    end
+
+    it "allows IPv6 addresses as hosts if configured" do
+      Marten.settings.allowed_hosts = ["[fedc:ba98:7654:3210:fedc:ba98:7654:3210]"]
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "[fedc:ba98:7654:3210:fedc:ba98:7654:3210]"}
+        )
+      )
+      request_1.host.should eq "[fedc:ba98:7654:3210:fedc:ba98:7654:3210]"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "[fedc:ba98:7654:3210:fedc:ba98:7654:3210]:8000"}
+        )
+      )
+      request_2.host.should eq "[fedc:ba98:7654:3210:fedc:ba98:7654:3210]:8000"
+    end
+
+    it "allows hosts that end with a '.'" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com."}
+        )
+      )
+      request.host.should eq "example.com."
+    end
+
+    it "allows local addresses by default if none is configured in debug mode" do
+      Marten.settings.allowed_hosts = [] of String
+      Marten.settings.debug = true
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "127.0.0.1:8000"})
+      )
+      request_1.host.should eq "127.0.0.1:8000"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "localhost:8000"})
+      )
+      request_2.host.should eq "localhost:8000"
+
+      request_3 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "[::1]:8000"})
+      )
+      request_3.host.should eq "[::1]:8000"
     end
   end
 
   describe "#body" do
     it "returns the request body" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz", body: "foo=bar")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.body.should eq "foo=bar"
     end
 
     it "returns an empty string if the request has no body" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.body.should eq ""
     end
@@ -29,14 +221,22 @@ describe Marten::HTTP::Request do
   describe "#full_path" do
     it "returns the request full path when query params are present" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz?foo=bar&xyz=test&foo=baz")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.full_path.should eq "/test/xyz?foo=bar&foo=baz&xyz=test"
     end
 
     it "returns the request full path when query params are not present" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.full_path.should eq "/test/xyz"
     end
@@ -44,20 +244,38 @@ describe Marten::HTTP::Request do
 
   describe "#headers" do
     it "returns the request headers" do
-      headers = ::HTTP::Headers{"Content-Type" => "application/json"}
+      headers = ::HTTP::Headers{"Content-Type" => "application/json", "Host" => "example.com"}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(method: "GET", resource: "/test/xyz", headers: headers)
       )
       request.headers.should be_a Marten::HTTP::Headers
-      request.headers.size.should eq 1
+      request.headers.size.should eq 2
       request.headers["Content-Type"].should eq "application/json"
+      request.headers["Host"].should eq "example.com"
+    end
+  end
+
+  describe "#host" do
+    it "returns the request host" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.host.should eq "example.com"
     end
   end
 
   describe "#method" do
     it "returns the request method" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.method.should eq "GET"
     end
@@ -66,7 +284,11 @@ describe Marten::HTTP::Request do
   describe "#path" do
     it "returns the request path" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.path.should eq "/test/xyz"
     end
@@ -75,7 +297,11 @@ describe Marten::HTTP::Request do
   describe "#query_params" do
     it "returns the request query parameters" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz?foo=bar&xyz=test&foo=baz")
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
       )
       request.query_params.should be_a Marten::HTTP::QueryParams
       request.query_params.size.should eq 3

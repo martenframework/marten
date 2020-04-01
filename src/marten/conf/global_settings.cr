@@ -5,6 +5,7 @@ module Marten
       class UnknownSettingsNamespace < Exception; end
 
       @request_max_parameters : Nil | Int32
+      @view400 : Views::Base.class
       @view404 : Views::Base.class
       @view500 : Views::Base.class
 
@@ -18,6 +19,7 @@ module Marten
       getter request_max_parameters
       getter secret_key
       getter use_x_forwarded_host
+      getter view400
       getter view404
       getter view500
 
@@ -29,6 +31,7 @@ module Marten
       setter request_max_parameters
       setter secret_key
       setter use_x_forwarded_host
+      setter view400
       setter view404
       setter view500
 
@@ -43,6 +46,7 @@ module Marten
         @request_max_parameters = 1000
         @secret_key = ""
         @use_x_forwarded_host = false
+        @view400 = Views::Defaults::BadRequest
         @view404 = Views::Defaults::PageNotFound
         @view500 = Views::Defaults::ServerError
       end

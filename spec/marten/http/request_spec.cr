@@ -22,10 +22,85 @@ describe Marten::HTTP::Request do
       )
       request.nil?.should be_false
     end
+  end
+
+  describe "#body" do
+    it "returns the request body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.body.should eq "foo=bar"
+    end
+
+    it "returns an empty string if the request has no body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.body.should eq ""
+    end
+  end
+
+  describe "#full_path" do
+    it "returns the request full path when query params are present" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.full_path.should eq "/test/xyz?foo=bar&foo=baz&xyz=test"
+    end
+
+    it "returns the request full path when query params are not present" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.full_path.should eq "/test/xyz"
+    end
+  end
+
+  describe "#headers" do
+    it "returns the request headers" do
+      headers = ::HTTP::Headers{"Content-Type" => "application/json", "Host" => "example.com"}
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "GET", resource: "/test/xyz", headers: headers)
+      )
+      request.headers.should be_a Marten::HTTP::Headers
+      request.headers.size.should eq 2
+      request.headers["Content-Type"].should eq "application/json"
+      request.headers["Host"].should eq "example.com"
+    end
+  end
+
+  describe "#host" do
+    it "returns the request host" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.host.should eq "example.com"
+    end
 
     it "raises UnexpectedHost if no host is specified in the headers" do
       expect_raises(Marten::HTTP::Errors::UnexpectedHost) do
-        Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: ""))
+        Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "")).host
       end
     end
 
@@ -37,7 +112,7 @@ describe Marten::HTTP::Request do
             resource: "",
             headers: HTTP::Headers{"Host" => "foobar.com"}
           )
-        )
+        ).host
       end
     end
 
@@ -49,7 +124,7 @@ describe Marten::HTTP::Request do
             resource: "",
             headers: HTTP::Headers{"X-Forwarded-Host" => "example.com"}
           )
-        )
+        ).host
       end
     end
 
@@ -62,7 +137,7 @@ describe Marten::HTTP::Request do
             resource: "",
             headers: HTTP::Headers{"X-Forwarded-Host" => "foobar.com"}
           )
-        )
+        ).host
       end
     end
 
@@ -190,81 +265,6 @@ describe Marten::HTTP::Request do
         ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "[::1]:8000"})
       )
       request_3.host.should eq "[::1]:8000"
-    end
-  end
-
-  describe "#body" do
-    it "returns the request body" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz",
-          body: "foo=bar",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      request.body.should eq "foo=bar"
-    end
-
-    it "returns an empty string if the request has no body" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      request.body.should eq ""
-    end
-  end
-
-  describe "#full_path" do
-    it "returns the request full path when query params are present" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      request.full_path.should eq "/test/xyz?foo=bar&foo=baz&xyz=test"
-    end
-
-    it "returns the request full path when query params are not present" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      request.full_path.should eq "/test/xyz"
-    end
-  end
-
-  describe "#headers" do
-    it "returns the request headers" do
-      headers = ::HTTP::Headers{"Content-Type" => "application/json", "Host" => "example.com"}
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "/test/xyz", headers: headers)
-      )
-      request.headers.should be_a Marten::HTTP::Headers
-      request.headers.size.should eq 2
-      request.headers["Content-Type"].should eq "application/json"
-      request.headers["Host"].should eq "example.com"
-    end
-  end
-
-  describe "#host" do
-    it "returns the request host" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      request.host.should eq "example.com"
     end
   end
 

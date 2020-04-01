@@ -5,11 +5,10 @@ module Marten
     # When a page is request, Marten creates a `Marten::HTTP::Request` that gives access to all the information and
     # metadata of the incoming request.
     class Request
-      @host : String
-      @port : Nil | String
+      @host : String?
+      @port : String?
 
       def initialize(@request : ::HTTP::Request)
-        @host = extract_and_validate_host
       end
 
       # Returns the raw body of the request as a string.
@@ -29,7 +28,7 @@ module Marten
 
       # Returns the host associated with the considered request.
       def host : String
-        @host
+        @host ||= extract_and_validate_host
       end
 
       # Returns a string representation of HTTP method that was used in the request.

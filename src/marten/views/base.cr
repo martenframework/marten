@@ -66,6 +66,8 @@ module Marten
         response
       end
 
+      protected delegate reverse, to: Marten.routes
+
       private getter request
       private getter params
 

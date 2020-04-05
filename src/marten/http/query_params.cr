@@ -3,9 +3,9 @@ module Marten
     class QueryParams
       class ImmutableStateError < Exception; end
 
-      def initialize(@query : ::HTTP::Params, @mutable = false)
+      def initialize(@params : ::HTTP::Params, @mutable = false)
         if !Marten.settings.request_max_parameters &&
-          @query.size > Marten.settings.request_max_parameters.as(Int32)
+          @params.size > Marten.settings.request_max_parameters.as(Int32)
           raise Errors::TooManyParametersReceived.new(
             "The number of GET/POST parameters that were received is too large"
           )
@@ -14,52 +14,52 @@ module Marten
 
       # Returns the first value associated with the passed parameter name.
       def [](name : String | Symbol)
-        @query[name.to_s]
+        @params[name.to_s]
       end
 
       # Returns the first value associated with the passed parameter name or `nil` if the parameter is not present.
       def []?(name : String | Symbol)
-        @query[name.to_s]?
+        @params[name.to_s]?
       end
 
       # Sets the first value for a given parameter name.
       def []=(name : String | Symbol, value)
         with_ensured_mutability do
-          @query[name.to_s] = value.to_s
+          @params[name.to_s] = value.to_s
         end
       end
 
       # Returns `true` if the parameter with the provided name exists.
       def has_key?(name : String | Symbol) # ameba:disable Style/PredicateName
-        @query.has_key?(name.to_s)
+        @params.has_key?(name.to_s)
       end
 
       # Returns the first value for specified parameter name or fallback to the provided default value ( which is `nil`
       # by default).
       def fetch(name : String | Symbol, default = nil)
-        @query.fetch(name.to_s, default)
+        @params.fetch(name.to_s, default)
       end
 
       # Returns all the values for a specified parameter name.
       def fetch_all(name : String | Symbol)
-        @query.fetch_all(name.to_s)
+        @params.fetch_all(name.to_s)
       end
 
       # Sets all the values associated with a specific parameter name.
       def set_all(name : String | Symbol, values)
         with_ensured_mutability do
-          @query.set_all(name.to_s, values)
+          @params.set_all(name.to_s, values)
         end
       end
 
       # Returns the number of parameters.
-      delegate size, to: @query
+      delegate size, to: @params
 
       # Returns `true` if no parameters are present.
-      delegate empty?, to: @query
+      delegate empty?, to: @params
 
       # Returns the serialized version of the parameters.
-      delegate to_s, to: @query
+      delegate to_s, to: @params
 
       private def mutable?
         @mutable

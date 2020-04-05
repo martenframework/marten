@@ -22,6 +22,18 @@ describe Marten::HTTP::Request do
       )
       request.nil?.should be_false
     end
+
+    it "overrides the request's body IO in order to use a memory IO" do
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      request.wrapped_request.body.should be_a IO::Memory
+    end
   end
 
   describe "#body" do
@@ -307,6 +319,14 @@ describe Marten::HTTP::Request do
       request.query_params.size.should eq 3
       request.query_params.fetch_all(:foo).should eq ["bar", "baz"]
       request.query_params.fetch_all(:xyz).should eq ["test"]
+    end
+  end
+end
+
+module Marten::HTTP::RequestSpec
+  class TestRequest < Marten::HTTP::Request
+    def wrapped_request
+      @request
     end
   end
 end

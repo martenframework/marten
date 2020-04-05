@@ -9,6 +9,7 @@ module Marten
       @port : String?
 
       def initialize(@request : ::HTTP::Request)
+        # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
         @request.body = IO::Memory.new((request.body || IO::Memory.new).gets_to_end)
       end
 

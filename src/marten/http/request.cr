@@ -20,12 +20,12 @@ module Marten
 
       # Returns the parsed request data.
       def data : Data
-        @data ||= Data.new(extract_data_params)
+        @data ||= Data.new(extract_raw_data_params)
       end
 
       # Returns the path including the GET parameters if applicable.
       def full_path : String
-        @full_path ||= (path + (query_params.empty? ? "" : "?#{query_params}")).as(String)
+        @full_path ||= (path + (query_params.empty? ? "" : "?#{@request.query_params}")).as(String)
       end
 
       # Returns the HTTP headers embedded in the request.
@@ -54,14 +54,14 @@ module Marten
 
       # Returns the HTTP GET parameters embedded in the request.
       def query_params : QueryParams
-        @query_parans ||= QueryParams.new(@request.query_params)
+        @query_parans ||= QueryParams.new(extract_raw_query_params)
       end
 
       private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
       private CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data"
       private HOST_VALIDATION_RE = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
 
-      private def extract_data_params
+      private def extract_raw_data_params
         params = Data::RawHash.new
 
         if content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
@@ -82,6 +82,17 @@ module Marten
               params[part.name] << part.body.gets_to_end
             end
           end
+        end
+
+        params
+      end
+
+      private def extract_raw_query_params
+        params = QueryParams::RawHash.new
+
+        @request.query_params.each do |key, value|
+          params[key] = [] of QueryParams::Value unless params.has_key?(key)
+          params[key] << value
         end
 
         params

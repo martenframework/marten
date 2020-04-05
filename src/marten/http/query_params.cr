@@ -6,9 +6,7 @@ module Marten
       def initialize(@params : ::HTTP::Params, @mutable = false)
         if !Marten.settings.request_max_parameters &&
           @params.size > Marten.settings.request_max_parameters.as(Int32)
-          raise Errors::TooManyParametersReceived.new(
-            "The number of GET/POST parameters that were received is too large"
-          )
+          raise Errors::TooManyParametersReceived.new("The number of parameters that were received is too large")
         end
       end
 
@@ -34,8 +32,8 @@ module Marten
         @params.has_key?(name.to_s)
       end
 
-      # Returns the first value for specified parameter name or fallback to the provided default value ( which is `nil`
-      # by default).
+      # Returns the first value for the specified parameter name or fallback to the provided default value ( which is
+      # `nil` by default).
       def fetch(name : String | Symbol, default = nil)
         @params.fetch(name.to_s, default)
       end

@@ -1,9 +1,7 @@
 module Marten
   module HTTP
     class QueryParams
-      class ImmutableStateError < Exception; end
-
-      def initialize(@params : ::HTTP::Params, @mutable = false)
+      def initialize(@params : ::HTTP::Params)
         if !Marten.settings.request_max_parameters &&
           @params.size > Marten.settings.request_max_parameters.as(Int32)
           raise Errors::TooManyParametersReceived.new("The number of parameters that were received is too large")
@@ -18,13 +16,6 @@ module Marten
       # Returns the first value associated with the passed parameter name or `nil` if the parameter is not present.
       def []?(name : String | Symbol)
         @params[name.to_s]?
-      end
-
-      # Sets the first value for a given parameter name.
-      def []=(name : String | Symbol, value)
-        with_ensured_mutability do
-          @params[name.to_s] = value.to_s
-        end
       end
 
       # Returns `true` if the parameter with the provided name exists.
@@ -43,13 +34,6 @@ module Marten
         @params.fetch_all(name.to_s)
       end
 
-      # Sets all the values associated with a specific parameter name.
-      def set_all(name : String | Symbol, values)
-        with_ensured_mutability do
-          @params.set_all(name.to_s, values)
-        end
-      end
-
       # Returns the number of parameters.
       delegate size, to: @params
 
@@ -58,15 +42,6 @@ module Marten
 
       # Returns the serialized version of the parameters.
       delegate to_s, to: @params
-
-      private def mutable?
-        @mutable
-      end
-
-      private def with_ensured_mutability
-        raise ImmutableStateError.new("THis QueryParams instance is immutable") unless mutable?
-        yield
-      end
     end
   end
 end

@@ -9,11 +9,17 @@ module Marten
       @port : String?
 
       def initialize(@request : ::HTTP::Request)
+        @request.body = IO::Memory.new((request.body || IO::Memory.new).gets_to_end)
       end
 
       # Returns the raw body of the request as a string.
       def body : String
         @body ||= @request.body.nil? ? "" : @request.body.as(IO).gets_to_end
+      end
+
+      # Returns the parsed request data.
+      def data : Data
+        @data ||= Data.new(*extract_data_params)
       end
 
       # Returns the path including the GET parameters if applicable.
@@ -50,7 +56,31 @@ module Marten
         @query_parans ||= QueryParams.new(@request.query_params)
       end
 
+      private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
+      private CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data"
       private HOST_VALIDATION_RE = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
+
+      private def extract_data_params
+        params = ::HTTP::Params.new
+        files = Data::UploadedFilesHash.new { |h, k| h[k] = [] of UploadedFile }
+
+        if content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
+          params = ::HTTP::Params.parse(body)
+        elsif content_type?(CONTENT_TYPE_MULTIPART_FORM)
+          # Rewind the request's body and parses multipart form data (both regular params and files).
+          @request.body.as(IO).rewind
+          ::HTTP::FormData.parse(@request) do |part|
+            next unless part
+            if !part.filename.nil? && !part.filename.not_nil!.empty?
+              files[part.name] << UploadedFile.new(part)
+            else
+              params.add(part.name, part.body.gets_to_end)
+            end
+          end
+        end
+
+        {params, files}
+      end
 
       private def extract_and_validate_host
         if Marten.settings.use_x_forwarded_host && headers.has_key?(:X_FORWARDED_HOST)
@@ -110,6 +140,10 @@ module Marten
         end
 
         allowed_hosts
+      end
+
+      private def content_type?(content_type)
+        headers[:CONTENT_TYPE]?.try &.starts_with?(content_type)
       end
     end
   end

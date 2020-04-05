@@ -1,33 +1,33 @@
 require "./spec_helper"
 
-module Marten::Routing::ParameterSpec
-  describe Marten::Routing::Parameter do
-    describe "::register" do
-      it "allows to register a new path parameter implementation" do
-        Marten::Routing::Parameter.register("foo", FooParameter)
-        Marten::Routing::Parameter.registry["foo"].should be_a FooParameter
-        Marten::Routing::Parameter.registry.delete("foo")
-      end
-
-      it "allows to register a new path parameter implementation using a symbol identifier" do
-        Marten::Routing::Parameter.register(:foo, FooParameter)
-        Marten::Routing::Parameter.registry["foo"].should be_a FooParameter
-        Marten::Routing::Parameter.registry.delete("foo")
-      end
+describe Marten::Routing::Parameter do
+  describe "::register" do
+    it "allows to register a new path parameter implementation" do
+      Marten::Routing::Parameter.register("foo", Marten::Routing::ParameterSpec::FooParameter)
+      Marten::Routing::Parameter.registry["foo"].should be_a Marten::Routing::ParameterSpec::FooParameter
+      Marten::Routing::Parameter.registry.delete("foo")
     end
 
-    describe "::registry" do
-      it "returns the registered path parameter implementations" do
-        Marten::Routing::Parameter.registry.size.should eq 5
-        Marten::Routing::Parameter.registry["str"].should be_a Marten::Routing::Parameter::String
-        Marten::Routing::Parameter.registry["int"].should be_a Marten::Routing::Parameter::Integer
-        Marten::Routing::Parameter.registry["path"].should be_a Marten::Routing::Parameter::Path
-        Marten::Routing::Parameter.registry["slug"].should be_a Marten::Routing::Parameter::Slug
-        Marten::Routing::Parameter.registry["uuid"].should be_a Marten::Routing::Parameter::UUID
-      end
+    it "allows to register a new path parameter implementation using a symbol identifier" do
+      Marten::Routing::Parameter.register(:foo, Marten::Routing::ParameterSpec::FooParameter)
+      Marten::Routing::Parameter.registry["foo"].should be_a Marten::Routing::ParameterSpec::FooParameter
+      Marten::Routing::Parameter.registry.delete("foo")
     end
   end
 
+  describe "::registry" do
+    it "returns the registered path parameter implementations" do
+      Marten::Routing::Parameter.registry.size.should eq 5
+      Marten::Routing::Parameter.registry["str"].should be_a Marten::Routing::Parameter::String
+      Marten::Routing::Parameter.registry["int"].should be_a Marten::Routing::Parameter::Integer
+      Marten::Routing::Parameter.registry["path"].should be_a Marten::Routing::Parameter::Path
+      Marten::Routing::Parameter.registry["slug"].should be_a Marten::Routing::Parameter::Slug
+      Marten::Routing::Parameter.registry["uuid"].should be_a Marten::Routing::Parameter::UUID
+    end
+  end
+end
+
+module Marten::Routing::ParameterSpec
   class FooParameter < Marten::Routing::Parameter::Base
     def regex : Regex
       /.+/

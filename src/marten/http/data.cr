@@ -1,9 +1,10 @@
 module Marten
   module HTTP
     class Data
-      alias UploadedFilesHash = Hash(String, Array(UploadedFile))
+      alias Value = String | UploadedFile
+      alias RawHash = Hash(String, Array(Value))
 
-      def initialize(@params : ::HTTP::Params, @files : UploadedFilesHash)
+      def initialize(@params : RawHash)
       end
     end
   end

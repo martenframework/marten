@@ -20,7 +20,7 @@ module Marten
 
       # Returns the parsed request data.
       def data : Data
-        @data ||= Data.new(*extract_data_params)
+        @data ||= Data.new(extract_data_params)
       end
 
       # Returns the path including the GET parameters if applicable.
@@ -62,25 +62,29 @@ module Marten
       private HOST_VALIDATION_RE = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
 
       private def extract_data_params
-        params = ::HTTP::Params.new
-        files = Data::UploadedFilesHash.new { |h, k| h[k] = [] of UploadedFile }
+        params = Data::RawHash.new
 
         if content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
-          params = ::HTTP::Params.parse(body)
+          ::HTTP::Params.parse(body) do |key, value|
+            params[key] = [] of Data::Value unless params.has_key?(key)
+            params[key] << value
+          end
         elsif content_type?(CONTENT_TYPE_MULTIPART_FORM)
           # Rewind the request's body and parses multipart form data (both regular params and files).
           @request.body.as(IO).rewind
           ::HTTP::FormData.parse(@request) do |part|
             next unless part
+
+            params[part.name] = [] of Data::Value unless params.has_key?(part.name)
             if !part.filename.nil? && !part.filename.not_nil!.empty?
-              files[part.name] << UploadedFile.new(part)
+              params[part.name] << UploadedFile.new(part)
             else
-              params.add(part.name, part.body.gets_to_end)
+              params[part.name] << part.body.gets_to_end
             end
           end
         end
 
-        {params, files}
+        params
       end
 
       private def extract_and_validate_host

@@ -1,7 +1,10 @@
 module Marten
   module HTTP
     class QueryParams
+      # :nodoc:
       alias Value = String
+
+      # :nodoc:
       alias RawHash = Hash(String, Array(Value))
 
       def initialize(@params : RawHash)

@@ -1,5 +1,6 @@
 module Marten
   module HTTP
+    # Represents a set of GET parameters, extracted from a request's query string.
     class QueryParams
       # :nodoc:
       alias Value = String
@@ -51,7 +52,7 @@ module Marten
       # Returns `true` if no parameters are present.
       delegate empty?, to: @params
 
-      # Returns the serialized version of the parameters.
+      # Returns the hash represention of the parameters.
       delegate to_s, to: @params
     end
   end

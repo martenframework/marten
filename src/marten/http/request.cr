@@ -19,8 +19,8 @@ module Marten
       end
 
       # Returns the parsed request data.
-      def data : Data
-        @data ||= Data.new(extract_raw_data_params)
+      def data : Params::Data
+        @data ||= Params::Data.new(extract_raw_data_params)
       end
 
       # Returns the path including the GET parameters if applicable.
@@ -53,8 +53,8 @@ module Marten
       end
 
       # Returns the HTTP GET parameters embedded in the request.
-      def query_params : QueryParams
-        @query_parans ||= QueryParams.new(extract_raw_query_params)
+      def query_params : Params::Query
+        @query_parans ||= Params::Query.new(extract_raw_query_params)
       end
 
       private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
@@ -62,11 +62,11 @@ module Marten
       private HOST_VALIDATION_RE = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
 
       private def extract_raw_data_params
-        params = Data::RawHash.new
+        params = Params::Data::RawHash.new
 
         if content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
           ::HTTP::Params.parse(body) do |key, value|
-            params[key] = [] of Data::Value unless params.has_key?(key)
+            params[key] = [] of Params::Data::Value unless params.has_key?(key)
             params[key] << value
           end
         elsif content_type?(CONTENT_TYPE_MULTIPART_FORM)
@@ -75,7 +75,7 @@ module Marten
           ::HTTP::FormData.parse(@request) do |part|
             next unless part
 
-            params[part.name] = [] of Data::Value unless params.has_key?(part.name)
+            params[part.name] = [] of Params::Data::Value unless params.has_key?(part.name)
             if !part.filename.nil? && !part.filename.not_nil!.empty?
               params[part.name] << UploadedFile.new(part)
             else
@@ -88,10 +88,10 @@ module Marten
       end
 
       private def extract_raw_query_params
-        params = QueryParams::RawHash.new
+        params = Params::Query::RawHash.new
 
         @request.query_params.each do |key, value|
-          params[key] = [] of QueryParams::Value unless params.has_key?(key)
+          params[key] = [] of Params::Query::Value unless params.has_key?(key)
           params[key] << value
         end
 

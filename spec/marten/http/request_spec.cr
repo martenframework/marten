@@ -315,7 +315,7 @@ describe Marten::HTTP::Request do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      request.query_params.should be_a Marten::HTTP::QueryParams
+      request.query_params.should be_a Marten::HTTP::Params::Query
       request.query_params.size.should eq 3
       request.query_params.fetch_all(:foo).should eq ["bar", "baz"]
       request.query_params.fetch_all(:xyz).should eq ["test"]

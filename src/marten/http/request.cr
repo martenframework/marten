@@ -67,7 +67,7 @@ module Marten
         if content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
           ::HTTP::Params.parse(body) do |key, value|
             params[key] = [] of Params::Data::Value unless params.has_key?(key)
-            params[key] << value
+            params[key].as(Params::Data::Values) << value
           end
         elsif content_type?(CONTENT_TYPE_MULTIPART_FORM)
           # Rewind the request's body and parses multipart form data (both regular params and files).
@@ -77,9 +77,9 @@ module Marten
 
             params[part.name] = [] of Params::Data::Value unless params.has_key?(part.name)
             if !part.filename.nil? && !part.filename.not_nil!.empty?
-              params[part.name] << UploadedFile.new(part)
+              params[part.name].as(Params::Data::Values) << UploadedFile.new(part)
             else
-              params[part.name] << part.body.gets_to_end
+              params[part.name].as(Params::Data::Values) << part.body.gets_to_end
             end
           end
         end

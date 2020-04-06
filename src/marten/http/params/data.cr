@@ -7,7 +7,7 @@ module Marten
         alias Value = String | UploadedFile
 
         # :nodoc:
-        alias RawHash = Hash(String, Array(Value))
+        alias RawHash = Hash(String, Array(String) | Array(UploadedFile) | Array(Value))
 
         def initialize(@params : RawHash)
           if !Marten.settings.request_max_parameters.nil? && size > Marten.settings.request_max_parameters.as(Int32)

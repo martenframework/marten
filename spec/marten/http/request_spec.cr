@@ -61,6 +61,80 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#data" do
+    it "returns an object containing the params extracted from application/x-www-form-urlencoded inputs" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "foo=bar&test=xyz&foo=baz"
+        )
+      )
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 3
+      request.data.fetch_all("foo").should eq ["bar", "baz"]
+      request.data.fetch_all("test").should eq ["xyz"]
+    end
+
+    it "returns an object containing the params extracted from multipart/form-data inputs" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host" => "example.com",
+            "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150"
+          },
+          body: <<-FORMDATA
+          -----------------------------735323031399963166993862150
+          Content-Disposition: form-data; name="text"
+
+          hello
+          -----------------------------735323031399963166993862150
+          Content-Disposition: form-data; name="file"; filename="a.txt"
+          Content-Type: text/plain
+
+          Content of a.txt.
+          -----------------------------735323031399963166993862150
+          Content-Disposition: form-data; name="file2"; filename="a.html"
+          Content-Type: text/html
+
+          <!DOCTYPE html><title>Content of a.html.</title>
+          -----------------------------735323031399963166993862150
+          Content-Disposition: form-data; name="file2"; filename="b.html"
+          Content-Type: text/html
+
+          <!DOCTYPE html><title>Content of b.html.</title>
+          -----------------------------735323031399963166993862150--
+          FORMDATA
+          .gsub('\n', "\r\n")
+        )
+      )
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 4
+      request.data.fetch_all("text").should eq ["hello"]
+      request.data.fetch_all("file").not_nil!.size.should eq 1
+      request.data["file"].should be_a Marten::HTTP::UploadedFile
+      request.data.fetch_all("file2").not_nil!.size.should eq 2
+      request.data.fetch_all("file2").not_nil!.[0].should be_a Marten::HTTP::UploadedFile
+      request.data.fetch_all("file2").not_nil!.[1].should be_a Marten::HTTP::UploadedFile
+    end
+
+    it "returns an object without parsed params if the content type is not supported" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/unknown"},
+          body: "dummy"
+        )
+      )
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+  end
+
   describe "#full_path" do
     it "returns the request full path when query params are present" do
       request = Marten::HTTP::Request.new(

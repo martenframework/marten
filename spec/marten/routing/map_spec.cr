@@ -41,4 +41,100 @@ describe Marten::Routing::Match do
       end
     end
   end
+
+  describe "#resolve" do
+    it "is able to resolve a path that does not contain any parameter" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/xyz", Marten::Views::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home", sub_map, name: "inc")
+
+      match = map.resolve("/home/xyz")
+      match.should be_a Marten::Routing::Match
+      match = match.as(Marten::Routing::Match)
+      match.view.should eq Marten::Views::Base
+      match.kwargs.should be_empty
+    end
+
+    it "is able to resolve a path that contains parameters" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
+
+      match = map.resolve("/home/xyz/my-slug/count/42/display")
+      match.should be_a Marten::Routing::Match
+      match = match.as(Marten::Routing::Match)
+      match.view.should eq Marten::Views::Base
+      match.kwargs.should eq({ "sid" => "my-slug", "number" => 42 })
+    end
+
+    it "raises if the path does not match any registered route rule" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
+
+      expect_raises(Marten::Routing::Errors::NoResolveMatch) do
+        map.resolve("/home")
+      end
+    end
+  end
+
+  describe "#reverse" do
+    it "returns the interpolated path for a top-level given route name without parameters" do
+      map = Marten::Routing::Map.new
+      map.path("/home/test", Marten::Views::Base, name: "home")
+
+      map.reverse("home").should eq "/home/test"
+    end
+
+    it "returns the interpolated path for a top-level given route name with parameters" do
+      map = Marten::Routing::Map.new
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+
+      map.reverse("home", sid: "hello-world", number: 42).should eq "/home/hello-world/test/42"
+    end
+
+    it "returns the interpolated path for a sub given route name without parameters" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/xyz", Marten::Views::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home", sub_map, name: "inc")
+
+      map.reverse("inc:xyz").should eq "/home/xyz"
+    end
+
+    it "returns the interpolated path for a given sub route name with parameters" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
+
+      map.reverse("inc:xyz", sid: "hello-world", number: 42).should eq "/home/xyz/hello-world/count/42/display"
+    end
+
+    it "raises an error if the route name does not match any registered name" do
+      map = Marten::Routing::Map.new
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+
+      expect_raises(Marten::Routing::Errors::NoReverseMatch) do
+        map.reverse("name:inc", sid: "hello-world", number: 42)
+      end
+    end
+
+    it "raises an error if the matched route name does not receive all the expected paramter" do
+      map = Marten::Routing::Map.new
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+
+      expect_raises(Marten::Routing::Errors::NoReverseMatch) do
+        map.reverse("home", sid: "hello-world")
+      end
+    end
+  end
 end

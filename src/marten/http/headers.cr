@@ -1,5 +1,6 @@
 module Marten
   module HTTP
+    # Represents a set of HTTP headers extracted from an HTTP request.
     class Headers
       def initialize(@headers : ::HTTP::Headers)
       end

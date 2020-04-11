@@ -1,5 +1,6 @@
 # Marten - The pragmatic web framework.
 
+require "db"
 require "logger"
 require "http"
 require "uuid"

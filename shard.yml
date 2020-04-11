@@ -4,6 +4,10 @@ version: 0.1.0.dev0
 authors:
   - Morgan Aubert <me@morganaubert.name>
 
+dependencies:
+  db:
+    github: crystal-lang/crystal-db
+
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba

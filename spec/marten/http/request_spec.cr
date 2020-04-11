@@ -1,14 +1,18 @@
 require "./spec_helper"
 
 describe Marten::HTTP::Request do
-  before_each do
-    Marten.settings.allowed_hosts = ["example.com"]
-  end
+  around_each do |t|
+    original_allowed_hosts = Marten.settings.allowed_hosts
+    original_debug = Marten.settings.debug
+    original_use_x_forwarded_host = Marten.settings.use_x_forwarded_host
 
-  after_each do
-    Marten.settings.allowed_hosts = [] of String
-    Marten.settings.debug = false
-    Marten.settings.use_x_forwarded_host = false
+    Marten.settings.allowed_hosts = %w(example.com)
+
+    t.run
+
+    Marten.settings.allowed_hosts = original_allowed_hosts
+    Marten.settings.debug = original_debug
+    Marten.settings.use_x_forwarded_host = original_use_x_forwarded_host
   end
 
   describe "::new" do

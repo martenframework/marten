@@ -8,3 +8,4 @@
 /run_tests
 *.dwarf
 .icr_*
+*.db

@@ -1,3 +1,7 @@
+Globs:
+  - spec/**/*.cr
+  - src/**/*.cr
+
 Layout/LineLength:
   Enabled: true
   MaxLength: 120

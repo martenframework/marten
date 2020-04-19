@@ -7,6 +7,7 @@ require "uuid"
 
 require "./marten/*"
 require "./marten/conf/**"
+require "./marten/db/**"
 require "./marten/ext/**"
 require "./marten/http/**"
 require "./marten/routing/**"

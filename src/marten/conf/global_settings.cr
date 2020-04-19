@@ -55,7 +55,7 @@ module Marten
       def database(id = :default)
         db_config = @databases.find { |d| d.id.to_s == id.to_s }
         not_yet_defined = db_config.nil?
-        db_config = Database.new(id) if db_config.nil?
+        db_config = Database.new(id.to_s) if db_config.nil?
         yield db_config.not_nil!
         @databases << db_config if not_yet_defined
       end
@@ -71,6 +71,7 @@ module Marten
 
       def setup
         setup_logger_formatting
+        setup_db_connections
       end
 
       macro method_missing(call)
@@ -89,6 +90,10 @@ module Marten
           io << "[#{progname}] "
           io << message
         end
+      end
+
+      private def setup_db_connections
+        databases.each { |db_config| DB::Connection.register(db_config) }
       end
     end
   end

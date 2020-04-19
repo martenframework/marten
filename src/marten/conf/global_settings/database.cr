@@ -3,7 +3,7 @@ module Marten
     class GlobalSettings
       class Database
         @backend : String | Symbol | Nil
-        @name : Symbol | String | Nil
+        @name : Path | String | Symbol | Nil
 
         getter id
         getter backend
@@ -12,7 +12,7 @@ module Marten
         setter backend
         setter name
 
-        def initialize(@id : String | Symbol)
+        def initialize(@id : String)
         end
       end
     end

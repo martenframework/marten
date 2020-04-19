@@ -37,6 +37,7 @@ module Marten
 
       def initialize
         @allowed_hosts = [] of String
+        @databases = [] of Database
         @debug = false
         @host = "localhost"
         @installed_apps = Array(Marten::App.class).new
@@ -52,8 +53,11 @@ module Marten
       end
 
       def database(id = :default)
-        db_config = Database.new
-        with db_config yield db_config
+        db_config = @databases.find { |d| d.id.to_s == id.to_s }
+        not_yet_defined = db_config.nil?
+        db_config = Database.new(id) if db_config.nil?
+        yield db_config.not_nil!
+        @databases << db_config if not_yet_defined
       end
 
       def installed_apps=(v)

@@ -2,6 +2,7 @@
 .vscode/
 /bin/
 /docs/
+/example_project/
 /lib/
 /.shards/
 /coverage/

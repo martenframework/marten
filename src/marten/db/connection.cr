@@ -2,7 +2,7 @@ module Marten
   module DB
     module Connection
       IMPLEMENTATIONS = {
-        sqlite: SQLite,
+        "sqlite" => SQLite,
       }
 
       @@registry = {} of ::String => Base

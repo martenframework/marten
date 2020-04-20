@@ -15,6 +15,14 @@ module Marten
 
         def initialize(@id : String)
         end
+
+        protected def validate
+          raise Errors::InvalidConfiguration.new("A database backend must be chosen") if backend.nil?
+
+          unless DB::Connection::IMPLEMENTATIONS.has_key?(backend.not_nil!.to_s)
+            raise Errors::InvalidConfiguration.new("Unknown database backend: '#{backend}'")
+          end
+        end
       end
     end
   end

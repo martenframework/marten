@@ -151,6 +151,7 @@ module Marten
 
       private def setup_db_connections
         databases.each do |db_config|
+          db_config.validate
           DB::Connection.register(db_config)
         end
       end

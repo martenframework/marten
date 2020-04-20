@@ -9,30 +9,84 @@ module Marten
       @view404 : Views::Base.class
       @view500 : Views::Base.class
 
+      # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
+
+      # Returns the application database configurations.
       getter databases
+
+      # Returns a boolean indicating whether the application runs in debug mode.
       getter debug
+
+      # Returns the host the HTTP server running the application will be listening on.
       getter host
+
+      # Returns the logger used by the application.
       getter logger
+
+      # Returns the port the HTTP server running the application will be listening on.
       getter port
+
+      # Returns a boolean indicating whether multiple processes can bind to the same HTTP server port.
       getter port_reuse
+
+      # Returns the maximum number of allowed parameters per request (such as GET or POST parameters).
       getter request_max_parameters
+
+      # Returns the secret key of the application.
       getter secret_key
+
+      # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
+
+      # Returns the configured view class that should generate responses for Bad Request responses (HTTP 400).
       getter view400
+
+      # Returns the configured view class that should generate responses for Not Found responses (HTTP 404).
       getter view404
+
+      # Returns the configured view class that should generate responses for Internal Error responses (HTTP 500).
       getter view500
 
+      # Allows to set the explicit list of allowed hosts for the application.
+      #
+      # The application has to be explictely configured to serve a list of allowed hosts. This is to mitigate HTTP Host
+      # header attacks.
       setter allowed_hosts
+
+      # Allows to activate or deactive debug mode.
       setter debug
+
+      # Allows to set the host the HTTP server running the application will be listening on.
       setter host
+
+      # Allows to set the port the HTTP server running the application will be listening on.
       setter port
+
+      # Allows to indicate whether multiple processes can bind to the same HTTP server port.
       setter port_reuse
+
+      # Allows to set the maximum number of allowed parameters per request (such as GET or POST parameters).
+      #
+      # This maximum limit is used to prevent large requests that could be used in the context of DOS attacks. Setting
+      # this value to `nil` will disable this behaviour.
       setter request_max_parameters
+
+      # Allows to set to the secret key of the application.
+      #
+      # The secret key will be used provide cryptographic signing. It should be unique and unpredictable.
       setter secret_key
+
+      # Allows to set whether the X-Forwarded-Host header is used to look for the host.
       setter use_x_forwarded_host
+
+      # Allows to set the view class that should generate responses for Bad Request responses (HTTP 400).
       setter view400
+
+      # Allows to set the view class that should generate responses for Not Found responses (HTTP 404).
       setter view404
+
+      # Allows to set the view class that should generate responses for Internal Error responses (HTTP 500).
       setter view500
 
       def initialize
@@ -52,6 +106,7 @@ module Marten
         @view500 = Views::Defaults::ServerError
       end
 
+      # Allows to configure a specific database connection for the application.
       def database(id = :default)
         db_config = @databases.find { |d| d.id.to_s == id.to_s }
         not_yet_defined = db_config.nil?
@@ -60,16 +115,18 @@ module Marten
         @databases << db_config if not_yet_defined
       end
 
+      # Allows to define the third-party applications used by the project.
       def installed_apps=(v)
         @installed_apps = Array(Marten::App.class).new
         @installed_apps.concat(v)
       end
 
+      # Allows to set the loger used by the application.
       def logger=(logger : ::Logger)
         @logger = logger
       end
 
-      def setup
+      protected def setup
         setup_logger_formatting
         setup_db_connections
       end
@@ -93,7 +150,9 @@ module Marten
       end
 
       private def setup_db_connections
-        databases.each { |db_config| DB::Connection.register(db_config) }
+        databases.each do |db_config|
+          DB::Connection.register(db_config)
+        end
       end
     end
   end

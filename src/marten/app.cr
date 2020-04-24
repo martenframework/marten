@@ -1,10 +1,20 @@
 module Marten
-  class App
-    macro inherited
-      @@location : String?
+  abstract class App
+    @@name : String?
 
-      def self.location
-        @@location ||= Path[__FILE__].parent.to_s
+    def self.name(name : String | Symbol)
+      @@name = name.to_s
+    end
+
+    def self.name
+      @@name
+    end
+
+    macro inherited
+      @@path : String?
+
+      def self.path
+        @@path ||= Path[__FILE__].parent.to_s
       end
     end
   end

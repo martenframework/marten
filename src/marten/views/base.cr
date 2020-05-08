@@ -93,6 +93,8 @@ module Marten
           options
         when "trace"
           trace
+        else
+          handle_http_method_not_allowed
         end
       end
     end

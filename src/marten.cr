@@ -17,7 +17,7 @@ require "./marten/views/**"
 module Marten
   VERSION = "0.1.0.dev0"
 
-  Log = ::Log.for("marten")
+  Log = ::Log.for("marten") # ameba:disable Style/ConstantNames
 
   @@env : Conf::Env?
   @@routes : Routing::Map?

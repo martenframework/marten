@@ -21,8 +21,8 @@ module Marten
       # Returns the host the HTTP server running the application will be listening on.
       getter host
 
-      # Returns the logger used by the application.
-      getter logger
+      # Returns the log backend used by the application.
+      getter log_backend
 
       # Returns the port the HTTP server running the application will be listening on.
       getter port
@@ -95,7 +95,7 @@ module Marten
         @debug = false
         @host = "localhost"
         @installed_apps = Array(Marten::App.class).new
-        @logger = Logger.new(STDOUT)
+        @log_backend = ::Log::IOBackend.new
         @port = 8000
         @port_reuse = true
         @request_max_parameters = 1000
@@ -121,13 +121,13 @@ module Marten
         @installed_apps.concat(v)
       end
 
-      # Allows to set the loger used by the application.
-      def logger=(logger : ::Logger)
-        @logger = logger
+      # Allows to set the log backend used by the application.
+      def log_backend=(log_backend : ::Log::Backend)
+        @log_backend = log_backend
       end
 
       protected def setup
-        setup_logger_formatting
+        setup_log_backend
         setup_db_connections
       end
 
@@ -139,14 +139,15 @@ module Marten
         end
       end
 
-      private def setup_logger_formatting
-        logger.progname = "Server"
-        logger.formatter = Logger::Formatter.new do |severity, datetime, progname, message, io|
-          io << "[#{severity.to_s[0]}] "
-          io << "[#{datetime.to_utc}] "
-          io << "[#{progname}] "
-          io << message
+      private def setup_log_backend
+        # TODO: define log backend as part of log backend initialization instead.
+        log_backend.as(::Log::IOBackend).formatter = ::Log::Formatter.new do |entry, io|
+          io << "[#{entry.severity.to_s[0]}] "
+          io << "[#{entry.timestamp.to_utc}] "
+          io << "[Server] "
+          io << entry.message
         end
+        ::Log.builder.bind("marten.*", :debug, log_backend)
       end
 
       private def setup_db_connections

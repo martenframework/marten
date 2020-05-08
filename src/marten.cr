@@ -1,7 +1,7 @@
 # Marten - The pragmatic web framework.
 
 require "db"
-require "logger"
+require "log"
 require "http"
 require "uuid"
 
@@ -16,6 +16,8 @@ require "./marten/views/**"
 
 module Marten
   VERSION = "0.1.0.dev0"
+
+  Log = ::Log.for("marten")
 
   @@env : Conf::Env?
   @@routes : Routing::Map?
@@ -37,10 +39,6 @@ module Marten
 
   def self.env
     @@env ||= Conf::Env.new
-  end
-
-  def self.logger
-    settings.logger
   end
 
   def self.settings

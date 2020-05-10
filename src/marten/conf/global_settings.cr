@@ -94,7 +94,7 @@ module Marten
         @databases = [] of Database
         @debug = false
         @host = "localhost"
-        @installed_apps = Array(Marten::App.class).new
+        @installed_apps = Array(Marten::Apps::Config.class).new
         @log_backend = ::Log::IOBackend.new
         @port = 8000
         @port_reuse = true
@@ -117,7 +117,7 @@ module Marten
 
       # Allows to define the third-party applications used by the project.
       def installed_apps=(v)
-        @installed_apps = Array(Marten::App.class).new
+        @installed_apps = Array(Marten::Apps::Config.class).new
         @installed_apps.concat(v)
       end
 

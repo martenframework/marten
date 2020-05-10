@@ -25,10 +25,14 @@ module Marten
 
   def self.setup
     settings.setup
+    Marten::Server.setup
   end
 
   def self.start
     setup
+
+    Log.info { "Marten running on #{Marten::Server.addresses.join ", "}" }
+
     Marten::Server.run
   end
 

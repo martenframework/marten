@@ -21,6 +21,9 @@ module Marten
       # Returns the host the HTTP server running the application will be listening on.
       getter host
 
+      # Returns the third-party applications used by the project.
+      getter installed_apps
+
       # Returns the log backend used by the application.
       getter log_backend
 

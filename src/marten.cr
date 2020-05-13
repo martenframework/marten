@@ -20,14 +20,10 @@ module Marten
 
   Log = ::Log.for("marten") # ameba:disable Style/ConstantNames
 
+  @@apps : Apps::Registry?
   @@env : Conf::Env?
   @@routes : Routing::Map?
   @@settings : Conf::GlobalSettings?
-
-  def self.setup
-    settings.setup
-    Marten::Server.setup
-  end
 
   def self.start
     setup
@@ -37,9 +33,19 @@ module Marten
     Marten::Server.run
   end
 
+  def self.setup
+    settings.setup
+    apps.populate(settings.installed_apps)
+    Marten::Server.setup
+  end
+
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
     yield settings
+  end
+
+  def self.apps
+    @@apps ||= Apps::Registry.new
   end
 
   def self.env

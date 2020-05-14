@@ -12,10 +12,8 @@ module Marten
       end
 
       macro inherited
-        @@path : String?
-
-        def self.path
-          @@path ||= Path[__FILE__].parent.to_s
+        def self.dir_location
+          __DIR__
         end
       end
     end

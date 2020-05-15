@@ -16,6 +16,21 @@ module Marten
           @app_configs[app.name] = app.new
         end
       end
+
+      # Returns the application config object contaning the passed model.
+      def get_containing_model(model : Marten::DB::Model.class)
+        candidates = [] of Config
+
+        @app_configs.values.each do |config|
+          if model.dir_location.starts_with?(config.class.dir_location)
+            remaining = model.dir_location[config.class.dir_location.size..]
+            next unless remaining == "" || remaining[0] == '/'
+            candidates << config
+          end
+        end
+
+        candidates.sort_by { |config| config.class.dir_location.size }.reverse.first unless candidates.empty?
+      end
     end
   end
 end

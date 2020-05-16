@@ -5,6 +5,12 @@ module Marten
         @@table_name ||= %{#{name.gsub("::", "_").underscore}s}
       end
 
+      #private def self.app_config
+      #  @@app_config ||= begin
+      #
+      #  end
+      #end
+
       macro inherited
         def self.dir_location
           __DIR__

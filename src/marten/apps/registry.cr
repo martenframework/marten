@@ -5,6 +5,10 @@ module Marten
         @app_configs = {} of String => Config
       end
 
+      def app_configs
+        @app_configs.values
+      end
+
       def populate(installed_apps : Array(Config.class))
         installed_apps.each do |app|
           raise Errors::InvalidAppConfig.new("App name cannot be empty for app '#{app}'") if app.name.empty?

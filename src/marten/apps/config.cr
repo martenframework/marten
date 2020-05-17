@@ -3,6 +3,8 @@ module Marten
     abstract class Config
       @@name = "app"
 
+      delegate name, to: self.class
+
       def self.name(name : String | Symbol)
         @@name = name.to_s
       end

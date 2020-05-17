@@ -26,13 +26,6 @@ describe Marten::Apps::Registry do
       registry.app_configs[1].should be_a Marten::Apps::RegistrySpec::Test2Config
     end
 
-    it "raises if one of the app configs contains an empty name" do
-      registry = Marten::Apps::Registry.new
-      expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
-        registry.populate([Marten::Apps::RegistrySpec::Test1Config, Marten::Apps::RegistrySpec::InvalidConfig])
-      end
-    end
-
     it "raises if the same app config is registered multiple times" do
       registry = Marten::Apps::Registry.new
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
@@ -63,18 +56,14 @@ end
 
 module Marten::Apps::RegistrySpec
   class Test1Config < Marten::Apps::Config
-    name :test1
+    name :test_a
   end
 
   class DupTest1Config < Marten::Apps::Config
-    name :test1
+    name :test_a
   end
 
   class Test2Config < Marten::Apps::Config
-    name :test2
-  end
-
-  class InvalidConfig < Marten::Apps::Config
-    name ""
+    name :test_b
   end
 end

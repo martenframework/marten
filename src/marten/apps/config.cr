@@ -1,22 +1,22 @@
 module Marten
   module Apps
     abstract class Config
-      @@name = "app"
+      @@label = "app"
 
-      delegate name, to: self.class
+      delegate label, to: self.class
 
-      def self.name(name : String | Symbol)
-        unless NAME_RE.match(name.to_s)
-          raise Errors::InvalidAppConfig.new("A rule name can only contain lowercase letters and underscores")
+      def self.label(label : String | Symbol)
+        unless LABEL_RE.match(label.to_s)
+          raise Errors::InvalidAppConfig.new("A rule label can only contain lowercase letters and underscores")
         end
-        @@name = name.to_s
+        @@label = label.to_s
       end
 
-      def self.name : String
-        @@name
+      def self.label : String
+        @@label
       end
 
-      private NAME_RE = /^[a-z_]+$/
+      private LABEL_RE = /^[a-z_]+$/
 
       macro inherited
         def self.dir_location

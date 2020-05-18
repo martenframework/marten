@@ -39,7 +39,7 @@ describe Marten::Apps::Registry do
       end
     end
 
-    it "raises if the multiple app configs are registered with the same name" do
+    it "raises if the multiple app configs are registered with the same label" do
       registry = Marten::Apps::Registry.new
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
         registry.populate(
@@ -56,14 +56,14 @@ end
 
 module Marten::Apps::RegistrySpec
   class Test1Config < Marten::Apps::Config
-    name :test_a
+    label :test_a
   end
 
   class DupTest1Config < Marten::Apps::Config
-    name :test_a
+    label :test_a
   end
 
   class Test2Config < Marten::Apps::Config
-    name :test_b
+    label :test_b
   end
 end

@@ -11,11 +11,11 @@ module Marten
 
       def populate(installed_apps : Array(Config.class))
         installed_apps.each do |app|
-          if @app_configs.has_key?(app.name)
-            raise Errors::InvalidAppConfig.new("App names must be unique, duplicate found: '#{app.name}'")
+          if @app_configs.has_key?(app.label)
+            raise Errors::InvalidAppConfig.new("App labels must be unique, duplicate found: '#{app.label}'")
           end
 
-          @app_configs[app.name] = app.new
+          @app_configs[app.label] = app.new
         end
       end
 

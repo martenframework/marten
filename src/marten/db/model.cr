@@ -4,7 +4,7 @@ module Marten
       @@app_config : Marten::Apps::Config?
 
       def self.table_name
-        @@table_name ||= %{#{app_config.name.downcase}_#{name.gsub("::", "_").underscore}s}
+        @@table_name ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
       end
 
       private def self.app_config

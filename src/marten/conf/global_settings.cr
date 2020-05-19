@@ -45,6 +45,9 @@ module Marten
       # Returns the configured view class that should generate responses for Bad Request responses (HTTP 400).
       getter view400
 
+      # Returns the configured view class that should generate responses for Permission Denied responses (HTTP 403).
+      getter view403
+
       # Returns the configured view class that should generate responses for Not Found responses (HTTP 404).
       getter view404
 
@@ -86,6 +89,9 @@ module Marten
       # Allows to set the view class that should generate responses for Bad Request responses (HTTP 400).
       setter view400
 
+      # Allows to set the view class that should generate responses for Permission Denied responses (HTTP 403).
+      setter view403
+
       # Allows to set the view class that should generate responses for Not Found responses (HTTP 404).
       setter view404
 
@@ -105,6 +111,7 @@ module Marten
         @secret_key = ""
         @use_x_forwarded_host = false
         @view400 = Views::Defaults::BadRequest
+        @view403 = Views::Defaults::PermissionDenied
         @view404 = Views::Defaults::PageNotFound
         @view500 = Views::Defaults::ServerError
       end

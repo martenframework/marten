@@ -6,6 +6,7 @@ module Marten
 
       @request_max_parameters : Nil | Int32
       @view400 : Views::Base.class
+      @view403 : Views::Base.class
       @view404 : Views::Base.class
       @view500 : Views::Base.class
 

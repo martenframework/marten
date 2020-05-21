@@ -77,18 +77,16 @@ module Marten
       # parameters passed in the method call. If no route is found or if the arguments can't be applied to the route, a
       # `Marten::Routing::Errors::NoReverseMatch` exception is raised.
       def reverse(name : String, **kwargs) : String
-        reversed = nil
+        perform_reverse(name, kwargs.to_h)
+      end
 
-        begin
-          reverser = @reversers[name]
-          reversed = reverser.reverse(**kwargs)
-        rescue KeyError
-          raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")
-        end
-
-        raise Errors::NoReverseMatch.new("'#{name}' route cannot receive #{kwargs} as parameters") if reversed.nil?
-
-        reversed
+      # Reverses a URL - returns the URL corresponding to a specific route name and hash of parameters.
+      #
+      # The URL lookup mechanism tries to identify the route matching the given name and tries to apply the parameters
+      # defined in the parameters hash passed in the method call. If no route is found or if the arguments can't be
+      # applied to the route, a `Marten::Routing::Errors::NoReverseMatch` exception is raised.
+      def reverse(name : String, params : Hash(String | Symbol, Parameter::Types))
+        perform_reverse(name, params)
       end
 
       protected getter reversers
@@ -100,6 +98,21 @@ module Marten
         matches = path_for_interpolation.scan(INTERPOLATION_PARAMETER_RE)
         parameter_names = matches.reduce([] of String) { |acc, match| acc + match.captures }
         parameter_names.size != parameter_names.uniq.size
+      end
+
+      private def perform_reverse(name, params)
+        reversed = nil
+
+        begin
+          reverser = @reversers[name]
+          reversed = reverser.reverse(params.is_a?(Hash(NoReturn, NoReturn)) ? nil : params)
+        rescue KeyError
+          raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")
+        end
+
+        raise Errors::NoReverseMatch.new("'#{name}' route cannot receive #{params} as parameters") if reversed.nil?
+
+        reversed
       end
     end
   end

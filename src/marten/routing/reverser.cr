@@ -17,10 +17,10 @@ module Marten
       )
       end
 
-      def reverse(**kwargs) : Nil | String
-        url_kwargs = {} of String => String
+      def reverse(params : Nil | Hash(String | Symbol, Parameter::Types)) : Nil | String
+        url_params = {} of String => String
 
-        kwargs.each do |key, value|
+        params.each do |key, value|
           param_name = key.to_s
 
           # A parameter that is not present in the set of route parameter handler means that the lookup is not
@@ -33,13 +33,13 @@ module Marten
           # parameter handlers received a value it could not handle.
           return if dumped_value.nil?
 
-          url_kwargs[param_name] = dumped_value
-        end
+          url_params[param_name] = dumped_value
+        end unless params.nil?
 
         # if not all expected parameters were passed this means that the lookup is not successful.
-        return unless url_kwargs.size == @parameters.size
+        return unless url_params.size == @parameters.size
 
-        @path_for_interpolation % url_kwargs
+        @path_for_interpolation % url_params
       end
     end
   end

@@ -3,17 +3,15 @@ module Marten
     class Base
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 
-      @@http_method_names : Array(String)?
+      @@http_method_names : Array(String) = HTTP_METHOD_NAMES
+
+      class_getter http_method_names
 
       getter request
       getter params
 
       def self.http_method_names(*method_names : String | Symbol)
         @@http_method_names = method_names.to_a.map(&.to_s)
-      end
-
-      def self.http_method_names : Array(String)
-        @@http_method_names || HTTP_METHOD_NAMES
       end
 
       def initialize(@request : HTTP::Request, @params : Hash(String, Routing::Parameter::Types))

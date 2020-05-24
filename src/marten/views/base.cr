@@ -5,6 +5,9 @@ module Marten
 
       @@http_method_names : Array(String)?
 
+      getter request
+      getter params
+
       def self.http_method_names(*method_names : String | Symbol)
         @@http_method_names = method_names.to_a.map(&.to_s)
       end
@@ -20,7 +23,7 @@ module Marten
         @params = {} of String => Routing::Parameter::Types
       end
 
-      def dispatch
+      def dispatch : Marten::HTTP::Response
         if self.class.http_method_names.includes?(request.method.downcase)
           call_http_method
         else
@@ -67,9 +70,6 @@ module Marten
       end
 
       protected delegate reverse, to: Marten.routes
-
-      private getter request
-      private getter params
 
       private def handle_http_method_not_allowed
         HTTP::Response::NotAllowed.new(self.class.http_method_names)

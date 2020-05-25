@@ -360,6 +360,28 @@ describe Marten::Views::Base do
       response.status.should eq 405
     end
   end
+
+  describe "#reverse" do
+    it "provides a shortcut allowing to perform route lookups" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view_1 = Marten::Views::BaseSpec::Test5View.new(request)
+      response_1 = view_1.dispatch
+      response_1.status.should eq 200
+      response_1.content.should eq Marten.routes.reverse("dummy_with_id", id: 42)
+
+      view_2 = Marten::Views::BaseSpec::Test5View.new(request)
+      response_2 = view_2.dispatch
+      response_2.status.should eq 200
+      response_2.content.should eq Marten.routes.reverse("dummy_with_id", { "id" => 42 })
+    end
+  end
 end
 
 module Marten::Views::BaseSpec
@@ -410,6 +432,22 @@ module Marten::Views::BaseSpec
 
     def trace
       Marten::HTTP::Response.new("TRACE processed", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class Test5View < Marten::Views::Base
+    http_method_names :get, :head
+
+    def get
+      Marten::HTTP::Response.new(reverse("dummy_with_id", id: 42), content_type: "text/plain", status: 200)
+    end
+  end
+
+  class Test6View < Marten::Views::Base
+    http_method_names :get, :head
+
+    def get
+      Marten::HTTP::Response.new(reverse("dummy_with_id", { "id" => 10 }), content_type: "text/plain", status: 200)
     end
   end
 end

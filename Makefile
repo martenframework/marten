@@ -45,13 +45,6 @@ t: tests
 tests:
 	crystal spec
 
-.PHONY: coverage
-## Collects code coverage data.
-coverage:
-	crystal build run_tests.cr
-	kcov --clean --include-path=./src ./coverage ./run_tests
-	cat coverage/run_tests.*/coverage.json
-
 
 # MAKEFILE HELPERS
 # ~~~~~~~~~~~~~~~~

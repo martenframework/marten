@@ -1,6 +1,8 @@
 module Marten
   module DB
     module Connection
+      DEFAULT_CONNECTION_NAME = "default"
+
       IMPLEMENTATIONS = {
         "sqlite" => SQLite,
       }
@@ -13,6 +15,12 @@ module Marten
 
       def self.registry
         @@registry
+      end
+
+      # Returns the connection to use for the passed `table_name`.
+      def self.for(table_name)
+        # TODO: implement mechanism like a database router allowing to pick a connection based on the table name.
+        registry[DEFAULT_CONNECTION_NAME]
       end
     end
   end

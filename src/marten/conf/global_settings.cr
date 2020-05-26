@@ -118,7 +118,7 @@ module Marten
       end
 
       # Allows to configure a specific database connection for the application.
-      def database(id = :default)
+      def database(id = DB::Connection::DEFAULT_CONNECTION_NAME)
         db_config = @databases.find { |d| d.id.to_s == id.to_s }
         not_yet_defined = db_config.nil?
         db_config = Database.new(id.to_s) if db_config.nil?

@@ -7,6 +7,10 @@ module Marten
         @@table_name ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
       end
 
+      def self.connection
+        Connection.for(table_name)
+      end
+
       private def self.app_config
         @@app_config ||= begin
           config = Marten.apps.get_containing_model(self)

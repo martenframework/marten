@@ -79,7 +79,7 @@ module Marten
       # this value to `nil` will disable this behaviour.
       setter request_max_parameters
 
-      # Allows to set to the secret key of the application.
+      # Allows to set the secret key of the application.
       #
       # The secret key will be used provide cryptographic signing. It should be unique and unpredictable.
       setter secret_key

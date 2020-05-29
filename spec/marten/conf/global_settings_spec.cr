@@ -130,4 +130,52 @@ describe Marten::Conf::GlobalSettings do
       global_settings.host.should eq "0.0.0.0"
     end
   end
+
+  describe "#installed_apps" do
+    it "returns an empty array by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.installed_apps.empty?.should be_true
+    end
+
+    it "returns the list of installed apps if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.installed_apps = [Marten::Conf::GlobalSettingsSpec::TestAppConfig]
+      global_settings.installed_apps.should eq [Marten::Conf::GlobalSettingsSpec::TestAppConfig]
+    end
+  end
+
+  describe "#installed_apps=" do
+    it "allows to configure the list of installed apps" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.installed_apps = [Marten::Conf::GlobalSettingsSpec::TestAppConfig]
+      global_settings.installed_apps.should eq [Marten::Conf::GlobalSettingsSpec::TestAppConfig]
+    end
+  end
+
+  describe "#log_backend" do
+    it "returns the IOBackend instance by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.log_backend.should be_a ::Log::IOBackend
+    end
+
+    it "returns the configured log backend if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.log_backend = ::Log::MemoryBackend.new
+      global_settings.log_backend.should be_a ::Log::MemoryBackend
+    end
+  end
+
+  describe "#log_backend=" do
+    it "allows to set a specific log backend to use" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.log_backend = ::Log::MemoryBackend.new
+      global_settings.log_backend.should be_a ::Log::MemoryBackend
+    end
+  end
+end
+
+module Marten::Conf::GlobalSettingsSpec
+  class TestAppConfig < Marten::Apps::Config
+    label :test
+  end
 end

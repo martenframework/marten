@@ -172,10 +172,211 @@ describe Marten::Conf::GlobalSettings do
       global_settings.log_backend.should be_a ::Log::MemoryBackend
     end
   end
+
+  describe "#port" do
+    it "returns 8000 by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port.should eq 8000
+    end
+
+    it "returns the configured port if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port = 80
+      global_settings.port.should eq 80
+    end
+  end
+
+  describe "#port=" do
+    it "allows to configure the HTTP server port" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port = 80
+      global_settings.port.should eq 80
+    end
+  end
+
+  describe "#port_reuse" do
+    it "returns true by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port_reuse.should be_true
+    end
+
+    it "returns the specific port reuse configuration if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port_reuse = false
+      global_settings.port_reuse.should be_false
+    end
+  end
+
+  describe "#port_reuse=" do
+    it "allows to configure whether the port_reuse boolean configuration option" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port_reuse = false
+      global_settings.port_reuse.should be_false
+    end
+  end
+
+  describe "#request_max_parameters" do
+    it "returns 1000 by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_parameters.should eq 1000
+    end
+
+    it "returns the specific request max parameters limit if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_parameters = 500
+      global_settings.request_max_parameters.should eq 500
+    end
+  end
+
+  describe "#request_max_parameters=" do
+    it "allows to configure the allowed request max parameters" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_parameters = 500
+      global_settings.request_max_parameters.should eq 500
+    end
+
+    it "can be set to nil to disable the protection" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_parameters = nil
+      global_settings.request_max_parameters.should be_nil
+    end
+  end
+
+  describe "#secret_key" do
+    it "returns an empty string by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.secret_key.should eq ""
+    end
+
+    it "returns the secret key if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.secret_key = "not_secret"
+      global_settings.secret_key.should eq "not_secret"
+    end
+  end
+
+  describe "#secret_key=" do
+    it "allows to set the app secret key" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.secret_key = "not_secret"
+      global_settings.secret_key.should eq "not_secret"
+    end
+  end
+
+  describe "#use_x_forwarded_host" do
+    it "returns false by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_host.should be_false
+    end
+
+    it "returns the configured boolean value if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_host = true
+      global_settings.use_x_forwarded_host.should be_true
+    end
+  end
+
+  describe "#use_x_forwarded_host=" do
+    it "allows to configure whether the X-Forwarded-Host header should be used" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_host = true
+      global_settings.use_x_forwarded_host.should be_true
+    end
+  end
+
+  describe "#view400" do
+    it "#returns Marten::Views::Defaults::BadRequest by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view400.should eq Marten::Views::Defaults::BadRequest
+    end
+
+    it "returns the configured view class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view400 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view400.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view400=" do
+    it "allows to configure the view class used for bad request responses" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view400 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view400.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view403" do
+    it "#returns Marten::Views::Defaults::PermissionDenied by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view403.should eq Marten::Views::Defaults::PermissionDenied
+    end
+
+    it "returns the configured view class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view403 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view403.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view403=" do
+    it "allows to configure the view class used for permission denied responses" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view403 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view403.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view404" do
+    it "#returns Marten::Views::Defaults::PageNotFound by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view404.should eq Marten::Views::Defaults::PageNotFound
+    end
+
+    it "returns the configured view class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view404 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view404.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view404=" do
+    it "allows to configure the view class used for not found responses" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view404 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view404.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view500" do
+    it "#returns Marten::Views::Defaults::ServerError by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view500.should eq Marten::Views::Defaults::ServerError
+    end
+
+    it "returns the configured view class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view500 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view500.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
+
+  describe "#view500=" do
+    it "allows to configure the view class used for server error responses" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.view500 = Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.view500.should eq Marten::Conf::GlobalSettingsSpec::TestView
+    end
+  end
 end
 
 module Marten::Conf::GlobalSettingsSpec
   class TestAppConfig < Marten::Apps::Config
     label :test
+  end
+
+  class TestView < Marten::Views::Base
+    def get
+      Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
+    end
   end
 end

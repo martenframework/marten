@@ -16,6 +16,10 @@ module Marten
         Connection.for(table_name)
       end
 
+      def self.all
+        QuerySet.new(self)
+      end
+
       private def self.app_config
         @@app_config ||= begin
           config = Marten.apps.get_containing_model(self)

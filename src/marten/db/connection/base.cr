@@ -7,6 +7,7 @@ module Marten
         def initialize(@config : Conf::GlobalSettings::Database)
         end
 
+        abstract def quote_char : Char
         abstract def scheme : String
 
         def db
@@ -15,6 +16,10 @@ module Marten
 
         def open(&block)
           yield db
+        end
+
+        def quote(name : String) : String
+          "#{quote_char}#{name}#{quote_char}"
         end
 
         private def url

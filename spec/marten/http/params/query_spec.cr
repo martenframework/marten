@@ -204,4 +204,13 @@ describe Marten::HTTP::Params::Query do
       params.empty?.should be_false
     end
   end
+
+  describe "#as_query" do
+    it "returns the URL query string version of the query parameters hash" do
+      params = Marten::HTTP::Params::Query.new(
+        Marten::HTTP::Params::Query::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+      )
+      params.as_query.should eq "foo=bar&xyz=test1&xyz=test2"
+    end
+  end
 end

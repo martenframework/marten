@@ -17,6 +17,16 @@ module Marten
             raise Errors::TooManyParametersReceived.new("The number of parameters that were received is too large")
           end
         end
+
+        def as_query : String
+          builder = ::HTTP::Params::Builder.new
+          @params.each do |name, values|
+            values.each do |value|
+              builder.add(name, value)
+            end
+          end
+          builder.to_s
+        end
       end
     end
   end

@@ -14,7 +14,7 @@ module Marten
         @@permanent = permanent
       end
 
-      def self.permanent(route_name : String?)
+      def self.route_name(route_name : String?)
         @@route_name = route_name
       end
 

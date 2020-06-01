@@ -29,7 +29,9 @@ module Marten
       end
 
       private def redirect_url
-        self.class.url || (self.class.route_name && reverse(self.class.route_name.not_nil!, params))
+        url = self.class.url || (self.class.route_name && reverse(self.class.route_name.not_nil!, params))
+        url = "#{url}?#{request.query_params.as_query}" if self.class.forward_query_string
+        url
       end
     end
   end

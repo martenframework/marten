@@ -117,6 +117,23 @@ describe Marten::Views::Redirect do
       response.status.should eq 302
       response.headers["Location"].should eq Marten.routes.reverse("dummy_with_id", id: 42)
     end
+
+    it "properly forwards query params if the corresponding option is enabled" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers.new
+        )
+      )
+      view = Marten::Views::RedirectSpec::ViewWithQueryStringForwardingEnabled.new(
+        request,
+        Hash(String, Marten::Routing::Parameter::Types){ "id" => 42 }
+      )
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com?foo=bar&foo=baz&xyz=test"
+    end
   end
 end
 

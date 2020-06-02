@@ -28,6 +28,30 @@ module Marten
         self.class.permanent ? HTTP::Response::PermanentRedirect.new(url) : HTTP::Response::Redirect.new(url)
       end
 
+      def head
+        get
+      end
+
+      def post
+        get
+      end
+
+      def options
+        get
+      end
+
+      def delete
+        get
+      end
+
+      def put
+        get
+      end
+
+      def patch
+        get
+      end
+
       private def redirect_url
         url = self.class.url || (self.class.route_name && reverse(self.class.route_name.not_nil!, params))
         url = "#{url}?#{request.query_params.as_query}" if self.class.forward_query_string

@@ -135,6 +135,72 @@ describe Marten::Views::Redirect do
       response.headers["Location"].should eq "https://example.com?foo=bar&foo=baz&xyz=test"
     end
   end
+
+  describe "#head" do
+    it "produces the same behaviour as GET requests" do
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "HEAD", resource: "", headers: HTTP::Headers.new))
+      view = Marten::Views::RedirectSpec::TemporaryStaticRedirect.new(request)
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com"
+    end
+  end
+
+  describe "#post" do
+    it "produces the same behaviour as GET requests" do
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers.new))
+      view = Marten::Views::RedirectSpec::TemporaryStaticRedirect.new(request)
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com"
+    end
+  end
+
+  describe "#options" do
+    it "produces the same behaviour as GET requests" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "OPTIONS", resource: "", headers: HTTP::Headers.new)
+      )
+      view = Marten::Views::RedirectSpec::TemporaryStaticRedirect.new(request)
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com"
+    end
+  end
+
+  describe "#delete" do
+    it "produces the same behaviour as GET requests" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "DELETE", resource: "", headers: HTTP::Headers.new)
+      )
+      view = Marten::Views::RedirectSpec::TemporaryStaticRedirect.new(request)
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com"
+    end
+  end
+
+  describe "#put" do
+    it "produces the same behaviour as GET requests" do
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "PUT", resource: "", headers: HTTP::Headers.new))
+      view = Marten::Views::RedirectSpec::TemporaryStaticRedirect.new(request)
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com"
+    end
+  end
+
+  describe "#patch" do
+    it "produces the same behaviour as GET requests" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "PATCH", resource: "", headers: HTTP::Headers.new)
+      )
+      view = Marten::Views::RedirectSpec::TemporaryStaticRedirect.new(request)
+      response = view.dispatch
+      response.status.should eq 302
+      response.headers["Location"].should eq "https://example.com"
+    end
+  end
 end
 
 module Marten::Views::RedirectSpec

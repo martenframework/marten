@@ -24,7 +24,7 @@ describe Marten::Routing::Parameter::Integer do
     it "loads an integer parameter" do
       parameter = Marten::Routing::Parameter::Integer.new
       parameter.loads("42").should eq 42
-      parameter.loads("42").should be_a Int64
+      parameter.loads("42").should be_a UInt64
     end
   end
 
@@ -37,6 +37,11 @@ describe Marten::Routing::Parameter::Integer do
     it "returns nil if the input is not an integer" do
       parameter = Marten::Routing::Parameter::Integer.new
       parameter.dumps({ foo: "bar" }).should be_nil
+    end
+
+    it "returns nil if the integer is less than 0" do
+      parameter = Marten::Routing::Parameter::Integer.new
+      parameter.dumps(-42).should be_nil
     end
   end
 end

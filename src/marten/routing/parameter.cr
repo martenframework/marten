@@ -3,7 +3,7 @@ module Marten
     module Parameter
       DEFAULT_TYPE = "str"
 
-      alias Types = Int16 | Int32 | Int64 | ::String | ::UUID
+      alias Types = Int8 | Int16 | Int32 | Int64 | UInt8 | UInt16 | UInt32 | UInt64 | ::String | ::UUID
 
       @@registry = {} of ::String => Base
 

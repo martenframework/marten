@@ -12,10 +12,6 @@ module Marten
           end
         end
       end
-
-      def self.old_namespace(namespace : String | Symbol)
-        Marten::Conf.register_settings_namespace(namespace.to_s, self)
-      end
     end
   end
 end

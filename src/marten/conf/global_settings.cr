@@ -142,14 +142,6 @@ module Marten
         setup_db_connections
       end
 
-      macro method_missing(call)
-        def {{ call.name }} : Settings
-          settings = Marten::Conf.settings_namespaces.fetch("{{ call.name }}", nil)
-          return settings unless settings.nil?
-          raise UnknownSettingsNamespace.new("No '{{ call.name }}' settings namespace available")
-        end
-      end
-
       private def setup_log_backend
         # TODO: define log backend as part of log backend initialization instead.
         log_backend.as(::Log::IOBackend).formatter = ::Log::Formatter.new do |entry, io|

@@ -4,6 +4,8 @@ module Marten
     class GlobalSettings
       class UnknownSettingsNamespace < Exception; end
 
+      @@registered_settings_namespaces = [] of String
+
       @request_max_parameters : Nil | Int32
       @view400 : Views::Base.class
       @view403 : Views::Base.class
@@ -98,6 +100,15 @@ module Marten
 
       # Allows to set the view class that should generate responses for Internal Error responses (HTTP 500).
       setter view500
+
+      # :nodoc:
+      def self.register_settings_namespace(ns)
+        if @@registered_settings_namespaces.includes?(ns)
+          raise Errors::InvalidConfiguration.new("Setting namespace '#{ns}' is defined more than once")
+        end
+
+        @@registered_settings_namespaces << ns
+      end
 
       def initialize
         @allowed_hosts = [] of String

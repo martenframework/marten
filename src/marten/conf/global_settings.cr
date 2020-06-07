@@ -102,12 +102,17 @@ module Marten
       setter view500
 
       # :nodoc:
-      def self.register_settings_namespace(ns)
-        if @@registered_settings_namespaces.includes?(ns)
+      def self.register_settings_namespace(ns : String)
+        if settings_namespace_registered?(ns)
           raise Errors::InvalidConfiguration.new("Setting namespace '#{ns}' is defined more than once")
         end
 
         @@registered_settings_namespaces << ns
+      end
+
+      # :nodoc:
+      def self.settings_namespace_registered?(ns : String) : Bool
+        @@registered_settings_namespaces.includes?(ns)
       end
 
       def initialize

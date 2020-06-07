@@ -1,6 +1,32 @@
 require "./spec_helper"
 
 describe Marten::Conf::GlobalSettings do
+  describe "::register_settings_namespace" do
+    it "allows to register a specific settings namespace" do
+      Marten::Conf::GlobalSettings.settings_namespace_registered?("testing_global_settings_1").should be_false
+      Marten::Conf::GlobalSettings.register_settings_namespace("testing_global_settings_1")
+      Marten::Conf::GlobalSettings.settings_namespace_registered?("testing_global_settings_1").should be_true
+    end
+
+    it "raises if a settings namespace is registered more than once" do
+      Marten::Conf::GlobalSettings.register_settings_namespace("testing_global_settings_2")
+      expect_raises(Marten::Conf::Errors::InvalidConfiguration) do
+        Marten::Conf::GlobalSettings.register_settings_namespace("testing_global_settings_2")
+      end
+    end
+  end
+
+  describe "::settings_namespace_registered?" do
+    it "returns true if the passed namespace string is registered" do
+      Marten::Conf::GlobalSettings.register_settings_namespace("testing_global_settings_3")
+      Marten::Conf::GlobalSettings.settings_namespace_registered?("testing_global_settings_3").should be_true
+    end
+
+    it "returns false if the passed namespace string is not registered" do
+      Marten::Conf::GlobalSettings.settings_namespace_registered?("testing_global_settings_unknown").should be_false
+    end
+  end
+
   describe "#allowed_hosts" do
     it "returns an empty list by default" do
       global_settings = Marten::Conf::GlobalSettings.new

@@ -25,7 +25,7 @@ module Marten
           config = Marten.apps.get_containing_model(self)
 
           if config.nil?
-            raise Exception.new("Model class is not part of an application defined in Marten.config.installed_apps")
+            raise Exception.new("Model class is not part of an application defined in Marten.settings.installed_apps")
           end
 
           config.not_nil!

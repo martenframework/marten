@@ -5,12 +5,19 @@ module Marten
         def initialize
         end
 
-        def execute
+        def execute : Array(Model)
           execute_query(build_query)
         end
 
-        def first
+        def first : Model
           execute_query(build_first_query).first
+        end
+
+        def exists? : Bool
+          Model.connection.open do |db|
+            result = db.scalar(build_exists_query)
+            result.to_s == "1"
+          end
         end
 
         def count
@@ -44,6 +51,14 @@ module Marten
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
             s << "LIMIT 1"
+          end
+        end
+
+        private def build_exists_query
+          build_sql do |s|
+            s << "SELECT EXISTS("
+            s << "  SELECT 1 FROM #{table_name}"
+            s << ")"
           end
         end
 

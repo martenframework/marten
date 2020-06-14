@@ -20,6 +20,10 @@ module Marten
         @result_cache.nil? ? @query.first : super
       end
 
+      def exists?
+        @result_cache.nil? ? @query.exists? : !@result_cache.not_nil!.empty?
+      end
+
       def count
         @query.count
       end

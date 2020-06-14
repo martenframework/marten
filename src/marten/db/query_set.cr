@@ -16,6 +16,10 @@ module Marten
         end
       end
 
+      def first
+        @result_cache.nil? ? @query.first : super
+      end
+
       def count
         @query.count
       end

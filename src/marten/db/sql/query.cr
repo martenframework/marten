@@ -44,7 +44,6 @@ module Marten
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
             s << "LIMIT 1"
-            s << offset
           end
         end
 

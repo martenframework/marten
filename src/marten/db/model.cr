@@ -2,6 +2,7 @@ module Marten
   module DB
     abstract class Model
       @@app_config : Marten::Apps::Config?
+      @@fields : Hash(String, Field::Base) = {} of String => Field::Base
       @@table_name : String?
 
       def self.table_name
@@ -17,7 +18,7 @@ module Marten
       end
 
       def self.all
-        QuerySet.new(self)
+        QuerySet(self).new
       end
 
       macro field(*args, **kwargs)
@@ -36,7 +37,17 @@ module Marten
       end
 
       protected def self.register_field(id, type, **options)
-        # Do something...
+        field_klass = Field.registry.fetch(type, nil)
+        raise "Unknown model field type '#{type}' for field '#{id}'" if field_klass.nil?
+
+        # TODO: handle fields registered more than once.
+        # TODO: handle fields inheritance.
+
+        @@fields[id] = field_klass.not_nil!.new(id, **options)
+      end
+
+      protected def self.fields
+        @@fields.values
       end
 
       private def self.app_config
@@ -44,7 +55,7 @@ module Marten
           config = Marten.apps.get_containing_model(self)
 
           if config.nil?
-            raise Exception.new("Model class is not part of an application defined in Marten.settings.installed_apps")
+            raise "Model class is not part of an application defined in Marten.settings.installed_apps"
           end
 
           config.not_nil!

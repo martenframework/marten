@@ -2,11 +2,7 @@ module Marten
   module Routing
     module Parameter
       class Slug < Base
-        private REGEX = /[-a-zA-Z0-9_]+/
-
-        def regex : Regex
-          REGEX
-        end
+        regex /[-a-zA-Z0-9_]+/
 
         def loads(value : ::String) : ::String
           value

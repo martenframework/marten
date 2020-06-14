@@ -2,11 +2,7 @@ module Marten
   module Routing
     module Parameter
       class String < Base
-        private REGEX = /[^\/]+/
-
-        def regex : Regex
-          REGEX
-        end
+        regex /[^\/]+/
 
         def loads(value : ::String) : ::String
           value

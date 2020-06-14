@@ -2,11 +2,7 @@ module Marten
   module Routing
     module Parameter
       class Integer < Base
-        private REGEX = /[0-9]+/
-
-        def regex : Regex
-          REGEX
-        end
+        regex /[0-9]+/
 
         def loads(value : ::String) : UInt64
           value.to_u64

@@ -1,8 +1,6 @@
 module Marten
   module DB
     abstract class Model
-      annotation FieldAnnotation; end
-
       @@app_config : Marten::Apps::Config?
       @@fields : Hash(String, Field::Base) = {} of String => Field::Base
       @@table_name : String?

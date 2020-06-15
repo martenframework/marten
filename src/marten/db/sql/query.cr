@@ -31,8 +31,8 @@ module Marten
           results = [] of Model
 
           Model.connection.open do |db|
-            db.query query do |record_set|
-              record_set.each { results << Model.new }
+            db.query query do |result_set|
+              result_set.each { results << Model.from_db_result_set(result_set) }
             end
           end
 

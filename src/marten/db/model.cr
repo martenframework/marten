@@ -1,9 +1,14 @@
 module Marten
   module DB
     abstract class Model
+      annotation FieldAnnotation; end
+
       @@app_config : Marten::Apps::Config?
       @@fields : Hash(String, Field::Base) = {} of String => Field::Base
       @@table_name : String?
+
+      # :nodoc:
+      @new_record : Bool = true
 
       def self.table_name
         @@table_name ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
@@ -22,6 +27,7 @@ module Marten
       end
 
       macro field(*args, **kwargs)
+        {{ Marten::DB::Field::Base.all_subclasses }}
         {% if args.size != 2 %}{% raise "A field name and type must be explicitly specified" %}{% end %}
 
         {% sanitized_id = args[0].is_a?(StringLiteral) || args[0].is_a?(SymbolLiteral) ? args[0].id : nil %}
@@ -36,6 +42,15 @@ module Marten
         end
       end
 
+      protected setter new_record
+
+      protected def self.from_db_result_set(result_set : ::DB::ResultSet)
+        obj = new
+        obj.new_record = false
+        obj.from_db_result_set(result_set)
+        obj
+      end
+
       protected def self.register_field(id, type, **options)
         field_klass = Field.registry.fetch(type, nil)
         raise "Unknown model field type '#{type}' for field '#{id}'" if field_klass.nil?
@@ -48,6 +63,14 @@ module Marten
 
       protected def self.fields
         @@fields.values
+      end
+
+      protected def from_db_result_set(result_set : ::DB::ResultSet)
+        result_set.column_names.each do |column_name|
+          field = @@fields.fetch(column_name, nil)
+          next if field.nil?
+          # assign... field.from_db_result_set(result_set)
+        end
       end
 
       private def self.app_config

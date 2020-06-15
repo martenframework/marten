@@ -17,6 +17,8 @@ module Marten
           @name = nil
         )
         end
+
+        abstract def from_db_result_set(result_set : ::DB::ResultSet)
       end
     end
   end

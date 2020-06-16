@@ -25,7 +25,6 @@ module Marten
       end
 
       macro field(*args, **kwargs)
-        {{ Marten::DB::Field::Base.all_subclasses }}
         {% if args.size != 2 %}{% raise "A field name and type must be explicitly specified" %}{% end %}
 
         {% sanitized_id = args[0].is_a?(StringLiteral) || args[0].is_a?(SymbolLiteral) ? args[0].id : nil %}
@@ -33,6 +32,17 @@ module Marten
 
         {% sanitized_type = args[1].is_a?(StringLiteral) || args[1].is_a?(SymbolLiteral) ? args[1].id : nil %}
         {% if sanitized_type.is_a?(NilLiteral) %}{% raise "Cannot use '#{args[1]}' as a valid field type" %}{% end %}
+
+        {% type_exists = false %}
+        {% for field_klass in Marten::DB::Field::Base.all_subclasses %}
+          {% field_ann = field_klass.annotation(Marten::DB::Field::Registration) %}
+          {% if field_ann && field_ann[:field_id] == sanitized_type %}
+            {% type_exists = true %}
+          {% end %}
+        {% end %}
+        {% unless type_exists %}
+          {% raise "'#{sanitized_type}' is not a valid type for field '#{@type.id}##{sanitized_id}'" %}
+        {% end %}
 
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 

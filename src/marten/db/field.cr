@@ -13,9 +13,18 @@ module Marten
       end
 
       macro register(id, field_klass)
-        @[Marten::DB::Field::Registration(field_id: {{ id }})]
-        class ::{{field_klass.resolve.id}}; end
-        add_field_to_registry({{ id }}, {{ field_klass }})
+        {% klass = field_klass.resolve %}
+
+        {% exposed_type = nil %}
+        {% for method in klass.methods %}
+          {% if method.name == "from_db_result_set" %}
+            {% exposed_type = method.return_type %}
+          {% end %}
+        {% end %}
+
+        @[Marten::DB::Field::Registration(id: {{ id }}, exposed_type: {{ exposed_type }})]
+        class ::{{klass.id}}; end
+        add_field_to_registry({{ id }}, {{ klass }})
       end
 
       register "int", Integer

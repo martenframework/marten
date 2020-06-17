@@ -29,6 +29,7 @@ module Marten
 
       register "int", Integer
       register "string", String
+      register "uuid", UUID
 
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
         @@registry[id.to_s] = field_klass

@@ -1,6 +1,9 @@
 module Marten
   module DB
     abstract class Model
+      annotation FieldVar
+      end
+
       @@app_config : Marten::Apps::Config?
       @@fields : Hash(String, Field::Base) = {} of String => Field::Base
       @@table_name : String?
@@ -34,10 +37,14 @@ module Marten
         {% if sanitized_type.is_a?(NilLiteral) %}{% raise "Cannot use '#{args[1]}' as a valid field type" %}{% end %}
 
         {% type_exists = false %}
-        {% for field_klass in Marten::DB::Field::Base.all_subclasses %}
-          {% field_ann = field_klass.annotation(Marten::DB::Field::Registration) %}
-          {% if field_ann && field_ann[:field_id] == sanitized_type %}
+        {% field_klass = nil %}
+        {% field_ann = nil %}
+        {% for k in Marten::DB::Field::Base.all_subclasses %}
+          {% ann = k.annotation(Marten::DB::Field::Registration) %}
+          {% if ann && ann[:id] == sanitized_type %}
             {% type_exists = true %}
+            {% field_klass = k %}
+            {% field_ann = ann %}
           {% end %}
         {% end %}
         {% unless type_exists %}
@@ -46,8 +53,14 @@ module Marten
 
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 
-        def {{ sanitized_id }}
+        @[Marten::DB::Model::FieldVar(field_klass: {{ field_klass }} )]
+        @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
+
+        def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}
+         @{{ sanitized_id }}
         end
+
+        def {{ sanitized_id }}=(@{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?); end
       end
 
       protected setter new_record
@@ -74,11 +87,20 @@ module Marten
       end
 
       protected def from_db_result_set(result_set : ::DB::ResultSet)
+        {% begin %}
         result_set.column_names.each do |column_name|
           field = @@fields.fetch(column_name, nil)
           next if field.nil?
-          # assign... field.from_db_result_set(result_set)
+          case column_name
+          {% for field_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::FieldVar) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::FieldVar) %}
+          when {{ field_var.name.stringify }}
+            @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          {% end %}
+          else
+          end
         end
+        {% end %}
       end
 
       private def self.app_config

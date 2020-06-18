@@ -19,13 +19,14 @@ module Marten
         end
 
         def as_query : String
-          builder = ::HTTP::Params::Builder.new
-          @params.each do |name, values|
-            values.each do |value|
-              builder.add(name, value)
+          String.build do |io|
+            builder = ::HTTP::Params::Builder.new(io)
+            @params.each do |name, values|
+              values.each do |value|
+                builder.add(name, value)
+              end
             end
           end
-          builder.to_s
         end
       end
     end

@@ -27,6 +27,7 @@ module Marten
         add_field_to_registry({{ id }}, {{ klass }})
       end
 
+      register "datetime", DateTime
       register "int", Integer
       register "string", String
       register "uuid", UUID

@@ -56,7 +56,7 @@ module Marten
         @[Marten::DB::Model::FieldVar(field_klass: {{ field_klass }} )]
         @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
 
-        def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}
+        def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
          @{{ sanitized_id }}
         end
 

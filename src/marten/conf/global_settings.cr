@@ -121,7 +121,13 @@ module Marten
         @debug = false
         @host = "localhost"
         @installed_apps = Array(Marten::Apps::Config.class).new
-        @log_backend = ::Log::IOBackend.new
+        log_formatter = ::Log::Formatter.new do |entry, io|
+          io << "[#{entry.severity.to_s[0]}] "
+          io << "[#{entry.timestamp.to_utc}] "
+          io << "[Server] "
+          io << entry.message
+        end
+        @log_backend = ::Log::IOBackend.new(formatter: log_formatter)
         @port = 8000
         @port_reuse = true
         @request_max_parameters = 1000
@@ -159,14 +165,7 @@ module Marten
       end
 
       private def setup_log_backend
-        # TODO: define log backend as part of log backend initialization instead.
-        log_backend.as(::Log::IOBackend).formatter = ::Log::Formatter.new do |entry, io|
-          io << "[#{entry.severity.to_s[0]}] "
-          io << "[#{entry.timestamp.to_utc}] "
-          io << "[Server] "
-          io << entry.message
-        end
-        ::Log.builder.bind("marten.*", :debug, log_backend)
+        ::Log.setup(:debug, log_backend)
       end
 
       private def setup_db_connections

@@ -289,6 +289,27 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#time_zone" do
+    it "returns a UTC time zone location by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.time_zone.should eq Time::Location.load("UTC")
+    end
+
+    it "returns the configured time zone location if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.time_zone = Time::Location.load("Europe/Paris")
+      global_settings.time_zone.should eq Time::Location.load("Europe/Paris")
+    end
+  end
+
+  describe "#time_zone=" do
+    it "allows to configure tje time zone of the application" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.time_zone = Time::Location.load("EST")
+      global_settings.time_zone.should eq Time::Location.load("EST")
+    end
+  end
+
   describe "#use_x_forwarded_host" do
     it "returns false by default" do
       global_settings = Marten::Conf::GlobalSettings.new

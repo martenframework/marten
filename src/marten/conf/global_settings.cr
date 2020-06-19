@@ -42,6 +42,9 @@ module Marten
       # Returns the secret key of the application.
       getter secret_key
 
+      # Returns the default time zone used by the application when it comes to display date times.
+      getter time_zone
+
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
 
@@ -85,6 +88,9 @@ module Marten
       #
       # The secret key will be used provide cryptographic signing. It should be unique and unpredictable.
       setter secret_key
+
+      # Allows to set the default time zone used by the application when it comes to display date times.
+      setter time_zone
 
       # Allows to set whether the X-Forwarded-Host header is used to look for the host.
       setter use_x_forwarded_host
@@ -132,6 +138,7 @@ module Marten
         @port_reuse = true
         @request_max_parameters = 1000
         @secret_key = ""
+        @time_zone = Time::Location.load("UTC")
         @use_x_forwarded_host = false
         @view400 = Views::Defaults::BadRequest
         @view403 = Views::Defaults::PermissionDenied

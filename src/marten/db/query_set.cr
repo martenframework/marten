@@ -16,7 +16,7 @@ module Marten
       end
 
       def [](index : Int)
-        raise IndexError.new("Negative indexes are not supported") if index < 0
+        raise "Negative indexes are not supported" if index < 0
 
         @result_cache.not_nil![index] unless @result_cache.nil?
 
@@ -26,6 +26,12 @@ module Marten
         qs.query.limit = 1
         qs.fetch
         qs.result_cache.not_nil![0]
+      end
+
+      def []?(index : Int)
+        self[index]
+      rescue IndexError
+        nil
       end
 
       def all

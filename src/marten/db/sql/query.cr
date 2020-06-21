@@ -27,6 +27,11 @@ module Marten
           end
         end
 
+        protected def clone
+          cloned = self.class.new
+          cloned
+        end
+
         private def execute_query(query)
           results = [] of Model
 

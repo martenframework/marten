@@ -5,8 +5,7 @@ module Marten
 
       @result_cache : Array(Model)?
 
-      def initialize
-        @query = SQL::Query(Model).new
+      def initialize(@query = SQL::Query(Model).new)
       end
 
       def each
@@ -14,6 +13,10 @@ module Marten
         @result_cache.not_nil!.each do |r|
           yield r
         end
+      end
+
+      def all
+        clone
       end
 
       def first
@@ -26,6 +29,11 @@ module Marten
 
       def count
         @query.count
+      end
+
+      protected def clone
+        cloned = self.class.new(query: @query.clone)
+        cloned
       end
 
       private def fetch

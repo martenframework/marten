@@ -16,7 +16,7 @@ module Marten
       end
 
       def [](index : Int)
-        raise "Negative indexes are not supported" if index < 0
+        raise_negative_indexes_not_supported if index < 0
 
         return @result_cache.not_nil![index] unless @result_cache.nil?
 
@@ -30,6 +30,35 @@ module Marten
 
       def []?(index : Int)
         self[index]
+      rescue IndexError
+        nil
+      end
+
+      def [](range : Range)
+        raise_negative_indexes_not_supported if !range.begin.nil? && range.begin.not_nil! < 0
+        raise_negative_indexes_not_supported if !range.end.nil? && range.end.not_nil! < 0
+
+        return @result_cache.not_nil![range] unless @result_cache.nil?
+
+        qs = clone
+
+        offset = range.begin.nil? ? 0 : range.begin.not_nil!
+        qs.query.offset = offset
+
+        unless range.end.nil?
+          qs.query.limit = range.excludes_end? ? (range.end.not_nil! - offset) : (range.end.not_nil! + 1 - offset)
+        end
+
+        qs.fetch
+        results = qs.result_cache.not_nil!.to_a
+
+        raise IndexError.new("Index out of bounds") if results.empty? && offset > 0
+
+        results
+      end
+
+      def []?(range : Range)
+        self[range]
       rescue IndexError
         nil
       end
@@ -60,6 +89,10 @@ module Marten
 
       protected def fetch
         @result_cache = @query.execute
+      end
+
+      private def raise_negative_indexes_not_supported
+        raise "Negative indexes are not supported"
       end
     end
   end

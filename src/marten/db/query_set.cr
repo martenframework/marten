@@ -15,6 +15,19 @@ module Marten
         end
       end
 
+      def [](index : Int)
+        @result_cache.not_nil![index] unless @result_cache.nil?
+
+        # TODO: raise in case of negative index.
+
+        qs = clone
+
+        qs.query.offset = index
+        qs.query.limit = 1
+        qs.fetch
+        qs.result_cache.not_nil![0]
+      end
+
       def all
         clone
       end
@@ -31,12 +44,15 @@ module Marten
         @query.count
       end
 
+      protected getter query
+      protected getter result_cache
+
       protected def clone
         cloned = self.class.new(query: @query.clone)
         cloned
       end
 
-      private def fetch
+      protected def fetch
         @result_cache = @query.execute
       end
     end

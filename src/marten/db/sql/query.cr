@@ -2,8 +2,8 @@ module Marten
   module DB
     module SQL
       class Query(Model)
-        def initialize
-        end
+        @limit : Int64? = nil
+        @offset : Int64? = nil
 
         def execute : Array(Model)
           execute_query(build_query)
@@ -27,6 +27,14 @@ module Marten
           end
         end
 
+        def limit=(limit)
+          @limit = limit.to_i64
+        end
+
+        def offset=(offset)
+          @offset = offset.to_i64
+        end
+
         protected def clone
           cloned = self.class.new
           cloned
@@ -48,6 +56,8 @@ module Marten
           build_sql do |s|
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
+            s << "LIMIT #{@limit}" unless @limit.nil?
+            s << "OFFSET #{@offset}" unless @offset.nil?
           end
         end
 
@@ -56,6 +66,7 @@ module Marten
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
             s << "LIMIT 1"
+            s << "OFFSET #{@offset}" unless @offset.nil?
           end
         end
 

@@ -16,9 +16,9 @@ module Marten
       end
 
       def [](index : Int)
-        @result_cache.not_nil![index] unless @result_cache.nil?
+        raise IndexError.new("Negative indexes are not supported") if index < 0
 
-        # TODO: raise in case of negative index.
+        @result_cache.not_nil![index] unless @result_cache.nil?
 
         qs = clone
 

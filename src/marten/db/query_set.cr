@@ -49,12 +49,7 @@ module Marten
           qs.query.limit = range.excludes_end? ? (range.end.not_nil! - offset) : (range.end.not_nil! + 1 - offset)
         end
 
-        qs.fetch
-        results = qs.result_cache.not_nil!.to_a
-
-        raise IndexError.new("Index out of bounds") if results.empty? && offset > 0
-
-        results
+        qs
       end
 
       def []?(range : Range)

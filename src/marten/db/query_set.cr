@@ -8,6 +8,14 @@ module Marten
       def initialize(@query = SQL::Query(Model).new)
       end
 
+      def inspect(io)
+        results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
+        io << "<#{self.class.name} ["
+        io << "#{results[...INSPECT_RESULTS_LIMIT].join(", ")}"
+        io << ", ...(remaining truncated)..." if results.size > INSPECT_RESULTS_LIMIT
+        io << "]>"
+      end
+
       def each
         fetch if @result_cache.nil?
         @result_cache.not_nil!.each do |r|
@@ -85,6 +93,8 @@ module Marten
       protected def fetch
         @result_cache = @query.execute
       end
+
+      private INSPECT_RESULTS_LIMIT = 20
 
       private def raise_negative_indexes_not_supported
         raise "Negative indexes are not supported"

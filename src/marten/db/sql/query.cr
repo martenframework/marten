@@ -2,8 +2,11 @@ module Marten
   module DB
     module SQL
       class Query(Model)
-        @limit : Int64? = nil
-        @offset : Int64? = nil
+        @limit = nil
+        @offset = nil
+
+        def initialize(@limit : Int64?, @offset : Int64?)
+        end
 
         def execute : Array(Model)
           execute_query(build_query)
@@ -36,7 +39,7 @@ module Marten
         end
 
         protected def clone
-          cloned = self.class.new
+          cloned = self.class.new(limit: @limit, offset: @offset)
           cloned
         end
 

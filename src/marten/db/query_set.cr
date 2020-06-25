@@ -82,6 +82,12 @@ module Marten
         @query.count
       end
 
+      def order(*fields : String | Symbol)
+        qs = clone
+        qs.query.order(*fields.map(&.to_s))
+        qs
+      end
+
       protected getter query
       protected getter result_cache
 

@@ -4,8 +4,9 @@ module Marten
       class Query(Model)
         @limit = nil
         @offset = nil
+        @order_clauses = nil
 
-        def initialize(@limit : Int64?, @offset : Int64?)
+        def initialize(@limit : Int64?, @offset : Int64?, @order_clauses : Array({String, Bool})?)
         end
 
         def execute : Array(Model)
@@ -38,10 +39,24 @@ module Marten
           @offset = offset.to_i64
         end
 
+        def order(*fields : String) : Nil
+          order_clauses = [] of {String, Bool}
+          fields.each do |field|
+            reversed = field.starts_with?('-')
+            field = field[1..] if reversed
+            # TODO: add field validation
+
+            order_clauses << {field, reversed}
+          end
+          @order_clauses = order_clauses
+        end
+
         protected def clone
-          cloned = self.class.new(limit: @limit, offset: @offset)
+          cloned = self.class.new(limit: @limit, offset: @offset, order_clauses: @order_clauses)
           cloned
         end
+
+        private LOOKUP_SEP = "__"
 
         private def execute_query(query)
           results = [] of Model
@@ -59,6 +74,7 @@ module Marten
           build_sql do |s|
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
+            s << order_by
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
@@ -68,6 +84,7 @@ module Marten
           build_sql do |s|
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
+            s << order_by
             s << "LIMIT 1"
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
@@ -86,6 +103,14 @@ module Marten
             s << "SELECT COUNT(*)"
             s << "FROM #{table_name}"
           end
+        end
+
+        private def order_by
+          return if @order_clauses.nil? || @order_clauses.not_nil!.empty?
+          clauses = @order_clauses.not_nil!.map do |field, reversed|
+            reversed ? "#{field} DESC" : "#{field} ASC"
+          end
+          "ORDER BY #{clauses.join(", ")}"
         end
 
         private def build_sql

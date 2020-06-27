@@ -4,9 +4,13 @@ module Marten
       class Query(Model)
         @limit = nil
         @offset = nil
-        @order_clauses = nil
+        @order_clauses = [] of {String, Bool}
 
-        def initialize(@limit : Int64?, @offset : Int64?, @order_clauses : Array({String, Bool})?)
+        def initialize(
+          @limit : Int64?,
+          @offset : Int64?,
+          @order_clauses : Array({String, Bool}),
+        )
         end
 
         def execute : Array(Model)
@@ -52,7 +56,11 @@ module Marten
         end
 
         protected def clone
-          cloned = self.class.new(limit: @limit, offset: @offset, order_clauses: @order_clauses)
+          cloned = self.class.new(
+            limit: @limit,
+            offset: @offset,
+            order_clauses: @order_clauses
+          )
           cloned
         end
 
@@ -106,8 +114,8 @@ module Marten
         end
 
         private def order_by
-          return if @order_clauses.nil? || @order_clauses.not_nil!.empty?
-          clauses = @order_clauses.not_nil!.map do |field, reversed|
+          return if @order_clauses.empty?
+          clauses = @order_clauses.map do |field, reversed|
             reversed ? "#{field} DESC" : "#{field} ASC"
           end
           "ORDER BY #{clauses.join(", ")}"

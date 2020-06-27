@@ -88,6 +88,12 @@ module Marten
         qs
       end
 
+      def reverse
+        qs = clone
+        qs.query.default_ordering = !@query.default_ordering
+        qs
+      end
+
       protected getter query
       protected getter result_cache
 

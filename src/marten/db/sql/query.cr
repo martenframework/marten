@@ -2,11 +2,17 @@ module Marten
   module DB
     module SQL
       class Query(Model)
+        @default_ordering = true
         @limit = nil
         @offset = nil
         @order_clauses = [] of {String, Bool}
 
+        getter default_ordering
+
+        setter default_ordering
+
         def initialize(
+          @default_ordering : Bool,
           @limit : Int64?,
           @offset : Int64?,
           @order_clauses : Array({String, Bool}),
@@ -57,6 +63,7 @@ module Marten
 
         protected def clone
           cloned = self.class.new(
+            default_ordering: @default_ordering,
             limit: @limit,
             offset: @offset,
             order_clauses: @order_clauses
@@ -116,7 +123,7 @@ module Marten
         private def order_by
           return if @order_clauses.empty?
           clauses = @order_clauses.map do |field, reversed|
-            reversed ? "#{field} DESC" : "#{field} ASC"
+            reversed ^ @default_ordering ? "#{field} ASC" : "#{field} DESC"
           end
           "ORDER BY #{clauses.join(", ")}"
         end

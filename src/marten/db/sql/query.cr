@@ -2,6 +2,8 @@ module Marten
   module DB
     module SQL
       class Query(Model)
+        LOOKUP_SEP = "__"
+
         @default_ordering = true
         @limit = nil
         @offset = nil
@@ -54,7 +56,6 @@ module Marten
           fields.each do |field|
             reversed = field.starts_with?('-')
             field = field[1..] if reversed
-            # TODO: add field validation
 
             order_clauses << {field, reversed}
           end
@@ -70,8 +71,6 @@ module Marten
           )
           cloned
         end
-
-        private LOOKUP_SEP = "__"
 
         private def execute_query(query)
           results = [] of Model

@@ -79,7 +79,9 @@ module Marten
       protected def self.register_field(id, type, **options)
         field_klass = Field.registry[type]
 
-        raise Errors::FieldError.new("Field names cannot contain '__'") if id.includes?("__")
+        if id.includes?(SQL::Query::LOOKUP_SEP)
+          raise Errors::FieldError.new("Field names cannot contain '#{SQL::Query::LOOKUP_SEP}'")
+        end
 
         @@fields[id] = field_klass.not_nil!.new(id, **options)
       end

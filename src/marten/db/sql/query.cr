@@ -56,7 +56,7 @@ module Marten
           fields.each do |field|
             reversed = field.starts_with?('-')
             field = field[1..] if reversed
-
+            verify_field(field)
             order_clauses << {field, reversed}
           end
           @order_clauses = order_clauses
@@ -138,6 +138,20 @@ module Marten
 
         private def columns
           Model.fields.map(&.id).flatten.join(", ")
+        end
+
+        private def verify_field(raw_field)
+          raw_field.split(LOOKUP_SEP).each_with_index do |part, i|
+            raise NotImplementedError.new("Model relations are not implemented yet") if i > 0
+            begin
+              Model.get_field(part)
+            rescue Errors::UnknownField
+              valid_choices = Model.fields.map(&.id).join(", ")
+              raise Errors::InvalidField.new(
+                "Unable to resolve '#{part}' as a field. Valid choices are: #{valid_choices}."
+              )
+            end
+          end
         end
       end
     end

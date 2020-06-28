@@ -80,7 +80,7 @@ module Marten
         field_klass = Field.registry[type]
 
         if id.includes?(SQL::Query::LOOKUP_SEP)
-          raise Errors::FieldError.new("Field names cannot contain '#{SQL::Query::LOOKUP_SEP}'")
+          raise Errors::InvalidField.new("Field names cannot contain '#{SQL::Query::LOOKUP_SEP}'")
         end
 
         @@fields[id] = field_klass.not_nil!.new(id, **options)

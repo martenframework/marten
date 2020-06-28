@@ -90,6 +90,10 @@ module Marten
         @@fields.values
       end
 
+      protected def self.get_field(id)
+        @@fields.fetch(id) { raise Errors::UnknownField.new("Unknown field '#{id}'") }
+      end
+
       protected def from_db_result_set(result_set : ::DB::ResultSet)
         {% begin %}
         result_set.column_names.each do |column_name|

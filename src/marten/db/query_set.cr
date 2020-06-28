@@ -94,6 +94,10 @@ module Marten
         qs
       end
 
+      def size
+        count
+      end
+
       protected getter query
       protected getter result_cache
 

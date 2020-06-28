@@ -77,11 +77,9 @@ module Marten
       end
 
       protected def self.register_field(id, type, **options)
-        field_klass = Field.registry.fetch(type, nil)
-        raise "Unknown model field type '#{type}' for field '#{id}'" if field_klass.nil?
+        field_klass = Field.registry[type]
 
-        # TODO: handle fields registered more than once.
-        # TODO: handle fields inheritance.
+        raise Errors::FieldError.new("Field names cannot contain '__'") if id.includes?("__")
 
         @@fields[id] = field_klass.not_nil!.new(id, **options)
       end

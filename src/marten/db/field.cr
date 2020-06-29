@@ -35,6 +35,16 @@ module Marten
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
         @@registry[id.to_s] = field_klass
       end
+
+      macro finished
+        {% field_types = [] of String %}
+        {% for k in Marten::DB::Field::Base.all_subclasses %}
+          {% ann = k.annotation(Marten::DB::Field::Registration) %}
+          {% field_types << ann[:exposed_type] %}
+        {% end %}
+
+        alias Types = {{ field_types.join(" | ").id }}
+      end
     end
   end
 end

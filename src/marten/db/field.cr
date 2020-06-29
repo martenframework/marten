@@ -43,7 +43,7 @@ module Marten
           {% field_types << ann[:exposed_type] %}
         {% end %}
 
-        alias Types = {{ field_types.join(" | ").id }}
+        alias Types = {% for t, i in field_types %}{{ t }}{% if i + 1 < field_types.size %} | {% end %}{% end %}
       end
     end
   end

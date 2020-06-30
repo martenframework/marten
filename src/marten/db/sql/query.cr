@@ -13,6 +13,9 @@ module Marten
 
         setter default_ordering
 
+        def initialize
+        end
+
         def initialize(
           @default_ordering : Bool,
           @limit : Int64?,

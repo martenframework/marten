@@ -76,6 +76,12 @@ module Marten
         filter(Q(Model).new(**kwargs))
       end
 
+      def filter(&block)
+        expr = Expression::Filter(Model).new
+        query : Q(Model) = with expr yield
+        filter(query)
+      end
+
       def filter(query : Q(Model))
       end
 

@@ -30,12 +30,16 @@ module Marten
         )
       end
 
+      def |(other : self)
+        combine(other, Connector::OR)
+      end
+
       protected getter children
       protected getter connector
       protected getter filters
       protected getter negated
 
-      protected def add(other : self, conn : String)
+      protected def add(other : self, conn : Connector)
         return if @children.includes?(other)
 
         if @connector == conn
@@ -50,7 +54,7 @@ module Marten
       private def combine(other, conn)
         combined = self.class.new(connector: conn)
         combined.add(self, conn)
-        conbined.add(other, conn)
+        combined.add(other, conn)
         combined
       end
     end

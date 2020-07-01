@@ -1,3 +1,5 @@
+require "./field"
+
 module Marten
   module DB
     class QuerySet(Model)
@@ -68,6 +70,13 @@ module Marten
 
       def all
         clone
+      end
+
+      def filter(**kwargs)
+        filter(Q(Model).new(**kwargs))
+      end
+
+      def filter(query : Q(Model))
       end
 
       def first

@@ -30,6 +30,10 @@ module Marten
         )
       end
 
+      def &(other : self)
+        combine(other, Connector::AND)
+      end
+
       def |(other : self)
         combine(other, Connector::OR)
       end

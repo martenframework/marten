@@ -65,6 +65,10 @@ module Marten
           @order_clauses = order_clauses
         end
 
+        protected def add_query_node(query_node : QueryNode(Model))
+
+        end
+
         protected def clone
           cloned = self.class.new(
             default_ordering: @default_ordering,

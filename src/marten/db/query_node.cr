@@ -2,7 +2,7 @@ require "./field"
 
 module Marten
   module DB
-    class Q(Model)
+    class QueryNode(Model)
       enum Connector
         AND
         OR

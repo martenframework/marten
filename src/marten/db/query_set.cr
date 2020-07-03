@@ -73,16 +73,19 @@ module Marten
       end
 
       def filter(**kwargs)
-        filter(Q(Model).new(**kwargs))
+        filter(QueryNode(Model).new(**kwargs))
       end
 
       def filter(&block)
         expr = Expression::Filter(Model).new
-        query : Q(Model) = with expr yield
+        query : QueryNode(Model) = with expr yield
         filter(query)
       end
 
-      def filter(query : Q(Model))
+      def filter(query_node : QueryNode(Model))
+        qs = clone
+        qs.query.add_query_node(query_node)
+        qs
       end
 
       def first

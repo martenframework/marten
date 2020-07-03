@@ -8,14 +8,6 @@ module Marten
         OR
       end
 
-      def initialize(
-        @children : Array(self),
-        @connector : Connector,
-        @negated : Bool,
-        @filters : Hash(String | Symbol, Field::Types)
-      )
-      end
-
       def initialize(@children = [] of self, @connector = Connector::AND, @negated = false, **kwargs)
         @filters = {} of String | Symbol => Field::Types
         @filters.merge!(kwargs.to_h)
@@ -42,6 +34,14 @@ module Marten
       protected getter connector
       protected getter filters
       protected getter negated
+
+      protected def initialize(
+        @children : Array(self),
+        @connector : Connector,
+        @negated : Bool,
+        @filters : Hash(String | Symbol, Field::Types)
+      )
+      end
 
       protected def add(other : self, conn : Connector)
         return if @children.includes?(other)

@@ -9,7 +9,7 @@ module Marten
       end
 
       def initialize(@children = [] of self, @connector = Connector::AND, @negated = false, **kwargs)
-        @filters = {} of String | Symbol => Field::Types
+        @filters = {} of String | Symbol => Field::Any
         @filters.merge!(kwargs.to_h)
       end
 
@@ -17,7 +17,7 @@ module Marten
         @children : Array(self),
         @connector : Connector,
         @negated : Bool,
-        @filters : Hash(String | Symbol, Field::Types)
+        @filters : Hash(String | Symbol, Field::Any)
       )
       end
 

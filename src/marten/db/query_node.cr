@@ -13,6 +13,14 @@ module Marten
         @filters.merge!(kwargs.to_h)
       end
 
+      def initialize(
+        @children : Array(self),
+        @connector : Connector,
+        @negated : Bool,
+        @filters : Hash(String | Symbol, Field::Types)
+      )
+      end
+
       def ==(other : self)
         (
           (other.filters == @filters) &&
@@ -34,14 +42,6 @@ module Marten
       protected getter connector
       protected getter filters
       protected getter negated
-
-      protected def initialize(
-        @children : Array(self),
-        @connector : Connector,
-        @negated : Bool,
-        @filters : Hash(String | Symbol, Field::Types)
-      )
-      end
 
       protected def add(other : self, conn : Connector)
         return if @children.includes?(other)

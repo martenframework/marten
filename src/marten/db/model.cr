@@ -59,12 +59,11 @@ module Marten
           {% raise "'#{sanitized_type}' is not a valid type for field '#{@type.id}##{sanitized_id}'" %}
         {% end %}
 
+        {% FIELDS_[sanitized_id.stringify] = kwargs %}
+
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 
-        @[Marten::DB::Model::FieldInstanceVariable(
-          field_klass: {{ field_klass }},
-          primary_key: {{ kwargs[:primary_key] }}
-        )]
+        @[Marten::DB::Model::FieldInstanceVariable(field_klass: {{ field_klass }}, field_kwargs: {{ kwargs }})]
         @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
 
         def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
@@ -72,12 +71,6 @@ module Marten
         end
 
         def {{ sanitized_id }}=(@{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?); end
-
-        {% if kwargs[:primary_key] %}
-        def pk : {{ field_ann[:exposed_type] }}?
-          @{{ sanitized_id }}
-        end
-        {% end %}
       end
 
       protected setter new_record
@@ -101,16 +94,13 @@ module Marten
       protected def self.pk_field
         {% begin %}
         {%
-          pkeys = @type.instance_vars.select do |ivar|
+          pkey = @type.instance_vars.find do |ivar|
             ann = ivar.annotation(Marten::DB::Model::FieldInstanceVariable)
-            ann && ann[:primary_key]
+            ann && ann[:field_kwargs][:primary_key]
           end
         %}
 
-        {% if pkeys.size == 0 %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}
-        {% if pkeys.size > 1 %}{{ raise "Many primary keys found for model '#{@type}' ; only one is allowed" }}{% end %}
-
-        @@fields[{{ pkeys[0].id.stringify }}]
+        @@fields[{{ pkey.id.stringify }}]
         {% end %}
       end
 
@@ -153,8 +143,11 @@ module Marten
           __DIR__
         end
 
+        FIELDS_ = {} of Nil => Nil
+
         macro finished
           _verify_model_name
+          _setup_primary_key
         end
       end
 
@@ -162,6 +155,20 @@ module Marten
         {% if @type.id.includes?(LOOKUP_SEP) %}
           {% raise "Cannot use '#{@type.id}' as a valid model name: model names cannot contain '#{LOOKUP_SEP.id}'" %}
         {% end %}
+      end
+
+      macro _setup_primary_key
+        {% pkeys = [] of StringLiteral %}
+        {% for id, kwargs in FIELDS_ %}
+          {% if kwargs[:primary_key] %}{% pkeys << id %}{% end %}
+        {% end %}
+
+        {% if pkeys.size == 0 %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}
+        {% if pkeys.size > 1 %}{{ raise "Many primary keys found for model '#{@type}' ; only one is allowed" }}{% end %}
+
+        def pk
+          {{ pkeys[0].id }}
+        end
       end
     end
   end

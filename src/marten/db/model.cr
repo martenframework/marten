@@ -1,8 +1,7 @@
 module Marten
   module DB
     abstract class Model
-      annotation FieldVar
-      end
+      annotation FieldInstanceVariable; end
 
       @@app_config : Marten::Apps::Config?
       @@fields : Hash(String, Field::Base) = {} of String => Field::Base
@@ -57,7 +56,7 @@ module Marten
 
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 
-        @[Marten::DB::Model::FieldVar(field_klass: {{ field_klass }} )]
+        @[Marten::DB::Model::FieldInstanceVariable(field_klass: {{ field_klass }} )]
         @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
 
         def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
@@ -100,8 +99,9 @@ module Marten
           field = @@fields.fetch(column_name, nil)
           next if field.nil?
           case column_name
-          {% for field_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::FieldVar) } %}
-          {% ann = field_var.annotation(Marten::DB::Model::FieldVar) %}
+          {% for field_var in @type.instance_vars
+            .select { |ivar| ivar.annotation(Marten::DB::Model::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::FieldInstanceVariable) %}
           when {{ field_var.name.stringify }}
             @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
           {% end %}

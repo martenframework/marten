@@ -61,7 +61,10 @@ module Marten
 
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 
-        @[Marten::DB::Model::FieldInstanceVariable(field_klass: {{ field_klass }})]
+        @[Marten::DB::Model::FieldInstanceVariable(
+          field_klass: {{ field_klass }},
+          primary_key: {{ kwargs[:primary_key] }}
+        )]
         @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
 
         def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
@@ -93,6 +96,22 @@ module Marten
 
       protected def self.fields
         @@fields.values
+      end
+
+      protected def self.pk_field
+        {% begin %}
+        {%
+          pkeys = @type.instance_vars.select do |ivar|
+            ann = ivar.annotation(Marten::DB::Model::FieldInstanceVariable)
+            ann && ann[:primary_key]
+          end
+        %}
+
+        {% if pkeys.size == 0 %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}
+        {% if pkeys.size > 1 %}{{ raise "Many primary keys found for model '#{@type}' ; only one is allowed" }}{% end %}
+
+        @@fields[{{ pkeys[0].id.stringify }}]
+        {% end %}
       end
 
       protected def self.get_field(id)

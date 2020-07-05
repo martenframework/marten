@@ -57,6 +57,7 @@ module Marten
           fields.each do |field|
             reversed = field.starts_with?('-')
             field = field[1..] if reversed
+            field = Model.pk_field.id if field == "pk"
             verify_field(field)
             order_clauses << {field, reversed}
           end

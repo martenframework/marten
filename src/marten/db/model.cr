@@ -3,6 +3,8 @@ module Marten
     abstract class Model
       annotation FieldInstanceVariable; end
 
+      LOOKUP_SEP = "__"
+
       @@app_config : Marten::Apps::Config?
       @@fields : Hash(String, Field::Base) = {} of String => Field::Base
       @@table_name : String?
@@ -35,6 +37,9 @@ module Marten
 
         {% sanitized_id = args[0].is_a?(StringLiteral) || args[0].is_a?(SymbolLiteral) ? args[0].id : nil %}
         {% if sanitized_id.is_a?(NilLiteral) %}{% raise "Cannot use '#{args[0]}' as a valid field name" %}{% end %}
+        {% if sanitized_id.includes?(LOOKUP_SEP) %}
+          {% raise "Cannot use '#{args[0]}' as a valid field name: field names cannot contain '#{LOOKUP_SEP.id}'" %}
+        {% end %}
 
         {% sanitized_type = args[1].is_a?(StringLiteral) || args[1].is_a?(SymbolLiteral) ? args[1].id : nil %}
         {% if sanitized_type.is_a?(NilLiteral) %}{% raise "Cannot use '#{args[1]}' as a valid field type" %}{% end %}
@@ -77,11 +82,6 @@ module Marten
 
       protected def self.register_field(id, type, **options)
         field_klass = Field.registry[type]
-
-        if id.includes?(SQL::Query::LOOKUP_SEP)
-          raise Errors::InvalidField.new("Field names cannot contain '#{SQL::Query::LOOKUP_SEP}'")
-        end
-
         @@fields[id] = field_klass.not_nil!.new(id, **options)
       end
 

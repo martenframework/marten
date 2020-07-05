@@ -2,8 +2,6 @@ module Marten
   module DB
     module SQL
       class Query(Model)
-        LOOKUP_SEP = "__"
-
         @default_ordering = true
         @limit = nil
         @offset = nil
@@ -66,7 +64,6 @@ module Marten
         end
 
         protected def add_query_node(query_node : QueryNode(Model))
-
         end
 
         protected def clone
@@ -148,7 +145,7 @@ module Marten
         end
 
         private def verify_field(raw_field)
-          raw_field.split(LOOKUP_SEP).each_with_index do |part, i|
+          raw_field.split(Model::LOOKUP_SEP).each_with_index do |part, i|
             raise NotImplementedError.new("Model relations are not implemented yet") if i > 0
             begin
               Model.get_field(part)

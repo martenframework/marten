@@ -61,7 +61,7 @@ module Marten
 
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 
-        @[Marten::DB::Model::FieldInstanceVariable(field_klass: {{ field_klass }} )]
+        @[Marten::DB::Model::FieldInstanceVariable(field_klass: {{ field_klass }})]
         @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
 
         def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
@@ -69,6 +69,12 @@ module Marten
         end
 
         def {{ sanitized_id }}=(@{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?); end
+
+        {% if kwargs[:primary_key] %}
+        def pk : {{ field_ann[:exposed_type] }}?
+          @{{ sanitized_id }}
+        end
+        {% end %}
       end
 
       protected setter new_record

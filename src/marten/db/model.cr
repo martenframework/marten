@@ -127,6 +127,16 @@ module Marten
         def self.dir_location
           __DIR__
         end
+
+        macro finished
+          _verify_model_name
+        end
+      end
+
+      macro _verify_model_name
+        {% if @type.id.includes?(LOOKUP_SEP) %}
+          {% raise "Cannot use '#{@type.id}' as a valid model name: model names cannot contain '#{LOOKUP_SEP.id}'" %}
+        {% end %}
       end
     end
   end

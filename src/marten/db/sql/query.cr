@@ -26,10 +26,6 @@ module Marten
           execute_query(build_query)
         end
 
-        def first : Model
-          execute_query(build_first_query).first
-        end
-
         def exists? : Bool
           Model.connection.open do |db|
             result = db.scalar(build_exists_query)
@@ -77,6 +73,10 @@ module Marten
           cloned
         end
 
+        protected def ordered?
+          !@order_clauses.empty?
+        end
+
         private def execute_query(query)
           results = [] of Model
 
@@ -95,16 +95,6 @@ module Marten
             s << "FROM #{table_name}"
             s << order_by
             s << "LIMIT #{@limit}" unless @limit.nil?
-            s << "OFFSET #{@offset}" unless @offset.nil?
-          end
-        end
-
-        private def build_first_query
-          build_sql do |s|
-            s << "SELECT #{columns}"
-            s << "FROM #{table_name}"
-            s << order_by
-            s << "LIMIT 1"
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
         end

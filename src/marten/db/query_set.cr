@@ -89,7 +89,7 @@ module Marten
       end
 
       def first
-        @result_cache.nil? ? @query.first : super
+        (query.ordered? ? self : order("pk"))[..0].to_a.first
       end
 
       def exists?

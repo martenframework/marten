@@ -143,6 +143,8 @@ module Marten
       end
 
       macro inherited
+        class NotFound < Marten::DB::Errors::RecordNotFound; end
+
         def self.dir_location
           __DIR__
         end

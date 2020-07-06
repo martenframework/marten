@@ -32,6 +32,10 @@ module Marten
         QuerySet(self).new.first
       end
 
+      def self.last
+        QuerySet(self).new.last
+      end
+
       macro field(*args, **kwargs)
         {% if args.size != 2 %}{% raise "A field name and type must be explicitly specified" %}{% end %}
 

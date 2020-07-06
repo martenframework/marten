@@ -92,6 +92,10 @@ module Marten
         (query.ordered? ? self : order("pk"))[..0].to_a.first
       end
 
+      def last
+        (query.ordered? ? reverse : order("-pk"))[..0].to_a.first
+      end
+
       def exists?
         @result_cache.nil? ? @query.exists? : !@result_cache.not_nil!.empty?
       end

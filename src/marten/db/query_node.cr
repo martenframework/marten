@@ -3,19 +3,14 @@ require "./field"
 module Marten
   module DB
     class QueryNode(Model)
-      enum Connector
-        AND
-        OR
-      end
-
-      def initialize(@children = [] of self, @connector = Connector::AND, @negated = false, **kwargs)
+      def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, **kwargs)
         @filters = {} of String | Symbol => Field::Any
         @filters.merge!(kwargs.to_h)
       end
 
       def initialize(
         @children : Array(self),
-        @connector : Connector,
+        @connector : SQL::PredicateConnector,
         @negated : Bool,
         @filters : Hash(String | Symbol, Field::Any)
       )
@@ -31,11 +26,11 @@ module Marten
       end
 
       def &(other : self)
-        combine(other, Connector::AND)
+        combine(other, SQL::PredicateConnector::AND)
       end
 
       def |(other : self)
-        combine(other, Connector::OR)
+        combine(other, SQL::PredicateConnector::OR)
       end
 
       protected getter children
@@ -43,7 +38,7 @@ module Marten
       protected getter filters
       protected getter negated
 
-      protected def add(other : self, conn : Connector)
+      protected def add(other : self, conn : SQL::PredicateConnector)
         return if @children.includes?(other)
 
         if @connector == conn

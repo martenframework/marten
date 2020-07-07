@@ -40,12 +40,30 @@ module Marten
           end
         end
 
-        def limit=(limit)
-          @limit = limit.to_i64
-        end
+        def slice(from, size = nil)
+          # "from' is always relative to the currently set offset, while "from" + "limit" must not go further than the
+          # currently set @offset + @limit for consistency reasons.
+          from = from.to_i64
 
-        def offset=(offset)
-          @offset = offset.to_i64
+          if @offset.nil?
+            new_offset = offset = from
+          elsif !@limit.nil?
+            new_offset = Math.min(@offset.not_nil! + from, @offset.not_nil! + @limit.not_nil!)
+          else
+            new_offset = @offset.not_nil! + from
+          end
+
+          new_limit = nil
+          if @limit.nil?
+            new_limit = size.to_i64 unless size.nil?
+          elsif size.nil?
+            new_limit = @limit
+          else
+            new_limit = (@offset.not_nil! + @limit.not_nil!) - new_offset
+          end
+
+          @offset = new_offset
+          @limit = new_limit
         end
 
         def order(*fields : String) : Nil

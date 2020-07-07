@@ -32,8 +32,7 @@ module Marten
 
         qs = clone
 
-        qs.query.offset = index
-        qs.query.limit = 1
+        qs.query.slice(index, 1)
         qs.fetch
         qs.result_cache.not_nil![0]
       end
@@ -52,12 +51,10 @@ module Marten
 
         qs = clone
 
-        offset = range.begin.nil? ? 0 : range.begin.not_nil!
-        qs.query.offset = offset
+        from = range.begin.nil? ? 0 : range.begin.not_nil!
+        size = range.excludes_end? ? (range.end.not_nil! - from) : (range.end.not_nil! + 1 - from) unless range.end.nil?
 
-        unless range.end.nil?
-          qs.query.limit = range.excludes_end? ? (range.end.not_nil! - offset) : (range.end.not_nil! + 1 - offset)
-        end
+        qs.query.slice(from, size)
 
         qs
       end

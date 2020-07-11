@@ -8,6 +8,7 @@ module Marten
         end
 
         abstract def operator_for(predicate) : String
+        abstract def parameter_id_for_ordered_argument(number : Int) : String
         abstract def quote_char : Char
         abstract def scheme : String
 

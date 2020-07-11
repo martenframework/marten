@@ -6,6 +6,10 @@ module Marten
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end
 
+        def parameter_id_for_ordered_argument(number : Int) : String
+          "?"
+        end
+
         def quote_char : Char
           '"'
         end

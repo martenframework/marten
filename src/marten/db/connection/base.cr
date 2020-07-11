@@ -7,6 +7,7 @@ module Marten
         def initialize(@config : Conf::GlobalSettings::Database)
         end
 
+        abstract def operator_for(predicate) : String
         abstract def quote_char : Char
         abstract def scheme : String
 

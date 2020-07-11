@@ -6,6 +6,7 @@ module Marten
         @limit = nil
         @offset = nil
         @order_clauses = [] of {String, Bool}
+        @predicate_node = nil
 
         getter default_ordering
 
@@ -19,11 +20,12 @@ module Marten
           @limit : Int64?,
           @offset : Int64?,
           @order_clauses : Array({String, Bool}),
+          @predicate_node : PredicateNode?
         )
         end
 
         def execute : Array(Model)
-          execute_query(build_query)
+          execute_query(*build_query)
         end
 
         def exists? : Bool
@@ -79,6 +81,12 @@ module Marten
         end
 
         protected def add_query_node(query_node : QueryNode(Model))
+          predicate_node = process_query_node(query_node)
+          if @predicate_node.nil?
+            @predicate_node = predicate_node
+          else
+            @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+          end
         end
 
         protected def clone
@@ -86,7 +94,8 @@ module Marten
             default_ordering: @default_ordering,
             limit: @limit,
             offset: @offset,
-            order_clauses: @order_clauses
+            order_clauses: @order_clauses,
+            predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone
           )
           cloned
         end
@@ -95,11 +104,11 @@ module Marten
           !@order_clauses.empty?
         end
 
-        private def execute_query(query)
+        private def execute_query(query, parameters)
           results = [] of Model
 
           Model.connection.open do |db|
-            db.query query do |result_set|
+            db.query query, args: parameters do |result_set|
               result_set.each { results << Model.from_db_result_set(result_set) }
             end
           end
@@ -108,13 +117,29 @@ module Marten
         end
 
         private def build_query
-          build_sql do |s|
+          if @predicate_node.nil?
+            where = nil
+            parameters = nil
+          else
+            where, parameters = @predicate_node.not_nil!.to_sql(Model.connection)
+            parameters.each_with_index do |p, i|
+              where = where % (
+                [Model.connection.parameter_id_for_ordered_argument(i)] + (["%s"] * (parameters.size - i))
+              )
+            end
+            where = "WHERE #{where}"
+          end
+
+          sql = build_sql do |s|
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
+            s << where
             s << order_by
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
+
+          { sql, parameters }
         end
 
         private def build_exists_query
@@ -153,6 +178,24 @@ module Marten
           Model.fields.map(&.id).flatten.join(", ")
         end
 
+        private def process_query_node(query_node)
+          connector = query_node.connector
+          predicate_node = PredicateNode.new(connector: connector, negated: query_node.negated)
+
+          query_node.filters.each do |raw_query, raw_value|
+            raw_query = raw_query.to_s
+            predicate = solve_field_and_predicate(raw_query, raw_value)
+            predicate_node.predicates << predicate
+          end
+
+          query_node.children.each do |child_node|
+            child_node = process_query_node(child_node)
+            predicate_node.add(child_node, connector)
+          end
+
+          predicate_node
+        end
+
         private def verify_field(raw_field)
           raw_field.split(Model::LOOKUP_SEP).each_with_index do |part, i|
             raise NotImplementedError.new("Model relations are not implemented yet") if i > 0
@@ -165,6 +208,29 @@ module Marten
               )
             end
           end
+        end
+
+        private def solve_field_and_predicate(raw_query, raw_value)
+          field, predicate = nil, nil
+
+          splitted_raw_query = raw_query.split(Model::LOOKUP_SEP, 2)
+          raw_field = splitted_raw_query[0]
+          raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
+
+          begin
+            field = Model.get_field(raw_field)
+          rescue Errors::UnknownField
+            valid_choices = Model.fields.map(&.id).join(", ")
+            raise Errors::InvalidField.new(
+              "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
+            )
+          end
+
+          # TODO: verify and initialize predicate based an raw predicate.
+
+          predicate ||= Predicate::Exact.new(field, raw_value)
+
+          predicate
         end
       end
     end

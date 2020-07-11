@@ -19,6 +19,7 @@ module Marten
         end
 
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
+        abstract def to_db(value) : ::DB::Any
       end
     end
   end

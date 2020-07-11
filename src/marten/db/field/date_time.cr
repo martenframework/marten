@@ -6,6 +6,15 @@ module Marten
           value = result_set.read(Time?)
           value.in(Marten.settings.time_zone) unless value.nil?
         end
+
+        def to_db(value) : ::DB::Any
+          case value
+          when Nil
+            nil
+          when Time
+            value.to_utc
+          end
+        end
       end
     end
   end

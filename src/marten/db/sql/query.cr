@@ -48,7 +48,7 @@ module Marten
           from = from.to_i64
 
           if @offset.nil?
-            new_offset = offset = from
+            new_offset = from
           elsif !@limit.nil?
             new_offset = Math.min(@offset.not_nil! + from, @offset.not_nil! + @limit.not_nil!)
           else
@@ -122,7 +122,7 @@ module Marten
             parameters = nil
           else
             where, parameters = @predicate_node.not_nil!.to_sql(Model.connection)
-            parameters.each_with_index do |p, i|
+            parameters.each_with_index do |_p, i|
               where = where % (
                 [Model.connection.parameter_id_for_ordered_argument(i)] + (["%s"] * (parameters.size - i))
               )
@@ -215,7 +215,7 @@ module Marten
 
           splitted_raw_query = raw_query.split(Model::LOOKUP_SEP, 2)
           raw_field = splitted_raw_query[0]
-          raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
+          # raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
 
           begin
             field = Model.get_field(raw_field)

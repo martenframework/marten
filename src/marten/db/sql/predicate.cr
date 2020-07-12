@@ -15,6 +15,7 @@ module Marten
         end
 
         register Exact
+        register IExact
       end
     end
   end

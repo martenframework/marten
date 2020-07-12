@@ -211,11 +211,9 @@ module Marten
         end
 
         private def solve_field_and_predicate(raw_query, raw_value)
-          field, predicate = nil, nil
-
           splitted_raw_query = raw_query.split(Model::LOOKUP_SEP, 2)
           raw_field = splitted_raw_query[0]
-          # raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
+          raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
 
           begin
             field = Model.get_field(raw_field)
@@ -226,11 +224,15 @@ module Marten
             )
           end
 
-          # TODO: verify and initialize predicate based an raw predicate.
+          if raw_predicate.nil?
+            predicate_klass = Predicate::Exact
+          else
+            predicate_klass = Predicate.registry.fetch(raw_predicate) do
+              raise Errors::UnknownField.new("Unknown predicate type '#{raw_predicate}'")
+            end
+          end
 
-          predicate ||= Predicate::Exact.new(field, raw_value)
-
-          predicate
+          predicate_klass.new(field, raw_value)
         end
       end
     end

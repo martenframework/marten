@@ -20,6 +20,7 @@ module Marten
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "exact" => "= %s",
+          "iexact" => "LIKE %s ESCAPE '\\'"
         }
       end
     end

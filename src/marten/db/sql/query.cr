@@ -29,8 +29,9 @@ module Marten
         end
 
         def exists? : Bool
+          sql, parameters = build_exists_query
           Model.connection.open do |db|
-            result = db.scalar(build_exists_query)
+            result = db.scalar(sql, args: parameters)
             result.to_s == "1"
           end
         end
@@ -133,11 +134,18 @@ module Marten
         end
 
         private def build_exists_query
-          build_sql do |s|
+          where, parameters = where_clause_and_parameters
+
+          sql = build_sql do |s|
             s << "SELECT EXISTS("
-            s << "  SELECT 1 FROM #{table_name}"
+            s << "SELECT 1 FROM #{table_name}"
+            s << where
+            s << "LIMIT #{@limit}" unless @limit.nil?
+            s << "OFFSET #{@offset}" unless @offset.nil?
             s << ")"
           end
+
+          { sql, parameters }
         end
 
         private def build_count_query

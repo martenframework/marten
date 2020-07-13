@@ -155,7 +155,6 @@ module Marten
             s << "SELECT COUNT(*)"
             s << "FROM #{table_name}"
             s << where
-            s << order_by
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end

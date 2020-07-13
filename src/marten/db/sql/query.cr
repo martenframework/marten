@@ -36,8 +36,9 @@ module Marten
         end
 
         def count
+          sql, parameters = build_count_query
           Model.connection.open do |db|
-            result = db.scalar(build_count_query)
+            result = db.scalar(sql, args: parameters)
             result.to_s.to_i
           end
         end
@@ -117,18 +118,7 @@ module Marten
         end
 
         private def build_query
-          if @predicate_node.nil?
-            where = nil
-            parameters = nil
-          else
-            where, parameters = @predicate_node.not_nil!.to_sql(Model.connection)
-            parameters.each_with_index do |_p, i|
-              where = where % (
-                [Model.connection.parameter_id_for_ordered_argument(i)] + (["%s"] * (parameters.size - i))
-              )
-            end
-            where = "WHERE #{where}"
-          end
+          where, parameters = where_clause_and_parameters
 
           sql = build_sql do |s|
             s << "SELECT #{columns}"
@@ -151,10 +141,18 @@ module Marten
         end
 
         private def build_count_query
-          build_sql do |s|
+          where, parameters = where_clause_and_parameters
+
+          sql = build_sql do |s|
             s << "SELECT COUNT(*)"
             s << "FROM #{table_name}"
+            s << where
+            s << order_by
+            s << "LIMIT #{@limit}" unless @limit.nil?
+            s << "OFFSET #{@offset}" unless @offset.nil?
           end
+
+          { sql, parameters }
         end
 
         private def order_by
@@ -176,6 +174,23 @@ module Marten
 
         private def columns
           Model.fields.map(&.id).flatten.join(", ")
+        end
+
+        private def where_clause_and_parameters
+          if @predicate_node.nil?
+            where = nil
+            parameters = nil
+          else
+            where, parameters = @predicate_node.not_nil!.to_sql(Model.connection)
+            parameters.each_with_index do |_p, i|
+              where = where % (
+                [Model.connection.parameter_id_for_ordered_argument(i)] + (["%s"] * (parameters.size - i))
+              )
+            end
+            where = "WHERE #{where}"
+          end
+
+          { where, parameters }
         end
 
         private def process_query_node(query_node)

@@ -33,6 +33,13 @@ module Marten
         combine(other, SQL::PredicateConnector::OR)
       end
 
+      def - : self
+        negated_parent = self.class.new
+        negated_parent.add(self, SQL::PredicateConnector::AND)
+        negated_parent.negate
+        negated_parent
+      end
+
       protected getter children
       protected getter connector
       protected getter filters
@@ -48,6 +55,10 @@ module Marten
           @connector = conn
           @children = [new_child, other]
         end
+      end
+
+      protected def negate
+        @negated = !@negated
       end
 
       private def combine(other, conn)

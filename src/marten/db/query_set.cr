@@ -80,9 +80,21 @@ module Marten
       end
 
       def filter(query_node : QueryNode(Model))
-        qs = clone
-        qs.query.add_query_node(query_node)
-        qs
+        add_query_node(query_node)
+      end
+
+      def exclude(**kwargs)
+        exclude(QueryNode(Model).new(**kwargs))
+      end
+
+      def exclude(&block)
+        expr = Expression::Filter(Model).new
+        query : QueryNode(Model) = with expr yield
+        exclude(query)
+      end
+
+      def exclude(query_node : QueryNode(Model))
+        add_query_node(-query_node)
       end
 
       def first
@@ -130,6 +142,12 @@ module Marten
       end
 
       private INSPECT_RESULTS_LIMIT = 20
+
+      private def add_query_node(query_node)
+        qs = clone
+        qs.query.add_query_node(query_node)
+        qs
+      end
 
       private def raise_negative_indexes_not_supported
         raise "Negative indexes are not supported"

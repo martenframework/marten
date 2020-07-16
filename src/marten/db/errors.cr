@@ -13,6 +13,9 @@ module Marten
       # Represents an error raised when an inexistent record is queried for a specific model. This exception is
       # automatically subclassed for every model class.
       class RecordNotFound < Exception; end
+
+      # Represents an error raised when a get query returned more than one result.
+      class MultipleRecordsFound < Exception; end
     end
   end
 end

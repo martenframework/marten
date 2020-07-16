@@ -69,6 +69,13 @@ module Marten
         clone
       end
 
+      def get(**kwargs)
+        results = filter(**kwargs)[..GET_RESULTS_LIMIT].to_a
+        return results.first if results.size == 1
+        raise Model::NotFound.new("#{Model.name} query didn't return any results") if results.empty?
+        raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
+      end
+
       def filter(**kwargs)
         filter(QueryNode(Model).new(**kwargs))
       end
@@ -142,6 +149,7 @@ module Marten
       end
 
       private INSPECT_RESULTS_LIMIT = 20
+      private GET_RESULTS_LIMIT = 20
 
       private def add_query_node(query_node)
         qs = clone

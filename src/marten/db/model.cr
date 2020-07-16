@@ -29,6 +29,30 @@ module Marten
         QuerySet(self).new
       end
 
+      def self.filter(**kwargs)
+        QuerySet(self).new.filter(**kwargs)
+      end
+
+      def self.filter(&block)
+        expr = Expression::Filter(self).new
+        query : QueryNode(self) = with expr yield
+        QuerySet(self).new.filter(query)
+      end
+
+      def self.exclude(**kwargs)
+        QuerySet(self).new.exclude(**kwargs)
+      end
+
+      def self.exclude(&block)
+        expr = Expression::Filter(self).new
+        query : QueryNode(self) = with expr yield
+        QuerySet(self).new.exclude(query)
+      end
+
+      def self.get(**kwargs)
+        QuerySet(self).new.get(**kwargs)
+      end
+
       def self.first
         QuerySet(self).new.first
       end

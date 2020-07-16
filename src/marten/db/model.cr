@@ -4,6 +4,7 @@ module Marten
       annotation FieldInstanceVariable; end
 
       LOOKUP_SEP = "__"
+      PRIMARY_KEY_ALIAS = "pk"
 
       @@app_config : Marten::Apps::Config?
       @@fields : Hash(String, Field::Base) = {} of String => Field::Base

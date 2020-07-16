@@ -75,7 +75,7 @@ module Marten
           fields.each do |field|
             reversed = field.starts_with?('-')
             field = field[1..] if reversed
-            field = Model.pk_field.id if field == "pk"
+            field = Model.pk_field.id if field == Model::PRIMARY_KEY_ALIAS
             verify_field(field)
             order_clauses << {field, reversed}
           end
@@ -234,7 +234,10 @@ module Marten
 
         private def solve_field_and_predicate(raw_query, raw_value)
           splitted_raw_query = raw_query.split(Model::LOOKUP_SEP, 2)
+
           raw_field = splitted_raw_query[0]
+          raw_field = Model.pk_field.id if raw_field == Model::PRIMARY_KEY_ALIAS
+
           raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
 
           begin

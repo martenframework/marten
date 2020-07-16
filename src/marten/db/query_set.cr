@@ -105,11 +105,11 @@ module Marten
       end
 
       def first
-        (query.ordered? ? self : order("pk"))[..0].to_a.first
+        (query.ordered? ? self : order(Model::PRIMARY_KEY_ALIAS))[..0].to_a.first
       end
 
       def last
-        (query.ordered? ? reverse : order("-pk"))[..0].to_a.first
+        (query.ordered? ? reverse : order("-#{Model::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
       end
 
       def exists?

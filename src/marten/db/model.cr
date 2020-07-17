@@ -99,6 +99,10 @@ module Marten
          @{{ sanitized_id }}
         end
 
+        def {{ sanitized_id }}!
+         @{{ sanitized_id }}.not_nil!
+        end
+
         def {{ sanitized_id }}=(@{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?); end
       end
 

@@ -7,6 +7,10 @@ module Marten
       # Represents an error raised when an inexistent field is requested for a specific model.
       class UnknownField < Exception; end
 
+      # Represents an error raised when a field value cannot be processed because it doesn't have the expected type.
+      # This can happen when initializing model objects using unexpected values and types.
+      class UnexpectedFieldValue < Exception; end
+
       # Represents an error raised when an inexistent predicate is requested for a specific query.
       class UnknownPredicate < Exception; end
 

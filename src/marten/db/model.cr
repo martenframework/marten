@@ -53,6 +53,13 @@ module Marten
         QuerySet(self).new.get(**kwargs)
       end
 
+      def initialize(**kwargs)
+        assign_field_values(kwargs.to_h.transform_keys(&.to_s))
+      end
+
+      def initialize
+      end
+
       def self.first
         QuerySet(self).new.first
       end
@@ -92,7 +99,11 @@ module Marten
 
         register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
 
-        @[Marten::DB::Model::FieldInstanceVariable(field_klass: {{ field_klass }}, field_kwargs: {{ kwargs }})]
+        @[Marten::DB::Model::FieldInstanceVariable(
+          field_klass: {{ field_klass }},
+          field_kwargs: {{ kwargs }},
+          field_type: {{ field_ann[:exposed_type] }}
+        )]
         @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
 
         def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
@@ -169,6 +180,19 @@ module Marten
 
           config.not_nil!
         end
+      end
+
+      private def assign_field_values(values : Hash(String, Field::Any))
+        {% for field_var in @type.instance_vars
+          .select { |ivar| ivar.annotation(Marten::DB::Model::FieldInstanceVariable) } %}
+          if values.has_key?({{field_var.name.stringify}})
+            value = values[{{field_var.name.stringify}}]
+            if !value.is_a?({{ field_var.type }})
+              raise "Value for field {{ field_var.id }} should of type {{ field_var.type }}, not #{typeof(value)}"
+            end
+            @{{ field_var.id }} = value
+          end
+        {% end %}
       end
 
       macro inherited

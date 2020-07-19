@@ -27,6 +27,7 @@ module Marten
         add_field_to_registry({{ id }}, {{ klass }})
       end
 
+      register "big_int", BigInt
       register "date_time", DateTime
       register "int", Int
       register "string", String

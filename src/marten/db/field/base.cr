@@ -2,9 +2,9 @@ module Marten
   module DB
     module Field
       abstract class Base
-        @primary_key : Bool
-        @blank : Bool
-        @null : Bool
+        @primary_key : ::Bool
+        @blank : ::Bool
+        @null : ::Bool
         @name : ::String?
 
         getter id

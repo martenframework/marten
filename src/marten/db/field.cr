@@ -28,6 +28,7 @@ module Marten
       end
 
       register "big_int", BigInt
+      register "bool", Bool
       register "date_time", DateTime
       register "int", Int
       register "string", String

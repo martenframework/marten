@@ -14,6 +14,7 @@ module Marten
           @@registry
         end
 
+        register Contains
         register Exact
         register IExact
       end

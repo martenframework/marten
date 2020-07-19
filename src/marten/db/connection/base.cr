@@ -10,6 +10,7 @@ module Marten
         abstract def operator_for(predicate) : String
         abstract def parameter_id_for_ordered_argument(number : Int) : String
         abstract def quote_char : Char
+        abstract def sanitize_like_pattern(pattern : String) : String
         abstract def scheme : String
 
         def db

@@ -13,10 +13,17 @@ module Marten
           end
 
           def to_sql(connection : Connection::Base)
-            lhs_sql = @left_operand.id
-            rhs_sql = connection.operator_for(self.class.predicate_name) % "%s"
-            params = [@left_operand.to_db(@right_operand)]
-            { "%s %s" % [lhs_sql, rhs_sql], params }
+            sql_left_operand = @left_operand.id
+            sql_right_operand = connection.operator_for(self.class.predicate_name) % "%s"
+            { "%s %s" % [sql_left_operand, sql_right_operand], sql_params(connection) }
+          end
+
+          private def sql_params(connection)
+            [sql_right_operand_param(connection)]
+          end
+
+          private def sql_right_operand_param(_connection)
+            @left_operand.to_db(@right_operand)
           end
         end
       end

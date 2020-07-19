@@ -13,6 +13,8 @@ module Marten
             nil
           when ::UUID
             value.to_s
+          else
+            raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
           end
         end
       end

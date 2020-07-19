@@ -14,6 +14,8 @@ module Marten
             value
           when Int8, Int16
             value.as(Int8 | Int16).to_i32
+          else
+            raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
           end
         end
       end

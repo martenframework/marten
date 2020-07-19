@@ -12,6 +12,8 @@ module Marten
             nil
           when ::Bool
             value
+          else
+            raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
           end
         end
       end

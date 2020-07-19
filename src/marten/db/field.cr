@@ -28,7 +28,7 @@ module Marten
       end
 
       register "date_time", DateTime
-      register "int", Integer
+      register "int", Int
       register "string", String
       register "uuid", UUID
 

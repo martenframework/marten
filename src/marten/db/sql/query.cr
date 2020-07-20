@@ -191,7 +191,7 @@ module Marten
             where, parameters = @predicate_node.not_nil!.to_sql(Model.connection)
             parameters.each_with_index do |_p, i|
               where = where % (
-                [Model.connection.parameter_id_for_ordered_argument(i)] + (["%s"] * (parameters.size - i))
+                [Model.connection.parameter_id_for_ordered_argument(i + 1)] + (["%s"] * (parameters.size - i))
               )
             end
             where = "WHERE #{where}"

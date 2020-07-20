@@ -4,6 +4,7 @@ module Marten
       DEFAULT_CONNECTION_NAME = "default"
 
       IMPLEMENTATIONS = {
+        "postgresql" => PostgreSQL,
         "sqlite" => SQLite,
       }
 

@@ -4,14 +4,17 @@ module Marten
       # Defines the configuration of a specific database connection.
       class Database
         @backend : String?
+        @host : String?
         @name : String?
+        @password : String?
+        @user : String?
 
         getter id
         getter backend
+        getter host
         getter name
-
-        setter backend
-        setter name
+        getter password
+        getter user
 
         def initialize(@id : String)
         end
@@ -20,8 +23,20 @@ module Marten
           @backend = val.to_s
         end
 
+        def host=(val : String | Symbol)
+          @host = val.to_s
+        end
+
         def name=(val : Path | String | Symbol)
           @name = val.to_s
+        end
+
+        def password=(val : String | Symbol)
+          @password = val.to_s
+        end
+
+        def user=(val : String | Symbol)
+          @user = val.to_s
         end
 
         protected def validate

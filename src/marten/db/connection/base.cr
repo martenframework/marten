@@ -3,8 +3,10 @@ module Marten
     module Connection
       abstract class Base
         @db : ::DB::Database?
+        @url : String
 
         def initialize(@config : Conf::GlobalSettings::Database)
+          @url = build_url
         end
 
         abstract def operator_for(predicate) : String
@@ -14,7 +16,7 @@ module Marten
         abstract def scheme : String
 
         def db
-          @db ||= ::DB.open(url)
+          @db ||= ::DB.open(@url)
         end
 
         def open(&block)
@@ -25,8 +27,22 @@ module Marten
           "#{quote_char}#{name}#{quote_char}"
         end
 
-        private def url
-          "#{scheme}://#{db_name}"
+        private def build_url
+          parts = [] of String?
+
+          parts << "#{scheme}://"
+
+          unless @config.user.nil?
+            parts << "#{@config.user}:#{@config.password}@"
+          end
+
+          unless @config.host.nil?
+            parts << "#{@config.host}/"
+          end
+
+          parts << db_name
+
+          parts.compact!.join("")
         end
 
         private def db_name

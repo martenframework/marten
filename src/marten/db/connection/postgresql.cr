@@ -2,6 +2,11 @@ module Marten
   module DB
     module Connection
       class PostgreSQL < Base
+        def left_operand_for(id : String, predicate) : String
+          transformation = PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING.fetch(predicate, nil)
+          transformation.nil? ? id : (transformation % id)
+        end
+
         def operator_for(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end
@@ -22,11 +27,16 @@ module Marten
           "postgres"
         end
 
+        private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
+          "icontains" => "UPPER(%s)",
+          "iexact" => "UPPER(%s)",
+        }
+
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains" => "LIKE %s",
           "exact" => "= %s",
-          "icontains" => "LIKE %s",
-          "iexact" => "LIKE %s",
+          "icontains" => "LIKE UPPER(%s)",
+          "iexact" => "LIKE UPPER(%s)",
         }
       end
     end

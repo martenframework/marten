@@ -2,6 +2,10 @@ module Marten
   module DB
     module Connection
       class SQLite < Base
+        def left_operand_for(id : String, _predicate) : String
+          id
+        end
+
         def operator_for(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end

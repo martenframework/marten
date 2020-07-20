@@ -7,6 +7,7 @@ module Marten
         @host : String?
         @name : String?
         @password : String?
+        @port : Int32?
         @user : String?
 
         getter id
@@ -14,6 +15,7 @@ module Marten
         getter host
         getter name
         getter password
+        getter port
         getter user
 
         def initialize(@id : String)
@@ -33,6 +35,10 @@ module Marten
 
         def password=(val : String | Symbol)
           @password = val.to_s
+        end
+
+        def port=(val : Int)
+          @port = val.to_i32
         end
 
         def user=(val : String | Symbol)

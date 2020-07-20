@@ -37,17 +37,15 @@ module Marten
             parts << "#{@config.user}:#{@config.password}@"
           end
 
-          unless @config.host.nil?
+          if !@config.host.nil? && !@config.port.nil?
+            parts << "#{@config.host}:#{@config.port}/"
+          elsif !@config.host.nil?
             parts << "#{@config.host}/"
           end
 
-          parts << db_name
+          parts << @config.name
 
           parts.compact!.join("")
-        end
-
-        private def db_name
-          @config.name
         end
       end
     end

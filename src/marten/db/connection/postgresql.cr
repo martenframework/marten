@@ -30,6 +30,7 @@ module Marten
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
           "icontains" => "UPPER(%s)",
           "iexact" => "UPPER(%s)",
+          "istartswith" => "UPPER(%s)",
         }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
@@ -37,6 +38,8 @@ module Marten
           "exact" => "= %s",
           "icontains" => "LIKE UPPER(%s)",
           "iexact" => "LIKE UPPER(%s)",
+          "istartswith" => "LIKE UPPER(%s)",
+          "startswith" => "LIKE %s",
         }
       end
     end

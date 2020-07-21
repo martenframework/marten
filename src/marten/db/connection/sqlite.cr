@@ -31,6 +31,8 @@ module Marten
           "exact" => "= %s",
           "icontains" => "LIKE %s ESCAPE '\\'",
           "iexact" => "LIKE %s ESCAPE '\\'",
+          "istartswith" => "LIKE %s ESCAPE '\\'",
+          "startswith" => "LIKE %s ESCAPE '\\'",
         }
       end
     end

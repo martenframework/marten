@@ -18,6 +18,8 @@ module Marten
         register Exact
         register IContains
         register IExact
+        register IStartsWith
+        register StartsWith
       end
     end
   end

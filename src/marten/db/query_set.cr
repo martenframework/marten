@@ -10,10 +10,14 @@ module Marten
       def initialize(@query = SQL::Query(Model).new)
       end
 
+      def to_s(io)
+        inspect(io)
+      end
+
       def inspect(io)
         results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
         io << "<#{self.class.name} ["
-        io << "#{results[...INSPECT_RESULTS_LIMIT].join(", ")}"
+        io << "#{results[...INSPECT_RESULTS_LIMIT].map(&.inspect).join(", ")}"
         io << ", ...(remaining truncated)..." if results.size > INSPECT_RESULTS_LIMIT
         io << "]>"
       end

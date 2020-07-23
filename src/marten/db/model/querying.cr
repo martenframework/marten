@@ -5,6 +5,8 @@ module Marten
         macro included
           extend Marten::DB::Model::Querying::ClassMethods
 
+          LOOKUP_SEP = "__"
+
           macro inherited
             class NotFound < Marten::DB::Errors::RecordNotFound; end
           end

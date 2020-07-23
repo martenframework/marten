@@ -10,6 +10,8 @@ module Marten
 
           extend Marten::DB::Model::Table::ClassMethods
 
+          PRIMARY_KEY_ALIAS = "pk"
+
           macro inherited
             FIELDS_ = {} of Nil => Nil
 

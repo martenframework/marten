@@ -11,9 +11,6 @@ module Marten
       include Table
       include Querying
 
-      LOOKUP_SEP = "__"
-      PRIMARY_KEY_ALIAS = "pk"
-
       # :nodoc:
       @new_record : Bool = true
 

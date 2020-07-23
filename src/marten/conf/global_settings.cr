@@ -2,8 +2,6 @@ module Marten
   module Conf
     # Defines the global settings of a Marten web application.
     class GlobalSettings
-      class UnknownSettingsNamespace < Exception; end
-
       @@registered_settings_namespaces = [] of String
 
       @request_max_parameters : Nil | Int32

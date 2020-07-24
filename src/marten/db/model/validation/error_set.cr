@@ -19,6 +19,8 @@ module Marten
           end
 
           delegate each, to: @errors
+
+          delegate clear, to: @errors
         end
       end
     end

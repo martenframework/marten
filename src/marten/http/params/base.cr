@@ -1,7 +1,10 @@
 module Marten
   module HTTP
     module Params
-      # :nodoc:
+      # Represents an abstract set of parameters (query parameters, form data, etc).
+      #
+      # This abstract class is subclassed by `Marten::HTTP::Params::Data` and `Marten::HTTP::Params::Query`, which
+      # respectively provided access to the parsed content of request bodies and request query strings.
       abstract class Base
         # Returns the last value associated with the passed parameter name.
         def [](name : String | Symbol)

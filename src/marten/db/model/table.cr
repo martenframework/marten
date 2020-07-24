@@ -2,6 +2,7 @@ module Marten
   module DB
     abstract class Model
       module Table
+        # :nodoc:
         annotation FieldInstanceVariable; end
 
         macro included
@@ -147,12 +148,14 @@ module Marten
           {% end %}
         end
 
+        # :nodoc:
         macro _verify_model_name
           {% if @type.id.includes?(LOOKUP_SEP) %}
             {% raise "Cannot use '#{@type.id}' as a valid model name: model names cannot contain '#{LOOKUP_SEP.id}'" %}
           {% end %}
         end
 
+        # :nodoc:
         macro _setup_primary_key
           {% pkeys = [] of StringLiteral %}
           {% for id, kwargs in FIELDS_ %}

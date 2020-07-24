@@ -18,6 +18,7 @@ module Marten
           end
         end
 
+        # Returns a string corresponding to the params in query string format.
         def as_query : String
           String.build do |io|
             builder = ::HTTP::Params::Builder.new(io)

@@ -6,6 +6,14 @@ module Marten
         macro included
           include Core::Validation
         end
+
+        private def perform_validation
+          self.class.fields.each do |field|
+            field.perform_validation(self)
+          end
+
+          super
+        end
       end
     end
   end

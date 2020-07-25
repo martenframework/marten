@@ -2,6 +2,7 @@ require "./model/app_config"
 require "./model/connection"
 require "./model/querying"
 require "./model/table"
+require "./model/validation"
 
 module Marten
   module DB
@@ -10,6 +11,7 @@ module Marten
       include Connection
       include Table
       include Querying
+      include Validation
 
       # :nodoc:
       @new_record : Bool = true

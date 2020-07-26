@@ -5,6 +5,8 @@ module Marten
       class ErrorSet
         include Enumerable(Error)
 
+        DEFAULT_ERROR_TYPE = :invalid
+
         def initialize
           @errors = [] of Error
         end
@@ -24,7 +26,7 @@ module Marten
         # record.errors.add("This record is invalid!", type: :invalid_record)
         # ```
         def add(message : String, *, type : Nil | String | Symbol = nil)
-          @errors << Error.new(type: type || :invalid, field: nil, message: message)
+          @errors << Error.new(type: type || DEFAULT_ERROR_TYPE, field: nil, message: message)
         end
 
         # Adds a new field error to the error set.
@@ -42,7 +44,7 @@ module Marten
         # records.errors.add(:attribute, "This record attribute is invalid!", type: :invalid_attribute)
         # ```
         def add(field : String | Symbol, message : String, *, type : Nil | String | Symbol = nil)
-          @errors << Error.new(type: type || :invalid, field: field, message: message)
+          @errors << Error.new(type: type || DEFAULT_ERROR_TYPE, field: field, message: message)
         end
 
         # Iterates over all the `Marten::Core::Validation::Error` objects in this error set.

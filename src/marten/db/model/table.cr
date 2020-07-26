@@ -115,6 +115,24 @@ module Marten
           def {{ sanitized_id }}=(@{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?); end
         end
 
+        # Allows to read the value of a specific field.
+        #
+        # This methods returns the value of the field corresponding to `field_name`. If the passed `field_name` doesn't
+        # match any existing field, a `Marten::DB::Errors::UnknownField` exception is raised.
+        def get_field_value(field_name : String | Symbol)
+          {% begin %}
+          case field_name.to_s
+          {% for field_var in @type.instance_vars
+            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          when {{ field_var.name.stringify }}
+            @{{ field_var.id }}
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
+          end
+          {% end %}
+        end
+
         protected def from_db_result_set(result_set : ::DB::ResultSet)
           {% begin %}
           result_set.column_names.each do |column_name|

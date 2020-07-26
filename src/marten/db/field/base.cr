@@ -32,14 +32,25 @@ module Marten
 
           if value.nil? && !@null
             record.errors.add(id, null_error_message(record), type: :null)
+          elsif empty_value?(value) && !@blank
+            record.errors.add(id, blank_error_message(record), type: :blank)
           end
 
           validate(record)
         end
 
+        private def empty_value?(value) : ::Bool
+          value.nil?
+        end
+
         private def null_error_message(_record)
           # TODO: add I18n support.
           "This field cannot be null."
+        end
+
+        private def blank_error_message(_record)
+          # TODO: add I18n support.
+          "This field cannot be blank."
         end
       end
     end

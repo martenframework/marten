@@ -16,6 +16,17 @@ module Marten
             raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
           end
         end
+
+        def empty_value?(value) : ::Bool
+          case value
+          when Nil
+            true
+          when ::String
+            value.empty?
+          else
+            raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
+          end
+        end
       end
     end
   end

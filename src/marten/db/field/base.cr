@@ -28,7 +28,18 @@ module Marten
         end
 
         protected def perform_validation(record : Model)
+          value = record.get_field_value(id)
+
+          if value.nil? && !@null
+            record.errors.add(id, null_error_message(record), type: :null)
+          end
+
           validate(record)
+        end
+
+        private def null_error_message(_record)
+          # TODO: add I18n support.
+          "This field cannot be null."
         end
       end
     end

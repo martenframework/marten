@@ -95,11 +95,15 @@ module Marten
 
           {% FIELDS_[sanitized_id.stringify] = kwargs %}
 
-          register_field({{ sanitized_id.stringify }}, {{ sanitized_type.stringify }}, **{{ kwargs }})
+          register_field(
+            {{ sanitized_id.stringify }},
+            {{ sanitized_type.stringify }},
+            {% unless kwargs.empty? %}**{{ kwargs }}{% end %}
+          )
 
           @[Marten::DB::Model::Table::FieldInstanceVariable(
             field_klass: {{ field_klass }},
-            field_kwargs: {{ kwargs }},
+            field_kwargs: {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %},
             field_type: {{ field_ann[:exposed_type] }}
           )]
           @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?

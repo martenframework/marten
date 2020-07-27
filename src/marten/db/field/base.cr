@@ -6,7 +6,7 @@ module Marten
         @blank : ::Bool
         @null : ::Bool
         @name : ::String?
-        @max_length : ::Int32?
+        @max_size : ::Int32?
 
         getter id
 
@@ -16,7 +16,7 @@ module Marten
           @blank = false,
           @null = false,
           @name = nil,
-          @max_length = nil
+          @max_size = nil
         )
         end
 

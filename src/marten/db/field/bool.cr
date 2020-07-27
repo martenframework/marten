@@ -13,7 +13,7 @@ module Marten
           when ::Bool
             value
           else
-            raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
+            raise_unexpected_field_value(value)
           end
         end
       end

@@ -52,6 +52,10 @@ module Marten
           # TODO: add I18n support.
           "This field cannot be blank."
         end
+
+        private def raise_unexpected_field_value(value)
+          raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
+        end
       end
     end
   end

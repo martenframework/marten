@@ -15,7 +15,7 @@ module Marten
           when Int8, Int16, Int32
             value.as(Int8 | Int16 | Int32).to_i64
           else
-            raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
+            raise_unexpected_field_value(value)
           end
         end
       end

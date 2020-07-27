@@ -26,7 +26,7 @@ module Marten
         # Runs custom validation logic for a specific model field and model object.
         #
         # This method should be overriden for each field implementation that requires custom validation logic.
-        def validate(record : Model)
+        def validate(record, value)
         end
 
         protected def perform_validation(record : Model)
@@ -38,7 +38,7 @@ module Marten
             record.errors.add(id, blank_error_message(record), type: :blank)
           end
 
-          validate(record)
+          validate(record, value)
         end
 
         private def empty_value?(value) : ::Bool

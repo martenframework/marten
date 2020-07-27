@@ -32,6 +32,7 @@ module Marten
       register "date_time", DateTime
       register "int", Int
       register "string", String
+      register "text", Text
       register "uuid", UUID
 
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)

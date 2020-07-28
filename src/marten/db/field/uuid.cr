@@ -24,7 +24,7 @@ module Marten
 
           if value.as?(::String)
             begin
-              return if ::UUID.new(value)
+              return if ::UUID.new(value.as(::String))
             rescue ArgumentError
             end
           end

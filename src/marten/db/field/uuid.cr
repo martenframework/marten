@@ -17,6 +17,20 @@ module Marten
             raise_unexpected_field_value(value)
           end
         end
+
+        def validate(record, value)
+          return if value.nil?
+          return if value.as?(::UUID)
+
+          if value.as?(::String)
+            begin
+              return if ::UUID.new(value)
+            rescue ArgumentError
+            end
+          end
+
+          record.errors.add(id, "A valid UUID must be provided")
+        end
       end
     end
   end

@@ -9,6 +9,8 @@ module Marten
         @max_size : ::Int32?
 
         getter id
+        getter name
+        getter max_size
 
         def initialize(
           @id : ::String,
@@ -22,6 +24,18 @@ module Marten
 
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
         abstract def to_db(value) : ::DB::Any
+
+        def primary_key?
+          @primary_key
+        end
+
+        def blank?
+          @blank
+        end
+
+        def null?
+          @null
+        end
 
         # Runs custom validation logic for a specific model field and model object.
         #

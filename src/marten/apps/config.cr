@@ -7,7 +7,7 @@ module Marten
 
       def self.label(label : String | Symbol)
         unless LABEL_RE.match(label.to_s)
-          raise Errors::InvalidAppConfig.new("A rule label can only contain lowercase letters and underscores")
+          raise Errors::InvalidAppConfig.new("A label can only contain lowercase letters and underscores")
         end
         @@label = label.to_s
       end

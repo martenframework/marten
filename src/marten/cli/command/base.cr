@@ -3,6 +3,10 @@ module Marten
     class Command
       abstract class Base
         macro inherited
+          def self.dir_location
+            __DIR__
+          end
+
           Command.register_subcommand({{ @type }})
         end
 
@@ -71,7 +75,14 @@ module Marten
 
         private def banner_parts
           banner_parts = [] of String
-          banner_parts << "Usage: manage #{self.class.command_name} [options]\n\n"
+
+          banner_parts << "Usage: manage #{self.class.command_name} [options]"
+          unless arguments.empty?
+            banner_parts << " #{argument_handlers.map { |h| "[#{h.name}]" }.join(" " )}"
+          end
+
+          banner_parts << "\n\n"
+
           banner_parts << "#{self.class.help}\n\n" unless self.class.help.empty?
 
           unless arguments.empty?

@@ -52,6 +52,19 @@ module Marten
         usage = [] of String
 
         usage << USAGE_HEADER
+
+        per_app_commands = @@command_registry.values.group_by do |command|
+          command.dir_location.starts_with?(__DIR__) ? "marten" : command.app_config.label
+        end
+
+        per_app_commands.each do |app_label, commands|
+          usage << "\n[#{app_label}]\n"
+          commands.each do |command|
+            usage << "    #{command.command_name}\n"
+          end
+          usage << "\n"
+        end
+
         usage << USAGE_FOOTER
 
         puts usage.join("")

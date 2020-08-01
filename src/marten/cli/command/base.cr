@@ -13,6 +13,7 @@ module Marten
         # :nodoc:
         record ArgumentHandler, name : String, block : String ->
 
+        @@app_config : Marten::Apps::Config?
         @@command_name : String = ""
         @@help : String = ""
 
@@ -25,6 +26,10 @@ module Marten
 
         def self.help(help : String)
           @@help = help
+        end
+
+        protected def self.app_config
+          @@app_config ||= Marten.apps.get_containing(self)
         end
 
         @arguments = [] of String

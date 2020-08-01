@@ -35,6 +35,11 @@ module Marten
           exit
         end
 
+        if command == "--help" || command == "-h"
+          show_top_level_usage
+          exit
+        end
+
         command_klass = @@command_registry.fetch(command) do
           puts "Unknown command"
           exit

@@ -16,15 +16,7 @@ module Marten
 
         module ClassMethods
           protected def app_config
-            @@app_config ||= begin
-              config = Marten.apps.get_containing_model(self)
-
-              if config.nil?
-                raise "Model class is not part of an application defined in Marten.settings.installed_apps"
-              end
-
-              config.not_nil!
-            end
+            @@app_config ||= Marten.apps.get_containing(self)
           end
         end
       end

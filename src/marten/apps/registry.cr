@@ -19,19 +19,21 @@ module Marten
         end
       end
 
-      # Returns the application config object contaning the passed model.
-      def get_containing_model(model : Marten::DB::Model.class)
+      # Returns the application config object contaning the passed class.
+      def get_containing(klass)
         candidates = [] of Config
 
         @app_configs.values.each do |config|
-          if model.dir_location.starts_with?(config.class.dir_location)
-            remaining = model.dir_location[config.class.dir_location.size..]
+          if klass.dir_location.starts_with?(config.class.dir_location)
+            remaining = klass.dir_location[config.class.dir_location.size..]
             next unless remaining == "" || remaining[0] == '/'
             candidates << config
           end
         end
 
-        candidates.sort_by { |config| config.class.dir_location.size }.reverse.first unless candidates.empty?
+        result = candidates.sort_by { |config| config.class.dir_location.size }.reverse.first unless candidates.empty?
+        raise "Class '#{klass}' is not part of an application defined in Marten.settings.installed_apps" if result.nil?
+        result.not_nil!
       end
     end
   end

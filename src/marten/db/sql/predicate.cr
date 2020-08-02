@@ -15,8 +15,10 @@ module Marten
         end
 
         register Contains
+        register EndsWith
         register Exact
         register IContains
+        register IEndsWith
         register IExact
         register IStartsWith
         register StartsWith

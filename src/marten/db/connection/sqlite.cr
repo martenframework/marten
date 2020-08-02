@@ -28,8 +28,10 @@ module Marten
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains" => "LIKE %s ESCAPE '\\'",
+          "endswith": "LIKE %s ESCAPE '\\'",
           "exact" => "= %s",
           "icontains" => "LIKE %s ESCAPE '\\'",
+          "iendswith": "LIKE %s ESCAPE '\\'",
           "iexact" => "LIKE %s ESCAPE '\\'",
           "istartswith" => "LIKE %s ESCAPE '\\'",
           "startswith" => "LIKE %s ESCAPE '\\'",

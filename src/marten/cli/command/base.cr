@@ -65,7 +65,7 @@ module Marten
           parser.unknown_args do |args, _args_after_two_dashes|
             args.each_with_index do |arg, i|
               handler = argument_handlers[i]?
-              error("Unrecognized argument: #{arg}") if handler.nil?
+              show_error_and_exit("Unrecognized argument: #{arg}") if handler.nil?
               handler.block.call(arg)
             end
           end
@@ -138,9 +138,13 @@ module Marten
           end
         end
 
-        private def error(msg, exit_code = 1, stderr = STDERR)
-          stderr.print("Error: ".colorize.toggle(color).red.bold)
+        private def show_error(msg, stderr = STDERR)
           stderr.puts(msg.colorize.toggle(color).bright)
+        end
+
+        private def show_error_and_exit(msg, exit_code = 1, stderr = STDERR)
+          stderr.print("Error: ".colorize.toggle(color).red.bold)
+          show_error(msg, stderr)
           exit(exit_code)
         end
       end

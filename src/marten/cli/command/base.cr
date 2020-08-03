@@ -34,6 +34,7 @@ module Marten
 
         @arguments = [] of String
         @argument_handlers = [] of ArgumentHandler
+        @color = true
         @parser : OptionParser?
 
         def initialize(@options : Array(String))
@@ -49,6 +50,10 @@ module Marten
           @parser = OptionParser.new
 
           setup
+
+          parser.on("--no-color", "Disable colored output") do
+            @color = false
+          end
 
           parser.on("-h", "--help", "Show this help") do
             puts parser

@@ -7,10 +7,12 @@ module Marten
         end
 
         module ClassMethods
+          # Returns the database connection to use for the considered model.
           def connection
             DB::Connection.for(table_name)
           end
 
+          # Allows to run the underlying block in a database transaction.
           def transaction
             connection.transaction do
               yield

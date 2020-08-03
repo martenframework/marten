@@ -10,6 +10,12 @@ module Marten
           def connection
             DB::Connection.for(table_name)
           end
+
+          def transaction
+            connection.transaction do
+              yield
+            end
+          end
         end
       end
     end

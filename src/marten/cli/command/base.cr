@@ -132,8 +132,9 @@ module Marten
           end
         end
 
-        private def error(msg, exit_code = 1)
-          puts msg
+        private def error(msg, exit_code = 1, stderr = STDERR)
+          stderr.print("Error: ")
+          stderr.puts(msg)
           exit(exit_code)
         end
       end

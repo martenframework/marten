@@ -77,6 +77,7 @@ module Marten
 
         private getter arguments
         private getter argument_handlers
+        private getter color
         private getter options
 
         private def parser
@@ -138,8 +139,8 @@ module Marten
         end
 
         private def error(msg, exit_code = 1, stderr = STDERR)
-          stderr.print("Error: ")
-          stderr.puts(msg)
+          stderr.print("Error: ".colorize.toggle(color).red.bold)
+          stderr.puts(msg.colorize.toggle(color).bright)
           exit(exit_code)
         end
       end

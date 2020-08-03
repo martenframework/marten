@@ -1,5 +1,6 @@
 # Marten - The pragmatic web framework.
 
+require "colorize"
 require "db"
 require "log"
 require "http"

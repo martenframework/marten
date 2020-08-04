@@ -221,14 +221,7 @@ module Marten
         private def verify_field(raw_field)
           raw_field.split(Model::LOOKUP_SEP).each_with_index do |part, i|
             raise NotImplementedError.new("Model relations are not implemented yet") if i > 0
-            begin
-              Model.get_field(part)
-            rescue Errors::UnknownField
-              valid_choices = Model.fields.map(&.id).join(", ")
-              raise Errors::InvalidField.new(
-                "Unable to resolve '#{part}' as a field. Valid choices are: #{valid_choices}."
-              )
-            end
+            get_field(part)
           end
         end
 
@@ -240,14 +233,7 @@ module Marten
 
           raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
 
-          begin
-            field = Model.get_field(raw_field)
-          rescue Errors::UnknownField
-            valid_choices = Model.fields.map(&.id).join(", ")
-            raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
-            )
-          end
+          field = get_field(raw_field)
 
           if raw_predicate.nil?
             predicate_klass = Predicate::Exact
@@ -258,6 +244,15 @@ module Marten
           end
 
           predicate_klass.new(field, raw_value)
+        end
+
+        private def get_field(raw_field)
+          Model.get_field(raw_field)
+        rescue Errors::UnknownField
+          valid_choices = Model.fields.map(&.id).join(", ")
+          raise Errors::InvalidField.new(
+            "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
+          )
         end
       end
     end

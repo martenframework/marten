@@ -45,6 +45,8 @@ module Marten
             yield
           end
           true
+        rescue Marten::DB::Errors::Rollback
+          false
         ensure
           transactions.delete(Fiber.current.object_id)
         end

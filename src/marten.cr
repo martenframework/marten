@@ -56,6 +56,10 @@ module Marten
     @@env ||= Conf::Env.new
   end
 
+  # Returns the settings of the application.
+  #
+  # This method returns the main `Marten::Conf::GlobalSettings` object containing the settings configured for the
+  # current environment.
   def self.settings
     @@settings ||= Conf::GlobalSettings.new
   end

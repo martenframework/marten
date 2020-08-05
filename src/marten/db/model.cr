@@ -1,5 +1,6 @@
 require "./model/app_config"
 require "./model/connection"
+require "./model/persistence"
 require "./model/querying"
 require "./model/table"
 require "./model/validation"
@@ -9,12 +10,10 @@ module Marten
     abstract class Model
       include AppConfig
       include Connection
+      include Persistence
       include Table
       include Querying
       include Validation
-
-      # :nodoc:
-      @new_record : Bool = true
 
       def initialize(**kwargs)
         assign_field_values(kwargs.to_h.transform_keys(&.to_s))
@@ -22,8 +21,6 @@ module Marten
 
       def initialize
       end
-
-      protected setter new_record
     end
   end
 end

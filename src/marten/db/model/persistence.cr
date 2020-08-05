@@ -3,6 +3,9 @@ module Marten
     abstract class Model
       module Persistence
         # :nodoc:
+        @destroyed : Bool = false
+
+        # :nodoc:
         @new_record : Bool = true
 
         protected setter new_record

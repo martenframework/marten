@@ -24,6 +24,14 @@ module Marten
           @destroyed
         end
 
+        # Returns a boolean indicating if the record is peristed in the database.
+        #
+        # This method returns `true` if the record at hand exists in the database. Otherwise (if it's a new record or if
+        # it was destroyed previously), the method returns `false`.
+        def persisted?
+          !(new_record? || destroyed?)
+        end
+
         protected setter new_record
       end
     end

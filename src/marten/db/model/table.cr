@@ -184,8 +184,13 @@ module Marten
                 )
               end
               @{{ field_var.id }} = value
+              values.delete({{field_var.name.stringify}})
             end
           {% end %}
+
+          unless values.empty?
+            raise Errors::UnknownField.new("Unknown field '#{values.first[0]}' for #{self.class.name}")
+          end
         end
 
         private def field_db_values

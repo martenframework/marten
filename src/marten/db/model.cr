@@ -16,10 +16,9 @@ module Marten
       include Validation
 
       def initialize(**kwargs)
-        assign_field_values(kwargs.to_h.transform_keys(&.to_s))
-      end
-
-      def initialize
+        values = Hash(String, Field::Any).new
+        kwargs.each { |key, v| values[key.to_s] = v }
+        assign_field_values(values)
       end
     end
   end

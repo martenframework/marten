@@ -143,7 +143,7 @@ module Marten
 
         def inspect(io)
           io << "#<#{self.class.name}:0x#{object_id.to_s(16)} "
-          io << "#{self.class.pk_field.id}: #{pk}"
+          io << "#{self.class.pk_field.id}: #{pk.inspect}"
           {% for field_var in @type.instance_vars
             .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}

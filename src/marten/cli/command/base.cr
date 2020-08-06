@@ -139,7 +139,7 @@ module Marten
         end
 
         private def print(msg)
-          @stdout.puts(msg)
+          @stdout.puts(msg.to_s)
         end
 
         private def print_error(msg)
@@ -147,9 +147,13 @@ module Marten
         end
 
         private def print_error_and_exit(msg, exit_code = 1)
-          @stderr.print("Error: ".colorize.toggle(color).red.bold)
+          @stderr.print(style("Error: ", fore: :red).colorize.bold)
           print_error(msg)
           exit(exit_code)
+        end
+
+        private def style(msg, fore = nil)
+          msg.colorize.toggle(color).fore(fore).to_s
         end
       end
     end

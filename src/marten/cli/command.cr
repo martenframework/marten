@@ -63,9 +63,9 @@ module Marten
         end
 
         per_app_commands.each do |app_label, commands|
-          usage << "\n[#{app_label}]\n"
+          usage << "\n[#{app_label}]\n".colorize(:green).to_s
           commands.each do |command|
-            usage << "    #{command.command_name}\n"
+            usage << "  › #{command.command_name}\n"
           end
           usage << "\n"
         end

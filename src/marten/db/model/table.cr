@@ -225,6 +225,10 @@ module Marten
           def pk
             {{ pkeys[0].id }}
           end
+
+          def pk=(val)
+            self.{{ pkeys[0].id }} = val
+          end
         end
       end
     end

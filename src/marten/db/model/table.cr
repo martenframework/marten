@@ -188,6 +188,16 @@ module Marten
           {% end %}
         end
 
+        private def field_db_values
+          values = {} of String => ::DB::Any
+          {% for field_var in @type.instance_vars
+            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+            values[{{ field_var.name.stringify }}] = self.class.get_field({{ field_var.name.stringify }})
+              .to_db(@{{ field_var.id }})
+          {% end %}
+          values
+        end
+
         # :nodoc:
         macro _verify_model_name
           {% if @type.id.includes?(LOOKUP_SEP) %}

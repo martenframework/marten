@@ -137,6 +137,24 @@ module Marten
           {% end %}
         end
 
+        def to_s(io)
+          inspect(io)
+        end
+
+        def inspect(io)
+          io << "#<#{self.class.name}:0x#{object_id.to_s(16)} "
+          io << "#{self.class.pk_field.id}: #{pk}"
+          {% for field_var in @type.instance_vars
+            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% unless ann[:field_kwargs] && ann[:field_kwargs][:primary_key] %}
+          io << ", "
+          io << {{ field_var.name.stringify }} + ": #{@{{ field_var.id }}.inspect}"
+          {% end %}
+          {% end %}
+          io << ">"
+        end
+
         protected def from_db_result_set(result_set : ::DB::ResultSet)
           {% begin %}
           result_set.column_names.each do |column_name|

@@ -37,7 +37,7 @@ module Marten
         @color = true
         @parser : OptionParser?
 
-        def initialize(@options : Array(String))
+        def initialize(@options : Array(String), @stdout : IO = STDOUT, @stderr : IO = STDERR)
         end
 
         def setup
@@ -56,7 +56,7 @@ module Marten
           end
 
           parser.on("-h", "--help", "Show this help") do
-            puts parser
+            print(parser)
             exit
           end
 
@@ -138,13 +138,17 @@ module Marten
           end
         end
 
-        private def print_error(msg, stderr = STDERR)
-          stderr.puts(msg.colorize.toggle(color).bright)
+        private def print(msg)
+          @stdout.puts(msg)
         end
 
-        private def print_error_and_exit(msg, exit_code = 1, stderr = STDERR)
-          stderr.print("Error: ".colorize.toggle(color).red.bold)
-          print_error(msg, stderr)
+        private def print_error(msg)
+          @stderr.puts(msg.colorize.toggle(color).bright)
+        end
+
+        private def print_error_and_exit(msg, exit_code = 1)
+          @stderr.print("Error: ".colorize.toggle(color).red.bold)
+          print_error(msg)
           exit(exit_code)
         end
       end

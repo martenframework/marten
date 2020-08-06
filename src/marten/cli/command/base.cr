@@ -144,7 +144,7 @@ module Marten
 
         private def print_error_and_exit(msg, exit_code = 1, stderr = STDERR)
           stderr.print("Error: ".colorize.toggle(color).red.bold)
-          printerror(msg, stderr)
+          print_error(msg, stderr)
           exit(exit_code)
         end
       end

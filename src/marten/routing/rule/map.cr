@@ -7,7 +7,9 @@ module Marten
         @parameters : Hash(String, Parameter::Base)
         @reversers : Nil | Array(Reverser)
 
+        getter map
         getter name
+        getter path
 
         def initialize(@path : String, @map : Marten::Routing::Map, @name : String)
           @regex, @path_for_interpolation, @parameters = path_to_regex(@path)

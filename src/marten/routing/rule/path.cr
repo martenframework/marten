@@ -8,6 +8,8 @@ module Marten
         @reversers : Nil | Array(Reverser)
 
         getter name
+        getter path
+        getter view
 
         def initialize(@path : String, @view : Marten::Views::Base.class, @name : String)
           @regex, @path_for_interpolation, @parameters = path_to_regex(@path)

@@ -14,7 +14,7 @@ module Marten
             when Marten::Routing::Rule::Path
               print_path(rule, parent_path, parent_name)
             when Marten::Routing::Rule::Map
-              process_routes_map(rule.map, parent_path: rule.path)
+              process_routes_map(rule.map, parent_path: rule.path, parent_name: rule.name)
             end
           end
         end
@@ -25,7 +25,7 @@ module Marten
           parts << style(parent_path + rule.path, fore: :light_blue)
           parts << style("[#{parent_name.nil? ? rule.name : "#{parent_name}:#{rule.name}"}]", fore: :light_yellow)
           parts << "›"
-          parts << style(rule.view.name, fore: :light_green)
+          parts << style([parent_name, rule.view.name].compact.join(":"), fore: :light_green)
           parts << "(#{rule.view.http_method_names.join(", ")})"
 
           print(parts.join(" "))

@@ -46,9 +46,9 @@ module Marten
         protected def perform_validation(record : Model)
           value = record.get_field_value(id)
 
-          if !primary_key? && value.nil? && !@null
+          if value.nil? && !@null
             record.errors.add(id, null_error_message(record), type: :null)
-          elsif !primary_key? && empty_value?(value) && !@blank
+          elsif empty_value?(value) && !@blank
             record.errors.add(id, blank_error_message(record), type: :blank)
           end
 

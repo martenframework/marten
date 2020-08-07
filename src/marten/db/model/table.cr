@@ -39,11 +39,6 @@ module Marten
             obj
           end
 
-          protected def register_field(id, type, **options)
-            field_klass = Field.registry[type]
-            @@fields[id] = field_klass.not_nil!.new(id, **options)
-          end
-
           protected def fields
             @@fields.values
           end
@@ -95,9 +90,9 @@ module Marten
 
           {% FIELDS_[sanitized_id.stringify] = kwargs %}
 
-          register_field(
+          # Registers the field to the model class.
+          @@fields[{{ sanitized_id.stringify }}] = {{ field_klass }}.new(
             {{ sanitized_id.stringify }},
-            {{ sanitized_type.stringify }},
             {% unless kwargs.empty? %}**{{ kwargs }}{% end %}
           )
 

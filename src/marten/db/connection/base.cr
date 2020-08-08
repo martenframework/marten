@@ -10,6 +10,11 @@ module Marten
           @url = build_url
         end
 
+        abstract def insert(
+          table_name : String,
+          values : Hash(String, ::DB::Any),
+          pk_field_to_fetch : String? = nil
+        ) : Int64?
         abstract def left_operand_for(id : String, predicate) : String
         abstract def operator_for(predicate) : String
         abstract def parameter_id_for_ordered_argument(number : Int) : String

@@ -8,6 +8,22 @@ module Marten
         # :nodoc:
         @new_record : Bool = true
 
+        # Saves the model instances.
+        #
+        # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
+        # This method will return `true` if the model instance is valid and was created / updated successfully.
+        # Otherwise it will returns `false` if the model instance validation failed.
+        def save : Bool
+          if valid? && !persisted?
+            self.class.connection.transaction do
+              insert_or_update
+              true
+            end
+          else
+            false
+          end
+        end
+
         # Returns a boolean indicating if the record doesn't exist in the database yet.
         #
         # This methods returns `true` if the model instance hasn't been saved and doesn't exist in the database yet. In
@@ -33,6 +49,30 @@ module Marten
         end
 
         protected setter new_record
+
+        private def insert_or_update
+          if persisted?
+            raise NotImplementedError.new("Model records update not implemented yet")
+          else
+            insert
+          end
+        end
+
+        private def insert
+          values = field_db_values
+
+          pk_field_to_fetch = self.class.pk_field.id
+          if self.class.pk_field.is_a?(Field::AutoTypes)
+            values.delete(self.class.pk_field.id)
+          else
+            pk_field_to_fetch = nil
+          end
+
+          pk = self.class.connection.insert(self.class.table_name, values, pk_field_to_fetch: pk_field_to_fetch)
+
+          self.pk ||= pk
+          self.new_record = false
+        end
       end
     end
   end

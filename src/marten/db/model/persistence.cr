@@ -8,7 +8,7 @@ module Marten
         # :nodoc:
         @new_record : Bool = true
 
-        # Saves the model instances.
+        # Saves the model instance.
         #
         # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
         # This method will return `true` if the model instance is valid and was created / updated successfully.

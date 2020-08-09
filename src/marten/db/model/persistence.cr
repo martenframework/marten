@@ -12,7 +12,7 @@ module Marten
         #
         # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
         # This method will return `true` if the model instance is valid and was created / updated successfully.
-        # Otherwise it will returns `false` if the model instance validation failed.
+        # Otherwise it will return `false` if the model instance validation failed.
         def save : Bool
           if valid? && !persisted?
             self.class.connection.transaction do

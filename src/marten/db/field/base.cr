@@ -55,6 +55,9 @@ module Marten
           validate(record, value)
         end
 
+        protected def prepare_save(record, new_record = false)
+        end
+
         private def empty_value?(value) : ::Bool
           value.nil?
         end

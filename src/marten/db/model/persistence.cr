@@ -61,9 +61,9 @@ module Marten
         private def insert
           values = field_db_values
 
-          pk_field_to_fetch = self.class.pk_field.id
           if self.class.pk_field.is_a?(Field::AutoTypes)
-            values.delete(self.class.pk_field.id)
+            pk_field_to_fetch = self.class.pk_field.id
+            values.delete(pk_field_to_fetch)
           else
             pk_field_to_fetch = nil
           end

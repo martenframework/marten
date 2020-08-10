@@ -17,6 +17,7 @@ module Marten
           @primary_key = false,
           @blank = false,
           @null = false,
+          @editable = true,
           @name = nil,
           @max_size = nil
         )
@@ -46,9 +47,9 @@ module Marten
         protected def perform_validation(record : Model)
           value = record.get_field_value(id)
 
-          if value.nil? && !@null
+          if value.nil? && !@null && @editable
             record.errors.add(id, null_error_message(record), type: :null)
-          elsif empty_value?(value) && !@blank
+          elsif empty_value?(value) && !@blank && @editable
             record.errors.add(id, blank_error_message(record), type: :blank)
           end
 

@@ -132,6 +132,29 @@ module Marten
           {% end %}
         end
 
+        # Allows to set the value of a specific field.
+        #
+        # If the passed `field_name` doesn't match any existing field, a `Marten::DB::Errors::UnknownField` exception
+        # will be raised.
+        def set_field_value(field_name : String | Symbol, value : Field::Any)
+          {% begin %}
+          case field_name.to_s
+          {% for field_var in @type.instance_vars
+            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          when {{ field_var.name.stringify }}
+            if !value.is_a?({{ field_var.type }})
+              raise Errors::UnexpectedFieldValue.new(
+                "Value for field {{ field_var.id }} should of type {{ field_var.type }}, not #{typeof(value)}"
+              )
+            end
+            @{{ field_var.id }} = value
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
+          end
+          {% end %}
+        end
+
         def to_s(io)
           inspect(io)
         end

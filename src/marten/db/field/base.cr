@@ -16,7 +16,7 @@ module Marten
           @blank = false,
           @null = false,
           @editable = true,
-          @name = nil,
+          @name = nil
         )
         end
 
@@ -35,6 +35,13 @@ module Marten
           @null
         end
 
+        # Runs pre-save logic for the specific field and record at hand.
+        #
+        # This method does nothing by default but can be overridden for specific fields that need to set values on the
+        # model instance before save or perform any pre-save logic.
+        def prepare_save(record, new_record = false)
+        end
+
         # Runs custom validation logic for a specific model field and model object.
         #
         # This method should be overriden for each field implementation that requires custom validation logic.
@@ -51,9 +58,6 @@ module Marten
           end
 
           validate(record, value)
-        end
-
-        protected def prepare_save(record, new_record = false)
         end
 
         private def empty_value?(value) : ::Bool

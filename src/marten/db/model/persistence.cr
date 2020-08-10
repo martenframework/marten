@@ -59,6 +59,11 @@ module Marten
         end
 
         private def insert
+          self.class.fields.each do |field|
+            next if field.primary_key?
+            field.prepare_save(self, new_record: true)
+          end
+
           values = field_db_values
 
           if self.class.pk_field.is_a?(Field::AutoTypes)
@@ -66,11 +71,6 @@ module Marten
             values.delete(pk_field_to_fetch)
           else
             pk_field_to_fetch = nil
-          end
-
-          self.class.fields.each do |field|
-            next if field.primary_key?
-            field.prepare_save(self, new_record: true)
           end
 
           pk = self.class.connection.insert(self.class.table_name, values, pk_field_to_fetch: pk_field_to_fetch)

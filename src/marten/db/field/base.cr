@@ -6,11 +6,9 @@ module Marten
         @blank : ::Bool
         @null : ::Bool
         @name : ::String?
-        @max_size : ::Int32?
 
         getter id
         getter name
-        getter max_size
 
         def initialize(
           @id : ::String,
@@ -19,7 +17,6 @@ module Marten
           @null = false,
           @editable = true,
           @name = nil,
-          @max_size = nil
         )
         end
 

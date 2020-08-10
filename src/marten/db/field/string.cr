@@ -2,6 +2,21 @@ module Marten
   module DB
     module Field
       class String < Base
+        @max_size : ::Int32?
+
+        getter max_size
+
+        def initialize(
+          @id : ::String,
+          @primary_key = false,
+          @blank = false,
+          @null = false,
+          @editable = true,
+          @name = nil,
+          @max_size = nil
+        )
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : ::String?
           result_set.read(::String?)
         end

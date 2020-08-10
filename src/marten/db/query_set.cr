@@ -73,6 +73,12 @@ module Marten
         clone
       end
 
+      def get(**kwargs)
+        get!(**kwargs)
+      rescue Model::NotFound
+        nil
+      end
+
       def get!(**kwargs)
         results = filter(**kwargs)[..GET_RESULTS_LIMIT].to_a
         return results.first if results.size == 1

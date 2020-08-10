@@ -83,7 +83,25 @@ module Marten
 
           # Returns the model instance matching the given set of filters.
           #
-          # Model fields such as primary keys or fields with a unique constraints should be used here in order to
+          # Model fields such as primary keys or fields with a unique constraint should be used here in order to
+          # retrieve a specific record:
+          #
+          # ```
+          # post_1 = Post.get(id: 123)
+          # post_2 = Post.get(id: 456, is_published: false)
+          # ```
+          #
+          # If the specified set of filters doesn't match any records, the returned value will be `nil`.
+          #
+          # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+          # exception if multiple records match the specified set of filters.
+          def get(**kwargs)
+            QuerySet(self).new.get(**kwargs)
+          end
+
+          # Returns the model instance matching the given set of filters.
+          #
+          # Model fields such as primary keys or fields with a unique constraint should be used here in order to
           # retrieve a specific record:
           #
           # ```

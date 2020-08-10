@@ -97,7 +97,7 @@ module Marten
           # In order to ensure data consistency, this method will also raise a
           # `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
           def get!(**kwargs)
-            QuerySet(self).new.get(**kwargs)
+            QuerySet(self).new.get!(**kwargs)
           end
 
           # Returns the first record for the considered model.

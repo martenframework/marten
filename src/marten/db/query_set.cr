@@ -73,7 +73,7 @@ module Marten
         clone
       end
 
-      def get(**kwargs)
+      def get!(**kwargs)
         results = filter(**kwargs)[..GET_RESULTS_LIMIT].to_a
         return results.first if results.size == 1
         raise Model::NotFound.new("#{Model.name} query didn't return any results") if results.empty?

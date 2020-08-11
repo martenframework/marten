@@ -6,6 +6,7 @@ module Marten
 
         Available commands:
 
+
         USAGE_HEADER
 
       USAGE_FOOTER = <<-USAGE_FOOTER
@@ -63,7 +64,7 @@ module Marten
         end
 
         per_app_commands.each do |app_label, commands|
-          usage << "\n[#{app_label}]\n".colorize(:green).to_s
+          usage << "[#{app_label}]\n".colorize(:green).to_s
           commands.each do |command|
             usage << "  › #{command.command_name}\n"
           end

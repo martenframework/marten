@@ -16,6 +16,13 @@ module Marten
         @@label
       end
 
+      # :nodoc:
+      # The ::dir_location method must be defined for the registry mechanism to compile when no applications are
+      # installed (which means that no app configs are defined at all).
+      def self.dir_location
+        __DIR__
+      end
+
       private LABEL_RE = /^[a-z_]+$/
 
       macro inherited

@@ -3,5 +3,5 @@
 if [ -z "$SKIP_MARTEN_ADMIN_CLI_PRECOMPILATION" ]; then
   shards build
   mkdir -p ../../bin
-  cp -r "$PWD/bin" "$PWD/../.."
+  cp -r "$PWD/bin/marten-admin" "$PWD/../../bin/"
 fi

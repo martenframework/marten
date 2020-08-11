@@ -16,7 +16,7 @@ development_dependencies:
 
 targets:
   marten-admin:
-    main: src/marten_admin.cr
+    main: src/admin_cli.cr
 
 scripts:
   postinstall: scripts/precompile_admin_cli

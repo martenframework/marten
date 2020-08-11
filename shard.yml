@@ -19,6 +19,6 @@ targets:
     main: src/marten_admin.cr
 
 scripts:
-  postinstall: script/precompile_admin_cli
+  postinstall: scripts/precompile_admin_cli
 
 license: MIT

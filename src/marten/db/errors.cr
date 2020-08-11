@@ -4,6 +4,9 @@ module Marten
       # Represents an error raised when a problem is detected with a specific model field.
       class InvalidField < Exception; end
 
+      # Represents an error raised when a create / save operation fails because of an invalid record.
+      class InvalidRecord < Exception; end
+
       # Represents an error raised when a get query returned more than one result.
       class MultipleRecordsFound < Exception; end
 

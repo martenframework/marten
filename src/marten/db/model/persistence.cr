@@ -24,6 +24,17 @@ module Marten
           end
         end
 
+
+        # Saves the model instance.
+        #
+        # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
+        # This method will return `true` if the model instance is valid and was created / updated successfully.
+        # Otherwise it will raise a `Marten::DB::Errors::InvalidRecord` exception if the model instance validation
+        # failed.
+        def save! : Bool
+          save || (raise Errors::InvalidRecord.new("Record is invalid"))
+        end
+
         # Returns a boolean indicating if the record doesn't exist in the database yet.
         #
         # This methods returns `true` if the model instance hasn't been saved and doesn't exist in the database yet. In

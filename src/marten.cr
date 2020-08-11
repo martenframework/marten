@@ -1,15 +1,12 @@
 # Marten - The pragmatic web framework.
 
-require "colorize"
 require "db"
 require "log"
 require "http"
-require "option_parser"
 require "uuid"
 
 require "./marten/*"
 require "./marten/apps/**"
-require "./marten/cli/**"
 require "./marten/conf/**"
 require "./marten/core/**"
 require "./marten/db/**"

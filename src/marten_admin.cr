@@ -1,3 +1,3 @@
-require "marten"
+require "./marten"
 
 Marten::CLI.run

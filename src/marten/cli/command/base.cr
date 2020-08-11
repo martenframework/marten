@@ -7,7 +7,7 @@ module Marten
             __DIR__
           end
 
-          Command.register_subcommand({{ @type }})
+          Marten::CLI::Command.register_subcommand({{ @type }})
         end
 
         # :nodoc:

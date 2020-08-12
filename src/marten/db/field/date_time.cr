@@ -9,6 +9,7 @@ module Marten
           @null = false,
           @editable = true,
           @name = nil,
+          @db_column = nil,
           @auto_now = false,
           @auto_now_add = false
         )

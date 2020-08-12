@@ -6,6 +6,7 @@ module Marten
         @blank : ::Bool
         @null : ::Bool
         @name : ::String?
+        @db_column : ::String | Symbol | Nil
 
         getter id
         getter name
@@ -16,7 +17,8 @@ module Marten
           @blank = false,
           @null = false,
           @editable = true,
-          @name = nil
+          @name = nil,
+          @db_column = nil
         )
         end
 
@@ -25,7 +27,7 @@ module Marten
 
         # Returns the name of the column associated with the considered field.
         def db_column
-          @id
+          @db_column.try(&.to_s) || @id
         end
 
         def primary_key?

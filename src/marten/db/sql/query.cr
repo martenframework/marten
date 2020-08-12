@@ -180,7 +180,7 @@ module Marten
         end
 
         private def columns
-          Model.fields.map(&.column).flatten.join(", ")
+          Model.fields.map(&.db_column).flatten.join(", ")
         end
 
         private def where_clause_and_parameters

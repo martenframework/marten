@@ -62,7 +62,7 @@ module Marten
           end
 
           protected def fields_per_column
-            @@fields_per_column ||= fields.map { |field| [field.column, field] }.to_h
+            @@fields_per_column ||= fields.map { |field| [field.db_column, field] }.to_h
           end
         end
 
@@ -221,7 +221,7 @@ module Marten
           {% for field_var in @type.instance_vars
             .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.column] = field.to_db(@{{ field_var.id }})
+            values[field.db_column] = field.to_db(@{{ field_var.id }})
           {% end %}
           values
         end

@@ -24,7 +24,7 @@ module Marten
         abstract def to_db(value) : ::DB::Any
 
         # Returns the name of the column associated with the considered field.
-        def column
+        def db_column
           @id
         end
 

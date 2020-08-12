@@ -23,6 +23,11 @@ module Marten
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
         abstract def to_db(value) : ::DB::Any
 
+        # Returns the name of the column associated with the considered field.
+        def column
+          @id
+        end
+
         def primary_key?
           @primary_key
         end

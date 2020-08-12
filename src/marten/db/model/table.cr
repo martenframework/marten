@@ -8,6 +8,7 @@ module Marten
         macro included
           @@table_name : String?
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
+          @@fields_per_column : Hash(String, Field::Base)?
 
           extend Marten::DB::Model::Table::ClassMethods
 
@@ -58,6 +59,10 @@ module Marten
 
           protected def get_field(id)
             @@fields.fetch(id) { raise Errors::UnknownField.new("Unknown field '#{id}'") }
+          end
+
+          protected def fields_per_column
+            @@fields_per_column ||= fields.map { |field| [field.column, field] }.to_h
           end
         end
 
@@ -176,9 +181,9 @@ module Marten
         protected def from_db_result_set(result_set : ::DB::ResultSet)
           {% begin %}
           result_set.column_names.each do |column_name|
-            field = @@fields.fetch(column_name, nil)
+            field = self.class.fields_per_column[column_name]?
             next if field.nil?
-            case column_name
+            case field.as(Field::Base).id
             {% for field_var in @type.instance_vars
               .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
@@ -215,8 +220,8 @@ module Marten
           values = {} of String => ::DB::Any
           {% for field_var in @type.instance_vars
             .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-            values[{{ field_var.name.stringify }}] = self.class.get_field({{ field_var.name.stringify }})
-              .to_db(@{{ field_var.id }})
+            field = self.class.get_field({{ field_var.name.stringify }})
+            values[field.column] = field.to_db(@{{ field_var.id }})
           {% end %}
           values
         end

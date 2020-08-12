@@ -292,6 +292,10 @@ module Marten
             return if @{{ field_id }}.nil?
             {{ related_model_klass }}.get(pk: @{{ field_id }})
           end
+
+          def {{ relation_attribute_name }}! : {{ related_model_klass }}
+            {{ relation_attribute_name }}.not_nil!
+          end
         end
 
         # :nodoc:

@@ -93,30 +93,21 @@ module Marten
             {% raise "'#{sanitized_type}' is not a valid type for field '#{@type.id}##{sanitized_id}'" %}
           {% end %}
 
-          {% FIELDS_[sanitized_id.stringify] = kwargs %}
-
-          # Registers the field to the model class.
-          @@fields[{{ sanitized_id.stringify }}] = {{ field_klass }}.new(
-            {{ sanitized_id.stringify }},
-            {% unless kwargs.empty? %}**{{ kwargs }}{% end %}
-          )
-
-          @[Marten::DB::Model::Table::FieldInstanceVariable(
-            field_klass: {{ field_klass }},
-            field_kwargs: {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %},
-            field_type: {{ field_ann[:exposed_type] }}
-          )]
-          @{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
-
-          def {{ sanitized_id }} : {{ field_ann[:exposed_type] }}?
-          @{{ sanitized_id }}
-          end
-
-          def {{ sanitized_id }}!
-          @{{ sanitized_id }}.not_nil!
-          end
-
-          def {{ sanitized_id }}=(@{{ sanitized_id }} : {{ field_ann[:exposed_type] }}?); end
+          {% if field_klass <= Marten::DB::Field::ForeignKey %}
+            _register_foreign_key_field(
+              {{ sanitized_id }},
+              {{ field_klass }},
+              {{ field_ann }},
+              {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
+            )
+          {% else %}
+            _register_simple_field(
+              {{ sanitized_id }},
+              {{ field_klass }},
+              {{ field_ann }},
+              {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
+            )
+          {% end %}
         end
 
         # Allows to read the value of a specific field.
@@ -227,6 +218,83 @@ module Marten
         end
 
         # :nodoc:
+        macro _register_simple_field(field_id, field_klass, field_ann, kwargs)
+          {% FIELDS_[field_id.stringify] = kwargs %}
+
+          # Registers the field to the model class.
+          @@fields[{{ field_id.stringify }}] = {{ field_klass }}.new(
+            {{ field_id.stringify }},
+            {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+          )
+
+          @[Marten::DB::Model::Table::FieldInstanceVariable(
+            field_klass: {{ field_klass }},
+            field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
+            field_type: {{ field_ann[:exposed_type] }}
+          )]
+
+          @{{ field_id }} : {{ field_ann[:exposed_type] }}?
+
+          def {{ field_id }} : {{ field_ann[:exposed_type] }}?
+            @{{ field_id }}
+          end
+
+          def {{ field_id }}!
+            @{{ field_id }}.not_nil!
+          end
+
+          def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
+        end
+
+        # :nodoc:
+        macro _register_foreign_key_field(field_id, field_klass, field_ann, kwargs)
+          {% if kwargs.is_a?(NilLiteral) %}{% raise "A related model is required ('to' option)" %}{% end %}
+
+          {% relation_attribute_name = field_id %}
+          {% field_id = (field_id.stringify + "_id").id %}
+
+          # Registers a field corresponding to the related object ID to the considered model class. For example, if an
+          # 'author' foreign key is defined in a 'post' model, an 'author_id' foreign key field will actually be created
+          # for the model at hand.
+
+          {% FIELDS_[field_id.stringify] = kwargs %}
+
+          @@fields[{{ field_id.stringify }}] = {{ field_klass }}.new(
+            {{ field_id.stringify }},
+            {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+          )
+
+          @[Marten::DB::Model::Table::FieldInstanceVariable(
+            field_klass: {{ field_klass }},
+            field_kwargs: {{ kwargs }},
+            field_type: {{ field_ann[:exposed_type] }}
+          )]
+
+          @{{ field_id }} : {{ field_ann[:exposed_type] }}?
+
+          def {{ field_id }} : {{ field_ann[:exposed_type] }}?
+            @{{ field_id }}
+          end
+
+          def {{ field_id }}!
+            @{{ field_id }}.not_nil!
+          end
+
+          def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
+
+          # Creates the necessary methods allowing to interact with the related object.
+
+          {% related_model_klass = kwargs[:to] %}
+
+          @{{ relation_attribute_name }} : {{ related_model_klass }}?
+
+          def {{ relation_attribute_name }} : {{ related_model_klass }}?
+            return if @{{ field_id }}.nil?
+            {{ related_model_klass }}.get(pk: @{{ field_id }})
+          end
+        end
+
+        # :nodoc:
         macro _verify_model_name
           {% if @type.id.includes?(LOOKUP_SEP) %}
             {% raise "Cannot use '#{@type.id}' as a valid model name: model names cannot contain '#{LOOKUP_SEP.id}'" %}
@@ -237,7 +305,7 @@ module Marten
         macro _setup_primary_key
           {% pkeys = [] of StringLiteral %}
           {% for id, kwargs in FIELDS_ %}
-            {% if kwargs[:primary_key] %}{% pkeys << id %}{% end %}
+            {% if kwargs && kwargs[:primary_key] %}{% pkeys << id %}{% end %}
           {% end %}
 
           {% if pkeys.size == 0 %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}

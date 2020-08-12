@@ -10,6 +10,8 @@ require "./field/uuid"
 require "./field/auto"
 require "./field/big_auto"
 
+require "./field/foreign_key"
+
 module Marten
   module DB
     module Field
@@ -62,6 +64,7 @@ module Marten
       register "big_int", BigInt
       register "bool", Bool
       register "date_time", DateTime
+      register "foreign_key", ForeignKey
       register "int", Int
       register "string", String
       register "text", Text

@@ -290,7 +290,7 @@ module Marten
 
           def {{ relation_attribute_name }} : {{ related_model_klass }}?
             return if @{{ field_id }}.nil?
-            {{ related_model_klass }}.get(pk: @{{ field_id }})
+            @{{ relation_attribute_name }} ||= {{ related_model_klass }}.get(pk: @{{ field_id }})
           end
 
           def {{ relation_attribute_name }}! : {{ related_model_klass }}

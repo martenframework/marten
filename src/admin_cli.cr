@@ -1,3 +1,3 @@
 require "./marten"
 
-Marten::CLI.run
+Marten::CLI.run(name: "marten-admin")

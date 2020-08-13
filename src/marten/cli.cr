@@ -5,8 +5,10 @@ require "./cli/**"
 
 module Marten
   module CLI
-    def self.run(options = ARGV)
-      Command.new(options).run
+    DEFAULT_COMMAND_NAME = "manage"
+
+    def self.run(options = ARGV, name = DEFAULT_COMMAND_NAME)
+      Command.new(options, name).run
     end
   end
 end

@@ -2,7 +2,7 @@ module Marten
   module CLI
     class Command
       USAGE_HEADER = <<-USAGE_HEADER
-        Usage: manage [command] [arguments]
+        Usage: %s [command] [arguments]
 
         Available commands:
 
@@ -21,7 +21,7 @@ module Marten
         @@command_registry[command_klass.command_name] = command_klass
       end
 
-      def initialize(@options : Array(String))
+      def initialize(@options : Array(String), @name : String = Marten::CLI::DEFAULT_COMMAND_NAME)
       end
 
       def run
@@ -44,7 +44,7 @@ module Marten
 
         options.shift
 
-        command = command_klass.not_nil!.new(options)
+        command = command_klass.not_nil!.new(options, main_command_name: @name)
         command.handle
       end
 
@@ -53,7 +53,7 @@ module Marten
       private def show_top_level_usage
         usage = [] of String
 
-        usage << USAGE_HEADER
+        usage << USAGE_HEADER % @name
 
         per_app_commands = @@command_registry.values.group_by do |command|
           command.dir_location.starts_with?(__DIR__) ? "marten" : command.app_config.label

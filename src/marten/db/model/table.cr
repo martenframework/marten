@@ -264,13 +264,17 @@ module Marten
             {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
           )
 
+          # Getter and setter methods for the raw related object ID and the plain related object need to be created.
+
           @[Marten::DB::Model::Table::FieldInstanceVariable(
             field_klass: {{ field_klass }},
             field_kwargs: {{ kwargs }},
             field_type: {{ field_ann[:exposed_type] }}
           )]
-
           @{{ field_id }} : {{ field_ann[:exposed_type] }}?
+
+          {% related_model_klass = kwargs[:to] %}
+          @{{ relation_attribute_name }} : {{ related_model_klass }}?
 
           def {{ field_id }} : {{ field_ann[:exposed_type] }}?
             @{{ field_id }}
@@ -280,13 +284,10 @@ module Marten
             @{{ field_id }}.not_nil!
           end
 
-          def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
-
-          # Creates the necessary methods allowing to interact with the related object.
-
-          {% related_model_klass = kwargs[:to] %}
-
-          @{{ relation_attribute_name }} : {{ related_model_klass }}?
+          def {{ field_id }}=(related_id : {{ field_ann[:exposed_type] }}?)
+            @{{ field_id }} = related_id
+            @{{ relation_attribute_name }} = nil
+          end
 
           def {{ relation_attribute_name }} : {{ related_model_klass }}?
             return if @{{ field_id }}.nil?
@@ -295,6 +296,11 @@ module Marten
 
           def {{ relation_attribute_name }}! : {{ related_model_klass }}
             {{ relation_attribute_name }}.not_nil!
+          end
+
+          def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)
+            @{{ field_id }} = related_object.try(&.id)
+            @{{ relation_attribute_name }} = related_object
           end
         end
 

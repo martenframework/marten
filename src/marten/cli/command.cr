@@ -21,10 +21,6 @@ module Marten
         @@command_registry[command_klass.command_name] = command_klass
       end
 
-      def self.run(options = ARGV)
-        new(options).run
-      end
-
       def initialize(@options : Array(String))
       end
 

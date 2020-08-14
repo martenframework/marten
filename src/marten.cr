@@ -37,7 +37,7 @@ module Marten
       Marten::Server.stop
     end
 
-    Marten::Server.run
+    Marten::Server.start
   end
 
   def self.setup

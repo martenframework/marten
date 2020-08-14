@@ -20,7 +20,7 @@ module Marten
       INSTANCE.addresses.map { |address| "http://#{address}" }
     end
 
-    def self.run
+    def self.start
       INSTANCE.listen
     end
 

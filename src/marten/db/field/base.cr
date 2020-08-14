@@ -55,6 +55,36 @@ module Marten
         def validate(record, value)
         end
 
+        # :nodoc:
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
+          # Registers the field to the model class.
+
+          class ::{{ model_klass }}
+            @@fields[{{ field_id.stringify }}] = {{ @type }}.new(
+              {{ field_id.stringify }},
+              {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+            )
+
+            @[Marten::DB::Model::Table::FieldInstanceVariable(
+              field_klass: {{ @type }},
+              field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
+              field_type: {{ field_ann[:exposed_type] }}
+            )]
+
+            @{{ field_id }} : {{ field_ann[:exposed_type] }}?
+
+            def {{ field_id }} : {{ field_ann[:exposed_type] }}?
+              @{{ field_id }}
+            end
+
+            def {{ field_id }}!
+              @{{ field_id }}.not_nil!
+            end
+
+            def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
+          end
+        end
+
         protected def perform_validation(record : Model)
           value = record.get_field_value(id)
 

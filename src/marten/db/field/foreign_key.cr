@@ -30,6 +30,64 @@ module Marten
             raise_unexpected_field_value(value)
           end
         end
+
+        # :nodoc:
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
+          {% if kwargs.is_a?(NilLiteral) %}{% raise "A related model is required ('to' option)" %}{% end %}
+
+          {% relation_attribute_name = field_id %}
+          {% field_id = (field_id.stringify + "_id").id %}
+
+          # Registers a field corresponding to the related object ID to the considered model class. For example, if an
+          # 'author' foreign key is defined in a 'post' model, an 'author_id' foreign key field will actually be created
+          # for the model at hand.
+
+          class ::{{ model_klass }}
+            @@fields[{{ field_id.stringify }}] = {{ @type }}.new(
+              {{ field_id.stringify }},
+              {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+            )
+
+            # Getter and setter methods for the raw related object ID and the plain related object need to be created.
+
+            @[Marten::DB::Model::Table::FieldInstanceVariable(
+              field_klass: {{ @type }},
+              field_kwargs: {{ kwargs }},
+              field_type: {{ field_ann[:exposed_type] }}
+            )]
+            @{{ field_id }} : {{ field_ann[:exposed_type] }}?
+
+            {% related_model_klass = kwargs[:to] %}
+            @{{ relation_attribute_name }} : {{ related_model_klass }}?
+
+            def {{ field_id }} : {{ field_ann[:exposed_type] }}?
+              @{{ field_id }}
+            end
+
+            def {{ field_id }}!
+              @{{ field_id }}.not_nil!
+            end
+
+            def {{ field_id }}=(related_id : {{ field_ann[:exposed_type] }}?)
+              @{{ field_id }} = related_id
+              @{{ relation_attribute_name }} = nil
+            end
+
+            def {{ relation_attribute_name }} : {{ related_model_klass }}?
+              return if @{{ field_id }}.nil?
+              @{{ relation_attribute_name }} ||= {{ related_model_klass }}.get(pk: @{{ field_id }})
+            end
+
+            def {{ relation_attribute_name }}! : {{ related_model_klass }}
+              {{ relation_attribute_name }}.not_nil!
+            end
+
+            def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)
+              @{{ field_id }} = related_object.try(&.id)
+              @{{ relation_attribute_name }} = related_object
+            end
+          end
+        end
       end
     end
   end

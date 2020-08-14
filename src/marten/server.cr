@@ -23,5 +23,9 @@ module Marten
     def self.run
       INSTANCE.listen
     end
+
+    def self.stop
+      INSTANCE.close
+    end
   end
 end

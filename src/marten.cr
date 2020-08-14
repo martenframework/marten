@@ -29,7 +29,13 @@ module Marten
   def self.start
     setup
 
-    Log.info { "Marten running on #{Marten::Server.addresses.join ", "}" }
+    Log.info { "Marten running on #{Marten::Server.addresses.join ", "} (Press CTRL+C to quit)" }
+
+    Signal::INT.trap do
+      Signal::INT.reset
+      Log.info { "Shutting down" }
+      Marten::Server.stop
+    end
 
     Marten::Server.run
   end

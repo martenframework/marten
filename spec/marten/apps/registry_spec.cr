@@ -1,3 +1,4 @@
+require "./registry_spec/**"
 require "./spec_helper"
 
 describe Marten::Apps::Registry do
@@ -52,6 +53,51 @@ describe Marten::Apps::Registry do
       end
     end
   end
+
+  describe "#get_containing" do
+    it "returns the app config instance associated with the passed class" do
+      registry = Marten::Apps::Registry.new
+      registry.populate(
+        [
+          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::TestApp::App,
+        ]
+      )
+      registry.get_containing(Marten::Apps::RegistrySpec::TestEntity).should(
+        be_a(Marten::Apps::RegistrySpec::Test1Config)
+      )
+    end
+
+    it "always picks the the app config corresponding to the deepest dir location" do
+      registry = Marten::Apps::Registry.new
+      registry.populate(
+        [
+          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::TestApp::App,
+        ]
+      )
+      registry.get_containing(Marten::Apps::RegistrySpec::TestApp::Entities::Test).should(
+        be_a(Marten::Apps::RegistrySpec::TestApp::App)
+      )
+    end
+
+    it "raises if no app config for the given class can be found" do
+      registry = Marten::Apps::Registry.new
+      registry.populate(
+        [
+          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::TestApp::App,
+        ]
+      )
+      expect_raises(
+        Exception,
+        "Class 'Marten::Apps::RegistrySpec::InvalidEntity' is not part of an application defined in " \
+        "Marten.settings.installed_apps"
+      ) do
+        registry.get_containing(Marten::Apps::RegistrySpec::InvalidEntity)
+      end
+    end
+  end
 end
 
 module Marten::Apps::RegistrySpec
@@ -65,5 +111,17 @@ module Marten::Apps::RegistrySpec
 
   class Test2Config < Marten::Apps::Config
     label :test_b
+  end
+
+  class TestEntity
+    def self.dir_location
+      __DIR__
+    end
+  end
+
+  class InvalidEntity
+    def self.dir_location
+      "/etc/xyz"
+    end
   end
 end

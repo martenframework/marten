@@ -1,20 +1,6 @@
 module Marten
   module CLI
     class Command
-      USAGE_HEADER = <<-USAGE_HEADER
-        Usage: %s [command] [arguments]
-
-        Available commands:
-
-
-        USAGE_HEADER
-
-      USAGE_FOOTER = <<-USAGE_FOOTER
-        Run a command followed by --help to see command specific information, ex:
-        manage <command> --help
-
-        USAGE_FOOTER
-
       @@command_registry = {} of ::String => Base.class
 
       def self.register_subcommand(command_klass : Base.class)
@@ -47,6 +33,20 @@ module Marten
         command = command_klass.not_nil!.new(options, main_command_name: @name)
         command.handle
       end
+
+      private USAGE_HEADER = <<-USAGE_HEADER
+        Usage: %s [command] [arguments]
+
+        Available commands:
+
+
+        USAGE_HEADER
+
+      private USAGE_FOOTER = <<-USAGE_FOOTER
+        Run a command followed by --help to see command specific information, ex:
+        manage <command> --help
+
+        USAGE_FOOTER
 
       private getter options
 

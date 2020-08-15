@@ -8,6 +8,7 @@ module Marten
           @@app_config : Marten::Apps::Config?
 
           macro inherited
+            # :nodoc:
             def self.dir_location
               __DIR__
             end

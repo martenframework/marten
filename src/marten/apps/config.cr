@@ -26,6 +26,7 @@ module Marten
       private LABEL_RE = /^[a-z_]+$/
 
       macro inherited
+        # :nodoc:
         def self.dir_location
           __DIR__
         end

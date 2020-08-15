@@ -3,6 +3,7 @@ module Marten
     class Command
       abstract class Base
         macro inherited
+          # :nodoc:
           def self.dir_location
             __DIR__
           end

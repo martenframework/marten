@@ -42,8 +42,6 @@ module Marten
 
         # :nodoc:
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
-          {% if kwargs.is_a?(NilLiteral) %}{% raise "A related model is required ('to' option)" %}{% end %}
-
           {% relation_attribute_name = field_id %}
           {% field_id = (field_id.stringify + "_id").id %}
 

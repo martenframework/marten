@@ -4,11 +4,6 @@ module Marten
       class UUID < Base
         include IsBuiltInField
 
-        def initialize(id, **kwargs)
-          super
-          @max_size = 32
-        end
-
         def from_db_result_set(result_set : ::DB::ResultSet) : ::UUID?
           value = result_set.read(::String?)
           ::UUID.new(value) unless value.nil?

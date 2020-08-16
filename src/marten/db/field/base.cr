@@ -59,6 +59,10 @@ module Marten
         end
 
         # :nodoc:
+        macro check_definition(field_id, kwargs)
+        end
+
+        # :nodoc:
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           # Registers the field to the model class.
 

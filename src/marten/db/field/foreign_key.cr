@@ -34,6 +34,13 @@ module Marten
         end
 
         # :nodoc:
+        macro check_definition(field_id, kwargs)
+          {% if kwargs.is_a?(NilLiteral) || kwargs[:to].is_a?(NilLiteral) %}
+            {% raise "A related model must be specified for foreign keys ('to' option)" %}
+          {% end %}
+        end
+
+        # :nodoc:
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           {% if kwargs.is_a?(NilLiteral) %}{% raise "A related model is required ('to' option)" %}{% end %}
 

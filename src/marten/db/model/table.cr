@@ -95,6 +95,11 @@ module Marten
 
           {% FIELDS_[sanitized_id.stringify] = kwargs %}
 
+          {{ field_klass }}.check_definition(
+            {{ sanitized_id }},
+            {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
+          )
+
           {{ field_klass }}.contribute_to_model(
             {{ @type }},
             {{ sanitized_id }},

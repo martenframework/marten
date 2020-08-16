@@ -43,6 +43,23 @@ module Marten
           "sqlite3"
         end
 
+        protected def column_type_for_built_in_field(field_id)
+          BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING[field_id]
+        end
+
+        private BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING = {
+          "Marten::DB::Field::Auto" => "integer",
+          "Marten::DB::Field::BigAuto" => "integer",
+          "Marten::DB::Field::BigInt" => "integer",
+          "Marten::DB::Field::Bool" => "bool",
+          "Marten::DB::Field::DateTime" => "datetime",
+          "Marten::DB::Field::ForeignKey" => "integer",
+          "Marten::DB::Field::Int" => "integer",
+          "Marten::DB::Field::String" => "varchar(%{max_size})",
+          "Marten::DB::Field::Text" => "text",
+          "Marten::DB::Field::UUID" => "char(32)",
+        }
+
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains" => "LIKE %s ESCAPE '\\'",
           "endswith": "LIKE %s ESCAPE '\\'",

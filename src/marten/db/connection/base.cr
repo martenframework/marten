@@ -10,6 +10,7 @@ module Marten
           @url = build_url
         end
 
+        abstract def column_type_for_built_in_field(field_id)
         abstract def insert(
           table_name : String,
           values : Hash(String, ::DB::Any),

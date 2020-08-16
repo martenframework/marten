@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class ForeignKey < Base
+        include IsBuiltInField
+
         def initialize(
           @id : ::String,
           @to : Model.class,

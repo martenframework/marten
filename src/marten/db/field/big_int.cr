@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class BigInt < Base
+        include IsBuiltInField
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Int64?
           result_set.read(Int32 | Int64 | Nil).try(&.to_i64)
         end

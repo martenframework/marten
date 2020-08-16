@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class DateTime < Base
+        include IsBuiltInField
+
         def initialize(
           @id : ::String,
           @primary_key = false,

@@ -22,6 +22,9 @@ module Marten
         )
         end
 
+        # Returns the raw type of the column to use for the field at hand and a specific database connection.
+        abstract def db_type(connection : Connection::Base) : ::String
+
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
         abstract def to_db(value) : ::DB::Any
 

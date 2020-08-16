@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class String < Base
+        include IsBuiltInField
+
         @max_size : ::Int32?
 
         getter max_size
@@ -49,6 +51,10 @@ module Marten
           if value.as(::String).size > @max_size.not_nil!
             record.errors.add(id, "The maximum allowed length is #{@max_size}")
           end
+        end
+
+        private def db_type_parameters
+          { max_size: max_size }
         end
       end
     end

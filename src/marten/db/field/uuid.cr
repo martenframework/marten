@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class UUID < Base
+        include IsBuiltInField
+
         def initialize(id, **kwargs)
           super
           @max_size = 32

@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class Text < Base
+        include IsBuiltInField
+
         @max_size : ::Int32?
 
         getter max_size

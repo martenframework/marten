@@ -46,6 +46,23 @@ module Marten
           "postgres"
         end
 
+        protected def column_type_for_built_in_field(field_id)
+          BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING[field_id]
+        end
+
+        private BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING = {
+          "Marten::DB::Field::Auto" => "serial",
+          "Marten::DB::Field::BigAuto" => "bigserial",
+          "Marten::DB::Field::BigInt" => "bigint",
+          "Marten::DB::Field::Bool" => "boolean",
+          "Marten::DB::Field::DateTime" => "timestamp with time zone",
+          "Marten::DB::Field::ForeignKey" => "bigint",
+          "Marten::DB::Field::Int" => "integer",
+          "Marten::DB::Field::String" => "varchar(%{max_size})",
+          "Marten::DB::Field::Text" => "text",
+          "Marten::DB::Field::UUID" => "uuid",
+        }
+
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
           "icontains" => "UPPER(%s)",
           "iendswith" => "UPPER(%s)",

@@ -1,3 +1,5 @@
+require "./field/concerns/**"
+
 require "./field/base"
 require "./field/big_int"
 require "./field/bool"

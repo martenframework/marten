@@ -51,6 +51,13 @@ module Marten
           end
         end
 
+        # :nodoc:
+        macro check_definition(field_id, kwargs)
+          {% if kwargs.is_a?(NilLiteral) || kwargs[:max_size].is_a?(NilLiteral) %}
+            {% raise "String fields must define 'max_size' property" %}
+          {% end %}
+        end
+
         private def db_type_parameters
           { max_size: max_size }
         end

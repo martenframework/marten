@@ -8,7 +8,10 @@ module Marten
         @name : ::String?
         @db_column : ::String | Symbol | Nil
 
+        # Returns the ID of the field used in the associated model.
         getter id
+
+        # Returns the human-readable name of the field.
         getter name
 
         def initialize(
@@ -25,7 +28,10 @@ module Marten
         # Returns the raw type of the column to use for the field at hand and a specific database connection.
         abstract def db_type(connection : Connection::Base) : ::String
 
+        # Extracts the field value from a DB result set and returns the right object corresponding to this value.
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
+
+        # Converts the field value to the corresponding DB value.
         abstract def to_db(value) : ::DB::Any
 
         # Returns the name of the column associated with the considered field.
@@ -33,14 +39,17 @@ module Marten
           @db_column.try(&.to_s) || @id
         end
 
+        # Returns a boolean indicating whether the field is a primary key.
         def primary_key?
           @primary_key
         end
 
+        # Returns a boolean indicating whether the field can be blank validation-wise.
         def blank?
           @blank
         end
 
+        # Returns a boolean indicating whether the field can be null at the database level.
         def null?
           @null
         end

@@ -18,6 +18,11 @@ module Marten
         @@registry
       end
 
+      # Returns the default database connection.
+      def self.default
+        registry[DEFAULT_CONNECTION_NAME]
+      end
+
       # Returns the connection to use for the passed `table_name`.
       def self.for(table_name)
         # TODO: implement mechanism like a database router allowing to pick a connection based on the table name.

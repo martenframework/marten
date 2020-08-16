@@ -4,18 +4,16 @@ module Marten
       class String < Base
         include IsBuiltInField
 
-        @max_size : ::Int32?
-
         getter max_size
 
         def initialize(
           @id : ::String,
+          @max_size : ::Int32,
           @primary_key = false,
           @blank = false,
           @null = false,
           @editable = true,
-          @name = nil,
-          @max_size = nil
+          @name = nil
         )
         end
 
@@ -46,9 +44,9 @@ module Marten
         end
 
         def validate(record, value)
-          return if !value.as?(::String) || @max_size.nil?
+          return if !value.as?(::String)
 
-          if value.as(::String).size > @max_size.not_nil!
+          if value.as(::String).size > @max_size
             record.errors.add(id, "The maximum allowed length is #{@max_size}")
           end
         end

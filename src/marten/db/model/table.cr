@@ -185,6 +185,16 @@ module Marten
           {% end %}
         end
 
+        protected def field_values
+          values = {} of String => Field::Any
+          {% for field_var in @type.instance_vars
+            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+            field = self.class.get_field({{ field_var.name.stringify }})
+            values[field.db_column] = {{ field_var.id }}
+          {% end %}
+          values
+        end
+
         private def assign_field_values(values : Hash(String, Field::Any))
           {% for field_var in @type.instance_vars
             .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}

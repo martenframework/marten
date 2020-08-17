@@ -141,7 +141,7 @@ module Marten
                 "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
               )
             end
-            @{{ field_var.id }} = value
+            self.{{ field_var.id }} = value
           {% end %}
           else
             raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
@@ -195,7 +195,7 @@ module Marten
                   "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
                 )
               end
-              @{{ field_var.id }} = value
+              self.{{ field_var.id }} = value
               values.delete({{field_var.name.stringify}})
             end
           {% end %}

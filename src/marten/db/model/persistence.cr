@@ -24,7 +24,6 @@ module Marten
           end
         end
 
-
         # Saves the model instance.
         #
         # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
@@ -33,6 +32,16 @@ module Marten
         # failed.
         def save! : Bool
           save || (raise Errors::InvalidRecord.new("Record is invalid"))
+        end
+
+        # Reloads the model instance.
+        #
+        # This methods retrieves the record at the database level and updates the current model instances with the new
+        # values.
+        def reload
+          reloaded = self.class.get!(pk: pk)
+          self.assign_field_values(reloaded.field_values)
+          self
         end
 
         # Returns a boolean indicating if the record doesn't exist in the database yet.

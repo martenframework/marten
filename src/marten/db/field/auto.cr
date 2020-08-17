@@ -3,8 +3,7 @@ module Marten
     module Field
       class Auto < Int
         include IsBuiltInField
-
-        protected def perform_validation(_record : Model); end
+        include IsAutoField
       end
     end
   end

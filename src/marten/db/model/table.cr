@@ -138,7 +138,7 @@ module Marten
           when {{ field_var.name.stringify }}
             if !value.is_a?({{ field_var.type }})
               raise Errors::UnexpectedFieldValue.new(
-                "Value for field {{ field_var.id }} should of type {{ field_var.type }}, not #{typeof(value)}"
+                "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
               )
             end
             @{{ field_var.id }} = value
@@ -192,7 +192,7 @@ module Marten
               value = values[{{field_var.name.stringify}}]
               if !value.is_a?({{ field_var.type }})
                 raise Errors::UnexpectedFieldValue.new(
-                  "Value for field {{ field_var.id }} should of type {{ field_var.type }}, not #{typeof(value)}"
+                  "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
                 )
               end
               @{{ field_var.id }} = value

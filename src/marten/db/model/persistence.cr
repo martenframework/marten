@@ -41,6 +41,7 @@ module Marten
         def reload
           reloaded = self.class.get!(pk: pk)
           self.assign_field_values(reloaded.field_values)
+          @new_record = false
           self
         end
 

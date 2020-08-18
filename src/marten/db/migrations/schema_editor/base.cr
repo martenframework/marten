@@ -1,6 +1,6 @@
 module Marten
   module DB
-    module Migration
+    module Migrations
       module SchemaEditor
         abstract class Base
           def initialize(@connection : Connection::Base)

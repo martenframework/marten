@@ -24,6 +24,9 @@ module Marten
       # This can happen when initializing model objects using unexpected values and types.
       class UnexpectedFieldValue < Exception; end
 
+      # Represents an error raised when an unknown database connection is requested.
+      class UnknownConnection < Exception; end
+
       # Represents an error raised when an inexistent field is requested for a specific model.
       class UnknownField < Exception; end
 

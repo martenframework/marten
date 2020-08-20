@@ -146,6 +146,12 @@ module Marten
         count
       end
 
+      def using(db : String | Symbol)
+        qs = clone
+        qs.query.using = db.to_s
+        qs
+      end
+
       protected getter query
       protected getter result_cache
 

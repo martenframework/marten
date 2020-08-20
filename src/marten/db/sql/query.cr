@@ -7,10 +7,12 @@ module Marten
         @offset = nil
         @order_clauses = [] of {String, Bool}
         @predicate_node = nil
+        @using = nil
 
         getter default_ordering
 
         setter default_ordering
+        setter using
 
         def initialize
         end
@@ -20,7 +22,8 @@ module Marten
           @limit : Int64?,
           @offset : Int64?,
           @order_clauses : Array({String, Bool}),
-          @predicate_node : PredicateNode?
+          @predicate_node : PredicateNode?,
+          @using : String?
         )
         end
 
@@ -30,7 +33,7 @@ module Marten
 
         def exists? : Bool
           sql, parameters = build_exists_query
-          Model.connection.open do |db|
+          connection.open do |db|
             result = db.scalar(sql, args: parameters)
             result.to_s == "1"
           end
@@ -38,7 +41,7 @@ module Marten
 
         def count
           sql, parameters = build_count_query
-          Model.connection.open do |db|
+          connection.open do |db|
             result = db.scalar(sql, args: parameters)
             result.to_s.to_i
           end
@@ -97,7 +100,8 @@ module Marten
             limit: @limit,
             offset: @offset,
             order_clauses: @order_clauses,
-            predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone
+            predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
+            using: @using
           )
           cloned
         end
@@ -106,10 +110,14 @@ module Marten
           !@order_clauses.empty?
         end
 
+        private def connection
+          @using.nil? ? Model.connection : Connection.get(@using)
+        end
+
         private def execute_query(query, parameters)
           results = [] of Model
 
-          Model.connection.open do |db|
+          connection.open do |db|
             db.query query, args: parameters do |result_set|
               result_set.each { results << Model.from_db_result_set(result_set) }
             end
@@ -176,7 +184,7 @@ module Marten
         end
 
         private def table_name
-          Model.connection.quote(Model.table_name)
+          connection.quote(Model.table_name)
         end
 
         private def columns
@@ -188,10 +196,10 @@ module Marten
             where = nil
             parameters = nil
           else
-            where, parameters = @predicate_node.not_nil!.to_sql(Model.connection)
+            where, parameters = @predicate_node.not_nil!.to_sql(connection)
             parameters.each_with_index do |_p, i|
               where = where % (
-                [Model.connection.parameter_id_for_ordered_argument(i + 1)] + (["%s"] * (parameters.size - i))
+                [connection.parameter_id_for_ordered_argument(i + 1)] + (["%s"] * (parameters.size - i))
               )
             end
             where = "WHERE #{where}"

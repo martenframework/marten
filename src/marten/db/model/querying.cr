@@ -21,6 +21,15 @@ module Marten
             QuerySet(self).new
           end
 
+          # Returns a queryset that will be evaluated using the specified database.
+          #
+          # A valid database alias must be used here (it must correspond to an ID of a database configured in the
+          # project settings). If the passed database alias doesn't correspond to any defined connections, a
+          # `Marten::DB::Errors::UnknownConnection` error will be raised.
+          def using(db : String | Symbol)
+            all.using(db)
+          end
+
           # Returns a queryset matching a specific set of filters.
           #
           # This method returns a `Marten::DB::QuerySet` object. The filters passed to this method method must be

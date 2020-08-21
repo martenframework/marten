@@ -25,7 +25,12 @@ docs:
 
 .PHONY: qa
 ## Trigger all quality assurance checks.
-qa: lint
+qa: format lint
+
+.PHONY: format
+## Trigger crystal formatting
+format:
+	crystal tool format --check
 
 .PHONY: lint
 ## Trigger code quality checks.

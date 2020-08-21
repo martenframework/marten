@@ -60,7 +60,7 @@ describe Marten::HTTP::Response do
       response = Marten::HTTP::Response.new
       response["Allow"] = "GET, POST"
       response["Content-Length"] = "0"
-      response.headers.should eq({ "Allow" => "GET, POST", "Content-Length" => "0" })
+      response.headers.should eq({"Allow" => "GET, POST", "Content-Length" => "0"})
     end
   end
 

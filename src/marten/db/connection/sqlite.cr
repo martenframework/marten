@@ -36,7 +36,7 @@ module Marten
         end
 
         def sanitize_like_pattern(pattern : String) : String
-          pattern.gsub("%", "\%").gsub("_", "\_")
+          pattern.gsub("%", "%").gsub("_", "_")
         end
 
         def scheme : String
@@ -48,27 +48,27 @@ module Marten
         end
 
         private BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING = {
-          "Marten::DB::Field::Auto" => "integer",
-          "Marten::DB::Field::BigAuto" => "integer",
-          "Marten::DB::Field::BigInt" => "integer",
-          "Marten::DB::Field::Bool" => "bool",
-          "Marten::DB::Field::DateTime" => "datetime",
+          "Marten::DB::Field::Auto"       => "integer",
+          "Marten::DB::Field::BigAuto"    => "integer",
+          "Marten::DB::Field::BigInt"     => "integer",
+          "Marten::DB::Field::Bool"       => "bool",
+          "Marten::DB::Field::DateTime"   => "datetime",
           "Marten::DB::Field::ForeignKey" => "integer",
-          "Marten::DB::Field::Int" => "integer",
-          "Marten::DB::Field::String" => "varchar(%{max_size})",
-          "Marten::DB::Field::Text" => "text",
-          "Marten::DB::Field::UUID" => "char(32)",
+          "Marten::DB::Field::Int"        => "integer",
+          "Marten::DB::Field::String"     => "varchar(%{max_size})",
+          "Marten::DB::Field::Text"       => "text",
+          "Marten::DB::Field::UUID"       => "char(32)",
         }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
-          "contains" => "LIKE %s ESCAPE '\\'",
-          "endswith": "LIKE %s ESCAPE '\\'",
-          "exact" => "= %s",
-          "icontains" => "LIKE %s ESCAPE '\\'",
-          "iendswith": "LIKE %s ESCAPE '\\'",
-          "iexact" => "LIKE %s ESCAPE '\\'",
+          "contains"    => "LIKE %s ESCAPE '\\'",
+          "endswith":      "LIKE %s ESCAPE '\\'",
+          "exact"       => "= %s",
+          "icontains"   => "LIKE %s ESCAPE '\\'",
+          "iendswith":     "LIKE %s ESCAPE '\\'",
+          "iexact"      => "LIKE %s ESCAPE '\\'",
           "istartswith" => "LIKE %s ESCAPE '\\'",
-          "startswith" => "LIKE %s ESCAPE '\\'",
+          "startswith"  => "LIKE %s ESCAPE '\\'",
         }
       end
     end

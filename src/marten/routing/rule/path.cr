@@ -34,7 +34,7 @@ module Marten
 
         private def path_to_regex(_path)
           regex, path_for_interpolation, parameters = super
-          { Regex.new("#{regex.source}$"), path_for_interpolation, parameters }
+          {Regex.new("#{regex.source}$"), path_for_interpolation, parameters}
         end
       end
     end

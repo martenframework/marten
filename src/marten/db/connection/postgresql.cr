@@ -39,7 +39,7 @@ module Marten
         end
 
         def sanitize_like_pattern(pattern : String) : String
-          pattern.gsub("%", "\%").gsub("_", "\_")
+          pattern.gsub("%", "%").gsub("_", "_")
         end
 
         def scheme : String
@@ -51,34 +51,34 @@ module Marten
         end
 
         private BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING = {
-          "Marten::DB::Field::Auto" => "serial",
-          "Marten::DB::Field::BigAuto" => "bigserial",
-          "Marten::DB::Field::BigInt" => "bigint",
-          "Marten::DB::Field::Bool" => "boolean",
-          "Marten::DB::Field::DateTime" => "timestamp with time zone",
+          "Marten::DB::Field::Auto"       => "serial",
+          "Marten::DB::Field::BigAuto"    => "bigserial",
+          "Marten::DB::Field::BigInt"     => "bigint",
+          "Marten::DB::Field::Bool"       => "boolean",
+          "Marten::DB::Field::DateTime"   => "timestamp with time zone",
           "Marten::DB::Field::ForeignKey" => "bigint",
-          "Marten::DB::Field::Int" => "integer",
-          "Marten::DB::Field::String" => "varchar(%{max_size})",
-          "Marten::DB::Field::Text" => "text",
-          "Marten::DB::Field::UUID" => "uuid",
+          "Marten::DB::Field::Int"        => "integer",
+          "Marten::DB::Field::String"     => "varchar(%{max_size})",
+          "Marten::DB::Field::Text"       => "text",
+          "Marten::DB::Field::UUID"       => "uuid",
         }
 
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
-          "icontains" => "UPPER(%s)",
-          "iendswith" => "UPPER(%s)",
-          "iexact" => "UPPER(%s)",
+          "icontains"   => "UPPER(%s)",
+          "iendswith"   => "UPPER(%s)",
+          "iexact"      => "UPPER(%s)",
           "istartswith" => "UPPER(%s)",
         }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
-          "contains" => "LIKE %s",
-          "endswith" => "LIKE %s",
-          "exact" => "= %s",
-          "icontains" => "LIKE UPPER(%s)",
-          "iendswith" => "LIKE UPPER(%s)",
-          "iexact" => "LIKE UPPER(%s)",
+          "contains"    => "LIKE %s",
+          "endswith"    => "LIKE %s",
+          "exact"       => "= %s",
+          "icontains"   => "LIKE UPPER(%s)",
+          "iendswith"   => "LIKE UPPER(%s)",
+          "iexact"      => "LIKE UPPER(%s)",
           "istartswith" => "LIKE UPPER(%s)",
-          "startswith" => "LIKE %s",
+          "startswith"  => "LIKE %s",
         }
       end
     end

@@ -24,19 +24,19 @@ describe Marten::Views::Base do
         )
       )
 
-      params_1 = Hash(String, Marten::Routing::Parameter::Types){ "id" => 42 }
+      params_1 = Hash(String, Marten::Routing::Parameter::Types){"id" => 42}
       view_1 = Marten::Views::Base.new(request, params_1)
-      view_1.params.should eq({ "id" => 42 })
+      view_1.params.should eq({"id" => 42})
 
-      params_2 = Hash(String, Marten::Routing::Parameter::Types){ "slug" => "my-slug" }
+      params_2 = Hash(String, Marten::Routing::Parameter::Types){"slug" => "my-slug"}
       view_2 = Marten::Views::Base.new(request, params_2)
-      view_2.params.should eq({ "slug" => "my-slug" })
+      view_2.params.should eq({"slug" => "my-slug"})
 
       params_3 = Hash(String, Marten::Routing::Parameter::Types){
         "id" => ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3"),
       }
       view_3 = Marten::Views::Base.new(request, params_3)
-      view_3.params.should eq({ "id" =>::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3") })
+      view_3.params.should eq({"id" => ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3")})
     end
   end
 
@@ -83,7 +83,7 @@ describe Marten::Views::Base do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){ "id" => 42 }
+      params = Hash(String, Marten::Routing::Parameter::Types){"id" => 42}
       view = Marten::Views::Base.new(request, params)
       view.params.should eq params
     end
@@ -379,7 +379,7 @@ describe Marten::Views::Base do
       view_2 = Marten::Views::BaseSpec::Test5View.new(request)
       response_2 = view_2.dispatch
       response_2.status.should eq 200
-      response_2.content.should eq Marten.routes.reverse("dummy_with_id", { "id" => 42 })
+      response_2.content.should eq Marten.routes.reverse("dummy_with_id", {"id" => 42})
     end
   end
 end
@@ -447,7 +447,7 @@ module Marten::Views::BaseSpec
     http_method_names :get, :head
 
     def get
-      Marten::HTTP::Response.new(reverse("dummy_with_id", { "id" => 10 }), content_type: "text/plain", status: 200)
+      Marten::HTTP::Response.new(reverse("dummy_with_id", {"id" => 10}), content_type: "text/plain", status: 200)
     end
   end
 end

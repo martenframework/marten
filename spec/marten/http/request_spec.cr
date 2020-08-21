@@ -87,8 +87,8 @@ describe Marten::HTTP::Request do
           method: "POST",
           resource: "/test/xyz",
           headers: HTTP::Headers{
-            "Host" => "example.com",
-            "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150"
+            "Host"         => "example.com",
+            "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
           },
           body: <<-FORMDATA
           -----------------------------735323031399963166993862150
@@ -112,7 +112,7 @@ describe Marten::HTTP::Request do
           <!DOCTYPE html><title>Content of b.html.</title>
           -----------------------------735323031399963166993862150--
           FORMDATA
-          .gsub('\n', "\r\n")
+            .gsub('\n', "\r\n")
         )
       )
       request.data.should be_a Marten::HTTP::Params::Data

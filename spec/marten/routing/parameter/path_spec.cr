@@ -37,7 +37,7 @@ describe Marten::Routing::Parameter::Path do
 
     it "returns nil if the input is not a string" do
       parameter = Marten::Routing::Parameter::Path.new
-      parameter.dumps({ foo: "bar" }).should be_nil
+      parameter.dumps({foo: "bar"}).should be_nil
     end
   end
 end

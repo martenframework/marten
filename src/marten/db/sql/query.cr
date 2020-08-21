@@ -138,7 +138,7 @@ module Marten
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
 
-          { sql, parameters }
+          {sql, parameters}
         end
 
         private def build_exists_query
@@ -153,7 +153,7 @@ module Marten
             s << ")"
           end
 
-          { sql, parameters }
+          {sql, parameters}
         end
 
         private def build_count_query
@@ -167,7 +167,7 @@ module Marten
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
 
-          { sql, parameters }
+          {sql, parameters}
         end
 
         private def order_by
@@ -205,7 +205,7 @@ module Marten
             where = "WHERE #{where}"
           end
 
-          { where, parameters }
+          {where, parameters}
         end
 
         private def process_query_node(query_node)

@@ -59,7 +59,7 @@ module Marten
         end
 
         private def db_type_parameters
-          { max_size: max_size }
+          {max_size: max_size}
         end
       end
     end

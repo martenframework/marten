@@ -58,8 +58,8 @@ module Marten
       end
 
       private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
-      private CONTENT_TYPE_MULTIPART_FORM = "multipart/form-data"
-      private HOST_VALIDATION_RE = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
+      private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"
+      private HOST_VALIDATION_RE            = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
 
       private def extract_raw_data_params
         params = Params::Data::RawHash.new

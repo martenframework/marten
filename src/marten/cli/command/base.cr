@@ -42,7 +42,8 @@ module Marten
           @options : Array(String),
           @stdout : IO = STDOUT,
           @stderr : IO = STDERR,
-          @main_command_name=Marten::CLI::DEFAULT_COMMAND_NAME)
+          @main_command_name = Marten::CLI::DEFAULT_COMMAND_NAME
+        )
         end
 
         def setup
@@ -94,7 +95,7 @@ module Marten
 
           banner_parts << "Usage: #{@main_command_name} #{self.class.command_name} [options]"
           unless arguments.empty?
-            banner_parts << " #{argument_handlers.map { |h| "[#{h.name}]" }.join(" " )}"
+            banner_parts << " #{argument_handlers.map { |h| "[#{h.name}]" }.join(" ")}"
           end
 
           banner_parts << "\n\n"

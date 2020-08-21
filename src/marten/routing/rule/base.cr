@@ -6,7 +6,7 @@ module Marten
         abstract def resolve(path : String) : Nil | Match
         protected abstract def reversers : Array(Reverser)
 
-        private PARAMETER_RE = /<(?P<name>\w+)(?::(?P<type>[^>:]+))?>/
+        private PARAMETER_RE      = /<(?P<name>\w+)(?::(?P<type>[^>:]+))?>/
         private PARAMETER_NAME_RE = /^[a-z_][a-zA-Z_0-9]*$/
 
         private def path_to_regex(path : String)

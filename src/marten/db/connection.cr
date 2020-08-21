@@ -5,7 +5,7 @@ module Marten
 
       IMPLEMENTATIONS = {
         "postgresql" => PostgreSQL,
-        "sqlite" => SQLite,
+        "sqlite"     => SQLite,
       }
 
       @@registry = {} of ::String => Base

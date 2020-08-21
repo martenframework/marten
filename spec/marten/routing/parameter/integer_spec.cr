@@ -36,7 +36,7 @@ describe Marten::Routing::Parameter::Integer do
 
     it "returns nil if the input is not an integer" do
       parameter = Marten::Routing::Parameter::Integer.new
-      parameter.dumps({ foo: "bar" }).should be_nil
+      parameter.dumps({foo: "bar"}).should be_nil
     end
 
     it "returns nil if the integer is less than 0" do

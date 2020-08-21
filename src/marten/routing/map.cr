@@ -36,7 +36,7 @@ module Marten
 
         if target.is_a?(Marten::Views::Base.class)
           rule = Rule::Path.new(path, target, name.to_s)
-        else  # Nested routes map
+        else # Nested routes map
           rule = Rule::Map.new(path, target, name.to_s)
         end
 
@@ -91,7 +91,7 @@ module Marten
 
       protected getter reversers
 
-      private RULE_NAME_RE = /^[a-zA-Z_0-9]+$/
+      private RULE_NAME_RE               = /^[a-zA-Z_0-9]+$/
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
 
       private def path_with_duplicated_parameters?(path_for_interpolation)

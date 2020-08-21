@@ -5,7 +5,7 @@ describe Marten::HTTP::UploadedFile do
     it "allows to initialize an uploaded file from a form data part" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{ "Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123} },
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
           IO::Memory.new
         )
       )
@@ -17,7 +17,7 @@ describe Marten::HTTP::UploadedFile do
     it "returns the filename" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{ "Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123} },
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
           IO::Memory.new
         )
       )
@@ -29,7 +29,7 @@ describe Marten::HTTP::UploadedFile do
     it "returns the file size specified in the content disposition" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{ "Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123} },
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
           IO::Memory.new
         )
       )
@@ -41,7 +41,7 @@ describe Marten::HTTP::UploadedFile do
     it "returns the IO object allowing to manipulate the file content" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{ "Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123} },
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
           IO::Memory.new("This is a test")
         )
       )

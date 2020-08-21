@@ -165,7 +165,7 @@ module Marten
       end
 
       private INSPECT_RESULTS_LIMIT = 20
-      private GET_RESULTS_LIMIT = 20
+      private GET_RESULTS_LIMIT     = 20
 
       private def add_query_node(query_node)
         qs = clone

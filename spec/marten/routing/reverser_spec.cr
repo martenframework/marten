@@ -58,7 +58,7 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({ param1: "hello-world", param2: 42 }.to_h).should eq "/test/hello-world/xyz/42"
+      reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/test/hello-world/xyz/42"
     end
 
     it "returns nil if one of the parameters is not expected by the reverser" do
@@ -70,7 +70,7 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({ unknown_param: "hello-world" }.to_h).should be_nil
+      reverser.reverse({unknown_param: "hello-world"}.to_h).should be_nil
     end
 
     it "returns nil if one of the parameters has not the expected type" do
@@ -82,7 +82,7 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({ param1: "hello-world", param2: "foobar" }.to_h).should be_nil
+      reverser.reverse({param1: "hello-world", param2: "foobar"}.to_h).should be_nil
     end
 
     it "returns nil if not all expected paramters are present" do
@@ -94,7 +94,7 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({ param1: "hello-world" }.to_h).should be_nil
+      reverser.reverse({param1: "hello-world"}.to_h).should be_nil
     end
   end
 end

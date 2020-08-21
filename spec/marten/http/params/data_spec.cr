@@ -15,11 +15,11 @@ describe Marten::HTTP::Params::Data do
           "xyz" => [
             Marten::HTTP::UploadedFile.new(
               HTTP::FormData::Part.new(
-                HTTP::Headers{ "Content-Disposition" => %{form-data; name="file"; filename="a.txt"} },
+                HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"}},
                 IO::Memory.new
               )
-            )
-          ]
+            ),
+          ],
         }
       )
       params["foo"].should eq "bar"
@@ -29,7 +29,7 @@ describe Marten::HTTP::Params::Data do
       Marten.settings.request_max_parameters = 2
       expect_raises(Marten::HTTP::Errors::TooManyParametersReceived) do
         Marten::HTTP::Params::Data.new(
-          Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+          Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
         )
       end
     end
@@ -38,7 +38,7 @@ describe Marten::HTTP::Params::Data do
       param_value = ["bar"] * (Marten.settings.request_max_parameters.not_nil! + 1)
       Marten.settings.request_max_parameters = nil
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => param_value }
+        Marten::HTTP::Params::Data::RawHash{"foo" => param_value}
       )
       params.fetch_all("foo").should eq param_value
     end
@@ -47,21 +47,21 @@ describe Marten::HTTP::Params::Data do
   describe "#[]" do
     it "returns the last value of a single-value parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params["foo"].should eq "bar"
     end
 
     it "returns the last value of a multi-value parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params["xyz"].should eq "test2"
     end
 
     it "raises KeyError if the parameter is unknown" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       expect_raises(KeyError) do
         params["dummy"]
@@ -70,7 +70,7 @@ describe Marten::HTTP::Params::Data do
 
     it "raises KeyError if the parameter name corresponds to an empty array" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => [] of String }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => [] of String}
       )
       expect_raises(KeyError) do
         params["xyz"]
@@ -81,28 +81,28 @@ describe Marten::HTTP::Params::Data do
   describe "#[]?" do
     it "returns the last value of a single-value parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params["foo"]?.should eq "bar"
     end
 
     it "returns the last value of a multi-value parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params["xyz"]?.should eq "test2"
     end
 
     it "returns nil if the parameter is unknown" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params["dummy"]?.should be_nil
     end
 
     it "returns nil if the parameter name corresponds to an empty array" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => [] of String }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => [] of String}
       )
       params["xyz"]?.should be_nil
     end
@@ -111,52 +111,51 @@ describe Marten::HTTP::Params::Data do
   describe "#fetch" do
     it "returns the last value of a single-value parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch("foo").should eq "bar"
     end
 
     it "returns the last value of a multi-value parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch("xyz").should eq "test2"
     end
 
     it "returns nil by default if the parameter is unknown" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch("dummy").should be_nil
     end
 
     it "returns nil by default if the parameter name corresponds to an empty array" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => [] of String }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => [] of String}
       )
       params.fetch("xyz").should be_nil
     end
 
     it "can return a specific fallback value if the parameter is unknown" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch("dummy", "notfound").should eq "notfound"
     end
 
     it "can return a specific fallback value if the parameter name corresponds to an empty array" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => [] of String }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => [] of String}
       )
       params.fetch("xyz", "notfound").should eq "notfound"
     end
   end
 
-
   describe "#fetch_all" do
     it "returns all the values for a specific parameter" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch_all("foo").should eq ["bar"]
       params.fetch_all("xyz").should eq ["test1", "test2"]
@@ -164,14 +163,14 @@ describe Marten::HTTP::Params::Data do
 
     it "returns nil by default if the parameter is unknown" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch_all("dummy").should be_nil
     end
 
     it "can return a specific fallback value if the parameter is unknown" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.fetch_all("dummy", "notfound").should eq "notfound"
     end
@@ -180,7 +179,7 @@ describe Marten::HTTP::Params::Data do
   describe "#size" do
     it "returns the number of parameter values" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.size.should eq 3
     end
@@ -194,7 +193,7 @@ describe Marten::HTTP::Params::Data do
 
     it "count empty arrays" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => [] of String, "xyz" => [] of String }
+        Marten::HTTP::Params::Data::RawHash{"foo" => [] of String, "xyz" => [] of String}
       )
       params.size.should eq 2
     end
@@ -210,7 +209,7 @@ describe Marten::HTTP::Params::Data do
 
     it "returns false if parameters are available" do
       params = Marten::HTTP::Params::Data.new(
-        Marten::HTTP::Params::Data::RawHash{ "foo" => ["bar"], "xyz" => ["test1", "test2"] }
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
       )
       params.empty?.should be_false
     end

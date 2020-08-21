@@ -31,7 +31,7 @@ describe Marten::Routing::Parameter::UUID do
 
     it "returns nil if the input is not a UUID" do
       parameter = Marten::Routing::Parameter::UUID.new
-      parameter.dumps({ foo: "bar" }).should be_nil
+      parameter.dumps({foo: "bar"}).should be_nil
     end
   end
 

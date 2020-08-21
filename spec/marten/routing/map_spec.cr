@@ -68,7 +68,7 @@ describe Marten::Routing::Match do
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
       match.view.should eq Marten::Views::Base
-      match.kwargs.should eq({ "sid" => "my-slug", "number" => 42 })
+      match.kwargs.should eq({"sid" => "my-slug", "number" => 42})
     end
 
     it "raises if the path does not match any registered route rule" do
@@ -150,7 +150,7 @@ describe Marten::Routing::Match do
       map = Marten::Routing::Map.new
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
 
-      map.reverse("home", { "sid" => "hello-world", "number" => 42 }).should eq "/home/hello-world/test/42"
+      map.reverse("home", {"sid" => "hello-world", "number" => 42}).should eq "/home/hello-world/test/42"
     end
 
     it "returns the interpolated path for a sub given route name without parameters" do
@@ -170,7 +170,7 @@ describe Marten::Routing::Match do
       map = Marten::Routing::Map.new
       map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
 
-      map.reverse("inc:xyz", { "sid" => "hello-world", "number" => 42 }).should(
+      map.reverse("inc:xyz", {"sid" => "hello-world", "number" => 42}).should(
         eq("/home/xyz/hello-world/count/42/display")
       )
     end
@@ -180,7 +180,7 @@ describe Marten::Routing::Match do
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
-        map.reverse("name:inc", { "sid" => "hello-world", "number" => 42 })
+        map.reverse("name:inc", {"sid" => "hello-world", "number" => 42})
       end
     end
 
@@ -189,7 +189,7 @@ describe Marten::Routing::Match do
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
-        map.reverse("home", { "sid" => "hello-world" })
+        map.reverse("home", {"sid" => "hello-world"})
       end
     end
   end

@@ -66,7 +66,7 @@ module Marten
             sql_string = "(#{sql_string})" if sql_parts.size > 1
           end
 
-          { sql_string, sql_params }
+          {sql_string, sql_params}
         end
       end
     end

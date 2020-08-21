@@ -39,7 +39,7 @@ describe Marten::Routing::Parameter::Slug do
 
     it "returns nil if the input is not a string" do
       parameter = Marten::Routing::Parameter::Slug.new
-      parameter.dumps({ foo: "bar" }).should be_nil
+      parameter.dumps({foo: "bar"}).should be_nil
     end
   end
 end

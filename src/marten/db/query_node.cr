@@ -19,9 +19,9 @@ module Marten
       def ==(other : self)
         (
           (other.filters == @filters) &&
-          (other.children == @children) &&
-          (other.connector == @connector) &&
-          (other.negated == @negated)
+            (other.children == @children) &&
+            (other.connector == @connector) &&
+            (other.negated == @negated)
         )
       end
 

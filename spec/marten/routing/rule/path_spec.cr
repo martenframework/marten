@@ -21,7 +21,7 @@ describe Marten::Routing::Rule::Path do
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
       match.view.should eq Marten::Views::Base
-      match.kwargs.should eq({ "sid" => "my-slug", "number" => 42 })
+      match.kwargs.should eq({"sid" => "my-slug", "number" => 42})
     end
 
     it "returns nil if the path does not match the considered rule" do

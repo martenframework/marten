@@ -5,7 +5,7 @@ describe Marten::Routing::Match do
     it "returns the associated view class" do
       match = Marten::Routing::Match.new(
         Marten::Routing::MatchSpec::TestView,
-        { "id" => 123 } of String => Marten::Routing::Parameter::Types
+        {"id" => 123} of String => Marten::Routing::Parameter::Types
       )
       match.view.should eq Marten::Routing::MatchSpec::TestView
     end
@@ -15,9 +15,9 @@ describe Marten::Routing::Match do
     it "returns the associated view parameters" do
       match = Marten::Routing::Match.new(
         Marten::Routing::MatchSpec::TestView,
-        { "id" => 123 } of String => Marten::Routing::Parameter::Types
+        {"id" => 123} of String => Marten::Routing::Parameter::Types
       )
-      match.kwargs.should eq({ "id" => 123 })
+      match.kwargs.should eq({"id" => 123})
     end
   end
 end

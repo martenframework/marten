@@ -116,7 +116,7 @@ module Marten
           {% begin %}
           case field_name.to_s
           {% for field_var in @type.instance_vars
-            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           when {{ field_var.name.stringify }}
             @{{ field_var.id }}
           {% end %}
@@ -134,7 +134,7 @@ module Marten
           {% begin %}
           case field_name.to_s
           {% for field_var in @type.instance_vars
-            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           when {{ field_var.name.stringify }}
             if !value.is_a?({{ field_var.type }})
               raise Errors::UnexpectedFieldValue.new(
@@ -157,7 +157,7 @@ module Marten
           io << "#<#{self.class.name}:0x#{object_id.to_s(16)} "
           io << "#{self.class.pk_field.id}: #{pk.inspect}"
           {% for field_var in @type.instance_vars
-            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           {% unless ann[:field_kwargs] && ann[:field_kwargs][:primary_key] %}
           io << ", "
@@ -174,7 +174,7 @@ module Marten
             next if field.nil?
             case field.as(Field::Base).id
             {% for field_var in @type.instance_vars
-              .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                  .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
             when {{ field_var.name.stringify }}
               @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
@@ -188,7 +188,7 @@ module Marten
         protected def field_values
           values = {} of String => Field::Any
           {% for field_var in @type.instance_vars
-            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             field = self.class.get_field({{ field_var.name.stringify }})
             values[field.db_column] = {{ field_var.id }}
           {% end %}
@@ -197,7 +197,7 @@ module Marten
 
         private def assign_field_values(values : Hash(String, Field::Any))
           {% for field_var in @type.instance_vars
-            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             if values.has_key?({{field_var.name.stringify}})
               value = values[{{field_var.name.stringify}}]
               if !value.is_a?({{ field_var.type }})
@@ -218,7 +218,7 @@ module Marten
         private def field_db_values
           values = {} of String => ::DB::Any
           {% for field_var in @type.instance_vars
-            .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             field = self.class.get_field({{ field_var.name.stringify }})
             values[field.db_column] = field.to_db(@{{ field_var.id }})
           {% end %}

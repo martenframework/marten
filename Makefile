@@ -25,11 +25,16 @@ docs:
 
 .PHONY: qa
 ## Trigger all quality assurance checks.
-qa: format lint
+qa: format_checks lint
 
 .PHONY: format
-## Trigger crystal formatting
+## Perform and apply crystal formatting.
 format:
+	crystal tool format
+
+.PHONY: format_checks
+## Trigger crystal formatting checks.
+format_checks:
 	crystal tool format --check
 
 .PHONY: lint

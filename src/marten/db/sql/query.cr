@@ -10,6 +10,7 @@ module Marten
         @using = nil
 
         getter default_ordering
+        getter using
 
         setter default_ordering
         setter using

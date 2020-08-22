@@ -43,6 +43,10 @@ module Marten
           "sqlite3"
         end
 
+        protected def build_url
+          super.gsub(IN_MEMORY_ID, "")
+        end
+
         protected def column_type_for_built_in_field(field_id)
           BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING[field_id]
         end
@@ -71,6 +75,8 @@ module Marten
           "startswith"  => "LIKE %s ESCAPE '\\'",
         }
       end
+
+      private IN_MEMORY_ID = ":memory:"
     end
   end
 end

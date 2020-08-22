@@ -39,25 +39,7 @@ module Marten
           "#{quote_char}#{name}#{quote_char}"
         end
 
-        private getter transactions
-
-        private def current_transaction
-          transactions[Fiber.current.object_id]?
-        end
-
-        private def new_transaction
-          db.transaction do |tx|
-            transactions[Fiber.current.object_id] ||= tx
-            yield
-          end
-          true
-        rescue Marten::DB::Errors::Rollback
-          false
-        ensure
-          transactions.delete(Fiber.current.object_id)
-        end
-
-        private def build_url
+        protected def build_url
           parts = [] of String?
 
           parts << "#{scheme}://"
@@ -75,6 +57,24 @@ module Marten
           parts << @config.name
 
           parts.compact!.join("")
+        end
+
+        private getter transactions
+
+        private def current_transaction
+          transactions[Fiber.current.object_id]?
+        end
+
+        private def new_transaction
+          db.transaction do |tx|
+            transactions[Fiber.current.object_id] ||= tx
+            yield
+          end
+          true
+        rescue Marten::DB::Errors::Rollback
+          false
+        ensure
+          transactions.delete(Fiber.current.object_id)
         end
       end
     end

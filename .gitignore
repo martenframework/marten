@@ -10,3 +10,4 @@
 *.dwarf
 .icr_*
 *.db
+/.shard.lock

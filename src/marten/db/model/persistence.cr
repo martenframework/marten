@@ -13,10 +13,11 @@ module Marten
         # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
         # This method will return `true` if the model instance is valid and was created / updated successfully.
         # Otherwise it will return `false` if the model instance validation failed.
-        def save : Bool
+        def save(using : Nil | String | Symbol = nil) : Bool
           if valid? && !persisted?
-            self.class.connection.transaction do
-              insert_or_update
+            connection = using.nil? ? self.class.connection : DB::Connection.get(using)
+            connection.transaction do
+              insert_or_update(connection)
               true
             end
           else
@@ -30,8 +31,8 @@ module Marten
         # This method will return `true` if the model instance is valid and was created / updated successfully.
         # Otherwise it will raise a `Marten::DB::Errors::InvalidRecord` exception if the model instance validation
         # failed.
-        def save! : Bool
-          save || (raise Errors::InvalidRecord.new("Record is invalid"))
+        def save!(using : Nil | String | Symbol = nil) : Bool
+          save(using) || (raise Errors::InvalidRecord.new("Record is invalid"))
         end
 
         # Reloads the model instance.
@@ -71,15 +72,15 @@ module Marten
 
         protected setter new_record
 
-        private def insert_or_update
+        private def insert_or_update(connection)
           if persisted?
             raise NotImplementedError.new("Model records update not implemented yet")
           else
-            insert
+            insert(connection)
           end
         end
 
-        private def insert
+        private def insert(connection)
           self.class.fields.each do |field|
             next if field.primary_key?
             field.prepare_save(self, new_record: true)
@@ -94,7 +95,7 @@ module Marten
             pk_field_to_fetch = nil
           end
 
-          pk = self.class.connection.insert(self.class.table_name, values, pk_field_to_fetch: pk_field_to_fetch)
+          pk = connection.insert(self.class.table_name, values, pk_field_to_fetch: pk_field_to_fetch)
 
           self.pk ||= pk
           self.new_record = false

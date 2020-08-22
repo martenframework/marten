@@ -13,6 +13,10 @@ dependencies:
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
+  pg:
+    github: will/crystal-pg
+  sqlite3:
+    github: crystal-lang/crystal-sqlite3
 
 targets:
   marten-admin:

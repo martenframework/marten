@@ -3,7 +3,7 @@ require "./test_project/**"
 Marten.configure do |config|
   config.secret_key = "dummy"
 
-  {% if env("MARTEN_SPEC_DB_CONNECION").id == "postgresql" %}
+  {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
     raise NotImplementedError.new("Test PostgreSQL connection should be configured here!")
   {% else %}
     # Default to an in-memory SQLite.

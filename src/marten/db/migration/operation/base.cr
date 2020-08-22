@@ -1,9 +1,9 @@
-require "./migration/**"
-
 module Marten
   module DB
     abstract class Migration
-      def operations
+      module Operation
+        abstract class Base
+        end
       end
     end
   end

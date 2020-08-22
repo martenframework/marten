@@ -146,6 +146,32 @@ module Marten
         count
       end
 
+      def create(**kwargs)
+        object = Model.new(**kwargs)
+        object.save(using: @query.using)
+        object
+      end
+
+      def create(**kwargs, &block)
+        object = Model.new(**kwargs)
+        yield object
+        object.save(using: @query.using)
+        object
+      end
+
+      def create!(**kwargs)
+        object = Model.new(**kwargs)
+        object.save!(using: @query.using)
+        object
+      end
+
+      def create!(**kwargs, &block)
+        object = Model.new(**kwargs)
+        yield object
+        object.save!(using: @query.using)
+        object
+      end
+
       def using(db : String | Symbol)
         qs = clone
         qs.query.using = db.to_s

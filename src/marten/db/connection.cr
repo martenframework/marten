@@ -3,9 +3,12 @@ module Marten
     module Connection
       DEFAULT_CONNECTION_NAME = "default"
 
+      POSTGRESQL_ID = "postgresql"
+      SQLITE_ID     = "sqlite"
+
       IMPLEMENTATIONS = {
-        "postgresql" => PostgreSQL,
-        "sqlite"     => SQLite,
+        POSTGRESQL_ID => PostgreSQL,
+        SQLITE_ID     => SQLite,
       }
 
       @@registry = {} of ::String => Base

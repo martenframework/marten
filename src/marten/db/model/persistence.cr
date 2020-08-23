@@ -2,6 +2,69 @@ module Marten
   module DB
     abstract class Model
       module Persistence
+        macro included
+          extend Marten::DB::Model::Persistence::ClassMethods
+        end
+
+        module ClassMethods
+          # Creates a model instance and saves it to the database if it is valid.
+          #
+          # The model instance is initialized using the attributes defined in the `kwargs` double splat argument.
+          # Regardless of whether it is valid or not (and thus persisted to the database or not), the initialized model
+          # instance is returned by this method.
+          def create(**kwargs)
+            object = new(**kwargs)
+            object.save
+            object
+          end
+
+          # Creates a model instance and saves it to the database if it is valid.
+          #
+          # This method provides the exact same behaviour as `create` with the ability to define a block that is
+          # executed for the new object. This block can be used to directly initialize the object before it is persisted
+          # to the database:
+          #
+          # ```
+          # Post.create(title: "My blog post") do |post|
+          #   post.complex_attribute = compute_comple_attribute
+          # end
+          # ```
+          def create(**kwargs, &block)
+            object = new(**kwargs)
+            yield object
+            object.save
+            object
+          end
+
+          # Creates a model instance and saves it to the database if it is valid.
+          #
+          # The model instance is initialized using the attributes defined in the `kwargs` double splat argument.
+          # If the model instance is valid, it is persisted to the database ; otherwise a
+          # `Marten::DB::Errors::InvalidRecord` exception is raised.
+          def create!(**kwargs)
+            object = new(**kwargs)
+            object.save!
+            object
+          end
+
+          # Creates a model instance and saves it to the database if it is valid.
+          #
+          # This method provides the exact same behaviour as `create!` with the ability to define a block that is
+          # executed for the new object. This block can be used to directly initialize the object before it is persisted
+          # to the database:
+          #
+          # ```
+          # Post.create!(title: "My blog post") do |post|
+          #   post.complex_attribute = compute_comple_attribute
+          # end
+          def create!(**kwargs, &block)
+            object = new(**kwargs)
+            yield object
+            object.save!
+            object
+          end
+        end
+
         # :nodoc:
         @destroyed : Bool = false
 

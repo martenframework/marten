@@ -1,10 +1,24 @@
 require "./test_project/**"
 
+ENV_SETTINGS_FILENAME = ".spec.env.json"
+
+if File.exists?(ENV_SETTINGS_FILENAME)
+  env_settings = Hash(String, Int32 | String).from_json(File.read(ENV_SETTINGS_FILENAME))
+else
+  env_settings = Hash(String, Int32 | String).new
+end
+
 Marten.configure do |config|
   config.secret_key = "dummy"
 
   {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-    raise NotImplementedError.new("Test PostgreSQL connection should be configured here!")
+    config.database do |db|
+      db.backend = :postgresql
+      db.name = env_settings["POSTGRESQL_DB_NAME"]
+      db.user = env_settings["POSTGRESQL_DB_USER"]
+      db.password = env_settings["POSTGRESQL_DB_PASSWORD"]
+      db.host = env_settings["POSTGRESQL_DB_HOST"]
+    end
   {% else %}
     # Default to an in-memory SQLite.
     config.database do |db|

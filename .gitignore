@@ -11,3 +11,4 @@
 .icr_*
 *.db
 /shard.lock
+.spec.env.json

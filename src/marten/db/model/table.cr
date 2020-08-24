@@ -25,10 +25,15 @@ module Marten
         end
 
         module ClassMethods
+          # Returns the name of the table associated with the considered model.
+          #
+          # Unless explicitely specified, the table name is automatically generated based on the label of the app
+          # associated with the considered model and the class name of the model.
           def table_name
             @@table_name ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
           end
 
+          # Allows to explicitely define the name of the table associated with the model.
           def table_name(table_name : String | Symbol)
             @@table_name = table_name.to_s
           end

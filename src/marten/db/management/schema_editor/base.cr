@@ -7,6 +7,7 @@ module Marten
           end
 
           abstract def create_table_statement(table_name : String, column_definitions : String)
+          abstract def delete_table_statement(table_name : String) : String
 
           def create_model(model : Model.class)
             column_definitions = [] of String
@@ -18,6 +19,13 @@ module Marten
 
             sql = create_table_statement(@connection.quote(model.table_name), column_definitions.join(", "))
 
+            @connection.open do |db|
+              db.exec(sql)
+            end
+          end
+
+          def delete_model(model : Model.class)
+            sql = delete_table_statement(@connection.quote(model.table_name))
             @connection.open do |db|
               db.exec(sql)
             end

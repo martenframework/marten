@@ -6,7 +6,7 @@ module Marten
           def initialize(@connection : Connection::Base)
           end
 
-          abstract def create_table_statement(table_name : String, column_definitions : String)
+          abstract def create_table_statement(table_name : String, column_definitions : String) : String
           abstract def delete_table_statement(table_name : String) : String
 
           def create_model(model : Model.class)

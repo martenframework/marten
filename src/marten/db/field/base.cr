@@ -19,6 +19,7 @@ module Marten
           @primary_key = false,
           @blank = false,
           @null = false,
+          @unique = false,
           @editable = true,
           @name = nil,
           @db_column = nil
@@ -52,6 +53,11 @@ module Marten
         # Returns a boolean indicating whether the field can be null at the database level.
         def null?
           @null
+        end
+
+        # Returns a boolean indicating whether the field value should be unique throughout the associated table.
+        def unique?
+          @unique
         end
 
         # Runs pre-save logic for the specific field and record at hand.

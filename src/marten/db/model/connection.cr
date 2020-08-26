@@ -13,8 +13,9 @@ module Marten
           end
 
           # Allows to run the underlying block in a database transaction.
-          def transaction
-            connection.transaction do
+          def transaction(using : Nil | String | Symbol = nil)
+            conn = using.nil? ? connection : DB::Connection.get(using.to_s)
+            conn.transaction do
               yield
             end
           end

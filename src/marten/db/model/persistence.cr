@@ -78,7 +78,7 @@ module Marten
         # Otherwise it will return `false` if the model instance validation failed.
         def save(using : Nil | String | Symbol = nil) : Bool
           if valid? && !persisted?
-            connection = using.nil? ? self.class.connection : DB::Connection.get(using)
+            connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
             connection.transaction do
               insert_or_update(connection)
               true
@@ -95,7 +95,7 @@ module Marten
         # Otherwise it will raise a `Marten::DB::Errors::InvalidRecord` exception if the model instance validation
         # failed.
         def save!(using : Nil | String | Symbol = nil) : Bool
-          save(using) || (raise Errors::InvalidRecord.new("Record is invalid"))
+          save(using: using) || (raise Errors::InvalidRecord.new("Record is invalid"))
         end
 
         # Reloads the model instance.

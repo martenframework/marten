@@ -33,6 +33,7 @@ module Marten
 
           private def column_sql_for_field(field)
             sql = field.db_type(@connection)
+            sql += field.null? ? " NULL" : " NOT NULL"
             sql += " PRIMARY KEY" if field.primary_key?
             sql
           end

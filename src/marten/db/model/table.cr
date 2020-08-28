@@ -173,19 +173,23 @@ module Marten
         end
 
         protected def from_db_result_set(result_set : ::DB::ResultSet)
-          {% begin %}
           result_set.column_names.each do |column_name|
-            field = self.class.fields_per_column[column_name]?
-            next if field.nil?
-            case field.as(Field::Base).id
-            {% for field_var in @type.instance_vars
-                                  .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
-            when {{ field_var.name.stringify }}
-              @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
-            {% end %}
-            else
-            end
+            assign_field_from_db_result_set(result_set, column_name)
+          end
+        end
+
+        protected def assign_field_from_db_result_set(result_set : ::DB::ResultSet, column_name : String)
+          {% begin %}
+          field = self.class.fields_per_column[column_name]?
+          return if field.nil?
+          case field.as(Field::Base).id
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          when {{ field_var.name.stringify }}
+          @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          {% end %}
+          else
           end
           {% end %}
         end

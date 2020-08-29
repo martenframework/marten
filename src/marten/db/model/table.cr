@@ -9,6 +9,7 @@ module Marten
           @@table_name : String?
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
           @@fields_per_column : Hash(String, Field::Base)?
+          @@relation_fields_per_relation_name : Hash(String, Field::Base)?
 
           extend Marten::DB::Model::Table::ClassMethods
 
@@ -66,8 +67,21 @@ module Marten
             @@fields.fetch(id) { raise Errors::UnknownField.new("Unknown field '#{id}'") }
           end
 
+          protected def get_relation_field(relation_name)
+            relation_fields_per_relation_name.fetch(relation_name) do
+              raise Errors::UnknownField.new("Unknown relation field '#{relation_name}'")
+            end
+          end
+
           protected def fields_per_column
             @@fields_per_column ||= fields.map { |field| [field.db_column, field] }.to_h
+          end
+
+          protected def relation_fields_per_relation_name
+            @@relation_fields_per_relation_name ||= fields
+              .select(&.relation?)
+              .map { |field| [field.relation_name, field] }
+              .to_h
           end
         end
 

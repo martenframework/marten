@@ -119,6 +119,18 @@ module Marten
           validate(record, value)
         end
 
+        protected def related_model
+          raise NotImplementedError.new("#relation_model must be implemented by subclasses if necessary")
+        end
+
+        protected def relation?
+          false
+        end
+
+        protected def relation_name
+          raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
+        end
+
         private def empty_value?(value) : ::Bool
           value.nil?
         end

@@ -6,6 +6,7 @@ module Marten
 
         def initialize(
           @id : ::String,
+          @relation_name : ::String,
           @to : Model.class,
           @primary_key = false,
           @blank = false,
@@ -34,6 +35,18 @@ module Marten
           end
         end
 
+        protected def related_model
+          @to
+        end
+
+        protected def relation?
+          true
+        end
+
+        protected def relation_name
+          @relation_name
+        end
+
         # :nodoc:
         macro check_definition(field_id, kwargs)
           {% if kwargs.is_a?(NilLiteral) || kwargs[:to].is_a?(NilLiteral) %}
@@ -53,6 +66,7 @@ module Marten
           class ::{{ model_klass }}
             @@fields[{{ field_id.stringify }}] = {{ @type }}.new(
               {{ field_id.stringify }},
+              {{ relation_attribute_name.stringify }},
               {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
             )
 

@@ -248,9 +248,6 @@ module Marten
           joins
         end
 
-        private def setup_joins
-        end
-
         private def process_query_node(query_node)
           connector = query_node.connector
           predicate_node = PredicateNode.new(connector: connector, negated: query_node.negated)

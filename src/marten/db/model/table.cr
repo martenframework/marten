@@ -51,16 +51,7 @@ module Marten
           end
 
           protected def pk_field
-            {% begin %}
-            {%
-              pkey = @type.instance_vars.find do |ivar|
-                ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
-                ann && ann[:field_kwargs][:primary_key]
-              end
-            %}
-
-            @@fields[{{ pkey.id.stringify }}]
-            {% end %}
+            _pk_field
           end
 
           protected def get_field(id)
@@ -82,6 +73,19 @@ module Marten
               .select(&.relation?)
               .map { |field| [field.relation_name, field] }
               .to_h
+          end
+
+          private def _pk_field
+            {% begin %}
+            {%
+              pkey = @type.instance_vars.find do |ivar|
+                ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
+                ann && ann[:field_kwargs][:primary_key]
+              end
+            %}
+
+            @@fields[{{ pkey.id.stringify }}]
+            {% end %}
           end
         end
 

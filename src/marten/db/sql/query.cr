@@ -3,6 +3,7 @@ module Marten
     module SQL
       class Query(Model)
         @default_ordering = true
+        @joined_relations = [] of String
         @limit = nil
         @offset = nil
         @order_clauses = [] of {String, Bool}
@@ -20,6 +21,7 @@ module Marten
 
         def initialize(
           @default_ordering : Bool,
+          @joined_relations : Array(String),
           @limit : Int64?,
           @offset : Int64?,
           @order_clauses : Array({String, Bool}),
@@ -86,6 +88,10 @@ module Marten
           @order_clauses = order_clauses
         end
 
+        def add_join(relation : String) : Nil
+          @joined_relations << relation
+        end
+
         protected def add_query_node(query_node : QueryNode(Model))
           predicate_node = process_query_node(query_node)
           if @predicate_node.nil?
@@ -98,6 +104,7 @@ module Marten
         protected def clone
           cloned = self.class.new(
             default_ordering: @default_ordering,
+            joined_relations: @joined_relations,
             limit: @limit,
             offset: @offset,
             order_clauses: @order_clauses,
@@ -115,7 +122,7 @@ module Marten
           @using.nil? ? Model.connection : Connection.get(@using)
         end
 
-        private def execute_query(query, parameters)
+        private def execute_query(query, parameters, joins)
           results = [] of Model
 
           connection.open do |db|
@@ -129,17 +136,19 @@ module Marten
 
         private def build_query
           where, parameters = where_clause_and_parameters
+          joins = compute_joins
 
           sql = build_sql do |s|
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
+            s << joins.map(&.to_sql).join(" ")
             s << where
             s << order_by
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
 
-          {sql, parameters}
+          {sql, parameters, joins}
         end
 
         private def build_exists_query
@@ -189,7 +198,22 @@ module Marten
         end
 
         private def columns
-          Model.fields.map(&.db_column).flatten.join(", ")
+          columns = [] of String
+
+          columns += Model.fields.map { |f| column_name(Model.table_name, f.db_column) }
+
+          unless @joined_relations.empty?
+            @joined_relations.each do |relation|
+              field = Model.get_relation_field(relation).as(Field::Base)
+              columns += field.related_model.fields.map { |f| column_name(field.relation_name, f.db_column) }
+            end
+          end
+
+          columns.flatten.join(", ")
+        end
+
+        private def column_name(alias_prefix, name)
+          "#{alias_prefix}.#{name}"
         end
 
         private def where_clause_and_parameters
@@ -207,6 +231,24 @@ module Marten
           end
 
           {where, parameters}
+        end
+
+        private def compute_joins
+          joins = [] of Join
+
+          @joined_relations.each do |relation|
+            field = Model.get_relation_field(relation).as(Field::Base)
+            joins << Join.new(
+              Model.table_name,
+              field,
+              field.null? ? JoinType::LEFT_OUTER : JoinType::INNER
+            )
+          end
+
+          joins
+        end
+
+        private def setup_joins
         end
 
         private def process_query_node(query_node)

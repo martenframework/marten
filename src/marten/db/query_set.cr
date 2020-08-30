@@ -178,6 +178,13 @@ module Marten
         qs
       end
 
+      def join(*relations : String | Symbol)
+        qs = clone
+        relations.each do |relation|
+          qs.add_join(relation.to_s)
+        end
+      end
+
       protected getter query
       protected getter result_cache
 

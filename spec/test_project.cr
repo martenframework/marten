@@ -11,6 +11,10 @@ end
 Marten.configure do |config|
   config.secret_key = "dummy"
 
+  config.installed_apps = [
+    TestApp,
+  ]
+
   {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
     config.database do |db|
       db.backend = :postgresql

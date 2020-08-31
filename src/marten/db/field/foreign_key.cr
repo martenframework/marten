@@ -64,10 +64,12 @@ module Marten
           # for the model at hand.
 
           class ::{{ model_klass }}
-            @@fields[{{ field_id.stringify }}] = {{ @type }}.new(
-              {{ field_id.stringify }},
-              {{ relation_attribute_name.stringify }},
-              {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+            register_field(
+              {{ @type }}.new(
+                {{ field_id.stringify }},
+                {{ relation_attribute_name.stringify }},
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+              )
             )
 
             # Getter and setter methods for the raw related object ID and the plain related object need to be created.

@@ -8,7 +8,7 @@ module Marten
         macro included
           @@table_name : String?
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
-          @@fields_per_column : Hash(String, Field::Base)?
+          @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
           @@relation_fields_per_relation_name : Hash(String, Field::Base)?
 
           extend Marten::DB::Model::Table::ClassMethods
@@ -39,6 +39,12 @@ module Marten
             @@table_name = table_name.to_s
           end
 
+          # :nodoc:
+          def register_field(field : Field::Base)
+            @@fields[field.id] = field
+            @@fields_per_column[field.db_column] = field
+          end
+
           protected def from_db_result_set(result_set : ::DB::ResultSet)
             obj = new
             obj.new_record = false
@@ -65,7 +71,7 @@ module Marten
           end
 
           protected def fields_per_column
-            @@fields_per_column ||= fields.map { |field| [field.db_column, field] }.to_h
+            @@fields_per_column
           end
 
           protected def relation_fields_per_relation_name

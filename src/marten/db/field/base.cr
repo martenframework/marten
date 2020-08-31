@@ -82,9 +82,11 @@ module Marten
           # Registers the field to the model class.
 
           class ::{{ model_klass }}
-            @@fields[{{ field_id.stringify }}] = {{ @type }}.new(
-              {{ field_id.stringify }},
-              {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+            register_field(
+              {{ @type }}.new(
+                {{ field_id.stringify }},
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+              )
             )
 
             @[Marten::DB::Model::Table::FieldInstanceVariable(

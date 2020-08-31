@@ -181,8 +181,9 @@ module Marten
       def join(*relations : String | Symbol)
         qs = clone
         relations.each do |relation|
-          qs.add_join(relation.to_s)
+          qs.query.add_join(relation.to_s)
         end
+        qs
       end
 
       protected getter query

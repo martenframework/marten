@@ -239,7 +239,7 @@ module Marten
           @joined_relations.each do |relation|
             field = Model.get_relation_field(relation).as(Field::Base)
             joins << Join.new(
-              Model.table_name,
+              Model,
               field,
               field.null? ? JoinType::LEFT_OUTER : JoinType::INNER
             )

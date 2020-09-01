@@ -275,6 +275,7 @@ module Marten
 
         private def solve_field_and_predicate(raw_query, raw_value)
           splitted_raw_query = raw_query.split(Model::LOOKUP_SEP, 2)
+          # TODO: add support for predicates targetting related object columns.
 
           raw_field = splitted_raw_query[0]
           raw_field = Model.pk_field.id if raw_field == Model::PRIMARY_KEY_ALIAS
@@ -291,7 +292,7 @@ module Marten
             end
           end
 
-          predicate_klass.new(field, raw_value)
+          predicate_klass.new(field, raw_value, alias_prefix: Model.table_name)
         end
 
         private def get_field(raw_field)

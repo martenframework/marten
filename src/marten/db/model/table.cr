@@ -45,10 +45,10 @@ module Marten
             @@fields_per_column[field.db_column] = field
           end
 
-          protected def from_db_result_set(result_set : ::DB::ResultSet)
+          protected def from_db_row_iterator(row_iterator : SQL::RowIterator)
             obj = new
             obj.new_record = false
-            obj.from_db_result_set(result_set)
+            obj.from_db_row_iterator(row_iterator)
             obj
           end
 
@@ -196,9 +196,20 @@ module Marten
           io << ">"
         end
 
-        protected def from_db_result_set(result_set : ::DB::ResultSet)
-          result_set.column_names.each do |column_name|
+        protected def from_db_row_iterator(row_iterator : SQL::RowIterator)
+          row_iterator.each_local_column do |result_set, column_name|
             assign_field_from_db_result_set(result_set, column_name)
+          end
+
+          row_iterator.each_joined_relation do |relation_row_iterator, relation_field|
+            if get_field_value(relation_field.id).nil?
+              # In that case the local relation field (relation ID, likely) is nil, which means that we need to
+              # "advance" the row cursor so that the next relation can be correctly picked up afterwards.
+              relation_row_iterator.advance
+            else
+              related_object = relation_field.related_model.from_db_row_iterator(relation_row_iterator)
+              assign_related_object(related_object, relation_field)
+            end
           end
         end
 
@@ -212,6 +223,22 @@ module Marten
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           when {{ field_var.name.stringify }}
           @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          {% end %}
+          else
+          end
+          {% end %}
+        end
+
+        protected def assign_related_object(related_object, relation_field)
+          {% begin %}
+          case relation_field.id
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% if ann && ann[:relation_name] %}
+          when {{ field_var.name.stringify }}
+          @{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }})
+          {% end %}
           {% end %}
           else
           end

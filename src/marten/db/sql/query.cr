@@ -127,7 +127,7 @@ module Marten
 
           connection.open do |db|
             db.query query, args: parameters do |result_set|
-              result_set.each { results << Model.from_db_result_set(result_set) }
+              result_set.each { results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, joins)) }
             end
           end
 
@@ -147,6 +147,7 @@ module Marten
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
+          puts sql
 
           {sql, parameters, joins}
         end

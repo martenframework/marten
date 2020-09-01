@@ -5,6 +5,8 @@ module Marten
         def initialize(@parent_model : Model.class, @relation_field : Field::Base, @type : JoinType)
         end
 
+        protected getter relation_field
+
         protected def to_sql
           statement = case @type
                       when JoinType::INNER

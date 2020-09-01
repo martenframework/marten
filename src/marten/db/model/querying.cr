@@ -30,6 +30,24 @@ module Marten
             all.using(db)
           end
 
+          # Returns a queryset whose specified `relations` are "followed" and joined to each result.
+          #
+          # When using `#join`, the specified foreign-key relationships will be followed and each record returned by the
+          # queryset will have the corresponding related objects already selected and populated. Using `#join` can
+          # result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the
+          # following example:
+          #
+          # ```
+          # p1 = Post.get(id: 1)
+          # puts p1.author # hits the database to retrieved the related "author"
+          #
+          # p2 = Post.join(:author).get(id: 1)
+          # puts p2.author # doesn't hit the database since the related "author" was already selected
+          # ```
+          def join(*relations : String | Symbol)
+            all.join(*relations)
+          end
+
           # Returns a queryset matching a specific set of filters.
           #
           # This method returns a `Marten::DB::QuerySet` object. The filters passed to this method method must be

@@ -147,7 +147,6 @@ module Marten
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
-          puts sql
 
           {sql, parameters, joins}
         end

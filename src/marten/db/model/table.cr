@@ -9,7 +9,7 @@ module Marten
           @@table_name : String?
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
           @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
-          @@relation_fields_per_relation_name : Hash(String, Field::Base)?
+          @@relation_fields_per_relation_name : Hash(String, Field::Base) = {} of String => Field::Base
 
           extend Marten::DB::Model::Table::ClassMethods
 
@@ -43,6 +43,7 @@ module Marten
           def register_field(field : Field::Base)
             @@fields[field.id] = field
             @@fields_per_column[field.db_column] = field
+            @@relation_fields_per_relation_name[field.relation_name] = field if field.relation?
           end
 
           protected def from_db_row_iterator(row_iterator : SQL::RowIterator)
@@ -65,20 +66,13 @@ module Marten
           end
 
           protected def get_relation_field(relation_name)
-            relation_fields_per_relation_name.fetch(relation_name) do
+            @@relation_fields_per_relation_name.fetch(relation_name) do
               raise Errors::UnknownField.new("Unknown relation field '#{relation_name}'")
             end
           end
 
           protected def fields_per_column
             @@fields_per_column
-          end
-
-          protected def relation_fields_per_relation_name
-            @@relation_fields_per_relation_name ||= fields
-              .select(&.relation?)
-              .map { |field| [field.relation_name, field] }
-              .to_h
           end
 
           private def _pk_field

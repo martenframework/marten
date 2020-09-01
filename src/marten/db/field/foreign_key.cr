@@ -74,14 +74,17 @@ module Marten
 
             # Getter and setter methods for the raw related object ID and the plain related object need to be created.
 
+            {% related_model_klass = kwargs[:to] %}
+
             @[Marten::DB::Model::Table::FieldInstanceVariable(
               field_klass: {{ @type }},
               field_kwargs: {{ kwargs }},
-              field_type: {{ field_ann[:exposed_type] }}
+              field_type: {{ field_ann[:exposed_type] }},
+              relation_name: {{ relation_attribute_name }},
+              related_model: {{ related_model_klass }}
             )]
             @{{ field_id }} : {{ field_ann[:exposed_type] }}?
 
-            {% related_model_klass = kwargs[:to] %}
             @{{ relation_attribute_name }} : {{ related_model_klass }}?
 
             def {{ field_id }} : {{ field_ann[:exposed_type] }}?
@@ -99,7 +102,9 @@ module Marten
 
             def {{ relation_attribute_name }} : {{ related_model_klass }}?
               return if @{{ field_id }}.nil?
-              @{{ relation_attribute_name }} ||= {{ related_model_klass }}.get(pk: @{{ field_id }})
+              @{{ relation_attribute_name }} ||= begin
+                {{ related_model_klass }}.get(pk: @{{ field_id }})
+              end
             end
 
             def {{ relation_attribute_name }}! : {{ related_model_klass }}

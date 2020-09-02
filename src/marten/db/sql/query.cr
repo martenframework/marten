@@ -3,7 +3,7 @@ module Marten
     module SQL
       class Query(Model)
         @default_ordering = true
-        @joined_relations = [] of String
+        @joins = [] of Join
         @limit = nil
         @offset = nil
         @order_clauses = [] of {String, Bool}
@@ -21,7 +21,7 @@ module Marten
 
         def initialize(
           @default_ordering : Bool,
-          @joined_relations : Array(String),
+          @joins : Array(Join),
           @limit : Int64?,
           @offset : Int64?,
           @order_clauses : Array({String, Bool}),
@@ -78,18 +78,34 @@ module Marten
 
         def order(*fields : String) : Nil
           order_clauses = [] of {String, Bool}
-          fields.each do |field|
-            reversed = field.starts_with?('-')
-            field = field[1..] if reversed
-            field = Model.pk_field.id if field == Model::PRIMARY_KEY_ALIAS
-            verify_field(field)
-            order_clauses << {field, reversed}
+
+          fields.each do |raw_field|
+            reversed = raw_field.starts_with?('-')
+            raw_field = raw_field[1..] if reversed
+
+            # raw_field = Model.pk_field.id if field == Model::PRIMARY_KEY_ALIAS
+
+            field_path = verify_field(raw_field)
+            relation_field_path = field_path.select(&.relation?)
+
+            if relation_field_path.empty? || field_path.size == 1
+              column = "#{Model.table_name}.#{field_path[0].db_column}"
+            else
+              ensure_join_for_field_path(relation_field_path)
+              parent_model = relation_field_path.size > 2 ? relation_field_path[-2].related_model : Model
+              relation_field = relation_field_path.last
+              join = find_join_for(parent_model, relation_field.relation_name).not_nil!
+              column = join.column_name(field_path.last.db_column)
+            end
+
+            order_clauses << {column, reversed}
           end
+
           @order_clauses = order_clauses
         end
 
         def add_join(relation : String) : Nil
-          @joined_relations << relation
+          ensure_join_for_field_path(verify_field(relation, only_relations: true))
         end
 
         protected def add_query_node(query_node : QueryNode(Model))
@@ -104,7 +120,7 @@ module Marten
         protected def clone
           cloned = self.class.new(
             default_ordering: @default_ordering,
-            joined_relations: @joined_relations,
+            joins: @joins,
             limit: @limit,
             offset: @offset,
             order_clauses: @order_clauses,
@@ -122,12 +138,12 @@ module Marten
           @using.nil? ? Model.connection : Connection.get(@using)
         end
 
-        private def execute_query(query, parameters, joins)
+        private def execute_query(query, parameters)
           results = [] of Model
 
           connection.open do |db|
             db.query query, args: parameters do |result_set|
-              result_set.each { results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, joins)) }
+              result_set.each { results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, @joins)) }
             end
           end
 
@@ -136,19 +152,18 @@ module Marten
 
         private def build_query
           where, parameters = where_clause_and_parameters
-          joins = compute_joins
 
           sql = build_sql do |s|
             s << "SELECT #{columns}"
             s << "FROM #{table_name}"
-            s << joins.map(&.to_sql).join(" ")
+            s << @joins.map(&.to_sql).join(" ")
             s << where
             s << order_by
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
           end
 
-          {sql, parameters, joins}
+          {sql, parameters}
         end
 
         private def build_exists_query
@@ -200,20 +215,11 @@ module Marten
         private def columns
           columns = [] of String
 
-          columns += Model.fields.map { |f| column_name(Model.table_name, f.db_column) }
+          columns += Model.fields.map { |f| "#{Model.table_name}.#{f.db_column}" }
 
-          unless @joined_relations.empty?
-            @joined_relations.each do |relation|
-              field = Model.get_relation_field(relation).as(Field::Base)
-              columns += field.related_model.fields.map { |f| column_name(field.relation_name, f.db_column) }
-            end
-          end
+          @joins.each { |join| columns += join.columns }
 
           columns.flatten.join(", ")
-        end
-
-        private def column_name(alias_prefix, name)
-          "#{alias_prefix}.#{name}"
         end
 
         private def where_clause_and_parameters
@@ -231,21 +237,6 @@ module Marten
           end
 
           {where, parameters}
-        end
-
-        private def compute_joins
-          joins = [] of Join
-
-          @joined_relations.each do |relation|
-            field = Model.get_relation_field(relation).as(Field::Base)
-            joins << Join.new(
-              Model,
-              field,
-              field.null? ? JoinType::LEFT_OUTER : JoinType::INNER
-            )
-          end
-
-          joins
         end
 
         private def process_query_node(query_node)
@@ -266,10 +257,62 @@ module Marten
           predicate_node
         end
 
-        private def verify_field(raw_field)
+        private def verify_field(raw_field, only_relations = false)
+          field_path = [] of Field::Base
+
           raw_field.split(Model::LOOKUP_SEP).each_with_index do |part, i|
-            raise NotImplementedError.new("Model relations are not implemented yet") if i > 0
-            get_field(part)
+            if i > 0
+              # In this case we are trying to process a query field like "author__username", so we have to ensure that
+              # we are considering a relation field (such as a foreign key).
+              previous_field = field_path[i - 1]
+
+              if previous_field.relation?
+                model = previous_field.related_model
+              else
+                raise Errors::InvalidField.new("Unable to resolve '#{raw_field}' as an existing field")
+              end
+            else
+              model = Model
+            end
+
+            part = model.pk_field.id if part == Model::PRIMARY_KEY_ALIAS
+
+            field = if only_relations
+                      get_relation_field(part, model)
+                    else
+                      get_relation_field(part, model, silent: true) || get_field(part, model)
+                    end
+
+            field_path << field.as(Field::Base)
+          end
+
+          field_path
+        end
+
+        private def ensure_join_for_field_path(field_path)
+          parent_model = Model
+
+          field_path.each do |field|
+            # First try to find if any Join object is already created for the considered field.
+            join = find_join_for(parent_model, field.relation_name)
+
+            if join.nil?
+              join = Join.new(
+                @joins.empty? ? 1 : (@joins.size + 1),
+                parent_model,
+                field,
+                field.null? ? JoinType::LEFT_OUTER : JoinType::INNER
+              )
+              @joins << join
+            end
+
+            parent_model = field.related_model
+          end
+        end
+
+        private def find_join_for(model, relation_name)
+          @joins.find do |join|
+            join.parent_model == model && join.relation_field.relation_name == relation_name
           end
         end
 
@@ -282,7 +325,7 @@ module Marten
 
           raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
 
-          field = get_field(raw_field)
+          field = get_field(raw_field, Model)
 
           if raw_predicate.nil?
             predicate_klass = Predicate::Exact
@@ -295,12 +338,22 @@ module Marten
           predicate_klass.new(field, raw_value, alias_prefix: Model.table_name)
         end
 
-        private def get_field(raw_field)
-          Model.get_field(raw_field)
+        private def get_field(raw_field, model)
+          model.get_field(raw_field)
         rescue Errors::UnknownField
-          valid_choices = Model.fields.map(&.id).join(", ")
+          valid_choices = model.fields.map(&.id).join(", ")
           raise Errors::InvalidField.new(
             "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
+          )
+        end
+
+        private def get_relation_field(raw_relation, model, silent = false)
+          model.get_relation_field(raw_relation)
+        rescue Errors::UnknownField
+          return nil if silent
+          valid_choices = model.fields.select(&.relation?).map(&.relation_name).join(", ")
+          raise Errors::InvalidField.new(
+            "Unable to resolve '#{raw_relation}' as a relation field. Valid choices are: #{valid_choices}."
           )
         end
       end

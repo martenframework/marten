@@ -2,7 +2,13 @@ module Marten
   module DB
     module SQL
       class Join
-        def initialize(@id : Int32, @parent_model : Model.class, @relation_field : Field::Base, @type : JoinType)
+        def initialize(
+          @id : Int32,
+          @relation_field : Field::Base,
+          @type : JoinType,
+          @parent_model : Model.class,
+          @parent_alias : String?
+        )
         end
 
         protected getter parent_model
@@ -27,13 +33,13 @@ module Marten
           table_name = @relation_field.related_model.table_name
           table_pk = @relation_field.related_model.pk_field.id
           column_name = @relation_field.db_column
-          parent_table_name = @parent_model.table_name
+          parent_table_name = @parent_alias || @parent_model.table_name
 
           "#{statement} #{table_name} #{table_alias} " \
           "ON (#{parent_table_name}.#{column_name} = #{column_name(table_pk)})"
         end
 
-        private def table_alias
+        protected def table_alias
           "t#{@id}"
         end
       end

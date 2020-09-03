@@ -291,6 +291,7 @@ module Marten
 
         private def ensure_join_for_field_path(field_path)
           parent_model = Model
+          parent_join = nil
 
           field_path.each do |field|
             # First try to find if any Join object is already created for the considered field.
@@ -300,14 +301,21 @@ module Marten
             if join.nil?
               join = Join.new(
                 @joins.empty? ? 1 : (@joins.size + 1),
-                parent_model,
                 field,
-                field.null? ? JoinType::LEFT_OUTER : JoinType::INNER
+                field.null? ? JoinType::LEFT_OUTER : JoinType::INNER,
+                parent_model,
+                parent_join.try(&.table_alias)
               )
-              @joins << join
+
+              if parent_join.nil?
+                @joins << join
+              else
+                @joins.insert(@joins.index(parent_join).not_nil! + 1, join)
+              end
             end
 
             parent_model = field.related_model
+            parent_join = join
           end
         end
 

@@ -83,8 +83,6 @@ module Marten
             reversed = raw_field.starts_with?('-')
             raw_field = raw_field[1..] if reversed
 
-            # raw_field = Model.pk_field.id if field == Model::PRIMARY_KEY_ALIAS
-
             field_path = verify_field(raw_field)
             relation_field_path = field_path.select(&.relation?)
 
@@ -104,7 +102,7 @@ module Marten
           @order_clauses = order_clauses
         end
 
-        def add_join(relation : String) : Nil
+        protected def add_join(relation : String) : Nil
           ensure_join_for_field_path(verify_field(relation, only_relations: true))
         end
 
@@ -269,6 +267,8 @@ module Marten
               if previous_field.relation?
                 model = previous_field.related_model
               else
+                # If the previous was not a relation, it means that we are in the presence of a query field like
+                # "firstname__lastname", which is an invalid one and does not correspond to an actual existing field.
                 raise Errors::InvalidField.new("Unable to resolve '#{raw_field}' as an existing field")
               end
             else
@@ -296,6 +296,7 @@ module Marten
             # First try to find if any Join object is already created for the considered field.
             join = find_join_for(parent_model, field.relation_name)
 
+            # No existing join means that we must create a new one.
             if join.nil?
               join = Join.new(
                 @joins.empty? ? 1 : (@joins.size + 1),

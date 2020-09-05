@@ -207,7 +207,7 @@ module Marten
             # No existing join means that we must create a new one.
             if join.nil?
               join = Join.new(
-                @joins.empty? ? 1 : (@joins.map(&.to_a).flatten.size + 1),
+                @joins.empty? ? 1 : (flattened_joins.size + 1),
                 field,
                 field.null? ? JoinType::LEFT_OUTER : JoinType::INNER,
                 model
@@ -239,9 +239,13 @@ module Marten
         end
 
         private def find_join_for(model, relation_name)
-          @joins.map(&.to_a).flatten.find do |join|
+          flattened_joins.find do |join|
             join.model == model && join.field.relation_name == relation_name
           end
+        end
+
+        private def flattened_joins
+          @joins.map(&.to_a).flatten
         end
 
         private def get_field(raw_field, model)

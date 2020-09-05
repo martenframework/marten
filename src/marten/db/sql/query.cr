@@ -197,31 +197,31 @@ module Marten
         end
 
         private def ensure_join_for_field_path(field_path)
-          parent_model = Model
+          model = Model
           parent_join = nil
 
           field_path.each do |field|
             # First try to find if any Join object is already created for the considered field.
-            join = find_join_for(parent_model, field.relation_name)
+            join = find_join_for(model, field.relation_name)
 
             # No existing join means that we must create a new one.
             if join.nil?
               join = Join.new(
-                @joins.empty? ? 1 : (@joins.size + 1),
+                @joins.empty? ? 1 : (@joins.map(&.to_a).flatten.size + 1),
                 field,
                 field.null? ? JoinType::LEFT_OUTER : JoinType::INNER,
-                parent_model,
-                parent_join.try(&.table_alias)
+                model
               )
 
               if parent_join.nil?
                 @joins << join
               else
-                @joins.insert(@joins.index(parent_join).not_nil! + 1, join)
+                parent_join.add_child(join)
+                # @joins.insert(@joins.index(parent_join).not_nil! + 1, join)
               end
             end
 
-            parent_model = field.related_model
+            model = field.related_model
             parent_join = join
           end
         end
@@ -239,8 +239,8 @@ module Marten
         end
 
         private def find_join_for(model, relation_name)
-          @joins.find do |join|
-            join.parent_model == model && join.relation_field.relation_name == relation_name
+          @joins.map(&.to_a).flatten.find do |join|
+            join.model == model && join.field.relation_name == relation_name
           end
         end
 

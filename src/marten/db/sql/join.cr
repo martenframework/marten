@@ -1,28 +1,46 @@
 module Marten
   module DB
     module SQL
+      # Represents an SQL join used in the context of a specific query.
+      #
+      # SQL joins are managed as a tree, which means that each join can be associated with a list of underlying
+      # children joins (for the joins following the considered relationship). SQL joins are "flattened" when the raw SQL
+      # queries are generated.
       class Join
+        @parent : Nil | self
+
+        getter children
+        getter field
+        getter model
+        getter parent
+
         def initialize(
           @id : Int32,
-          @relation_field : Field::Base,
+          @field : Field::Base,
           @type : JoinType,
-          @parent_model : Model.class,
-          @parent_alias : String?
+          @model : Model.class
         )
+          @children = [] of self
         end
 
-        protected getter parent_model
-        protected getter relation_field
+        def add_child(child : self) : Nil
+          child.parent = self
+          @children << child
+        end
 
-        protected def column_name(name)
+        def column_name(name) : String
           "#{table_alias}.#{name}"
         end
 
-        protected def columns
-          relation_field.related_model.fields.map { |f| column_name(f.db_column) }
+        def columns : Array(String)
+          field.related_model.fields.map { |f| column_name(f.db_column) } + children.map(&.columns).flatten
         end
 
-        protected def to_sql
+        def to_a : Array(self)
+          [self] + @children.map(&.to_a).flatten
+        end
+
+        def to_sql : String
           statement = case @type
                       when JoinType::INNER
                         "INNER JOIN"
@@ -30,14 +48,18 @@ module Marten
                         "LEFT OUTER JOIN"
                       end
 
-          table_name = @relation_field.related_model.table_name
-          table_pk = @relation_field.related_model.pk_field.id
-          column_name = @relation_field.db_column
-          parent_table_name = @parent_alias || @parent_model.table_name
+          table_name = field.related_model.table_name
+          table_pk = field.related_model.pk_field.id
+          column_name = field.db_column
+          parent_table_name = parent.try(&.table_alias) || model.table_name
 
-          "#{statement} #{table_name} #{table_alias} " \
-          "ON (#{parent_table_name}.#{column_name} = #{column_name(table_pk)})"
+          sql = "#{statement} #{table_name} #{table_alias} " \
+                "ON (#{parent_table_name}.#{column_name} = #{column_name(table_pk)})"
+
+          ([sql] + children.map(&.to_sql).flatten).join(" ")
         end
+
+        protected setter parent
 
         protected def table_alias
           "t#{@id}"

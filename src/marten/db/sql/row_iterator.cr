@@ -17,17 +17,8 @@ module Marten
           # join. This is done to allow the next appropriate join relation to be read properly by the next row iterator
           # and to handle the case of null foreign keys for example.
 
-          @model.fields.size.times do
-            @result_set.read(::DB::Any)
-            @cursor += 1
-          end
-
-          @joins.each do |join|
-            join.relation_field.related_model.fields.size.times do
-              @result_set.read(::DB::Any)
-              @cursor += 1
-            end
-          end
+          each_local_column { |rs, _c| rs.read(::DB::Any) }
+          each_joined_relation { |ri, _c| ri.advance }
         end
 
         def each_local_column
@@ -40,13 +31,13 @@ module Marten
         def each_joined_relation
           @joins.each do |join|
             relation_iterator = self.class.new(
-              join.relation_field.related_model,
+              join.field.related_model,
               @result_set,
-              [] of Join, # TODO: identify the nested joins and forward them in this array.
+              join.children,
               @cursor
             )
 
-            yield relation_iterator, join.relation_field
+            yield relation_iterator, join.field
 
             @cursor = relation_iterator.cursor
           end

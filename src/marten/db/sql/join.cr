@@ -36,6 +36,10 @@ module Marten
           field.related_model.fields.map { |f| column_name(f.db_column) } + children.map(&.columns).flatten
         end
 
+        def table_alias : String
+          "t#{@id}"
+        end
+
         def to_a : Array(self)
           [self] + @children.map(&.to_a).flatten
         end
@@ -60,10 +64,6 @@ module Marten
         end
 
         protected setter parent
-
-        protected def table_alias
-          "t#{@id}"
-        end
       end
     end
   end

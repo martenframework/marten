@@ -293,15 +293,25 @@ module Marten
         end
 
         private def solve_field_and_predicate(raw_query, raw_value)
-          splitted_raw_query = raw_query.split(Model::LOOKUP_SEP, 2)
-          # TODO: add support for predicates targetting related object columns.
+          qparts = raw_query.rpartition(Model::LOOKUP_SEP)
+          raw_field = qparts[0]
+          raw_predicate = qparts[2]
 
-          raw_field = splitted_raw_query[0]
-          raw_field = Model.pk_field.id if raw_field == Model::PRIMARY_KEY_ALIAS
+          begin
+            field_path = verify_field(raw_query)
+            raw_predicate = nil
+          rescue e : Errors::InvalidField
+            raise e if raw_predicate.try(&.empty?)
+            field_path = verify_field(raw_field)
+          end
 
-          raw_predicate = splitted_raw_query.size > 1 ? splitted_raw_query[1] : nil
+          relation_field_path = field_path.select(&.relation?)
 
-          field = get_field(raw_field, Model)
+          join = unless relation_field_path.empty? || field_path.size == 1
+            ensure_join_for_field_path(relation_field_path)
+          end
+
+          field = field_path.last
 
           if raw_predicate.nil?
             predicate_klass = Predicate::Exact
@@ -311,7 +321,7 @@ module Marten
             end
           end
 
-          predicate_klass.new(field, raw_value, alias_prefix: Model.table_name)
+          predicate_klass.new(field, raw_value, alias_prefix: join.nil? ? Model.table_name : join.table_alias)
         end
 
         private def table_name

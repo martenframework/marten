@@ -63,11 +63,8 @@ module Marten
             if relation_field_path.empty? || field_path.size == 1
               column = "#{Model.table_name}.#{field_path[0].db_column}"
             else
-              ensure_join_for_field_path(relation_field_path)
-              parent_model = relation_field_path.size > 2 ? relation_field_path[-2].related_model : Model
-              relation_field = relation_field_path.last
-              join = find_join_for(parent_model, relation_field.relation_name).not_nil!
-              column = join.column_name(field_path.last.db_column)
+              join = ensure_join_for_field_path(relation_field_path)
+              column = join.not_nil!.column_name(field_path.last.db_column)
             end
 
             order_clauses << {column, reversed}
@@ -224,6 +221,8 @@ module Marten
             model = field.related_model
             parent_join = join
           end
+
+          parent_join
         end
 
         private def execute_query(query, parameters)

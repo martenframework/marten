@@ -135,6 +135,7 @@ module Marten
           sql = build_sql do |s|
             s << "SELECT COUNT(*)"
             s << "FROM #{table_name}"
+            s << @joins.map(&.to_sql).join(" ")
             s << where
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
@@ -149,6 +150,7 @@ module Marten
           sql = build_sql do |s|
             s << "SELECT EXISTS("
             s << "SELECT 1 FROM #{table_name}"
+            s << @joins.map(&.to_sql).join(" ")
             s << where
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?

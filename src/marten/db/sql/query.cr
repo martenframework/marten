@@ -327,7 +327,7 @@ module Marten
           when Field::Any
             raw_value
           when DB::Model
-            raw_value.id
+            raw_value.pk
           end
 
           predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.table_name : join.table_alias)

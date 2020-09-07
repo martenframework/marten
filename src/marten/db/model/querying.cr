@@ -44,6 +44,14 @@ module Marten
           # p2 = Post.join(:author).get(id: 1)
           # puts p2.author # doesn't hit the database since the related "author" was already selected
           # ```
+          #
+          # It should be noted that it is also possible to follow foreign keys of direct related models too by using the
+          # double underscores notation(`__`). For example the following query will select the joined "author" and its
+          # associated "profile":
+          #
+          # ```
+          # Post.join(:author__profile)
+          # ```
           def join(*relations : String | Symbol)
             all.join(*relations)
           end

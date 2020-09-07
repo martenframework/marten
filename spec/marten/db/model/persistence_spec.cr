@@ -45,4 +45,29 @@ describe Marten::DB::Model::Persistence do
       object.persisted?.should be_true
     end
   end
+
+  describe "::create!" do
+    it "raises InvalidRecord if the model instance is invalid" do
+      expect_raises(Marten::DB::Errors::InvalidRecord) { TestUser.create!(username: nil) }
+    end
+
+    it "returns the persisted model instance if it is valid" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.valid?.should be_true
+      object.persisted?.should be_true
+    end
+
+    it "allows to initialize the new valid object in a dedicated block" do
+      object = TestUser.create!(username: "jd") do |o|
+        o.email = "jd@example.com"
+        o.first_name = "John"
+        o.last_name = "Doe"
+      end
+      object.email.should eq "jd@example.com"
+      object.first_name.should eq "John"
+      object.last_name.should eq "Doe"
+      object.valid?.should be_true
+      object.persisted?.should be_true
+    end
+  end
 end

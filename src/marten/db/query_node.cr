@@ -4,7 +4,7 @@ module Marten
   module DB
     class QueryNode(Model)
       def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, **kwargs)
-        @filters = {} of String | Symbol => Field::Any
+        @filters = {} of String | Symbol => Field::Any | DB::Model
         @filters.merge!(kwargs.to_h)
       end
 
@@ -12,7 +12,7 @@ module Marten
         @children : Array(self),
         @connector : SQL::PredicateConnector,
         @negated : Bool,
-        @filters : Hash(String | Symbol, Field::Any)
+        @filters : Hash(String | Symbol, Field::Any | DB::Model)
       )
       end
 

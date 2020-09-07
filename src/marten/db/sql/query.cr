@@ -323,7 +323,14 @@ module Marten
             end
           end
 
-          predicate_klass.new(field, raw_value, alias_prefix: join.nil? ? Model.table_name : join.table_alias)
+          value : Field::Any = case raw_value
+          when Field::Any
+            raw_value
+          when DB::Model
+            raw_value.id
+          end
+
+          predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.table_name : join.table_alias)
         end
 
         private def table_name

@@ -23,6 +23,10 @@ module Marten
         abstract def sanitize_like_pattern(pattern : String) : String
         abstract def scheme : String
 
+        def alias : String
+          @config.id
+        end
+
         def db
           @db ||= ::DB.open(@url)
         end

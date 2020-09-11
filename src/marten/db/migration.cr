@@ -10,7 +10,7 @@ module Marten
         end
 
         # :nodoc:
-        def self.id
+        def self.migration_name
           File.basename(__FILE__, ".cr")
         end
 
@@ -26,6 +26,11 @@ module Marten
 
       # :nodoc:
       def self.id
+        "#{app_config.label}_#{migration_name}"
+      end
+
+      # :nodoc:
+      def self.migration_name
         "__base__migration"
       end
 

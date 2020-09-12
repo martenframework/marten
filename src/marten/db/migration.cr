@@ -37,7 +37,7 @@ module Marten
 
       # :nodoc:
       def self.id
-        "#{app_config.label}_#{migration_name}"
+        gen_id(app_config.label, migration_name)
       end
 
       # :nodoc:
@@ -55,6 +55,10 @@ module Marten
 
       protected def self.app_config
         @@app_config ||= Marten.apps.get_containing(self)
+      end
+
+      protected def self.gen_id(app_label, migration_name)
+        "#{app_label}_#{migration_name}"
       end
 
       def operations

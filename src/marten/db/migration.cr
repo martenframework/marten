@@ -17,6 +17,7 @@ module Marten
       end
 
       @@app_config : Marten::Apps::Config?
+      @@replacement_ids : Array(String)?
 
       class_getter depends_on = [] of Tuple(String, String)
       class_getter replaces = [] of Tuple(String, String)
@@ -48,6 +49,10 @@ module Marten
       # to the list of migration replaced by the current migration.
       def self.replaces(app_name : String | Symbol, migration_name : String | Symbol)
         @@replaces << {app_name.to_s, migration_name.to_s}
+      end
+
+      def self.replacement_ids
+        @@replacement_ids ||= @@replaces.map { |app_label, migration_name| gen_id(app_label, migration_name) }
       end
 
       protected def self.app_config

@@ -77,7 +77,9 @@ module Marten
         # This method will return `true` if the model instance is valid and was created / updated successfully.
         # Otherwise it will return `false` if the model instance validation failed.
         def save(using : Nil | String | Symbol = nil) : Bool
-          if valid? && !persisted?
+          if valid?
+            # TODO: this block should probably be executed if the record is not persisted or if changes have been made
+            # to the considered record (dirty changes mechanism).
             connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
             connection.transaction do
               insert_or_update(connection)
@@ -137,7 +139,7 @@ module Marten
 
         private def insert_or_update(connection)
           if persisted?
-            raise NotImplementedError.new("Model records update not implemented yet")
+            update(connection)
           else
             insert(connection)
           end
@@ -162,6 +164,23 @@ module Marten
 
           self.pk ||= pk
           self.new_record = false
+        end
+
+        private def update(connection)
+          self.class.fields.each do |field|
+            next if field.primary_key?
+            field.prepare_save(self, new_record: false)
+          end
+
+          values = field_db_values
+          values.delete(self.class.pk_field.db_column)
+
+          connection.update(
+            self.class.table_name,
+            values,
+            pk_column_name: self.class.pk_field.db_column,
+            pk_value: pk
+          )
         end
       end
     end

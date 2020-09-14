@@ -22,6 +22,12 @@ module Marten
         abstract def quote_char : Char
         abstract def sanitize_like_pattern(pattern : String) : String
         abstract def scheme : String
+        abstract def update(
+          table_name : String,
+          values : Hash(String, ::DB::Any),
+          pk_column_name : String,
+          pk_value : ::DB::Any
+        ) : Nil
 
         def alias : String
           @config.id

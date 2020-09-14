@@ -46,6 +46,24 @@ module Marten
           "postgres"
         end
 
+        def update(
+          table_name : String,
+          values : Hash(String, ::DB::Any),
+          pk_column_name : String,
+          pk_value : ::DB::Any
+        ) : Nil
+          column_names = values.keys.map_with_index do |column_name, i|
+            "#{quote(column_name)}=#{parameter_id_for_ordered_argument(i + 1)}"
+          end.join(", ")
+
+          statement = "UPDATE #{quote(table_name)} SET #{column_names} " \
+                      "WHERE #{quote(pk_column_name)}=#{parameter_id_for_ordered_argument(values.size + 1)}"
+
+          open do |db|
+            db.exec(statement, args: values.values + [pk_value])
+          end
+        end
+
         protected def column_type_for_built_in_field(field_id)
           BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING[field_id]
         end

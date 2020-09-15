@@ -41,6 +41,8 @@ module Marten
   def self.start
     setup
 
+    Marten::Server.setup
+
     Log.info { "Marten running on #{Marten::Server.addresses.join ", "} (Press CTRL+C to quit)" }
 
     Signal::INT.trap do
@@ -55,7 +57,6 @@ module Marten
   def self.setup
     settings.setup
     apps.populate(settings.installed_apps)
-    Marten::Server.setup
   end
 
   def self.configure(env : Nil | String | Symbol = nil)

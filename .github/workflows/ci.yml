@@ -21,9 +21,21 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: crystallang/crystal:0.35.1
+    services:
+      postgres:
+        image: postgres:12.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ""
+          POSTGRES_DB: machina_test
+        ports:
+          - 5432:5432
+        # Needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     strategy:
       matrix:
         db: [
+          'postgresql',
           'sqlite',
         ]
     steps:
@@ -40,5 +52,9 @@ jobs:
       with:
         path: ~/.cache/crystal
         key: ${{ runner.os }}-crystal
+    - name: Setup env JSON file
+      run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
       run: make tests
+      env:
+        MARTEN_SPEC_DB_CONNECTION: ${{ matrix.db }}

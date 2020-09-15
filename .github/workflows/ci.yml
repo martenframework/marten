@@ -21,8 +21,17 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: crystallang/crystal:0.35.1
+    strategy:
+      matrix:
+        db: [
+          'sqlite',
+        ]
     steps:
     - uses: actions/checkout@v2
+    - name: Install packages required for SQLite
+      run: |
+        apt-get update
+        apt-get -yqq install libsqlite3
     - name: Install shards
       run: shards install --ignore-crystal-version
     - name: Cache Crystal

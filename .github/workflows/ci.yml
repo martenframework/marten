@@ -29,9 +29,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite
+      if: matrix.db == 'sqlite'
       run: |
         apt-get update
-        apt-get -yqq install libsqlite3
+        apt-get -yqq install libsqlite3-dev
     - name: Install shards
       run: shards install --ignore-crystal-version
     - name: Cache Crystal

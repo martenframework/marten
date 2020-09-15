@@ -40,6 +40,11 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v2
+    - name: Install packages required for PostgreSQL
+      if: matrix.db == 'postgresql'
+      run: |
+        apt-get update
+        apt-get -yqq install libpq-dev postgresql-client
     - name: Install packages required for SQLite
       if: matrix.db == 'sqlite'
       run: |

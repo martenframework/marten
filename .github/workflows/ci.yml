@@ -44,7 +44,7 @@ jobs:
       if: matrix.db == 'postgresql'
       run: |
         apt-get update
-        apt-get -yqq install libpq-dev postgresql-client
+        apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev
     - name: Install packages required for SQLite
       if: matrix.db == 'sqlite'
       run: |

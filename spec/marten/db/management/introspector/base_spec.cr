@@ -9,6 +9,8 @@ describe Marten::DB::Management::Introspector::Base do
       t.run
 
       schema_editor.delete_model(Marten::DB::Management::Introspector::BaseSpec::TestModel)
+    rescue e : Exception
+      puts e.inspect_with_backtrace
     end
 
     it "returns the table names of the associated database connection" do

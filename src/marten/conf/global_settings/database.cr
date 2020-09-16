@@ -45,7 +45,8 @@ module Marten
           @user = val.to_s
         end
 
-        protected def validate
+        # :nodoc:
+        def validate : Nil
           raise_invalid_config("missing database backend") if backend.to_s.empty?
 
           unless DB::Connection::IMPLEMENTATIONS.has_key?(backend)

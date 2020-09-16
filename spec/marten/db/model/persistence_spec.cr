@@ -8,8 +8,6 @@ describe Marten::DB::Model::Persistence do
     t.run
 
     schema_editor.delete_model(TestUser)
-  rescue e : Exception
-    puts e.inspect_with_backtrace
   end
 
   describe "::create" do

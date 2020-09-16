@@ -26,7 +26,7 @@ jobs:
         image: postgres:10.8
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: "postgres"
+          POSTGRES_PASSWORD: postgres
           POSTGRES_DB: marten_test
         ports:
           - 5432:5432

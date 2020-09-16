@@ -73,77 +73,8 @@ module Marten
         clone
       end
 
-      def get(**kwargs)
-        get!(**kwargs)
-      rescue Model::NotFound
-        nil
-      end
-
-      def get!(**kwargs)
-        results = filter(**kwargs)[..GET_RESULTS_LIMIT].to_a
-        return results.first if results.size == 1
-        raise Model::NotFound.new("#{Model.name} query didn't return any results") if results.empty?
-        raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
-      end
-
-      def filter(**kwargs)
-        filter(QueryNode(Model).new(**kwargs))
-      end
-
-      def filter(&block)
-        expr = Expression::Filter(Model).new
-        query : QueryNode(Model) = with expr yield
-        filter(query)
-      end
-
-      def filter(query_node : QueryNode(Model))
-        add_query_node(query_node)
-      end
-
-      def exclude(**kwargs)
-        exclude(QueryNode(Model).new(**kwargs))
-      end
-
-      def exclude(&block)
-        expr = Expression::Filter(Model).new
-        query : QueryNode(Model) = with expr yield
-        exclude(query)
-      end
-
-      def exclude(query_node : QueryNode(Model))
-        add_query_node(-query_node)
-      end
-
-      def first
-        (query.ordered? ? self : order(Model::PRIMARY_KEY_ALIAS))[..0].to_a.first
-      end
-
-      def last
-        (query.ordered? ? reverse : order("-#{Model::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
-      end
-
-      def exists?
-        @result_cache.nil? ? @query.exists? : !@result_cache.not_nil!.empty?
-      end
-
       def count
         @query.count
-      end
-
-      def order(*fields : String | Symbol)
-        qs = clone
-        qs.query.order(*fields.map(&.to_s))
-        qs
-      end
-
-      def reverse
-        qs = clone
-        qs.query.default_ordering = !@query.default_ordering
-        qs
-      end
-
-      def size
-        count
       end
 
       def create(**kwargs)
@@ -172,10 +103,73 @@ module Marten
         object
       end
 
-      def using(db : String | Symbol)
-        qs = clone
-        qs.query.using = db.to_s
-        qs
+      def exclude(**kwargs)
+        exclude(QueryNode(Model).new(**kwargs))
+      end
+
+      def exclude(&block)
+        expr = Expression::Filter(Model).new
+        query : QueryNode(Model) = with expr yield
+        exclude(query)
+      end
+
+      def exclude(query_node : QueryNode(Model))
+        add_query_node(-query_node)
+      end
+
+      def exists?
+        @result_cache.nil? ? @query.exists? : !@result_cache.not_nil!.empty?
+      end
+
+      def filter(**kwargs)
+        filter(QueryNode(Model).new(**kwargs))
+      end
+
+      def filter(&block)
+        expr = Expression::Filter(Model).new
+        query : QueryNode(Model) = with expr yield
+        filter(query)
+      end
+
+      def filter(query_node : QueryNode(Model))
+        add_query_node(query_node)
+      end
+
+      def first
+        (query.ordered? ? self : order(Model::PRIMARY_KEY_ALIAS))[..0].to_a.first
+      end
+
+      def get(**kwargs)
+        get(QueryNode(Model).new(**kwargs))
+      end
+
+      def get(&block)
+        expr = Expression::Filter(Model).new
+        query : QueryNode(Model) = with expr yield
+        get(query)
+      end
+
+      def get(query_node : QueryNode(Model))
+        get!(query_node)
+      rescue Model::NotFound
+        nil
+      end
+
+      def get!(**kwargs)
+        get!(QueryNode(Model).new(**kwargs))
+      end
+
+      def get!(&block)
+        expr = Expression::Filter(Model).new
+        query : QueryNode(Model) = with expr yield
+        get!(query)
+      end
+
+      def get!(query_node : QueryNode(Model))
+        results = filter(query_node)[..GET_RESULTS_LIMIT].to_a
+        return results.first if results.size == 1
+        raise Model::NotFound.new("#{Model.name} query didn't return any results") if results.empty?
+        raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
       end
 
       def join(*relations : String | Symbol)
@@ -183,6 +177,32 @@ module Marten
         relations.each do |relation|
           qs.query.add_join(relation.to_s)
         end
+        qs
+      end
+
+      def last
+        (query.ordered? ? reverse : order("-#{Model::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
+      end
+
+      def order(*fields : String | Symbol)
+        qs = clone
+        qs.query.order(*fields.map(&.to_s))
+        qs
+      end
+
+      def reverse
+        qs = clone
+        qs.query.default_ordering = !@query.default_ordering
+        qs
+      end
+
+      def size
+        count
+      end
+
+      def using(db : String | Symbol)
+        qs = clone
+        qs.query.using = db.to_s
         qs
       end
 

@@ -7,6 +7,10 @@ module Marten
             "CREATE TABLE #{table_name} (#{column_definitions})"
           end
 
+          def ddl_rollbackable? : Bool
+            true
+          end
+
           def delete_table_statement(table_name : String) : String
             "DROP TABLE #{table_name}"
           end

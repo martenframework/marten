@@ -2,11 +2,21 @@ module Marten
   module DB
     module Management
       module SchemaEditor
+        # Base implementation of a database schema editor.
+        #
+        # The database schema editor is used in the context of DB management in order to perform operation on models:
+        # create / delete models, add new fields, etc. It's heavily used by the migrations mechanism.
         abstract class Base
           def initialize(@connection : Connection::Base)
           end
 
+          # Returns the SQL statement allowing to create a database table.
           abstract def create_table_statement(table_name : String, column_definitions : String) : String
+
+          # Returns a boolean indicating if the schema editor implementation supports rollbacking DDL statements.
+          abstract def ddl_rollbackable? : Bool
+
+          # Returns the SQL statement allowing to delete a database table.
           abstract def delete_table_statement(table_name : String) : String
 
           def create_model(model : Model.class)

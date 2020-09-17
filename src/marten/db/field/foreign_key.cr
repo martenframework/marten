@@ -14,7 +14,8 @@ module Marten
           @unique = false,
           @editable = true,
           @name = nil,
-          @db_column = nil
+          @db_column = nil,
+          @db_index = true
         )
         end
 

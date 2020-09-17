@@ -13,6 +13,7 @@ module Marten
           @editable = true,
           @name = nil,
           @db_column = nil,
+          @db_index = false,
           @auto_now = false,
           @auto_now_add = false
         )

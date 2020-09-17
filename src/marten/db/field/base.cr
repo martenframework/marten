@@ -7,6 +7,7 @@ module Marten
         @null : ::Bool
         @name : ::String?
         @db_column : ::String | Symbol | Nil
+        @db_index : ::Bool
 
         # Returns the ID of the field used in the associated model.
         getter id
@@ -22,7 +23,8 @@ module Marten
           @unique = false,
           @editable = true,
           @name = nil,
-          @db_column = nil
+          @db_column = nil,
+          @db_index = false
         )
         end
 

@@ -42,6 +42,11 @@ module Marten
           @db_column.try(&.to_s) || @id
         end
 
+        # Returns true if an index should be created at the database level for the field.
+        def db_index?
+          @db_index
+        end
+
         # Returns a boolean indicating whether the field is a primary key.
         def primary_key?
           @primary_key

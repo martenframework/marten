@@ -4,6 +4,9 @@ version: 0.1.0.dev0
 authors:
   - Morgan Aubert <me@morganaubert.name>
 
+description: |
+  The pragmatic™ web framework.
+
 crystal: 0.35.0
 
 dependencies:

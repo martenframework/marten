@@ -8,7 +8,11 @@ module Marten
         # create / delete models, add new fields, etc. It's heavily used by the migrations mechanism.
         abstract class Base
           def initialize(@connection : Connection::Base)
+            @deferred_statements = [] of String
           end
+
+          # Returns the SQL statement allowing to create a database index.
+          abstract def create_index_statement(name : String, table_name : String, columns : Array(String)) : String
 
           # Returns the SQL statement allowing to create a database table.
           abstract def create_table_statement(table_name : String, column_definitions : String) : String
@@ -32,12 +36,32 @@ module Marten
             @connection.open do |db|
               db.exec(sql)
             end
+
+            # Processes indexes configured as part of specific fields using db_index and the corresponding SQL
+            # statements to the array of deferred SQL statements.
+            model.fields.each do |field|
+              next if !field.db_index? || field.unique?
+
+              @deferred_statements << create_index_statement(
+                index_name(model.table_name, [field.db_column]),
+                @connection.quote(model.table_name),
+                [@connection.quote(field.db_column)]
+              )
+            end
           end
 
           def delete_model(model : Model.class)
             sql = delete_table_statement(@connection.quote(model.table_name))
             @connection.open do |db|
               db.exec(sql)
+            end
+          end
+
+          protected def execute_deferred_statements
+            @deferred_statements.each do |sql|
+              @connection.open do |db|
+                db.exec(sql)
+              end
             end
           end
 
@@ -53,6 +77,10 @@ module Marten
             end
 
             sql
+          end
+
+          private def index_name(table_name, columns)
+            "index_#{table_name}_on_#{columns.join("_")}"
           end
         end
       end

@@ -25,9 +25,11 @@ module Marten
           if atomic && editor.ddl_rollbackable?
             connection.transaction do
               yield editor
+              editor.execute_deferred_statements
             end
           else
             yield editor
+            editor.execute_deferred_statements
           end
         end
       end

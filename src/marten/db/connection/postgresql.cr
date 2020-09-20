@@ -38,10 +38,6 @@ module Marten
           '"'
         end
 
-        def sanitize_like_pattern(pattern : String) : String
-          pattern.gsub("%", "%").gsub("_", "_")
-        end
-
         def scheme : String
           "postgres"
         end

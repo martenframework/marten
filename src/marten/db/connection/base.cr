@@ -44,9 +44,6 @@ module Marten
         # Returns the quote character to use to quote table names, columns, etc.
         abstract def quote_char : Char
 
-        # Escapes special characters from a pattern aimed at being used in the context of a LIKE statement.
-        abstract def sanitize_like_pattern(pattern : String) : String
-
         # Returns the scheme to consider for the underlying database backend.
         abstract def scheme : String
 
@@ -74,6 +71,11 @@ module Marten
         # used instead.
         def open(&block)
           yield current_transaction.nil? ? db : current_transaction.not_nil!.connection
+        end
+
+        # Escapes special characters from a pattern aimed at being used in the context of a LIKE statement.
+        def sanitize_like_pattern(pattern : String) : String
+          pattern.gsub("%", "\%").gsub("_", "\_")
         end
 
         # Open a transaction.

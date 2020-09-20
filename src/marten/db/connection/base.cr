@@ -75,7 +75,7 @@ module Marten
 
         # Escapes special characters from a pattern aimed at being used in the context of a LIKE statement.
         def sanitize_like_pattern(pattern : String) : String
-          pattern.gsub("%", "\%").gsub("_", "\_")
+          pattern.gsub("%", "%").gsub("_", "_")
         end
 
         # Open a transaction.

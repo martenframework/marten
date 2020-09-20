@@ -1,6 +1,10 @@
 module Marten
   module DB
     module Connection
+      # Abstract base class for a database connection.
+      #
+      # A database connection provides the main interface allowing to interact with the underlying database. Subclasses
+      # must define a set of function allowing to define backend-specifics such as statements, operators, etc.
       abstract class Base
         @db : ::DB::Database?
         @url : String
@@ -10,18 +14,43 @@ module Marten
           @url = build_url
         end
 
+        # Returns the database type for a specific built-in field implementation.
+        #
+        # Note that this method is only used handling column types of Marten built-in types as custom field
+        # implementation must define a `#db_type` method.
         abstract def column_type_for_built_in_field(field_id)
+
+        # Allows to insert a new row in a specific table.
         abstract def insert(
           table_name : String,
           values : Hash(String, ::DB::Any),
           pk_field_to_fetch : String? = nil
         ) : Int64?
+
+        # Returns the left operand to use for specific query predicate.
+        #
+        # Most of the time the initial ID will be left intact but depending on the connection implementation and the
+        # considered predicate type (eg. "istartswith"), specific SQL functions could be applied on the column ID.
         abstract def left_operand_for(id : String, predicate) : String
+
+        # Returns the operator to use for a specific query predicate.
         abstract def operator_for(predicate) : String
+
+        # Returns the parameterized identifier for an ordered argument.
+        #
+        # This method takes the number of the argument which is aimed to be part of an array of ordered SQL arguments.
         abstract def parameter_id_for_ordered_argument(number : Int) : String
+
+        # Returns the quote character to use to quote table names, columns, etc.
         abstract def quote_char : Char
+
+        # Escapes special characters from a pattern aimed at being used in the context of a LIKE statement.
         abstract def sanitize_like_pattern(pattern : String) : String
+
+        # Returns the scheme to consider for the underlying database backend.
         abstract def scheme : String
+
+        # Allows to update an existing row in a specific table.
         abstract def update(
           table_name : String,
           values : Hash(String, ::DB::Any),
@@ -29,22 +58,33 @@ module Marten
           pk_value : ::DB::Any
         ) : Nil
 
+        # Returns the DB alias of the considered connection.
         def alias : String
           @config.id
         end
 
+        # Returns a new database entrypoint to interact with the underlying database.
         def db
           @db ||= ::DB.open(@url)
         end
 
+        # Provides a database entrypoint to the block.
+        #
+        # If this method is called in an existing transaction, the connection associated with this transaction will be
+        # used instead.
         def open(&block)
           yield current_transaction.nil? ? db : current_transaction.not_nil!.connection
         end
 
+        # Open a transaction.
+        #
+        # Atomicity will be ensured for the database operations performed inside the block. Note that any existing
+        # transaction will be used in case of nested calls to this method.
         def transaction
           current_transaction ? yield : new_transaction { yield }
         end
 
+        # Allows to quote a specific name (such as a table name or column ID) for the database at hand.
         def quote(name : String) : String
           "#{quote_char}#{name}#{quote_char}"
         end

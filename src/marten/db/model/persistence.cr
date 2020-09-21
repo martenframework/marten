@@ -102,7 +102,7 @@ module Marten
 
         # Reloads the model instance.
         #
-        # This methods retrieves the record at the database level and updates the current model instances with the new
+        # This methods retrieves the record at the database level and updates the current model instance with the new
         # values.
         def reload
           reloaded = self.class.get!(pk: pk)

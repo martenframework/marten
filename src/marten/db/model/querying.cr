@@ -18,6 +18,11 @@ module Marten
           # This method returns a `Marten::DB::QuerySet` object that - if evaluated - will return all the records for
           # the considered model.
           def all
+            default_queryset
+          end
+
+          # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
+          def default_queryset
             QuerySet(self).new
           end
 
@@ -33,7 +38,7 @@ module Marten
           #
           # If multiple filters are specified, they will be joined using an **AND** operator at the SQL level.
           def exclude(**kwargs)
-            QuerySet(self).new.exclude(**kwargs)
+            default_queryset.exclude(**kwargs)
           end
 
           # Returns a queryset whose records do not match the given set of advanced filters.
@@ -48,7 +53,7 @@ module Marten
           def exclude(&block)
             expr = Expression::Filter(self).new
             query : QueryNode(self) = with expr yield
-            QuerySet(self).new.exclude(query)
+            default_queryset.exclude(query)
           end
 
           # Returns a queryset matching a specific set of filters.
@@ -63,7 +68,7 @@ module Marten
           #
           # If multiple filters are specified, they will be joined using an **AND** operator at the SQL level.
           def filter(**kwargs)
-            QuerySet(self).new.filter(**kwargs)
+            default_queryset.filter(**kwargs)
           end
 
           # Returns a queryset matching a specific set of advanced filters.
@@ -78,14 +83,14 @@ module Marten
           def filter(&block)
             expr = Expression::Filter(self).new
             query : QueryNode(self) = with expr yield
-            QuerySet(self).new.filter(query)
+            default_queryset.filter(query)
           end
 
           # Returns the first record for the considered model.
           #
           # `nil` will be returned if no records can be found.
           def first
-            QuerySet(self).new.first
+            default_queryset.first
           end
 
           # Returns the model instance matching the given set of filters.
@@ -103,7 +108,7 @@ module Marten
           # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
           # exception if multiple records match the specified set of filters.
           def get(**kwargs)
-            QuerySet(self).new.get(**kwargs)
+            default_queryset.get(**kwargs)
           end
 
           # Returns the model instance matching a specifc set of advanced filters.
@@ -123,7 +128,7 @@ module Marten
           def get(&block)
             expr = Expression::Filter(self).new
             query : QueryNode(self) = with expr yield
-            QuerySet(self).new.get(query)
+            default_queryset.get(query)
           end
 
           # Returns the model instance matching the given set of filters.
@@ -142,7 +147,7 @@ module Marten
           # In order to ensure data consistency, this method will also raise a
           # `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
           def get!(**kwargs)
-            QuerySet(self).new.get!(**kwargs)
+            default_queryset.get!(**kwargs)
           end
 
           # Returns the model instance matching a specifc set of advanced filters.
@@ -163,7 +168,7 @@ module Marten
           def get!(&block)
             expr = Expression::Filter(self).new
             query : QueryNode(self) = with expr yield
-            QuerySet(self).new.get!(query)
+            default_queryset.get!(query)
           end
 
           # Returns a queryset whose specified `relations` are "followed" and joined to each result.
@@ -196,7 +201,7 @@ module Marten
           #
           # `nil` will be returned if no records can be found.
           def last
-            QuerySet(self).new.last
+            default_queryset.last
           end
 
           # Returns a queryset that will be evaluated using the specified database.

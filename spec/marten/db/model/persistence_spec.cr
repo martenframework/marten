@@ -70,4 +70,78 @@ describe Marten::DB::Model::Persistence do
       object.persisted?.should be_true
     end
   end
+
+  describe "#save" do
+    it "allows to save a new object" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.save.should be_true
+      object.persisted?.should be_true
+    end
+
+    it "returns false if the new object is invalid" do
+      object = TestUser.new(last_name: "Doe")
+      object.save.should be_false
+      object.persisted?.should be_false
+    end
+
+    it "allows to save an existing object" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.username = "jd2"
+      object.save.should be_true
+    end
+
+    it "returns false if an existing object is invalid" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.email = nil
+      object.save.should be_false
+    end
+  end
+
+  describe "#save!" do
+    it "allows to save a new object" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.save!.should be_true
+      object.persisted?.should be_true
+    end
+
+    it "raises if the new object is invalid" do
+      object = TestUser.new(last_name: "Doe")
+      expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
+      object.persisted?.should be_false
+    end
+
+    it "allows to save an existing object" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.username = "jd2"
+      object.save!.should be_true
+    end
+
+    it "raises if an existing object is invalid" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.email = nil
+      expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
+    end
+  end
+
+  describe "#reload" do
+    it "allows to reload an object" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object_alt = TestUser.get!(pk: object.pk)
+      object_alt.username = "jd2"
+      object_alt.save!
+
+      object.reload.username.should eq "jd2"
+    end
+
+    it "allows to reload an object from a new object whose primary key is manually assigned" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object_alt = TestUser.new
+      object_alt.pk = object.pk
+
+      object.reload.username.should eq "jd"
+      object.new_record?.should be_false
+    end
+  end
 end

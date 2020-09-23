@@ -23,7 +23,14 @@ module Marten
         __DIR__
       end
 
-      private LABEL_RE = /^[a-z_]+$/
+      def initialize
+        @models = [] of DB::Model.class
+      end
+
+      # Associates a model to the current app config.
+      def register_model(model : DB::Model.class)
+        @models << model
+      end
 
       macro inherited
         # :nodoc:
@@ -31,6 +38,8 @@ module Marten
           __DIR__
         end
       end
+
+      private LABEL_RE = /^[a-z_]+$/
     end
   end
 end

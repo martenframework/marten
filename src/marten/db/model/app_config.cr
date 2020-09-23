@@ -12,6 +12,9 @@ module Marten
             def self.dir_location
               __DIR__
             end
+
+            # Register the model class to make it available to the associated app config later on.
+            Marten.apps.register_model(self)
           end
         end
 

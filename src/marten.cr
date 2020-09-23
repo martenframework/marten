@@ -83,4 +83,8 @@ module Marten
   def self.routes
     @@routes ||= Routing::Map.new
   end
+
+  protected def self.dir_location
+    __DIR__
+  end
 end

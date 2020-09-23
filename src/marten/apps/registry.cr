@@ -49,7 +49,7 @@ module Marten
         rescue e : Errors::AppNotFound
           # Special models (living) can be associated to no configured apps (eg. this is the case for built-in migration
           # records) ; in those cases we don't try to associate the model with an existing app.
-          raise e unless model.name.starts_with?("Marten::")
+          raise e unless model.dir_location.starts_with?(Marten.dir_location)
         end
       end
 

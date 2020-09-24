@@ -1,7 +1,5 @@
 module Marten::Apps::RegistrySpec::TestApp::Entities
   class Test
-    def self.dir_location
-      __DIR__
-    end
+    include Marten::Apps::Association
   end
 end

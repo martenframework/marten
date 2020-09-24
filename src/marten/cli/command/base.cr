@@ -2,12 +2,9 @@ module Marten
   module CLI
     class Command
       abstract class Base
-        macro inherited
-          # :nodoc:
-          def self.dir_location
-            __DIR__
-          end
+        include Apps::Association
 
+        macro inherited
           Marten::CLI::Command.register_subcommand({{ @type }})
         end
 

@@ -16,14 +16,17 @@ module Marten
         candidates = [] of Config
 
         @app_configs.values.each do |config|
-          if klass.dir_location.starts_with?(config.class.dir_location)
-            remaining = klass.dir_location[config.class.dir_location.size..]
+          if klass._marten_app_location.starts_with?(config.class._marten_app_location)
+            remaining = klass._marten_app_location[config.class._marten_app_location.size..]
             next unless remaining == "" || remaining[0] == '/'
             candidates << config
           end
         end
 
-        result = candidates.sort_by { |config| config.class.dir_location.size }.reverse.first unless candidates.empty?
+        result = unless candidates.empty?
+          candidates.sort_by { |config| config.class._marten_app_location.size }.reverse.first
+        end
+
         if result.nil?
           raise Errors::AppNotFound.new(
             "Class '#{klass}' is not part of an application defined in Marten.settings.installed_apps"
@@ -49,7 +52,7 @@ module Marten
         rescue e : Errors::AppNotFound
           # Special models (living) can be associated to no configured apps (eg. this is the case for built-in migration
           # records) ; in those cases we don't try to associate the model with an existing app.
-          raise e unless model.dir_location.starts_with?(Marten.dir_location)
+          raise e unless model._marten_app_location.starts_with?(Marten.dir_location)
         end
       end
 

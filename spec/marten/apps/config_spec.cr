@@ -30,12 +30,6 @@ describe Marten::Apps::Config do
     end
   end
 
-  describe "::dir_location" do
-    it "returns the path where the app config class is defined" do
-      Marten::Apps::ConfigSpec::TestConfig.dir_location.should eq __DIR__
-    end
-  end
-
   describe "#label" do
     it "returns the app config label" do
       app_config = Marten::Apps::ConfigSpec::TestConfig.new

@@ -3,12 +3,9 @@ require "./migration/**"
 module Marten
   module DB
     abstract class Migration
-      macro inherited
-        # :nodoc:
-        def self.dir_location
-          __DIR__
-        end
+      include Apps::Association
 
+      macro inherited
         def self.migration_name
           File.basename(__FILE__, ".cr")
         end
@@ -28,11 +25,6 @@ module Marten
       # to the list of migration dependencies of the current migration.
       def self.depends_on(app_name : String | Symbol, migration_name : String | Symbol)
         @@depends_on << {app_name.to_s, migration_name.to_s}
-      end
-
-      # :nodoc:
-      def self.dir_location
-        __DIR__
       end
 
       def self.id

@@ -114,13 +114,13 @@ module Marten::Apps::RegistrySpec
   end
 
   class TestEntity
-    def self.dir_location
+    def self._marten_app_location
       __DIR__
     end
   end
 
   class InvalidEntity
-    def self.dir_location
+    def self._marten_app_location
       "/etc/xyz"
     end
   end

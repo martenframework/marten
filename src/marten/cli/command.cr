@@ -56,7 +56,7 @@ module Marten
         usage << USAGE_HEADER % @name
 
         per_app_commands = @@command_registry.values.group_by do |command|
-          command.dir_location.starts_with?(__DIR__) ? "marten" : command.app_config.label
+          command._marten_app_location.starts_with?(__DIR__) ? "marten" : command.app_config.label
         end
 
         per_app_commands.each do |app_label, commands|

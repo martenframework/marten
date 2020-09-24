@@ -3,6 +3,8 @@ module Marten
     abstract class Config
       @@label = "app"
 
+      getter models
+
       delegate label, to: self.class
 
       def self.label(label : String | Symbol)

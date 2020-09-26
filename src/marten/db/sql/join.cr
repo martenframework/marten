@@ -52,10 +52,10 @@ module Marten
                         "LEFT OUTER JOIN"
                       end
 
-          table_name = field.related_model.table_name
+          table_name = field.related_model.db_table
           table_pk = field.related_model.pk_field.id
           column_name = field.db_column
-          parent_table_name = parent.try(&.table_alias) || model.table_name
+          parent_table_name = parent.try(&.table_alias) || model.db_table
 
           sql = "#{statement} #{table_name} #{table_alias} " \
                 "ON (#{parent_table_name}.#{column_name} = #{column_name(table_pk)})"

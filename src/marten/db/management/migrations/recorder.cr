@@ -26,7 +26,7 @@ module Marten
           end
 
           private def record_table_exist?
-            introspector.table_names.includes?(Record.table_name)
+            introspector.table_names.includes?(Record.db_table)
           end
 
           private def schema_editor

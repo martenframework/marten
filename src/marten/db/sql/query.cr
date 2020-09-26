@@ -61,7 +61,7 @@ module Marten
             relation_field_path = field_path.select(&.relation?)
 
             if relation_field_path.empty? || field_path.size == 1
-              column = "#{Model.table_name}.#{field_path[0].db_column}"
+              column = "#{Model.db_table}.#{field_path[0].db_column}"
             else
               join = ensure_join_for_field_path(relation_field_path)
               column = join.not_nil!.column_name(field_path.last.db_column)
@@ -184,7 +184,7 @@ module Marten
         private def columns
           columns = [] of String
 
-          columns += Model.fields.map { |f| "#{Model.table_name}.#{f.db_column}" }
+          columns += Model.fields.map { |f| "#{Model.db_table}.#{f.db_column}" }
 
           @joins.each { |join| columns += join.columns }
 
@@ -330,11 +330,11 @@ module Marten
             raw_value.pk
           end
 
-          predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.table_name : join.table_alias)
+          predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
         end
 
         private def table_name
-          connection.quote(Model.table_name)
+          connection.quote(Model.db_table)
         end
 
         private def verify_field(raw_field, only_relations = false)

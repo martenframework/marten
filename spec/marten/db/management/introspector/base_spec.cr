@@ -16,7 +16,7 @@ describe Marten::DB::Management::Introspector::Base do
 
       introspector = Marten::DB::Management::Introspector.for(connection)
 
-      introspector.table_names.should contain(TestUser.table_name)
+      introspector.table_names.should contain(TestUser.db_table)
       introspector.table_names.should_not contain("unknown_table")
     end
   end

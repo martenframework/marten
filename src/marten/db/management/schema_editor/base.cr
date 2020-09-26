@@ -31,7 +31,7 @@ module Marten
               column_definitions << "#{@connection.quote(field.db_column)} #{column_type}"
             end
 
-            sql = create_table_statement(@connection.quote(model.table_name), column_definitions.join(", "))
+            sql = create_table_statement(@connection.quote(model.db_table), column_definitions.join(", "))
 
             @connection.open do |db|
               db.exec(sql)
@@ -43,15 +43,15 @@ module Marten
               next if !field.db_index? || field.unique?
 
               @deferred_statements << create_index_statement(
-                index_name(model.table_name, [field.db_column]),
-                @connection.quote(model.table_name),
+                index_name(model.db_table, [field.db_column]),
+                @connection.quote(model.db_table),
                 [@connection.quote(field.db_column)]
               )
             end
           end
 
           def delete_model(model : Model.class)
-            sql = delete_table_statement(@connection.quote(model.table_name))
+            sql = delete_table_statement(@connection.quote(model.db_table))
             @connection.open do |db|
               db.exec(sql)
             end

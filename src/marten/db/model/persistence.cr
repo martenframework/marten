@@ -160,7 +160,7 @@ module Marten
             pk_field_to_fetch = nil
           end
 
-          pk = connection.insert(self.class.table_name, values, pk_field_to_fetch: pk_field_to_fetch)
+          pk = connection.insert(self.class.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
 
           self.pk ||= pk
           self.new_record = false
@@ -176,7 +176,7 @@ module Marten
           values.delete(self.class.pk_field.db_column)
 
           connection.update(
-            self.class.table_name,
+            self.class.db_table,
             values,
             pk_column_name: self.class.pk_field.db_column,
             pk_value: pk

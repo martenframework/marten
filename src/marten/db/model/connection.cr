@@ -9,7 +9,7 @@ module Marten
         module ClassMethods
           # Returns the database connection to use for the considered model.
           def connection
-            DB::Connection.for(table_name)
+            DB::Connection.for(db_table)
           end
 
           # Allows to run the underlying block in a database transaction.

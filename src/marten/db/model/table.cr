@@ -6,7 +6,7 @@ module Marten
         annotation FieldInstanceVariable; end
 
         macro included
-          @@table_name : String?
+          @@db_table : String?
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
           @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
           @@relation_fields_per_relation_name : Hash(String, Field::Base) = {} of String => Field::Base
@@ -30,13 +30,13 @@ module Marten
           #
           # Unless explicitely specified, the table name is automatically generated based on the label of the app
           # associated with the considered model and the class name of the model.
-          def table_name
-            @@table_name ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
+          def db_table
+            @@db_table ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
           end
 
           # Allows to explicitely define the name of the table associated with the model.
-          def table_name(table_name : String | Symbol)
-            @@table_name = table_name.to_s
+          def db_table(db_table : String | Symbol)
+            @@db_table = db_table.to_s
           end
 
           # :nodoc:

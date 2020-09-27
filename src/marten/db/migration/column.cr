@@ -18,6 +18,11 @@ module Marten
   module DB
     abstract class Migration
       module Column
+        @@registry = {} of ::String => Base.class
+
+        def self.registry
+          @@registry
+        end
       end
     end
   end

@@ -2,21 +2,16 @@ module Marten
   module DB
     abstract class Migration
       module Operation
-        class CreateModel < Base
-          def initialize(
-            @name : String,
-            @fields : Array(Field::Base),
-            @db_name : String
-          )
+        class CreateTable < Base
+          def initialize(@name : String, @columns : Array(Column::Base))
           end
 
           def state_forward(app_label : String, state : Management::Migrations::ProjectState) : Nil
-            state.add_model(
-              Management::Migrations::ModelState.new(
+            state.add_table(
+              Management::Migrations::TableState.new(
                 app_label,
                 @name,
-                @fields.dup,
-                @db_name
+                @columns.dup
               )
             )
           end

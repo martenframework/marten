@@ -59,6 +59,14 @@ module Marten
         self.class.id
       end
 
+      def mutate_state(project_state : Management::Migrations::ProjectState, preserve = true)
+        new_state = preserve ? project_state : project_state.clone
+        operations.not_nil!.each do |operation|
+          operation.state_forward(self.class.app_config.label, new_state)
+        end
+        new_state
+      end
+
       def operations
       end
     end

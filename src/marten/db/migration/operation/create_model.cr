@@ -6,7 +6,7 @@ module Marten
           def initialize(
             @name : String,
             @fields : Array(Field::Base),
-            @db_name : String,
+            @db_name : String
           )
           end
 

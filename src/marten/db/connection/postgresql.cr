@@ -68,21 +68,21 @@ module Marten
           end
         end
 
-        protected def column_type_for_built_in_field(field_id)
-          BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING[field_id]
+        protected def column_type_for_built_in_column(id)
+          BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
         end
 
-        private BUILT_IN_FIELD_TO_COLUMN_TYPE_MAPPING = {
-          "Marten::DB::Field::Auto"       => "serial",
-          "Marten::DB::Field::BigAuto"    => "bigserial",
-          "Marten::DB::Field::BigInt"     => "bigint",
-          "Marten::DB::Field::Bool"       => "boolean",
-          "Marten::DB::Field::DateTime"   => "timestamp with time zone",
-          "Marten::DB::Field::ForeignKey" => "bigint",
-          "Marten::DB::Field::Int"        => "integer",
-          "Marten::DB::Field::String"     => "varchar(%{max_size})",
-          "Marten::DB::Field::Text"       => "text",
-          "Marten::DB::Field::UUID"       => "uuid",
+        private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
+          "Marten::DB::Migration::Column::Auto"       => "serial",
+          "Marten::DB::Migration::Column::BigAuto"    => "bigserial",
+          "Marten::DB::Migration::Column::BigInt"     => "bigint",
+          "Marten::DB::Migration::Column::Bool"       => "boolean",
+          "Marten::DB::Migration::Column::DateTime"   => "timestamp with time zone",
+          "Marten::DB::Migration::Column::ForeignKey" => "bigint",
+          "Marten::DB::Migration::Column::Int"        => "integer",
+          "Marten::DB::Migration::Column::String"     => "varchar(%{max_size})",
+          "Marten::DB::Migration::Column::Text"       => "text",
+          "Marten::DB::Migration::Column::UUID"       => "uuid",
         }
 
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {

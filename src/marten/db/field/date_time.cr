@@ -2,8 +2,6 @@ module Marten
   module DB
     module Field
       class DateTime < Base
-        include IsBuiltInField
-
         def initialize(
           @id : ::String,
           @primary_key = false,
@@ -32,6 +30,16 @@ module Marten
           if @auto_now || (@auto_now_add && new_record)
             record.set_field_value(id, Time.local)
           end
+        end
+
+        def to_column : Migration::Column::Base
+          Migration::Column::DateTime.new(
+            db_column,
+            primary_key?,
+            null?,
+            unique?,
+            db_index?
+          )
         end
 
         def to_db(value) : ::DB::Any

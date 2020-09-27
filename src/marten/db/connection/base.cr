@@ -14,11 +14,11 @@ module Marten
           @url = build_url
         end
 
-        # Returns the database type for a specific built-in field implementation.
+        # Returns the database type for a specific built-in column implementation.
         #
-        # Note that this method is only used handling column types of Marten built-in types as custom field
-        # implementation must define a `#db_type` method.
-        abstract def column_type_for_built_in_field(field_id)
+        # Note that this method is only used when handling column types of Marten built-in types as custom column
+        # implementations must define a `#db_type` method.
+        abstract def column_type_for_built_in_column(id)
 
         # Allows to insert a new row in a specific table.
         abstract def insert(

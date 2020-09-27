@@ -2,10 +2,18 @@ module Marten
   module DB
     module Field
       class Int < Base
-        include IsBuiltInField
-
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32?
           result_set.read(Int32?)
+        end
+
+        def to_column : Migration::Column::Base
+          Migration::Column::Int.new(
+            db_column,
+            primary_key?,
+            null?,
+            unique?,
+            db_index?
+          )
         end
 
         def to_db(value) : ::DB::Any

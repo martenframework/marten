@@ -2,8 +2,6 @@ module Marten
   module DB
     module Field
       class Text < Base
-        include IsBuiltInField
-
         @max_size : ::Int32?
 
         getter max_size
@@ -24,6 +22,16 @@ module Marten
 
         def from_db_result_set(result_set : ::DB::ResultSet) : ::String?
           result_set.read(::String?)
+        end
+
+        def to_column : Migration::Column::Base
+          Migration::Column::Text.new(
+            db_column,
+            primary_key?,
+            null?,
+            unique?,
+            db_index?
+          )
         end
 
         def to_db(value) : ::DB::Any

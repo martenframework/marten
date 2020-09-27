@@ -26,9 +26,11 @@ module Marten
           def create_model(model : Model.class)
             column_definitions = [] of String
 
-            model.fields.each do |field|
-              column_type = column_sql_for_field(field)
-              column_definitions << "#{@connection.quote(field.db_column)} #{column_type}"
+            columns = model.fields.map(&.to_column)
+
+            columns.each do |column|
+              column_type = column_sql_for(column)
+              column_definitions << "#{@connection.quote(column.name)} #{column_type}"
             end
 
             sql = create_table_statement(@connection.quote(model.db_table), column_definitions.join(", "))
@@ -37,15 +39,15 @@ module Marten
               db.exec(sql)
             end
 
-            # Processes indexes configured as part of specific fields using db_index and the corresponding SQL
-            # statements to the array of deferred SQL statements.
-            model.fields.each do |field|
-              next if !field.db_index? || field.unique?
+            # Forwards indexes configured as part of specific columns and the corresponding SQL statements to the array
+            # of deferred SQL statements.
+            columns.each do |column|
+              next if !column.index? || column.unique?
 
               @deferred_statements << create_index_statement(
-                index_name(model.db_table, [field.db_column]),
+                index_name(model.db_table, [column.name]),
                 @connection.quote(model.db_table),
-                [@connection.quote(field.db_column)]
+                [@connection.quote(column.name)]
               )
             end
           end
@@ -65,14 +67,14 @@ module Marten
             end
           end
 
-          private def column_sql_for_field(field)
-            sql = field.db_type(@connection)
+          private def column_sql_for(column)
+            sql = column.sql_type(@connection)
 
-            sql += field.null? ? " NULL" : " NOT NULL"
+            sql += column.null? ? " NULL" : " NOT NULL"
 
-            if field.primary_key?
+            if column.primary_key?
               sql += " PRIMARY KEY"
-            elsif field.unique?
+            elsif column.unique?
               sql += " UNIQUE"
             end
 

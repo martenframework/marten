@@ -2,8 +2,6 @@ module Marten
   module DB
     module Field
       class String < Base
-        include IsBuiltInField
-
         getter max_size
 
         def initialize(
@@ -22,6 +20,17 @@ module Marten
 
         def from_db_result_set(result_set : ::DB::ResultSet) : ::String?
           result_set.read(::String?)
+        end
+
+        def to_column : Migration::Column::Base
+          Migration::Column::String.new(
+            name: db_column,
+            max_size: max_size,
+            primary_key: primary_key?,
+            null: null?,
+            unique: unique?,
+            index: db_index?,
+          )
         end
 
         def to_db(value) : ::DB::Any
@@ -59,10 +68,6 @@ module Marten
           {% if kwargs.is_a?(NilLiteral) || kwargs[:max_size].is_a?(NilLiteral) %}
             {% raise "String fields must define 'max_size' property" %}
           {% end %}
-        end
-
-        private def db_type_parameters
-          {max_size: max_size}
         end
       end
     end

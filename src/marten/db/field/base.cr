@@ -1,6 +1,7 @@
 module Marten
   module DB
     module Field
+      # Abstract base field implementation.
       abstract class Base
         @primary_key : ::Bool
         @blank : ::Bool
@@ -28,11 +29,11 @@ module Marten
         )
         end
 
-        # Returns the raw type of the column to use for the field at hand and a specific database connection.
-        abstract def db_type(connection : Connection::Base) : ::String
-
         # Extracts the field value from a DB result set and returns the right object corresponding to this value.
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
+
+        # Returns a migration column object corresponding to the field at hand.
+        abstract def to_column : Migration::Column::Base
 
         # Converts the field value to the corresponding DB value.
         abstract def to_db(value) : ::DB::Any

@@ -2,8 +2,6 @@ module Marten
   module DB
     module Field
       class ForeignKey < Base
-        include IsBuiltInField
-
         def initialize(
           @id : ::String,
           @relation_name : ::String,
@@ -21,6 +19,17 @@ module Marten
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
           result_set.read(Int32 | Int64 | Nil)
+        end
+
+        def to_column : Migration::Column::Base
+          Migration::Column::ForeignKey.new(
+            name: db_column,
+            to_table_name: @to.db_table,
+            primary_key: primary_key?,
+            null: null?,
+            unique: unique?,
+            index: db_index?
+          )
         end
 
         def to_db(value) : ::DB::Any

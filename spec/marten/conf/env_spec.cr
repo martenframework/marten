@@ -26,4 +26,10 @@ describe Marten::Conf::Env do
       Marten::Conf::Env.new.id.should eq "test"
     end
   end
+
+  describe "#to_s" do
+    it "returns the environment identifier" do
+      Marten::Conf::Env.new.to_s.should eq "test"
+    end
+  end
 end

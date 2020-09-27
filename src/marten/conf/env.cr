@@ -9,6 +9,10 @@ module Marten
         @id ||= ENV["MARTEN_ENV"]? || "development"
       end
 
+      def to_s(io)
+        io << id
+      end
+
       macro method_missing(call)
         {% if call.name.ends_with?('?') %}
           return self.==("{{ call.name[0..-2] }}")

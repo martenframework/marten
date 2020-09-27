@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::DB::Model::Persistence do
   around_each do |t|
-    schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+    schema_editor = Marten::DB::Connection.default.schema_editor
     schema_editor.create_model(TestUser)
 
     t.run

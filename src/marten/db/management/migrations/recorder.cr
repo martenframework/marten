@@ -18,7 +18,7 @@ module Marten
           end
 
           private def introspector
-            @introspector ||= Introspector.for(@connection).not_nil!
+            @introspector ||= @connection.introspector
           end
 
           private def record_qs
@@ -30,7 +30,7 @@ module Marten
           end
 
           private def schema_editor
-            @schema_editor ||= SchemaEditor.for(@connection).not_nil!
+            @schema_editor ||= @connection.schema_editor
           end
         end
       end

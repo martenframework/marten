@@ -19,6 +19,10 @@ module Marten
           new_record_id
         end
 
+        def introspector : Management::Introspector::Base
+          Management::Introspector::SQLite.new(self)
+        end
+
         def left_operand_for(id : String, _predicate) : String
           id
         end
@@ -33,6 +37,10 @@ module Marten
 
         def quote_char : Char
           '"'
+        end
+
+        def schema_editor : Management::SchemaEditor::Base
+          Management::SchemaEditor::SQLite.new(self)
         end
 
         def scheme : String

@@ -4,6 +4,7 @@ module Marten
   module DB
     abstract class Migration
       include Apps::Association
+      include DSL
 
       macro inherited
         def self.migration_name
@@ -55,6 +56,11 @@ module Marten
         "#{app_label}_#{migration_name}"
       end
 
+      def initialize
+        @operations = [] of Operation::Base
+        @plan_loaded = false
+      end
+
       def id
         self.class.id
       end
@@ -68,6 +74,20 @@ module Marten
       end
 
       def operations
+        load_plan unless plan_loaded?
+        @operations
+      end
+
+      def plan
+      end
+
+      private def load_plan
+        plan
+        @plan_loaded = true
+      end
+
+      private def plan_loaded?
+        @plan_loaded
       end
     end
   end

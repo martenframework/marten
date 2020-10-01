@@ -10,6 +10,7 @@ module Marten
         class Reader
           @migrations_per_app_configs : Hash(Apps::Config, Array(Migration.class))?
 
+          getter applied_migrations
           getter graph
 
           def initialize(@connection : Connection::Base)

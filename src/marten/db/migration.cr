@@ -17,8 +17,18 @@ module Marten
       @@app_config : Marten::Apps::Config?
       @@replacement_ids : Array(String)?
 
+      class_getter atomic : Bool = true
       class_getter depends_on = [] of Tuple(String, String)
       class_getter replaces = [] of Tuple(String, String)
+
+      # Allows to specify whether the whole migration should run inside a single transaction or not.
+      #
+      # By default, for databases that support DDL transactions, each migration will run inside a single transaction.
+      # This can be disabled on a per-migration basis, which can be useful is the migration is intended to affect large
+      # tables or when performing data migrations.
+      def self.atomic(atomic : Bool)
+        @@atomic = atomic
+      end
 
       # Allows to specify the dependencies of the current migration.
       #
@@ -59,6 +69,10 @@ module Marten
       def initialize
         @operations = [] of Operation::Base
         @plan_loaded = false
+      end
+
+      def atomic?
+        self.class.atomic
       end
 
       def id

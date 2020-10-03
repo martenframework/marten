@@ -4,6 +4,10 @@ module Marten
       module Migrations
         # Represents the state of a specific table at a specific step in a migration plan.
         class TableState
+          getter app_label
+          getter columns
+          getter name
+
           # Initializes a table state from a specific model class.
           def self.from_model(model : Model.class)
             new(

@@ -23,17 +23,21 @@ module Marten
           # Returns the SQL statement allowing to delete a database table.
           abstract def delete_table_statement(table_name : String) : String
 
-          def create_model(model : Model.class)
+          # Creates a new table directly from a model class.
+          def create_model(model : Model.class) : Nil
+            create_table(Migrations::TableState.from_model(model))
+          end
+
+          # Creates a new table from a migration table state.
+          def create_table(table : Migrations::TableState) : Nil
             column_definitions = [] of String
 
-            columns = model.fields.map(&.to_column)
-
-            columns.each do |column|
+            table.columns.each do |column|
               column_type = column_sql_for(column)
               column_definitions << "#{@connection.quote(column.name)} #{column_type}"
             end
 
-            sql = create_table_statement(@connection.quote(model.db_table), column_definitions.join(", "))
+            sql = create_table_statement(@connection.quote(table.name), column_definitions.join(", "))
 
             @connection.open do |db|
               db.exec(sql)
@@ -41,19 +45,25 @@ module Marten
 
             # Forwards indexes configured as part of specific columns and the corresponding SQL statements to the array
             # of deferred SQL statements.
-            columns.each do |column|
+            table.columns.each do |column|
               next if !column.index? || column.unique?
 
               @deferred_statements << create_index_statement(
-                index_name(model.db_table, [column.name]),
-                @connection.quote(model.db_table),
+                index_name(table.name, [column.name]),
+                @connection.quote(table.name),
                 [@connection.quote(column.name)]
               )
             end
           end
 
+          # Deletes the table of a specific model.
           def delete_model(model : Model.class)
-            sql = delete_table_statement(@connection.quote(model.db_table))
+            delete_table(Migrations::TableState.from_model(model))
+          end
+
+          # Deletes the table corresponding to a migration table state.
+          def delete_table(table : Migrations::TableState)
+            sql = delete_table_statement(@connection.quote(table.name))
             @connection.open do |db|
               db.exec(sql)
             end

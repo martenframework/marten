@@ -141,8 +141,10 @@ module Marten
           end
         end
 
-        private def print(msg)
-          @stdout.puts(msg.to_s)
+        private def print(msg, ending = "\n")
+          msg = msg.to_s
+          msg += ending if ending && !msg.ends_with?(ending)
+          @stdout.print(msg)
         end
 
         private def print_error(msg)

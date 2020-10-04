@@ -21,6 +21,8 @@ module Marten
 
           private def build_graph
             recorder = Recorder.new(@connection)
+            recorder.setup
+
             defined_migrations = {} of String => Migration
             replacements = {} of String => Migration
 

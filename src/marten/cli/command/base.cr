@@ -155,8 +155,11 @@ module Marten
           exit(exit_code)
         end
 
-        private def style(msg, fore = nil)
-          msg.colorize.toggle(color).fore(fore).to_s
+        private def style(msg, fore = nil, mode = nil)
+          output = msg.colorize.toggle(color)
+          output.fore(fore) unless fore.nil?
+          output.mode(mode) unless mode.nil?
+          output.to_s
         end
       end
     end

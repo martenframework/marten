@@ -19,6 +19,20 @@ module Marten
             build_graph
           end
 
+          # Returns a migration class for a specific app config and migration name.
+          def get_migration(app_config : Apps::Config, migration_name : String) : Migration.class
+            results = [] of Migration.class
+            migrations_per_app_configs[app_config].each do |migration_klass|
+              next unless migration_klass.migration_name.starts_with?(migration_name)
+              results << migration_klass
+            end
+            results[0]
+          rescue IndexError | KeyError
+            raise Errors::MigrationNotFound.new(
+              "No migration '#{migration_name}' associated with app '#{app_config.label}'"
+            )
+          end
+
           private def build_graph
             recorder = Recorder.new(@connection)
             recorder.setup

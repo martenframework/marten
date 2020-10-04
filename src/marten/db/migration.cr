@@ -71,6 +71,19 @@ module Marten
         @plan_loaded = false
       end
 
+      def apply_forward(
+        project_state : Management::Migrations::ProjectState,
+        schema_editor : Management::SchemaEditor::Base
+      )
+        operations.not_nil!.each do |operation|
+          old_state = project_state.clone
+          operation.mutate_state_forward(self.class.app_config.label, project_state)
+          operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
+        end
+
+        project_state
+      end
+
       def atomic?
         self.class.atomic
       end
@@ -82,8 +95,9 @@ module Marten
       def mutate_state(project_state : Management::Migrations::ProjectState, preserve = true)
         new_state = preserve ? project_state.clone : project_state
         operations.not_nil!.each do |operation|
-          operation.state_forward(self.class.app_config.label, new_state)
+          operation.mutate_state_forward(self.class.app_config.label, new_state)
         end
+
         new_state
       end
 

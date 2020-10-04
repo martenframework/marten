@@ -9,12 +9,23 @@ module Marten
           def initialize(@connection : Connection::Base)
           end
 
-          def setup
-            schema_editor.create_model(Record) unless record_table_exist?
+          def setup : Nil
+            return if record_table_exist?
+            schema_editor.create_table(
+              TableState.new(app_label: "marten", name: Record.db_table, columns: Record.fields.map(&.to_column))
+            )
           end
 
           def applied_migrations
             record_qs
+          end
+
+          def record(migration : Migration)
+            record(migration.class.app_config.label, migration.class.migration_name)
+          end
+
+          def record(app_label : String, name : String)
+            record_qs.create!(app: app_label, name: name)
           end
 
           private def introspector

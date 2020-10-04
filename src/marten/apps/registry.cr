@@ -11,6 +11,15 @@ module Marten
         @app_configs.values
       end
 
+      # Returns the app config instance for the passed app label.
+      #
+      # Raises `Marten::Apps::Errors::AppNotFound` if the app config cannot be found.
+      def get(label : String)
+        @app_configs.fetch(label) do
+          raise Errors::AppNotFound.new("Label '#{label}' is not associated with any installed apps")
+        end
+      end
+
       # Returns the application config object contaning the passed class.
       def get_containing(klass)
         candidates = [] of Config

@@ -18,6 +18,24 @@ describe Marten::Apps::Registry do
     end
   end
 
+  describe "#get" do
+    it "returns the registered app corresponding to the passed app label" do
+      registry = Marten::Apps::Registry.new
+      registry.populate([Marten::Apps::RegistrySpec::Test1Config])
+      registry.get("test_a").should be_a Marten::Apps::RegistrySpec::Test1Config
+    end
+
+    it "raises if the app label does not correspond to any registered apps" do
+      registry = Marten::Apps::Registry.new
+      expect_raises(
+        Marten::Apps::Errors::AppNotFound,
+        "Label 'unknown' is not associated with any installed apps"
+      ) do
+        registry.get("unknown")
+      end
+    end
+  end
+
   describe "#populate" do
     it "allows to populate a list of registered app configs" do
       registry = Marten::Apps::Registry.new

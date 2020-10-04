@@ -32,6 +32,11 @@ module Marten
             end
           end
 
+          # Returns the node associated with a given migration ID.
+          def find_node(id : String)
+            @nodes[id]
+          end
+
           # Return the leaves of the graph.
           #
           # Leaves correspond to migration nodes that don't have any child (that is no other migrations depend on them).

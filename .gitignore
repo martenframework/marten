@@ -3,6 +3,9 @@
 /bin/
 /docs/
 /example_project/
+/example_projects/
+/test_project/
+/test_projects/
 /lib/
 /.shards/
 /coverage/

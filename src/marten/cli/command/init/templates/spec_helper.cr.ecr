@@ -1,0 +1,8 @@
+ENV["MARTEN_ENV"] = "test"
+
+require "spec"
+require "marten"
+
+require "../src/project"
+
+Spec.before_suite &->Marten.setup

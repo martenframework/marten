@@ -1,4 +1,5 @@
 require "colorize"
+require "ecr"
 require "option_parser"
 
 require "./cli/**"

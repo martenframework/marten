@@ -1,0 +1,10 @@
+Marten.configure do |config|
+  config.secret_key = "notsecure"
+
+  # config.installed_apps = []
+
+  config.database do |db|
+    db.backend = :sqlite
+    db.name = Path["<%= @context.name %>.db"].expand
+  end
+end

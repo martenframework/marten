@@ -69,6 +69,21 @@ module Marten
             end
           end
 
+          # Syncs all models for the current database connection.
+          #
+          # Every model whose table is not yet created will be created at the database level. This method should not be
+          # used on production databases (those are likely to be mutated using migrations), but this can be usefull when
+          # initializing a database for the first time in development or when running tests.
+          def sync_models
+            table_names = @connection.introspector.table_names
+            Marten.apps.app_configs.each do |app|
+              app.models.each do |model|
+                next if table_names.includes?(model.db_table)
+                create_model(model)
+              end
+            end
+          end
+
           protected def execute_deferred_statements
             @deferred_statements.each do |sql|
               @connection.open do |db|

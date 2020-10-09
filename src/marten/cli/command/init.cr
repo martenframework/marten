@@ -39,7 +39,10 @@ module Marten
           context.dir = (@dir.nil? || @dir.not_nil!.empty?) ? @name.not_nil! : @dir.not_nil!
 
           self.class.templates.each do |template_klass|
-            template_klass.new(context).render
+            tpl = template_klass.new(context)
+            print("  › Creating #{style(tpl.path, mode: :dim)}...", ending: "")
+            tpl.render
+            print(style(" DONE", fore: :light_green, mode: :bold))
           end
         end
 

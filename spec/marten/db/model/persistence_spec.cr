@@ -1,15 +1,6 @@
 require "./spec_helper"
 
 describe Marten::DB::Model::Persistence do
-  around_each do |t|
-    schema_editor = Marten::DB::Connection.default.schema_editor
-    schema_editor.create_model(TestUser)
-
-    t.run
-
-    schema_editor.delete_model(TestUser)
-  end
-
   describe "::create" do
     it "returns the non-persisted model instance if it is invalid" do
       object = TestUser.create(username: nil)

@@ -22,6 +22,12 @@ module Marten
         get(DEFAULT_CONNECTION_NAME)
       end
 
+      # Returns the connection to use for the passed `table_name`.
+      def self.for(table_name)
+        # TODO: implement mechanism like a database router allowing to pick a connection based on the table name.
+        default
+      end
+
       # Returns the database connection configured for a given `db_alias`.
       #
       # If no database connection can be found, a `Marten::DB::Errors::UnknownConnection` exception is raised.
@@ -31,13 +37,7 @@ module Marten
         raise Errors::UnknownConnection.new("Unknown database connection '#{db_alias}'")
       end
 
-      # Returns the connection to use for the passed `table_name`.
-      def self.for(table_name)
-        # TODO: implement mechanism like a database router allowing to pick a connection based on the table name.
-        default
-      end
-
-      private def self.registry
+      protected def self.registry
         @@registry
       end
     end

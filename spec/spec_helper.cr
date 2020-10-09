@@ -7,6 +7,6 @@ require "sqlite3"
 
 require "../src/marten"
 require "../src/marten/cli"
-require "./test_project"
+require "../src/marten/spec"
 
-Spec.before_suite &->Marten.setup
+require "./test_project"

@@ -2,14 +2,6 @@ module Marten
   module DB
     module Connection
       class PostgreSQL < Base
-        def column_type_for_built_in_column(id)
-          BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
-        end
-
-        def column_type_suffix_for_built_in_column(id)
-          nil
-        end
-
         def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : Int64?
           column_names = values.keys.map { |column_name| "#{quote(column_name)}" }.join(", ")
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
@@ -75,19 +67,6 @@ module Marten
             db.exec(statement, args: values.values + [pk_value])
           end
         end
-
-        private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-          "Marten::DB::Migration::Column::Auto"       => "serial",
-          "Marten::DB::Migration::Column::BigAuto"    => "bigserial",
-          "Marten::DB::Migration::Column::BigInt"     => "bigint",
-          "Marten::DB::Migration::Column::Bool"       => "boolean",
-          "Marten::DB::Migration::Column::DateTime"   => "timestamp with time zone",
-          "Marten::DB::Migration::Column::ForeignKey" => "bigint",
-          "Marten::DB::Migration::Column::Int"        => "integer",
-          "Marten::DB::Migration::Column::String"     => "varchar(%{max_size})",
-          "Marten::DB::Migration::Column::Text"       => "text",
-          "Marten::DB::Migration::Column::UUID"       => "uuid",
-        }
 
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
           "icontains"   => "UPPER(%s)",

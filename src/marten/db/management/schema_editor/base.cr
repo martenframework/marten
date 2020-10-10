@@ -11,6 +11,17 @@ module Marten
             @deferred_statements = [] of String
           end
 
+          # Returns the database type for a specific built-in column implementation.
+          #
+          # Note that this method is only used when handling column types of Marten built-in types as custom column
+          # implementations must define a `#db_type` method.
+          abstract def column_type_for_built_in_column(id)
+
+          # Returns the database type suffix for a specific built-in column implementation.
+          #
+          # Note that this method is only used when handling column types of Marten built-in types.
+          abstract def column_type_suffix_for_built_in_column(id)
+
           # Returns the SQL statement allowing to create a database index.
           abstract def create_index_statement(name : String, table_name : String, columns : Array(String)) : String
 

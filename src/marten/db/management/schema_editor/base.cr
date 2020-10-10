@@ -74,7 +74,7 @@ module Marten
           # Every model whose table is not yet created will be created at the database level. This method should not be
           # used on production databases (those are likely to be mutated using migrations), but this can be usefull when
           # initializing a database for the first time in development or when running tests.
-          def sync_models
+          def sync_models : Nil
             table_names = @connection.introspector.table_names
             Marten.apps.app_configs.each do |app|
               app.models.each do |model|
@@ -94,6 +94,7 @@ module Marten
 
           private def column_sql_for(column)
             sql = column.sql_type(@connection)
+            suffix = column.sql_type_suffix(@connection)
 
             sql += column.null? ? " NULL" : " NOT NULL"
 
@@ -102,6 +103,8 @@ module Marten
             elsif column.unique?
               sql += " UNIQUE"
             end
+
+            sql += " #{suffix}" unless suffix.nil?
 
             sql
           end

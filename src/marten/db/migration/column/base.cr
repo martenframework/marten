@@ -33,6 +33,11 @@ module Marten
             @primary_key
           end
 
+          # Returns the raw type suffix of the column to use for the column at hand and a specific database connection.
+          def sql_type_suffix(connection : Connection::Base) : ::String?
+            nil
+          end
+
           # Returns a boolean indicating whether the column value should be unique throughout the associated table.
           def unique?
             @unique

@@ -2,6 +2,14 @@ module Marten
   module DB
     module Connection
       class PostgreSQL < Base
+        def column_type_for_built_in_column(id)
+          BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
+        end
+
+        def column_type_suffix_for_built_in_column(id)
+          nil
+        end
+
         def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : Int64?
           column_names = values.keys.map { |column_name| "#{quote(column_name)}" }.join(", ")
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
@@ -66,10 +74,6 @@ module Marten
           open do |db|
             db.exec(statement, args: values.values + [pk_value])
           end
-        end
-
-        protected def column_type_for_built_in_column(id)
-          BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
         end
 
         private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {

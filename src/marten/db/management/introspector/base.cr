@@ -8,6 +8,20 @@ module Marten
 
           abstract def list_table_names_statement : String
 
+          # Returns all the table names associated with models of the installed applications only.
+          def model_table_names
+            table_names = [] of String
+
+            Marten.apps.app_configs.each do |app_config|
+              app_config.models.each do |model|
+                table_names << model.db_table
+              end
+            end
+
+            table_names
+          end
+
+          # Returns all the tables names in the considered database.
           def table_names
             names = [] of String
 

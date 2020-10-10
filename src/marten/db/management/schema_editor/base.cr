@@ -7,6 +7,8 @@ module Marten
         # The database schema editor is used in the context of DB management in order to perform operation on models:
         # create / delete models, add new fields, etc. It's heavily used by the migrations mechanism.
         abstract class Base
+          delegate quote, to: @connection
+
           def initialize(@connection : Connection::Base)
             @deferred_statements = [] of String
           end
@@ -48,10 +50,10 @@ module Marten
 
             table.columns.each do |column|
               column_type = column_sql_for(column)
-              column_definitions << "#{@connection.quote(column.name)} #{column_type}"
+              column_definitions << "#{quote(column.name)} #{column_type}"
             end
 
-            sql = create_table_statement(@connection.quote(table.name), column_definitions.join(", "))
+            sql = create_table_statement(quote(table.name), column_definitions.join(", "))
 
             @connection.open do |db|
               db.exec(sql)
@@ -64,8 +66,8 @@ module Marten
 
               @deferred_statements << create_index_statement(
                 index_name(table.name, [column.name]),
-                @connection.quote(table.name),
-                [@connection.quote(column.name)]
+                quote(table.name),
+                [quote(column.name)]
               )
             end
           end
@@ -77,7 +79,7 @@ module Marten
 
           # Deletes the table corresponding to a migration table state.
           def delete_table(table : Migrations::TableState)
-            sql = delete_table_statement(@connection.quote(table.name))
+            sql = delete_table_statement(quote(table.name))
             @connection.open do |db|
               db.exec(sql)
             end
@@ -85,7 +87,7 @@ module Marten
 
           # Flushes all model tables.
           def flush_model_tables : Nil
-            table_names = @connection.introspector.model_table_names.map { |n| @connection.quote(n) }
+            table_names = @connection.introspector.model_table_names.map { |n| quote(n) }
             flush_statements = flush_tables_statements(table_names)
             @connection.open do |db|
               flush_statements.each do |sql|

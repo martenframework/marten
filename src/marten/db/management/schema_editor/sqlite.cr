@@ -36,9 +36,9 @@ module Marten
 
             # Add a statement to reset table sequences.
             statements <<
-              "UPDATE #{@connection.quote("sqlite_sequence")} " \
-              "SET #{@connection.quote("seq")} = 0 " \
-              "WHERE #{@connection.quote("name")} IN (#{table_names.join(", ")})"
+              "UPDATE #{quote("sqlite_sequence")} " \
+              "SET #{quote("seq")} = 0 " \
+              "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
 
             statements
           end

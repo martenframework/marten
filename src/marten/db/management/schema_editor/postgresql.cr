@@ -18,6 +18,10 @@ module Marten
           def delete_table_statement(table_name : String) : String
             "DROP TABLE #{table_name} CASCADE"
           end
+
+          def flush_tables_statements(table_names : Array(String)) : Array(String)
+            ["TRUNCATE #{table_names.join(", ")} RESTART IDENTITY;"]
+          end
         end
       end
     end

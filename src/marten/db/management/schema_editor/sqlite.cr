@@ -18,6 +18,22 @@ module Marten
           def delete_table_statement(table_name : String) : String
             "DROP TABLE #{table_name}"
           end
+
+          def flush_tables_statements(table_names : Array(String)) : Array(String)
+            statements = [] of String
+
+            table_names.each do |table_name|
+              statements << "DELETE FROM #{table_name}"
+            end
+
+            # Add a statement to reset table sequences.
+            statements <<
+              "UPDATE #{@connection.quote("sqlite_sequence")} " \
+              "SET #{@connection.quote("seq")} = 0 " \
+              "WHERE #{@connection.quote("name")} IN (#{table_names.join(", ")})"
+
+            statements
+          end
         end
       end
     end

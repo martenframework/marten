@@ -23,6 +23,9 @@ module Marten
           # Returns the SQL statement allowing to delete a database table.
           abstract def delete_table_statement(table_name : String) : String
 
+          # Returns the SQL statements allowing to flush the passed database tables.
+          abstract def flush_tables_statements(table_names : Array(String)) : Array(String)
+
           # Creates a new table directly from a model class.
           def create_model(model : Model.class) : Nil
             create_table(Migrations::TableState.from_model(model))
@@ -66,6 +69,17 @@ module Marten
             sql = delete_table_statement(@connection.quote(table.name))
             @connection.open do |db|
               db.exec(sql)
+            end
+          end
+
+          # Flushes all model tables.
+          def flush_model_tables : Nil
+            table_names = @connection.introspector.model_table_names.map { |n| @connection.quote(n) }
+            flush_statements = flush_tables_statements(table_names)
+            @connection.open do |db|
+              flush_statements.each do |sql|
+                db.exec(sql)
+              end
             end
           end
 

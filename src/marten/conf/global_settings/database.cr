@@ -6,8 +6,10 @@ module Marten
         @backend : String?
         @host : String?
         @name : String?
+        @name_set_with_env : String?
         @password : String?
         @port : Int32?
+        @target_env : String?
         @user : String?
 
         getter id
@@ -31,6 +33,7 @@ module Marten
 
         def name=(val : Path | String | Symbol)
           @name = val.to_s
+          @name_set_with_env = @target_env
         end
 
         def password=(val : String | Symbol)
@@ -54,6 +57,16 @@ module Marten
           end
 
           raise_invalid_config("missing database name") if name.to_s.empty?
+        end
+
+        protected getter name_set_with_env
+
+        protected def with_target_env(target_env : String?)
+          current_target_env = @target_env
+          @target_env = target_env
+          yield self
+        ensure
+          @target_env = current_target_env
         end
 
         private def raise_invalid_config(msg)

@@ -5,6 +5,7 @@ module Marten
       @@registered_settings_namespaces = [] of String
 
       @request_max_parameters : Nil | Int32
+      @target_env : String?
       @view400 : Views::Base.class
       @view403 : Views::Base.class
       @view404 : Views::Base.class
@@ -149,7 +150,7 @@ module Marten
         db_config = @databases.find { |d| d.id.to_s == id.to_s }
         not_yet_defined = db_config.nil?
         db_config = Database.new(id.to_s) if db_config.nil?
-        yield db_config.not_nil!
+        db_config.not_nil!.with_target_env(@target_env) { |db_config_with_target_env| yield db_config_with_target_env }
         @databases << db_config if not_yet_defined
       end
 
@@ -167,6 +168,14 @@ module Marten
       protected def setup
         setup_log_backend
         setup_db_connections
+      end
+
+      protected def with_target_env(target_env : String?)
+        current_target_env = @target_env
+        @target_env = target_env
+        yield self
+      ensure
+        @target_env = current_target_env
       end
 
       private def setup_log_backend

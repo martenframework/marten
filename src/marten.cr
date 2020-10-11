@@ -49,7 +49,7 @@ module Marten
 
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
-    yield settings
+    settings.with_target_env(env.try(&.to_s)) { |settings_with_target_env| yield settings_with_target_env }
   end
 
   def self.apps

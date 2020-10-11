@@ -37,7 +37,7 @@ module Marten
         raise Errors::UnknownConnection.new("Unknown database connection '#{db_alias}'")
       end
 
-      protected def self.registry
+      def self.registry
         @@registry
       end
     end

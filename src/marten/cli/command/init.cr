@@ -66,6 +66,7 @@ module Marten
         template "config_settings_base.cr.ecr", "config/settings/base.cr"
         template "config_settings_development.cr.ecr", "config/settings/development.cr"
         template "config_settings_production.cr.ecr", "config/settings/production.cr"
+        template "config_settings_test.cr.ecr", "config/settings/test.cr"
 
         template "spec_helper.cr.ecr", "spec/spec_helper.cr"
 

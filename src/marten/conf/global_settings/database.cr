@@ -20,6 +20,9 @@ module Marten
         getter port
         getter user
 
+        # :nodoc:
+        getter name_set_with_env
+
         def initialize(@id : String)
         end
 
@@ -59,9 +62,8 @@ module Marten
           raise_invalid_config("missing database name") if name.to_s.empty?
         end
 
-        protected getter name_set_with_env
-
-        protected def with_target_env(target_env : String?)
+        # :nodoc:
+        def with_target_env(target_env : String?)
           current_target_env = @target_env
           @target_env = target_env
           yield self

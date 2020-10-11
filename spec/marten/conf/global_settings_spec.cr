@@ -414,9 +414,33 @@ describe Marten::Conf::GlobalSettings do
       global_settings.view500.should eq Marten::Conf::GlobalSettingsSpec::TestView
     end
   end
+
+  describe "#with_target_env" do
+    it "allows to temporarily persist the configured env" do
+      settings = Marten::Conf::GlobalSettingsSpec::TestGlobalSettings.new
+
+      settings.target_env.should be_nil
+
+      settings.with_target_env("test") do |s1|
+        s1.target_env.should eq "test"
+
+        s1.with_target_env("production") do |s2|
+          s2.target_env.should eq "production"
+        end
+
+        s1.target_env.should eq "test"
+      end
+
+      settings.target_env.should be_nil
+    end
+  end
 end
 
 module Marten::Conf::GlobalSettingsSpec
+  class TestGlobalSettings < Marten::Conf::GlobalSettings
+    getter target_env
+  end
+
   class TestAppConfig < Marten::Apps::Config
     label :test
   end

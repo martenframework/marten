@@ -232,4 +232,46 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_2.validate.should be_nil
     end
   end
+
+  describe "#with_target_env" do
+    it "allows to temporarily persist the configured env" do
+      db_config = Marten::Conf::GlobalSettings::DatabaseSpec::TestDatabase.new("default")
+
+      db_config.target_env.should be_nil
+
+      db_config.with_target_env("test") do |c1|
+        c1.target_env.should eq "test"
+
+        c1.with_target_env("production") do |c2|
+          c2.target_env.should eq "production"
+        end
+
+        c1.target_env.should eq "test"
+      end
+
+      db_config.target_env.should be_nil
+    end
+  end
+
+  describe "#name_set_with_env" do
+    it "returns nil by default" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.name = "test"
+      db_config.name_set_with_env.should be_nil
+    end
+
+    it "returns the current env targetted when setting the DB name" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.with_target_env("test") do |c|
+        c.name = "test_db"
+      end
+      db_config.name_set_with_env.should eq "test"
+    end
+  end
+end
+
+module Marten::Conf::GlobalSettings::DatabaseSpec
+  class TestDatabase < Marten::Conf::GlobalSettings::Database
+    getter target_env
+  end
 end

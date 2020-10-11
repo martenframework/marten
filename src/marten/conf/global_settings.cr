@@ -165,17 +165,18 @@ module Marten
         @log_backend = log_backend
       end
 
-      protected def setup
-        setup_log_backend
-        setup_db_connections
-      end
-
-      protected def with_target_env(target_env : String?)
+      # :nodoc:
+      def with_target_env(target_env : String?)
         current_target_env = @target_env
         @target_env = target_env
         yield self
       ensure
         @target_env = current_target_env
+      end
+
+      protected def setup
+        setup_log_backend
+        setup_db_connections
       end
 
       private def setup_log_backend

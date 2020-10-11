@@ -1,12 +1,15 @@
 module Marten
   module Conf
     class Env
+      DEVELOPMENT = "development"
+      TEST        = "test"
+
       def ==(value : String) : Bool
         id == value
       end
 
       def id
-        @id ||= ENV["MARTEN_ENV"]? || "development"
+        @id ||= ENV["MARTEN_ENV"]? || DEVELOPMENT
       end
 
       def to_s(io)

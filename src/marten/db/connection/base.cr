@@ -97,6 +97,14 @@ module Marten
           "#{quote_char}#{name}#{quote_char}"
         end
 
+        # Returns true if the current database was explicitly configured for the test environment.
+        #
+        # The only way this method can return true is when the database name was explicitly set in a configuration
+        # targetting the test environment.
+        def test_database?
+          @config.name_set_with_env == Conf::Env::TEST
+        end
+
         protected def build_url
           parts = [] of String?
 

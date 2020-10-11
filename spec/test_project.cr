@@ -8,7 +8,7 @@ else
   env_settings = Hash(String, Int32 | String).new
 end
 
-Marten.configure do |config|
+Marten.configure :test do |config|
   config.secret_key = "dummy"
 
   config.installed_apps = [

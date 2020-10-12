@@ -39,13 +39,7 @@ module Marten
 
           private def execute_backward(plan, full_plan)
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
-
-            # Create a project state corresponding up to the already applied migrations only.
-            state = ProjectState.new
-            full_plan.map(&.first).each do |migration|
-              next unless @reader.applied_migrations.has_key?(migration.id)
-              migration.mutate_state(state, preserve: false)
-            end
+            state = generate_current_project_state(full_plan)
 
             full_plan.map(&.first).each do |migration|
               break if migration_ids_to_unapply.empty?
@@ -62,13 +56,7 @@ module Marten
 
           private def execute_forward(plan, full_plan)
             migration_ids_to_apply = plan.map { |m, _d| m.id }
-
-            # Create a project state corresponding up to the already applied migrations only.
-            state = ProjectState.new
-            full_plan.map(&.first).each do |migration|
-              next unless @reader.applied_migrations.has_key?(migration.id)
-              migration.mutate_state(state, preserve: false)
-            end
+            state = generate_current_project_state(full_plan)
 
             full_plan.map(&.first).each do |migration|
               break if migration_ids_to_apply.empty?
@@ -94,6 +82,16 @@ module Marten
             else
               @reader.graph.leaves
             end
+          end
+
+          private def generate_current_project_state(full_plan)
+            # Create a project state corresponding up to the already applied migrations only.
+            state = ProjectState.new
+            full_plan.map(&.first).each do |migration|
+              next unless @reader.applied_migrations.has_key?(migration.id)
+              migration.mutate_state_forward(state, preserve: false)
+            end
+            state
           end
 
           private def generate_plan(targets, full = false)

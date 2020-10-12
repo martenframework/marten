@@ -170,7 +170,7 @@ module Marten
             end
 
             plan.each do |migration|
-              project_state = migration.mutate_state(project_state, preserve: false)
+              project_state = migration.mutate_state_forward(project_state, preserve: false)
             end
 
             project_state

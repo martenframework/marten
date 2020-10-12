@@ -102,6 +102,8 @@ module Marten
 
             targets.each do |target|
               if target.is_a?(PreInitialNode)
+                # In this case all the migrations within the considered app will be unapplied (including the first or
+                # initial one). So we need to add all its dependents to the migration plan.
                 @reader.graph.roots.select { |n| n.migration.class.app_config.label == target.app_label }.each do |root|
                   @reader.graph.path_backward(root).each do |node|
                     next unless applied_migrations.has_key?(node.migration.id)

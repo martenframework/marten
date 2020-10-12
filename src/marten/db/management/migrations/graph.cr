@@ -68,6 +68,18 @@ module Marten
             path.map { |id| @nodes[id] }
           end
 
+          # Return the roots of the graph.
+          #
+          # Roots correspond to migration nodes that don't have any dependencies inside their app.
+          def roots
+            roots = Set(Node).new
+            @nodes.values.each do |node|
+              next unless node.parents.all? { |n| n.migration.class.app_config != node.migration.class.app_config }
+              roots << node
+            end
+            roots.to_a.sort { |n1, n2| n1.migration.id <=> n2.migration.id }
+          end
+
           # Setup a replacement migration.
           #
           # From a `Marten::DB::Migration` object defining replacements, this method ensures that all the "replaced"

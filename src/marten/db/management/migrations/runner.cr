@@ -3,7 +3,7 @@ module Marten
     module Management
       module Migrations
         class Runner
-          PRE_FIRST_MIGRATION_ID = "zero"
+          PRE_INITIAL_MIGRATION_ID = "zero"
 
           def initialize(@connection : Connection::Base)
             @reader = Reader.new(@connection)
@@ -86,7 +86,7 @@ module Marten
           private def find_targets(app_config, migration_name)
             if !app_config.nil? && migration_name.nil?
               @reader.graph.leaves.select { |n| n.migration.class.app_config == app_config }
-            elsif !app_config.nil? && migration_name == PRE_FIRST_MIGRATION_ID
+            elsif !app_config.nil? && migration_name == PRE_INITIAL_MIGRATION_ID
               [PreInitialNode.new(app_config.label)]
             elsif !app_config.nil? && !migration_name.nil?
               migration_klass = @reader.get_migration(app_config, migration_name)

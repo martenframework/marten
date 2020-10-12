@@ -28,6 +28,14 @@ module Marten
             record_qs.create!(app: app_label, name: name)
           end
 
+          def unrecord(migration : Migration)
+            unrecord(migration.class.app_config.label, migration.class.migration_name)
+          end
+
+          def unrecord(app_label : String, name : String)
+            record_qs.filter(app: app_label, name: name).delete(raw: true)
+          end
+
           private def introspector
             @introspector ||= @connection.introspector
           end

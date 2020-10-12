@@ -34,6 +34,11 @@ module Marten
             @tables[table_id(table)] = table
           end
 
+          # Deletes a table state from the current project state.
+          def delete_table(app_label : String, name : String) : Nil
+            @tables.delete(table_id(app_label, name))
+          end
+
           # Returns the table state corresponding to the passed app label and table name.
           def get_table(app_label : String, name : String) : TableState
             @tables[table_id(app_label, name)]

@@ -6,6 +6,16 @@ module Marten
           def initialize(@name : String, @columns : Array(Column::Base))
           end
 
+          def mutate_db_backward(
+            app_label : String,
+            schema_editor : Management::SchemaEditor::Base,
+            from_state : Management::Migrations::ProjectState,
+            to_state : Management::Migrations::ProjectState
+          ) : Nil
+            table = from_state.get_table(app_label, @name)
+            schema_editor.delete_table(table)
+          end
+
           def mutate_db_forward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
@@ -14,6 +24,10 @@ module Marten
           ) : Nil
             table = to_state.get_table(app_label, @name)
             schema_editor.create_table(table)
+          end
+
+          def mutate_state_backward(app_label : String, state : Management::Migrations::ProjectState) : Nil
+            state.delete_table(app_label, @name)
           end
 
           def mutate_state_forward(app_label : String, state : Management::Migrations::ProjectState) : Nil

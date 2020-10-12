@@ -71,6 +71,19 @@ module Marten
         @plan_loaded = false
       end
 
+      def apply_backward(
+        project_state : Management::Migrations::ProjectState,
+        schema_editor : Management::SchemaEditor::Base
+      )
+        operations.not_nil!.each do |operation|
+          old_state = project_state.clone
+          operation.mutate_state_backward(self.class.app_config.label, project_state)
+          operation.mutate_db_backward(self.class.app_config.label, schema_editor, old_state, project_state)
+        end
+
+        project_state
+      end
+
       def apply_forward(
         project_state : Management::Migrations::ProjectState,
         schema_editor : Management::SchemaEditor::Base

@@ -135,4 +135,17 @@ describe Marten::DB::Model::Persistence do
       object.new_record?.should be_false
     end
   end
+
+  describe "#new_record?" do
+    it "returns true if the record does not exist in the database yet" do
+      object = TestUser.new(username: "foobar")
+      object.new_record?.should be_true
+    end
+
+    it "returns false for an existing record" do
+      TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object = TestUser.get!(username: "jd")
+      object.new_record?.should be_false
+    end
+  end
 end

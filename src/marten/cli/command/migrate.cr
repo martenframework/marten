@@ -11,7 +11,8 @@ module Marten
           on_argument(:app_label, "The name of an application to run migrations for") { |v| @app_label = v }
           on_argument(
             :migration,
-            "A migration target (name or number, such as '0001') up to which the DB should be migrated"
+            "A migration target (name or number, such as '0001') up to which the DB should be migrated. " \
+            "Use 'zero' to unapply all the migrations of a specific application"
           ) { |v| @migration = v }
         end
 

@@ -73,6 +73,14 @@ module Marten
           @order_clauses = order_clauses
         end
 
+        def raw_delete
+          sql, parameters = build_delete_query
+          connection.open do |db|
+            result = db.exec(sql, args: parameters)
+            result.rows_affected
+          end
+        end
+
         def slice(from, size = nil)
           # "from' is always relative to the currently set offset, while "from" + "limit" must not go further than the
           # currently set @offset + @limit for consistency reasons.
@@ -125,8 +133,16 @@ module Marten
           cloned
         end
 
+        protected def joins?
+          !@joins.empty?
+        end
+
         protected def ordered?
           !@order_clauses.empty?
+        end
+
+        protected def sliced?
+          !(@limit.nil? && @offset.nil?)
         end
 
         private def build_count_query
@@ -139,6 +155,19 @@ module Marten
             s << where
             s << "LIMIT #{@limit}" unless @limit.nil?
             s << "OFFSET #{@offset}" unless @offset.nil?
+          end
+
+          {sql, parameters}
+        end
+
+        private def build_delete_query
+          where, parameters = where_clause_and_parameters
+
+          sql = build_sql do |s|
+            s << "DELETE"
+            s << "FROM #{table_name}"
+            s << @joins.map(&.to_sql).join(" ")
+            s << where
           end
 
           {sql, parameters}

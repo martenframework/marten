@@ -103,6 +103,24 @@ module Marten
         object
       end
 
+      # Deletes the records corresponding to the current queryset and returns the number of deleted records.
+      #
+      # By default, related objects will be deleted by following the deletion strategy defined in each foreign key field
+      # if applicable, unless the `raw` argument is set to `true`.
+      #
+      # When the `raw` argument is set to `true`, a raw SQL delete statement will be used to delete all the records
+      # matching the currently applied filters. Note that using this option could cause errors if the underlying
+      # database enforces referential integrity.
+      def delete(raw : Bool = false) : Int64
+        raise Errors::UnmetQuerySetCondition.new("Delete with sliced queries is not supported") if query.sliced?
+        raise Errors::UnmetQuerySetCondition.new("Delete with joins is not supported") if query.joins?
+
+        raise NotImplementedError.new("Default #delete behaviour is not yet implemented.") unless raw
+
+        qs = clone
+        qs.query.raw_delete
+      end
+
       def exclude(**kwargs)
         exclude(QueryNode(Model).new(**kwargs))
       end

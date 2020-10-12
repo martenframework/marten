@@ -32,6 +32,10 @@ module Marten
 
       # Represents an error raised when an inexistent predicate is requested for a specific query.
       class UnknownPredicate < Exception; end
+
+      # Represents an error raised when a condition is not met on a particular query set in order to perform a specific
+      # operation.
+      class UnmetQuerySetCondition < Exception; end
     end
   end
 end

@@ -18,14 +18,26 @@ Marten.configure :test do |config|
   {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
     config.database do |db|
       db.backend = :postgresql
-      db.name = env_settings["POSTGRESQL_DB_NAME"].as(String)
+      db.name = env_settings["POSTGRESQL_DEFAULT_DB_NAME"].as(String)
+      db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
+      db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
+      db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
+    end
+
+    config.database :other do |db|
+      db.backend = :postgresql
+      db.name = env_settings["POSTGRESQL_OTHER_DB_NAME"].as(String)
       db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
       db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
       db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
     end
   {% else %}
-    # Default to an in-memory SQLite.
     config.database do |db|
+      db.backend = :sqlite
+      db.name = ":memory:"
+    end
+
+    config.database :other do |db|
       db.backend = :sqlite
       db.name = ":memory:"
     end

@@ -50,6 +50,10 @@ jobs:
       run: |
         apt-get update
         apt-get -yqq install libsqlite3-dev
+    - name: Install packages required for PostgreSQL
+      if: matrix.db == 'postgresql'
+      run: |
+        createdb marten_other_test
     - name: Install shards
       run: shards install --ignore-crystal-version
     - name: Cache Crystal

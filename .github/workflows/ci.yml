@@ -54,6 +54,8 @@ jobs:
       if: matrix.db == 'postgresql'
       run: |
         createdb marten_other_test -h postgres -U postgres
+      env:
+        PGPASSWORD: postgres
     - name: Install shards
       run: shards install --ignore-crystal-version
     - name: Cache Crystal

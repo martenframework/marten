@@ -1,4 +1,8 @@
-require "./migration/**"
+require "./migration/dsl"
+require "./migration/dsl/**"
+require "./migration/column"
+require "./migration/operation/base"
+require "./migration/operation/**"
 
 module Marten
   module DB

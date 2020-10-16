@@ -80,10 +80,19 @@ module Marten
         project_state : Management::Migrations::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
-        operations_backward.not_nil!.each do |operation|
+        ops_backward, directed_forward = operations_backward
+        ops_backward.not_nil!.each do |operation|
           old_state = project_state.clone
-          operation.mutate_state_backward(self.class.app_config.label, project_state)
-          operation.mutate_db_backward(self.class.app_config.label, schema_editor, old_state, project_state)
+          if directed_forward
+            # If 'explicit' backward operations are defined (using 'plan_backward'), then this means that those
+            # operations have to be applied forward since the intent of what's described in 'plan_backward' (and the
+            # order of what's defined in this method) prevails.
+            operation.mutate_state_forward(self.class.app_config.label, project_state)
+            operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
+          else
+            operation.mutate_state_backward(self.class.app_config.label, project_state)
+            operation.mutate_db_backward(self.class.app_config.label, schema_editor, old_state, project_state)
+          end
         end
 
         project_state
@@ -93,7 +102,7 @@ module Marten
         project_state : Management::Migrations::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
-        operations_forward.not_nil!.each do |operation|
+        operations_forward[0].not_nil!.each do |operation|
           old_state = project_state.clone
           operation.mutate_state_forward(self.class.app_config.label, project_state)
           operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
@@ -112,7 +121,7 @@ module Marten
 
       def mutate_state_forward(project_state : Management::Migrations::ProjectState, preserve = true)
         new_state = preserve ? project_state.clone : project_state
-        operations_forward.not_nil!.each do |operation|
+        operations_forward[0].not_nil!.each do |operation|
           operation.mutate_state_forward(self.class.app_config.label, new_state)
         end
 
@@ -121,12 +130,12 @@ module Marten
 
       def operations_backward
         load_plan unless plan_loaded?
-        @operations_backward.empty? ? @operations_bidirectional.reverse : @operations_backward
+        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
       end
 
       def operations_forward
         load_plan unless plan_loaded?
-        @operations_forward.empty? ? @operations_bidirectional : @operations_forward
+        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
       end
 
       def plan

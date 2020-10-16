@@ -3,7 +3,7 @@ module Marten
     abstract class Migration
       module DSL
         macro create_table(name)
-          @operations << CreateTable.new({{ name }}).build do
+          operations << CreateTable.new({{ name }}).build do
             {{ yield }}
           end.operation
         end

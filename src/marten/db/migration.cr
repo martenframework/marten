@@ -21,6 +21,8 @@ module Marten
       class_getter depends_on = [] of Tuple(String, String)
       class_getter replaces = [] of Tuple(String, String)
 
+      @plan_loading_direction : Symbol?
+
       # Allows to specify whether the whole migration should run inside a single transaction or not.
       #
       # By default, for databases that support DDL transactions, each migration will run inside a single transaction.
@@ -67,15 +69,18 @@ module Marten
       end
 
       def initialize
-        @operations = [] of Operation::Base
+        @operations_bidirectional = [] of Operation::Base
+        @operations_backward = [] of Operation::Base
+        @operations_forward = [] of Operation::Base
         @plan_loaded = false
+        @plan_loading_direction = nil
       end
 
       def apply_backward(
         project_state : Management::Migrations::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
-        operations.not_nil!.each do |operation|
+        operations_backward.not_nil!.each do |operation|
           old_state = project_state.clone
           operation.mutate_state_backward(self.class.app_config.label, project_state)
           operation.mutate_db_backward(self.class.app_config.label, schema_editor, old_state, project_state)
@@ -88,7 +93,7 @@ module Marten
         project_state : Management::Migrations::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
-        operations.not_nil!.each do |operation|
+        operations_forward.not_nil!.each do |operation|
           old_state = project_state.clone
           operation.mutate_state_forward(self.class.app_config.label, project_state)
           operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
@@ -107,23 +112,53 @@ module Marten
 
       def mutate_state_forward(project_state : Management::Migrations::ProjectState, preserve = true)
         new_state = preserve ? project_state.clone : project_state
-        operations.not_nil!.each do |operation|
+        operations_forward.not_nil!.each do |operation|
           operation.mutate_state_forward(self.class.app_config.label, new_state)
         end
 
         new_state
       end
 
-      def operations
+      def operations_backward
         load_plan unless plan_loaded?
-        @operations
+        @operations_backward.empty? ? @operations_bidirectional.reverse : @operations_backward
+      end
+
+      def operations_forward
+        load_plan unless plan_loaded?
+        @operations_forward.empty? ? @operations_bidirectional : @operations_forward
       end
 
       def plan
       end
 
+      def plan_backward
+      end
+
+      def plan_forward
+      end
+
+      private def operations
+        case @plan_loading_direction
+        when :bidirectional
+          @operations_bidirectional
+        when :backward
+          @operations_backward
+        when :forward
+          @operations_forward
+        end.not_nil!
+      end
+
       private def load_plan
+        @plan_loading_direction = :bidirectional
         plan
+
+        @plan_loading_direction = :backward
+        plan_backward
+
+        @plan_loading_direction = :forward
+        plan_forward
+
         @plan_loaded = true
       end
 

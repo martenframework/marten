@@ -31,6 +31,22 @@ Marten.configure :test do |config|
       db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
       db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
     end
+  {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+    config.database do |db|
+      db.backend = :mysql
+      db.name = env_settings["MYSQL_DEFAULT_DB_NAME"].as(String)
+      db.user = env_settings["MYSQL_DB_USER"].as(String)
+      db.password = env_settings["MYSQL_DB_PASSWORD"].as(String)
+      db.host = env_settings["MYSQL_DB_HOST"].as(String)
+    end
+
+    config.database :other do |db|
+      db.backend = :mysql
+      db.name = env_settings["MYSQL_OTHER_DB_NAME"].as(String)
+      db.user = env_settings["MYSQL_DB_USER"].as(String)
+      db.password = env_settings["MYSQL_DB_PASSWORD"].as(String)
+      db.host = env_settings["MYSQL_DB_HOST"].as(String)
+    end
   {% else %}
     config.database do |db|
       db.backend = :sqlite

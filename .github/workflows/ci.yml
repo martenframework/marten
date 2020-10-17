@@ -32,9 +32,18 @@ jobs:
           - 5432:5432
         # Needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: "mysql"
+          MYSQL_DATABASE: marten_test
+        ports:
+          - 3307:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     strategy:
       matrix:
         db: [
+          'mysql',
           'postgresql',
           'sqlite',
         ]
@@ -56,6 +65,12 @@ jobs:
         createdb marten_other_test -h postgres -U postgres
       env:
         PGPASSWORD: postgres
+    - name: Create additional DB for MySQL
+      if: matrix.db == 'mysql'
+      run: |
+        mysql -u root --passowrd=mysql -e 'create database marten_other_test;'
+      env:
+        PGPASSWORD: mysql
     - name: Install shards
       run: shards install --ignore-crystal-version
     - name: Cache Crystal

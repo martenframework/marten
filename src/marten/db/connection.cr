@@ -3,10 +3,12 @@ module Marten
     module Connection
       DEFAULT_CONNECTION_NAME = "default"
 
+      MYSQL_ID      = "mysql"
       POSTGRESQL_ID = "postgresql"
       SQLITE_ID     = "sqlite"
 
       IMPLEMENTATIONS = {
+        MYSQL_ID      => MySQL,
         POSTGRESQL_ID => PostgreSQL,
         SQLITE_ID     => SQLite,
       }

@@ -2,6 +2,7 @@ ENV["MARTEN_ENV"] = "test"
 
 require "spec"
 
+require "mysql"
 require "pg"
 require "sqlite3"
 

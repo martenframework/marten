@@ -2,9 +2,15 @@ ENV["MARTEN_ENV"] = "test"
 
 require "spec"
 
-require "mysql"
-require "pg"
-require "sqlite3"
+require "json"
+
+{% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+  require "pg"
+{% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+  require "mysql"
+{% else %}
+  require "sqlite3"
+{% end %}
 
 require "../src/marten"
 require "../src/marten/cli"

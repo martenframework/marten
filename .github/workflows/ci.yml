@@ -67,7 +67,7 @@ jobs:
     - name: Create additional DB for MySQL
       if: matrix.db == 'mysql'
       run: |
-        mysql -u root -h mysql --passowrd=mysql -e 'create database marten_other_test;'
+        mysql -u root -h mysql --password=mysql -e 'create database marten_other_test;'
       env:
         PGPASSWORD: mysql
     - name: Create additional DB for PostgreSQL

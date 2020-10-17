@@ -49,6 +49,11 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v2
+    - name: Install packages required for MySQL
+      if: matrix.db == 'mysql'
+      run: |
+        apt-get update
+        apt-get -yqq install mysql-client libmysqlclient-dev
     - name: Install packages required for PostgreSQL
       if: matrix.db == 'postgresql'
       run: |
@@ -59,18 +64,18 @@ jobs:
       run: |
         apt-get update
         apt-get -yqq install libsqlite3-dev
+    - name: Create additional DB for MySQL
+      if: matrix.db == 'mysql'
+      run: |
+        mysql -u root -h mysql --passowrd=mysql -e 'create database marten_other_test;'
+      env:
+        PGPASSWORD: mysql
     - name: Create additional DB for PostgreSQL
       if: matrix.db == 'postgresql'
       run: |
         createdb marten_other_test -h postgres -U postgres
       env:
         PGPASSWORD: postgres
-    - name: Create additional DB for MySQL
-      if: matrix.db == 'mysql'
-      run: |
-        mysql -u root --passowrd=mysql -e 'create database marten_other_test;'
-      env:
-        PGPASSWORD: mysql
     - name: Install shards
       run: shards install --ignore-crystal-version
     - name: Cache Crystal

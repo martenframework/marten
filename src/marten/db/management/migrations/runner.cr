@@ -41,7 +41,7 @@ module Marten
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
             state = generate_current_project_state(full_plan)
 
-            full_plan.map(&.first).each do |migration|
+            full_plan.reverse.map(&.first).each do |migration|
               break if migration_ids_to_unapply.empty?
               next unless migration_ids_to_unapply.includes?(migration.id)
 

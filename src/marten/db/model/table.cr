@@ -302,6 +302,10 @@ module Marten
             {{ pkeys[0].id }}
           end
 
+          def pk!
+            {{ pkeys[0].id }}.not_nil!
+          end
+
           def pk=(val)
             self.{{ pkeys[0].id }} = val
           end

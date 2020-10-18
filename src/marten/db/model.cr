@@ -24,6 +24,11 @@ module Marten
         yield self
       end
 
+      # Returns true if `other` is the same object or corresponds to the exact same record at the database level.
+      def ==(other : self)
+        super || !pk.nil? && other.pk == pk
+      end
+
       private def initialize_field_values(**kwargs)
         values = Hash(String, Field::Any).new
         kwargs.each { |key, v| values[key.to_s] = v }

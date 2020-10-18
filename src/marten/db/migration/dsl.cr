@@ -34,7 +34,7 @@ module Marten
 
           {{ column_klass }}.new(
             {{ sanitized_id.stringify }},
-            {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+            {% unless kwargs.is_a?(NilLiteral) || kwargs.empty? %}**{{ kwargs }}{% end %}
           )
         end
       end

@@ -24,7 +24,8 @@ module Marten
         def to_column : Migration::Column::Base
           Migration::Column::ForeignKey.new(
             name: db_column,
-            to_table_name: @to.db_table,
+            to_table: @to.db_table,
+            to_column: @to.pk_field.db_column,
             primary_key: primary_key?,
             null: null?,
             unique: unique?,

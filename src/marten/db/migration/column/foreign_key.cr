@@ -5,9 +5,13 @@ module Marten
         class ForeignKey < Base
           include IsBuiltInColumn
 
+          getter to_column
+          getter to_table
+
           def initialize(
             @name : ::String,
-            @to_table_name : ::String,
+            @to_table : ::String,
+            @to_column : ::String,
             @primary_key = false,
             @null = false,
             @unique = false,

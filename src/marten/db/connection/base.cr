@@ -93,7 +93,7 @@ module Marten
         end
 
         # Allows to quote a specific name (such as a table name or column ID) for the database at hand.
-        def quote(name : String) : String
+        def quote(name : String | Symbol) : String
           "#{quote_char}#{name}#{quote_char}"
         end
 

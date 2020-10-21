@@ -18,7 +18,7 @@ module Marten
             @primary_key = false,
             @null = false,
             @unique = false,
-            @index = false
+            @index = true
           )
             @to_table = to_table.to_s
             @to_column = to_column.to_s

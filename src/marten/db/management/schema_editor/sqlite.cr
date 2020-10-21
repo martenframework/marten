@@ -43,6 +43,15 @@ module Marten
             statements
           end
 
+          def prepare_foreign_key_for_new_table(
+            table : Migrations::TableState,
+            column : Migration::Column::ForeignKey,
+            column_definition : String
+          ) : String
+            "#{column_definition} REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)}) " \
+            "DEFERRABLE INITIALLY DEFERRED"
+          end
+
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Migration::Column::Auto"       => "integer",
             "Marten::DB::Migration::Column::BigAuto"    => "integer",

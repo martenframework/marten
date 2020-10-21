@@ -41,6 +41,20 @@ module Marten
             statements
           end
 
+          def prepare_foreign_key_for_new_table(
+            table : Migrations::TableState,
+            column : Migration::Column::ForeignKey,
+            column_definition : String
+          ) : String
+            constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
+            @deferred_statements << "ALTER TABLE #{quote(table.name)} ADD CONSTRAINT #{quote(constraint_name)} " \
+                                    "FOREIGN KEY (#{quote(column.name)}) " \
+                                    "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+
+            # Returns the initial column definition since the foreign key creation is deferred.
+            column_definition
+          end
+
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Migration::Column::Auto"       => "integer AUTO_INCREMENT",
             "Marten::DB::Migration::Column::BigAuto"    => "bigint AUTO_INCREMENT",

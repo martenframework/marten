@@ -39,6 +39,13 @@ module Marten
           # Returns the SQL statements allowing to flush the passed database tables.
           abstract def flush_tables_statements(table_names : Array(String)) : Array(String)
 
+          # Given a table, column and column SQL statement, prepares the foreign key corresponding to the column.
+          abstract def prepare_foreign_key_for_new_table(
+            table : Migrations::TableState,
+            column : Migration::Column::ForeignKey,
+            column_definition : String
+          ) : String
+
           # Creates a new table directly from a model class.
           def create_model(model : Model.class) : Nil
             create_table(Migrations::TableState.from_model(model))
@@ -50,7 +57,13 @@ module Marten
 
             table.columns.each do |column|
               column_type = column_sql_for(column)
-              column_definitions << "#{quote(column.name)} #{column_type}"
+              column_definition = "#{quote(column.name)} #{column_type}"
+
+              if column.is_a?(Migration::Column::ForeignKey)
+                column_definition = prepare_foreign_key_for_new_table(table, column, column_definition)
+              end
+
+              column_definitions << column_definition
             end
 
             sql = create_table_statement(quote(table.name), column_definitions.join(", "))

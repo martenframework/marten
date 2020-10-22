@@ -242,4 +242,12 @@ describe Marten::DB::Model::Querying do
       expect_raises(Tag::NotFound) { Tag.get! { q(name: "crystal") } }
     end
   end
+
+  describe "::join" do
+    it "allows to configure joins for a specific relation" do
+      user = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post")
+      Post.join(:author).query.joins?.should be_true
+    end
+  end
 end

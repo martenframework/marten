@@ -50,6 +50,10 @@ module Marten
           end
         end
 
+        def joins?
+          !@joins.empty?
+        end
+
         def order(*fields : String) : Nil
           order_clauses = [] of {String, Bool}
 
@@ -71,6 +75,10 @@ module Marten
           end
 
           @order_clauses = order_clauses
+        end
+
+        def ordered?
+          !@order_clauses.empty?
         end
 
         def raw_delete
@@ -107,6 +115,10 @@ module Marten
           @limit = new_limit
         end
 
+        def sliced?
+          !(@limit.nil? && @offset.nil?)
+        end
+
         protected def add_join(relation : String) : Nil
           ensure_join_for_field_path(verify_field(relation, only_relations: true))
         end
@@ -131,18 +143,6 @@ module Marten
             using: @using
           )
           cloned
-        end
-
-        protected def joins?
-          !@joins.empty?
-        end
-
-        protected def ordered?
-          !@order_clauses.empty?
-        end
-
-        protected def sliced?
-          !(@limit.nil? && @offset.nil?)
         end
 
         private def build_count_query

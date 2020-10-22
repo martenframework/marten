@@ -7,6 +7,8 @@ module Marten
 
       @result_cache : Array(Model)?
 
+      getter query
+
       def initialize(@query = SQL::Query(Model).new)
       end
 
@@ -224,7 +226,6 @@ module Marten
         qs
       end
 
-      protected getter query
       protected getter result_cache
 
       protected def clone

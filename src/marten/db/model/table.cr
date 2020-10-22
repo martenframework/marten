@@ -232,6 +232,7 @@ module Marten
           {% if ann && ann[:relation_name] %}
           when {{ field_var.name.stringify }}
           @{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }})
+          @{{ field_var.id }} = related_object.as({{ ann[:related_model] }}).try(&.pk)
           {% end %}
           {% end %}
           else

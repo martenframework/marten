@@ -30,7 +30,14 @@ module Marten
 
       private def initialize_field_values(**kwargs)
         values = Hash(String, Field::Any).new
-        kwargs.each { |key, v| values[key.to_s] = v }
+        kwargs.each do |key, value|
+          if value.is_a?(Model)
+            relation_field = self.class.get_relation_field(key.to_s)
+            assign_related_object(value, relation_field)
+          else
+            values[key.to_s] = value
+          end
+        end
         assign_field_values(values)
       end
     end

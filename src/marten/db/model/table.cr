@@ -216,7 +216,7 @@ module Marten
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           when {{ field_var.name.stringify }}
-          @{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          self.{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
           {% end %}
           else
           end
@@ -231,8 +231,13 @@ module Marten
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           {% if ann && ann[:relation_name] %}
           when {{ field_var.name.stringify }}
-          @{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }})
-          @{{ field_var.id }} = related_object.as({{ ann[:related_model] }}).try(&.pk)
+            if !related_object.is_a?({{ ann[:related_model] }})
+              raise Errors::UnexpectedFieldValue.new(
+                "Value for relation {{ ann[:relation_name] }} should be of type {{ ann[:related_model] }}, " \
+                "not #{typeof(related_object)}"
+              )
+            end
+            self.{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }})
           {% end %}
           {% end %}
           else

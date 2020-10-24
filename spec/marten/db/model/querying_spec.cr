@@ -250,4 +250,49 @@ describe Marten::DB::Model::Querying do
       Post.join(:author).query.joins?.should be_true
     end
   end
+
+  describe "::last" do
+    before_each do
+      TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "fb@example.com", first_name: "Foo", last_name: "Bar")
+
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "crystal", is_active: false)
+    end
+
+    it "returns the last object" do
+      TestUser.last.should eq TestUser.get!(username: "foo")
+    end
+
+    it "makes use of the default queryset" do
+      Tag.last.should eq Tag.get!(name: "coding")
+    end
+  end
+
+  describe "::using" do
+    before_each do
+      TestUser.using(:other).create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.using(:other).create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "fb@example.com", first_name: "Foo", last_name: "Bar")
+
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.using(:other).create!(name: "coding", is_active: true)
+      Tag.using(:other).create!(name: "crystal", is_active: false)
+    end
+
+    it "returns a default queryset using the specified database" do
+      qs1 = TestUser.using(:other)
+      results1 = qs1.to_a
+      results1.size.should eq 2
+      results1.includes?(TestUser.using(:other).get!(username: "jd1")).should be_true
+      results1.includes?(TestUser.using(:other).get!(username: "jd1")).should be_true
+
+      qs2 = Tag.using(:other)
+      results2 = qs2.to_a
+      results2.size.should eq 1
+      results2.includes?(Tag.using(:other).get(name: "coding")).should be_true
+    end
+  end
 end

@@ -18,9 +18,9 @@ describe Marten::DB::Model do
     end
 
     it "allows to initialize model objects with specific field values in a block" do
-      user = TestUser.new(username: "jd") do |user|
-        user.first_name = "John"
-        user.last_name = "Doe"
+      user = TestUser.new(username: "jd") do |u|
+        u.first_name = "John"
+        u.last_name = "Doe"
       end
 
       user.username.should eq "jd"

@@ -112,7 +112,6 @@ module Marten
             end
 
             def {{ relation_attribute_name }} : {{ related_model_klass }}?
-              return if @{{ field_id }}.nil?
               @{{ relation_attribute_name }} ||= begin
                 {{ related_model_klass }}.get(pk: @{{ field_id }})
               end

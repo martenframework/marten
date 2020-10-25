@@ -16,6 +16,9 @@ module Marten
         setter default_ordering
         setter using
 
+        # :nodoc:
+        delegate build_sql, to: connection
+
         def initialize
         end
 
@@ -203,11 +206,6 @@ module Marten
           end
 
           {sql, parameters}
-        end
-
-        private def build_sql
-          yield (clauses = [] of String?)
-          clauses.compact!.join " "
         end
 
         private def columns

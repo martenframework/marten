@@ -66,6 +66,12 @@ module Marten
           @config.id
         end
 
+        # Allows to conveniently build a SQL statement by yielding an array of nillable strings.
+        def build_sql
+          yield (clauses = [] of String?)
+          clauses.compact!.join " "
+        end
+
         # Returns a new database entrypoint to interact with the underlying database.
         def db
           @db ||= ::DB.open(@url)

@@ -41,6 +41,18 @@ module Marten
             statements
           end
 
+          def prepare_foreign_key_for_new_column(
+            table : Migrations::TableState,
+            column : Migration::Column::ForeignKey,
+            column_definition : String
+          ) : String
+            constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
+
+            "#{column_definition}, ADD CONSTRAINT #{quote(constraint_name)} " \
+            "FOREIGN KEY (#{quote(column.name)}) " \
+            "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+          end
+
           def prepare_foreign_key_for_new_table(
             table : Migrations::TableState,
             column : Migration::Column::ForeignKey,

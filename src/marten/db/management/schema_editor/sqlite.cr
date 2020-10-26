@@ -3,6 +3,10 @@ module Marten
     module Management
       module SchemaEditor
         class SQLite < Base
+          def add_column(table : Migrations::TableState, column : Migration::Column::Base)
+            raise NotImplementedError.new("TODO: ability to 'remake' tables with added columns")
+          end
+
           def column_type_for_built_in_column(id)
             BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
           end
@@ -41,6 +45,14 @@ module Marten
               "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
 
             statements
+          end
+
+          def prepare_foreign_key_for_new_column(
+            table : Migrations::TableState,
+            column : Migration::Column::ForeignKey,
+            column_definition : String
+          ) : String
+            raise NotImplementedError.new("Adding foreign keys to tables is not supported by the SQLite schema editor")
           end
 
           def prepare_foreign_key_for_new_table(

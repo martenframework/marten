@@ -39,12 +39,41 @@ module Marten
           # Returns the SQL statements allowing to flush the passed database tables.
           abstract def flush_tables_statements(table_names : Array(String)) : Array(String)
 
-          # Given a table, column and column SQL statement, prepares the foreign key corresponding to the column.
+          # Given an existing table, new column and column SQL statement, prepares the foreign key for the new column.
+          abstract def prepare_foreign_key_for_new_column(
+            table : Migrations::TableState,
+            column : Migration::Column::ForeignKey,
+            column_definition : String
+          ) : String
+
+          # Given a new table, column and column SQL statement, prepares the foreign key corresponding to the column.
           abstract def prepare_foreign_key_for_new_table(
             table : Migrations::TableState,
             column : Migration::Column::ForeignKey,
             column_definition : String
           ) : String
+
+          # Adds a column to a specific table.
+          def add_column(table : Migrations::TableState, column : Migration::Column::Base) : Nil
+            column_type = column_sql_for(column)
+            column_definition = "#{quote(column.name)} #{column_type}"
+
+            if column.is_a?(Migration::Column::ForeignKey)
+              column_definition = prepare_foreign_key_for_new_column(table, column, column_definition)
+            end
+
+            @connection.open do |db|
+              db.exec("ALTER TABLE #{quote(table.name)} ADD COLUMN #{column_definition}")
+            end
+
+            if column.index? && !column.unique?
+              @deferred_statements << create_index_statement(
+                index_name(table.name, [column.name]),
+                quote(table.name),
+                [quote(column.name)]
+              )
+            end
+          end
 
           # Creates a new table directly from a model class.
           def create_model(model : Model.class) : Nil

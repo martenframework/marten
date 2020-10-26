@@ -18,6 +18,7 @@ module Marten
 
         # :nodoc:
         delegate build_sql, to: connection
+        delegate quote, to: connection
 
         def initialize
         end
@@ -361,7 +362,7 @@ module Marten
         end
 
         private def table_name
-          connection.quote(Model.db_table)
+          quote(Model.db_table)
         end
 
         private def verify_field(raw_field, only_relations = false)

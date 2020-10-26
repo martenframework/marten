@@ -36,6 +36,10 @@ module Marten
       # Represents an error raised when a condition is not met on a particular query set in order to perform a specific
       # operation.
       class UnmetQuerySetCondition < Exception; end
+
+      # Represents an error raised when a condition is not met on a particular object in order to be saved. This error
+      # is not related to model instances validation.
+      class UnmetSaveCondition < Exception; end
     end
   end
 end

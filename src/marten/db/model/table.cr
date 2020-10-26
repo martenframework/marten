@@ -285,6 +285,22 @@ module Marten
           values
         end
 
+        private def get_cached_related_object(relation_field)
+          {% begin %}
+          case relation_field.id
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% if ann && ann[:relation_name] %}
+          when {{ field_var.name.stringify }}
+            @{{ ann[:relation_name] }}
+          {% end %}
+          {% end %}
+          else
+          end
+          {% end %}
+        end
+
         # :nodoc:
         macro _verify_model_name
           {% if @type.id.includes?(LOOKUP_SEP) %}

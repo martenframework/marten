@@ -66,10 +66,45 @@ module Marten
         end
 
         # :nodoc:
-        @destroyed : Bool = false
+        @deleted : Bool = false
 
         # :nodoc:
         @new_record : Bool = true
+
+        # Returns a boolean indicating if the record was deleted or not.
+        #
+        # This method returns `true` if the model instance was deleted previously. Other it returns `false` in any
+        # other cases.
+        def deleted?
+          @deleted
+        end
+
+        # Returns a boolean indicating if the record doesn't exist in the database yet.
+        #
+        # This methods returns `true` if the model instance hasn't been saved and doesn't exist in the database yet. In
+        # any other cases it returns `false`.
+        def new_record?
+          @new_record
+        end
+
+        # Returns a boolean indicating if the record is persisted in the database.
+        #
+        # This method returns `true` if the record at hand exists in the database. Otherwise (if it's a new record or if
+        # it was deleted previously), the method returns `false`.
+        def persisted?
+          !(new_record? || deleted?)
+        end
+
+        # Reloads the model instance.
+        #
+        # This methods retrieves the record at the database level and updates the current model instance with the new
+        # values.
+        def reload
+          reloaded = self.class.get!(pk: pk)
+          self.assign_field_values(reloaded.field_values)
+          @new_record = false
+          self
+        end
 
         # Saves the model instance.
         #
@@ -100,44 +135,20 @@ module Marten
           save(using: using) || (raise Errors::InvalidRecord.new("Record is invalid"))
         end
 
-        # Reloads the model instance.
-        #
-        # This methods retrieves the record at the database level and updates the current model instance with the new
-        # values.
-        def reload
-          reloaded = self.class.get!(pk: pk)
-          self.assign_field_values(reloaded.field_values)
-          @new_record = false
-          self
-        end
-
-        # Returns a boolean indicating if the record doesn't exist in the database yet.
-        #
-        # This methods returns `true` if the model instance hasn't been saved and doesn't exist in the database yet. In
-        # any other cases it returns `false`.
-        def new_record?
-          @new_record
-        end
-
-        # Returns a boolean indicating if the record was destroyed or not.
-        #
-        # This method returns `true` if the model instance was destroyed previously. Other it returns `false` in any
-        # other cases.
-        def destroyed?
-          @destroyed
-        end
-
-        # Returns a boolean indicating if the record is peristed in the database.
-        #
-        # This method returns `true` if the record at hand exists in the database. Otherwise (if it's a new record or if
-        # it was destroyed previously), the method returns `false`.
-        def persisted?
-          !(new_record? || destroyed?)
-        end
-
         protected setter new_record
 
         private def insert_or_update(connection)
+          # Prevent saving if an unsaved related object is assigned to the current model instance. This situation could
+          # lead to data loss since the current model instance could be saved but not the related object.
+          self.class.fields.each do |field|
+            next if !field.relation?
+            related_obj = get_cached_related_object(field)
+            next if related_obj.nil? || related_obj.not_nil!.persisted?
+            raise Errors::UnmetSaveCondition.new(
+              "Save is prohibited because related object '#{field.relation_name}' is not persisted"
+            )
+          end
+
           if persisted?
             update(connection)
           else

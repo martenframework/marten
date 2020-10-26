@@ -38,8 +38,11 @@ module Marten
           ) : String
             constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
 
-            "#{column_definition} CONSTRAINT #{quote(constraint_name)} " \
-            "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)}) DEFERRABLE INITIALLY DEFERRED"
+            "#{column_definition} " + build_sql do |s|
+              s << "CONSTRAINT #{quote(constraint_name)}"
+              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+              s << "DEFERRABLE INITIALLY DEFERRED"
+            end
           end
 
           def prepare_foreign_key_for_new_table(
@@ -48,10 +51,14 @@ module Marten
             column_definition : String
           ) : String
             constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
-            @deferred_statements << "ALTER TABLE #{quote(table.name)} ADD CONSTRAINT #{quote(constraint_name)} " \
-                                    "FOREIGN KEY (#{quote(column.name)}) " \
-                                    "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)}) " \
-                                    "DEFERRABLE INITIALLY DEFERRED"
+
+            @deferred_statements << build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ADD CONSTRAINT #{quote(constraint_name)}"
+              s << "FOREIGN KEY (#{quote(column.name)})"
+              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+              s << "DEFERRABLE INITIALLY DEFERRED"
+            end
 
             # Returns the initial column definition since the foreign key creation is deferred.
             column_definition

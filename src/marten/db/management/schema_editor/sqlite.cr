@@ -39,10 +39,11 @@ module Marten
             end
 
             # Add a statement to reset table sequences.
-            statements <<
-              "UPDATE #{quote("sqlite_sequence")} " \
-              "SET #{quote("seq")} = 0 " \
-              "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
+            statements << build_sql do |s|
+              s << "UPDATE #{quote("sqlite_sequence")}"
+              s << "SET #{quote("seq")} = 0"
+              s << "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
+            end
 
             statements
           end
@@ -60,8 +61,10 @@ module Marten
             column : Migration::Column::ForeignKey,
             column_definition : String
           ) : String
-            "#{column_definition} REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)}) " \
-            "DEFERRABLE INITIALLY DEFERRED"
+            "#{column_definition} " + build_sql do |s|
+              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+              s << "DEFERRABLE INITIALLY DEFERRED"
+            end
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {

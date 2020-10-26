@@ -7,6 +7,7 @@ module Marten
         # The database schema editor is used in the context of DB management in order to perform operation on models:
         # create / delete models, add new fields, etc. It's heavily used by the migrations mechanism.
         abstract class Base
+          delegate build_sql, to: @connection
           delegate quote, to: @connection
 
           def initialize(@connection : Connection::Base)

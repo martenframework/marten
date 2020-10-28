@@ -6,6 +6,8 @@ module Marten
         abstract class Base
           getter name
 
+          setter primary_key
+
           def initialize(
             @name : ::String,
             @primary_key = false,

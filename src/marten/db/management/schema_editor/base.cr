@@ -160,6 +160,7 @@ module Marten
                 db.exec(sql)
               end
             end
+            @deferred_statements.clear
           end
 
           private def column_sql_for(column)

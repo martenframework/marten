@@ -8,6 +8,8 @@ module Marten
           getter columns
           getter name
 
+          setter name
+
           # Initializes a table state from a specific model class.
           def self.from_model(model : Model.class)
             new(
@@ -22,6 +24,10 @@ module Marten
             @name : String,
             @columns : Array(Migration::Column::Base)
           )
+          end
+
+          def add_column(column : Migration::Column::Base)
+            @columns << column
           end
 
           def clone

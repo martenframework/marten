@@ -54,6 +54,9 @@ module Marten
             column_definition : String
           ) : String
 
+          # Returns the SQL statement allowing to rename a database table.
+          abstract def rename_table_statement(old_name : String, new_name : String)
+
           # Adds a column to a specific table.
           def add_column(table : Migrations::TableState, column : Migration::Column::Base) : Nil
             column_type = column_sql_for(column)
@@ -137,6 +140,15 @@ module Marten
                 db.exec(sql)
               end
             end
+          end
+
+          # Renames a specific table.
+          def rename_table(table : Migrations::TableState, new_name : String) : Nil
+            sql = rename_table_statement(quote(table.name), quote(new_name))
+            @connection.open do |db|
+              db.exec(sql)
+            end
+            # TODO: rename deferred statemens referencing the renamed table?
           end
 
           # Syncs all models for the current database connection.

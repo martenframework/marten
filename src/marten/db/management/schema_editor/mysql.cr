@@ -73,6 +73,10 @@ module Marten
             column_definition
           end
 
+          def rename_table_statement(old_name : String, new_name : String)
+            "RENAME TABLE #{old_name} TO #{new_name}"
+          end
+
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Migration::Column::Auto"       => "integer AUTO_INCREMENT",
             "Marten::DB::Migration::Column::BigAuto"    => "bigint AUTO_INCREMENT",

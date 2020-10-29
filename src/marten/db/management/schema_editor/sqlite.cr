@@ -4,7 +4,7 @@ module Marten
       module SchemaEditor
         class SQLite < Base
           def add_column(table : Migrations::TableState, column : Migration::Column::Base)
-            raise NotImplementedError.new("TODO: ability to 'remake' tables with added columns")
+            raise NotImplementedError.new("Ability to 'remake' tables with added columns is not yet implemented")
           end
 
           def column_type_for_built_in_column(id)
@@ -65,6 +65,10 @@ module Marten
               s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
               s << "DEFERRABLE INITIALLY DEFERRED"
             end
+          end
+
+          def rename_table_statement(old_name : String, new_name : String)
+            "ALTER TABLE #{old_name} RENAME TO #{new_name}"
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {

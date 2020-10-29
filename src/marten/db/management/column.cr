@@ -16,7 +16,7 @@ require "./column/foreign_key"
 
 module Marten
   module DB
-    abstract class Migration
+    module Management
       module Column
         annotation Registration
         end
@@ -30,7 +30,7 @@ module Marten
         macro register(id, column_klass)
           {% klass = column_klass.resolve %}
 
-          @[Marten::DB::Migration::Column::Registration(id: {{ id }})]
+          @[Marten::DB::Management::Column::Registration(id: {{ id }})]
           class ::{{ klass.id }}; end
           add_column_to_registry({{ id }}, {{ klass }})
         end

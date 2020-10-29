@@ -1,8 +1,8 @@
 module Marten
   module DB
-    abstract class Migration
+    module Management
       module Column
-        class Bool < Base
+        class UUID < Base
           include IsBuiltInColumn
         end
       end

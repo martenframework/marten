@@ -1,8 +1,8 @@
 module Marten
   module DB
-    abstract class Migration
+    module Management
       module Column
-        class UUID < Base
+        class BigAuto < Base
           include IsBuiltInColumn
         end
       end

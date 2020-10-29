@@ -1,6 +1,6 @@
 module Marten
   module DB
-    abstract class Migration
+    module Management
       module Column
         class ForeignKey < Base
           include IsBuiltInColumn

@@ -3,7 +3,7 @@ module Marten
     module Management
       module SchemaEditor
         class SQLite < Base
-          def add_column(table : Migrations::TableState, column : Migration::Column::Base)
+          def add_column(table : TableState, column : Column::Base)
             remake_table_with_column_change(table, column, change_type: :add)
           end
 
@@ -49,16 +49,16 @@ module Marten
           end
 
           def prepare_foreign_key_for_new_column(
-            table : Migrations::TableState,
-            column : Migration::Column::ForeignKey,
+            table : TableState,
+            column : Column::ForeignKey,
             column_definition : String
           ) : String
             raise NotImplementedError.new("Adding foreign keys to tables is not supported by the SQLite schema editor")
           end
 
           def prepare_foreign_key_for_new_table(
-            table : Migrations::TableState,
-            column : Migration::Column::ForeignKey,
+            table : TableState,
+            column : Column::ForeignKey,
             column_definition : String
           ) : String
             "#{column_definition} " + build_sql do |s|
@@ -72,21 +72,21 @@ module Marten
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Migration::Column::Auto"       => "integer",
-            "Marten::DB::Migration::Column::BigAuto"    => "integer",
-            "Marten::DB::Migration::Column::BigInt"     => "integer",
-            "Marten::DB::Migration::Column::Bool"       => "bool",
-            "Marten::DB::Migration::Column::DateTime"   => "datetime",
-            "Marten::DB::Migration::Column::ForeignKey" => "integer",
-            "Marten::DB::Migration::Column::Int"        => "integer",
-            "Marten::DB::Migration::Column::String"     => "varchar(%{max_size})",
-            "Marten::DB::Migration::Column::Text"       => "text",
-            "Marten::DB::Migration::Column::UUID"       => "char(32)",
+            "Marten::DB::Management::Column::Auto"       => "integer",
+            "Marten::DB::Management::Column::BigAuto"    => "integer",
+            "Marten::DB::Management::Column::BigInt"     => "integer",
+            "Marten::DB::Management::Column::Bool"       => "bool",
+            "Marten::DB::Management::Column::DateTime"   => "datetime",
+            "Marten::DB::Management::Column::ForeignKey" => "integer",
+            "Marten::DB::Management::Column::Int"        => "integer",
+            "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
+            "Marten::DB::Management::Column::Text"       => "text",
+            "Marten::DB::Management::Column::UUID"       => "char(32)",
           }
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_SUFFIX_MAPPING = {
-            "Marten::DB::Migration::Column::Auto"    => "AUTOINCREMENT",
-            "Marten::DB::Migration::Column::BigAuto" => "AUTOINCREMENT",
+            "Marten::DB::Management::Column::Auto"    => "AUTOINCREMENT",
+            "Marten::DB::Management::Column::BigAuto" => "AUTOINCREMENT",
           }
 
           private def remake_table_with_column_change(table, column, change_type)

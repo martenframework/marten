@@ -32,8 +32,8 @@ module Marten
           end
         end
 
-        def to_column : Migration::Column::Base
-          Migration::Column::DateTime.new(
+        def to_column : Management::Column::Base
+          Management::Column::DateTime.new(
             db_column,
             primary_key?,
             null?,

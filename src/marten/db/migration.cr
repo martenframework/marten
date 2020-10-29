@@ -1,6 +1,5 @@
 require "./migration/dsl"
 require "./migration/dsl/**"
-require "./migration/column"
 require "./migration/operation/base"
 require "./migration/operation/**"
 
@@ -81,7 +80,7 @@ module Marten
       end
 
       def apply_backward(
-        project_state : Management::Migrations::ProjectState,
+        project_state : Management::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
         ops_backward, directed_forward = operations_backward
@@ -103,7 +102,7 @@ module Marten
       end
 
       def apply_forward(
-        project_state : Management::Migrations::ProjectState,
+        project_state : Management::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
         operations_forward[0].not_nil!.each do |operation|
@@ -123,7 +122,7 @@ module Marten
         self.class.id
       end
 
-      def mutate_state_forward(project_state : Management::Migrations::ProjectState, preserve = true)
+      def mutate_state_forward(project_state : Management::ProjectState, preserve = true)
         new_state = preserve ? project_state.clone : project_state
         operations_forward[0].not_nil!.each do |operation|
           operation.mutate_state_forward(self.class.app_config.label, new_state)

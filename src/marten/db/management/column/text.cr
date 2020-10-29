@@ -1,8 +1,8 @@
 module Marten
   module DB
-    abstract class Migration
+    module Management
       module Column
-        class DateTime < Base
+        class Text < Base
           include IsBuiltInColumn
         end
       end

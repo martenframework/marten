@@ -10,8 +10,8 @@ module Marten
           result_set.read(Int32 | Int64 | Nil)
         end
 
-        def to_column : Migration::Column::Base
-          Migration::Column::Auto.new(
+        def to_column : Management::Column::Base
+          Management::Column::Auto.new(
             db_column,
             primary_key?,
             null?,

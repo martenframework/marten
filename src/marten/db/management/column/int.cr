@@ -1,8 +1,8 @@
 module Marten
   module DB
-    abstract class Migration
+    module Management
       module Column
-        class Text < Base
+        class Int < Base
           include IsBuiltInColumn
         end
       end

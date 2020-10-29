@@ -21,8 +21,8 @@ module Marten
           result_set.read(Int32 | Int64 | Nil)
         end
 
-        def to_column : Migration::Column::Base
-          Migration::Column::ForeignKey.new(
+        def to_column : Management::Column::Base
+          Management::Column::ForeignKey.new(
             name: db_column,
             to_table: @to.db_table,
             to_column: @to.pk_field.db_column,

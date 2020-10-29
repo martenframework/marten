@@ -42,15 +42,15 @@ module Marten
 
           # Given an existing table, new column and column SQL statement, prepares the foreign key for the new column.
           abstract def prepare_foreign_key_for_new_column(
-            table : Migrations::TableState,
-            column : Migration::Column::ForeignKey,
+            table : TableState,
+            column : Column::ForeignKey,
             column_definition : String
           ) : String
 
           # Given a new table, column and column SQL statement, prepares the foreign key corresponding to the column.
           abstract def prepare_foreign_key_for_new_table(
-            table : Migrations::TableState,
-            column : Migration::Column::ForeignKey,
+            table : TableState,
+            column : Column::ForeignKey,
             column_definition : String
           ) : String
 
@@ -58,11 +58,11 @@ module Marten
           abstract def rename_table_statement(old_name : String, new_name : String)
 
           # Adds a column to a specific table.
-          def add_column(table : Migrations::TableState, column : Migration::Column::Base) : Nil
+          def add_column(table : TableState, column : Column::Base) : Nil
             column_type = column_sql_for(column)
             column_definition = "#{quote(column.name)} #{column_type}"
 
-            if column.is_a?(Migration::Column::ForeignKey)
+            if column.is_a?(Column::ForeignKey)
               column_definition = prepare_foreign_key_for_new_column(table, column, column_definition)
             end
 
@@ -81,18 +81,18 @@ module Marten
 
           # Creates a new table directly from a model class.
           def create_model(model : Model.class) : Nil
-            create_table(Migrations::TableState.from_model(model))
+            create_table(TableState.from_model(model))
           end
 
           # Creates a new table from a migration table state.
-          def create_table(table : Migrations::TableState) : Nil
+          def create_table(table : TableState) : Nil
             column_definitions = [] of String
 
             table.columns.each do |column|
               column_type = column_sql_for(column)
               column_definition = "#{quote(column.name)} #{column_type}"
 
-              if column.is_a?(Migration::Column::ForeignKey)
+              if column.is_a?(Column::ForeignKey)
                 column_definition = prepare_foreign_key_for_new_table(table, column, column_definition)
               end
 
@@ -120,11 +120,11 @@ module Marten
 
           # Deletes the table of a specific model.
           def delete_model(model : Model.class)
-            delete_table(Migrations::TableState.from_model(model))
+            delete_table(TableState.from_model(model))
           end
 
           # Deletes the table corresponding to a migration table state.
-          def delete_table(table : Migrations::TableState)
+          def delete_table(table : TableState)
             sql = delete_table_statement(quote(table.name))
             @connection.open do |db|
               db.exec(sql)
@@ -143,7 +143,7 @@ module Marten
           end
 
           # Renames a specific table.
-          def rename_table(table : Migrations::TableState, new_name : String) : Nil
+          def rename_table(table : TableState, new_name : String) : Nil
             sql = rename_table_statement(quote(table.name), quote(new_name))
             @connection.open do |db|
               db.exec(sql)

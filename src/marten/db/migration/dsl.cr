@@ -21,8 +21,8 @@ module Marten
 
           {% type_exists = false %}
           {% column_klass = nil %}
-          {% for k in Marten::DB::Migration::Column::Base.all_subclasses %}
-            {% ann = k.annotation(Marten::DB::Migration::Column::Registration) %}
+          {% for k in Marten::DB::Management::Column::Base.all_subclasses %}
+            {% ann = k.annotation(Marten::DB::Management::Column::Registration) %}
             {% if ann && ann[:id] == sanitized_type %}
               {% type_exists = true %}
               {% column_klass = k %}

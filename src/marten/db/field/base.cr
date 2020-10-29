@@ -33,7 +33,7 @@ module Marten
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
 
         # Returns a migration column object corresponding to the field at hand.
-        abstract def to_column : Migration::Column::Base
+        abstract def to_column : Management::Column::Base
 
         # Converts the field value to the corresponding DB value.
         abstract def to_db(value) : ::DB::Any

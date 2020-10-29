@@ -6,8 +6,8 @@ module Marten
           [true, "true", 1, "1", "yes"].includes?(result_set.read)
         end
 
-        def to_column : Migration::Column::Base
-          Migration::Column::Bool.new(
+        def to_column : Management::Column::Base
+          Management::Column::Bool.new(
             db_column,
             primary_key?,
             null?,

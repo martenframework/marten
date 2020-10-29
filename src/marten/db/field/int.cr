@@ -6,8 +6,8 @@ module Marten
           result_set.read(Int32?)
         end
 
-        def to_column : Migration::Column::Base
-          Migration::Column::Int.new(
+        def to_column : Management::Column::Base
+          Management::Column::Int.new(
             db_column,
             primary_key?,
             null?,

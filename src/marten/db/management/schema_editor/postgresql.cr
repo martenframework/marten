@@ -32,8 +32,8 @@ module Marten
           end
 
           def prepare_foreign_key_for_new_column(
-            table : Migrations::TableState,
-            column : Migration::Column::ForeignKey,
+            table : TableState,
+            column : Column::ForeignKey,
             column_definition : String
           ) : String
             constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
@@ -46,8 +46,8 @@ module Marten
           end
 
           def prepare_foreign_key_for_new_table(
-            table : Migrations::TableState,
-            column : Migration::Column::ForeignKey,
+            table : TableState,
+            column : Column::ForeignKey,
             column_definition : String
           ) : String
             constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
@@ -69,16 +69,16 @@ module Marten
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Migration::Column::Auto"       => "serial",
-            "Marten::DB::Migration::Column::BigAuto"    => "bigserial",
-            "Marten::DB::Migration::Column::BigInt"     => "bigint",
-            "Marten::DB::Migration::Column::Bool"       => "boolean",
-            "Marten::DB::Migration::Column::DateTime"   => "timestamp with time zone",
-            "Marten::DB::Migration::Column::ForeignKey" => "bigint",
-            "Marten::DB::Migration::Column::Int"        => "integer",
-            "Marten::DB::Migration::Column::String"     => "varchar(%{max_size})",
-            "Marten::DB::Migration::Column::Text"       => "text",
-            "Marten::DB::Migration::Column::UUID"       => "uuid",
+            "Marten::DB::Management::Column::Auto"       => "serial",
+            "Marten::DB::Management::Column::BigAuto"    => "bigserial",
+            "Marten::DB::Management::Column::BigInt"     => "bigint",
+            "Marten::DB::Management::Column::Bool"       => "boolean",
+            "Marten::DB::Management::Column::DateTime"   => "timestamp with time zone",
+            "Marten::DB::Management::Column::ForeignKey" => "bigint",
+            "Marten::DB::Management::Column::Int"        => "integer",
+            "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
+            "Marten::DB::Management::Column::Text"       => "text",
+            "Marten::DB::Management::Column::UUID"       => "uuid",
           }
         end
       end

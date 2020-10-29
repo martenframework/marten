@@ -19,7 +19,7 @@ module Marten
             columns << _init_column({{ args.splat }}, {{ kwargs.double_splat }})
           end
 
-          private getter columns = [] of Column::Base
+          private getter columns = [] of Management::Column::Base
         end
       end
     end

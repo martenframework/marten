@@ -11,8 +11,13 @@ module Marten
             nil
           end
 
-          def create_index_statement(name : String, table_name : String, columns : Array(String)) : String
-            "CREATE INDEX #{name} ON #{table_name} (#{columns.join(", ")})"
+          def create_index_statement(table : TableState, columns : Array(Column::Base)) : Statement
+            Statement.new(
+              "CREATE INDEX %{name} ON %{table} (%{columns})",
+              name: statement_index_name(table.name, columns.map(&.name)),
+              table: statement_table(table.name),
+              columns: statement_columns(table.name, columns.map(&.name)),
+            )
           end
 
           def create_table_statement(table_name : String, column_definitions : String) : String
@@ -46,7 +51,7 @@ module Marten
             column : Column::ForeignKey,
             column_definition : String
           ) : String
-            constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
+            constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
 
             "#{column_definition}, " + build_sql do |s|
               s << "ADD CONSTRAINT #{quote(constraint_name)}"
@@ -60,14 +65,19 @@ module Marten
             column : Column::ForeignKey,
             column_definition : String
           ) : String
-            constraint_name = index_name(table.name, [column.name]) + "_fk_#{column.to_table}_#{column.to_column}"
-
-            @deferred_statements << build_sql do |s|
-              s << "ALTER TABLE #{quote(table.name)}"
-              s << "ADD CONSTRAINT #{quote(constraint_name)}"
-              s << "FOREIGN KEY (#{quote(column.name)})"
-              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
-            end
+            @deferred_statements << Statement.new(
+              build_sql do |s|
+                s << "ALTER TABLE %{table}"
+                s << "ADD CONSTRAINT %{constraint}"
+                s << "FOREIGN KEY (%{column})"
+                s << "REFERENCES %{to_table} (%{to_column})"
+              end,
+              table: statement_table(table.name),
+              constraint: statement_foreign_key_name(table.name, column.name, column.to_table, column.to_column),
+              column: statement_columns(table.name, [column.name]),
+              to_table: statement_table(column.to_table),
+              to_column: statement_columns(column.to_table, [column.to_column]),
+            )
 
             # Returns the initial column definition since the foreign key creation is deferred.
             column_definition

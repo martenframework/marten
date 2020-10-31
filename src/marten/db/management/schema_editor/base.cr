@@ -11,7 +11,7 @@ module Marten
           delegate quote, to: @connection
 
           def initialize(@connection : Connection::Base)
-            @deferred_statements = [] of String
+            @deferred_statements = [] of Statement
           end
 
           # Returns the database type for a specific built-in column implementation.
@@ -26,7 +26,7 @@ module Marten
           abstract def column_type_suffix_for_built_in_column(id)
 
           # Returns the SQL statement allowing to create a database index.
-          abstract def create_index_statement(name : String, table_name : String, columns : Array(String)) : String
+          abstract def create_index_statement(table : TableState, columns : Array(Column::Base)) : Statement
 
           # Returns the SQL statement allowing to create a database table.
           abstract def create_table_statement(table_name : String, column_definitions : String) : String
@@ -71,11 +71,7 @@ module Marten
             end
 
             if column.index? && !column.unique?
-              @deferred_statements << create_index_statement(
-                index_name(table.name, [column.name]),
-                quote(table.name),
-                [quote(column.name)]
-              )
+              @deferred_statements << create_index_statement(table, [column])
             end
           end
 
@@ -109,12 +105,7 @@ module Marten
             # of deferred SQL statements.
             table.columns.each do |column|
               next if !column.index? || column.unique?
-
-              @deferred_statements << create_index_statement(
-                index_name(table.name, [column.name]),
-                quote(table.name),
-                [quote(column.name)]
-              )
+              @deferred_statements << create_index_statement(table, [column])
             end
           end
 
@@ -148,7 +139,7 @@ module Marten
             @connection.open do |db|
               db.exec(sql)
             end
-            # TODO: rename deferred statemens referencing the renamed table?
+            # TODO: rename deferred statements referencing the renamed table?
           end
 
           # Syncs all models for the current database connection.
@@ -169,7 +160,7 @@ module Marten
           protected def execute_deferred_statements
             @deferred_statements.each do |sql|
               @connection.open do |db|
-                db.exec(sql)
+                db.exec(sql.to_s)
               end
             end
             @deferred_statements.clear
@@ -192,8 +183,24 @@ module Marten
             sql
           end
 
-          private def index_name(table_name, columns)
-            "index_#{table_name}_on_#{columns.join("_")}"
+          private def index_name(table_name, columns, suffix)
+            "index_#{table_name}_on_#{columns.join("_")}#{suffix}"
+          end
+
+          private def statement_columns(*args, **kwargs)
+            Statement::Columns.new(->quote(String), *args, **kwargs)
+          end
+
+          private def statement_foreign_key_name(*args, **kwargs)
+            Statement::ForeignKeyName.new(->index_name(String, Array(String), String), *args, **kwargs)
+          end
+
+          private def statement_index_name(*args, **kwargs)
+            Statement::IndexName.new(->index_name(String, Array(String), String), *args, **kwargs)
+          end
+
+          private def statement_table(*args, **kwargs)
+            Statement::Table.new(->quote(String), *args, **kwargs)
           end
         end
       end

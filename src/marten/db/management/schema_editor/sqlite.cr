@@ -15,8 +15,13 @@ module Marten
             BUILT_IN_COLUMN_TO_DB_TYPE_SUFFIX_MAPPING[id]?
           end
 
-          def create_index_statement(name : String, table_name : String, columns : Array(String)) : String
-            "CREATE INDEX #{name} ON #{table_name} (#{columns.join(", ")})"
+          def create_index_statement(table : TableState, columns : Array(Column::Base)) : Statement
+            Statement.new(
+              "CREATE INDEX %{name} ON %{table} (%{columns})",
+              name: statement_index_name(table.name, columns.map(&.name)),
+              table: statement_table(table.name),
+              columns: statement_columns(table.name, columns.map(&.name)),
+            )
           end
 
           def create_table_statement(table_name : String, column_definitions : String) : String

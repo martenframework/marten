@@ -42,6 +42,41 @@ describe Marten::Core::Validation do
       foo.errors.first.type.should eq Marten::Core::Validation::ErrorSet::DEFAULT_ERROR_TYPE.to_s
       foo.errors.first.field.should eq "bar"
     end
+
+    it "makes use of defined validation methods" do
+      a = Marten::Core::ValidationSpec::A.new
+
+      a.valid?.should be_false
+
+      a.errors.size.should eq 1
+      a.errors.first.message.should eq "The subject is blank!"
+      a.errors.first.field.should eq "subject"
+
+      a.subject = "Hello"
+
+      a.valid?.should be_true
+
+      a.errors.empty?.should be_true
+    end
+
+    it "makes use of the class defined validation methods and those of its ancestors" do
+      b = Marten::Core::ValidationSpec::B.new
+
+      b.valid?.should be_false
+
+      b.errors.size.should eq 2
+      b.errors.to_a[0].message.should eq "The subject is blank!"
+      b.errors.to_a[0].field.should eq "subject"
+      b.errors.to_a[1].message.should eq "The content is blank!"
+      b.errors.to_a[1].field.should eq "content"
+
+      b.subject = "Hello"
+      b.content = "This is a message"
+
+      b.valid?.should be_true
+
+      b.errors.empty?.should be_true
+    end
   end
 
   describe "#invalid?" do
@@ -76,6 +111,32 @@ module Marten::Core::ValidationSpec
 
     def validate
       errors.add(:bar, "This is invalid!") if @bar == 0
+    end
+  end
+
+  class A
+    include Marten::Core::Validation
+
+    @subject : String = ""
+
+    setter subject
+
+    validate :validate_subject
+
+    private def validate_subject
+      errors.add(:subject, "The subject is blank!") if @subject.empty?
+    end
+  end
+
+  class B < A
+    @content : String = ""
+
+    setter content
+
+    validate :validate_content
+
+    private def validate_content
+      errors.add(:content, "The content is blank!") if @content.empty?
     end
   end
 end

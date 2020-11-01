@@ -65,10 +65,10 @@ describe Marten::Core::Validation do
       b.valid?.should be_false
 
       b.errors.size.should eq 2
-      b.errors.to_a[0].message.should eq "The subject is blank!"
-      b.errors.to_a[0].field.should eq "subject"
-      b.errors.to_a[1].message.should eq "The content is blank!"
-      b.errors.to_a[1].field.should eq "content"
+      b.errors[0].message.should eq "The subject is blank!"
+      b.errors[0].field.should eq "subject"
+      b.errors[1].message.should eq "The content is blank!"
+      b.errors[1].field.should eq "content"
 
       b.subject = "Hello"
       b.content = "This is a message"

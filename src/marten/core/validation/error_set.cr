@@ -3,7 +3,7 @@ module Marten
     module Validation
       # Represents a set of validation errors.
       class ErrorSet
-        include Enumerable(Error)
+        include Indexable(Error)
 
         DEFAULT_ERROR_TYPE = :invalid
 
@@ -52,6 +52,9 @@ module Marten
 
         # Clears all the `Marten::Core::Validation::Error` objects from this error set.
         delegate clear, to: @errors
+
+        # :nodoc:
+        delegate unsafe_fetch, to: @errors
       end
     end
   end

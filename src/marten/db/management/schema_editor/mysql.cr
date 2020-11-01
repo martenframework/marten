@@ -11,7 +11,7 @@ module Marten
             nil
           end
 
-          def create_index_statement(table : TableState, columns : Array(Column::Base)) : Statement
+          def create_index_deferred_statement(table : TableState, columns : Array(Column::Base)) : Statement
             Statement.new(
               "CREATE INDEX %{name} ON %{table} (%{columns})",
               name: statement_index_name(table.name, columns.map(&.name)),

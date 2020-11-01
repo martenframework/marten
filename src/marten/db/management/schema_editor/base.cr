@@ -26,7 +26,7 @@ module Marten
           abstract def column_type_suffix_for_built_in_column(id)
 
           # Returns the SQL statement allowing to create a database index.
-          abstract def create_index_statement(table : TableState, columns : Array(Column::Base)) : Statement
+          abstract def create_index_deferred_statement(table : TableState, columns : Array(Column::Base)) : Statement
 
           # Returns the SQL statement allowing to create a database table.
           abstract def create_table_statement(table_name : String, column_definitions : String) : String
@@ -71,7 +71,7 @@ module Marten
             end
 
             if column.index? && !column.unique?
-              @deferred_statements << create_index_statement(table, [column])
+              @deferred_statements << create_index_deferred_statement(table, [column])
             end
           end
 
@@ -105,7 +105,7 @@ module Marten
             # of deferred SQL statements.
             table.columns.each do |column|
               next if !column.index? || column.unique?
-              @deferred_statements << create_index_statement(table, [column])
+              @deferred_statements << create_index_deferred_statement(table, [column])
             end
           end
 

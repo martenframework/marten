@@ -139,7 +139,9 @@ module Marten
             @connection.open do |db|
               db.exec(sql)
             end
-            # TODO: rename deferred statements referencing the renamed table?
+            @deferred_statements.each do |statement|
+              statement.rename_table(table.name, new_name)
+            end
           end
 
           # Syncs all models for the current database connection.

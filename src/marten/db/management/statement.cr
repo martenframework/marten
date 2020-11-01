@@ -14,6 +14,12 @@ module Marten
           @params.merge!(kwargs.to_h.transform_keys(&.to_s))
         end
 
+        def rename_table(old_name : String, new_name : String)
+          @params.values.each do |ref|
+            ref.rename_table(old_name, new_name)
+          end
+        end
+
         def to_s
           @template % @params.transform_values(&.to_s)
         end

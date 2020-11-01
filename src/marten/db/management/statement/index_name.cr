@@ -11,6 +11,10 @@ module Marten
           )
           end
 
+          def rename_table(old_name : String, new_name : String)
+            @table = new_name if @table == old_name
+          end
+
           def to_s
             @index_name_proc.call(@table, @columns, @suffix)
           end

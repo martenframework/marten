@@ -12,6 +12,11 @@ module Marten
           )
           end
 
+          def rename_table(old_name : String, new_name : String)
+            @table = new_name if @table == old_name
+            @to_table = new_name if @to_table == new_name
+          end
+
           def to_s
             IndexName.new(@index_name_proc, @table, [@column], "_fk_#{@to_table}_#{@to_column}").to_s
           end

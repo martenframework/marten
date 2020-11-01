@@ -35,6 +35,17 @@ describe Marten::DB::Model::Persistence do
       object.valid?.should be_true
       object.persisted?.should be_true
     end
+
+    it "raises if an optional related object is not persisted" do
+      existing_user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      new_user = TestUser.new
+      expect_raises(
+        Marten::DB::Errors::UnmetSaveCondition,
+        "Save is prohibited because related object 'updated_by' is not persisted"
+      ) do
+        Post.create(author: existing_user, updated_by: new_user, title: "Test")
+      end
+    end
   end
 
   describe "::create!" do
@@ -85,6 +96,20 @@ describe Marten::DB::Model::Persistence do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.email = nil
       object.save.should be_false
+    end
+
+    it "raises if an optional related object is not persisted" do
+      existing_user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      new_user = TestUser.new
+
+      post = Post.new(author: existing_user, updated_by: new_user, title: "Test")
+
+      expect_raises(
+        Marten::DB::Errors::UnmetSaveCondition,
+        "Save is prohibited because related object 'updated_by' is not persisted"
+      ) do
+        post.save!
+      end
     end
   end
 

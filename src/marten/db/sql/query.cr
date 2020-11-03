@@ -220,7 +220,7 @@ module Marten
         end
 
         private def connection
-          @using.nil? ? Model.connection : Connection.get(@using)
+          @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
         end
 
         private def ensure_join_for_field_path(field_path)

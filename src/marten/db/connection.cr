@@ -33,8 +33,8 @@ module Marten
       # Returns the database connection configured for a given `db_alias`.
       #
       # If no database connection can be found, a `Marten::DB::Errors::UnknownConnection` exception is raised.
-      def self.get(db_alias)
-        registry[db_alias]
+      def self.get(db_alias : String | Symbol)
+        registry[db_alias.to_s]
       rescue KeyError
         raise Errors::UnknownConnection.new("Unknown database connection '#{db_alias}'")
       end

@@ -244,7 +244,6 @@ module Marten
                 @joins << join
               else
                 parent_join.add_child(join)
-                # @joins.insert(@joins.index(parent_join).not_nil! + 1, join)
               end
             end
 

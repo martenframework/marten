@@ -8,6 +8,10 @@ module Marten
           end.operation
         end
 
+        macro rename_table(old_name, new_name)
+          operations << Operation::RenameTable.new({{ old_name }}, {{ new_name }})
+        end
+
         macro _init_column(*args, **kwargs)
           {% if args.size != 2 %}{% raise "A column name and type must be explicitly specified" %}{% end %}
 

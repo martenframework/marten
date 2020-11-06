@@ -14,6 +14,10 @@ module Marten
           @params.merge!(kwargs.to_h.transform_keys(&.to_s))
         end
 
+        def references_table?(name : String) : Bool
+          @params.values.any? { |ref| ref.references_table?(name) }
+        end
+
         def rename_table(old_name : String, new_name : String)
           @params.values.each do |ref|
             ref.rename_table(old_name, new_name)

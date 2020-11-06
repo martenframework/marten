@@ -11,6 +11,10 @@ module Marten
           )
           end
 
+          def references_table?(name : String?)
+            @table == name
+          end
+
           def rename_table(old_name : String, new_name : String)
             @table = new_name if @table == old_name
           end

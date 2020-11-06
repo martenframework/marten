@@ -7,7 +7,7 @@ describe Marten::DB::Model::Querying do
       TestUser.create!(username: "foo", email: "fb@example.com", first_name: "Foo", last_name: "Bar")
 
       qs = TestUser.all
-      qs.should be_a(Marten::DB::QuerySet(TestUser))
+      qs.should be_a(Marten::DB::Query::Set(TestUser))
 
       results = qs.to_a
       results.size.should eq 2
@@ -21,7 +21,7 @@ describe Marten::DB::Model::Querying do
       Tag.create!(name: "coding", is_active: true)
 
       qs = Tag.all
-      qs.should be_a(Marten::DB::QuerySet(Tag))
+      qs.should be_a(Marten::DB::Query::Set(Tag))
 
       results = qs.to_a
       results.size.should eq 2
@@ -36,7 +36,7 @@ describe Marten::DB::Model::Querying do
       TestUser.create!(username: "foo", email: "fb@example.com", first_name: "Foo", last_name: "Bar")
 
       qs = TestUser.default_queryset
-      qs.should be_a(Marten::DB::QuerySet(TestUser))
+      qs.should be_a(Marten::DB::Query::Set(TestUser))
 
       results = qs.to_a
       results.size.should eq 2
@@ -58,7 +58,7 @@ describe Marten::DB::Model::Querying do
 
     it "returns a queryset without the objects matching the excluding predicates" do
       qs = TestUser.exclude(username: "foo")
-      qs.should be_a(Marten::DB::QuerySet(TestUser))
+      qs.should be_a(Marten::DB::Query::Set(TestUser))
 
       results = qs.to_a
       results.size.should eq 2
@@ -68,7 +68,7 @@ describe Marten::DB::Model::Querying do
 
     it "makes use of the default queryset" do
       qs = Tag.exclude(name: "coding")
-      qs.should be_a(Marten::DB::QuerySet(Tag))
+      qs.should be_a(Marten::DB::Query::Set(Tag))
 
       results = qs.to_a
       results.size.should eq 1
@@ -77,7 +77,7 @@ describe Marten::DB::Model::Querying do
 
     it "returns a queryset without the objects matching the advanced predicates expression" do
       qs = TestUser.exclude { q(username: "foo") | q(username: "jd1") }
-      qs.should be_a(Marten::DB::QuerySet(TestUser))
+      qs.should be_a(Marten::DB::Query::Set(TestUser))
 
       results = qs.to_a
       results.size.should eq 1
@@ -86,7 +86,7 @@ describe Marten::DB::Model::Querying do
 
     it "makes use of the default queryset when using a block defining an advanced predicates expression" do
       qs = Tag.exclude { q(name: "crystal") | q(name: "coding") }
-      qs.should be_a(Marten::DB::QuerySet(Tag))
+      qs.should be_a(Marten::DB::Query::Set(Tag))
 
       results = qs.to_a
       results.size.should eq 0
@@ -106,7 +106,7 @@ describe Marten::DB::Model::Querying do
 
     it "returns a queryset with the objects matching the filter predicates" do
       qs = TestUser.filter(username__startswith: "jd")
-      qs.should be_a(Marten::DB::QuerySet(TestUser))
+      qs.should be_a(Marten::DB::Query::Set(TestUser))
 
       results = qs.to_a
       results.size.should eq 2
@@ -116,7 +116,7 @@ describe Marten::DB::Model::Querying do
 
     it "makes use of the default queryset" do
       qs = Tag.filter(name: "coding")
-      qs.should be_a(Marten::DB::QuerySet(Tag))
+      qs.should be_a(Marten::DB::Query::Set(Tag))
 
       results = qs.to_a
       results.size.should eq 1
@@ -125,7 +125,7 @@ describe Marten::DB::Model::Querying do
 
     it "returns a queryset with the objects matching the advanced predicates expression" do
       qs = TestUser.filter { q(username: "foo") | q(username: "jd1") }
-      qs.should be_a(Marten::DB::QuerySet(TestUser))
+      qs.should be_a(Marten::DB::Query::Set(TestUser))
 
       results = qs.to_a
       results.size.should eq 2
@@ -135,7 +135,7 @@ describe Marten::DB::Model::Querying do
 
     it "makes use of the default queryset when using a block defining an advanced predicates expression" do
       qs = Tag.filter { q(name__startswith: "cr") & q(name__endswith: "al") }
-      qs.should be_a(Marten::DB::QuerySet(Tag))
+      qs.should be_a(Marten::DB::Query::Set(Tag))
 
       results = qs.to_a
       results.size.should eq 1

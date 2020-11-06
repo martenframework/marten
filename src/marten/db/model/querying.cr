@@ -15,7 +15,7 @@ module Marten
         module ClassMethods
           # Returns a queryset targetting all the records for the considered model.
           #
-          # This method returns a `Marten::DB::QuerySet` object that - if evaluated - will return all the records for
+          # This method returns a `Marten::DB::Query::Set` object that - if evaluated - will return all the records for
           # the considered model.
           def all
             default_queryset
@@ -23,12 +23,12 @@ module Marten
 
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
-            QuerySet(self).new
+            Query::Set(self).new
           end
 
           # Returns a queryset whose records do not match the given set of filters.
           #
-          # This method returns a `Marten::DB::QuerySet` object. The filters passed to this method method must be
+          # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be
           # specified using the predicate format:
           #
           # ```
@@ -43,22 +43,22 @@ module Marten
 
           # Returns a queryset whose records do not match the given set of advanced filters.
           #
-          # This method returns a `Marten::DB::QuerySet` object and allows to define complex database queries involving
-          # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
-          # expression. These expressions can then be used to build complex queries such as:
+          # This method returns a `Marten::DB::Query::Set` object and allows to define complex database queries
+          # involving **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a
+          # `q(...)` expression. These expressions can then be used to build complex queries such as:
           #
           # ```
           # Post.exclude { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
           # ```
           def exclude(&block)
-            expr = Expression::Filter(self).new
-            query : QueryNode(self) = with expr yield
+            expr = Query::Expression::Filter(self).new
+            query : Query::Node(self) = with expr yield
             default_queryset.exclude(query)
           end
 
           # Returns a queryset matching a specific set of filters.
           #
-          # This method returns a `Marten::DB::QuerySet` object. The filters passed to this method method must be
+          # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be
           # specified using the predicate format:
           #
           # ```
@@ -73,16 +73,16 @@ module Marten
 
           # Returns a queryset matching a specific set of advanced filters.
           #
-          # This method returns a `Marten::DB::QuerySet` object and allows to define complex database queries involving
-          # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
-          # expression. These expressions can then be used to build complex queries such as:
+          # This method returns a `Marten::DB::Query::Set` object and allows to define complex database queries
+          # involving **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a
+          # `q(...)` expression. These expressions can then be used to build complex queries such as:
           #
           # ```
           # Post.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
           # ```
           def filter(&block)
-            expr = Expression::Filter(self).new
-            query : QueryNode(self) = with expr yield
+            expr = Query::Expression::Filter(self).new
+            query : Query::Node(self) = with expr yield
             default_queryset.filter(query)
           end
 
@@ -126,8 +126,8 @@ module Marten
           # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
           # exception if multiple records match the specified set of filters.
           def get(&block)
-            expr = Expression::Filter(self).new
-            query : QueryNode(self) = with expr yield
+            expr = Query::Expression::Filter(self).new
+            query : Query::Node(self) = with expr yield
             default_queryset.get(query)
           end
 
@@ -166,8 +166,8 @@ module Marten
           # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
           # exception if multiple records match the specified set of filters.
           def get!(&block)
-            expr = Expression::Filter(self).new
-            query : QueryNode(self) = with expr yield
+            expr = Query::Expression::Filter(self).new
+            query : Query::Node(self) = with expr yield
             default_queryset.get!(query)
           end
 

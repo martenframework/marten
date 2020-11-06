@@ -46,7 +46,7 @@ module Marten
             @@relation_fields_per_relation_name[field.relation_name] = field if field.relation?
           end
 
-          protected def from_db_row_iterator(row_iterator : SQL::RowIterator)
+          protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
             obj = new
             obj.new_record = false
             obj.from_db_row_iterator(row_iterator)
@@ -190,7 +190,7 @@ module Marten
           io << ">"
         end
 
-        protected def from_db_row_iterator(row_iterator : SQL::RowIterator)
+        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
           row_iterator.each_local_column do |result_set, column_name|
             assign_field_from_db_result_set(result_set, column_name)
           end

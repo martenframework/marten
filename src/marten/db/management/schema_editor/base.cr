@@ -120,6 +120,9 @@ module Marten
             @connection.open do |db|
               db.exec(sql)
             end
+
+            # Removes all deferred statements that still referenece the deleted table.
+            @deferred_statements.reject! { |s| s.references_table?(table.name) }
           end
 
           # Flushes all model tables.

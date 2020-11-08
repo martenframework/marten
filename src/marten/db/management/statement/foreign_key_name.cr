@@ -12,6 +12,10 @@ module Marten
           )
           end
 
+          def references_column?(table : String, column : String?)
+            (@table == table && @column == column) || (@to_table == table && @to_column == column)
+          end
+
           def references_table?(name : String?)
             @table == name || @to_table == name
           end

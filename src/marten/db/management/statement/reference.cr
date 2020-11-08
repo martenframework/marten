@@ -3,6 +3,10 @@ module Marten
     module Management
       class Statement
         abstract class Reference
+          def references_column?(table : String, column : String?)
+            false
+          end
+
           def references_table?(name : String?)
             false
           end

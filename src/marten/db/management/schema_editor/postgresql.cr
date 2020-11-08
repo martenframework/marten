@@ -28,6 +28,14 @@ module Marten
             true
           end
 
+          def delete_column_statement(table : TableState, column : Column::Base) : String
+            "ALTER TABLE #{quote(table.name)} DROP COLUMN #{quote(column.name)} CASCADE"
+          end
+
+          def delete_foreign_key_constraint_statement(table : TableState, name : String) : String
+            "ALTER TABLE #{quote(table.name)} DROP CONSTRAINT #{quote(name)}"
+          end
+
           def delete_table_statement(table_name : String) : String
             "DROP TABLE #{table_name} CASCADE"
           end

@@ -32,6 +32,18 @@ module Marten
             true
           end
 
+          def delete_column_statement(table : TableState, column : Column::Base) : String
+            raise NotImplementedError.new(
+              "Deleting columns from tables through SQL is not supported by the SQLite schema editor"
+            )
+          end
+
+          def delete_foreign_key_constraint_statement(table : TableState, name : String) : String
+            raise NotImplementedError.new(
+              "Removing foreign keys from tables is not supported by the SQLite schema editor"
+            )
+          end
+
           def delete_table_statement(table_name : String) : String
             "DROP TABLE #{table_name}"
           end
@@ -70,6 +82,10 @@ module Marten
               s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
               s << "DEFERRABLE INITIALLY DEFERRED"
             end
+          end
+
+          def remove_column(table : TableState, column : Column::Base) : Nil
+            remake_table_with_column_change(table, column, change_type: :delete)
           end
 
           def rename_table_statement(old_name : String, new_name : String)
@@ -114,6 +130,9 @@ module Marten
               end
 
               remade_table.add_column(column)
+            elsif change_type == :delete
+              remade_table.remove_column(column)
+              column_names_mapping.delete(column.name)
             end
 
             # Create the new table.

@@ -34,6 +34,12 @@ module Marten
           # Returns a boolean indicating if the schema editor implementation supports rollbacking DDL statements.
           abstract def ddl_rollbackable? : Bool
 
+          # Returns the SQL statement allowing to delete a specific column from a table.
+          abstract def delete_column_statement(table : TableState, column : Column::Base) : String
+
+          # Returns the SQL statement allowing to delete a specific foreign key constraint from a table.
+          abstract def delete_foreign_key_constraint_statement(table : TableState, name : String) : String
+
           # Returns the SQL statement allowing to delete a database table.
           abstract def delete_table_statement(table_name : String) : String
 
@@ -121,7 +127,7 @@ module Marten
               db.exec(sql)
             end
 
-            # Removes all deferred statements that still referenece the deleted table.
+            # Removes all deferred statements that still reference the deleted table.
             @deferred_statements.reject! { |s| s.references_table?(table.name) }
           end
 
@@ -134,6 +140,25 @@ module Marten
                 db.exec(sql)
               end
             end
+          end
+
+          # Removes a column from a specific table.
+          def remove_column(table : TableState, column : Column::Base) : Nil
+            # First drops possible foreign key constraints if applicable.
+            fk_constraint_names = @connection.introspector.foreign_key_constraint_names(table.name, column.name)
+            fk_constraint_names.each do |constraint_name|
+              @connection.open do |db|
+                db.exec(delete_foreign_key_constraint_statement(table, constraint_name))
+              end
+            end
+
+            # Now drops the column.
+            @connection.open do |db|
+              db.exec(delete_column_statement(table, column))
+            end
+
+            # Removes all deferred statements that still reference the deleted column.
+            @deferred_statements.reject! { |s| s.references_column?(table.name, column.name) }
           end
 
           # Renames a specific table.

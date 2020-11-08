@@ -29,6 +29,10 @@ module Marten
           @columns << column
         end
 
+        def remove_column(column : Column::Base)
+          @columns.reject! { |c| c.name == column.name }
+        end
+
         def clone
           TableState.new(@app_label.dup, @name.dup, @columns.dup)
         end

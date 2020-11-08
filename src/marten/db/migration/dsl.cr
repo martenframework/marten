@@ -8,6 +8,10 @@ module Marten
           end.operation
         end
 
+        macro delete_table(name)
+          operations << Operation::DeleteTable.new({{ name }})
+        end
+
         macro rename_table(old_name, new_name)
           operations << Operation::RenameTable.new({{ old_name }}, {{ new_name }})
         end

@@ -10,17 +10,17 @@ module Marten
           end
 
           # Returns the SQL statement allowing to list the foreign key constraints for a specific table.
-          abstract def get_foreign_key_constraint_names_statement(table_name : String) : String
+          abstract def get_foreign_key_constraint_names_statement(table_name : String, column_name : String) : String
 
           # Returns the SQL statement allowing to list all table names.
           abstract def list_table_names_statement : String
 
           # Returns an array of all the foreign key constraints of a specific table.
-          def foreign_key_constraint_names(table_name : String) : Array(String)
+          def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
             names = [] of String
 
             @connection.open do |db|
-              db.query(get_foreign_key_constraint_names_statement(table_name)) do |rs|
+              db.query(get_foreign_key_constraint_names_statement(table_name, column_name)) do |rs|
                 rs.each do
                   names << rs.read(String)
                 end

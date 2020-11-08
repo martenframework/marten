@@ -2,6 +2,13 @@ module Marten
   module DB
     abstract class Migration
       module DSL
+        macro add_column(table_name, *args, **kwargs)
+          operations << Operation::AddColumn.new(
+            {{ table_name }},
+            _init_column({{ args.splat }}, {{ kwargs.double_splat }})
+          )
+        end
+
         macro create_table(name)
           operations << CreateTable.new({{ name }}).build do
             {{ yield }}

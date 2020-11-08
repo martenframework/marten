@@ -31,10 +31,6 @@ module Marten
             schema_editor.rename_table(table, @new_name)
           end
 
-          def mutate_state_backward(app_label : String, state : Management::ProjectState) : Nil
-            state.rename_table(app_label, @new_name, @old_name)
-          end
-
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
             state.rename_table(app_label, @old_name, @new_name)
           end

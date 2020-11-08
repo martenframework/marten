@@ -80,21 +80,39 @@ module Marten
       end
 
       def apply_backward(
+        pre_forward_project_state : Management::ProjectState,
         project_state : Management::ProjectState,
         schema_editor : Management::SchemaEditor::Base
       )
         ops_backward, directed_forward = operations_backward
-        ops_backward.not_nil!.each do |operation|
-          old_state = project_state.clone
-          if directed_forward
-            # If 'explicit' backward operations are defined (using 'plan_backward'), then this means that those
-            # operations have to be applied forward since the intent of what's described in 'plan_backward' (and the
-            # order of what's defined in this method) prevails.
+
+        if directed_forward
+          # If 'explicit' backward operations are defined (using 'plan_backward'), then this means that those
+          # operations have to be applied forward since the intent of what's described in 'plan_backward' (and the
+          # order of what's defined in this method) prevails.
+          ops_backward.not_nil!.each do |operation|
+            old_state = project_state.clone
             operation.mutate_state_forward(self.class.app_config.label, project_state)
             operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
-          else
-            operation.mutate_state_backward(self.class.app_config.label, project_state)
-            operation.mutate_db_backward(self.class.app_config.label, schema_editor, old_state, project_state)
+          end
+        else
+          # Computes the state that would be active before each of the migration operations if they were executed
+          # forward. This is necessary because some specific backward operations need the knowledge of the pre-forward
+          # project state in order to properly revert themselves in some cases.
+          pre_forward_operation_states = [] of Tuple(Management::ProjectState, Management::ProjectState)
+          new_state = pre_forward_project_state
+          operations_forward[0].not_nil!.each do |operation|
+            new_state = new_state.clone
+            old_state = new_state.clone
+            operation.mutate_state_forward(self.class.app_config.label, new_state)
+            pre_forward_operation_states << {old_state, new_state}
+          end
+
+          # Now revert each of the defined operations in reverse order by using the previously computed states.
+          ops_backward.not_nil!.each do |operation|
+            to_state, from_state = pre_forward_operation_states.pop
+            operation.mutate_db_backward(self.class.app_config.label, schema_editor, from_state, to_state)
+            project_state = to_state
           end
         end
 

@@ -26,10 +26,6 @@ module Marten
             schema_editor.create_table(table)
           end
 
-          def mutate_state_backward(app_label : String, state : Management::ProjectState) : Nil
-            state.delete_table(app_label, @name)
-          end
-
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
             state.add_table(
               Management::TableState.new(

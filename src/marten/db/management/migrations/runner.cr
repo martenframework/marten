@@ -41,13 +41,27 @@ module Marten
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
             state = generate_current_project_state(full_plan)
 
-            full_plan.reverse.map(&.first).each do |migration|
+            # Generates a hash of pre-migration states: each state in this hash corresponds to the state that would be
+            # active if we were to apply each migration forward.
+            pre_forward_state = ProjectState.new
+            pre_forward_migration_states = {} of String => ProjectState
+            full_plan.map(&.first).each do |migration|
               break if migration_ids_to_unapply.empty?
-              next unless migration_ids_to_unapply.includes?(migration.id)
 
+              if migration_ids_to_unapply.includes?(migration.id)
+                pre_forward_migration_states[migration.id] = pre_forward_state
+                pre_forward_state = migration.mutate_state_forward(pre_forward_state, preserve: true)
+                migration_ids_to_unapply.delete(migration.id)
+              elsif @reader.applied_migrations.has_key?(migration.id)
+                migration.mutate_state_forward(pre_forward_state, preserve: false)
+              end
+            end
+
+            state = generate_current_project_state(full_plan)
+            plan.map(&.first).each do |migration|
               yield Progress.new(ProgressType::MIGRATION_APPLY_BACKWARD_START, migration)
 
-              state = migrate_backward(state, migration)
+              state = migrate_backward(pre_forward_migration_states[migration.id], state, migration)
               migration_ids_to_unapply.delete(migration.id)
 
               yield Progress.new(ProgressType::MIGRATION_APPLY_BACKWARD_SUCCESS, migration)
@@ -144,9 +158,9 @@ module Marten
             plan
           end
 
-          private def migrate_backward(state, migration)
+          private def migrate_backward(pre_forward_state, state, migration)
             SchemaEditor.run_for(@connection, atomic: migration.atomic?) do |schema_editor|
-              state = migration.apply_backward(state, schema_editor)
+              state = migration.apply_backward(pre_forward_state, state, schema_editor)
               unrecord_migration(migration)
             end
 

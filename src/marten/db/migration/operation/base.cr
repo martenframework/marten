@@ -17,8 +17,6 @@ module Marten
             to_state : Management::ProjectState
           ) : Nil
 
-          abstract def mutate_state_backward(app_label : String, state : Management::ProjectState) : Nil
-
           abstract def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
         end
       end

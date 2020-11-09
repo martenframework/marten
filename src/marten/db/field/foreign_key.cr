@@ -13,8 +13,10 @@ module Marten
           @editable = true,
           @name = nil,
           @db_column = nil,
-          @db_index = true
+          @db_index = true,
+          @related_name : Nil | ::String | Symbol = nil
         )
+          @related_name = @related_name.try(&.to_s)
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
@@ -126,6 +128,22 @@ module Marten
               @{{ relation_attribute_name }} = related_object
             end
           end
+
+          # Configure reverse relation methods if applicable (when the 'related_name' option is set).
+
+          {% related_field_name = kwargs[:related_name] %}
+
+          {% if !related_field_name.nil? %}
+          class ::{{ model_klass }}
+            macro finished
+              class ::{{ related_model_klass }}
+                def {{ related_field_name.id }}
+                  Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
+                end
+              end
+            end
+          end
+          {% end %}
         end
       end
     end

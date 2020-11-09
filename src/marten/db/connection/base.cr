@@ -72,11 +72,6 @@ module Marten
           clauses.compact!.join " "
         end
 
-        # Returns a new database entrypoint to interact with the underlying database.
-        def db
-          @db ||= ::DB.open(@url)
-        end
-
         # Provides a database entrypoint to the block.
         #
         # If this method is called in an existing transaction, the connection associated with this transaction will be
@@ -129,6 +124,10 @@ module Marten
           parts << @config.name
 
           parts.compact!.join("")
+        end
+
+        protected def db
+          @db ||= ::DB.open(@url)
         end
 
         private getter transactions

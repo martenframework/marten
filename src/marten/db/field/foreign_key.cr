@@ -14,9 +14,9 @@ module Marten
           @name = nil,
           @db_column = nil,
           @db_index = true,
-          @related_name : Nil | ::String | Symbol = nil
+          @related : Nil | ::String | Symbol = nil
         )
-          @related_name = @related_name.try(&.to_s)
+          @related = @related.try(&.to_s)
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
@@ -129,9 +129,9 @@ module Marten
             end
           end
 
-          # Configure reverse relation methods if applicable (when the 'related_name' option is set).
+          # Configure reverse relation methods if applicable (when the 'related' option is set).
 
-          {% related_field_name = kwargs[:related_name] %}
+          {% related_field_name = kwargs[:related] %}
 
           {% if !related_field_name.nil? %}
           class ::{{ model_klass }}

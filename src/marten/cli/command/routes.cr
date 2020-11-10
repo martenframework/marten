@@ -26,7 +26,10 @@ module Marten
           parts << style("[#{parent_name.nil? ? rule.name : "#{parent_name}:#{rule.name}"}]", fore: :light_yellow)
           parts << "›"
           parts << style([parent_name, rule.view.name].compact.join(":"), fore: :light_green)
-          parts << "(#{rule.view.http_method_names.join(", ")})"
+
+          if rule.view.http_method_names != Views::Base.http_method_names
+            parts << "(#{rule.view.http_method_names.join(", ")})"
+          end
 
           print(parts.join(" "))
         end

@@ -29,8 +29,16 @@ module Marten
           @columns << column
         end
 
+        def get_column(name : String) : Column::Base
+          @columns.find { |c| c.name == name }.not_nil!
+        end
+
         def remove_column(column : Column::Base)
           @columns.reject! { |c| c.name == column.name }
+        end
+
+        def remove_column(column_name : String)
+          @columns.reject! { |c| c.name == column_name }
         end
 
         def clone

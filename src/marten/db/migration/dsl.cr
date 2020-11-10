@@ -19,6 +19,10 @@ module Marten
           operations << Operation::DeleteTable.new({{ name }})
         end
 
+        macro remove_column(table_name, column_name)
+          operations << Operation::RemoveColumn.new({{ table_name }}, {{ column_name }})
+        end
+
         macro rename_table(old_name, new_name)
           operations << Operation::RenameTable.new({{ old_name }}, {{ new_name }})
         end

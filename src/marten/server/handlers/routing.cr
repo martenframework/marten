@@ -6,7 +6,6 @@ module Marten
 
         def call(context : ::HTTP::Server::Context)
           process(context)
-          call_next(context)
         end
 
         private def process(context)
@@ -14,6 +13,8 @@ module Marten
 
           view = matched.view.new(context.marten.request, matched.kwargs)
           context.marten.response = view.dispatch.as(HTTP::Response)
+
+          context
         end
       end
     end

@@ -29,6 +29,9 @@ module Marten
       # Returns the log backend used by the application.
       getter log_backend
 
+      # Returns the list of middlewares used by the application.
+      getter middleware
+
       # Returns the port the HTTP server running the application will be listening on.
       getter port
 
@@ -133,6 +136,7 @@ module Marten
           io << entry.message
         end
         @log_backend = ::Log::IOBackend.new(formatter: log_formatter)
+        @middleware = Array(Marten::Middleware.class).new
         @port = 8000
         @port_reuse = true
         @request_max_parameters = 1000
@@ -163,6 +167,12 @@ module Marten
       # Allows to set the log backend used by the application.
       def log_backend=(log_backend : ::Log::Backend)
         @log_backend = log_backend
+      end
+
+      # Allows to define the list of middlewares used by the application.
+      def middleware=(v)
+        @middleware = Array(Marten::Middleware.class).new
+        @middleware.concat(v)
       end
 
       # :nodoc:

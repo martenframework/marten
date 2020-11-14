@@ -1,7 +1,7 @@
 module Marten
   module DB
     module Field
-      class ForeignKey < Base
+      class OneToMany < Base
         def initialize(
           @id : ::String,
           @relation_name : ::String,
@@ -63,7 +63,7 @@ module Marten
         # :nodoc:
         macro check_definition(field_id, kwargs)
           {% if kwargs.is_a?(NilLiteral) || kwargs[:to].is_a?(NilLiteral) %}
-            {% raise "A related model must be specified for foreign keys ('to' option)" %}
+            {% raise "A related model must be specified for one to many fields ('to' option)" %}
           {% end %}
         end
 
@@ -73,8 +73,8 @@ module Marten
           {% field_id = (field_id.stringify + "_id").id %}
 
           # Registers a field corresponding to the related object ID to the considered model class. For example, if an
-          # 'author' foreign key is defined in a 'post' model, an 'author_id' foreign key field will actually be created
-          # for the model at hand.
+          # 'author' one to many field is defined in a 'post' model, an 'author_id' one to many field will actually be
+          # created for the model at hand.
 
           class ::{{ model_klass }}
             register_field(

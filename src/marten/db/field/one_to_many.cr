@@ -65,6 +65,10 @@ module Marten
           {% if kwargs.is_a?(NilLiteral) || kwargs[:to].is_a?(NilLiteral) %}
             {% raise "A related model must be specified for one to many fields ('to' option)" %}
           {% end %}
+
+          {% if !kwargs.is_a?(NilLiteral) && kwargs[:unique] == true %}
+            {% raise "One to many fields cannot set 'unique: true' (use 'one_to_one' fields instead)" %}
+          {% end %}
         end
 
         # :nodoc:

@@ -4,6 +4,10 @@ module Marten
       module Column
         class Int < Base
           include IsBuiltInColumn
+
+          def clone
+            self.class.new(@name, @primary_key, @null, @unique, @index)
+          end
         end
       end
     end

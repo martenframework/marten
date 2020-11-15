@@ -15,6 +15,10 @@ module Marten
           )
           end
 
+          def clone
+            self.class.new(@name, @max_size, @primary_key, @null, @unique, @index)
+          end
+
           private def db_type_parameters
             {max_size: @max_size}
           end

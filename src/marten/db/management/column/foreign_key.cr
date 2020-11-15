@@ -23,6 +23,10 @@ module Marten
             @to_table = to_table.to_s
             @to_column = to_column.to_s
           end
+
+          def clone
+            self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
+          end
         end
       end
     end

@@ -18,6 +18,9 @@ module Marten
           )
           end
 
+          # Returns a copy of the column.
+          abstract def clone
+
           # Returns the raw type of the column to use for the column at hand and a specific database connection.
           abstract def sql_type(connection : Connection::Base) : ::String
 

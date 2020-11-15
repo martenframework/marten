@@ -39,7 +39,6 @@ module Marten
 
           private def execute_backward(plan, full_plan)
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
-            state = generate_current_project_state(full_plan)
 
             # Generates a hash of pre-migration states: each state in this hash corresponds to the state that would be
             # active if we were to apply each migration forward.

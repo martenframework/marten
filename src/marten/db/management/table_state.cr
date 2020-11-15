@@ -41,6 +41,10 @@ module Marten
           @columns.reject! { |c| c.name == column_name }
         end
 
+        def rename_column(old_name : String, new_name : String)
+          get_column(old_name).name = new_name
+        end
+
         def clone
           TableState.new(@app_label.dup, @name.dup, @columns.dup)
         end

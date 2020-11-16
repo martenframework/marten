@@ -20,6 +20,14 @@ module Marten
             @table == name || @to_table == name
           end
 
+          def rename_column(table : String, old_name : String, new_name : String)
+            if @table == table && @column == old_name
+              @column = new_name
+            elsif @to_table == table && @to_column == old_name
+              @to_column = new_name
+            end
+          end
+
           def rename_table(old_name : String, new_name : String)
             @table = new_name if @table == old_name
             @to_table = new_name if @to_table == new_name

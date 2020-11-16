@@ -11,6 +11,9 @@ module Marten
             false
           end
 
+          def rename_column(table : String, old_name : String, new_name : String)
+          end
+
           def rename_table(old_name : String, new_name : String)
           end
         end

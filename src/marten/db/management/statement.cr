@@ -22,6 +22,12 @@ module Marten
           @params.values.any? { |ref| ref.references_table?(name) }
         end
 
+        def rename_column(table : String, old_name : String, new_name : String)
+          @params.values.each do |ref|
+            ref.rename_column(table, old_name, new_name)
+          end
+        end
+
         def rename_table(old_name : String, new_name : String)
           @params.values.each do |ref|
             ref.rename_table(old_name, new_name)

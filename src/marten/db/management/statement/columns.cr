@@ -14,6 +14,12 @@ module Marten
             @table == name
           end
 
+          def rename_column(table : String, old_name : String, new_name : String)
+            return if @table != table
+            return if (pos = @columns.index(old_name)).nil?
+            @columns[pos] = new_name
+          end
+
           def rename_table(old_name : String, new_name : String)
             @table = new_name if @table == old_name
           end

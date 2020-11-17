@@ -60,8 +60,10 @@ module Marten
             column_definition : String
           ) : String
 
+          abstract def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
+
           # Returns the SQL statement allowing to rename a database table.
-          abstract def rename_table_statement(old_name : String, new_name : String)
+          abstract def rename_table_statement(old_name : String, new_name : String) : String
 
           # Adds a column to a specific table.
           def add_column(table : TableState, column : Column::Base) : Nil
@@ -159,6 +161,17 @@ module Marten
 
             # Removes all deferred statements that still reference the deleted column.
             @deferred_statements.reject! { |s| s.references_column?(table.name, column.name) }
+          end
+
+          # Renames a specific column.
+          def rename_column(table : TableState, column : Column::Base, new_name : String)
+            sql = rename_column_statement(table, column, new_name)
+            @connection.open do |db|
+              db.exec(sql)
+            end
+            @deferred_statements.each do |statement|
+              statement.rename_column(table.name, column.name, new_name)
+            end
           end
 
           # Renames a specific table.

@@ -91,7 +91,11 @@ module Marten
             column_definition
           end
 
-          def rename_table_statement(old_name : String, new_name : String)
+          def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
+            "ALTER TABLE #{quote(table.name)} CHANGE #{quote(column.name)} #{quote(new_name)} #{column_sql_for(column)}"
+          end
+
+          def rename_table_statement(old_name : String, new_name : String) : String
             "RENAME TABLE #{old_name} TO #{new_name}"
           end
 

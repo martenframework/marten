@@ -44,5 +44,45 @@ describe Marten::DB::Connection::Base do
         result.should eq 1
       end
     end
+
+    it "reuses any already opened transaction" do
+      conn = Marten::DB::Connection.default
+
+      conn.transaction do
+        conn.open do |db|
+          db.should be_a(DB::Connection)
+        end
+      end
+    end
+  end
+
+  describe "#sanitize_like_pattern" do
+    it "properly escapes % characters" do
+      conn = Marten::DB::Connection.default
+      conn.sanitize_like_pattern("test%foo").should eq "test\\%foo"
+    end
+
+    it "properly escapes _ characters" do
+      conn = Marten::DB::Connection.default
+      conn.sanitize_like_pattern("test_foo").should eq "test\\_foo"
+    end
+  end
+
+  describe "#transaction" do
+    it "wraps DB operations in a transaction" do
+      conn = Marten::DB::Connection.default
+
+      TestUser.connection.should eq conn
+
+      expect_raises Exception, "Unexpected" do
+        conn.transaction do
+          TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+          raise "Unexpected error"
+          TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+        end
+      end
+
+      TestUser.all.size.should eq 0
+    end
   end
 end

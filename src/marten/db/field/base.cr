@@ -6,7 +6,6 @@ module Marten
         @primary_key : ::Bool
         @blank : ::Bool
         @null : ::Bool
-        @name : ::String?
         @db_column : ::String | Symbol | Nil
         @db_index : ::Bool
 
@@ -23,7 +22,6 @@ module Marten
           @null = false,
           @unique = false,
           @editable = true,
-          @name = nil,
           @db_column = nil,
           @db_index = false
         )

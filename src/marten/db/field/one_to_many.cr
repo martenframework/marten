@@ -11,7 +11,6 @@ module Marten
           @null = false,
           @unique = false,
           @editable = true,
-          @name = nil,
           @db_column = nil,
           @db_index = true,
           @related : Nil | ::String | Symbol = nil
@@ -141,6 +140,8 @@ module Marten
           class ::{{ model_klass }}
             macro finished
               class ::{{ related_model_klass }}
+                # TODO: register relation.
+
                 def {{ related_field_name.id }}
                   Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
                 end

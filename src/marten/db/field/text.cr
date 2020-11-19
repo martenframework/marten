@@ -13,7 +13,6 @@ module Marten
           @null = false,
           @unique = false,
           @editable = true,
-          @name = nil,
           @max_size = nil,
           @db_column = nil,
           @db_index = false

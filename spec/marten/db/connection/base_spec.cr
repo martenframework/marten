@@ -35,6 +35,41 @@ describe Marten::DB::Connection::Base do
     end
   end
 
+  describe "#insert" do
+    it "inserts a new record in a specific table and returns nil if the new ID is not requested" do
+      conn = Marten::DB::Connection.default
+
+      record_id = conn.insert(
+        Tag.db_table,
+        values: {"name" => "crystal", "is_active" => true}
+      )
+
+      record_id.should be_nil
+
+      conn.open do |db|
+        result = db.scalar("SELECT count(id) FROM #{Tag.db_table}")
+        result.should eq 1
+      end
+    end
+
+    it "inserts a new record in a specific table and returns the corresponding ID when requested" do
+      conn = Marten::DB::Connection.default
+
+      record_id = conn.insert(
+        Tag.db_table,
+        values: {"name" => "crystal", "is_active" => true},
+        pk_field_to_fetch: "id"
+      )
+
+      record_id.should be_truthy
+
+      conn.open do |db|
+        result = db.scalar("SELECT count(id) FROM #{Tag.db_table} WHERE id = #{record_id}")
+        result.should eq 1
+      end
+    end
+  end
+
   describe "#open" do
     it "allows to open a DB connection" do
       conn = Marten::DB::Connection.default

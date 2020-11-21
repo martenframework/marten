@@ -85,4 +85,24 @@ describe Marten::DB::Connection::Base do
       TestUser.all.size.should eq 0
     end
   end
+
+  describe "#test_database?" do
+    it "returns true if the connection is associated with a test database" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.with_target_env(Marten::Conf::Env::TEST) do |c|
+        c.name = "test_db"
+      end
+      conn = Marten::DB::Connection::SQLite.new(db_config)
+      conn.test_database?.should be_true
+    end
+
+    it "returns false if the connection is not associated with a test database" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.with_target_env("production") do |c|
+        c.name = "production_db"
+      end
+      conn = Marten::DB::Connection::SQLite.new(db_config)
+      conn.test_database?.should be_false
+    end
+  end
 end

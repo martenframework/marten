@@ -13,6 +13,9 @@ jobs:
       image: crystallang/crystal:0.35.1
     steps:
       - uses: actions/checkout@v1
+      - uses: webfactory/ssh-agent@v0.4.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Install shards
         run: shards install --ignore-crystal-version
       - name: QA checks
@@ -49,6 +52,9 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v2
+    - uses: webfactory/ssh-agent@v0.4.1
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Install packages required for MySQL
       if: matrix.db == 'mysql'
       run: |

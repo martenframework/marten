@@ -80,7 +80,7 @@ module Marten
             {%
               pkey = @type.instance_vars.find do |ivar|
                 ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
-                ann && ann[:field_kwargs][:primary_key]
+                ann && ann[:field_kwargs] && ann[:field_kwargs][:primary_key]
               end
             %}
 

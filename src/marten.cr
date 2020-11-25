@@ -46,7 +46,7 @@ module Marten
   def self.setup
     settings.setup
     apps.populate(settings.installed_apps)
-    apps.app_configs.each(&.setup)
+    apps.setup
   end
 
   def self.configure(env : Nil | String | Symbol = nil)

@@ -72,6 +72,11 @@ module Marten
       def register_model(model : DB::Model.class)
         @unassigned_models << model
       end
+
+      # Triggers app config setups.
+      def setup
+        app_configs.each(&.setup)
+      end
     end
   end
 end

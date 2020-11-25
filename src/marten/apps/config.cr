@@ -16,6 +16,7 @@ module Marten
         @@label = label.to_s
       end
 
+      # Returns the label of the application config.
       def self.label : String
         @@label
       end
@@ -27,6 +28,14 @@ module Marten
       # Associates a model to the current app config.
       def register_model(model : DB::Model.class)
         @models << model
+      end
+
+      # Allows to perform additional setup operations for a given application.
+      #
+      # Each application class can override this method in order to perform additional initializations and setup
+      # operations if needed. This method will be called during the Marten setup process when all the applications
+      # are known and initialized.
+      def setup
       end
 
       private LABEL_RE = /^[a-z_]+$/

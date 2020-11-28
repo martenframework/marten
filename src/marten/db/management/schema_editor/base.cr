@@ -133,6 +133,13 @@ module Marten
             @deferred_statements.reject! { |s| s.references_table?(table.name) }
           end
 
+          # Executes a custom SQL statement.
+          def execute(sql : String)
+            @connection.open do |db|
+              db.exec(sql)
+            end
+          end
+
           # Flushes all model tables.
           def flush_model_tables : Nil
             table_names = @connection.introspector.model_table_names.map { |n| quote(n) }

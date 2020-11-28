@@ -19,6 +19,10 @@ module Marten
           operations << Operation::DeleteTable.new({{ name }})
         end
 
+        macro execute(forward_sql, backward_sql = nil)
+          operations << Operation::ExecuteSQL.new({{ forward_sql }}, {{ backward_sql }})
+        end
+
         macro remove_column(table_name, column_name)
           operations << Operation::RemoveColumn.new({{ table_name }}, {{ column_name }})
         end

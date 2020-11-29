@@ -140,7 +140,9 @@ module Marten
           class ::{{ model_klass }}
             macro finished
               class ::{{ related_model_klass }}
-                # TODO: register relation.
+                register_reverse_relation(
+                  Marten::DB::ReverseRelation.new(::{{ model_klass }}, {{ field_id.stringify }})
+                )
 
                 def {{ related_field_name.id }}
                   Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})

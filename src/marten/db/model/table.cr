@@ -10,6 +10,7 @@ module Marten
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
           @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
           @@relation_fields_per_relation_name : Hash(String, Field::Base) = {} of String => Field::Base
+          @@reverse_relations : Array(ReverseRelation) = [] of ReverseRelation
 
           extend Marten::DB::Model::Table::ClassMethods
 
@@ -46,19 +47,24 @@ module Marten
             @@relation_fields_per_relation_name[field.relation_name] = field if field.relation?
           end
 
-          protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
-            obj = new
-            obj.new_record = false
-            obj.from_db_row_iterator(row_iterator)
-            obj
+          # :nodoc:
+          def register_reverse_relation(reverse_relation : ReverseRelation)
+            @@reverse_relations << reverse_relation
           end
 
           protected def fields
             @@fields.values
           end
 
-          protected def pk_field
-            _pk_field
+          protected def fields_per_column
+            @@fields_per_column
+          end
+
+          protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
+            obj = new
+            obj.new_record = false
+            obj.from_db_row_iterator(row_iterator)
+            obj
           end
 
           protected def get_field(id)
@@ -71,8 +77,12 @@ module Marten
             end
           end
 
-          protected def fields_per_column
-            @@fields_per_column
+          protected def pk_field
+            _pk_field
+          end
+
+          protected def reverse_relations
+            @@reverse_relations
           end
 
           private def _pk_field

@@ -67,10 +67,10 @@ module Marten
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains"    => "LIKE BINARY %s",
-          "endswith":      "LIKE BINARY %s",
+          "endswith"    => "LIKE BINARY %s",
           "exact"       => "= %s",
           "icontains"   => "LIKE %s",
-          "iendswith":     "LIKE %s",
+          "iendswith"   => "LIKE %s",
           "iexact"      => "LIKE %s",
           "istartswith" => "LIKE %s",
           "startswith"  => "LIKE BINARY %s",

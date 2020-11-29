@@ -140,4 +140,30 @@ describe Marten::DB::Connection::Base do
       conn.test_database?.should be_false
     end
   end
+
+  describe "#update" do
+    it "updates an existing record in a specific table" do
+      conn = Marten::DB::Connection.default
+
+      record_id = conn.insert(
+        Tag.db_table,
+        values: {"name" => "crystal", "is_active" => true},
+        pk_field_to_fetch: "id"
+      )
+
+      record_id = conn.update(
+        Tag.db_table,
+        values: {"name" => "ruby"},
+        pk_column_name: "id",
+        pk_value: record_id
+      )
+
+      record_id.should be_nil
+
+      conn.open do |db|
+        result = db.scalar("SELECT count(id) FROM #{Tag.db_table} WHERE name = 'ruby'")
+        result.should eq 1
+      end
+    end
+  end
 end

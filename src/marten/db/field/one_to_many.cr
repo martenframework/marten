@@ -13,9 +13,11 @@ module Marten
           @editable = true,
           @db_column = nil,
           @db_index = true,
-          @related : Nil | ::String | Symbol = nil
+          @related : Nil | ::String | Symbol = nil,
+          on_delete : ::String | Symbol = :do_nothing
         )
           @related = @related.try(&.to_s)
+          @on_delete = Deletion::Strategy.parse(on_delete.to_s)
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil

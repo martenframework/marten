@@ -12,6 +12,7 @@ require "./field/uuid"
 require "./field/auto"
 require "./field/big_auto"
 
+require "./field/one_to_one"
 require "./field/one_to_many"
 
 module Marten
@@ -66,6 +67,7 @@ module Marten
       register "big_int", BigInt
       register "bool", Bool
       register "date_time", DateTime
+      register "one_to_one", OneToOne
       register "one_to_many", OneToMany
       register "int", Int
       register "string", String

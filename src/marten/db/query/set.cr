@@ -157,7 +157,7 @@ module Marten
         end
 
         def first
-          (query.ordered? ? self : order(Model::PRIMARY_KEY_ALIAS))[..0].to_a.first
+          (query.ordered? ? self : order(Constants::PRIMARY_KEY_ALIAS))[..0].to_a.first
         end
 
         def get(**kwargs)
@@ -202,7 +202,7 @@ module Marten
         end
 
         def last
-          (query.ordered? ? reverse : order("-#{Model::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
+          (query.ordered? ? reverse : order("-#{Constants::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
         end
 
         def order(*fields : String | Symbol)

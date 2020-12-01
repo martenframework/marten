@@ -5,8 +5,6 @@ module Marten
         macro included
           extend Marten::DB::Model::Querying::ClassMethods
 
-          LOOKUP_SEP = "__"
-
           macro inherited
             class NotFound < Marten::DB::Errors::RecordNotFound; end
           end
@@ -211,6 +209,10 @@ module Marten
           # `Marten::DB::Errors::UnknownConnection` error will be raised.
           def using(db : String | Symbol)
             all.using(db)
+          end
+
+          protected def base_queryset
+            Query::Set(self).new
           end
         end
       end

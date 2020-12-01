@@ -323,7 +323,7 @@ module Marten
           end
 
           private def solve_field_and_predicate(raw_query, raw_value)
-            qparts = raw_query.rpartition(Model::LOOKUP_SEP)
+            qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
             raw_field = qparts[0]
             raw_predicate = qparts[2]
 
@@ -368,7 +368,7 @@ module Marten
           private def verify_field(raw_field, only_relations = false)
             field_path = [] of Field::Base
 
-            raw_field.split(Model::LOOKUP_SEP).each_with_index do |part, i|
+            raw_field.split(Constants::LOOKUP_SEP).each_with_index do |part, i|
               if i > 0
                 # In this case we are trying to process a query field like "author__username", so we have to ensure that
                 # we are considering a relation field (such as a foreign key).
@@ -385,7 +385,7 @@ module Marten
                 model = Model
               end
 
-              part = model.pk_field.id if part == Model::PRIMARY_KEY_ALIAS
+              part = model.pk_field.id if part == Constants::PRIMARY_KEY_ALIAS
 
               field = if only_relations
                         get_relation_field(part, model)

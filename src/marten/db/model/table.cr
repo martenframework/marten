@@ -6,6 +6,8 @@ module Marten
         annotation FieldInstanceVariable; end
 
         macro included
+          LOOKUP_SEP = {{ Marten::DB::Constants::LOOKUP_SEP }}
+
           @@db_table : String?
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
           @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
@@ -13,8 +15,6 @@ module Marten
           @@reverse_relations : Array(ReverseRelation) = [] of ReverseRelation
 
           extend Marten::DB::Model::Table::ClassMethods
-
-          PRIMARY_KEY_ALIAS = "pk"
 
           macro inherited
             FIELDS_ = {} of Nil => Nil
@@ -104,7 +104,7 @@ module Marten
 
           {% sanitized_id = args[0].is_a?(StringLiteral) || args[0].is_a?(SymbolLiteral) ? args[0].id : nil %}
           {% if sanitized_id.is_a?(NilLiteral) %}{% raise "Cannot use '#{args[0]}' as a valid field name" %}{% end %}
-          {% if sanitized_id.includes?(LOOKUP_SEP) %}
+          {% if sanitized_id.stringify.includes?(LOOKUP_SEP) %}
             {% raise "Cannot use '#{args[0]}' as a valid field name: field names cannot contain '#{LOOKUP_SEP.id}'" %}
           {% end %}
 

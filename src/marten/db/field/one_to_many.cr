@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class OneToMany < Base
+        getter on_delete
+
         def initialize(
           @id : ::String,
           @relation_name : ::String,

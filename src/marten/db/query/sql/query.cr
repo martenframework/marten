@@ -128,7 +128,7 @@ module Marten
             ensure_join_for_field_path(verify_field(relation, only_relations: true))
           end
 
-          protected def add_query_node(query_node : Node(Model))
+          protected def add_query_node(query_node : Node)
             predicate_node = process_query_node(query_node)
             if @predicate_node.nil?
               @predicate_node = predicate_node

@@ -125,16 +125,16 @@ module Marten
         end
 
         def exclude(**kwargs)
-          exclude(Node(Model).new(**kwargs))
+          exclude(Node.new(**kwargs))
         end
 
         def exclude(&block)
           expr = Expression::Filter(Model).new
-          query : Node(Model) = with expr yield
+          query : Node = with expr yield
           exclude(query)
         end
 
-        def exclude(query_node : Node(Model))
+        def exclude(query_node : Node)
           add_query_node(-query_node)
         end
 
@@ -143,16 +143,16 @@ module Marten
         end
 
         def filter(**kwargs)
-          filter(Node(Model).new(**kwargs))
+          filter(Node.new(**kwargs))
         end
 
         def filter(&block)
           expr = Expression::Filter(Model).new
-          query : Node(Model) = with expr yield
+          query : Node = with expr yield
           filter(query)
         end
 
-        def filter(query_node : Node(Model))
+        def filter(query_node : Node)
           add_query_node(query_node)
         end
 
@@ -161,32 +161,32 @@ module Marten
         end
 
         def get(**kwargs)
-          get(Node(Model).new(**kwargs))
+          get(Node.new(**kwargs))
         end
 
         def get(&block)
           expr = Expression::Filter(Model).new
-          query : Node(Model) = with expr yield
+          query : Node = with expr yield
           get(query)
         end
 
-        def get(query_node : Node(Model))
+        def get(query_node : Node)
           get!(query_node)
         rescue Model::NotFound
           nil
         end
 
         def get!(**kwargs)
-          get!(Node(Model).new(**kwargs))
+          get!(Node.new(**kwargs))
         end
 
         def get!(&block)
           expr = Expression::Filter(Model).new
-          query : Node(Model) = with expr yield
+          query : Node = with expr yield
           get!(query)
         end
 
-        def get!(query_node : Node(Model))
+        def get!(query_node : Node)
           results = filter(query_node)[..GET_RESULTS_LIMIT].to_a
           return results.first if results.size == 1
           raise Model::NotFound.new("#{Model.name} query didn't return any results") if results.empty?

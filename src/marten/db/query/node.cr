@@ -1,7 +1,7 @@
 module Marten
   module DB
     module Query
-      class Node(Model)
+      class Node
         def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, **kwargs)
           @filters = {} of String | Symbol => Field::Any | DB::Model
           @filters.merge!(kwargs.to_h)

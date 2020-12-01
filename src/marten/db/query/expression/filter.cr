@@ -4,7 +4,7 @@ module Marten
       class Expression
         class Filter(Model)
           def q(**kwargs)
-            Node(Model).new(**kwargs)
+            Node.new(**kwargs)
           end
         end
       end

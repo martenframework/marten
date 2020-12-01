@@ -16,8 +16,8 @@ module Marten
           node_filters = Hash(String | Symbol, Field::Any | DB::Model).new
           node_filters[@related_field_id] = @instance.pk
           @query.add_query_node(
-            Node(Model).new(
-              Array(Node(Model)).new,
+            Node.new(
+              Array(Node).new,
               SQL::PredicateConnector::AND,
               false,
               node_filters

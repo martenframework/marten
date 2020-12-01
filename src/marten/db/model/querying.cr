@@ -52,7 +52,7 @@ module Marten
           # ```
           def exclude(&block)
             expr = Query::Expression::Filter(self).new
-            query : Query::Node(self) = with expr yield
+            query : Query::Node = with expr yield
             default_queryset.exclude(query)
           end
 
@@ -82,7 +82,7 @@ module Marten
           # ```
           def filter(&block)
             expr = Query::Expression::Filter(self).new
-            query : Query::Node(self) = with expr yield
+            query : Query::Node = with expr yield
             default_queryset.filter(query)
           end
 
@@ -127,7 +127,7 @@ module Marten
           # exception if multiple records match the specified set of filters.
           def get(&block)
             expr = Query::Expression::Filter(self).new
-            query : Query::Node(self) = with expr yield
+            query : Query::Node = with expr yield
             default_queryset.get(query)
           end
 
@@ -167,7 +167,7 @@ module Marten
           # exception if multiple records match the specified set of filters.
           def get!(&block)
             expr = Query::Expression::Filter(self).new
-            query : Query::Node(self) = with expr yield
+            query : Query::Node = with expr yield
             default_queryset.get!(query)
           end
 

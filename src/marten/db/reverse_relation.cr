@@ -3,6 +3,12 @@ module Marten
     class ReverseRelation
       @field : Field::Base?
 
+      # Returns the field ID that initiated the reverse relation.
+      getter field_id
+
+      # Returns the model class targetted by the reverse relation.
+      getter model
+
       def initialize(@model : Model.class, @field_id : String)
       end
 
@@ -22,7 +28,7 @@ module Marten
       end
 
       private def field
-        @field ||= @model.get_field(@field_id)
+        @field ||= model.get_field(@field_id)
       end
     end
   end

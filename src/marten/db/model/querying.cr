@@ -21,7 +21,9 @@ module Marten
 
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
-            Query::Set(self).new
+            {% begin %}
+            Query::Set({{ @type }}).new
+            {% end %}
           end
 
           # Returns a queryset whose records do not match the given set of filters.
@@ -211,8 +213,14 @@ module Marten
             all.using(db)
           end
 
-          protected def base_queryset
-            Query::Set(self).new
+          # :nodoc:
+          # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
+          # Although this method is public (because it's generated for all models), it used internally by Marten to
+          # ensure correct behaviours when deleting records.
+          def _base_queryset
+            {% begin %}
+            Query::Set({{ @type }}).new
+            {% end %}
           end
         end
       end

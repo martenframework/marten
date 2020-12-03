@@ -50,12 +50,14 @@ module Marten
 
             @predicates.each do |predicate|
               predicate_sql, predicate_params = predicate.to_sql(connection)
+              next if predicate_sql.empty?
               sql_parts << predicate_sql
               sql_params.concat(predicate_params)
             end
 
             @children.each do |child|
               child_sql, child_params = child.to_sql(connection)
+              next if child_sql.empty?
               sql_parts << child_sql
               sql_params.concat(child_params)
             end

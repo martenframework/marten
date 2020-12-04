@@ -13,7 +13,7 @@ module Marten
         end
 
         protected def fetch
-          node_filters = Hash(String | Symbol, Field::Any | DB::Model).new
+          node_filters = Node::FilterHash.new
           node_filters[@related_field_id] = @instance.pk
           @query.add_query_node(
             Node.new(

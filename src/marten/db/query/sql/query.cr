@@ -351,12 +351,12 @@ module Marten
               end
             end
 
-            value : Field::Any = case raw_value
-            when Field::Any
-              raw_value
-            when DB::Model
-              raw_value.pk
-            end
+            value = case raw_value
+                    when Field::Any, Array(Field::Any)
+                      raw_value
+                    when DB::Model
+                      raw_value.pk
+                    end
 
             predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end

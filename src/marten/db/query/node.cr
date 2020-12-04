@@ -2,16 +2,27 @@ module Marten
   module DB
     module Query
       class Node
+        alias FilterHash = Hash(String | Symbol, Field::Any | Array(Field::Any) | DB::Model)
+
         def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, **kwargs)
-          @filters = {} of String | Symbol => Field::Any | DB::Model
-          @filters.merge!(kwargs.to_h)
+          @filters = FilterHash.new
+          kwargs.each do |key, value|
+            @filters[key] = case value
+                            when Array
+                              arr = Array(Field::Any).new
+                              value.each { |v| arr << v }
+                              arr
+                            else
+                              value
+                            end
+          end
         end
 
         def initialize(
           @children : Array(self),
           @connector : SQL::PredicateConnector,
           @negated : Bool,
-          @filters : Hash(String | Symbol, Field::Any | DB::Model)
+          @filters : FilterHash
         )
         end
 

@@ -12,9 +12,6 @@ module Marten
         # Returns the ID of the field used in the associated model.
         getter id
 
-        # Returns the human-readable name of the field.
-        getter name
-
         def initialize(
           @id : ::String,
           @primary_key = false,
@@ -36,6 +33,11 @@ module Marten
         # Converts the field value to the corresponding DB value.
         abstract def to_db(value) : ::DB::Any
 
+        # Returns a boolean indicating whether the field can be blank validation-wise.
+        def blank?
+          @blank
+        end
+
         # Returns the name of the column associated with the considered field.
         def db_column
           @db_column.try(&.to_s) || @id
@@ -46,14 +48,11 @@ module Marten
           @db_index
         end
 
-        # Returns a boolean indicating whether the field is a primary key.
-        def primary_key?
-          @primary_key
-        end
-
-        # Returns a boolean indicating whether the field can be blank validation-wise.
-        def blank?
-          @blank
+        # Returns a boolean indicating whether the field is editable.
+        #
+        # Non-editable fields will be skipped at validation time.
+        def editable?
+          @editable
         end
 
         # Returns a boolean indicating whether the field can be null at the database level.
@@ -61,16 +60,21 @@ module Marten
           @null
         end
 
-        # Returns a boolean indicating whether the field value should be unique throughout the associated table.
-        def unique?
-          @unique
-        end
-
         # Runs pre-save logic for the specific field and record at hand.
         #
         # This method does nothing by default but can be overridden for specific fields that need to set values on the
         # model instance before save or perform any pre-save logic.
         def prepare_save(record, new_record = false)
+        end
+
+        # Returns a boolean indicating whether the field is a primary key.
+        def primary_key?
+          @primary_key
+        end
+
+        # Returns a boolean indicating whether the field value should be unique throughout the associated table.
+        def unique?
+          @unique
         end
 
         # Runs custom validation logic for a specific model field and model object.
@@ -139,6 +143,11 @@ module Marten
           raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
         end
 
+        private def blank_error_message(_record)
+          # TODO: add I18n support.
+          "This field cannot be blank."
+        end
+
         private def empty_value?(value) : ::Bool
           value.nil?
         end
@@ -146,11 +155,6 @@ module Marten
         private def null_error_message(_record)
           # TODO: add I18n support.
           "This field cannot be null."
-        end
-
-        private def blank_error_message(_record)
-          # TODO: add I18n support.
-          "This field cannot be blank."
         end
 
         private def raise_unexpected_field_value(value)

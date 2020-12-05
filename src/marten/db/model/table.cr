@@ -40,6 +40,18 @@ module Marten
             @@db_table = db_table.to_s
           end
 
+          # Returns all the fields instances associated with the current model.
+          def fields
+            @@fields.values
+          end
+
+          # Allows to retrieve a specific field instance associated with the current model.
+          #
+          # The returned object will be an instance of a subclass of `Marten::DB::Field::Base`.
+          def get_field(id : String | Symbol)
+            @@fields.fetch(id.to_s) { raise Errors::UnknownField.new("Unknown field '#{id}'") }
+          end
+
           # :nodoc:
           def register_field(field : Field::Base)
             @@fields[field.id] = field
@@ -52,10 +64,6 @@ module Marten
             @@reverse_relations << reverse_relation
           end
 
-          protected def fields
-            @@fields.values
-          end
-
           protected def fields_per_column
             @@fields_per_column
           end
@@ -65,10 +73,6 @@ module Marten
             obj.new_record = false
             obj.from_db_row_iterator(row_iterator)
             obj
-          end
-
-          protected def get_field(id)
-            @@fields.fetch(id) { raise Errors::UnknownField.new("Unknown field '#{id}'") }
           end
 
           protected def get_relation_field(relation_name)

@@ -84,7 +84,9 @@ module Marten
         {% field_types = [] of String %}
         {% for k in Marten::DB::Field::Base.all_subclasses %}
           {% ann = k.annotation(Marten::DB::Field::Registration) %}
-          {% field_types << ann[:exposed_type] %}
+          {% if ann %}
+            {% field_types << ann[:exposed_type] %}
+          {% end %}
         {% end %}
 
         alias Any = {% for t, i in field_types %}{{ t }}{% if i + 1 < field_types.size %} | {% end %}{% end %}

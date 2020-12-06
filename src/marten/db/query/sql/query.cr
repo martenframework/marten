@@ -343,20 +343,23 @@ module Marten
 
             field = field_path.last
 
-            if raw_predicate.nil?
-              predicate_klass = Predicate::Exact
-            else
-              predicate_klass = Predicate.registry.fetch(raw_predicate) do
-                raise Errors::UnknownField.new("Unknown predicate type '#{raw_predicate}'")
-              end
-            end
-
             value = case raw_value
                     when Field::Any, Array(Field::Any)
                       raw_value
                     when DB::Model
                       raw_value.pk
                     end
+
+            if raw_predicate.nil? && value.nil?
+              predicate_klass = Predicate::IsNull
+              value = true
+            elsif raw_predicate.nil?
+              predicate_klass = Predicate::Exact
+            else
+              predicate_klass = Predicate.registry.fetch(raw_predicate) do
+                raise Errors::UnknownField.new("Unknown predicate type '#{raw_predicate}'")
+              end
+            end
 
             predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end

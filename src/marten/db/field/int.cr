@@ -22,8 +22,8 @@ module Marten
             nil
           when Int32
             value
-          when Int8, Int16
-            value.as(Int8 | Int16).to_i32
+          when Int8, Int16, Int64
+            value.as(Int8 | Int16 | Int64).to_i32
           else
             raise_unexpected_field_value(value)
           end

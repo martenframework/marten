@@ -205,6 +205,11 @@ module Marten
           (query.ordered? ? reverse : order("-#{Constants::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
         end
 
+        # Returns the model class associated with the query set.
+        def model
+          Model
+        end
+
         def order(*fields : String | Symbol)
           qs = clone
           qs.query.order(*fields.map(&.to_s))

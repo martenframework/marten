@@ -22,6 +22,7 @@ module Marten
           register IEndsWith
           register IExact
           register In
+          register IsNull
           register IStartsWith
           register StartsWith
         end

@@ -26,7 +26,7 @@ module Marten
           #
           # ```
           # Post.create(title: "My blog post") do |post|
-          #   post.complex_attribute = compute_comple_attribute
+          #   post.complex_attribute = compute_complex_attribute
           # end
           # ```
           def create(**kwargs, &block)
@@ -55,7 +55,7 @@ module Marten
           #
           # ```
           # Post.create!(title: "My blog post") do |post|
-          #   post.complex_attribute = compute_comple_attribute
+          #   post.complex_attribute = compute_complex_attribute
           # end
           def create!(**kwargs, &block)
             object = new(**kwargs)
@@ -71,9 +71,27 @@ module Marten
         # :nodoc:
         @new_record : Bool = true
 
+        # Deletes the model instance.
+        #
+        # This methods deletes the model instance by complying to the deletion rules defined as part of the relation
+        # fields if applicable (`on_delete` option on one to many or one to one fields). It returns the number of rows
+        # that were deleted as part of the record deletion.
+        def delete(using : Nil | String | Symbol = nil)
+          deletion = Deletion::Runner.new(
+            using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
+          )
+
+          deletion.add(self)
+          deleted_count = deletion.execute
+
+          @deleted = true
+
+          deleted_count
+        end
+
         # Returns a boolean indicating if the record was deleted or not.
         #
-        # This method returns `true` if the model instance was deleted previously. Other it returns `false` in any
+        # This method returns `true` if the model instance was deleted previously. Otherwise it returns `false` in any
         # other cases.
         def deleted?
           @deleted

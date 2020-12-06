@@ -7,6 +7,14 @@ module Marten
 
           macro inherited
             class NotFound < Marten::DB::Errors::RecordNotFound; end
+
+            # :nodoc:
+            # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
+            # Although this method is public (because it's generated for all models), it used internally by Marten to
+            # ensure correct behaviours when deleting records.
+            def self._base_queryset
+              Marten::DB::Query::Set(self).new
+            end
           end
         end
 
@@ -211,16 +219,6 @@ module Marten
           # `Marten::DB::Errors::UnknownConnection` error will be raised.
           def using(db : String | Symbol)
             all.using(db)
-          end
-
-          # :nodoc:
-          # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
-          # Although this method is public (because it's generated for all models), it used internally by Marten to
-          # ensure correct behaviours when deleting records.
-          def _base_queryset
-            {% begin %}
-            Query::Set({{ @type }}).new
-            {% end %}
           end
         end
       end

@@ -139,6 +139,35 @@ describe Marten::DB::Model::Persistence do
     end
   end
 
+  describe "#delete" do
+    it "allows to delete objects" do
+      obj_1 = Tag.create!(name: "crystal", is_active: true)
+      obj_1.delete.should eq 1
+      obj_1.deleted?.should be_true
+      Tag.get(name: "crystal").should be_nil
+
+      obj_2 = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      sub_obj_2 = Post.create!(title: "Test", author: obj_2)
+      obj_2.delete.should eq 2
+      obj_2.deleted?.should be_true
+      TestUser.get(username: "jd").should be_nil
+      Post.get(id: sub_obj_2.id).should be_nil
+    end
+  end
+
+  describe "#delete?" do
+    it "returns true when an object is deleted" do
+      obj = Tag.create!(name: "crystal", is_active: true)
+      obj.delete
+      obj.deleted?.should be_true
+    end
+
+    it "returns false when an object is not deleted" do
+      obj = Tag.create!(name: "crystal", is_active: true)
+      obj.deleted?.should be_false
+    end
+  end
+
   describe "#reload" do
     it "allows to reload an object" do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")

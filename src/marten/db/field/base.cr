@@ -60,6 +60,19 @@ module Marten
           @null
         end
 
+        # :nodoc:
+        def perform_validation(record : Model)
+          value = record.get_field_value(id)
+
+          if value.nil? && !@null && @editable
+            record.errors.add(id, null_error_message(record), type: :null)
+          elsif empty_value?(value) && !@blank && @editable
+            record.errors.add(id, blank_error_message(record), type: :blank)
+          end
+
+          validate(record, value)
+        end
+
         # Runs pre-save logic for the specific field and record at hand.
         #
         # This method does nothing by default but can be overridden for specific fields that need to set values on the
@@ -117,18 +130,6 @@ module Marten
 
             def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
           end
-        end
-
-        protected def perform_validation(record : Model)
-          value = record.get_field_value(id)
-
-          if value.nil? && !@null && @editable
-            record.errors.add(id, null_error_message(record), type: :null)
-          elsif empty_value?(value) && !@blank && @editable
-            record.errors.add(id, blank_error_message(record), type: :blank)
-          end
-
-          validate(record, value)
         end
 
         protected def related_model

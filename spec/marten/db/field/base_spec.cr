@@ -154,6 +154,84 @@ describe Marten::DB::Field::Base do
       obj.name.should be_nil
     end
   end
+
+  describe "#perform_validation" do
+    it "adds an error to the record if the field is not nullable and the value is nil" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", null: false, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 1
+      obj.errors.first.field.should eq "name"
+      obj.errors.first.type.should eq "null"
+    end
+
+    it "does not add an error to the record if the field is not nullable and not editable and the value is nil" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", null: false, editable: false, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if the field is nullable and the value is nil" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", null: true, blank: true, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if the field is not nullable and the value is not nil" do
+      obj = Tag.new(name: "crystal")
+
+      field = Marten::DB::Field::String.new("name", null: true, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "adds an error to the record if the field cannot be blank and the value is blank" do
+      obj = Tag.new(name: "")
+
+      field = Marten::DB::Field::String.new("name", blank: false, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 1
+      obj.errors.first.field.should eq "name"
+      obj.errors.first.type.should eq "blank"
+    end
+
+    it "does not add an error to the record if the field cannot be blank and is not editable and the value is blank" do
+      obj = Tag.new(name: "")
+
+      field = Marten::DB::Field::String.new("name", blank: false, editable: false, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if the field can be blank and the value is blank" do
+      obj = Tag.new(name: "")
+
+      field = Marten::DB::Field::String.new("name", blank: true, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if the field cannot be blank and the value is not blank" do
+      obj = Tag.new(name: "crystal")
+
+      field = Marten::DB::Field::String.new("name", blank: false, max_size: 128)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+  end
 end
 
 module Marten::DB::Field::BaseSpec

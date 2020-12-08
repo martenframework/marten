@@ -6,7 +6,7 @@ describe Marten::DB::Field::Auto do
       field = Marten::DB::Field::Auto.new("my_field", db_column: "my_field_col", primary_key: true)
 
       Marten::DB::Connection.default.open do |db|
-        db.query("SELECT CAST(42 AS int)") do |rs|
+        db.query("SELECT 42") do |rs|
           rs.each do
             value = field.from_db_result_set(rs)
             value.should be_a Int32 | Int64

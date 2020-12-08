@@ -1,6 +1,35 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::Auto do
+  describe "#from_db_result_set" do
+    it "is able to read an integer value from a DB result set" do
+      field = Marten::DB::Field::Auto.new("my_field", db_column: "my_field_col", primary_key: true)
+
+      Marten::DB::Connection.default.open do |db|
+        db.query("SELECT CAST(42 AS int)") do |rs|
+          rs.each do
+            value = field.from_db_result_set(rs)
+            value.should be_a Int32 | Int64
+            value.should eq 42
+          end
+        end
+      end
+    end
+
+    it "is able to read a nil value from a DB result set" do
+      field = Marten::DB::Field::Auto.new("my_field", db_column: "my_field_col", primary_key: true)
+
+      Marten::DB::Connection.default.open do |db|
+        db.query("SELECT NULL") do |rs|
+          rs.each do
+            value = field.from_db_result_set(rs)
+            value.should be_nil
+          end
+        end
+      end
+    end
+  end
+
   describe "#to_column" do
     it "returns the expected column" do
       field = Marten::DB::Field::Auto.new("my_field", db_column: "my_field_col", primary_key: true)

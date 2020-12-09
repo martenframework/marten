@@ -45,7 +45,7 @@ describe Marten::DB::Field::BigInt do
   end
 
   describe "#to_db" do
-    it "returns nil if the value is nil expected column" do
+    it "returns nil if the value is nil" do
       field = Marten::DB::Field::BigInt.new("my_field")
       field.to_db(nil).should be_nil
     end
@@ -68,6 +68,14 @@ describe Marten::DB::Field::BigInt do
     it "returns a casted Int64 value if the value is an Int32" do
       field = Marten::DB::Field::BigInt.new("my_field")
       field.to_db(42.to_i32).should eq 42.to_i64
+    end
+
+    it "raises UnexpectedFieldValue if the value is not supported" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.to_db(["foo", "bar"])
+      end
     end
   end
 end

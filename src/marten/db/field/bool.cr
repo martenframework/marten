@@ -3,7 +3,8 @@ module Marten
     module Field
       class Bool < Base
         def from_db_result_set(result_set : ::DB::ResultSet) : ::Bool?
-          [true, "true", 1, "1", "yes"].includes?(result_set.read)
+          val = result_set.read
+          null? && val.nil? ? nil : [true, "true", 1, "1", "yes"].includes?(val)
         end
 
         def to_column : Management::Column::Base

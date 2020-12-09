@@ -2,29 +2,31 @@ require "./spec_helper"
 
 describe Marten::DB::Field::Bool do
   describe "#from_db_result_set" do
-    it "is able to read a true boolean value from a DB result set" do
-      field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")
+    {% if env("MARTEN_SPEC_DB_CONNECTION").id != "sqlite" && env("MARTEN_SPEC_DB_CONNECTION") %}
+      it "is able to read a true boolean value from a DB result set" do
+        field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")
 
-      Marten::DB::Connection.default.open do |db|
-        db.query("SELECT true") do |rs|
-          rs.each do
-            field.from_db_result_set(rs).should be_true
+        Marten::DB::Connection.default.open do |db|
+          db.query("SELECT true") do |rs|
+            rs.each do
+              field.from_db_result_set(rs).should be_true
+            end
           end
         end
       end
-    end
 
-    it "is able to read a false boolean value from a DB result set" do
-      field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")
+      it "is able to read a false boolean value from a DB result set" do
+        field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")
 
-      Marten::DB::Connection.default.open do |db|
-        db.query("SELECT false") do |rs|
-          rs.each do
-            field.from_db_result_set(rs).should be_false
+        Marten::DB::Connection.default.open do |db|
+          db.query("SELECT false") do |rs|
+            rs.each do
+              field.from_db_result_set(rs).should be_false
+            end
           end
         end
       end
-    end
+    {% end %}
 
     it "assumes that \"true\" is truthy" do
       field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")

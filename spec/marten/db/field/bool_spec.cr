@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::DB::Field::Bool do
   describe "#from_db_result_set" do
-    {% if env("MARTEN_SPEC_DB_CONNECTION").id != "sqlite" && env("MARTEN_SPEC_DB_CONNECTION") %}
+    {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" || env("MARTEN_SPEC_DB_CONNECTION") == "mysql" %}
       it "is able to read a true boolean value from a DB result set" do
         field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")
 

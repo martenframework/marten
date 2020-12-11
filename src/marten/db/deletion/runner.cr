@@ -58,6 +58,8 @@ module Marten
         end
 
         private def register_records_for_deletion(records, source)
+          return if records.empty?
+
           model = records[0].class
 
           # Register the records for deletion by keeping track of the order in which records should be deleted if a

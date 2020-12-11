@@ -150,6 +150,10 @@ module Marten
             cloned
           end
 
+          protected def connection
+            @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
+          end
+
           private def build_count_query
             where, parameters = where_clause_and_parameters
 
@@ -218,10 +222,6 @@ module Marten
             @joins.each { |join| columns += join.columns }
 
             columns.flatten.join(", ")
-          end
-
-          private def connection
-            @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
           private def ensure_join_for_field_path(field_path)

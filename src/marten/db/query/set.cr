@@ -118,10 +118,15 @@ module Marten
           raise Errors::UnmetQuerySetCondition.new("Delete with sliced queries is not supported") if query.sliced?
           raise Errors::UnmetQuerySetCondition.new("Delete with joins is not supported") if query.joins?
 
-          raise NotImplementedError.new("Default #delete behaviour is not yet implemented.") unless raw
-
           qs = clone
-          qs.query.raw_delete
+
+          if raw
+            qs.query.raw_delete
+          else
+            deletion = Deletion::Runner.new(qs.query.connection)
+            deletion.add(qs)
+            deletion.execute
+          end
         end
 
         def exclude(**kwargs)

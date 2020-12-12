@@ -20,11 +20,9 @@ describe Marten::DB::Field::BigInt do
       field = Marten::DB::Field::BigInt.new("my_field", db_column: "my_field_col", primary_key: true)
 
       Marten::DB::Connection.default.open do |db|
-        db.query("SELECT 42") do |rs|
+        db.query("SELECT NULL") do |rs|
           rs.each do
-            value = field.from_db_result_set(rs)
-            value.should be_a Int32 | Int64
-            value.should eq 42
+            field.from_db_result_set(rs).should be_nil
           end
         end
       end

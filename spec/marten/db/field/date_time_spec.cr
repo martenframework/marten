@@ -97,7 +97,7 @@ describe Marten::DB::Field::DateTime do
       user.created_at.should be_nil
 
       time = Time.local
-      Timecop.freeze(time) do |frozen_time|
+      Timecop.freeze(time) do
         field.prepare_save(user, true)
       end
 
@@ -122,7 +122,7 @@ describe Marten::DB::Field::DateTime do
       user.updated_at.should be_nil
 
       time = Time.local
-      Timecop.freeze(time) do |frozen_time|
+      Timecop.freeze(time) do
         field.prepare_save(user, true)
       end
 
@@ -136,7 +136,7 @@ describe Marten::DB::Field::DateTime do
       user.updated_at.should be_nil
 
       time = Time.local
-      Timecop.freeze(time) do |frozen_time|
+      Timecop.freeze(time) do
         field.prepare_save(user, false)
       end
 

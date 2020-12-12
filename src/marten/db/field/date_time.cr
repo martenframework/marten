@@ -2,6 +2,9 @@ module Marten
   module DB
     module Field
       class DateTime < Base
+        getter auto_now
+        getter auto_now_add
+
         def initialize(
           @id : ::String,
           @primary_key = false,
@@ -18,6 +21,16 @@ module Marten
             @blank = true
             @editable = false
           end
+        end
+
+        # Returns a boolean indicating if the field automatically sets the current time at record save time.
+        def auto_now?
+          @auto_now
+        end
+
+        # Returns a boolean indicating if the field automatically sets the current time at record creation time.
+        def auto_now_add?
+          @auto_now_add
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Time?

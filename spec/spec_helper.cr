@@ -1,8 +1,8 @@
 ENV["MARTEN_ENV"] = "test"
 
-require "spec"
-
 require "json"
+require "spec"
+require "timecop"
 
 {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
   require "pg"

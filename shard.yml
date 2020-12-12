@@ -22,6 +22,8 @@ development_dependencies:
     github: will/crystal-pg
   sqlite3:
     github: crystal-lang/crystal-sqlite3
+  timecop:
+    github: crystal-community/timecop.cr
 
 targets:
   marten-admin:

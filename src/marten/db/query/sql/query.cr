@@ -124,6 +124,21 @@ module Marten
             !(@limit.nil? && @offset.nil?)
           end
 
+          def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))
+            values_to_update = Hash(String, ::DB::Any).new
+
+            values.each do |name, value|
+              field = get_field(name, Model)
+              values_to_update[field.db_column] = field.to_db(value)
+            end
+
+            sql, parameters = build_update_query(values_to_update)
+            connection.open do |db|
+              result = db.exec(sql, args: parameters)
+              result.rows_affected
+            end
+          end
+
           protected def add_join(relation : String) : Nil
             ensure_join_for_field_path(verify_field(relation, only_relations: true))
           end
@@ -212,6 +227,32 @@ module Marten
             end
 
             {sql, parameters}
+          end
+
+          private def build_update_query(values)
+            where, where_parameters = where_clause_and_parameters
+            where_parameters_size = where_parameters.nil? ? 0 : where_parameters.size
+
+            column_names = values.keys.map_with_index do |column_name, i|
+              "#{quote(column_name)}=#{connection.parameter_id_for_ordered_argument(where_parameters_size + i + 1)}"
+            end.join(", ")
+
+            final_parameters = values.values
+            final_parameters += where_parameters if !where_parameters.nil?
+
+            sql = if !where_parameters.nil? && !@joins.empty?
+                    # TODO: add "ID IN" subquery in order to perform an update based on conditions on joined tables.
+                    raise NotImplementedError.new("Add support for udpate queries based on related objects filtering")
+                  else
+                    build_sql do |s|
+                      s << "UPDATE"
+                      s << table_name
+                      s << "SET #{column_names}"
+                      s << where
+                    end
+                  end
+
+            {sql, final_parameters}
           end
 
           private def columns

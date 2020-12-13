@@ -11,25 +11,6 @@ module Marten
         def initialize(@query = SQL::Query(Model).new)
         end
 
-        def to_s(io)
-          inspect(io)
-        end
-
-        def inspect(io)
-          results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
-          io << "<#{self.class.name} ["
-          io << "#{results[...INSPECT_RESULTS_LIMIT].map(&.inspect).join(", ")}"
-          io << ", ...(remaining truncated)..." if results.size > INSPECT_RESULTS_LIMIT
-          io << "]>"
-        end
-
-        def each
-          fetch if @result_cache.nil?
-          @result_cache.not_nil!.each do |r|
-            yield r
-          end
-        end
-
         def [](index : Int)
           raise_negative_indexes_not_supported if index < 0
 
@@ -129,6 +110,13 @@ module Marten
           end
         end
 
+        def each
+          fetch if @result_cache.nil?
+          @result_cache.not_nil!.each do |r|
+            yield r
+          end
+        end
+
         def exclude(**kwargs)
           exclude(Node.new(**kwargs))
         end
@@ -198,6 +186,14 @@ module Marten
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
         end
 
+        def inspect(io)
+          results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
+          io << "<#{self.class.name} ["
+          io << "#{results[...INSPECT_RESULTS_LIMIT].map(&.inspect).join(", ")}"
+          io << ", ...(remaining truncated)..." if results.size > INSPECT_RESULTS_LIMIT
+          io << "]>"
+        end
+
         def join(*relations : String | Symbol)
           qs = clone
           relations.each do |relation|
@@ -229,6 +225,18 @@ module Marten
 
         def size
           count
+        end
+
+        def to_s(io)
+          inspect(io)
+        end
+
+        def update(**kwargs)
+          update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
+          update_hash.merge!(kwargs.to_h)
+
+          qs = clone
+          qs.query.update_with(update_hash)
         end
 
         def using(db : String | Symbol)

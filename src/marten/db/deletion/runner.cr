@@ -24,7 +24,7 @@ module Marten
           @connection.transaction do
             # Step 1: delete all the querysets that were identified as raw-deleteable.
             @querysets_to_raw_delete.each do |model_klass, node|
-              count += model_klass._base_queryset.filter(node).delete(raw: true)
+              count += model_klass._base_queryset.using(@connection.alias).filter(node).delete(raw: true)
             end
 
             # Step 2: perform field updates (set null values when applicable).
@@ -33,7 +33,7 @@ module Marten
             # Step 3: delete all the records that were registered for deletion.
             @records_to_delete.each do |model_klass, records|
               node = records.reduce(Query::Node.new) { |acc, rec| acc | Query::Node.new(pk: rec.id) }
-              count += model_klass._base_queryset.filter(node).delete(raw: true)
+              count += model_klass._base_queryset.using(@connection.alias).filter(node).delete(raw: true)
             end
           end
 
@@ -81,7 +81,8 @@ module Marten
               @querysets_to_raw_delete << {reverse_relation.model, query_node_for(records, reverse_relation)}
             elsif reverse_relation.on_delete.cascade?
               add(
-                reverse_relation.model._base_queryset.filter(query_node_for(records, reverse_relation)),
+                reverse_relation.model._base_queryset.using(@connection.alias)
+                  .filter(query_node_for(records, reverse_relation)),
                 source: model
               )
             elsif reverse_relation.on_delete.protect?

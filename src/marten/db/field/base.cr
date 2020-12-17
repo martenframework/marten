@@ -85,6 +85,30 @@ module Marten
           @primary_key
         end
 
+        # Returns the related model associated with the field.
+        #
+        # This method will raise a `NotImplementedError` exception by default and should only be overriden if the
+        # `#relation?` method returns `true` (this is the case for fields such as one to many, one to one, etc).
+        def related_model
+          raise NotImplementedError.new("#relation_model must be implemented by subclasses if necessary")
+        end
+
+        # Returns true if the field is a relation.
+        #
+        # By default this method will always return `false`. It should be overriden if the field is intended to handle
+        # a relation with another model (eg. like one to many or one to one fields).
+        def relation?
+          false
+        end
+
+        # Returns the name of the relation on the model associated with the field.
+        #
+        # This method will raise a `NotImplementedError` exception by default and should only be overriden if the
+        # `#relation?` method returns `true` (this is the case for fields such as one to many, one to one, etc).
+        def relation_name
+          raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
+        end
+
         # Returns a boolean indicating whether the field value should be unique throughout the associated table.
         def unique?
           @unique
@@ -130,18 +154,6 @@ module Marten
 
             def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
           end
-        end
-
-        protected def related_model
-          raise NotImplementedError.new("#relation_model must be implemented by subclasses if necessary")
-        end
-
-        protected def relation?
-          false
-        end
-
-        protected def relation_name
-          raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
         end
 
         private def blank_error_message(_record)

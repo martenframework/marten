@@ -26,6 +26,18 @@ module Marten
           result_set.read(Int32 | Int64 | Nil)
         end
 
+        def related_model
+          @to
+        end
+
+        def relation?
+          true
+        end
+
+        def relation_name
+          @relation_name
+        end
+
         def to_column : Management::Column::Base
           Management::Column::ForeignKey.new(
             name: db_column,
@@ -49,18 +61,6 @@ module Marten
           else
             raise_unexpected_field_value(value)
           end
-        end
-
-        protected def related_model
-          @to
-        end
-
-        protected def relation?
-          true
-        end
-
-        protected def relation_name
-          @relation_name
         end
 
         # :nodoc:

@@ -102,6 +102,27 @@ describe Marten::DB::Field::Base do
     end
   end
 
+  describe "#related_model" do
+    it "raises NotImplementedError by default" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
+      expect_raises(NotImplementedError) { field.related_model }
+    end
+  end
+
+  describe "#relation?" do
+    it "returns false by default" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
+      field.relation?.should be_false
+    end
+  end
+
+  describe "#relation_name" do
+    it "raises NotImplementedError by default" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
+      expect_raises(NotImplementedError) { field.relation_name }
+    end
+  end
+
   describe "#unique?" do
     it "returns true if the field has a unicity constraint" do
       field = Marten::DB::Field::BaseSpec::TestField.new("my_field", unique: true)

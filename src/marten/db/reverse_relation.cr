@@ -14,7 +14,10 @@ module Marten
 
       # Returns the "on delete" strategy to consider for the considered reverse relation.
       def on_delete : Deletion::Strategy
-        field.as?(Field::OneToMany).try(&.on_delete).not_nil!
+        (
+          field.as?(Field::OneToMany).try(&.on_delete) ||
+            field.as?(Field::OneToOne).try(&.on_delete)
+        ).not_nil!
       end
 
       # Returns `true` if the reverse relation is associated with a one to many field.

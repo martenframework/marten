@@ -5,6 +5,8 @@ module Marten
         class String < Base
           include IsBuiltInColumn
 
+          getter max_size
+
           def initialize(
             @name : ::String,
             @max_size : ::Int32,

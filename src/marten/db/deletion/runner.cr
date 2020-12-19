@@ -5,6 +5,7 @@ module Marten
         def initialize(@connection : Connection::Base)
           @records_to_delete = {} of Model.class => Array(Model)
           @dependencies = {} of Model.class => Array(Model.class)
+          @field_updates = {} of Model.class => Hash(Tuple(String, Field::Any), Query::Node)
           @querysets_to_raw_delete = [] of Tuple(Model.class, Query::Node)
         end
 
@@ -28,7 +29,11 @@ module Marten
             end
 
             # Step 2: perform field updates (set null values when applicable).
-            # TODO.
+            @field_updates.each do |model_klass, query_node_updates|
+              query_node_updates.each do |(field_id, value), node|
+                model_klass._base_queryset.using(@connection.alias).filter(node).update({field_id => value})
+              end
+            end
 
             # Step 3: delete all the records that were registered for deletion.
             @records_to_delete.each do |model_klass, records|
@@ -72,7 +77,7 @@ module Marten
           model.reverse_relations.each do |reverse_relation|
             next if reverse_relation.on_delete.do_nothing?
 
-            if raw_deleteable?(reverse_relation.model)
+            if reverse_relation.on_delete.cascade? && raw_deleteable?(reverse_relation.model)
               @querysets_to_raw_delete << {reverse_relation.model, query_node_for(records, reverse_relation)}
             elsif reverse_relation.on_delete.cascade?
               add(
@@ -86,7 +91,11 @@ module Marten
                 "'#{reverse_relation.model}.#{reverse_relation.field_id}'"
               )
             elsif reverse_relation.on_delete.set_null?
-              # TODO: set null
+              @field_updates[reverse_relation.model] ||= {} of Tuple(String, Field::Any) => Query::Node
+              @field_updates[reverse_relation.model][{reverse_relation.field_id, nil}] = query_node_for(
+                records,
+                reverse_relation
+              )
             end
           end
         end

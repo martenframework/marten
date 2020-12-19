@@ -136,25 +136,27 @@ module Marten
             end
           end
 
+          # Register the reverse relation.
+
+          ::{{ related_model_klass }}.register_reverse_relation(
+            Marten::DB::ReverseRelation.new(::{{ model_klass }}, {{ field_id.stringify }})
+          )
+
           # Configure reverse relation methods if applicable (when the 'related' option is set).
 
           {% related_field_name = kwargs[:related] %}
 
+          {% if !related_field_name.nil? %}
           class ::{{ model_klass }}
             macro finished
               class ::{{ related_model_klass }}
-                register_reverse_relation(
-                  Marten::DB::ReverseRelation.new(::{{ model_klass }}, {{ field_id.stringify }})
-                )
-
-                {% if !related_field_name.nil? %}
                 def {{ related_field_name.id }}
                   Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
                 end
-                {% end %}
               end
             end
           end
+          {% end %}
         end
       end
     end

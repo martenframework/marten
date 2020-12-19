@@ -4,18 +4,24 @@ module Marten
       class Node
         alias FilterHash = Hash(String | Symbol, Field::Any | Array(Field::Any) | DB::Model)
 
-        def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, **kwargs)
+        def initialize(
+          @children = [] of self,
+          @connector = SQL::PredicateConnector::AND,
+          @negated = false,
+          **kwargs
+        )
           @filters = FilterHash.new
-          kwargs.each do |key, value|
-            @filters[key] = case value
-                            when Array
-                              arr = Array(Field::Any).new
-                              value.each { |v| arr << v }
-                              arr
-                            else
-                              value
-                            end
-          end
+          fill_filters(kwargs)
+        end
+
+        def initialize(
+          filters : Hash | NamedTuple,
+          @children = [] of self,
+          @connector = SQL::PredicateConnector::AND,
+          @negated = false
+        )
+          @filters = FilterHash.new
+          fill_filters(filters)
         end
 
         def initialize(
@@ -76,6 +82,19 @@ module Marten
           combined.add(self, conn)
           combined.add(other, conn)
           combined
+        end
+
+        private def fill_filters(filters)
+          filters.each do |key, value|
+            @filters[key] = case value
+                            when Array
+                              arr = Array(Field::Any).new
+                              value.each { |v| arr << v }
+                              arr
+                            else
+                              value
+                            end
+          end
         end
       end
     end

@@ -13,16 +13,7 @@ module Marten
         end
 
         protected def fetch
-          node_filters = Node::FilterHash.new
-          node_filters[@related_field_id] = @instance.pk
-          @query.add_query_node(
-            Node.new(
-              Array(Node).new,
-              SQL::PredicateConnector::AND,
-              false,
-              node_filters
-            )
-          )
+          @query.add_query_node(Node.new({@related_field_id => @instance.pk}))
           @result_cache = @query.execute
         end
       end

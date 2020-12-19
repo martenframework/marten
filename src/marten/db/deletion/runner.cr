@@ -41,13 +41,8 @@ module Marten
         end
 
         private def query_node_for(objs, reverse_relation)
-          node_filters = Query::Node::FilterHash.new
-          node_filters["#{reverse_relation.field_id}__in"] = objs.map(&.pk!.as(Field::Any))
           Query::Node.new(
-            Array(Query::Node).new,
-            Query::SQL::PredicateConnector::AND,
-            false,
-            node_filters
+            {"#{reverse_relation.field_id}__in" => objs.map(&.pk!.as(Field::Any))}
           )
         end
 

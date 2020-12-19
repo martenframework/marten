@@ -15,7 +15,7 @@ init:
 .PHONY: docs
 ## Builds the documentation.
 docs:
-	crystal docs
+	crystal docs --output=docs/ref
 
 
 # QUALITY ASSURANCE

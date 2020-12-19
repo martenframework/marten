@@ -231,12 +231,16 @@ module Marten
           inspect(io)
         end
 
-        def update(**kwargs)
+        def update(values : Hash | NamedTuple)
           update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
-          update_hash.merge!(kwargs.to_h)
+          update_hash.merge!(values)
 
           qs = clone
           qs.query.update_with(update_hash)
+        end
+
+        def update(**kwargs)
+          update(kwargs.to_h)
         end
 
         def using(db : String | Symbol)

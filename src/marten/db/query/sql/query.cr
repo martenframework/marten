@@ -246,8 +246,19 @@ module Marten
             final_parameters += where_parameters if !where_parameters.nil?
 
             sql = if !where_parameters.nil? && !@joins.empty?
-                    # TODO: add "ID IN" subquery in order to perform an update based on conditions on joined tables.
-                    raise NotImplementedError.new("Add support for udpate queries based on related objects filtering")
+                    sub_query = build_sql do |s|
+                      s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column}"
+                      s << "FROM #{table_name}"
+                      s << @joins.map(&.to_sql).join(" ")
+                      s << where
+                    end
+
+                    build_sql do |s|
+                      s << "UPDATE"
+                      s << table_name
+                      s << "SET #{column_names}"
+                      s << "WHERE #{Model.pk_field.db_column} IN (#{sub_query})"
+                    end
                   else
                     build_sql do |s|
                       s << "UPDATE"

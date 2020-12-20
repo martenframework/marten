@@ -24,7 +24,6 @@ module Marten
 
         def self.command_name(name : String | Symbol)
           @@command_name = name.to_s
-          Marten::CLI::Command.register_subcommand(self)
         end
 
         def self.help(help : String)

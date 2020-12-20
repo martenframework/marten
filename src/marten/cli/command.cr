@@ -1,13 +1,17 @@
 module Marten
   module CLI
     class Command
-      @@command_registry = {} of ::String => Base.class
+      @@command_registry = [] of Base.class
+
+      @commands_per_name : Hash(String, Base.class)
 
       def self.register_subcommand(command_klass : Base.class)
-        @@command_registry[command_klass.command_name] = command_klass
+        @@command_registry << command_klass
       end
 
       def initialize(@options : Array(String), @name : String = Marten::CLI::DEFAULT_COMMAND_NAME)
+        @commands_per_name = Hash(String, Base.class).new
+        @@command_registry.each { |k| @commands_per_name[k.command_name] = k }
       end
 
       def run
@@ -23,7 +27,7 @@ module Marten
           exit
         end
 
-        command_klass = @@command_registry.fetch(command) do
+        command_klass = @commands_per_name.fetch(command) do
           puts "Unknown command"
           exit
         end
@@ -55,7 +59,7 @@ module Marten
 
         usage << USAGE_HEADER % @name
 
-        per_app_commands = @@command_registry.values.group_by do |command|
+        per_app_commands = @commands_per_name.values.group_by do |command|
           command._marten_app_location.starts_with?(__DIR__) ? "marten" : command.app_config.label
         end
 

@@ -128,8 +128,13 @@ module Marten
             values_to_update = Hash(String, ::DB::Any).new
 
             values.each do |name, value|
-              field = get_field(name, Model)
-              values_to_update[field.db_column] = field.to_db(value)
+              field = get_relation_field(name, Model, silent: true) || get_field(name, Model)
+              values_to_update[field.db_column] = case value
+                                                  when Field::Any
+                                                    field.to_db(value)
+                                                  when DB::Model
+                                                    value.pk
+                                                  end
             end
 
             sql, parameters = build_update_query(values_to_update)
@@ -319,7 +324,7 @@ module Marten
           end
 
           private def get_field(raw_field, model)
-            model.get_field(raw_field)
+            model.get_field(raw_field.to_s)
           rescue Errors::UnknownField
             valid_choices = model.fields.map(&.id).join(", ")
             raise Errors::InvalidField.new(
@@ -328,7 +333,7 @@ module Marten
           end
 
           private def get_relation_field(raw_relation, model, silent = false)
-            model.get_relation_field(raw_relation)
+            model.get_relation_field(raw_relation.to_s)
           rescue Errors::UnknownField
             return nil if silent
             valid_choices = model.fields.select(&.relation?).map(&.relation_name).join(", ")

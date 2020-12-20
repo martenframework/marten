@@ -58,7 +58,7 @@ module Marten
         def validate(record, value)
           return if !value.as?(::String) || @max_size.nil?
 
-          if value.as(::String).size > @max_size.not_nil!
+          if value.not_nil!.as(::String).size > @max_size.not_nil!
             record.errors.add(id, "The maximum allowed length is #{@max_size}")
           end
         end

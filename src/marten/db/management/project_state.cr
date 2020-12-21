@@ -5,6 +5,8 @@ module Marten
       class ProjectState
         @tables : Hash(String, TableState)
 
+        getter tables
+
         # Initialize a project state from all the current tables of the project applications.
         def self.from_apps(apps : Array(Apps::Config))
           tables = [] of TableState

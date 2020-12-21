@@ -45,6 +45,11 @@ module Marten
           @tables[table_id(app_label, name)]
         end
 
+        # Returns the table state corresponding to the passed table ID.
+        def get_table(id : String) : TableState
+          @tables[id]
+        end
+
         # Renames a specific a table state.
         def rename_table(app_label : String, old_name : String, new_name : String) : Nil
           table = @tables.delete(table_id(app_label, old_name))

@@ -13,7 +13,7 @@ module Marten
           getter applied_migrations
           getter graph
 
-          def initialize(@connection : Connection::Base)
+          def initialize(@connection : Connection::Base? = nil)
             @applied_migrations = {} of String => Migration
             @graph = Graph.new
             build_graph
@@ -34,9 +34,6 @@ module Marten
           end
 
           private def build_graph
-            recorder = Recorder.new(@connection)
-            recorder.setup
-
             defined_migrations = {} of String => Migration
             replacements = {} of String => Migration
 
@@ -44,9 +41,14 @@ module Marten
               defined_migrations[migration_klass.id] = migration_klass.new
             end
 
-            recorder.applied_migrations.each do |migration|
-              migration_id = Migration.gen_id(migration.app, migration.name)
-              @applied_migrations[migration_id] = defined_migrations[migration_id]
+            if !@connection.nil?
+              recorder = Recorder.new(@connection.not_nil!)
+              recorder.setup
+
+              recorder.applied_migrations.each do |migration|
+                migration_id = Migration.gen_id(migration.app, migration.name)
+                @applied_migrations[migration_id] = defined_migrations[migration_id]
+              end
             end
 
             # Adds each migration node to the graph.

@@ -26,23 +26,20 @@ describe Marten::DB::Deletion::Runner do
       deletion.add(tag_3)
       deletion.execute
 
-      Tag.filter(id: tag_1.id).exists?.should be_true
-      Tag.filter(id: tag_2.id).exists?.should be_true
-      Tag.filter(id: tag_3.id).exists?.should be_false
+      Tag.all.size.should eq 2
+      Tag.all.map(&.id).to_set.should eq [tag_1.id, tag_2.id].to_set
     end
 
     it "can register a specific queryset for deletion" do
-      tag_1 = Tag.create!(name: "coding", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "ruby", is_active: true)
 
       deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
       deletion.add(Tag.filter { q(name: "coding") | q(name: "crystal") })
       deletion.execute
 
-      Tag.filter(id: tag_1.id).exists?.should be_false
-      Tag.filter(id: tag_2.id).exists?.should be_false
-      Tag.filter(id: tag_3.id).exists?.should be_true
+      Tag.all.map(&.id).should eq [tag_3.id]
     end
 
     it "supports model instances whose relations are configured to use cascade on_delete" do

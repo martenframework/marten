@@ -51,7 +51,7 @@ module Marten
             sql, parameters = build_exists_query
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
-              result.to_s == "1"
+              ["1", "t", "true"].includes?(result.to_s)
             end
           end
 

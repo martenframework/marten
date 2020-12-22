@@ -77,15 +77,14 @@ module Marten
           model.reverse_relations.each do |reverse_relation|
             next if reverse_relation.on_delete.do_nothing?
 
+            related_records = reverse_relation.model._base_queryset.using(@connection.alias)
+              .filter(query_node_for(records, reverse_relation))
+
             if reverse_relation.on_delete.cascade? && raw_deleteable?(reverse_relation.model)
               @querysets_to_raw_delete << {reverse_relation.model, query_node_for(records, reverse_relation)}
             elsif reverse_relation.on_delete.cascade?
-              add(
-                reverse_relation.model._base_queryset.using(@connection.alias)
-                  .filter(query_node_for(records, reverse_relation)),
-                source: model
-              )
-            elsif reverse_relation.on_delete.protect?
+              add(related_records, source: model)
+            elsif reverse_relation.on_delete.protect? && related_records.exists?
               raise Errors::ProtectedRecord.new(
                 "Cannot delete '#{model}' records because they are protected by the following relation: " \
                 "'#{reverse_relation.model}.#{reverse_relation.field_id}'"

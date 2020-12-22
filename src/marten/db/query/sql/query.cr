@@ -235,11 +235,10 @@ module Marten
           end
 
           private def build_update_query(values)
-            where, where_parameters = where_clause_and_parameters
-            where_parameters_size = where_parameters.nil? ? 0 : where_parameters.size
+            where, where_parameters = where_clause_and_parameters(offset: values.size)
 
             column_names = values.keys.map_with_index do |column_name, i|
-              "#{quote(column_name)}=#{connection.parameter_id_for_ordered_argument(where_parameters_size + i + 1)}"
+              "#{quote(column_name)}=#{connection.parameter_id_for_ordered_argument(i + 1)}"
             end.join(", ")
 
             final_parameters = values.values
@@ -459,7 +458,7 @@ module Marten
             field_path
           end
 
-          private def where_clause_and_parameters
+          private def where_clause_and_parameters(offset = 0)
             if @predicate_node.nil?
               where = nil
               parameters = nil
@@ -467,7 +466,7 @@ module Marten
               where, parameters = @predicate_node.not_nil!.to_sql(connection)
               parameters.each_with_index do |_p, i|
                 where = where % (
-                  [connection.parameter_id_for_ordered_argument(i + 1)] + (["%s"] * (parameters.size - i))
+                  [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
                 )
               end
               where = "WHERE #{where}"

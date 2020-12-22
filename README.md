@@ -2,7 +2,7 @@
 
 ![logo](docs/files/hero.svg)
 
-![CI](https://github.com/martenframework/marten/workflows/CI/badge.svg)
+[![CI](https://github.com/martenframework/marten/workflows/CI/badge.svg)](https://github.com/martenframework/marten/actions)
 
 ---
 

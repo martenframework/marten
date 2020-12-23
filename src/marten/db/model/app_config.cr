@@ -15,7 +15,7 @@ module Marten
         end
 
         module ClassMethods
-          protected def app_config
+          def app_config
             @@app_config ||= Marten.apps.get_containing(self)
           end
         end

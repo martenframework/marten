@@ -21,9 +21,9 @@ describe Marten::DB::Management::Introspector::Base do
 
       {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" || env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
         fk_constraint_names_1.size.should eq 1
-        fk_constraint_names_1.should contain("index_app_posts_on_author_id_fk_app_test_users_id")
+        fk_constraint_names_1.should contain("index_posts_on_author_id_fk_app_test_users_id")
         fk_constraint_names_2.size.should eq 1
-        fk_constraint_names_2.should contain("index_app_posts_on_updated_by_id_fk_app_test_users_id")
+        fk_constraint_names_2.should contain("index_posts_on_updated_by_id_fk_app_test_users_id")
       {% else %}
         # SQLite
         fk_constraint_names_1.should be_empty

@@ -2,7 +2,7 @@ module Marten
   module DB
     module Query
       class Expression
-        class Filter(Model)
+        class Filter
           def q(**kwargs)
             Node.new(**kwargs)
           end

@@ -122,7 +122,7 @@ module Marten
         end
 
         def exclude(&block)
-          expr = Expression::Filter(Model).new
+          expr = Expression::Filter.new
           query : Node = with expr yield
           exclude(query)
         end
@@ -140,7 +140,7 @@ module Marten
         end
 
         def filter(&block)
-          expr = Expression::Filter(Model).new
+          expr = Expression::Filter.new
           query : Node = with expr yield
           filter(query)
         end
@@ -158,7 +158,7 @@ module Marten
         end
 
         def get(&block)
-          expr = Expression::Filter(Model).new
+          expr = Expression::Filter.new
           query : Node = with expr yield
           get(query)
         end
@@ -174,7 +174,7 @@ module Marten
         end
 
         def get!(&block)
-          expr = Expression::Filter(Model).new
+          expr = Expression::Filter.new
           query : Node = with expr yield
           get!(query)
         end

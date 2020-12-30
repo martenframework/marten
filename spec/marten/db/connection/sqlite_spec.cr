@@ -27,7 +27,7 @@ require "./spec_helper"
     describe "#limit_value" do
       it "returns the passed value if it is not nil" do
         conn = Marten::DB::Connection.default
-        conn.limit_value(123456789).should eq 123456789
+        conn.limit_value(123_456_789).should eq 123_456_789
       end
 
       it "returns -1 if the passed value is nil" do

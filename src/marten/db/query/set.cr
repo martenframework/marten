@@ -270,7 +270,7 @@ module Marten
         end
 
         private def raise_negative_indexes_not_supported
-          raise "Negative indexes are not supported"
+          raise Errors::UnmetQuerySetCondition.new("Negative indexes are not supported")
         end
       end
     end

@@ -53,6 +53,11 @@ describe Marten::DB::Field::Text do
       field.to_db("hello").should eq "hello"
     end
 
+    it "returns a string value if the initial value is a symbol" do
+      field = Marten::DB::Field::Text.new("my_field")
+      field.to_db(:hello).should eq "hello"
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::Text.new("my_field")
 
@@ -73,9 +78,19 @@ describe Marten::DB::Field::Text do
       field.empty_value?("").should be_true
     end
 
+    it "returns true if the value is an empty symbol" do
+      field = Marten::DB::Field::Text.new("my_field")
+      field.empty_value?(:"").should be_true
+    end
+
     it "returns false if the value is a non-empty string" do
       field = Marten::DB::Field::Text.new("my_field")
       field.empty_value?("hello").should be_false
+    end
+
+    it "returns false if the value is a non-empty symbol" do
+      field = Marten::DB::Field::Text.new("my_field")
+      field.empty_value?(:hello).should be_false
     end
 
     it "raises UnexpectedFieldValue if the value is not supported" do

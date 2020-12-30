@@ -39,6 +39,8 @@ module Marten
             nil
           when ::String
             value
+          when Symbol
+            value.to_s
           else
             raise_unexpected_field_value(value)
           end
@@ -50,6 +52,8 @@ module Marten
             true
           when ::String
             value.empty?
+          when Symbol
+            value.to_s.empty?
           else
             raise_unexpected_field_value(value)
           end

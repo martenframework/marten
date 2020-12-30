@@ -27,6 +27,14 @@ module Marten
           id
         end
 
+        def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
+          if value.nil?
+            18_446_744_073_709_551_615 # 2**64 - 1
+          else
+            value
+          end
+        end
+
         def operator_for(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end

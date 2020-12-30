@@ -33,6 +33,9 @@ module Marten
         # considered predicate type (eg. "istartswith"), specific SQL functions could be applied on the column ID.
         abstract def left_operand_for(id : String, predicate) : String
 
+        # Returns a compatible value to use in the context of a LIMIT statement for the database at hand.
+        abstract def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
+
         # Returns the operator to use for a specific query predicate.
         abstract def operator_for(predicate) : String
 

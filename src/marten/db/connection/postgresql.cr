@@ -30,6 +30,10 @@ module Marten
           transformation.nil? ? id : (transformation % id)
         end
 
+        def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
+          value
+        end
+
         def operator_for(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end

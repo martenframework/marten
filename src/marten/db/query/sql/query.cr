@@ -176,13 +176,14 @@ module Marten
 
           private def build_count_query
             where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
               s << "SELECT COUNT(*)"
               s << "FROM #{table_name}"
               s << @joins.map(&.to_sql).join(" ")
               s << where
-              s << "LIMIT #{@limit}" unless @limit.nil?
+              s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
             end
 
@@ -204,13 +205,14 @@ module Marten
 
           private def build_exists_query
             where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
               s << "SELECT EXISTS("
               s << "SELECT 1 FROM #{table_name}"
               s << @joins.map(&.to_sql).join(" ")
               s << where
-              s << "LIMIT #{@limit}" unless @limit.nil?
+              s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ")"
             end
@@ -220,6 +222,7 @@ module Marten
 
           private def build_query
             where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
               s << "SELECT #{columns}"
@@ -227,7 +230,7 @@ module Marten
               s << @joins.map(&.to_sql).join(" ")
               s << where
               s << order_by
-              s << "LIMIT #{@limit}" unless @limit.nil?
+              s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
             end
 

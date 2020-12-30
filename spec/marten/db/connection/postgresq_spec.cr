@@ -16,6 +16,18 @@ require "./spec_helper"
       end
     end
 
+    describe "#limit_value" do
+      it "returns the passed value if it is not nil" do
+        conn = Marten::DB::Connection.default
+        conn.limit_value(123456789).should eq 123456789
+      end
+
+      it "returns nil if the passed value is nil" do
+        conn = Marten::DB::Connection.default
+        conn.limit_value(nil).should be_nil
+      end
+    end
+
     describe "#left_operand_for" do
       it "returns the expected operand for an icontains predicate" do
         conn = Marten::DB::Connection.default

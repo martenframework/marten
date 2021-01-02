@@ -12,6 +12,8 @@ crystal: 0.35.0
 dependencies:
   db:
     github: crystal-lang/crystal-db
+  i18n:
+    github: crystal-i18n/i18n
 
 development_dependencies:
   ameba:

@@ -1,8 +1,9 @@
 # Marten - The pragmatic web framework.
 
 require "db"
-require "log"
 require "http"
+require "i18n"
+require "log"
 require "uuid"
 
 require "./marten/apps/**"

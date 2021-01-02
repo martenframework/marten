@@ -3,6 +3,9 @@ module Marten
     abstract class Migration
       module Operation
         class CreateTable < Base
+          getter name
+          getter columns
+
           def initialize(@name : String, @columns : Array(Management::Column::Base))
           end
 

@@ -29,6 +29,9 @@ module Marten
       # Returns the log backend used by the application.
       getter log_backend
 
+      # The default log level used by the application.
+      getter log_level
+
       # Returns the list of middlewares used by the application.
       getter middleware
 
@@ -73,6 +76,9 @@ module Marten
 
       # Allows to set the host the HTTP server running the application will be listening on.
       setter host
+
+      # Allows to set the default log level that will be used by the application.
+      setter log_level
 
       # Allows to set the port the HTTP server running the application will be listening on.
       setter port
@@ -136,6 +142,7 @@ module Marten
           io << entry.message
         end
         @log_backend = ::Log::IOBackend.new(formatter: log_formatter)
+        @log_level = ::Log::Severity::Info
         @middleware = Array(Marten::Middleware.class).new
         @port = 8000
         @port_reuse = true
@@ -190,7 +197,7 @@ module Marten
       end
 
       private def setup_log_backend
-        ::Log.setup(:debug, log_backend)
+        ::Log.setup(log_level, log_backend)
       end
 
       private def setup_db_connections

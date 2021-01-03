@@ -199,6 +199,27 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#log_level" do
+    it "returns the info log level by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.log_level.should eq Log::Severity::Info
+    end
+
+    it "returns the configured log level if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.log_level = Log::Severity::Debug
+      global_settings.log_level.should eq Log::Severity::Debug
+    end
+  end
+
+  describe "#log_level=" do
+    it "allows to set a specific log level to use" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.log_level = Log::Severity::Debug
+      global_settings.log_level.should eq Log::Severity::Debug
+    end
+  end
+
   describe "#port" do
     it "returns 8000 by default" do
       global_settings = Marten::Conf::GlobalSettings.new

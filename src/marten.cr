@@ -48,6 +48,7 @@ module Marten
     settings.setup
     apps.populate(settings.installed_apps)
     apps.setup
+    setup_i18n
   end
 
   def self.configure(env : Nil | String | Symbol = nil)
@@ -77,5 +78,12 @@ module Marten
 
   protected def self.dir_location
     __DIR__
+  end
+
+  private def self.setup_i18n
+    # Ensure each app config translation loader is properly bound to the I18n config.
+    I18n.config.loaders += apps.app_configs.map(&.translations_loader).compact
+
+    I18n.init
   end
 end

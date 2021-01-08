@@ -38,7 +38,17 @@ module Marten
       def setup
       end
 
-      private LABEL_RE = /^[a-z_]+$/
+      # Returns the translations loader of the application.
+      #
+      # If the application doesn't define translations in a dedicated directory, `nil` is returned.
+      def translations_loader
+        locales_dir = Path[self.class._marten_app_location].join(LOCALES_DIR)
+        return unless Dir.exists?(locales_dir)
+        I18n::Loader::YAML.new(locales_dir.to_s)
+      end
+
+      private LABEL_RE    = /^[a-z_]+$/
+      private LOCALES_DIR = "locales"
     end
   end
 end

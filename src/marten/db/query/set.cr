@@ -150,7 +150,7 @@ module Marten
         end
 
         def first
-          (query.ordered? ? self : order(Constants::PRIMARY_KEY_ALIAS))[..0].to_a.first
+          (query.ordered? ? self : order(Constants::PRIMARY_KEY_ALIAS))[0]?
         end
 
         def get(**kwargs)
@@ -203,7 +203,7 @@ module Marten
         end
 
         def last
-          (query.ordered? ? reverse : order("-#{Constants::PRIMARY_KEY_ALIAS}"))[..0].to_a.first
+          (query.ordered? ? reverse : order("-#{Constants::PRIMARY_KEY_ALIAS}"))[0]?
         end
 
         # Returns the model class associated with the query set.
@@ -233,7 +233,7 @@ module Marten
 
         def update(values : Hash | NamedTuple)
           update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
-          update_hash.merge!(values)
+          update_hash.merge!(values.to_h)
 
           qs = clone
           qs.query.update_with(update_hash)

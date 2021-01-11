@@ -77,6 +77,10 @@ module Marten
             end
           end
 
+          parser.invalid_option do |flag|
+            print_error_and_exit("Unrecognized option: #{flag}")
+          end
+
           parser.parse(options)
 
           run

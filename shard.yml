@@ -7,7 +7,7 @@ authors:
 description: |
   The pragmatic™ web framework.
 
-crystal: 0.35.0
+crystal: ">= 0.35.0"
 
 dependencies:
   db:

@@ -160,7 +160,7 @@ module Marten
         end
 
         private def print_error_and_exit(msg, exit_code = 1)
-          @stderr.print(style("Error: ", fore: :red).colorize.bold)
+          @stderr.print(style("Error: ", fore: :red, mode: :bold))
           print_error(msg)
           exit(exit_code)
         end

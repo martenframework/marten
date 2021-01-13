@@ -44,6 +44,11 @@ module Marten
             nil
           end
 
+          # Returns the column type identifier.
+          def type : String
+            Column.registry.key_for(self.class)
+          end
+
           # Returns a boolean indicating whether the column value should be unique throughout the associated table.
           def unique?
             @unique

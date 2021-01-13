@@ -45,7 +45,7 @@ module Marten
           end
 
           # Returns the column type identifier.
-          def type : String
+          def type : ::String
             Column.registry.key_for(self.class)
           end
 

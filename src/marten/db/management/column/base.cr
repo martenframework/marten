@@ -39,6 +39,19 @@ module Marten
             @primary_key
           end
 
+          # Returns a serialized version of the column arguments to be used when generating migrations.
+          #
+          # The returned string will be used in the context of `add_column` / `column` statements in generated
+          # migrations.
+          def serialize_args : ::String
+            args = [%{"#{name}"}, %{"#{type}"}]
+            args << %{primary_key: #{@primary_key}} if primary_key?
+            args << %{null: #{@null}} if null?
+            args << %{unique: #{@unique}} if unique?
+            args << %{index: #{@index}} if index?
+            args.join(", ")
+          end
+
           # Returns the raw type suffix of the column to use for the column at hand and a specific database connection.
           def sql_type_suffix(connection : Connection::Base) : ::String?
             nil

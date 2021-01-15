@@ -25,6 +25,11 @@ module Marten
         @models = [] of DB::Model.class
       end
 
+      # Returns the migrations path for the application.
+      def migrations_path
+        Path[self.class._marten_app_location].join(MIGRATIONS_DIR)
+      end
+
       # Associates a model to the current app config.
       def register_model(model : DB::Model.class)
         @models << model
@@ -47,8 +52,9 @@ module Marten
         I18n::Loader::YAML.new(locales_dir.to_s)
       end
 
-      private LABEL_RE    = /^[a-z_]+$/
-      private LOCALES_DIR = "locales"
+      private LABEL_RE       = /^[a-z_]+$/
+      private LOCALES_DIR    = "locales"
+      private MIGRATIONS_DIR = "migrations"
     end
   end
 end

@@ -37,6 +37,10 @@ module Marten
             table = state.get_table(app_label, @table_name)
             table.remove_column(@column_name)
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/remove_column.ecr"
+          end
         end
       end
     end

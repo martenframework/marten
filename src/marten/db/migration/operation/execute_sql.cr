@@ -26,6 +26,10 @@ module Marten
 
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/execute_sql.ecr"
+          end
         end
       end
     end

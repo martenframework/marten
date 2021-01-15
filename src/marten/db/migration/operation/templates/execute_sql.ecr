@@ -1,0 +1,14 @@
+<%- if @backward_sql.nil? -%>,
+execute <<-SQL
+  <%= @forward_sql %>
+SQL
+<%- else -%>
+execute(
+  <<-SQL
+    <%= @forward_sql %>
+  SQL,
+  <<-SQL
+    <%= @backward_sql %>
+  SQL
+)
+<%- end %>

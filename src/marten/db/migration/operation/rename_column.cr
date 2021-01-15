@@ -39,6 +39,10 @@ module Marten
             table = state.get_table(app_label, @table_name)
             table.rename_column(@old_name, @new_name)
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/rename_column.ecr"
+          end
         end
       end
     end

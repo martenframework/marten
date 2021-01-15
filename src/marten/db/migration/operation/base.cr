@@ -18,6 +18,8 @@ module Marten
           ) : Nil
 
           abstract def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
+
+          abstract def serialize : String
         end
       end
     end

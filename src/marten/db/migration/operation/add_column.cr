@@ -33,6 +33,10 @@ module Marten
             table = state.get_table(app_label, @table_name)
             table.add_column(@column)
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/add_column.ecr"
+          end
         end
       end
     end

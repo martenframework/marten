@@ -32,6 +32,10 @@ module Marten
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
             state.delete_table(app_label, @name)
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/delete_table.ecr"
+          end
         end
       end
     end

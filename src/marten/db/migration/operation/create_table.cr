@@ -38,6 +38,10 @@ module Marten
               )
             )
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/create_table.ecr"
+          end
         end
       end
     end

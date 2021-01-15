@@ -34,6 +34,10 @@ module Marten
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
             state.rename_table(app_label, @old_name, @new_name)
           end
+
+          def serialize : String
+            ECR.render "#{__DIR__}/templates/rename_table.ecr"
+          end
         end
       end
     end

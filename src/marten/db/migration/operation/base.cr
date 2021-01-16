@@ -3,6 +3,8 @@ module Marten
     abstract class Migration
       module Operation
         abstract class Base
+          abstract def describe : String
+
           abstract def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

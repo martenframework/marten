@@ -6,6 +6,10 @@ module Marten
           def initialize(@forward_sql : String, @backward_sql : String? = nil)
           end
 
+          def describe : String
+            "Run raw SQL"
+          end
+
           def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

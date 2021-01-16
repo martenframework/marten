@@ -11,6 +11,10 @@ module Marten
             @new_name = new_name.to_s
           end
 
+          def describe : String
+            "Rename #{@old_name} table to #{@new_name}"
+          end
+
           def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

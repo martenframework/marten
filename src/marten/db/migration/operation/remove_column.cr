@@ -11,6 +11,10 @@ module Marten
             @column_name = column_name.to_s
           end
 
+          def describe : String
+            "Remove #{@column_name} on #{@table_name} table"
+          end
+
           def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

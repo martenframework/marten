@@ -9,6 +9,10 @@ module Marten
           def initialize(@name : String, @columns : Array(Management::Column::Base))
           end
 
+          def describe : String
+            "Create #{@name} table"
+          end
+
           def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

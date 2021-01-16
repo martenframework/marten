@@ -9,6 +9,10 @@ module Marten
             @name = name.to_s
           end
 
+          def describe : String
+            "Delete #{@name} table"
+          end
+
           def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

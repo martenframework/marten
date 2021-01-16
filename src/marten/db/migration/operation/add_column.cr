@@ -9,6 +9,10 @@ module Marten
             @table_name = table_name.to_s
           end
 
+          def describe : String
+            "Add #{@column.name} to #{@table_name} table"
+          end
+
           def mutate_db_backward(
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,

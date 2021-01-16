@@ -36,6 +36,50 @@ describe Marten::Apps::Config do
       app_config.label.should eq "test"
     end
   end
+
+  describe "#migrations_path" do
+    it "returns the app config migrations path" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.migrations_path.should eq Path.new(__DIR__).join("migrations")
+    end
+  end
+
+  describe "#models" do
+    it "returns the app's list of models" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.register_model(Tag)
+      app_config.models.should eq [Tag]
+    end
+  end
+
+  describe "#register_model" do
+    it "adds a model class to the app's list of models" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.register_model(Post)
+      app_config.models.should eq [Post]
+    end
+  end
+
+  describe "#translations_loader" do
+    it "returns a translations loader containing the app locales data" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      translations_loader = app_config.translations_loader
+      translations_loader.should be_a I18n::Loader::YAML
+
+      translations_loader.not_nil!.load.should eq(
+        I18n::TranslationsHash{
+          "en" => I18n::TranslationsHash{
+            "simple" => "Simple translation",
+          },
+        }
+      )
+    end
+
+    it "returns nil if the app does not define locales data" do
+      app_config = TestApp.new
+      app_config.translations_loader.should be_nil
+    end
+  end
 end
 
 module Marten::Apps::ConfigSpec

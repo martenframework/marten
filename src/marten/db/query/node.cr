@@ -2,7 +2,12 @@ module Marten
   module DB
     module Query
       class Node
-        alias FilterHash = Hash(String | Symbol, Field::Any | Array(Field::Any) | DB::Model)
+        alias FilterHash = Hash(String, Field::Any | Array(Field::Any) | DB::Model)
+
+        getter children
+        getter connector
+        getter filters
+        getter negated
 
         def initialize(
           @children = [] of self,
@@ -56,11 +61,6 @@ module Marten
           negated_parent
         end
 
-        protected getter children
-        protected getter connector
-        protected getter filters
-        protected getter negated
-
         protected def add(other : self, conn : SQL::PredicateConnector)
           return if @children.includes?(other)
 
@@ -86,14 +86,14 @@ module Marten
 
         private def fill_filters(filters)
           filters.each do |key, value|
-            @filters[key] = case value
-                            when Array
-                              arr = Array(Field::Any).new
-                              value.each { |v| arr << v }
-                              arr
-                            else
-                              value
-                            end
+            @filters[key.to_s] = case value
+                                 when Array
+                                   arr = Array(Field::Any).new
+                                   value.each { |v| arr << v }
+                                   arr
+                                 else
+                                   value
+                                 end
           end
         end
       end

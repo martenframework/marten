@@ -12,7 +12,7 @@ describe Marten::DB::Query::RelatedSet do
 
       qset = Marten::DB::Query::RelatedSet(Post).new(user_1, "author_id")
 
-      qset.all.to_a.should eq [post_1, post_3]
+      qset.all.to_set.should eq(Set{post_1, post_3})
     end
   end
 end

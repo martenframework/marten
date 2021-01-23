@@ -39,7 +39,7 @@ module Marten
             end
           end
 
-          record.errors.add(id, "A valid UUID must be provided")
+          record.errors.add(id, I18n.t("marten.db.field.uuid.errors.invalid"))
         end
       end
     end

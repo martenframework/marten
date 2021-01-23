@@ -81,6 +81,9 @@ module Marten
   end
 
   private def self.setup_i18n
+    # Add Marten's built-in translations first.
+    I18n.config.loaders << I18n::Loader::YAML.new("#{__DIR__}/marten/locales")
+
     # Ensure each app config translation loader is properly bound to the I18n config.
     I18n.config.loaders += apps.app_configs.map(&.translations_loader).compact
 

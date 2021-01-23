@@ -63,7 +63,7 @@ module Marten
           return if !value.as?(::String) || @max_size.nil?
 
           if value.as?(::String).not_nil!.size > @max_size.not_nil!
-            record.errors.add(id, "The maximum allowed length is #{@max_size}")
+            record.errors.add(id, I18n.t("marten.db.field.text.errors.too_long", max_size: max_size))
           end
         end
       end

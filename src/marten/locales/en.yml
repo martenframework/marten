@@ -1,0 +1,17 @@
+en:
+  marten:
+    db:
+      field:
+        base:
+          errors:
+            blank: "This field cannot be blank."
+            nil: "This field cannot be null."
+        string:
+          errors:
+            too_long: "The maximum allowed length is %{max_size}"
+        text:
+          errors:
+            too_long: "The maximum allowed length is %{max_size}"
+        uuid:
+          errors:
+            invalid: "A valid UUID must be provided"

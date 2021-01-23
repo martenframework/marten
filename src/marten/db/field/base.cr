@@ -157,8 +157,7 @@ module Marten
         end
 
         private def blank_error_message(_record)
-          # TODO: add I18n support.
-          "This field cannot be blank."
+          I18n.t("marten.db.field.base.errors.blank")
         end
 
         private def empty_value?(value) : ::Bool
@@ -166,8 +165,7 @@ module Marten
         end
 
         private def null_error_message(_record)
-          # TODO: add I18n support.
-          "This field cannot be null."
+          I18n.t("marten.db.field.base.errors.nil")
         end
 
         private def raise_unexpected_field_value(value)

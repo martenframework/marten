@@ -3,6 +3,11 @@ module Marten
     module Query
       module SQL
         class PredicateNode
+          getter children
+          getter connector
+          getter negated
+          getter predicates
+
           def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, *args)
             @predicates = [] of Predicate::Base
             @predicates.concat(args.to_a)
@@ -16,9 +21,7 @@ module Marten
           )
           end
 
-          protected getter predicates
-
-          protected def add(other : self, conn : SQL::PredicateConnector)
+          def add(other : self, conn : SQL::PredicateConnector)
             return if @children.includes?(other)
 
             if @connector == conn
@@ -35,7 +38,7 @@ module Marten
             end
           end
 
-          protected def clone
+          def clone
             self.class.new(
               children: @children.map { |c| c.clone.as(self) },
               connector: @connector,
@@ -44,7 +47,7 @@ module Marten
             )
           end
 
-          protected def to_sql(connection : Connection::Base)
+          def to_sql(connection : Connection::Base)
             sql_parts = [] of String
             sql_params = [] of Field::Any
 

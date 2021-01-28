@@ -157,6 +157,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#i18n" do
+    it "returns the i18n configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.i18n.should be_a Marten::Conf::GlobalSettings::I18n
+    end
+  end
+
   describe "#installed_apps" do
     it "returns an empty array by default" do
       global_settings = Marten::Conf::GlobalSettings.new

@@ -8,7 +8,7 @@ describe Marten::DB::Query::SQL::Predicate::Base do
   end
 end
 
-module  Marten::DB::Query::SQL::Predicate::BaseSpec
+module Marten::DB::Query::SQL::Predicate::BaseSpec
   class Test < Marten::DB::Query::SQL::Predicate::Base
     predicate_name "this_is_a_test"
   end

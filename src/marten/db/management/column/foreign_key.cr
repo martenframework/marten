@@ -24,6 +24,18 @@ module Marten
             @to_column = to_column.to_s
           end
 
+          def ==(other : self)
+            super || (
+              name == other.name &&
+                to_table == other.to_table &&
+                to_column == other.to_column &&
+                primary_key? == other.primary_key? &&
+                null? == other.null? &&
+                unique? == other.unique? &&
+                index? == other.index?
+            )
+          end
+
           def clone
             self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
           end

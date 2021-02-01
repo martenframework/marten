@@ -24,6 +24,17 @@ module Marten
           # Returns the raw type of the column to use for the column at hand and a specific database connection.
           abstract def sql_type(connection : Connection::Base) : ::String
 
+          # Returns true if the other column corresponds to the same column configuration.
+          def ==(other : self)
+            super || (
+              name == other.name &&
+                primary_key? == other.primary_key? &&
+                null? == other.null? &&
+                unique? == other.unique? &&
+                index? == other.index?
+            )
+          end
+
           # Returns true if an index should be created at the database level for the column.
           def index?
             @index

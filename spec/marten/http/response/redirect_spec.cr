@@ -5,7 +5,7 @@ describe Marten::HTTP::Response::Redirect do
     it "allows to initialize a 302 HTTP response by specifying the target location" do
       response = Marten::HTTP::Response::Redirect.new("https://example.com/foo/bar")
       response.status.should eq 302
-      response.headers.should eq({"Location" => "https://example.com/foo/bar"})
+      response.headers.should eq(HTTP::Headers{"Location" => "https://example.com/foo/bar"})
     end
   end
 end

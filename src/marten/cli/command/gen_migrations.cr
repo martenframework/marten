@@ -39,6 +39,7 @@ module Marten
                 ending: ""
               )
 
+              Dir.mkdir(app_config.migrations_path) unless Dir.exists?(app_config.migrations_path)
               File.write(app_config.migrations_path.join("#{migration.name}.cr"), migration.serialize)
 
               print(style(" DONE", fore: :light_green, mode: :bold))

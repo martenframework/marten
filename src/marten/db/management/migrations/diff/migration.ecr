@@ -1,0 +1,14 @@
+class Migration_<%= UUID.random.hexstring %> < Marten::DB::Migration
+  <%- @dependencies.each do |app_label, migration_name| -%>
+  depends_on "<%= app_label %>", "<%= migration_name %>"
+  <%- end -%>
+
+  def plan
+<%- @operations.each_with_index do |op, i| -%>
+<%- op.serialize.each_line do |line| -%>
+    <%= line %>
+<%- end -%><%- if i < @operations.size - 1 -%>
+
+<%- end %><%- end -%>
+  end
+end

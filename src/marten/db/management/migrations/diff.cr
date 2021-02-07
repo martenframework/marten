@@ -32,19 +32,23 @@ module Marten
             to_tables = @to_state.tables.keys.to_set
             renamed_tables = handle_and_identify_renamed_tables(from_tables, to_tables)
 
+            kept_tables = from_tables & to_tables
+
             # Generate a set of columns that are present in the original state.
-            from_columns = @from_state.tables.values.flat_map do |t|
+            from_columns = @from_state.tables.map do |tid, t|
+              next unless kept_tables.includes?(tid)
               t.columns.map { |c| {t.app_label, t.name, c.name} }
-            end.to_set
+            end.compact.flatten.to_set
             renamed_tables.each do |tid|
               table = @to_state.get_table(tid)
               from_columns += table.columns.map { |c| {table.app_label, table.name, c.name} }.to_set
             end
 
             # Generate a set of columns that are present in the destination state.
-            to_columns = @to_state.tables.values.flat_map do |t|
+            to_columns = @to_state.tables.map do |tid, t|
+              next unless kept_tables.includes?(tid)
               t.columns.map { |c| {t.app_label, t.name, c.name} }
-            end.to_set
+            end.compact.flatten.to_set
 
             handle_created_tables(from_tables, to_tables)
             handle_added_columns(from_columns, to_columns)

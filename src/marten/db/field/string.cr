@@ -8,6 +8,7 @@ module Marten
           @id : ::String,
           @max_size : ::Int32,
           @primary_key = false,
+          @default : ::DB::Any? = nil,
           @blank = false,
           @null = false,
           @unique = false,

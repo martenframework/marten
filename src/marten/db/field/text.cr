@@ -9,6 +9,7 @@ module Marten
         def initialize(
           @id : ::String,
           @primary_key = false,
+          @default : ::DB::Any? = nil,
           @blank = false,
           @null = false,
           @unique = false,

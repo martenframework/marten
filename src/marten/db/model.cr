@@ -30,6 +30,7 @@ module Marten
 
       private def initialize_field_values(**kwargs)
         values = Hash(String, Field::Any).new
+
         kwargs.each do |key, value|
           if value.is_a?(Model)
             relation_field = self.class.get_relation_field(key.to_s)
@@ -38,6 +39,13 @@ module Marten
             values[key.to_s] = value
           end
         end
+
+        self.class.fields.each do |field|
+          next if values.has_key?(field.id)
+          next if field.default.nil?
+          values[field.id] = field.default
+        end
+
         assign_field_values(values)
       end
     end

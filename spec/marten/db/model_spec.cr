@@ -59,5 +59,22 @@ describe Marten::DB::Model do
       post.author_id.should eq user2.id
       post.author.should eq user2
     end
+
+    it "assigns default field values unless they are explicitly specified" do
+      user_1 = TestUser.new
+      user_1.is_admin.should be_false
+
+      user_2 = TestUser.new(is_admin: true)
+      user_2.is_admin.should be_true
+
+      TestUser.create!(
+        username: "jd",
+        email: "jd@example.com",
+        first_name: "John",
+        last_name: "Doe",
+        is_admin: true
+      )
+      TestUser.get!(username: "jd").is_admin.should be_true
+    end
   end
 end

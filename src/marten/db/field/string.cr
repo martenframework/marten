@@ -2,13 +2,14 @@ module Marten
   module DB
     module Field
       class String < Base
+        getter default
         getter max_size
 
         def initialize(
           @id : ::String,
           @max_size : ::Int32,
           @primary_key = false,
-          @default : ::DB::Any? = nil,
+          @default : ::String? = nil,
           @blank = false,
           @null = false,
           @unique = false,

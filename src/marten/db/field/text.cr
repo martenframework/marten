@@ -4,12 +4,13 @@ module Marten
       class Text < Base
         @max_size : ::Int32?
 
+        getter default
         getter max_size
 
         def initialize(
           @id : ::String,
           @primary_key = false,
-          @default : ::DB::Any? = nil,
+          @default : ::String? = nil,
           @blank = false,
           @null = false,
           @unique = false,

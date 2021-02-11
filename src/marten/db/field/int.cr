@@ -2,6 +2,21 @@ module Marten
   module DB
     module Field
       class Int < Base
+        getter default
+
+        def initialize(
+          @id : ::String,
+          @primary_key = false,
+          @default : Int32? = nil,
+          @blank = false,
+          @null = false,
+          @unique = false,
+          @editable = true,
+          @db_column = nil,
+          @db_index = false
+        )
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32?
           result_set.read(Int32 | Int64 | Nil).try(&.to_i32)
         end

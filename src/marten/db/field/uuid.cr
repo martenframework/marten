@@ -2,6 +2,21 @@ module Marten
   module DB
     module Field
       class UUID < Base
+        getter default
+
+        def initialize(
+          @id : ::String,
+          @primary_key = false,
+          @default : ::UUID? = nil,
+          @blank = false,
+          @null = false,
+          @unique = false,
+          @editable = true,
+          @db_column = nil,
+          @db_index = false
+        )
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : ::UUID?
           value = result_set.read(::String?)
           ::UUID.new(value) unless value.nil?

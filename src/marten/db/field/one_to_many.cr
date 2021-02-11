@@ -22,6 +22,10 @@ module Marten
           @on_delete = Deletion::Strategy.parse(on_delete.to_s)
         end
 
+        def default
+          # No-op
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
           result_set.read(Int32 | Int64 | Nil)
         end

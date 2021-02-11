@@ -2,6 +2,21 @@ module Marten
   module DB
     module Field
       class Bool < Base
+        getter default
+
+        def initialize(
+          @id : ::String,
+          @primary_key = false,
+          @default : ::Bool? = nil,
+          @blank = false,
+          @null = false,
+          @unique = false,
+          @editable = true,
+          @db_column = nil,
+          @db_index = false
+        )
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : ::Bool?
           val = result_set.read
           null? && val.nil? ? nil : [true, "true", 1, "1", "yes"].includes?(val)

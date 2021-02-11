@@ -4,10 +4,12 @@ module Marten
       class DateTime < Base
         getter auto_now
         getter auto_now_add
+        getter default
 
         def initialize(
           @id : ::String,
           @primary_key = false,
+          @default : Time? = nil,
           @blank = false,
           @null = false,
           @unique = false,

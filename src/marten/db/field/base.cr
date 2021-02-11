@@ -9,16 +9,12 @@ module Marten
         @db_column : ::String | Symbol | Nil
         @db_index : ::Bool
 
-        # Returns the default value of the field if any.
-        getter default
-
         # Returns the ID of the field used in the associated model.
         getter id
 
         def initialize(
           @id : ::String,
           @primary_key = false,
-          @default : ::DB::Any? = nil,
           @blank = false,
           @null = false,
           @unique = false,
@@ -27,6 +23,9 @@ module Marten
           @db_index = false
         )
         end
+
+        # Returns the default value of the field if any.
+        abstract def default
 
         # Extracts the field value from a DB result set and returns the right object corresponding to this value.
         abstract def from_db_result_set(result_set : ::DB::ResultSet)

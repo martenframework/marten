@@ -42,6 +42,18 @@ describe Marten::DB::Field::Text do
     end
   end
 
+  describe "#default" do
+    it "returns nil by default" do
+      field = Marten::DB::Field::Text.new("my_field")
+      field.default.should be_nil
+    end
+
+    it "returns the configured default" do
+      field = Marten::DB::Field::Text.new("my_field", default: "foobar")
+      field.default.should eq "foobar"
+    end
+  end
+
   describe "#to_db" do
     it "returns nil if the value is nil" do
       field = Marten::DB::Field::Text.new("my_field")

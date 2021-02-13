@@ -43,6 +43,18 @@ describe Marten::DB::Field::String do
     end
   end
 
+  describe "#default" do
+    it "returns nil by default" do
+      field = Marten::DB::Field::String.new("my_field", max_size: 128)
+      field.default.should be_nil
+    end
+
+    it "returns the configured default" do
+      field = Marten::DB::Field::String.new("my_field", max_size: 128, default: "foobar")
+      field.default.should eq "foobar"
+    end
+  end
+
   describe "#to_db" do
     it "returns nil if the value is nil" do
       field = Marten::DB::Field::String.new("my_field", max_size: 128)

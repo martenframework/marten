@@ -41,6 +41,19 @@ describe Marten::DB::Field::UUID do
     end
   end
 
+  describe "#default" do
+    it "returns nil by default" do
+      field = Marten::DB::Field::UUID.new("my_field")
+      field.default.should be_nil
+    end
+
+    it "returns the configured default" do
+      default_val = UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
+      field = Marten::DB::Field::UUID.new("my_field", default: default_val)
+      field.default.should eq default_val
+    end
+  end
+
   describe "#to_db" do
     it "returns nil if the value is nil" do
       field = Marten::DB::Field::UUID.new("my_field")

@@ -39,6 +39,13 @@ describe Marten::DB::Field::Text do
       column.null?.should be_false
       column.unique?.should be_false
       column.index?.should be_false
+      column.default.should be_nil
+    end
+
+    it "properly forwards the default value if applicable" do
+      field = Marten::DB::Field::Text.new("my_field", default: "foobar")
+      column = field.to_column
+      column.default.should eq "foobar"
     end
   end
 

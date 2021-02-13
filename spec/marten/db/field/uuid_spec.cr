@@ -38,6 +38,14 @@ describe Marten::DB::Field::UUID do
       column.null?.should be_false
       column.unique?.should be_false
       column.index?.should be_false
+      column.default.should be_nil
+    end
+
+    it "properly forwards the default value if applicable" do
+      default_val = UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
+      field = Marten::DB::Field::UUID.new("my_field", default: default_val)
+      column = field.to_column
+      column.default.should eq default_val.to_s
     end
   end
 

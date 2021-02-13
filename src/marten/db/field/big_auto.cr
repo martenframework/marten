@@ -10,7 +10,8 @@ module Marten
             primary_key?,
             null?,
             unique?,
-            db_index?
+            db_index?,
+            to_db(default)
           )
         end
       end

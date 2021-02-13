@@ -176,6 +176,14 @@ describe Marten::DB::Field::DateTime do
       column.null?.should be_false
       column.unique?.should be_false
       column.index?.should be_false
+      column.default.should be_nil
+    end
+
+    it "properly forwards the default value if applicable" do
+      default_dt = Time.local
+      field = Marten::DB::Field::DateTime.new("my_field", db_column: "my_field_col", default: default_dt)
+      column = field.to_column
+      column.default.should eq default_dt
     end
   end
 

@@ -31,6 +31,7 @@ module Marten
             null: null?,
             unique: unique?,
             index: db_index?,
+            default: to_db(default)
           )
         end
 

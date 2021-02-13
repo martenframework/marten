@@ -39,6 +39,13 @@ describe Marten::DB::Field::Int do
       column.null?.should be_false
       column.unique?.should be_false
       column.index?.should be_false
+      column.default.should be_nil
+    end
+
+    it "properly forwards the default value if applicable" do
+      field = Marten::DB::Field::Int.new("my_field", db_column: "my_field_col", default: 42)
+      column = field.to_column
+      column.default.should eq 42
     end
   end
 

@@ -40,6 +40,13 @@ describe Marten::DB::Field::String do
       column.unique?.should be_false
       column.index?.should be_false
       column.max_size.should eq 128
+      column.default.should be_nil
+    end
+
+    it "properly forwards the default value if applicable" do
+      field = Marten::DB::Field::String.new("my_field", max_size: 128, default: "foobar")
+      column = field.to_column
+      column.default.should eq "foobar"
     end
   end
 

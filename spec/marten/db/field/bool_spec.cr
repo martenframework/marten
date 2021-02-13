@@ -111,6 +111,13 @@ describe Marten::DB::Field::Bool do
       column.null?.should be_false
       column.unique?.should be_false
       column.index?.should be_false
+      column.default.should be_nil
+    end
+
+    it "properly forwards the default value if applicable" do
+      field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col", default: true)
+      column = field.to_column
+      column.default.should be_true
     end
   end
 

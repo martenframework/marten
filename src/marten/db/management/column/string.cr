@@ -13,7 +13,8 @@ module Marten
             @primary_key = false,
             @null = false,
             @unique = false,
-            @index = false
+            @index = false,
+            @default : ::DB::Any? = nil
           )
           end
 

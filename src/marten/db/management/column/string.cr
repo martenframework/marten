@@ -24,7 +24,8 @@ module Marten
                 primary_key? == other.primary_key? &&
                 null? == other.null? &&
                 unique? == other.unique? &&
-                index? == other.index?
+                index? == other.index? &&
+                default == other.default
             )
           end
 
@@ -39,6 +40,7 @@ module Marten
             args << %{null: #{@null}} if null?
             args << %{unique: #{@unique}} if unique?
             args << %{index: #{@index}} if index?
+            args << %{default: #{default.inspect}} if !default.nil?
             args.join(", ")
           end
 

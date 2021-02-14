@@ -65,6 +65,11 @@ module Marten
             statements
           end
 
+          def prepare_default_value(value : ::DB::Any) : ::DB::Any
+            # TODO
+            value
+          end
+
           def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::ForeignKey,

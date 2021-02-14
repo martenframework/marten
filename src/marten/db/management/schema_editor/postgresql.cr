@@ -44,6 +44,15 @@ module Marten
             ["TRUNCATE #{table_names.join(", ")} RESTART IDENTITY;"]
           end
 
+          def prepare_default_value(value : ::DB::Any) : ::DB::Any
+            case value
+            when String
+              "'#{value}'"
+            else
+              value
+            end
+          end
+
           def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::ForeignKey,

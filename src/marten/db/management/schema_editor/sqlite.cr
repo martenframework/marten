@@ -85,7 +85,18 @@ module Marten
           end
 
           def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
-            value.to_s
+            case value
+            when Bool
+              (value ? 1 : 0).to_s
+            when Bytes
+              "X'#{value.hexstring}'"
+            when String
+              "'#{value.gsub("'", "''")}'"
+            when Time
+              "'#{value.to_utc.to_s("%F %H:%M:%S.%L")}'"
+            else
+              value.to_s
+            end
           end
 
           def remove_column(table : TableState, column : Column::Base) : Nil

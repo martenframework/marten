@@ -92,7 +92,17 @@ module Marten
           end
 
           def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
-            # TODO
+            defined?(::MySql) do
+              value = case value
+                      when Bytes
+                        "X'#{value.hexstring}'"
+                      when String, Time
+                        "'#{::MySql::Type.to_mysql(value)}'"
+                      else
+                        ::MySql::Type.to_mysql(value).to_s
+                      end
+            end
+
             value.to_s
           end
 

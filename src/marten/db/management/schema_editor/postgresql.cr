@@ -83,7 +83,19 @@ module Marten
           end
 
           def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
-            # TODO
+            defined?(::PG) do
+              value = case value
+                      when Bytes
+                        "X'#{value.hexstring}'"
+                      when String
+                        PG::EscapeHelper.escape_literal(value)
+                      when Time
+                        "'#{String.new(PQ::Param.encode(Time.local).slice)}'"
+                      else
+                        value.to_s
+                      end
+            end
+
             value.to_s
           end
 

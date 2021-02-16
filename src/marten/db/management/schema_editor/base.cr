@@ -220,6 +220,12 @@ module Marten
             @deferred_statements.clear
           end
 
+          private macro defined?(t)
+            {% if t.resolve? %}
+              {{ yield }}
+            {% end %}
+          end
+
           private def column_sql_for(column)
             sql = column.sql_type(@connection)
             suffix = column.sql_type_suffix(@connection)

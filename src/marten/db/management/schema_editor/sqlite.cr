@@ -65,11 +65,6 @@ module Marten
             statements
           end
 
-          def prepare_default_value(value : ::DB::Any) : ::DB::Any
-            # TODO
-            value
-          end
-
           def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::ForeignKey,
@@ -87,6 +82,10 @@ module Marten
               s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
               s << "DEFERRABLE INITIALLY DEFERRED"
             end
+          end
+
+          def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
+            value.to_s
           end
 
           def remove_column(table : TableState, column : Column::Base) : Nil

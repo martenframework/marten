@@ -46,9 +46,6 @@ module Marten
           # Returns the SQL statements allowing to flush the passed database tables.
           abstract def flush_tables_statements(table_names : Array(String)) : Array(String)
 
-          # Returns a prepared default value that can be inserted in a column definition.
-          abstract def prepare_default_value(value : ::DB::Any) : ::DB::Any
-
           # Given an existing table, new column and column SQL statement, prepares the foreign key for the new column.
           abstract def prepare_foreign_key_for_new_column(
             table : TableState,
@@ -63,6 +60,10 @@ module Marten
             column_definition : String
           ) : String
 
+          # Returns a prepared default value that can be inserted in a column definition.
+          abstract def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
+
+          # Returns the SQL statement allowing to rename a column.
           abstract def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
 
           # Returns the SQL statement allowing to rename a database table.
@@ -224,7 +225,7 @@ module Marten
             suffix = column.sql_type_suffix(@connection)
 
             if !column.default.nil?
-              sql += " DEFAULT #{prepare_default_value(column.default)}"
+              sql += " DEFAULT #{column.sql_quoted_default_value(@connection)}"
             end
 
             sql += column.null? ? " NULL" : " NOT NULL"

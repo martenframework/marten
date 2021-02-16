@@ -44,15 +44,6 @@ module Marten
             ["TRUNCATE #{table_names.join(", ")} RESTART IDENTITY;"]
           end
 
-          def prepare_default_value(value : ::DB::Any) : ::DB::Any
-            case value
-            when String
-              "'#{value}'"
-            else
-              value
-            end
-          end
-
           def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::ForeignKey,
@@ -89,6 +80,11 @@ module Marten
 
             # Returns the initial column definition since the foreign key creation is deferred.
             column_definition
+          end
+
+          def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
+            # TODO
+            value.to_s
           end
 
           def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String

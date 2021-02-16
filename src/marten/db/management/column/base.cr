@@ -23,6 +23,9 @@ module Marten
           # Returns a copy of the column.
           abstract def clone
 
+          # Returns the literal quoted value of the default value for a specific database connection.
+          abstract def sql_quoted_default_value(connection : Connection::Base) : ::String?
+
           # Returns the raw type of the column to use for the column at hand and a specific database connection.
           abstract def sql_type(connection : Connection::Base) : ::String
 

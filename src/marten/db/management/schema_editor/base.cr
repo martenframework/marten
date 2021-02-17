@@ -78,9 +78,7 @@ module Marten
               column_definition = prepare_foreign_key_for_new_column(table, column, column_definition)
             end
 
-            @connection.open do |db|
-              db.exec("ALTER TABLE #{quote(table.name)} ADD COLUMN #{column_definition}")
-            end
+            execute("ALTER TABLE #{quote(table.name)} ADD COLUMN #{column_definition}")
 
             if column.index? && !column.unique?
               @deferred_statements << create_index_deferred_statement(table, [column])
@@ -107,11 +105,7 @@ module Marten
               column_definitions << column_definition
             end
 
-            sql = create_table_statement(quote(table.name), column_definitions.join(", "))
-
-            @connection.open do |db|
-              db.exec(sql)
-            end
+            execute(create_table_statement(quote(table.name), column_definitions.join(", ")))
 
             # Forwards indexes configured as part of specific columns and the corresponding SQL statements to the array
             # of deferred SQL statements.
@@ -128,10 +122,7 @@ module Marten
 
           # Deletes the table corresponding to a migration table state.
           def delete_table(table : TableState)
-            sql = delete_table_statement(quote(table.name))
-            @connection.open do |db|
-              db.exec(sql)
-            end
+            execute(delete_table_statement(quote(table.name)))
 
             # Removes all deferred statements that still reference the deleted table.
             @deferred_statements.reject! { |s| s.references_table?(table.name) }
@@ -160,15 +151,11 @@ module Marten
             # First drops possible foreign key constraints if applicable.
             fk_constraint_names = @connection.introspector.foreign_key_constraint_names(table.name, column.name)
             fk_constraint_names.each do |constraint_name|
-              @connection.open do |db|
-                db.exec(delete_foreign_key_constraint_statement(table, constraint_name))
-              end
+              execute(delete_foreign_key_constraint_statement(table, constraint_name))
             end
 
             # Now drops the column.
-            @connection.open do |db|
-              db.exec(delete_column_statement(table, column))
-            end
+            execute(delete_column_statement(table, column))
 
             # Removes all deferred statements that still reference the deleted column.
             @deferred_statements.reject! { |s| s.references_column?(table.name, column.name) }
@@ -176,10 +163,7 @@ module Marten
 
           # Renames a specific column.
           def rename_column(table : TableState, column : Column::Base, new_name : String)
-            sql = rename_column_statement(table, column, new_name)
-            @connection.open do |db|
-              db.exec(sql)
-            end
+            execute(rename_column_statement(table, column, new_name))
             @deferred_statements.each do |statement|
               statement.rename_column(table.name, column.name, new_name)
             end
@@ -187,10 +171,7 @@ module Marten
 
           # Renames a specific table.
           def rename_table(table : TableState, new_name : String) : Nil
-            sql = rename_table_statement(quote(table.name), quote(new_name))
-            @connection.open do |db|
-              db.exec(sql)
-            end
+            execute(rename_table_statement(quote(table.name), quote(new_name)))
             @deferred_statements.each do |statement|
               statement.rename_table(table.name, new_name)
             end
@@ -213,9 +194,7 @@ module Marten
 
           protected def execute_deferred_statements
             @deferred_statements.each do |sql|
-              @connection.open do |db|
-                db.exec(sql.to_s)
-              end
+              execute(sql.to_s)
             end
             @deferred_statements.clear
           end

@@ -8,6 +8,49 @@ describe Marten::Core::Validation::ErrorSet do
     end
   end
 
+  describe "#[]" do
+    it "returns all the errors associated with a specific field expressed as a string" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Size must be greater than 10 characters")
+      error_set.add("slug", "Cannot contain spaces")
+      error_set.add("content", "This is invalid!")
+
+      error_set["slug"].size.should eq 2
+      error_set["slug"][0].message.should eq "Size must be greater than 10 characters"
+      error_set["slug"][1].message.should eq "Cannot contain spaces"
+    end
+
+    it "returns all the errors associated with a specific field expressed as a symbol" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Size must be greater than 10 characters")
+      error_set.add("slug", "Cannot contain spaces")
+      error_set.add("content", "This is invalid!")
+
+      error_set[:slug].size.should eq 2
+      error_set[:slug][0].message.should eq "Size must be greater than 10 characters"
+      error_set[:slug][1].message.should eq "Cannot contain spaces"
+    end
+
+    it "returns all the global errors if applicable" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Size must be greater than 10 characters")
+      error_set.add("slug", "Cannot contain spaces")
+      error_set.add("This is invalid!")
+
+      error_set[nil].size.should eq 1
+      error_set[nil][0].message.should eq "This is invalid!"
+    end
+
+    it "returns an empty array if there are no errors associated with the passed field" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Size must be greater than 10 characters")
+      error_set.add("slug", "Cannot contain spaces")
+      error_set.add("content", "This is invalid!")
+
+      error_set[:unknown].should be_empty
+    end
+  end
+
   describe "#add" do
     it "allows to add a default error to the set" do
       error_set = Marten::Core::Validation::ErrorSet.new

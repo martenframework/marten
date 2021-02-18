@@ -11,6 +11,11 @@ module Marten
           @errors = [] of Error
         end
 
+        # Returns all the errors associated with a specific field.
+        def [](field : Nil | String | Symbol)
+          @errors.select { |e| e.field == field.try(&.to_s) }
+        end
+
         # Adds a new global error to the error set.
         #
         # This method can be used to add a new global error (that is not associated with a specific field) to an

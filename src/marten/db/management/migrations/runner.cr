@@ -14,8 +14,7 @@ module Marten
             execute { }
           end
 
-          def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, &block)
-            # TODO: add support for faked migrations.
+          def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false, &block)
             targets = find_targets(app_config, migration_name)
 
             # Generates migration plans that define the order in which migrations have to be applied. The plan only
@@ -26,9 +25,9 @@ module Marten
 
             forward = plan.all? { |_migration, backward| !backward }
             if forward
-              execute_forward(plan, full_plan) { |progress| yield progress }
+              execute_forward(plan, full_plan, fake) { |progress| yield progress }
             else
-              execute_backward(plan, full_plan) { |progress| yield progress }
+              execute_backward(plan, full_plan, fake) { |progress| yield progress }
             end
           end
 
@@ -37,7 +36,7 @@ module Marten
             !generate_plan(targets).empty?
           end
 
-          private def execute_backward(plan, full_plan)
+          private def execute_backward(plan, full_plan, fake)
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
 
             # Generates a hash of pre-migration states: each state in this hash corresponds to the state that would be
@@ -60,14 +59,14 @@ module Marten
             plan.map(&.first).each do |migration|
               yield Progress.new(ProgressType::MIGRATION_APPLY_BACKWARD_START, migration)
 
-              state = migrate_backward(pre_forward_migration_states[migration.id], state, migration)
+              state = migrate_backward(pre_forward_migration_states[migration.id], state, migration, fake)
               migration_ids_to_unapply.delete(migration.id)
 
               yield Progress.new(ProgressType::MIGRATION_APPLY_BACKWARD_SUCCESS, migration)
             end
           end
 
-          private def execute_forward(plan, full_plan)
+          private def execute_forward(plan, full_plan, fake)
             migration_ids_to_apply = plan.map { |m, _d| m.id }
             state = generate_current_project_state(full_plan)
 
@@ -77,7 +76,7 @@ module Marten
 
               yield Progress.new(ProgressType::MIGRATION_APPLY_FORWARD_START, migration)
 
-              state = migrate_forward(state, migration)
+              state = migrate_forward(state, migration, fake)
               migration_ids_to_apply.delete(migration.id)
 
               yield Progress.new(ProgressType::MIGRATION_APPLY_FORWARD_SUCCESS, migration)
@@ -157,19 +156,27 @@ module Marten
             plan
           end
 
-          private def migrate_backward(pre_forward_state, state, migration)
-            SchemaEditor.run_for(@connection, atomic: migration.atomic?) do |schema_editor|
-              state = migration.apply_backward(pre_forward_state, state, schema_editor)
+          private def migrate_backward(pre_forward_state, state, migration, fake)
+            if fake
               unrecord_migration(migration)
+            else
+              SchemaEditor.run_for(@connection, atomic: migration.atomic?) do |schema_editor|
+                state = migration.apply_backward(pre_forward_state, state, schema_editor)
+                unrecord_migration(migration)
+              end
             end
 
             state
           end
 
-          private def migrate_forward(state, migration)
-            SchemaEditor.run_for(@connection, atomic: migration.atomic?) do |schema_editor|
-              state = migration.apply_forward(state, schema_editor)
+          private def migrate_forward(state, migration, fake)
+            if fake
               record_migration(migration)
+            else
+              SchemaEditor.run_for(@connection, atomic: migration.atomic?) do |schema_editor|
+                state = migration.apply_forward(state, schema_editor)
+                record_migration(migration)
+              end
             end
 
             state

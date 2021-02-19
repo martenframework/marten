@@ -5,15 +5,17 @@ module Marten
         help "Run database migrations."
 
         @app_label : String?
+        @fake : Bool = false
         @migration : String?
 
         def setup
           on_argument(:app_label, "The name of an application to run migrations for") { |v| @app_label = v }
           on_argument(
             :migration,
-            "A migration target (name or number, such as '0001') up to which the DB should be migrated. " \
+            "A migration target (name or version, such as '0001') up to which the DB should be migrated. " \
             "Use 'zero' to unapply all the migrations of a specific application"
           ) { |v| @migration = v }
+          on_option(:fake, "Set migrations as applied or unapplied without running them") { @fake = true }
         end
 
         def run
@@ -29,7 +31,7 @@ module Marten
 
           print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n\n")
 
-          runner.execute(app_config, migration_name) do |progress|
+          runner.execute(app_config, migration_name, @fake) do |progress|
             process_execution_progress(progress)
           end
         rescue e : Apps::Errors::AppNotFound | DB::Management::Migrations::Errors::MigrationNotFound
@@ -41,11 +43,11 @@ module Marten
           when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_BACKWARD_START
             print("  › Unapplying #{progress.migration.not_nil!.id}...", ending: "")
           when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_BACKWARD_SUCCESS
-            print(style(" DONE", fore: :light_green, mode: :bold))
+            print(style(@fake ? " FAKED" : " DONE", fore: :light_green, mode: :bold))
           when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_FORWARD_START
             print("  › Applying #{progress.migration.not_nil!.id}...", ending: "")
           when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_FORWARD_SUCCESS
-            print(style(" DONE", fore: :light_green, mode: :bold))
+            print(style(@fake ? " FAKED" : " DONE", fore: :light_green, mode: :bold))
           end
         end
       end

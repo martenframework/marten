@@ -19,6 +19,11 @@ module Marten
             build_graph
           end
 
+          # Returns an array of apps that have migrations defined.
+          def apps_with_migrations
+            migrations_per_app_configs.keys
+          end
+
           # Returns a migration class for a specific app config and migration name.
           def get_migration(app_config : Apps::Config, migration_name : String) : Migration.class
             results = [] of Migration.class

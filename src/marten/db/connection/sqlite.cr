@@ -3,7 +3,7 @@ module Marten
     module Connection
       class SQLite < Base
         def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : Int64?
-          column_names = values.keys.map { |column_name| "#{quote(column_name)}" }.join(", ")
+          column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
           statement = "INSERT INTO #{quote(table_name)} (#{column_names}) VALUES (#{numbered_values})"
 

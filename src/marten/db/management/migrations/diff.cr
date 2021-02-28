@@ -35,20 +35,20 @@ module Marten
             kept_tables = from_tables & to_tables
 
             # Generate a set of columns that are present in the original state.
-            from_columns = @from_state.tables.map do |tid, t|
+            from_columns = @from_state.tables.compact_map do |tid, t|
               next unless kept_tables.includes?(tid)
               t.columns.map { |c| {t.app_label, t.name, c.name} }
-            end.compact.flatten.to_set
+            end.flatten.to_set
             renamed_tables.each do |tid|
               table = @to_state.get_table(tid)
               from_columns += table.columns.map { |c| {table.app_label, table.name, c.name} }.to_set
             end
 
             # Generate a set of columns that are present in the destination state.
-            to_columns = @to_state.tables.map do |tid, t|
+            to_columns = @to_state.tables.compact_map do |tid, t|
               next unless kept_tables.includes?(tid)
               t.columns.map { |c| {t.app_label, t.name, c.name} }
-            end.compact.flatten.to_set
+            end.flatten.to_set
 
             handle_created_tables(from_tables, to_tables)
             handle_added_columns(from_columns, to_columns)
@@ -225,7 +225,7 @@ module Marten
                 dependencies = [] of OperationDependency
 
                 # Extract dependencies for all the foreign key columns associated with the considered table.
-                created_table.columns.select { |c| c.is_a?(Column::ForeignKey) }.each do |fk_column|
+                created_table.columns.select(Column::ForeignKey).each do |fk_column|
                   related_table = @to_state.tables.values
                     .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
                     .not_nil!
@@ -257,7 +257,7 @@ module Marten
               dependencies = [] of OperationDependency
 
               # Extract dependencies for all the foreign key columns associated with the considered table.
-              created_table.columns.select { |c| c.is_a?(Column::ForeignKey) }.each do |fk_column|
+              created_table.columns.select(Column::ForeignKey).each do |fk_column|
                 related_table = @to_state.tables.values
                   .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
                   .not_nil!

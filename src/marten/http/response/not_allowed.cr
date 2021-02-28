@@ -8,7 +8,7 @@ module Marten
           content_type : String = DEFAULT_CONTENT_TYPE
         )
           super(content: content, content_type: content_type, status: 405)
-          self["Allow"] = allowed_methods.map(&.upcase).join(", ")
+          self["Allow"] = allowed_methods.join(", ") { |m| m.upcase }
         end
       end
     end

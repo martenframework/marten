@@ -9,7 +9,7 @@ module Marten
             private def sql_right_operand(_connection)
               String.build do |s|
                 s << "IN ( "
-                s << @right_operand.as(Array(Field::Any)).map { "%s" }.join(" , ")
+                s << @right_operand.as(Array(Field::Any)).join(" , ") { "%s" }
                 s << " )"
               end
             end

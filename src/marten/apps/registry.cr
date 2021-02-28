@@ -33,7 +33,7 @@ module Marten
         end
 
         result = unless candidates.empty?
-          candidates.sort_by { |config| config.class._marten_app_location.size }.reverse.first
+          candidates.sort_by { |config| config.class._marten_app_location.size }.reverse!.first
         end
 
         if result.nil?

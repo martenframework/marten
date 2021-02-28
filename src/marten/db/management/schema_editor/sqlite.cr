@@ -162,8 +162,8 @@ module Marten
               db.exec(
                 build_sql do |s|
                   s << "INSERT INTO #{remade_table.name}"
-                  s << "(#{column_names_mapping.keys.map { |name| quote(name) }.join(", ")})"
-                  s << "SELECT #{column_names_mapping.values.map { |name| quote(name) }.join(", ")}"
+                  s << "(#{column_names_mapping.keys.join(", ") { |name| quote(name) }})"
+                  s << "SELECT #{column_names_mapping.values.join(", ") { |name| quote(name) }}"
                   s << "FROM #{table.name}"
                 end
               )

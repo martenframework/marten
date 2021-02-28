@@ -88,7 +88,7 @@ module Marten
     I18n.config.loaders << I18n::Loader::YAML.new("#{__DIR__}/marten/locales")
 
     # Ensure each app config translation loader is properly bound to the I18n config.
-    I18n.config.loaders += apps.app_configs.map(&.translations_loader).compact
+    I18n.config.loaders += apps.app_configs.compact_map(&.translations_loader)
 
     I18n.init
   end

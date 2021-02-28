@@ -34,7 +34,7 @@ module Marten
           end
 
           def columns : Array(String)
-            field.related_model.fields.map { |f| column_name(f.db_column) } + children.map(&.columns).flatten
+            field.related_model.fields.map { |f| column_name(f.db_column) } + children.flat_map(&.columns)
           end
 
           def table_alias : String
@@ -42,7 +42,7 @@ module Marten
           end
 
           def to_a : Array(self)
-            [self] + @children.map(&.to_a).flatten
+            [self] + @children.flat_map(&.to_a)
           end
 
           def to_sql : String
@@ -61,7 +61,7 @@ module Marten
             sql = "#{statement} #{table_name} #{table_alias} " \
                   "ON (#{parent_table_name}.#{column_name} = #{column_name(table_pk)})"
 
-            ([sql] + children.map(&.to_sql).flatten).join(" ")
+            ([sql] + children.flat_map(&.to_sql)).join(" ")
           end
 
           protected setter parent

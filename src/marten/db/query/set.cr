@@ -189,7 +189,7 @@ module Marten
         def inspect(io)
           results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
           io << "<#{self.class.name} ["
-          io << "#{results[...INSPECT_RESULTS_LIMIT].map(&.inspect).join(", ")}"
+          io << "#{results[...INSPECT_RESULTS_LIMIT].join(", ") { |r| r.inspect }}"
           io << ", ...(remaining truncated)..." if results.size > INSPECT_RESULTS_LIMIT
           io << "]>"
         end

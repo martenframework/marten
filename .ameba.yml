@@ -71,6 +71,9 @@ Metrics/CyclomaticComplexity:
 Performance/AnyAfterFilter:
   Enabled: true
 
+Performance/AnyInsteadOfEmpty:
+  Enabled: false
+
 Performance/FirstLastAfterFilter:
   Enabled: true
 
@@ -97,6 +100,9 @@ Style/RedundantBegin:
 
 Style/RedundantReturn:
   Enabled: true
+
+Style/VerboseBlock:
+  Enabled: false
 
 Style/TypeNames:
   Enabled: true

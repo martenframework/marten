@@ -193,7 +193,7 @@ describe Marten::Views::Base do
       view_1 = Marten::Views::Base.new(request)
       response_1 = view_1.dispatch
       response_1.status.should eq 200
-      response_1.headers["Allow"].should eq Marten::Views::Base.http_method_names.map(&.upcase).join(", ")
+      response_1.headers["Allow"].should eq Marten::Views::Base.http_method_names.join(", ") { |m| m.upcase }
       response_1.headers["Content-Length"].should eq "0"
 
       view_2 = Marten::Views::BaseSpec::Test1View.new(request)

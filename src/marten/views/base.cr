@@ -62,7 +62,7 @@ module Marten
       def options
         # Responds to requests for the OPTIONS HTTP verb.
         response = HTTP::Response.new
-        response["Allow"] = self.class.http_method_names.map(&.upcase).join(", ")
+        response["Allow"] = self.class.http_method_names.join(", ") { |m| m.upcase }
         response["Content-Length"] = "0"
         response
       end

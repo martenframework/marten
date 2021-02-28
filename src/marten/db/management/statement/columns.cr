@@ -25,7 +25,7 @@ module Marten
           end
 
           def to_s
-            @columns.map { |c| @quote_proc.call(c) }.join(", ")
+            @columns.join(", ") { |c| @quote_proc.call(c) }
           end
         end
       end

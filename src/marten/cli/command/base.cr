@@ -100,7 +100,7 @@ module Marten
 
           banner_parts << "Usage: #{@main_command_name} #{self.class.command_name} [options]"
           unless arguments.empty?
-            banner_parts << " #{argument_handlers.map { |h| "[#{h.name}]" }.join(" ")}"
+            banner_parts << " #{argument_handlers.join(" ") { |h| "[#{h.name}]" }}"
           end
 
           banner_parts << "\n\n"

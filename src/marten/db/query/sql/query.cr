@@ -181,7 +181,7 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT COUNT(*)"
               s << "FROM #{table_name}"
-              s << @joins.map(&.to_sql).join(" ")
+              s << @joins.join(" ") { |j| j.to_sql }
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -196,7 +196,7 @@ module Marten
             sql = build_sql do |s|
               s << "DELETE"
               s << "FROM #{table_name}"
-              s << @joins.map(&.to_sql).join(" ")
+              s << @joins.join(" ") { |j| j.to_sql }
               s << where
             end
 
@@ -210,7 +210,7 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT EXISTS("
               s << "SELECT 1 FROM #{table_name}"
-              s << @joins.map(&.to_sql).join(" ")
+              s << @joins.join(" ") { |j| j.to_sql }
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -227,7 +227,7 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT #{columns}"
               s << "FROM #{table_name}"
-              s << @joins.map(&.to_sql).join(" ")
+              s << @joins.join(" ") { |j| j.to_sql }
               s << where
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
@@ -251,7 +251,7 @@ module Marten
                     sub_query = build_sql do |s|
                       s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column}"
                       s << "FROM #{table_name}"
-                      s << @joins.map(&.to_sql).join(" ")
+                      s << @joins.join(" ") { |j| j.to_sql }
                       s << where
                     end
 
@@ -333,13 +333,13 @@ module Marten
           end
 
           private def flattened_joins
-            @joins.map(&.to_a).flatten
+            @joins.flat_map(&.to_a)
           end
 
           private def get_field(raw_field, model)
             model.get_field(raw_field.to_s)
           rescue Errors::UnknownField
-            valid_choices = model.fields.map(&.id).join(", ")
+            valid_choices = model.fields.join(", ") { |f| f.id }
             raise Errors::InvalidField.new(
               "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
             )
@@ -349,7 +349,7 @@ module Marten
             model.get_relation_field(raw_relation.to_s)
           rescue Errors::UnknownField
             return nil if silent
-            valid_choices = model.fields.select(&.relation?).map(&.relation_name).join(", ")
+            valid_choices = model.fields.select(&.relation?).join(", ") { |r| r.relation_name }
             raise Errors::InvalidField.new(
               "Unable to resolve '#{raw_relation}' as a relation field. Valid choices are: #{valid_choices}."
             )

@@ -22,7 +22,7 @@ module Marten
           ::UUID.new(value) unless value.nil?
         end
 
-        def to_column : Management::Column::Base
+        def to_column : Management::Column::Base?
           Management::Column::UUID.new(
             db_column,
             primary_key?,

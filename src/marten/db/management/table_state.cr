@@ -14,7 +14,7 @@ module Marten
           new(
             app_label: model.app_config.label,
             name: model.db_table,
-            columns: model.fields.map(&.to_column)
+            columns: model.fields.compact_map(&.to_column)
           )
         end
 

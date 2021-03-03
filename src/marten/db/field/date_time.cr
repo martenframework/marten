@@ -46,7 +46,7 @@ module Marten
           end
         end
 
-        def to_column : Management::Column::Base
+        def to_column : Management::Column::Base?
           Management::Column::DateTime.new(
             db_column,
             primary_key?,

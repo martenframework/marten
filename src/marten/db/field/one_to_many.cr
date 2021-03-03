@@ -42,7 +42,7 @@ module Marten
           @relation_name
         end
 
-        def to_column : Management::Column::Base
+        def to_column : Management::Column::Base?
           Management::Column::ForeignKey.new(
             name: db_column,
             to_table: @to.db_table,

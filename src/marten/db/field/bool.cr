@@ -22,7 +22,7 @@ module Marten
           null? && val.nil? ? nil : [true, "true", 1, "1", "yes"].includes?(val)
         end
 
-        def to_column : Management::Column::Base
+        def to_column : Management::Column::Base?
           Management::Column::Bool.new(
             db_column,
             primary_key?,

@@ -21,7 +21,7 @@ module Marten
           result_set.read(Int32 | Int64 | Nil).try(&.to_i32)
         end
 
-        def to_column : Management::Column::Base
+        def to_column : Management::Column::Base?
           Management::Column::Int.new(
             db_column,
             primary_key?,

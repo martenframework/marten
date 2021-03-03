@@ -23,7 +23,7 @@ module Marten
           result_set.read(::String?)
         end
 
-        def to_column : Management::Column::Base
+        def to_column : Management::Column::Base?
           Management::Column::String.new(
             name: db_column,
             max_size: max_size,

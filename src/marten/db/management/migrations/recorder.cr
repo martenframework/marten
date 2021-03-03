@@ -12,7 +12,11 @@ module Marten
           def setup : Nil
             return if record_table_exist?
             schema_editor.create_table(
-              TableState.new(app_label: "marten", name: Record.db_table, columns: Record.fields.map(&.to_column))
+              TableState.new(
+                app_label: "marten",
+                name: Record.db_table,
+                columns: Record.fields.compact_map(&.to_column)
+              )
             )
           end
 

@@ -32,7 +32,12 @@ module Marten
           # Unless explicitely specified, the table name is automatically generated based on the label of the app
           # associated with the considered model and the class name of the model.
           def db_table
-            @@db_table ||= %{#{app_config.label.downcase}_#{name.gsub("::", "_").underscore}s}
+            @@db_table ||= String.build do |s|
+              s << app_config.label.downcase
+              s << '_'
+              s << (model_name = name.gsub("::", "_").underscore)
+              s << 's' unless model_name.ends_with?('s')
+            end
           end
 
           # Allows to explicitely define the name of the table associated with the model.

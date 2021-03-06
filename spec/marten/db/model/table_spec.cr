@@ -6,6 +6,10 @@ describe Marten::DB::Model::Table do
       TestUser.db_table.should eq "app_test_users"
     end
 
+    it "does not append a s characters if model names already end by one" do
+      PostTags.db_table.should eq "app_post_tags"
+    end
+
     it "returns the configured table name if applicable" do
       Post.db_table.should eq "posts"
     end

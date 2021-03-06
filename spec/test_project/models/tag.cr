@@ -1,5 +1,5 @@
 class Tag < Marten::DB::Model
-  field :id, :auto, primary_key: true
+  field :id, :big_auto, primary_key: true
   field :name, :string, blank: false, null: false, max_size: 64, unique: true
   field :is_active, :bool, null: false
 

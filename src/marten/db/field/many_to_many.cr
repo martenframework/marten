@@ -5,7 +5,7 @@ module Marten
         def initialize(
           @id : ::String,
           @to : Model.class,
-          @through : Model.class,
+          @through : Model.class | Nil = nil,
           @primary_key = false,
           @blank = false,
           @null = false,
@@ -54,6 +54,9 @@ module Marten
           {% through_model = kwargs[:through] %}
 
           {% if !through_model.nil? %}
+            # Automatically creates a "through" model to manage the many-to-many relationship between the considered
+            # model and the related model.
+
             {% related_model_klass = kwargs[:to] %}
 
             {% from_model_name = model_klass.stringify %}
@@ -82,6 +85,15 @@ module Marten
               )
             end
           {% end %}
+
+          class ::{{ model_klass }}
+            register_field(
+              {{ @type }}.new(
+                {{ field_id.stringify }},
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+              )
+            )
+          end
         end
       end
     end

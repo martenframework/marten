@@ -41,6 +41,12 @@ describe Marten::DB::Model::Table do
       field.id.should eq "name"
     end
 
+    it "allows to retrieve a specific model fields from a relation name" do
+      field = Post.get_field(:author)
+      field.should be_a Marten::DB::Field::OneToMany
+      field.id.should eq "author_id"
+    end
+
     it "raises if the field cannot be found" do
       expect_raises(Marten::DB::Errors::UnknownField) do
         Tag.get_field(:unknown)

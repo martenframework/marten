@@ -54,7 +54,11 @@ module Marten
           #
           # The returned object will be an instance of a subclass of `Marten::DB::Field::Base`.
           def get_field(id : String | Symbol)
-            @@fields.fetch(id.to_s) { raise Errors::UnknownField.new("Unknown field '#{id}'") }
+            @@fields.fetch(id.to_s) do
+              @@relation_fields_per_relation_name.fetch(id.to_s) do
+                raise Errors::UnknownField.new("Unknown field '#{id}'")
+              end
+            end
           end
 
           # :nodoc:

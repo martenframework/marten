@@ -3,13 +3,16 @@ module Marten
     class ReverseRelation
       @field : Field::Base?
 
+      # Returns the ID of the reverse relation.
+      getter id
+
       # Returns the field ID that initiated the reverse relation.
       getter field_id
 
       # Returns the model class targetted by the reverse relation.
       getter model
 
-      def initialize(@model : Model.class, @field_id : String)
+      def initialize(@id : String, @model : Model.class, @field_id : String)
       end
 
       # Returns the "on delete" strategy to consider for the considered reverse relation.

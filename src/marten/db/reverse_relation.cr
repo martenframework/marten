@@ -12,7 +12,7 @@ module Marten
       # Returns the model class targetted by the reverse relation.
       getter model
 
-      def initialize(@id : String, @model : Model.class, @field_id : String)
+      def initialize(@id : String?, @model : Model.class, @field_id : String)
       end
 
       # Returns the "on delete" strategy to consider for the considered reverse relation.

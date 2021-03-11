@@ -5,9 +5,12 @@ describe Marten::DB::Query::SQL::Join do
     it "initializes a join node without children" do
       join = Marten::DB::Query::SQL::Join.new(
         1,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
       join.children.should be_empty
     end
@@ -17,15 +20,21 @@ describe Marten::DB::Query::SQL::Join do
     it "adds a join node as a child to another join node" do
       parent_join = Marten::DB::Query::SQL::Join.new(
         1,
-        ShowcasedPost.get_field("post_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        ShowcasedPost
+        ShowcasedPost,
+        ShowcasedPost.get_field("post_id"),
+        Post,
+        Post.get_field("id"),
+        true
       )
       child_join = Marten::DB::Query::SQL::Join.new(
         1,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       parent_join.add_child(child_join)
@@ -39,9 +48,12 @@ describe Marten::DB::Query::SQL::Join do
     it "returns a valid column name with the table prefix" do
       join = Marten::DB::Query::SQL::Join.new(
         1,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
       join.column_name("username").should eq "t1.username"
     end
@@ -51,15 +63,21 @@ describe Marten::DB::Query::SQL::Join do
     it "returns a array of all the parent and child column names" do
       parent_join = Marten::DB::Query::SQL::Join.new(
         1,
-        ShowcasedPost.get_field("post_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        ShowcasedPost
+        ShowcasedPost,
+        ShowcasedPost.get_field("post_id"),
+        Post,
+        Post.get_field("id"),
+        true
       )
       child_join = Marten::DB::Query::SQL::Join.new(
         1,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       parent_join.add_child(child_join)
@@ -75,15 +93,21 @@ describe Marten::DB::Query::SQL::Join do
     it "returns the alias of the table based on the join node ID" do
       parent_join = Marten::DB::Query::SQL::Join.new(
         1,
-        ShowcasedPost.get_field("post_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        ShowcasedPost
+        ShowcasedPost,
+        ShowcasedPost.get_field("post_id"),
+        Post,
+        Post.get_field("id"),
+        true
       )
       child_join = Marten::DB::Query::SQL::Join.new(
         2,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       parent_join.add_child(child_join)
@@ -97,15 +121,21 @@ describe Marten::DB::Query::SQL::Join do
     it "returns a flat array of the node and its children" do
       parent_join = Marten::DB::Query::SQL::Join.new(
         1,
-        ShowcasedPost.get_field("post_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        ShowcasedPost
+        ShowcasedPost,
+        ShowcasedPost.get_field("post_id"),
+        Post,
+        Post.get_field("id"),
+        true
       )
       child_join = Marten::DB::Query::SQL::Join.new(
         2,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       parent_join.add_child(child_join)
@@ -118,9 +148,12 @@ describe Marten::DB::Query::SQL::Join do
     it "returns the expected SQL for a single inner join" do
       join = Marten::DB::Query::SQL::Join.new(
         1,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       join.to_sql.should eq "INNER JOIN app_test_users t1 ON (posts.author_id = t1.id)"
@@ -129,9 +162,12 @@ describe Marten::DB::Query::SQL::Join do
     it "returns the expected SQL for a single left outer join" do
       join = Marten::DB::Query::SQL::Join.new(
         1,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::LEFT_OUTER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       join.to_sql.should eq "LEFT OUTER JOIN app_test_users t1 ON (posts.author_id = t1.id)"
@@ -140,15 +176,21 @@ describe Marten::DB::Query::SQL::Join do
     it "returns the expected SQL for a join node with children" do
       parent_join = Marten::DB::Query::SQL::Join.new(
         1,
-        ShowcasedPost.get_field("post_id"),
         Marten::DB::Query::SQL::JoinType::INNER,
-        ShowcasedPost
+        ShowcasedPost,
+        ShowcasedPost.get_field("post_id"),
+        Post,
+        Post.get_field("id"),
+        true
       )
       child_join = Marten::DB::Query::SQL::Join.new(
         2,
-        Post.get_field("author_id"),
         Marten::DB::Query::SQL::JoinType::LEFT_OUTER,
-        Post
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
       )
 
       parent_join.add_child(child_join)
@@ -157,6 +199,34 @@ describe Marten::DB::Query::SQL::Join do
         "INNER JOIN posts t1 ON (app_showcased_posts.post_id = t1.id) " \
         "LEFT OUTER JOIN app_test_users t2 ON (t1.author_id = t2.id)"
       )
+    end
+  end
+
+  describe "#selected?" do
+    it "returns true if the join is flagged as selected" do
+      join = Marten::DB::Query::SQL::Join.new(
+        1,
+        Marten::DB::Query::SQL::JoinType::INNER,
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
+      )
+      join.selected?.should be_true
+    end
+
+    it "returns false if the join is not flagged as selected" do
+      join = Marten::DB::Query::SQL::Join.new(
+        1,
+        Marten::DB::Query::SQL::JoinType::INNER,
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        false
+      )
+      join.selected?.should be_false
     end
   end
 end

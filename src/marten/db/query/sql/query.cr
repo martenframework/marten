@@ -67,13 +67,13 @@ module Marten
               raw_field = raw_field[1..] if reversed
 
               field_path = verify_field(raw_field)
-              relation_field_path = field_path.select(&.relation?)
+              relation_field_path = field_path.select { |field, _r| field.relation? }
 
               if relation_field_path.empty? || field_path.size == 1
-                column = "#{Model.db_table}.#{field_path[0].db_column}"
+                column = "#{Model.db_table}.#{field_path.first[0].db_column}"
               else
                 join = ensure_join_for_field_path(relation_field_path)
-                column = join.not_nil!.column_name(field_path.last.db_column)
+                column = join.not_nil!.column_name(field_path.last[0].db_column)
               end
 
               order_clauses << {column, reversed}
@@ -144,8 +144,11 @@ module Marten
             end
           end
 
-          protected def add_join(relation : String) : Nil
-            ensure_join_for_field_path(verify_field(relation, only_relations: true))
+          protected def add_selected_join(relation : String) : Nil
+            ensure_join_for_field_path(
+              verify_field(relation, only_relations: true, allow_reverse_relations: false),
+              selected: true
+            )
           end
 
           protected def add_query_node(query_node : Node)
@@ -278,26 +281,39 @@ module Marten
 
             columns += Model.fields.map { |f| "#{Model.db_table}.#{f.db_column}" }
 
-            @joins.each { |join| columns += join.columns }
+            @joins.select(&.selected?).each { |join| columns += join.columns }
 
             columns.flatten.join(", ")
           end
 
-          private def ensure_join_for_field_path(field_path)
+          private def ensure_join_for_field_path(field_path, selected = false)
             model = Model
             parent_join = nil
 
-            field_path.each do |field|
+            field_path.each do |field, reverse_relation|
+              from_model = model
+              from_common_field = reverse_relation.nil? ? field : model.pk_field
+              to_model = reverse_relation.nil? ? field.related_model : reverse_relation.model
+              to_common_field = reverse_relation.nil? ? field.related_model.pk_field : field
+
               # First try to find if any Join object is already created for the considered field.
-              join = find_join_for(model, field.relation_name)
+              join = flattened_joins.find do |j|
+                j.from_model == from_model &&
+                  j.from_common_field == from_common_field &&
+                  j.to_model == to_model &&
+                  j.to_common_field == to_common_field
+              end
 
               # No existing join means that we must create a new one.
               if join.nil?
                 join = Join.new(
-                  @joins.empty? ? 1 : (flattened_joins.size + 1),
-                  field,
-                  field.null? ? JoinType::LEFT_OUTER : JoinType::INNER,
-                  model
+                  id: @joins.empty? ? 1 : (flattened_joins.size + 1),
+                  type: field.null? || !reverse_relation.nil? ? JoinType::LEFT_OUTER : JoinType::INNER,
+                  from_model: from_model,
+                  from_common_field: from_common_field,
+                  to_model: to_model,
+                  to_common_field: to_common_field,
+                  selected: selected && reverse_relation.nil?
                 )
 
                 if parent_join.nil?
@@ -307,7 +323,7 @@ module Marten
                 end
               end
 
-              model = field.related_model
+              model = to_model
               parent_join = join
             end
 
@@ -326,12 +342,6 @@ module Marten
             results
           end
 
-          private def find_join_for(model, relation_name)
-            flattened_joins.find do |join|
-              join.model == model && join.field.relation_name == relation_name
-            end
-          end
-
           private def flattened_joins
             @joins.flat_map(&.to_a)
           end
@@ -339,20 +349,14 @@ module Marten
           private def get_field(raw_field, model)
             model.get_field(raw_field.to_s)
           rescue Errors::UnknownField
-            valid_choices = model.fields.join(", ") { |f| f.id }
-            raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
-            )
+            raise_invalid_field_error_with_valid_choices(raw_field, model)
           end
 
           private def get_relation_field(raw_relation, model, silent = false)
             model.get_relation_field(raw_relation.to_s)
           rescue Errors::UnknownField
             return nil if silent
-            valid_choices = model.fields.select(&.relation?).join(", ") { |r| r.relation_name }
-            raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_relation}' as a relation field. Valid choices are: #{valid_choices}."
-            )
+            raise_invalid_field_error_with_valid_choices(raw_relation, model)
           end
 
           private def order_by
@@ -381,6 +385,13 @@ module Marten
             predicate_node
           end
 
+          private def raise_invalid_field_error_with_valid_choices(raw_field, model)
+            valid_choices = model.fields.join(", ") { |f| f.id }
+            raise Errors::InvalidField.new(
+              "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
+            )
+          end
+
           private def solve_field_and_predicate(raw_query, raw_value)
             qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
             raw_field = qparts[0]
@@ -394,13 +405,13 @@ module Marten
               field_path = verify_field(raw_field)
             end
 
-            relation_field_path = field_path.select(&.relation?)
+            relation_field_path = field_path.select { |field, _r| field.relation? }
 
             join = unless relation_field_path.empty? || field_path.size == 1
               ensure_join_for_field_path(relation_field_path)
             end
 
-            field = field_path.last
+            field = field_path.last[0]
 
             value = case raw_value
                     when Field::Any, Array(Field::Any)
@@ -427,14 +438,14 @@ module Marten
             quote(Model.db_table)
           end
 
-          private def verify_field(raw_field, only_relations = false)
-            field_path = [] of Field::Base
+          private def verify_field(raw_field, only_relations = false, allow_reverse_relations = true)
+            field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
 
             raw_field.split(Constants::LOOKUP_SEP).each_with_index do |part, i|
               if i > 0
                 # In this case we are trying to process a query field like "author__username", so we have to ensure that
                 # we are considering a relation field (such as a foreign key).
-                previous_field = field_path[i - 1]
+                previous_field = field_path[i - 1][0]
 
                 if previous_field.relation?
                   model = previous_field.related_model
@@ -449,13 +460,21 @@ module Marten
 
               part = model.pk_field.id if part == Constants::PRIMARY_KEY_ALIAS
 
-              field = if only_relations
-                        get_relation_field(part, model)
-                      else
-                        get_relation_field(part, model, silent: true) || get_field(part, model)
-                      end
+              reverse_relation = nil
 
-              field_path << field.as(Field::Base)
+              field = begin
+                if only_relations
+                  get_relation_field(part, model)
+                else
+                  get_relation_field(part, model, silent: true) || get_field(part, model)
+                end
+              rescue e : Errors::InvalidField
+                raise e unless allow_reverse_relations
+                reverse_relation = model.reverse_relations.find { |r| r.id == part.to_s }
+                reverse_relation.nil? ? raise e : reverse_relation.not_nil!.model.get_field(reverse_relation.field_id)
+              end
+
+              field_path << {field.as(Field::Base), reverse_relation}
             end
 
             field_path

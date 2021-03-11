@@ -30,15 +30,15 @@ module Marten
           end
 
           def each_joined_relation
-            @joins.each do |join|
+            @joins.select(&.selected?).each do |join|
               relation_iterator = self.class.new(
-                join.field.related_model,
+                join.to_model,
                 @result_set,
                 join.children,
                 @cursor
               )
 
-              yield relation_iterator, join.field
+              yield relation_iterator, join.from_common_field
 
               @cursor = relation_iterator.cursor
             end

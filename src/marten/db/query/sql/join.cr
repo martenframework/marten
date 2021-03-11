@@ -10,16 +10,23 @@ module Marten
         class Join
           @parent : Nil | self
 
-          getter children
-          getter field
-          getter model
+          getter id
+          getter type
+          getter from_model
+          getter from_common_field
+          getter to_model
+          getter to_common_field
           getter parent
+          getter children
 
           def initialize(
             @id : Int32,
-            @field : Field::Base,
             @type : JoinType,
-            @model : Model.class
+            @from_model : Model.class,
+            @from_common_field : Field::Base,
+            @to_model : Model.class,
+            @to_common_field : Field::Base,
+            @selected : Bool
           )
             @children = [] of self
           end
@@ -34,7 +41,11 @@ module Marten
           end
 
           def columns : Array(String)
-            field.related_model.fields.map { |f| column_name(f.db_column) } + children.flat_map(&.columns)
+            to_model.fields.map { |f| column_name(f.db_column) } + children.flat_map(&.columns)
+          end
+
+          def selected?
+            @selected
           end
 
           def table_alias : String
@@ -53,13 +64,13 @@ module Marten
                           "LEFT OUTER JOIN"
                         end
 
-            table_name = field.related_model.db_table
-            table_pk = field.related_model.pk_field.id
-            column_name = field.db_column
-            parent_table_name = parent.try(&.table_alias) || model.db_table
+            to_table_name = to_model.db_table
+            to_table_common_column = to_common_field.db_column
+            from_table_name = parent.try(&.table_alias) || from_model.db_table
+            from_table_common_column = from_common_field.db_column
 
-            sql = "#{statement} #{table_name} #{table_alias} " \
-                  "ON (#{parent_table_name}.#{column_name} = #{column_name(table_pk)})"
+            sql = "#{statement} #{to_table_name} #{table_alias} " \
+                  "ON (#{from_table_name}.#{from_table_common_column} = #{column_name(to_table_common_column)})"
 
             ([sql] + children.flat_map(&.to_sql)).join(" ")
           end

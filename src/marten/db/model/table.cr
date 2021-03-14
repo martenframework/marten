@@ -64,7 +64,7 @@ module Marten
           # :nodoc:
           def register_field(field : Field::Base)
             @@fields[field.id] = field
-            @@fields_per_column[field.db_column] = field
+            @@fields_per_column[field.db_column!] = field if field.db_column?
             @@relation_fields_per_relation_name[field.relation_name] = field if field.relation?
           end
 
@@ -273,7 +273,7 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column] = {{ field_var.id }}
+            values[field.db_column!] = {{ field_var.id }} if field.db_column?
           {% end %}
           values
         end
@@ -303,7 +303,7 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column] = field.to_db(@{{ field_var.id }})
+            values[field.db_column!] = field.to_db(@{{ field_var.id }}) if field.db_column?
           {% end %}
           values
         end

@@ -12,7 +12,7 @@ module Marten
 
         def to_column : Management::Column::Base?
           Management::Column::Auto.new(
-            db_column,
+            db_column!,
             primary_key?,
             null?,
             unique?,

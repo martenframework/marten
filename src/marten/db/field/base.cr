@@ -46,6 +46,16 @@ module Marten
           @db_column.try(&.to_s) || @id
         end
 
+        # Returns a mandatory non-`nil` version of the DB column (and raise otherwise).
+        def db_column! : ::String
+          db_column.not_nil!
+        end
+
+        # Returns `true` if the field is associated with an in-DB column.
+        def db_column?
+          !db_column.nil?
+        end
+
         # Returns true if an index should be created at the database level for the field.
         def db_index?
           @db_index

@@ -25,7 +25,7 @@ module Marten
 
         def to_column : Management::Column::Base?
           Management::Column::String.new(
-            name: db_column,
+            name: db_column!,
             max_size: max_size,
             primary_key: primary_key?,
             null: null?,

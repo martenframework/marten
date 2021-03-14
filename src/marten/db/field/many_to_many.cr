@@ -18,6 +18,10 @@ module Marten
           @related = @related.try(&.to_s)
         end
 
+        def db_column
+          # No-op
+        end
+
         def default
           # No-op
         end

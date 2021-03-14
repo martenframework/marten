@@ -70,10 +70,10 @@ module Marten
               relation_field_path = field_path.select { |field, _r| field.relation? }
 
               if relation_field_path.empty? || field_path.size == 1
-                column = "#{Model.db_table}.#{field_path.first[0].db_column}"
+                column = "#{Model.db_table}.#{field_path.first[0].db_column!}"
               else
                 join = ensure_join_for_field_path(relation_field_path)
-                column = join.not_nil!.column_name(field_path.last[0].db_column)
+                column = join.not_nil!.column_name(field_path.last[0].db_column!)
               end
 
               order_clauses << {column, reversed}
@@ -129,12 +129,13 @@ module Marten
 
             values.each do |name, value|
               field = get_relation_field(name, Model, silent: true) || get_field(name, Model)
-              values_to_update[field.db_column] = case value
-                                                  when Field::Any
-                                                    field.to_db(value)
-                                                  when DB::Model
-                                                    value.pk
-                                                  end
+              next unless field.db_column?
+              values_to_update[field.db_column!] = case value
+                                                   when Field::Any
+                                                     field.to_db(value)
+                                                   when DB::Model
+                                                     value.pk
+                                                   end
             end
 
             sql, parameters = build_update_query(values_to_update)
@@ -252,7 +253,7 @@ module Marten
 
             sql = if !where_parameters.nil? && !@joins.empty?
                     sub_query = build_sql do |s|
-                      s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column}"
+                      s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column!}"
                       s << "FROM #{table_name}"
                       s << @joins.join(" ") { |j| j.to_sql }
                       s << where
@@ -262,7 +263,7 @@ module Marten
                       s << "UPDATE"
                       s << table_name
                       s << "SET #{column_names}"
-                      s << "WHERE #{Model.pk_field.db_column} IN (#{sub_query})"
+                      s << "WHERE #{Model.pk_field.db_column!} IN (#{sub_query})"
                     end
                   else
                     build_sql do |s|
@@ -279,7 +280,10 @@ module Marten
           private def columns
             columns = [] of String
 
-            columns += Model.fields.map { |f| "#{Model.db_table}.#{f.db_column}" }
+            columns += Model.fields.compact_map do |field|
+              next unless field.db_column?
+              "#{Model.db_table}.#{field.db_column!}"
+            end
 
             @joins.select(&.selected?).each { |join| columns += join.columns }
 

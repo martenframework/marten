@@ -183,7 +183,7 @@ module Marten
           values = field_db_values
 
           if self.class.pk_field.is_a?(Field::AutoTypes)
-            pk_field_to_fetch = self.class.pk_field.db_column
+            pk_field_to_fetch = self.class.pk_field.db_column!
             values.delete(pk_field_to_fetch)
           else
             pk_field_to_fetch = nil
@@ -202,12 +202,12 @@ module Marten
           end
 
           values = field_db_values
-          values.delete(self.class.pk_field.db_column)
+          values.delete(self.class.pk_field.db_column!)
 
           connection.update(
             self.class.db_table,
             values,
-            pk_column_name: self.class.pk_field.db_column,
+            pk_column_name: self.class.pk_field.db_column!,
             pk_value: pk
           )
         end

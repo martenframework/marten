@@ -44,9 +44,9 @@ module Marten
 
         def to_column : Management::Column::Base?
           Management::Column::ForeignKey.new(
-            name: db_column,
+            name: db_column!,
             to_table: @to.db_table,
-            to_column: @to.pk_field.db_column,
+            to_column: @to.pk_field.db_column!,
             primary_key: primary_key?,
             null: null?,
             unique: unique?,

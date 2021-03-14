@@ -5,7 +5,7 @@ module Marten
         def initialize(
           @id : ::String,
           @to : Model.class,
-          @through : Model.class | Nil = nil,
+          @through : Model.class,
           @primary_key = false,
           @blank = false,
           @null = false,
@@ -53,7 +53,7 @@ module Marten
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           {% through_model = kwargs[:through] %}
 
-          {% if !through_model.nil? %}
+          {% if through_model.is_a?(NilLiteral) %}
             # Automatically creates a "through" model to manage the many-to-many relationship between the considered
             # model and the related model.
 
@@ -65,6 +65,7 @@ module Marten
             {% field_id_string = field_id.stringify %}
 
             {% through_model_name = "#{model_klass}#{field_id_string.capitalize.id}" %}
+            {% through_related_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
             {% through_model_table_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
             {% through_model_from_field_id = from_model_name.downcase %}
             {% through_model_to_field_id = to_model_name.downcase %}
@@ -76,12 +77,19 @@ module Marten
 
             class ::{{ through_model_name.id }} < Marten::DB::Model
               field :id, :big_auto, primary_key: true
-              field :{{ through_model_from_field_id.id }}, :one_to_many, to: {{ model_klass }}, on_delete: :cascade
+              field(
+                :{{ through_model_from_field_id.id }},
+                :one_to_many,
+                to: {{ model_klass }},
+                on_delete: :cascade,
+                related: {{ through_related_name }}
+              )
               field(
                 :{{ through_model_to_field_id.id }},
                 :one_to_many,
                 to: {{ related_model_klass }},
-                on_delete: :cascade
+                on_delete: :cascade,
+                related: {{ through_related_name }}
               )
             end
           {% end %}
@@ -90,7 +98,8 @@ module Marten
             register_field(
               {{ @type }}.new(
                 {{ field_id.stringify }},
-                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
+                through: {{ through_model_name.id }}
               )
             )
           end

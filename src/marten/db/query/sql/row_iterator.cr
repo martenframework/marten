@@ -23,7 +23,7 @@ module Marten
           end
 
           def each_local_column
-            @model.fields.size.times do
+            @model.fields.count(&.db_column?).times do
               yield @result_set, @result_set.column_names[@cursor]
               @cursor += 1
             end

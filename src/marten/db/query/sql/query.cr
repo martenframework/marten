@@ -412,6 +412,9 @@ module Marten
             relation_field_path = field_path.select { |field, _r| field.relation? }
 
             join = unless relation_field_path.empty? || field_path.size == 1
+              # Prevent the last field to generate an extra join if the last field in the predicate is a relation (which
+              # is the case when a foreign key field is filtered on for example).
+              relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
               ensure_join_for_field_path(relation_field_path)
             end
 
@@ -449,10 +452,14 @@ module Marten
               if i > 0
                 # In this case we are trying to process a query field like "author__username", so we have to ensure that
                 # we are considering a relation field (such as a foreign key).
-                previous_field = field_path[i - 1][0]
+                previous_field, previous_reverse_relation = field_path[i - 1]
 
                 if previous_field.relation?
-                  model = previous_field.related_model
+                  model = if previous_reverse_relation.nil?
+                            previous_field.related_model
+                          else
+                            previous_reverse_relation.model
+                          end
                 else
                   # If the previous was not a relation, it means that we are in the presence of a query field like
                   # "firstname__lastname", which is an invalid one and does not correspond to an actual existing field.

@@ -35,6 +35,15 @@ module Marten
           )
           end
 
+          def add_query_node(query_node : Node)
+            predicate_node = process_query_node(query_node)
+            if @predicate_node.nil?
+              @predicate_node = predicate_node
+            else
+              @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+            end
+          end
+
           def count
             sql, parameters = build_count_query
             connection.open do |db|
@@ -150,15 +159,6 @@ module Marten
               verify_field(relation, only_relations: true, allow_reverse_relations: false),
               selected: true
             )
-          end
-
-          protected def add_query_node(query_node : Node)
-            predicate_node = process_query_node(query_node)
-            if @predicate_node.nil?
-              @predicate_node = predicate_node
-            else
-              @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
-            end
           end
 
           protected def clone

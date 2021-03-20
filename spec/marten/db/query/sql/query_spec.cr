@@ -41,14 +41,36 @@ describe Marten::DB::Query::SQL::Query do
       query.count.should eq 2
     end
 
+    it "returns the expected number of results for a sliced query" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.slice(1)
+      query_1.count.should eq 2
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.slice(1, 1)
+      query_2.count.should eq 1
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.slice(1, 2)
+      query_3.count.should eq 2
+
+      query_4 = Marten::DB::Query::SQL::Query(Tag).new
+      query_4.slice(0)
+      query_4.count.should eq 3
+    end
+
     it "makes use of the specified DB connection" do
       Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
       Tag.using(:other).create!(name: "coding", is_active: true)
 
-      query_1 = Marten::DB::Query::SQL::Query(Tag).new
-      query_1.using = "other"
-      query_1.count.should eq 1
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.using = "other"
+      query.count.should eq 1
     end
   end
 end

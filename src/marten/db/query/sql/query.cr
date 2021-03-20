@@ -184,11 +184,14 @@ module Marten
 
             sql = build_sql do |s|
               s << "SELECT COUNT(*)"
+              s << "FROM ("
+              s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column!}"
               s << "FROM #{table_name}"
               s << @joins.join(" ") { |j| j.to_sql }
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
+              s << ") subquery"
             end
 
             {sql, parameters}

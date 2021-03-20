@@ -39,10 +39,10 @@ module Marten
 
           from = range.begin.nil? ? 0 : range.begin.not_nil!
           size = if range.end.nil?
-            nil
-          else
-            range.excludes_end? ? (range.end.not_nil! - from) : (range.end.not_nil! + 1 - from)
-          end
+                   nil
+                 else
+                   range.excludes_end? ? (range.end.not_nil! - from) : (range.end.not_nil! + 1 - from)
+                 end
 
           qs.query.slice(from, size)
 

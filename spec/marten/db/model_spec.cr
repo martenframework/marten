@@ -50,14 +50,26 @@ describe Marten::DB::Model do
       post.author.should eq user
     end
 
-    it "is consistent when assigning both a relatd object and the corresponding ID" do
+    it "allows to assign nil as a specific field value" do
+      post = Post.new(author_id: nil)
+      post.author_id.should be_nil
+      post.author.should be_nil
+    end
+
+    it "allows to assign nil as a specific related object value" do
+      post = Post.new(author: nil)
+      post.author_id.should be_nil
+      post.author.should be_nil
+    end
+
+    it "is consistent when assigning both a related object and the corresponding ID" do
       user1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
 
       post = Post.new(author: user1, author_id: user2.id)
 
-      post.author_id.should eq user2.id
-      post.author.should eq user2
+      post.author_id.should eq user1.id
+      post.author.should eq user1
     end
 
     it "assigns default field values unless they are explicitly specified" do

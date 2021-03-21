@@ -225,7 +225,7 @@ module Marten
               relation_row_iterator.advance
             else
               related_object = relation_field.related_model.from_db_row_iterator(relation_row_iterator)
-              assign_related_object(related_object, relation_field)
+              assign_related_object(related_object, relation_field.id)
             end
           end
         end
@@ -246,21 +246,21 @@ module Marten
           {% end %}
         end
 
-        protected def assign_related_object(related_object, relation_field)
+        protected def assign_related_object(related_object, relation_field_id)
           {% begin %}
-          case relation_field.id
+          case relation_field_id
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           {% if ann && ann[:relation_name] %}
           when {{ field_var.name.stringify }}
-            if !related_object.is_a?({{ ann[:related_model] }})
+            if !related_object.nil? && !related_object.is_a?({{ ann[:related_model] }})
               raise Errors::UnexpectedFieldValue.new(
                 "Value for relation {{ ann[:relation_name] }} should be of type {{ ann[:related_model] }}, " \
                 "not #{typeof(related_object)}"
               )
             end
-            self.{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }})
+            self.{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }}?)
           {% end %}
           {% end %}
           else
@@ -278,11 +278,11 @@ module Marten
           values
         end
 
-        private def assign_field_values(values : Hash(String, Field::Any))
+        private def assign_field_values(values : Hash(String, Field::Any | Model))
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-            if values.has_key?({{field_var.name.stringify}})
-              value = values[{{field_var.name.stringify}}]
+            if values.has_key?({{ field_var.name.stringify }})
+              value = values[{{ field_var.name.stringify }}]
               if !value.is_a?({{ field_var.type }})
                 raise Errors::UnexpectedFieldValue.new(
                   "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
@@ -291,6 +291,15 @@ module Marten
               self.{{ field_var.id }} = value
               values.delete({{field_var.name.stringify}})
             end
+
+            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if ann && ann[:relation_name] %}
+              if values.has_key?({{ ann[:relation_name].stringify }})
+                value = values[{{ ann[:relation_name].stringify }}]
+                assign_related_object(value, {{ field_var.id.stringify }})
+                values.delete({{ ann[:relation_name].stringify }})
+              end
+            {% end %}
           {% end %}
 
           unless values.empty?

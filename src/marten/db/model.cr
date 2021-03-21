@@ -29,16 +29,9 @@ module Marten
       end
 
       private def initialize_field_values(**kwargs)
-        values = Hash(String, Field::Any).new
+        values = Hash(String, Field::Any | Model).new
 
-        kwargs.each do |key, value|
-          if value.is_a?(Model)
-            relation_field = self.class.get_relation_field(key.to_s)
-            assign_related_object(value, relation_field)
-          else
-            values[key.to_s] = value
-          end
-        end
+        kwargs.each { |key, value| values[key.to_s] = value }
 
         self.class.fields.each do |field|
           next if values.has_key?(field.id)

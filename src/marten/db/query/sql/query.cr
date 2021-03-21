@@ -437,7 +437,7 @@ module Marten
               predicate_klass = Predicate::Exact
             else
               predicate_klass = Predicate.registry.fetch(raw_predicate) do
-                raise Errors::UnknownField.new("Unknown predicate type '#{raw_predicate}'")
+                raise Errors::InvalidField.new("Unknown predicate type '#{raw_predicate}'")
               end
             end
 

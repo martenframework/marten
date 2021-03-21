@@ -93,7 +93,7 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Post).new
       query.add_query_node(Marten::DB::Query::Node.new(author: user_1))
       query.count.should eq 2
-      query.execute.should eq [post_1, post_3]
+      query.execute.to_set.should eq [post_1, post_3].to_set
     end
 
     it "is able to process query nodes with filters on reverse relations" do

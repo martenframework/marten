@@ -248,7 +248,7 @@ describe Marten::DB::Query::SQL::Query do
     end
 
     it "returns the expected results for a filtered query" do
-      tag_1 =Tag.create!(name: "ruby", is_active: true)
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
 

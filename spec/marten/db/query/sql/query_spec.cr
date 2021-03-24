@@ -237,4 +237,99 @@ describe Marten::DB::Query::SQL::Query do
       query.count.should eq 1
     end
   end
+
+  describe "#execute" do
+    it "returns the expected results for an unfiltered query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Marten::DB::Query::SQL::Query(Tag).new.execute.to_set.should eq [tag_1, tag_2, tag_3].to_set
+    end
+
+    it "returns the expected results for a filtered query" do
+      tag_1 =Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: :c))
+      query_1.execute.to_set.should eq [tag_2, tag_3].to_set
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+      query_2.execute.should eq [tag_1]
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.add_query_node(Marten::DB::Query::Node.new(name__startswith: "x"))
+      query_3.execute.should be_empty
+    end
+
+    it "returns the expected results for a filtered query involving joins" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+      query.execute.to_set.should eq [post_1, post_3].to_set
+    end
+
+    it "returns the expected results for a sliced query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.order("id")
+      query_1.slice(1)
+      query_1.execute.should eq [tag_2, tag_3]
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("id")
+      query_2.slice(1, 1)
+      query_2.execute.should eq [tag_2]
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.order("id")
+      query_3.slice(1, 2)
+      query_3.execute.should eq [tag_2, tag_3]
+
+      query_4 = Marten::DB::Query::SQL::Query(Tag).new
+      query_4.order("id")
+      query_4.slice(0)
+      query_4.execute.should eq [tag_1, tag_2, tag_3]
+    end
+
+    it "makes use of the specified DB connection" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.using(:other).create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.using = "other"
+      query.execute.should eq [tag_3]
+    end
+
+    it "makes use of the specified order" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.order("id")
+      query_1.execute.should eq [tag_1, tag_2, tag_3]
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("name")
+      query_2.execute.should eq [tag_3, tag_2, tag_1]
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.order("-name")
+      query_3.execute.should eq [tag_1, tag_2, tag_3]
+    end
+  end
 end

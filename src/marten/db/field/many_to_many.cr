@@ -2,6 +2,8 @@ module Marten
   module DB
     module Field
       class ManyToMany < Base
+        getter through
+
         def initialize(
           @id : ::String,
           @to : Model.class,
@@ -28,6 +30,14 @@ module Marten
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
           # No-op
+        end
+
+        def perform_validation(record : Model)
+          # No-op
+        end
+
+        def related_model
+          @to
         end
 
         def relation?
@@ -106,6 +116,16 @@ module Marten
                 through: {{ through_model_name.id }}
               )
             )
+
+            def {{ field_id }}
+              Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
+                self,
+                {{ field_id.stringify }},
+                {{ through_related_name }},
+                {{ through_model_from_field_id }},
+                {{ through_model_to_field_id }}
+              )
+            end
           end
         end
       end

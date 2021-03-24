@@ -93,14 +93,14 @@ module Marten
               field :id, :big_auto, primary_key: true
               field(
                 :{{ through_model_from_field_id.id }},
-                :one_to_many,
+                :many_to_one,
                 to: {{ model_klass }},
                 on_delete: :cascade,
                 related: {{ through_related_name }}
               )
               field(
                 :{{ through_model_to_field_id.id }},
-                :one_to_many,
+                :many_to_one,
                 to: {{ related_model_klass }},
                 on_delete: :cascade,
                 related: {{ through_related_name }}

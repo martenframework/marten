@@ -74,7 +74,7 @@ module Marten
         # Deletes the model instance.
         #
         # This methods deletes the model instance by complying to the deletion rules defined as part of the relation
-        # fields if applicable (`on_delete` option on one to many or one to one fields). It returns the number of rows
+        # fields if applicable (`on_delete` option on many to one or one to one fields). It returns the number of rows
         # that were deleted as part of the record deletion.
         def delete(using : Nil | String | Symbol = nil)
           deletion = Deletion::Runner.new(

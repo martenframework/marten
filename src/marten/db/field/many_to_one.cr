@@ -1,7 +1,7 @@
 module Marten
   module DB
     module Field
-      class OneToMany < Base
+      class ManyToOne < Base
         getter on_delete
 
         def initialize(
@@ -70,11 +70,11 @@ module Marten
         # :nodoc:
         macro check_definition(field_id, kwargs)
           {% if kwargs.is_a?(NilLiteral) || kwargs[:to].is_a?(NilLiteral) %}
-            {% raise "A related model must be specified for one to many fields ('to' option)" %}
+            {% raise "A related model must be specified for many to one fields ('to' option)" %}
           {% end %}
 
           {% if !kwargs.is_a?(NilLiteral) && kwargs[:unique].is_a?(BoolLiteral) && kwargs[:unique] %}
-            {% raise "One to many fields cannot set 'unique: true' (use 'one_to_one' fields instead)" %}
+            {% raise "Many to one fields cannot set 'unique: true' (use 'one_to_one' fields instead)" %}
           {% end %}
         end
 
@@ -84,7 +84,7 @@ module Marten
           {% field_id = (field_id.stringify + "_id").id %}
 
           # Registers a field corresponding to the related object ID to the considered model class. For example, if an
-          # 'author' one to many field is defined in a 'post' model, an 'author_id' one to many field will actually be
+          # 'author' many to one field is defined in a 'post' model, an 'author_id' many to one field will actually be
           # created for the model at hand.
 
           class ::{{ model_klass }}

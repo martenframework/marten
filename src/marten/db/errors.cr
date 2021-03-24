@@ -10,7 +10,7 @@ module Marten
       # Represents an error raised when a get query returned more than one result.
       class MultipleRecordsFound < Exception; end
 
-      # Represents an error raised when an attempt to delete an object targeted by protected relation (one to many or
+      # Represents an error raised when an attempt to delete an object targeted by protected relation (many to one or
       # one to one) is made.
       class ProtectedRecord < Exception; end
 

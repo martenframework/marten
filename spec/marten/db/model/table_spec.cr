@@ -43,7 +43,7 @@ describe Marten::DB::Model::Table do
 
     it "allows to retrieve a specific model fields from a relation name" do
       field = Post.get_field(:author)
-      field.should be_a Marten::DB::Field::OneToMany
+      field.should be_a Marten::DB::Field::ManyToOne
       field.id.should eq "author_id"
     end
 

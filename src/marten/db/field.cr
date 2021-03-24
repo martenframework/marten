@@ -12,9 +12,9 @@ require "./field/uuid"
 require "./field/auto"
 require "./field/big_auto"
 
-require "./field/one_to_one"
-require "./field/one_to_many"
 require "./field/many_to_many"
+require "./field/many_to_one"
+require "./field/one_to_one"
 
 module Marten
   module DB
@@ -70,8 +70,8 @@ module Marten
       register "date_time", DateTime
       register "int", Int
       register "many_to_many", ManyToMany
+      register "many_to_one", ManyToOne
       register "one_to_one", OneToOne
-      register "one_to_many", OneToMany
       register "string", String
       register "text", Text
       register "uuid", UUID

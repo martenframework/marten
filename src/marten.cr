@@ -13,6 +13,7 @@ require "./marten/db/**"
 require "./marten/ext/**"
 require "./marten/http/**"
 require "./marten/middleware"
+require "./marten/middleware/**"
 require "./marten/routing/**"
 require "./marten/server"
 require "./marten/server/**"
@@ -51,6 +52,19 @@ module Marten
     setup_i18n
   end
 
+  def self.setup_i18n
+    I18n.config.default_locale = settings.i18n.default_locale
+    I18n.config.available_locales = settings.i18n.available_locales
+
+    # Add Marten's built-in translations first.
+    I18n.config.loaders << I18n::Loader::YAML.new("#{__DIR__}/marten/locales")
+
+    # Ensure each app config translation loader is properly bound to the I18n config.
+    I18n.config.loaders += apps.app_configs.compact_map(&.translations_loader)
+
+    I18n.init
+  end
+
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
     settings.with_target_env(env.try(&.to_s)) { |settings_with_target_env| yield settings_with_target_env }
@@ -78,18 +92,5 @@ module Marten
 
   protected def self.dir_location
     __DIR__
-  end
-
-  private def self.setup_i18n
-    I18n.config.default_locale = settings.i18n.default_locale
-    I18n.config.available_locales = settings.i18n.available_locales
-
-    # Add Marten's built-in translations first.
-    I18n.config.loaders << I18n::Loader::YAML.new("#{__DIR__}/marten/locales")
-
-    # Ensure each app config translation loader is properly bound to the I18n config.
-    I18n.config.loaders += apps.app_configs.compact_map(&.translations_loader)
-
-    I18n.init
   end
 end

@@ -7,18 +7,14 @@ module Marten
         include ::HTTP::Handler
         include ViewResponseConverter
 
-        @middleware_chain : Array(Marten::Middleware)
-
-        def initialize
-          @middleware_chain = Marten.settings.middleware.map { |middleware_klass| middleware_klass.new }
-        end
+        @middleware_chain : Array(Marten::Middleware)?
 
         def call(context : ::HTTP::Server::Context)
           response : HTTP::Response? = nil
 
           # Call each middleware in order to let them process the incoming request and optionnaly bypass the routing
           # mechanism by returning an early response.
-          @middleware_chain.each do |middleware|
+          middleware_chain.each do |middleware|
             result = middleware.process_request(context.marten.request).as(HTTP::Response?)
 
             unless result.nil?
@@ -37,7 +33,7 @@ module Marten
 
           # Call each middleware in order to let them process the response in order to alter it or completely replace it
           # if applicable.
-          @middleware_chain.each do |middleware|
+          middleware_chain.each do |middleware|
             response = middleware.process_response(context.marten.request, response).as(HTTP::Response)
           end
 
@@ -45,6 +41,10 @@ module Marten
           convert_view_response(context, response)
 
           context
+        end
+
+        private def middleware_chain
+          @middleware_chain ||= Marten.settings.middleware.map { |middleware_klass| middleware_klass.new }
         end
       end
     end

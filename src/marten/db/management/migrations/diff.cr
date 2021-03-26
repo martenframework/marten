@@ -51,6 +51,7 @@ module Marten
             end.flatten.to_set
 
             handle_created_tables(from_tables, to_tables)
+            handle_removed_columns(from_columns, to_columns)
             handle_added_columns(from_columns, to_columns)
 
             changes = generate_migrations
@@ -276,6 +277,16 @@ module Marten
             end
           end
 
+          private def handle_removed_columns(from_columns, to_columns)
+            (from_columns - to_columns).each do |app_label, table_name, column_name|
+              insert_operation(
+                app_label,
+                DB::Migration::Operation::RemoveColumn.new(table_name, column_name),
+                [OperationDependency.new(app_label, table_name, :altered_table_constraints)]
+              )
+            end
+          end
+
           private def insert_operation(app_label, operation, dependencies, beginning = false)
             ops = (@detected_operations[app_label] ||= [] of DetectedOperation)
             beginning ? ops.unshift({operation, dependencies}) : ops.push({operation, dependencies})
@@ -285,6 +296,8 @@ module Marten
             case dependency[2]
             when :created_table
               operation.is_a?(DB::Migration::Operation::CreateTable) && operation.name == dependency[1]
+            when :altered_table_constraints
+              raise NotImplementedError.new("Requires operations to change table constraints")
             else
               false
             end

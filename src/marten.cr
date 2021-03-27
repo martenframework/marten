@@ -19,6 +19,7 @@ require "./marten/model"
 require "./marten/routing/**"
 require "./marten/server"
 require "./marten/server/**"
+require "./marten/view"
 require "./marten/views/**"
 
 module Marten

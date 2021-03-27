@@ -1,4 +1,4 @@
-class TestUser < Marten::DB::Model
+class TestUser < Marten::Model
   field :id, :big_auto, primary_key: true
   field :username, :string, blank: false, null: false, max_size: 155, unique: true
   field :email, :string, blank: false, null: false, max_size: 254

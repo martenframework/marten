@@ -1,3 +1,3 @@
-class TestApp < Marten::Apps::Config
+class TestApp < Marten::App
   label :app
 end

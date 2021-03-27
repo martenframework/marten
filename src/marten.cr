@@ -6,6 +6,7 @@ require "i18n"
 require "log"
 require "uuid"
 
+require "./marten/app"
 require "./marten/apps/**"
 require "./marten/conf/**"
 require "./marten/core/**"

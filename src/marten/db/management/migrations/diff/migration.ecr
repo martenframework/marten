@@ -1,4 +1,4 @@
-class Migration_<%= UUID.random.hexstring %> < Marten::DB::Migration
+class Migration_<%= UUID.random.hexstring %> < Marten::Migration
   <%- @dependencies.each do |app_label, migration_name| -%>
   depends_on "<%= app_label %>", "<%= migration_name %>"
   <%- end -%>

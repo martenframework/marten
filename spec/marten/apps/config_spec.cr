@@ -1,3 +1,4 @@
+require "./config_spec/**"
 require "./spec_helper"
 
 describe Marten::Apps::Config do
@@ -57,6 +58,21 @@ describe Marten::Apps::Config do
       app_config = Marten::Apps::ConfigSpec::TestConfig.new
       app_config.register_model(Post)
       app_config.models.should eq [Post]
+    end
+  end
+
+  describe "#templates_loader" do
+    it "returns a templates loader targetting the app templates" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      templates_loader = app_config.templates_loader
+      templates_loader.should be_a Crinja::Loader::FileSystemLoader
+
+      templates_loader.not_nil!.searchpaths.should eq [Path[__DIR__].join("templates").to_s]
+    end
+
+    it "returns nil if the app does not define a templates directory" do
+      app_config = Marten::Apps::ConfigSpec::AppWithoutTemplates::App.new
+      app_config.templates_loader.should be_nil
     end
   end
 

@@ -1,5 +1,6 @@
 # Marten - The pragmatic web framework.
 
+require "crinja"
 require "db"
 require "http"
 require "i18n"
@@ -28,6 +29,7 @@ module Marten
   Log = ::Log.for("marten")
 
   @@apps : Apps::Registry?
+  @@crinja : Crinja?
   @@env : Conf::Env?
   @@routes : Routing::Map?
   @@settings : Conf::GlobalSettings?
@@ -52,10 +54,25 @@ module Marten
     settings.setup
     apps.populate(settings.installed_apps)
     apps.setup
+    setup_crinja
     setup_i18n
   end
 
-  def self.setup_i18n
+  def self.setup_crinja : Nil
+    @@crinja = Crinja.new
+
+    loaders = [] of Crinja::Loader
+
+    # Add per-app templates loaders first.
+    loaders += apps.app_configs.compact_map(&.templates_loader) if settings.templates.app_dirs
+
+    # Then generate any new templates loader based on the configured templates dirs.
+    loaders += settings.templates.dirs.map { |d| Crinja::Loader::FileSystemLoader.new(d) }
+
+    crinja.loader = Crinja::Loader::ChoiceLoader.new(loaders)
+  end
+
+  def self.setup_i18n : Nil
     I18n.config.default_locale = settings.i18n.default_locale
     I18n.config.available_locales = settings.i18n.available_locales
 
@@ -75,6 +92,10 @@ module Marten
 
   def self.apps
     @@apps ||= Apps::Registry.new
+  end
+
+  def self.crinja
+    @@crinja.not_nil!
   end
 
   def self.env

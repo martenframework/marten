@@ -43,6 +43,15 @@ module Marten
       def setup
       end
 
+      # Returns the templates loader of the application.
+      #
+      # If the application doesn't have a dedicated templates directory, `nil` is returned.
+      def templates_loader
+        templates_dir = Path[self.class._marten_app_location].join(TEMPLATES_DIR)
+        return unless Dir.exists?(templates_dir)
+        Crinja::Loader::FileSystemLoader.new(templates_dir.to_s)
+      end
+
       # Returns the translations loader of the application.
       #
       # If the application doesn't define translations in a dedicated directory, `nil` is returned.
@@ -55,6 +64,7 @@ module Marten
       private LABEL_RE       = /^[a-z_]+$/
       private LOCALES_DIR    = "locales"
       private MIGRATIONS_DIR = "migrations"
+      private TEMPLATES_DIR  = "templates"
     end
   end
 end

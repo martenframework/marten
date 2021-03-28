@@ -187,6 +187,11 @@ module Marten
         @middleware.concat(v)
       end
 
+      # Provides access to templates settings.
+      def templates
+        @templates ||= GlobalSettings::Templates.new
+      end
+
       # :nodoc:
       def with_target_env(target_env : String?)
         current_target_env = @target_env

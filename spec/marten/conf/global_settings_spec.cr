@@ -317,6 +317,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#templates" do
+    it "returns the templates configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.templates.should be_a Marten::Conf::GlobalSettings::Templates
+    end
+  end
+
   describe "#time_zone" do
     it "returns a UTC time zone location by default" do
       global_settings = Marten::Conf::GlobalSettings.new

@@ -4,10 +4,13 @@ module Marten
       module Migrations
         class Diff
           class Migration
+            @version : String
+
             getter app_label
+            getter dependencies
             getter name
             getter operations
-            getter dependencies
+            getter version
 
             def initialize(
               @app_label : String,
@@ -15,6 +18,7 @@ module Marten
               @operations : Array(DB::Migration::Operation::Base),
               @dependencies : Array(Tuple(String, String))
             )
+              @version = @name.dup
               if @operations.size == 1
                 @name += "_#{@operations.first.describe.downcase.gsub(" ", "_")}"
               else

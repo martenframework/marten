@@ -19,6 +19,13 @@ module Marten
           macro inherited
             FIELDS_ = {} of Nil => Nil
 
+            # Reset table-related class variables upon inheritance.
+            # TODO: model class inheritance.
+            @@fields = {} of String => Marten::DB::Field::Base
+            @@fields_per_column = {} of String => Marten::DB::Field::Base
+            @@relation_fields_per_relation_name = {} of String => Marten::DB::Field::Base
+            @@reverse_relations = [] of Marten::DB::ReverseRelation
+
             macro finished
               _verify_model_name
               _setup_primary_key

@@ -2,6 +2,7 @@
 
 require "crinja"
 require "db"
+require "ecr/macros"
 require "http"
 require "i18n"
 require "log"

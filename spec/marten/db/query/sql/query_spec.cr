@@ -332,4 +332,128 @@ describe Marten::DB::Query::SQL::Query do
       query_3.execute.should eq [tag_1, tag_2, tag_3]
     end
   end
+
+  describe "#exists?" do
+    it "returns the expected booleans for an unfiltered query" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      Marten::DB::Query::SQL::Query(Tag).new.exists?.should be_true
+      Marten::DB::Query::SQL::Query(Post).new.exists?.should be_false
+    end
+
+    it "returns the expected booleans for a filtered query" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: :c))
+      query_1.exists?.should be_true
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+      query_2.exists?.should be_true
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.add_query_node(Marten::DB::Query::Node.new(name__startswith: "x"))
+      query_3.exists?.should be_false
+    end
+
+    it "returns the expected booleans for a filtered query involving joins" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      Post.create!(author: user_1, title: "Post 3")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+      query_1.exists?.should be_true
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "a"))
+      query_2.exists?.should be_false
+    end
+
+    it "returns the expected booleans for a sliced query" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.order("id")
+      query_1.slice(1)
+      query_1.exists?.should be_true
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("id")
+      query_2.slice(1, 1)
+      query_2.exists?.should be_true
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.order("id")
+      query_3.slice(1, 2)
+      query_3.exists?.should be_true
+
+      query_4 = Marten::DB::Query::SQL::Query(Tag).new
+      query_4.order("id")
+      query_4.slice(0)
+      query_4.exists?.should be_true
+
+      query_5 = Marten::DB::Query::SQL::Query(Tag).new
+      query_5.order("id")
+      query_5.slice(5, 6)
+      query_5.exists?.should be_false
+    end
+
+    it "makes use of the specified DB connection" do
+      Tag.using(:other).create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.using = "other"
+      query_1.exists?.should be_true
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.exists?.should be_false
+    end
+  end
+
+  describe "#joins?" do
+    it "returns true if joins are used" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+      query.joins?.should be_true
+    end
+
+    it "returns false if no joins are used" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "t"))
+      query.joins?.should be_false
+    end
+  end
+
+  describe "#order" do
+    it "can configure a query to be ordered by a single field" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("name")
+      query_2.execute.should eq [tag_3, tag_2, tag_1]
+    end
+
+    it "can configure a query to be ordered by a single field in reverse order" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("-name")
+      query_2.execute.should eq [tag_1, tag_2, tag_3]
+    end
+  end
 end

@@ -10,8 +10,6 @@ description: |
 crystal: ">= 0.36.0"
 
 dependencies:
-  crinja:
-    github: straight-shoota/crinja
   db:
     github: crystal-lang/crystal-db
   i18n:

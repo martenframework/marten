@@ -24,7 +24,7 @@ module Marten
 
       # Renders the configured template for a specific `context`.
       def render_to_response(context : Hash?)
-        HTTP::Response.new(Marten.crinja.get_template(self.class.template.not_nil!).render(context))
+        HTTP::Response.new(Marten.templates.get_template(self.class.template.not_nil!).render(context))
       end
     end
   end

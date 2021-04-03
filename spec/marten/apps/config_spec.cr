@@ -65,9 +65,9 @@ describe Marten::Apps::Config do
     it "returns a templates loader targetting the app templates" do
       app_config = Marten::Apps::ConfigSpec::TestConfig.new
       templates_loader = app_config.templates_loader
-      templates_loader.should be_a Crinja::Loader::FileSystemLoader
+      templates_loader.should be_a Marten::Template::Loader::FileSystem
 
-      templates_loader.not_nil!.searchpaths.should eq [Path[__DIR__].join("templates").to_s]
+      templates_loader.not_nil!.path.should eq Path[__DIR__].join("templates").to_s
     end
 
     it "returns nil if the app does not define a templates directory" do

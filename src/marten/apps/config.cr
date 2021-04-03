@@ -49,7 +49,7 @@ module Marten
       def templates_loader
         templates_dir = Path[self.class._marten_app_location].join(TEMPLATES_DIR)
         return unless Dir.exists?(templates_dir)
-        Crinja::Loader::FileSystemLoader.new(templates_dir.to_s)
+        Template::Loader::FileSystem.new(templates_dir.to_s)
       end
 
       # Returns the translations loader of the application.

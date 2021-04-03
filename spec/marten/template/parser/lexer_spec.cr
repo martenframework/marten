@@ -84,7 +84,6 @@ describe Marten::Template::Parser::Lexer do
       tokens[6].line_number.should eq 4
     end
 
-
     it "is able to process ignored verbatim blocks as expected" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE

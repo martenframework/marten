@@ -7,7 +7,7 @@ module Marten
       setter loaders
 
       # Returns the first compiled template matching the given template name.
-      def get_template(template_name : String) : Template::Template
+      def get_template(template_name : String) : Template
         @loaders.each do |loader|
           begin
             return loader.get_template(template_name)

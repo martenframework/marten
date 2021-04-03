@@ -7,7 +7,7 @@ module Marten
 
         # Returns a `Marten::Template::Template` compiled template from a specific template name.
         def get_template(template_name) : Template
-          Template::Template.new(get_template_source(template_name))
+          Template.new(get_template_source(template_name))
         end
       end
     end

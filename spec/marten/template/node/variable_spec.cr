@@ -4,8 +4,8 @@ describe Marten::Template::Node::Variable do
   describe "#render" do
     it "returns the string representation of the variable resolved using the current context" do
       ctx = Marten::Template::Context{
-        "foo" => "bar",
-        "user" => { "name" => "John Doe" }
+        "foo"  => "bar",
+        "user" => {"name" => "John Doe"},
       }
 
       node_1 = Marten::Template::Node::Variable.new("foo")

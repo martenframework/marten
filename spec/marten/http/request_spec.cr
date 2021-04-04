@@ -139,6 +139,30 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#delete?" do
+    it "returns true if the request is a DELETE" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "DELETE",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.delete?.should be_true
+    end
+
+    it "returns false if the request is not a DELETE" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.delete?.should be_false
+    end
+  end
+
   describe "#full_path" do
     it "returns the request full path when query params are present" do
       request = Marten::HTTP::Request.new(
@@ -160,6 +184,54 @@ describe Marten::HTTP::Request do
         )
       )
       request.full_path.should eq "/test/xyz"
+    end
+  end
+
+  describe "#get?" do
+    it "returns true if the request is a GET" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.get?.should be_true
+    end
+
+    it "returns false if the request is not a GET" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.get?.should be_false
+    end
+  end
+
+  describe "#head?" do
+    it "returns true if the request is a HEAD" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "HEAD",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.head?.should be_true
+    end
+
+    it "returns false if the request is not a HEAD" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.head?.should be_false
     end
   end
 
@@ -371,6 +443,30 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#options?" do
+    it "returns true if the request is an OPTIONS" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "OPTIONS",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.options?.should be_true
+    end
+
+    it "returns false if the request is not an OPTIONS" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.options?.should be_false
+    end
+  end
+
   describe "#path" do
     it "returns the request path" do
       request = Marten::HTTP::Request.new(
@@ -381,6 +477,78 @@ describe Marten::HTTP::Request do
         )
       )
       request.path.should eq "/test/xyz"
+    end
+  end
+
+  describe "#patch?" do
+    it "returns true if the request is a PATCH" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "PATCH",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.patch?.should be_true
+    end
+
+    it "returns false if the request is not a PATCH" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.patch?.should be_false
+    end
+  end
+
+  describe "#post?" do
+    it "returns true if the request is a POST" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.post?.should be_true
+    end
+
+    it "returns false if the request is not a POST" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.post?.should be_false
+    end
+  end
+
+  describe "#put?" do
+    it "returns true if the request is a PUT" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "PUT",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.put?.should be_true
+    end
+
+    it "returns false if the request is not a PUT" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.put?.should be_false
     end
   end
 
@@ -397,6 +565,30 @@ describe Marten::HTTP::Request do
       request.query_params.size.should eq 3
       request.query_params.fetch_all(:foo).should eq ["bar", "baz"]
       request.query_params.fetch_all(:xyz).should eq ["test"]
+    end
+  end
+
+  describe "#trace?" do
+    it "returns true if the request is a TRACE" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "TRACE",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.trace?.should be_true
+    end
+
+    it "returns false if the request is not a TRACE" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.trace?.should be_false
     end
   end
 end

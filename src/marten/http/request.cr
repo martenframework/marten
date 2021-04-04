@@ -23,9 +23,24 @@ module Marten
         @data ||= Params::Data.new(extract_raw_data_params)
       end
 
+      # Returns `true` if the request is a DELETE.
+      def delete?
+        method == "DELETE"
+      end
+
       # Returns the path including the GET parameters if applicable.
       def full_path : String
         @full_path ||= (path + (query_params.empty? ? "" : "?#{@request.query_params}")).as(String)
+      end
+
+      # Returns `true` if the request is a GET.
+      def get?
+        method == "GET"
+      end
+
+      # Returns `true` if the request is a HEAD.
+      def head?
+        method == "HEAD"
       end
 
       # Returns the HTTP headers embedded in the request.
@@ -45,6 +60,16 @@ module Marten
         @request.method.upcase
       end
 
+      # Returns `true` if the request is an OPTIONS.
+      def options?
+        method == "OPTIONS"
+      end
+
+      # Returns `true` if the request is a PATCH.
+      def patch?
+        method == "PATCH"
+      end
+
       # Returns the request path as a string.
       #
       # Only the path of the request is included (without scheme or domain).
@@ -52,9 +77,24 @@ module Marten
         @request.path
       end
 
+      # Returns `true` if the request is a POST.
+      def post?
+        method == "POST"
+      end
+
+      # Returns `true` if the request is a PUT.
+      def put?
+        method == "PUT"
+      end
+
       # Returns the HTTP GET parameters embedded in the request.
       def query_params : Params::Query
         @query_parans ||= Params::Query.new(extract_raw_query_params)
+      end
+
+      # Returns `true` if the request is a TRACE.
+      def trace?
+        method == "TRACE"
       end
 
       private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"

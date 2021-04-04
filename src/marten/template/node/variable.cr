@@ -5,6 +5,10 @@ module Marten
       #
       # A variable node will be resolved based on the current context in order to produce the final output.
       class Variable < Base
+        def initialize(source : String)
+          @expression = FilterExpression.new(source)
+        end
+
         def initialize(@expression : VariableExpression)
         end
 

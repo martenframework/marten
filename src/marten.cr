@@ -5,6 +5,7 @@ require "ecr/macros"
 require "http"
 require "i18n"
 require "log"
+require "mime/media_type"
 require "uuid"
 
 require "./marten/app"

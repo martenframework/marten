@@ -40,6 +40,112 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#accepts?" do
+    it "returns true if the passed media type is supported by the request" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{
+            "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp",
+          }
+        )
+      )
+
+      request.accepts?("text/html").should be_true
+      request.accepts?("application/xhtml+xml").should be_true
+      request.accepts?("application/xml").should be_true
+      request.accepts?("image/webp").should be_true
+    end
+
+    it "returns true in all cases if the Accept header contains */*" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{
+            "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          }
+        )
+      )
+
+      request.accepts?("*/*").should be_true
+      request.accepts?("image/jpeg").should be_true
+    end
+
+    it "returns false if the passed media type is not supported by the request" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{
+            "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp",
+          }
+        )
+      )
+
+      request.accepts?("*/*").should be_false
+      request.accepts?("image/jpeg").should be_false
+    end
+  end
+
+  describe "#accepted_media_types" do
+    it "returns the media types accepted by the request" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{
+            "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp",
+          }
+        )
+      )
+
+      request.accepted_media_types.size.should eq 4
+      request.accepted_media_types[0].should eq MIME::MediaType.parse("text/html")
+      request.accepted_media_types[1].should eq MIME::MediaType.parse("application/xhtml+xml")
+      request.accepted_media_types[2].should eq MIME::MediaType.parse("application/xml;q=0.9")
+      request.accepted_media_types[3].should eq MIME::MediaType.parse("image/webp")
+    end
+
+    it "ignores possibly empty or malformed media types" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{
+            "Accept" => "text/html,,,application/xhtml+xml,  ,application/xml;q=0.9,image/webp",
+          }
+        )
+      )
+
+      request.accepted_media_types.size.should eq 4
+      request.accepted_media_types[0].should eq MIME::MediaType.parse("text/html")
+      request.accepted_media_types[1].should eq MIME::MediaType.parse("application/xhtml+xml")
+      request.accepted_media_types[2].should eq MIME::MediaType.parse("application/xml;q=0.9")
+      request.accepted_media_types[3].should eq MIME::MediaType.parse("image/webp")
+    end
+
+    it "fallbacks to the any MIME type if no Accept header is present" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      request.accepted_media_types.size.should eq 1
+      request.accepted_media_types[0].should eq MIME::MediaType.parse("*/*")
+    end
+  end
+
   describe "#body" do
     it "returns the request body" do
       request = Marten::HTTP::Request.new(

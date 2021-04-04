@@ -5,12 +5,28 @@ module Marten
     # When a page is request, Marten creates a `Marten::HTTP::Request` that gives access to all the information and
     # metadata of the incoming request.
     class Request
+      @accepted_media_types : Array(MIME::MediaType)?
       @host : String?
       @port : String?
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
         @request.body = IO::Memory.new((request.body || IO::Memory.new).gets_to_end)
+      end
+
+      # Returns `true` if the passed media type is accepted by the request.
+      def accepts?(media_type : String)
+        accepted_media_types.any? { |mt| mt.media_type == "*/*" || mt.media_type == media_type }
+      end
+
+      # Returns an array of the media types accepted by the request.
+      def accepted_media_types : Array(MIME::MediaType)
+        @accepted_media_types ||= begin
+          raw_media_types = headers.fetch(:ACCEPT, "*/*")
+          raw_media_types.split(',').compact_map do |raw_media_type|
+            MIME::MediaType.parse(raw_media_type) unless raw_media_type.strip.empty?
+          end
+        end
       end
 
       # Returns the raw body of the request as a string.

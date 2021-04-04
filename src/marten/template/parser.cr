@@ -27,6 +27,7 @@ module Marten
             nodes.add(Node::Text.new(token.content))
           elsif token.type.variable?
             raise_syntax_error("Empty variable detected on line #{token.line_number}") if token.content.empty?
+            nodes.add(Node::Variable.new(VariableExpression.new(token.content)))
           end
         end
 

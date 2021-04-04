@@ -6,6 +6,12 @@ module Marten
 
       # Represents an error raised when a template cannot be found.
       class TemplateNotFound < Exception; end
+
+      # Represents an error raised when an unknown variable or an unknown variable attribute is being accessed.
+      class UnknownVariable < Exception; end
+
+      # Represents an error araised when an attempt to prepare a context value from an unsupported object is made.
+      class UnsupportedValue < Exception; end
     end
   end
 end

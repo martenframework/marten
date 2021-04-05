@@ -47,6 +47,10 @@ module Marten
         @raw.to_s(io)
       end
 
+      def truthy?
+        !(@raw == false || @raw == 0 || @raw.nil?)
+      end
+
       private def resolve_attribute(key)
         object = raw
         if object.responds_to?(:[]) && !object.is_a?(Array) && !object.is_a?(String)

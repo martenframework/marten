@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <title><%= "#{error.class} at #{request.path}" %></title>
+    <style>/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}</style>
+    <style>
+      html, body, td, input {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+      }
+
+      html {
+        font-size: 1rem;
+        line-height: 1.6;
+        background: #fff;
+      }
+
+      header {
+        padding: 3rem 4rem;
+        background-color: #df691a;
+      }
+
+      header > h1 {
+        margin: 0.25rem 0;
+        font-size: 1.8rem;
+        line-height: 2.2rem;
+        color: #fff;
+      }
+
+      header > h1 > .exception-class {
+        color: #282c34;
+      }
+
+      header > .exception-message {
+        font-size: 1.2rem;
+        color: #fff;
+      }
+
+      .logo-wrapper {
+        float: right;
+      }
+
+      section {
+        padding: 3rem;
+        position: relative;
+      }
+
+      section.exception-details {
+        background-color: #1f2d3b;
+        color: #dee5ed;
+        white-space: nowrap;
+      }
+
+      section.exception-details > .code-previews {
+        display: inline-block;
+        width: 40%;
+        vertical-align: top;
+      }
+
+      section.exception-details > .code-previews > h2 {
+        margin-top: 0;
+        margin-left: 1rem;
+      }
+
+      section.exception-details > .code-previews > .code-preview {
+        overflow: scroll;
+      }
+
+      section.exception-details > .code-previews > .code-preview.hidden {
+        display: none;
+      }
+
+      section.exception-details > .code-previews > .code-preview > .filepath {
+        padding: 1rem;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      section.exception-details > .code-previews > .code-preview > .snippet > pre.lines-wrapper {
+        line-height: 1.2rem;
+      }
+
+      section.exception-details > .code-previews > .code-preview > .snippet > .lines-wrapper > .line {
+        display: inline-block;
+        white-space: pre;
+        padding: 0.1rem 1rem;
+        font-size: 0.8rem;
+      }
+
+      section.exception-details > .code-previews > .code-preview > .snippet > .lines-wrapper > .line > .number {
+        margin-right: 1rem;
+        display: inline-block;
+      }
+
+      section.exception-details > .code-previews > .code-preview > .snippet > .lines-wrapper > .highlighted {
+        background-color: #2b3e50;
+      }
+
+      section.exception-details > .back-trace {
+        display: inline-block;
+        width: 60%;
+        vertical-align: top;
+      }
+
+      section.exception-details > .back-trace > h2 {
+        margin-top: 0;
+        margin-left: 1rem;
+      }
+
+      section.exception-details > .back-trace > .traces {
+        padding: 1rem;
+      }
+
+      section.exception-details > .back-trace > .traces > label {
+        position: relative;
+        margin-bottom: 1rem;
+        padding-left: 2rem;
+        display: block;
+        font-size: 0.8rem;
+        font-weight: bold;
+      }
+
+      section.exception-details > .back-trace > .traces > label input {
+        position: absolute;
+        opacity: 0;
+        cursor: pointer;
+        height: 0;
+        width: 0;
+      }
+
+      section.exception-details > .back-trace > .traces > label .checkmark {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 1.2rem;
+        width: 1.2rem;
+        background-color: #dee5ed;
+      }
+
+      section.exception-details > .back-trace > .traces > label:hover input ~ .checkmark {
+        background-color: #ccc;
+      }
+
+      section.exception-details > .back-trace > .traces > label input:checked ~ .checkmark {
+        background-color: #df691a;
+      }
+
+      section.exception-details > .back-trace > .traces > label .checkmark:after {
+        content: "";
+        position: absolute;
+        display: none;
+      }
+
+      section.exception-details > .back-trace > .traces > label input:checked ~ .checkmark:after {
+        display: block;
+      }
+
+      section.exception-details > .back-trace > .traces > label .checkmark:after {
+        top: 0.2rem ;
+        left: 0.4rem;
+        width: 0.2rem;
+        height: 0.5rem;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list {
+        margin: 0;
+        padding: 0;
+        padding-top: 1rem;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li.hideable {
+        display: none;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li.hideable.displayed {
+        display: block;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace {
+        margin: 0;
+        padding: 0.3rem 0.35rem;
+        display: block;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        font-size: 0.8rem;
+        text-align: left;
+        overflow: hidden;
+        white-space: nowrap;
+        color: #dee5ed;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace:hover,
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace:focus {
+        background-color: #2b3e50;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace:active {
+        background-color: #8694a4;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace.selected {
+        background-color: #8694a4;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace > .wrapper:before {
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #8694a4;
+        border-radius: 50%;
+        margin-right: 8px;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace > .dep-filename {
+        float: right;
+        max-width: 30%;
+        color: #d9534f;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace.selected > .wrapper:before {
+        background-color: #df691a;
+      }
+
+      section.exception-details > .back-trace > .traces > ul.trace-list > li >.trace.selected > .dep-filename {
+        color: #fff;
+      }
+
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="logo-wrapper">
+        <svg width="60px" version="1.0" viewBox="0 0 900.000000 966.000000" xmlns="http://www.w3.org/2000/svg">
+          <g transform="translate(0 966) scale(.1 -.1)" fill="#fff">
+            <path d="m4480 8752c-8-4-33-19-55-33s-67-41-100-59c-74-41-205-117-225-130-8-6-22-13-30-17s-46-26-85-48c-38-23-77-44-85-48s-28-16-45-27c-16-11-37-23-45-27s-46-26-85-48c-38-23-77-44-85-48s-28-16-45-27c-16-11-37-23-45-27-18-8-208-119-230-133-8-6-22-13-30-17s-58-32-110-63-102-59-110-63-28-16-45-27c-16-11-37-23-45-27s-46-26-85-48c-38-23-77-44-85-48s-29-16-46-26-51-30-75-43-63-36-87-51c-23-15-59-37-80-48-20-11-44-24-52-29-26-17-164-96-180-104-17-8-36-19-95-57-22-14-47-29-55-32-8-4-31-17-50-28-19-12-55-32-80-46-25-13-58-33-75-44-16-10-37-22-45-26s-46-26-85-48c-38-23-77-44-85-48s-28-16-45-27c-16-11-37-23-45-27-18-8-208-119-230-133-8-6-22-13-30-17s-69-39-135-78-137-79-158-90-51-32-67-47l-30-27v-2034-2034l22-20c13-11 43-33 68-49 47-30 53-33 135-78 28-15 64-36 80-46 17-11 44-26 60-34 17-8 53-29 80-45 28-17 59-35 70-41s34-19 50-30c17-11 39-24 50-30s34-19 50-30c17-11 39-24 51-29 11-5 50-27 85-48 35-22 71-42 79-46s31-17 50-28c19-12 55-32 80-46 25-13 59-33 75-44 17-10 37-22 45-26s58-32 110-63 102-59 110-63 29-16 45-26c17-11 50-31 75-44 25-14 61-34 80-46 19-11 44-25 55-31s34-19 50-29c17-11 50-31 75-44 25-14 61-34 80-46 19-11 44-25 55-31s34-19 50-30c17-11 37-23 45-27s58-32 110-63 102-59 110-63 29-16 45-27c17-11 37-23 45-27 18-8 159-89 180-103 8-6 22-13 30-17s47-26 85-48c39-23 77-44 85-48s29-16 45-27c17-11 37-23 45-27s58-32 110-63 102-59 110-63 29-16 45-27c17-11 37-23 45-27s47-26 85-48c39-23 77-44 85-48s29-16 45-26c17-11 50-31 75-44 25-14 61-34 80-46 19-11 45-25 57-30 11-5 24-15 28-20 17-29 59-12 255 103 57 33 112 66 122 71 9 6 39 22 65 36 26 15 64 36 83 48 19 11 42 24 50 28 8 3 33 18 55 32 58 37 78 49 95 58 19 9 160 90 180 103 8 6 22 13 30 17s47 25 85 48c39 22 77 44 85 48s29 16 45 27c17 11 37 23 45 27s47 26 85 48c39 23 77 44 85 48s29 16 45 27c17 11 37 23 45 27 16 7 255 147 280 163 8 5 38 21 65 35 55 28 69 36 133 78 24 15 45 27 47 27s47 26 102 58c54 32 105 61 113 65s29 16 45 27c17 11 37 23 45 27 18 8 158 89 180 103 8 6 26 15 39 20 13 6 38 21 55 33 35 26 53 36 121 71 28 15 64 35 80 46 17 11 39 24 50 30 11 5 27 14 35 20 22 14 163 95 180 103 8 4 29 16 45 27 17 11 37 23 45 27s47 26 85 48c39 23 77 44 85 48s29 16 45 27c33 21 56 34 130 74 28 15 67 41 88 57l38 31-3 2035-3 2035-28 24c-24 21-267 169-307 187-8 4-28 16-45 27-16 11-39 24-50 30s-47 26-80 45-69 40-80 45c-11 6-33 19-50 30-16 11-37 23-45 27-8 3-31 16-50 28s-71 41-115 65c-44 23-87 48-95 55s-42 28-75 46-73 41-90 51c-16 10-37 21-45 25-8 3-33 18-55 32-54 35-66 41-127 75-29 16-64 36-78 43-14 8-38 23-55 33-16 11-37 23-45 27-14 6-199 114-230 133-8 6-22 13-30 17s-46 25-85 48c-38 22-77 44-85 48s-28 16-45 27c-16 11-37 23-45 27s-46 25-85 48c-38 22-77 44-85 48s-28 16-45 27c-16 11-37 23-45 27s-58 32-110 63-102 59-110 63-28 16-45 27c-16 11-37 23-45 27s-46 26-85 48c-38 23-77 44-85 48s-28 16-45 27c-16 11-37 23-45 27s-59 33-113 65-100 58-102 58-59 33-127 73-130 76-138 80-31 17-50 28c-108 66-149 79-190 61zm-1790-2267c14-8 36-14 50-15 14 0 45-6 70-14 42-14 87-26 213-60 101-27 172-48 218-62 26-8 57-14 70-14 13-1 33-8 44-18 20-17 200-224 235-271 5-7 58-29 120-50 123-43 111-42 789-48 683-6 680-6 830 35 21 6 154 158 248 283 34 45 68 59 243 95 24 5 66 16 181 48 31 9 64 16 74 16 18 0 89 18 175 46 85 27 88 25 139-86 11-25 25-52 30-60 25-40 161-317 161-328 0-7-4-20-9-30-5-9-17-37-26-62-10-25-23-58-30-75-8-16-27-65-44-107-17-43-45-113-62-155-17-43-36-91-44-108-7-16-20-50-30-75-9-25-23-58-30-75-7-16-20-50-30-75-9-25-23-58-30-75-7-16-20-50-30-75-9-25-23-58-30-75-7-16-20-50-30-75-9-25-23-58-30-75-7-16-20-50-30-75s-23-58-30-75c-7-16-21-50-30-75-10-25-23-58-30-75-7-16-21-50-30-75-10-25-23-58-30-75-7-16-21-50-30-75-10-25-23-58-30-75-7-16-21-50-30-75-10-25-23-58-30-75-8-16-28-66-45-110s-37-93-45-110c-7-16-20-50-30-75-9-25-23-58-30-75-7-16-20-50-30-75-9-25-23-58-30-75-7-16-20-50-30-75-9-25-23-58-30-75-7-16-21-50-31-75s-24-53-32-62c-12-14-146-110-200-143-9-5-43-30-76-55-71-54-129-96-216-155-36-25-96-67-135-94-38-27-127-89-198-137-70-48-130-91-133-95-9-15-71-10-84 6-7 8-16 15-21 15s-41 22-81 49c-101 68-281 185-293 191-5 3-37 23-70 45s-64 42-70 45c-5 3-43 28-83 55-40 28-81 55-90 60-9 6-64 42-122 80-58 39-109 72-115 74-19 7-65 55-65 67 0 7-6 25-14 41-8 15-22 48-31 73s-23 59-30 75c-14 33-39 98-62 160-8 22-21 54-28 70-7 17-20 49-29 73-9 23-23 61-32 85-9 23-22 56-29 72-7 17-20 49-29 73-30 80-49 127-61 157-7 17-21 50-30 75s-23 59-30 75c-7 17-19 48-28 70-8 22-22 60-32 85-9 25-23 59-30 75-14 33-39 98-62 160-8 22-21 54-28 70-12 30-33 83-62 160-9 22-21 54-28 70-7 17-21 50-30 75s-23 58-31 73c-8 16-14 35-14 42s-6 26-14 42c-8 15-22 48-31 73s-23 59-30 75c-12 30-31 77-61 158-9 23-22 56-29 72-7 17-19 48-28 70-40 107-50 133-91 228-9 21-16 49-16 62 0 21 34 100 71 165 4 8 18 35 29 60 12 25 25 52 30 60 11 17 45 88 55 110 3 8 11 24 18 35s20 35 30 53c19 35 30 38 67 17z"/>
+          </g>
+        </svg>
+      </div>
+      <h1><span class="exception-class"><%= error.class %></span> at <%= request.path %></h1>
+      <div class="exception-message"><%= error.message ? error.message.to_s.lines.first : "Error" %></div>
+    </header>
+    <% if !frames.empty? %>
+    <section class="exception-details">
+      <div class="code-previews">
+        <h2>Snippet</h2>
+        <% frames.each do |frame| %>
+        <div class="code-preview <% if frame.index > 0 %>hidden<% end %>" data-index="<%= frame.index %>">
+          <div class="filepath"><%= frame.filepath %></div>
+          <div class="snippet">
+            <%- if frame.snippet_lines.empty? -%>
+              <div class="lines-wrapper">No code available.</div>
+            <%- else -%>
+              <pre class="lines-wrapper">
+                <%- frame.snippet_lines.each do |snippet_line| -%><span class="line <% if snippet_line[2] %>highlighted<% end %>"><span class="number"><%= snippet_line[1] %></span><span class="code"><%= snippet_line[0].rstrip %></span></span>
+                <%- end -%>
+              </pre>
+            <%- end -%>
+          </div>
+        </div>
+        <% end %>
+      </div>
+      <div class="back-trace">
+        <h2>Traceback</h2>
+        <div class="traces">
+          <label><input type="checkbox" /> Show all traces<span class="checkmark"></span></label>
+          <ul class="trace-list">
+            <% frames.each do |frame| %>
+            <li class="trace-item <% if frame.index > 9 %>hideable<% end %>">
+              <button class="trace <% if frame.index == 0 %>selected<% end %>" data-index="<%= frame.index %>">
+                <span class="wrapper">
+                  <span class="filepath">
+                    <%= frame.filepath %><% if frame.line_number %><span class="line_number">:<%= frame.line_number %></span><% end %>
+                  </span>
+                </span>
+                <span class="dep-filename"><% if !frame.dep_name.nil? %><%= frame.dep_name %> &bull; <% end %><%= frame.filename %></span>
+              </button>
+            </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </section>
+    <% end %>
+    <script type="text/javascript">
+      document.addEventListener('DOMContentLoaded', () => {
+        function processShowAllTracesChange(target) {
+          if (target.checked) {
+            hideableTraceItems.forEach((item) => {
+              item.classList.add('displayed');
+            });
+          } else {
+            hideableTraceItems.forEach((item) => {
+              item.classList.remove('displayed');
+            });
+          }
+        }
+
+        const traceButtons = document.querySelectorAll('.back-trace .trace-item .trace');
+        const hideableTraceItems = document.querySelectorAll('.back-trace .trace-item.hideable');
+        const showAllTracesCheckbox = document.querySelector('.back-trace .traces label input');
+
+        showAllTracesCheckbox.addEventListener('change', (event) => {
+          processShowAllTracesChange(event.currentTarget);
+        });
+        processShowAllTracesChange(showAllTracesCheckbox);
+
+        traceButtons.forEach((item) => {
+          item.addEventListener('click', (event) => {
+            const target = event.currentTarget;
+            const index = target.dataset.index;
+
+            document.querySelector('.back-trace .trace.selected').classList.remove('selected');
+
+            document.querySelectorAll('.code-previews .code-preview').forEach((codePreviewItem) => {
+              if(codePreviewItem.dataset.index == index) {
+                codePreviewItem.classList.remove('hidden');
+              } else {
+                codePreviewItem.classList.add('hidden');
+              }
+            });
+
+            target.classList.add('selected');
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

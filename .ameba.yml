@@ -13,7 +13,7 @@ Layout/TrailingWhitespace:
   Enabled: true
 
 Lint/ComparisonToBoolean:
-  Enabled: true
+  Enabled: false
 
 Lint/DebuggerStatement:
   Enabled: true

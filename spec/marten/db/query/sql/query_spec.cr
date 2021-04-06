@@ -533,7 +533,7 @@ describe Marten::DB::Query::SQL::Query do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
-      tag_4 = Tag.using(:other).create!(name: "other", is_active: true)
+      Tag.using(:other).create!(name: "other", is_active: true)
 
       query_1 = Marten::DB::Query::SQL::Query(Tag).new
       query_1.using = "other"

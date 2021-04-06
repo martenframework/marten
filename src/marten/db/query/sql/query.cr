@@ -203,9 +203,27 @@ module Marten
             sql = build_sql do |s|
               s << "DELETE"
               s << "FROM #{table_name}"
-              s << @joins.join(" ") { |j| j.to_sql }
-              s << where
+
+              if @joins.empty?
+                s << where
+              else
+                # If the filters involve joins we are forced to rely on a subquery in order to fetch the IDs of the
+                # records to delete. Actually we even rely on subquery that fetches everything from an extra subquery in
+                # order to overcome the fact that MySQL doesn't allow to reference tables that are being updated or
+                # deleted within a subquery.
+                s << "WHERE #{Model.db_table}.#{Model.pk_field.db_column!} IN ("
+                s << "  SELECT * FROM ("
+                s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
+                s << "    FROM #{table_name}"
+                s << @joins.join(" ") { |j| j.to_sql }
+                s << where
+                s << "  ) subquery"
+                s << ")"
+              end
             end
+
+            # Note: we are not using limit/offset here because it should not be possible to delete using a sliced
+            # queryset (this is actually explicitly prevented).
 
             {sql, parameters}
           end

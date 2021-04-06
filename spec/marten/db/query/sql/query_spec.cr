@@ -543,5 +543,21 @@ describe Marten::DB::Query::SQL::Query do
       query_2 = Marten::DB::Query::SQL::Query(Tag).new
       query_2.execute.to_set.should eq(Set{tag_1, tag_2, tag_3})
     end
+
+    it "properly makes use of filters involving joins if applicable" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Bob", last_name: "Ka")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Foo", last_name: "Bar")
+
+      Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John"))
+      query.raw_delete.should eq 1
+
+      Marten::DB::Query::SQL::Query(Post).new.execute.to_set.should eq(Set{post_2, post_3})
+    end
   end
 end

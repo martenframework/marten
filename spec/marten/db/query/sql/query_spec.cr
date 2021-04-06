@@ -441,9 +441,9 @@ describe Marten::DB::Query::SQL::Query do
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
 
-      query_2 = Marten::DB::Query::SQL::Query(Tag).new
-      query_2.order("name")
-      query_2.execute.should eq [tag_3, tag_2, tag_1]
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.execute.should eq [tag_3, tag_2, tag_1]
     end
 
     it "can configure a query to be ordered by a single field in reverse order" do
@@ -451,9 +451,97 @@ describe Marten::DB::Query::SQL::Query do
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
 
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("-name")
+      query.execute.should eq [tag_1, tag_2, tag_3]
+    end
+
+    it "can configure a query to be ordered by multiple fields" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Foo", last_name: "Bar")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Bob", last_name: "Ka")
+      user_4 = TestUser.create!(username: "u4", email: "u4@example.com", first_name: "John", last_name: "Arg")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.order("first_name", "last_name")
+      query.execute.should eq [user_3, user_2, user_4, user_1]
+    end
+
+    it "can configure a query to be ordered by multiple fields in various orders" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Foo", last_name: "Bar")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Bob", last_name: "Ka")
+      user_4 = TestUser.create!(username: "u4", email: "u4@example.com", first_name: "John", last_name: "Arg")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.order("first_name", "-last_name")
+      query.execute.should eq [user_3, user_2, user_1, user_4]
+    end
+
+    it "properly makes use of joins" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Bob", last_name: "Ka")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Foo", last_name: "Bar")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.order("author__first_name")
+      query.execute.should eq [post_2, post_3, post_1]
+    end
+  end
+
+  describe "#ordered?" do
+    it "returns true if the query is ordered" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.ordered?.should be_true
+    end
+
+    it "returns false if the query is not ordered" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.ordered?.should be_false
+    end
+  end
+
+  describe "#raw_delete" do
+    it "performs a raw delete and returns the number of deleted rows" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.raw_delete.should eq 3
+      query.exists?.should be_false
+    end
+
+    it "returns 0 if no rows are currently targetted by the query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "z"))
+      query.raw_delete.should eq 0
+
+      Marten::DB::Query::SQL::Query(Tag).new.execute.to_set.should eq(Set{tag_1, tag_2, tag_3})
+    end
+
+    it "makes use of the specified DB connection" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.using(:other).create!(name: "other", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.using = "other"
+      query_1.raw_delete.should eq 1
+      query_1.exists?.should be_false
+
       query_2 = Marten::DB::Query::SQL::Query(Tag).new
-      query_2.order("-name")
-      query_2.execute.should eq [tag_1, tag_2, tag_3]
+      query_2.execute.to_set.should eq(Set{tag_1, tag_2, tag_3})
     end
   end
 end

@@ -98,6 +98,18 @@ describe Marten::HTTP::Params::Query do
     end
   end
 
+  describe "#each" do
+    it "allows to iterate over key and values as expected" do
+      params = Marten::HTTP::Params::Query.new(
+        Marten::HTTP::Params::Query::RawHash{"foo" => ["bar"]}
+      )
+      params.each do |key, values|
+        key.should eq "foo"
+        values.should eq ["bar"]
+      end
+    end
+  end
+
   describe "#fetch" do
     it "returns the last value of a single-value parameter" do
       params = Marten::HTTP::Params::Query.new(

@@ -41,6 +41,9 @@ module Marten
           @params.reduce(0) { |acc, (_, v)| acc + (v.size > 0 ? v.size : 1) }
         end
 
+        # Allows to iterate over all the parameters.
+        delegate each, to: @params
+
         # Returns `true` if no parameters are present.
         delegate empty?, to: @params
 

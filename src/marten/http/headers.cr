@@ -2,6 +2,8 @@ module Marten
   module HTTP
     # Represents a set of HTTP headers extracted from an HTTP request.
     class Headers
+      include Enumerable({String, Array(String)})
+
       def initialize(@headers : ::HTTP::Headers)
       end
 
@@ -25,6 +27,9 @@ module Marten
       def fetch(name : String | Symbol, default = nil)
         @headers.fetch(name.to_s, default)
       end
+
+      # Allows to iterate over all the headers.
+      delegate each, to: @headers
 
       # Returns the number of headers.
       delegate size, to: @headers

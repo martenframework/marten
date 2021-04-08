@@ -58,6 +58,16 @@ describe Marten::HTTP::Headers do
     end
   end
 
+  describe "#each" do
+    it "allows to iterate over the keys and values" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.each do |key, value|
+        key.should eq "Content-Type"
+        value.should eq ["application/json"]
+      end
+    end
+  end
+
   describe "#has_key?" do
     it "returns true if the header is present" do
       headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})

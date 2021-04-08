@@ -240,6 +240,59 @@
         color: #fff;
       }
 
+      section.information {
+        background-color: #fff;
+        color: rgba(10,10,10,.9);
+        white-space: nowrap;
+      }
+
+      section.information h2 {
+        margin-top: 0;
+        color: #1f2d3b;
+      }
+
+      section.information dl {
+        margin-top: 0;
+        margin-bottom: 0.2rem;
+        font-size: 0.8rem !important;
+      }
+
+      section.information dl > dt {
+        width: 20%;
+        float: left;
+        overflow: hidden;
+        font-weight: bold;
+        color: #2b3e50;
+      }
+
+      section.information dl pre {
+        margin: 0;
+      }
+
+      section.information > .general {
+        margin: 0 1rem;
+        margin-bottom: 2rem;
+      }
+
+      section.information > .request-details {
+        margin: 0 1rem;
+      }
+
+      section.information > .request-details table.request-key-values tbody td {
+        padding-right: 1rem;
+        border-top: 1px dashed #ccc;
+      }
+
+      section.information > .request-details table.request-key-values th {
+        padding-right: 1rem;
+        text-align: left;
+      }
+
+      footer > .dislaimer {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #bbb;
+      }
     </style>
   </head>
   <body>
@@ -295,6 +348,120 @@
         </div>
       </div>
     </section>
+    <section class="information">
+      <div class="general">
+        <h2>General information</h2>
+        <dl>
+          <dt>Request method</dt>
+          <dd><pre><%= request.method %></pre></dd>
+        </dl>
+        <dl>
+          <dt>Full path</dt>
+          <dd><pre><%= request.full_path %></pre></dd>
+        </dl>
+        <dl>
+          <dt>Exception class</dt>
+          <dd><pre><%= error.class %></pre></dd>
+        </dl>
+        <dl>
+          <dt>Exception message</dt>
+          <dd><pre><%= error.message %></pre></dd>
+        </dl>
+        <dl>
+          <dt>Marten version</dt>
+          <dd><pre><%= Marten::VERSION %></pre></dd>
+        </dl>
+        <dl>
+          <dt>Crystal version</dt>
+          <dd><pre><%= Crystal::VERSION %></pre></dd>
+        </dl>
+        <dl>
+          <dt>Server time</dt>
+          <dd><pre><%= Time.local.to_s %></pre></dd>
+        </dl>
+      </div>
+      <div class="request-details">
+        <h2>Request detail</h2>
+        <dl>
+          <dt>Query params</dt>
+          <dd>
+            <% if request.query_params.empty? %>
+            No query params
+            <% else %>
+            <table class="request-key-values" cellspacing="0" cellpadding="0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% request.query_params.each do |key, values| %>
+                  <tr>
+                    <td><pre><%= key %></pre></td>
+                    <td><pre><%= values %></pre></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <% end %>
+          </dd>
+        </dl>
+        <dl>
+          <dt>Data</dt>
+          <dd>
+            <% if request.data.empty? %>
+            No data
+            <% else %>
+            <table class="request-key-values" cellspacing="0" cellpadding="0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% request.data.each do |key, values| %>
+                  <tr>
+                    <td><pre><%= key %></pre></td>
+                    <td><pre><%= values %></pre></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <% end %>
+          </dd>
+        </dl>
+        <dl>
+          <dt>Headers</dt>
+          <dd>
+            <% if request.headers.empty? %>
+            No headers
+            <% else %>
+            <table class="request-key-values" cellspacing="0" cellpadding="0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Value</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% request.headers.each do |key, values| %>
+                  <tr>
+                    <td><pre><%= key %></pre></td>
+                    <td><pre><%= values %></pre></td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+            <% end %>
+          </dd>
+        </dl>
+      </div>
+    </section>
+    <footer>
+      <p class="dislaimer">You are seeing this page because Marten is running in debug mode.</p>
+    </footer>
     <% end %>
     <script type="text/javascript">
       document.addEventListener('DOMContentLoaded', () => {

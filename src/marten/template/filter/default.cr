@@ -7,7 +7,7 @@ module Marten
       # truthy. A filter argument is mandatory. It should be noted that empty strings are considered and will be
       # returned by this filter.
       class Default < Base
-        def apply(value : Value, arg : Value?) : Value
+        def apply(value : Value, arg : Value? = nil) : Value
           raise Errors::InvalidSyntax.new("The 'default' filter requires one argument") if arg.nil?
           value.truthy? ? value : arg.not_nil!
         end

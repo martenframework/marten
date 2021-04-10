@@ -27,5 +27,15 @@ describe Marten::Template::Filter::Default do
       filter.apply(Marten::Template::Value.from(42), Marten::Template::Value.from("default")).should eq 42
       filter.apply(Marten::Template::Value.from("hello"), Marten::Template::Value.from("default")).should eq "hello"
     end
+
+    it "raises if the initial value is not specified" do
+      filter = Marten::Template::Filter::Default.new
+      expect_raises(
+        Marten::Template::Errors::InvalidSyntax,
+        "The 'default' filter requires one argument"
+      ) do
+        filter.apply(Marten::Template::Value.from(42))
+      end
+    end
   end
 end

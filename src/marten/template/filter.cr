@@ -25,6 +25,7 @@ module Marten
       end
 
       register "default", Default
+      register "upcase", UpCase
     end
   end
 end

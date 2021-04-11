@@ -2,25 +2,40 @@ module Marten
   module Template
     # A template variable.
     #
-    # A template variable's value access such as "foo.bar".
+    # A template variable's value access such as "foo.bar". It can also correspond to a literal value such as '42' or
+    # '"hello"'.
     class Variable
-      @lookups : Array(String)
+      @literal : Value? = nil
+      @lookups : Array(String)? = nil
 
       def initialize(raw : String)
-        # TODO: handle literals
-        @lookups = raw.split(ATTRIBUTE_SEPARATOR)
+        # First try to see of the raw variable is literal number.
+        begin
+          @literal = Value.from(raw.to_f)
+        rescue ArgumentError
+        end
+
+        # Then, try to see if it is a literal string (single-quoted or double-quoted) and otherwise consider that it is
+        # a standard variable access.
+        if @literal.nil? && ['\'', '"'].includes?((quote_char = raw[0])) && quote_char == raw[-1]
+          @literal = Value.from(raw[1..-2].gsub(%{\\#{quote_char}}, quote_char))
+        else
+          @lookups = raw.split(ATTRIBUTE_SEPARATOR)
+        end
       end
 
       def resolve(context : Context)
+        return @literal.not_nil! unless @literal.nil?
+
         current = nil
 
-        @lookups.each_with_index do |bit, i|
+        @lookups.not_nil!.each_with_index do |bit, i|
           current = if i == 0
                       context[bit]
                     else
                       current.not_nil![bit]
                     end
-        rescue Errors::UnknownVariable
+        rescue KeyError | Errors::UnknownVariable
           raise Errors::UnknownVariable.new("Failed lookup for attribute '#{bit}' in '#{current}")
         end
 

@@ -7,7 +7,7 @@ module Marten
 
       # Returns the filter object corresponding to the passed `filter_name`.
       #
-      # If no database connection can be found, a `Marten::DB::Errors::UnknownConnection` exception is raised.
+      # If no filter can be found, a `Marten::Template::Errors::InvalidSyntax` exception is raised.
       def self.get(filter_name : String | Symbol)
         registry[filter_name.to_s]
       rescue KeyError

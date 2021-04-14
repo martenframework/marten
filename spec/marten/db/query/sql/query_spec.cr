@@ -560,4 +560,117 @@ describe Marten::DB::Query::SQL::Query do
       Marten::DB::Query::SQL::Query(Post).new.execute.to_set.should eq(Set{post_2, post_3})
     end
   end
+
+  describe "#slice" do
+    it "allows to configure an offset on a non-sliced query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.order("name")
+      query_1.slice(1)
+      query_1.count.should eq 2
+      query_1.execute.should eq [tag_2, tag_1]
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("name")
+      query_2.slice(2)
+      query_2.count.should eq 1
+      query_2.execute.should eq [tag_1]
+    end
+
+    it "allows to configure an offset and a limit on a non-sliced query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.order("name")
+      query_1.slice(1, 1)
+      query_1.count.should eq 1
+      query_1.execute.should eq [tag_2]
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.order("name")
+      query_2.slice(1, 2)
+      query_2.count.should eq 2
+      query_2.execute.should eq [tag_2, tag_1]
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.order("name")
+      query_3.slice(2, 1)
+      query_3.count.should eq 1
+      query_3.execute.should eq [tag_1]
+    end
+
+    it "can apply a new offset to an already sliced query if it is within the current limits" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.slice(1, 2)
+      query.slice(1)
+      query.execute.should eq [tag_1]
+    end
+
+    it "does not return results that are outside of the current bounds when a new offset without limit is used" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "xyz", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.slice(1, 2)
+      query.slice(1)
+      query.execute.should eq [tag_1]
+    end
+
+    it "does not return results that are outside of the current bounds when a new offset with limit is used" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "xyz", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.slice(1, 2)
+      query.slice(1, 6)
+      query.execute.should eq [tag_1]
+    end
+
+    it "returns an empty set if the new offset falls outside of the current limits" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.slice(1, 2)
+      query.slice(4)
+      query.execute.should be_empty
+    end
+  end
+
+  describe "#sliced?" do
+    it "returns true if the query is sliced using only an offset" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.slice(4)
+      query.sliced?.should be_true
+    end
+
+    it "returns true if the query is sliced using only an offset and a limit" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.slice(4, 10)
+      query.sliced?.should be_true
+    end
+
+    it "returns true if the query is not sliced" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.sliced?.should be_false
+    end
+  end
 end

@@ -119,8 +119,6 @@ module Marten
             new_limit = nil
             if @limit.nil?
               new_limit = size.to_i64 unless size.nil?
-            elsif size.nil?
-              new_limit = @limit
             else
               new_limit = (@offset.not_nil! + @limit.not_nil!) - new_offset
             end

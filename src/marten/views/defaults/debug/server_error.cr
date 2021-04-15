@@ -32,6 +32,24 @@ module Marten
             end
           end
 
+          def template_snippet_lines
+            return if !error.is_a?(Marten::Template::Errors::InvalidSyntax)
+
+            tpl_error = error.as(Marten::Template::Errors::InvalidSyntax)
+
+            return if tpl_error.source.nil? || tpl_error.token.nil?
+
+            lines = [] of Tuple(String, Int32, Bool)
+
+            errored_line_number = tpl_error.token.not_nil!.line_number
+            lines += tpl_error.source.not_nil!.lines.map_with_index do |code, line_index|
+              next unless (errored_line_number - 10..errored_line_number + 10).includes?(line_index + 1)
+              {code, line_index + 1, line_index + 1 == errored_line_number}
+            end
+
+            lines.compact
+          end
+
           private BACKTRACE_FRAME_RE = /\s(?<file>[^\s\:]+):(?<line_number>\d+)/
 
           private def render_server_error_page

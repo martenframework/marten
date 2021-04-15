@@ -9,11 +9,10 @@ module Marten
     # contains the set of nodes that were generated from the parsing process. These nodes are all able to be rendered
     # in order to then generate a final output for a given context.
     class Parser
-      def initialize(source : String)
-        @tokens = Lexer.new(source).tokenize
-      end
+      @tokens : Array(Parser::Token)
 
-      def initialize(@tokens : Array(Token))
+      def initialize(@source : String)
+        @tokens = Lexer.new(@source).tokenize
       end
 
       # Generates a set of nodes from the lexical tokens.
@@ -32,6 +31,13 @@ module Marten
         end
 
         nodes
+      rescue e : Errors::InvalidSyntax
+        if Marten.settings.debug && e.source.nil? && e.token.nil?
+          e.source = @source
+          e.token = token
+        end
+
+        raise e
       end
 
       private def raise_syntax_error(msg)

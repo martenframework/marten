@@ -8,6 +8,16 @@ module Marten
         def initialize(@path : String)
         end
 
+        def get_template(template_name) : Template
+          super
+        rescue e : Errors::InvalidSyntax
+          if Marten.settings.debug && e.filepath.nil?
+            e.filepath = File.join(@path, template_name).to_s
+          end
+
+          raise e
+        end
+
         def get_template_source(template_name) : String
           template_fpath = File.join(@path, template_name)
 

@@ -2,7 +2,11 @@ module Marten
   module Template
     module Errors
       # Represents an error raised if a syntax error is detected when parsing a template.
-      class InvalidSyntax < Exception; end
+      class InvalidSyntax < Exception
+        property filepath : String? = nil
+        property source : String? = nil
+        property token : Parser::Token? = nil
+      end
 
       # Represents an error raised when a template cannot be found.
       class TemplateNotFound < Exception; end

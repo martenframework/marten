@@ -16,18 +16,32 @@ module Marten
       end
 
       # Generates a set of nodes from the lexical tokens.
-      def parse : NodeSet
+      def parse(up_to : Array(String)? = nil) : NodeSet
         nodes = NodeSet.new
 
         while !@tokens.empty?
-          token = @tokens.shift
+          token = shift_token
 
           if token.type.text?
             nodes.add(Node::Text.new(token.content))
           elsif token.type.variable?
             raise_syntax_error("Empty variable detected on line #{token.line_number}") if token.content.empty?
             nodes.add(Node::Variable.new(token.content))
+          elsif token.type.tag?
+            raise_syntax_error("Empty tag detected on line #{token.line_number}") if token.content.empty?
+
+            tag_name = token.content.split.first
+            if !up_to.nil? && up_to.includes?(tag_name)
+              @tokens.unshift(token)
+              return nodes
+            end
+
+            nodes.add(Node::Tag.new(self, token.content))
           end
+        end
+
+        if !up_to.nil?
+          raise_syntax_error("Unclosed tags, expected: #{up_to.join(", ")}")
         end
 
         nodes
@@ -38,6 +52,11 @@ module Marten
         end
 
         raise e
+      end
+
+      # Extracts the next token from the available lexical tokens.
+      def shift_token
+        @tokens.shift
       end
 
       private def raise_syntax_error(msg)

@@ -276,18 +276,21 @@ module Marten
             final_parameters += where_parameters if !where_parameters.nil?
 
             sql = if !where_parameters.nil? && !@joins.empty?
-                    sub_query = build_sql do |s|
-                      s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column!}"
-                      s << "FROM #{table_name}"
-                      s << @joins.join(" ") { |j| j.to_sql }
-                      s << where
-                    end
-
+                    # Construct an update query involving subqueries in order to counteract the fact that we have to
+                    # rely on joined tables. The extra subquery is necessary because MySQL doesn't allow to reference
+                    # update tables in a where clause.
                     build_sql do |s|
                       s << "UPDATE"
                       s << table_name
                       s << "SET #{column_names}"
-                      s << "WHERE #{Model.pk_field.db_column!} IN (#{sub_query})"
+                      s << "WHERE #{Model.db_table}.#{Model.pk_field.db_column!} IN ("
+                      s << "  SELECT * FROM ("
+                      s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
+                      s << "    FROM #{table_name}"
+                      s << @joins.join(" ") { |j| j.to_sql }
+                      s << where
+                      s << "  ) subquery"
+                      s << ")"
                     end
                   else
                     build_sql do |s|

@@ -743,7 +743,7 @@ describe Marten::DB::Query::SQL::Query do
       user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
       user_3 = TestUser.create!(username: "fix", email: "fix@example.com", first_name: "John", last_name: "Doe")
 
-      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_1 = Post.create!(author: user_3, title: "Post 1")
       post_2 = Post.create!(author: user_2, title: "Post 2")
       post_3 = Post.create!(author: user_3, title: "Post 3")
 

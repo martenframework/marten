@@ -3,7 +3,7 @@ module Marten
     module Filter
       # The "upcase" filter.
       #
-      # The "upcase" filter allows to convert a string so hat each of its character is uppercase.
+      # The "upcase" filter allows to convert a string so that each of its character is uppercase.
       class UpCase < Base
         def apply(value : Value, arg : Value? = nil) : Value
           Value.from(value.to_s.upcase)

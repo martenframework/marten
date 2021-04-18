@@ -51,6 +51,22 @@ module Marten
             )
           end
 
+          def clone
+            self.class.new(
+              default_ordering: @default_ordering,
+              joins: @joins,
+              limit: @limit,
+              offset: @offset,
+              order_clauses: @order_clauses,
+              predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
+              using: @using
+            )
+          end
+
+          def connection
+            @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
+          end
+
           def count
             sql, parameters = build_count_query
             connection.open do |db|
@@ -162,23 +178,6 @@ module Marten
               result = db.exec(sql, args: parameters)
               result.rows_affected
             end
-          end
-
-          protected def clone
-            cloned = self.class.new(
-              default_ordering: @default_ordering,
-              joins: @joins,
-              limit: @limit,
-              offset: @offset,
-              order_clauses: @order_clauses,
-              predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
-              using: @using
-            )
-            cloned
-          end
-
-          protected def connection
-            @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
           private def build_count_query

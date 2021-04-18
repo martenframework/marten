@@ -203,6 +203,92 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#clone" do
+    it "results in a new object" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.clone.object_id.should_not eq query.object_id
+    end
+
+    it "properly clones a query by respecting the default ordering" do
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.default_ordering = true
+      query_1.clone.default_ordering.should be_true
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.default_ordering = false
+      query_2.clone.default_ordering.should be_false
+    end
+
+    it "properly clones a query by respecting joins" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_selected_join("author")
+
+      results = query.clone.execute
+
+      results[0].__query_spec_author.should eq user_1
+      results[1].__query_spec_author.should eq user_2
+    end
+
+    it "properly clones a query by respecting limits and offsets" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("id")
+      query.slice(1, 2)
+      query.clone.execute.should eq [tag_2, tag_3]
+    end
+
+    it "properly clones a query by respecting order clauses" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+      query.clone.execute.should eq [tag_3, tag_2, tag_1]
+    end
+
+    it "properly clones a query by respecting predicates" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+      query.clone.execute.should eq [tag_1]
+    end
+
+    it "properly clones a query by respecting the active DB alias" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.using(:other).create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.using = "other"
+      query.clone.count.should eq 1
+    end
+  end
+
+  describe "#connection" do
+    it "returns the model connection by default" do
+      Marten::DB::Query::SQL::Query(Tag).new.connection.should eq Tag.connection
+    end
+
+    it "returns the specified connection if applicable" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.using = "other"
+      query.connection.should eq Marten::DB::Connection.get("other")
+    end
+  end
+
   describe "#count" do
     it "returns the expected number of results for an unfiltered query" do
       Tag.create!(name: "ruby", is_active: true)

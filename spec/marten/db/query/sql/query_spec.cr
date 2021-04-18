@@ -165,6 +165,44 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#add_selected_join" do
+    it "allows to specify a relation to join" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_selected_join("author")
+
+      results = query.execute
+
+      results[0].__query_spec_author.should eq user_1
+      results[1].__query_spec_author.should eq user_2
+    end
+
+    it "raises if the passed field is not a relation" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Unable to resolve 'title' as a relation field. Valid choices are:"
+      ) do
+        query.add_selected_join("title")
+      end
+    end
+
+    it "raises if the passed field is a reverse relation" do
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Unable to resolve 'posts' as a relation field. Valid choices are:"
+      ) do
+        query.add_selected_join("posts")
+      end
+    end
+  end
+
   describe "#count" do
     it "returns the expected number of results for an unfiltered query" do
       Tag.create!(name: "ruby", is_active: true)
@@ -672,5 +710,135 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Tag).new
       query.sliced?.should be_false
     end
+  end
+
+  describe "#update_with" do
+    it "allows to update the records matching a given query and returns the number of affected rows" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(first_name: "John"))
+      query.update_with({"last_name" => "Updated", "is_admin" => true}).should eq 2
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Abc"
+      user_3.is_admin.should be_falsey
+    end
+
+    it "is able to update a specific relation field" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "fix", email: "fix@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+      query.update_with({"author" => user_1}).should eq 2
+
+      post_1.reload
+      post_1.author.should eq user_1
+
+      post_2.reload
+      post_2.author.should eq user_2
+
+      post_3.reload
+      post_3.author.should eq user_1
+    end
+
+    it "raises if the passed relation object is not persisted" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "fix", email: "fix@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+
+      new_user = TestUser.new
+
+      expect_raises(
+        Marten::DB::Errors::UnexpectedFieldValue,
+        "#{new_user} is not persisted and cannot be used in update queries"
+      ) do
+        query.update_with({"author" => new_user})
+      end
+    end
+
+    it "returns 0 if no rows are updated" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(first_name: "Unknown"))
+      query.update_with({:last_name => "Updated", :is_admin => true}).should eq 0
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Doe"
+      user_1.is_admin.should be_falsey
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Bar"
+      user_2.is_admin.should be_falsey
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Abc"
+      user_3.is_admin.should be_falsey
+    end
+
+    it "allows to update records as expected when a query involves joins" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "fix", email: "fix@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+      query.update_with({"title" => "Updated"}).should eq 2
+
+      post_1.reload
+      post_1.title.should eq "Updated"
+
+      post_2.reload
+      post_2.title.should eq "Post 2"
+
+      post_3.reload
+      post_3.title.should eq "Updated"
+    end
+  end
+end
+
+class Post
+  def __query_spec_author
+    @author
+  end
+
+  def __query_spec_updated_by
+    @updated_by
   end
 end

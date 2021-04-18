@@ -44,6 +44,13 @@ module Marten
             end
           end
 
+          def add_selected_join(relation : String) : Nil
+            ensure_join_for_field_path(
+              verify_field(relation, only_relations: true, allow_reverse_relations: false),
+              selected: true
+            )
+          end
+
           def count
             sql, parameters = build_count_query
             connection.open do |db|
@@ -137,6 +144,11 @@ module Marten
             values.each do |name, value|
               field = get_relation_field(name, Model, silent: true) || get_field(name, Model)
               next unless field.db_column?
+
+              if value.is_a?(DB::Model) && !value.persisted?
+                raise Errors::UnexpectedFieldValue.new("#{value} is not persisted and cannot be used in update queries")
+              end
+
               values_to_update[field.db_column!] = case value
                                                    when Field::Any
                                                      field.to_db(value)
@@ -150,13 +162,6 @@ module Marten
               result = db.exec(sql, args: parameters)
               result.rows_affected
             end
-          end
-
-          protected def add_selected_join(relation : String) : Nil
-            ensure_join_for_field_path(
-              verify_field(relation, only_relations: true, allow_reverse_relations: false),
-              selected: true
-            )
           end
 
           protected def clone
@@ -379,7 +384,7 @@ module Marten
             model.get_relation_field(raw_relation.to_s)
           rescue Errors::UnknownField
             return nil if silent
-            raise_invalid_field_error_with_valid_choices(raw_relation, model)
+            raise_invalid_field_error_with_valid_choices(raw_relation, model, "relation field")
           end
 
           private def order_by
@@ -408,10 +413,10 @@ module Marten
             predicate_node
           end
 
-          private def raise_invalid_field_error_with_valid_choices(raw_field, model)
+          private def raise_invalid_field_error_with_valid_choices(raw_field, model, field_type = "field")
             valid_choices = model.fields.join(", ") { |f| f.id }
             raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_field}' as a field. Valid choices are: #{valid_choices}."
+              "Unable to resolve '#{raw_field}' as a #{field_type}. Valid choices are: #{valid_choices}."
             )
           end
 

@@ -36,7 +36,14 @@ module Marten
                       current.not_nil![bit]
                     end
         rescue KeyError | Errors::UnknownVariable
-          raise Errors::UnknownVariable.new("Failed lookup for attribute '#{bit}' in '#{current}")
+          raise Errors::UnknownVariable.new(
+            String.build do |s|
+              s << "Failed lookup for attribute '"
+              s << bit.to_s
+              s << "'"
+              s << " in " + current.to_s if current.is_a?(Context)
+            end
+          )
         end
 
         current.not_nil!

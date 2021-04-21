@@ -36,6 +36,13 @@ require "./spec_helper"
       end
     end
 
+    describe "#max_name_size" do
+      it "returns the expected value" do
+        conn = Marten::DB::Connection.default
+        conn.max_name_size.should eq 128
+      end
+    end
+
     describe "#operator_for" do
       it "returns the expected operator for a contains predicate" do
         conn = Marten::DB::Connection.default

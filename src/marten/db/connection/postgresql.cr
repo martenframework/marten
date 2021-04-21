@@ -34,6 +34,10 @@ module Marten
           value
         end
 
+        def max_name_size : Int32
+          63
+        end
+
         def operator_for(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end

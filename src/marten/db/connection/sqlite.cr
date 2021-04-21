@@ -31,6 +31,10 @@ module Marten
           value.nil? ? -1 : value
         end
 
+        def max_name_size : Int32
+          128
+        end
+
         def operator_for(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end

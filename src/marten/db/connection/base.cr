@@ -36,6 +36,9 @@ module Marten
         # Returns a compatible value to use in the context of a LIMIT statement for the database at hand.
         abstract def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
 
+        # Returns the maximum size for table names, column names or index / constraint names.
+        abstract def max_name_size : Int32
+
         # Returns the operator to use for a specific query predicate.
         abstract def operator_for(predicate) : String
 

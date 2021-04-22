@@ -161,6 +161,10 @@ module Marten
           )
         end
 
+        def self.db_unique_constraint(fields : Array(String) | Array(Symbol), name : String | Symbol) : Nil
+          # @unique_constraints << Constraint::Unique.new(...)
+        end
+
         # Allows to read the value of a specific field.
         #
         # This methods returns the value of the field corresponding to `field_name`. If the passed `field_name` doesn't

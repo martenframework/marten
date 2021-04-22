@@ -9,6 +9,8 @@ module Marten
       class Statement
         alias ReferenceTypes = Columns | ForeignKeyName | IndexName | Table
 
+        getter params
+
         def initialize(@template : String, **kwargs)
           @params = Hash(String, ReferenceTypes).new
           @params.merge!(kwargs.to_h.transform_keys(&.to_s))

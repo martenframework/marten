@@ -1,6 +1,7 @@
 # Marten - The pragmatic web framework.
 
 require "db"
+require "digest/md5"
 require "ecr/macros"
 require "http"
 require "i18n"

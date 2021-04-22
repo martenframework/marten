@@ -227,7 +227,25 @@ module Marten
           end
 
           private def index_name(table_name, columns, suffix)
-            "index_#{table_name}_on_#{columns.join("_")}#{suffix}"
+            index_name = "index_#{table_name}_on_#{columns.join("_")}#{suffix}"
+            return index_name if index_name.size <= @connection.max_name_size
+
+            digest = Digest::MD5.new
+            digest.update(table_name)
+            columns.each { |c| digest.update(c) }
+            index_suffix = digest.final.hexstring[...8] + suffix
+
+            remaining_size = @connection.max_name_size - index_suffix.size - 8
+
+            String.build do |s|
+              s << "index_"
+
+              table_columns = "#{table_name}_#{columns.join("_")}"[..remaining_size]
+              s << table_columns
+              s << "_" unless table_columns.ends_with?('_')
+
+              s << index_suffix
+            end
           end
 
           private def statement_columns(*args, **kwargs)

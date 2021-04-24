@@ -10,7 +10,7 @@ module Marten
 
             # :nodoc:
             # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
-            # Although this method is public (because it's generated for all models), it used internally by Marten to
+            # Although this method is public (because it's generated for all models), it is used internally by Marten to
             # ensure correct behaviours when deleting records.
             def self._base_queryset
               Marten::DB::Query::Set(self).new

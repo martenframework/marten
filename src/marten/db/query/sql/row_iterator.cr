@@ -23,7 +23,7 @@ module Marten
             # join. This is done to allow the next appropriate join relation to be read properly by the next row
             # iterator and to handle the case of null foreign keys for example.
 
-            each_local_column { |rs, _c| rs.read(::DB::Any) }
+            each_local_column { |rs, _c| rs.read(Int8 | ::DB::Any) }
             each_joined_relation { |ri, _c| ri.advance }
           end
 

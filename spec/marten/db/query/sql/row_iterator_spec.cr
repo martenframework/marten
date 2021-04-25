@@ -86,7 +86,7 @@ describe Marten::DB::Query::SQL::RowIterator do
                   column_name.should eq "author_id"
                   rs.read(Int64).should eq user_2.id
                 else
-                  rs.read(::DB::Any)
+                  rs.read(Int8 | ::DB::Any)
                 end
 
                 inner_iteration += 1
@@ -179,7 +179,7 @@ describe Marten::DB::Query::SQL::RowIterator do
           result_set.each do
             row_iterator = Marten::DB::Query::SQL::RowIterator.new(Post, result_set, [join])
 
-            row_iterator.each_local_column { |rs, _| rs.read(::DB::Any) }
+            row_iterator.each_local_column { |rs, _| rs.read(Int8 | ::DB::Any) }
 
             inner_iteration = 0
 
@@ -201,7 +201,7 @@ describe Marten::DB::Query::SQL::RowIterator do
                   column_name.should eq "username"
                   rs.read(String).should eq user_2.username
                 else
-                  rs.read(::DB::Any)
+                  rs.read(Int8 | ::DB::Any)
                 end
 
                 relation_iteration += 1

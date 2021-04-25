@@ -2,6 +2,11 @@ module Marten
   module DB
     module Query
       module SQL
+        # Allows to iterate over the rows of a result set.
+        #
+        # The `RowIterator` class allows to easily iterate over each local column of a given model and each of its
+        # associated relations so that they can in turn be initialized properly from their local column values when
+        # selected joins are used.
         class RowIterator
           getter cursor
 

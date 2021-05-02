@@ -24,6 +24,7 @@ module Marten
         @@registry
       end
 
+      register "if", If
       register "spaceless", Spaceless
     end
   end

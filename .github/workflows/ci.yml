@@ -19,8 +19,8 @@ jobs:
         run: make qa
   specs:
     runs-on: ubuntu-latest
-    container:
-      image: crystallang/crystal:1.0.0
+    # container:
+    #   image: crystallang/crystal:1.0.0
     services:
       postgres:
         image: postgres:10.8
@@ -49,18 +49,25 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v2
+    - name: Install Crystal
+      uses: oprypin/install-crystal@v1
+      with:
+        crystal: 1.0.0
+    - name: Ensure everything is up to date
+      run: |
+        sudo apt-get update
     - name: Install packages required for MySQL
       if: matrix.db == 'mysql'
       run: |
-        apt-get -yqq install mysql-client libmysqlclient-dev
+        sudo apt-get -yqq install mysql-client libmysqlclient-dev
     - name: Install packages required for PostgreSQL
       if: matrix.db == 'postgresql'
       run: |
-        apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev
+        sudo apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev
     - name: Install packages required for SQLite
       if: matrix.db == 'sqlite'
       run: |
-        apt-get -yqq install libsqlite3-dev
+        sudo apt-get -yqq install libsqlite3-dev
     - name: Create additional DB for MySQL
       if: matrix.db == 'mysql'
       run: |

@@ -12,8 +12,9 @@ module Marten
           end
 
           private REGISTRY = {
-            "||" => Operator::Or,
-            "&&" => Operator::And,
+            "||"  => Operator::Or,
+            "&&"  => Operator::And,
+            "not" => Operator::Not,
           }
         end
       end

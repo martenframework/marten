@@ -4,12 +4,17 @@ module Marten
       module Token
         # A condition value token.
         class Value < Base
+          @filter_expression : FilterExpression?
+
           def initialize(source : String)
             @filter_expression = FilterExpression.new(source)
           end
 
+          def initialize
+          end
+
           def eval(context : Context) : Marten::Template::Value
-            @filter_expression.resolve(context)
+            @filter_expression.not_nil!.resolve(context)
           end
 
           def id : String

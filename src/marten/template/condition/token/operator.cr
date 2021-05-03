@@ -15,6 +15,7 @@ module Marten
             "||"  => Operator::Or,
             "&&"  => Operator::And,
             "not" => Operator::Not,
+            "=="  => Operator::Equal,
           }
         end
       end

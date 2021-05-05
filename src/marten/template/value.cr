@@ -2,6 +2,8 @@ module Marten
   module Template
     # A template value.
     class Value
+      include Enumerable(self)
+
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) | Nil | String |
                   Time
 
@@ -42,6 +44,10 @@ module Marten
         @raw == other
       end
 
+      def each
+        yield_each_from_raw { |r| yield Value.from(r) }
+      end
+
       # :nodoc:
       def to_s(io)
         @raw.to_s(io)
@@ -61,6 +67,19 @@ module Marten
         end
 
         raise Errors::UnknownVariable.new
+      end
+
+      private def yield_each_from_raw
+        case object = raw
+        when Hash
+          object.keys.each { |k| yield k.as(Value).raw }
+        when Iterable(Value)
+          object.each { |v| yield v.as(Value).raw }
+        when Iterable
+          object.each { |v| yield v }
+        else
+          raise Errors::UnsupportedType.new("#{object.class} objects are not iterable")
+        end
       end
     end
   end

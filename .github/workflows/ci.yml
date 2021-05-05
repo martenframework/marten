@@ -20,7 +20,7 @@ jobs:
   specs:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.0.0
+      image: crystallang/crystal:ci-nightly-fix-curl-dev
     services:
       postgres:
         image: postgres:10.8

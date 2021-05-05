@@ -146,7 +146,7 @@ module Marten
 
           ::{{ related_model_klass }}.register_reverse_relation(
             Marten::DB::ReverseRelation.new(
-              {% if !related_field_name.nil? %}{{ related_field_name.id.stringify }}{% else %}nil{% end %},
+              {% if !related_field_name.is_a?(NilLiteral) %}{{ related_field_name.id.stringify }}{% else %}nil{% end %},
               ::{{ model_klass }},
               {{ field_id.stringify }}
             )
@@ -154,7 +154,7 @@ module Marten
 
           # Configure reverse relation methods if applicable (when the 'related' option is set).
 
-          {% if !related_field_name.nil? %}
+          {% if !related_field_name.is_a?(NilLiteral) %}
           class ::{{ model_klass }}
             macro finished
               class ::{{ related_model_klass }}

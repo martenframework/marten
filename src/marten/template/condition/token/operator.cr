@@ -17,6 +17,7 @@ module Marten
             "not" => Operator::Not,
             "in"  => Operator::In,
             "=="  => Operator::Equal,
+            "!="  => Operator::NotEqual,
           }
         end
       end

@@ -46,6 +46,14 @@ describe Marten::Template::Condition do
       token.eval(Marten::Template::Context{"var1" => 42, "var2" => nil}).truthy?.should be_false
     end
 
+    it "is able to process a not equal expression" do
+      condition = Marten::Template::Condition.new(["var1", "!=", "var2"])
+      token = condition.parse
+
+      token.eval(Marten::Template::Context{"var1" => 42, "var2" => 42}).truthy?.should be_false
+      token.eval(Marten::Template::Context{"var1" => 42, "var2" => nil}).truthy?.should be_true
+    end
+
     it "is able to process an in expression" do
       condition = Marten::Template::Condition.new(["var1", "in", "var2"])
       token = condition.parse

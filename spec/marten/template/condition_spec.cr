@@ -45,5 +45,15 @@ describe Marten::Template::Condition do
       token.eval(Marten::Template::Context{"var1" => 42, "var2" => 42}).truthy?.should be_true
       token.eval(Marten::Template::Context{"var1" => 42, "var2" => nil}).truthy?.should be_false
     end
+
+    it "is able to process an in expression" do
+      condition = Marten::Template::Condition.new(["var1", "in", "var2"])
+      token = condition.parse
+
+      token.eval(Marten::Template::Context{"var1" => "foo", "var2" => ["foo", "bar"]}).truthy?.should be_true
+      token.eval(Marten::Template::Context{"var1" => 42, "var2" => [1, 2, 42, 5]}).truthy?.should be_true
+      token.eval(Marten::Template::Context{"var1" => "test", "var2" => ["foo", "bar"]}).truthy?.should be_false
+      token.eval(Marten::Template::Context{"var1" => 12, "var2" => [1, 2, 42, 5]}).truthy?.should be_false
+    end
   end
 end

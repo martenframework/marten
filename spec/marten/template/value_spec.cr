@@ -1,6 +1,26 @@
 require "./spec_helper"
 
 describe Marten::Template::Value do
+  describe "#<=>" do
+    it "allows to compare number values" do
+      (Marten::Template::Value.from(42) > Marten::Template::Value.from(4)).should be_true
+      (Marten::Template::Value.from(42.12) > Marten::Template::Value.from(4)).should be_true
+      (Marten::Template::Value.from(42) < Marten::Template::Value.from(100)).should be_true
+      (Marten::Template::Value.from(42) > Marten::Template::Value.from(100)).should be_false
+      (Marten::Template::Value.from(42.123) < Marten::Template::Value.from(100.121_2)).should be_true
+    end
+
+    it "raises an unsupported type exception of the underlying object is not comparable" do
+      value = Marten::Template::Value.from("foo")
+      expect_raises(
+        Marten::Template::Errors::UnsupportedType,
+        "Unable to compare String objects with Int32 objects"
+      ) do
+        value >= Marten::Template::Value.from(42)
+      end
+    end
+  end
+
   describe "#each" do
     it "yields the keys of a specific hash" do
       value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})

@@ -2,6 +2,7 @@ module Marten
   module Template
     # A template value.
     class Value
+      include Comparable(self)
       include Enumerable(self)
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) | Nil | String |
@@ -42,6 +43,17 @@ module Marten
 
       def ==(other)
         @raw == other
+      end
+
+      def <=>(other : Value)
+        raw_value = raw
+        other_value = other.raw
+
+        if raw_value.is_a?(Number) && other_value.is_a?(Number)
+          raw_value <=> other_value
+        else
+          raise Errors::UnsupportedType.new("Unable to compare #{raw.class} objects with #{other_value.class} objects")
+        end
       end
 
       def each

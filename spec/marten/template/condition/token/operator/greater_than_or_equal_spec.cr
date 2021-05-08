@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::Template::Condition::Token::Operator::GreaterThanOrEqual do
   describe "#eval" do
-    it "applies the greater than operator as expected" do
+    it "applies the greater than or equal operator as expected" do
       condition = Marten::Template::Condition.new(["var2"])
 
       token = Marten::Template::Condition::Token::Operator::GreaterThanOrEqual.new

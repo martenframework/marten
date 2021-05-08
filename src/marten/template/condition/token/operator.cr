@@ -20,6 +20,7 @@ module Marten
             "!="  => Operator::NotEqual,
             ">"   => Operator::GreaterThan,
             ">="  => Operator::GreaterThanOrEqual,
+            "<"   => Operator::LessThan,
           }
         end
       end

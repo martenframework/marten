@@ -18,7 +18,8 @@ module Marten
             "in"  => Operator::In,
             "=="  => Operator::Equal,
             "!="  => Operator::NotEqual,
-            ">"   => Operator::NotEqual,
+            ">"   => Operator::GreaterThan,
+            ">="  => Operator::GreaterThanOrEqual,
           }
         end
       end

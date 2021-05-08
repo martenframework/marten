@@ -62,6 +62,15 @@ describe Marten::Template::Condition do
       token.eval(Marten::Template::Context{"var1" => 42, "var2" => 4}).truthy?.should be_true
     end
 
+    it "is able to process a greater than or equal expression" do
+      condition = Marten::Template::Condition.new(["var1", ">=", "var2"])
+      token = condition.parse
+
+      token.eval(Marten::Template::Context{"var1" => 42, "var2" => 42}).truthy?.should be_true
+      token.eval(Marten::Template::Context{"var1" => 42, "var2" => 4}).truthy?.should be_true
+      token.eval(Marten::Template::Context{"var1" => 12, "var2" => 42}).truthy?.should be_false
+    end
+
     it "is able to process an in expression" do
       condition = Marten::Template::Condition.new(["var1", "in", "var2"])
       token = condition.parse

@@ -21,6 +21,7 @@ module Marten
             ">"   => Operator::GreaterThan,
             ">="  => Operator::GreaterThanOrEqual,
             "<"   => Operator::LessThan,
+            "<="  => Operator::LessThanOrEqual,
           }
         end
       end

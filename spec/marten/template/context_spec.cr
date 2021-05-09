@@ -34,9 +34,63 @@ describe Marten::Template::Context do
       ctx["foo"].should eq "bar"
     end
 
+    it "returns the value corresponding to most recent values stack" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.stack do |depth_1_ctx|
+        depth_1_ctx["foo"].should eq "bar"
+
+        depth_1_ctx["foo"] = "depth_1_bar"
+        depth_1_ctx["foo"].should eq "depth_1_bar"
+
+        ctx.stack do |depth_2_ctx|
+          depth_2_ctx["foo"].should eq "depth_1_bar"
+
+          depth_2_ctx["foo"] = "depth_2_bar"
+          depth_2_ctx["foo"].should eq "depth_2_bar"
+        end
+
+        depth_1_ctx["foo"].should eq "depth_1_bar"
+      end
+
+      ctx["foo"].should eq "bar"
+    end
+
     it "raises a KeyError exception if no value corresponds to the passed key" do
       ctx = Marten::Template::Context{"foo" => "bar"}
       expect_raises(KeyError) { ctx["xyz"] }
+    end
+  end
+
+  describe "#[]?" do
+    it "returns the value corresponding to the passed key" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx["foo"]?.should eq "bar"
+    end
+
+    it "returns the value corresponding to most recent values stack" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.stack do |depth_1_ctx|
+        depth_1_ctx["foo"]?.should eq "bar"
+
+        depth_1_ctx["foo"] = "depth_1_bar"
+        depth_1_ctx["foo"]?.should eq "depth_1_bar"
+
+        ctx.stack do |depth_2_ctx|
+          depth_2_ctx["foo"]?.should eq "depth_1_bar"
+
+          depth_2_ctx["foo"] = "depth_2_bar"
+          depth_2_ctx["foo"]?.should eq "depth_2_bar"
+        end
+
+        depth_1_ctx["foo"]?.should eq "depth_1_bar"
+      end
+
+      ctx["foo"]?.should eq "bar"
+    end
+
+    it "returns nil if no value corresponds to the passed key" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx["xyz"]?.should be_nil
     end
   end
 
@@ -52,6 +106,94 @@ describe Marten::Template::Context do
       ctx = Marten::Template::Context.new
       ctx["foo"] = "bar"
       ctx["foo"].should eq Marten::Template::Value.from("bar")
+    end
+
+    it "is consistent with values stacks" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.stack do |depth_1_ctx|
+        depth_1_ctx["foo"].should eq "bar"
+
+        depth_1_ctx["depth_1_foo"] = "depth_1_bar"
+        depth_1_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+        ctx.stack do |depth_2_ctx|
+          depth_2_ctx["foo"].should eq "bar"
+          depth_2_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+          depth_2_ctx["depth_2_foo"] = "depth_2_bar"
+          depth_2_ctx["depth_2_foo"].should eq "depth_2_bar"
+        end
+
+        depth_1_ctx["foo"].should eq "bar"
+        depth_1_ctx["depth_1_foo"].should eq "depth_1_bar"
+      end
+
+      ctx["foo"].should eq "bar"
+      ctx["depth_1_foo"]?.should be_nil
+      ctx["depth_2_foo"]?.should be_nil
+    end
+  end
+
+  describe "#stack" do
+    it "adds another stack of values to the context" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.stack do |depth_1_ctx|
+        depth_1_ctx["foo"].should eq "bar"
+
+        depth_1_ctx["depth_1_foo"] = "depth_1_bar"
+        depth_1_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+        ctx.stack do |depth_2_ctx|
+          depth_2_ctx["foo"].should eq "bar"
+          depth_2_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+          depth_2_ctx["depth_2_foo"] = "depth_2_bar"
+          depth_2_ctx["depth_2_foo"].should eq "depth_2_bar"
+        end
+
+        depth_1_ctx["foo"].should eq "bar"
+        depth_1_ctx["depth_1_foo"].should eq "depth_1_bar"
+      end
+
+      ctx["foo"].should eq "bar"
+      ctx["depth_1_foo"]?.should be_nil
+      ctx["depth_2_foo"]?.should be_nil
+    end
+
+    it "can be used to override values consistently" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.stack do |depth_1_ctx|
+        depth_1_ctx["foo"].should eq "bar"
+
+        depth_1_ctx["foo"] = "depth_1_bar"
+        depth_1_ctx["foo"].should eq "depth_1_bar"
+
+        ctx.stack do |depth_2_ctx|
+          depth_2_ctx["foo"].should eq "depth_1_bar"
+
+          depth_2_ctx["foo"] = "depth_2_bar"
+          depth_2_ctx["foo"].should eq "depth_2_bar"
+        end
+
+        depth_1_ctx["foo"].should eq "depth_1_bar"
+      end
+
+      ctx["foo"].should eq "bar"
+    end
+
+    it "removes the stacked layer of values if an error occurs" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+
+      expect_raises(Exception) do
+        ctx.stack do |inner_ctx|
+          inner_ctx["foo"] = "inner_bar"
+          inner_ctx["test"] = 42
+          raise "BAD"
+        end
+      end
+
+      ctx["foo"].should eq "bar"
+      ctx["test"]?.should be_nil
     end
   end
 end

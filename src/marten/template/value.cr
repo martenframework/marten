@@ -16,7 +16,7 @@ module Marten
         when Hash, NamedTuple
           new(Hash(Value, Value).new.tap { |values| raw.each { |k, v| values[new(k.to_s)] = from(v) } })
         when Array, Tuple
-          new(raw.map { |item| from(item) })
+          new(raw.map { |item| from(item) }.to_a)
         when Range
           from(raw.to_a)
         when Char

@@ -1,6 +1,177 @@
 require "./spec_helper"
 
 describe Marten::Template::Value do
+  describe "::from" do
+    it "is able to initialize a new template value from a hash" do
+      value = Marten::Template::Value.from({"foo" => "bar", "test" => 42, "nested" => {"test" => 1}})
+
+      value.raw.should be_a Hash(Marten::Template::Value, Marten::Template::Value)
+      raw = value.raw.as(Hash(Marten::Template::Value, Marten::Template::Value))
+
+      raw.keys.should eq([
+        Marten::Template::Value.from("foo"),
+        Marten::Template::Value.from("test"),
+        Marten::Template::Value.from("nested"),
+      ])
+
+      raw[Marten::Template::Value.from("foo")].should eq Marten::Template::Value.from("bar")
+      raw[Marten::Template::Value.from("test")].should eq Marten::Template::Value.from(42)
+      raw[Marten::Template::Value.from("nested")].should eq Marten::Template::Value.from({"test" => 1})
+    end
+
+    it "is able to initialize a new template value from a named tuple" do
+      value = Marten::Template::Value.from({foo: "bar", test: 42, nested: {test: 1}})
+
+      value.raw.should be_a Hash(Marten::Template::Value, Marten::Template::Value)
+      raw = value.raw.as(Hash(Marten::Template::Value, Marten::Template::Value))
+
+      raw.keys.should eq([
+        Marten::Template::Value.from("foo"),
+        Marten::Template::Value.from("test"),
+        Marten::Template::Value.from("nested"),
+      ])
+
+      raw[Marten::Template::Value.from("foo")].should eq Marten::Template::Value.from("bar")
+      raw[Marten::Template::Value.from("test")].should eq Marten::Template::Value.from(42)
+      raw[Marten::Template::Value.from("nested")].should eq Marten::Template::Value.from({"test" => 1})
+    end
+
+    it "is able to initialize a new template value from an array" do
+      value = Marten::Template::Value.from(["foo", "bar", 42, {"test" => 1}])
+
+      value.raw.should be_a Array(Marten::Template::Value)
+      raw = value.raw.as(Array(Marten::Template::Value))
+
+      raw.should eq([
+        Marten::Template::Value.from("foo"),
+        Marten::Template::Value.from("bar"),
+        Marten::Template::Value.from(42),
+        Marten::Template::Value.from({"test" => 1}),
+      ])
+    end
+
+    it "is able to initialize a new template value from a tuple" do
+      value = Marten::Template::Value.from({"foo", "bar", 42, {"test" => 1}})
+
+      value.raw.should be_a Array(Marten::Template::Value)
+      raw = value.raw.as(Array(Marten::Template::Value))
+
+      raw.should eq([
+        Marten::Template::Value.from("foo"),
+        Marten::Template::Value.from("bar"),
+        Marten::Template::Value.from(42),
+        Marten::Template::Value.from({"test" => 1}),
+      ])
+    end
+
+    it "is able to initialize a new template value from a range" do
+      value = Marten::Template::Value.from((1..4))
+
+      value.raw.should be_a Array(Marten::Template::Value)
+      raw = value.raw.as(Array(Marten::Template::Value))
+
+      raw.should eq([
+        Marten::Template::Value.from(1),
+        Marten::Template::Value.from(2),
+        Marten::Template::Value.from(3),
+        Marten::Template::Value.from(4),
+      ])
+    end
+
+    it "is able to initialize a new template value from a char" do
+      value = Marten::Template::Value.from('x')
+      value.raw.should eq "x"
+    end
+
+    it "is able to initialize a new template value from an array of template values" do
+      other_value = Marten::Template::Value.from(["foo", "bar", 42])
+      value = Marten::Template::Value.from(other_value)
+      value.should eq Marten::Template::Value.from(["foo", "bar", 42])
+    end
+
+    it "is able to initialize a new template value from a bool" do
+      Marten::Template::Value.from(true).raw.should eq true
+      Marten::Template::Value.from(false).raw.should eq false
+    end
+
+    it "is able to initialize a new template value from a float" do
+      Marten::Template::Value.from(12.42).raw.should eq 12.42
+    end
+
+    it "is able to initialize a new template value from a hash of template values" do
+      other_value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})
+      value = Marten::Template::Value.from(other_value)
+      value.should eq Marten::Template::Value.from({"foo" => "bar", "test" => 42})
+    end
+
+    it "is able to initialize a new template value from an integer" do
+      Marten::Template::Value.from(12).raw.should eq 12
+      Marten::Template::Value.from(12_i64).raw.should eq 12_i64
+    end
+
+    it "is able to initialize a new template value from nil" do
+      Marten::Template::Value.from(nil).raw.should be_nil
+    end
+
+    it "is able to initialize a new template value from a string" do
+      Marten::Template::Value.from("foo bar").raw.should eq "foo bar"
+    end
+
+    it "is able to initialize a new template value from a time" do
+      time = Time.local
+      Marten::Template::Value.from(time).raw.should eq time
+    end
+
+    it "raises an unsupported value error if the passed value is not supported" do
+      expect_raises(
+        Marten::Template::Errors::UnsupportedValue,
+        "Unable to initialize template values from Path objects"
+      ) do
+        Marten::Template::Value.from(Path["foo/bar/baz.cr"])
+      end
+    end
+  end
+
+  describe "#[]" do
+    it "returns a value corresponding to the passed object attribute" do
+      value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})
+
+      value["foo"].should be_a Marten::Template::Value
+      value["foo"].should eq Marten::Template::Value.from("bar")
+
+      value["test"].should be_a Marten::Template::Value
+      value["test"].should eq Marten::Template::Value.from(42)
+    end
+
+    it "raises an unknown variable error if the attribute does not exist" do
+      value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["unknown"] }
+    end
+
+    it "raises an unknown variable error if the raw object does not allow attribute lookups" do
+      value = Marten::Template::Value.from(42)
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["unknown"] }
+    end
+  end
+
+  describe "#==" do
+    it "returns true if two value objects correspond to the same raw value" do
+      (Marten::Template::Value.from(42) == Marten::Template::Value.from(42)).should be_true
+    end
+
+    it "returns true if a value object and another raw value correspond to the same raw value" do
+      (Marten::Template::Value.from(42) == 42).should be_true
+    end
+
+    it "returns false if two value objects do not correspond to the same raw value" do
+      (Marten::Template::Value.from(42) == Marten::Template::Value.from(11)).should be_false
+    end
+
+    it "returns true if a value object and another raw value do not corespond to the same raw value" do
+      (Marten::Template::Value.from(42) == 11).should be_false
+    end
+  end
+
   describe "#<=>" do
     it "allows to compare number values" do
       (Marten::Template::Value.from(42) > Marten::Template::Value.from(4)).should be_true
@@ -53,6 +224,40 @@ describe Marten::Template::Value do
       ) do
         value.each { }
       end
+    end
+  end
+
+  describe "#to_s" do
+    it "returns the string representation of the underlying object" do
+      Marten::Template::Value.from(42).to_s.should eq 42.to_s
+      Marten::Template::Value.from("foo").to_s.should eq "foo".to_s
+    end
+  end
+
+  describe "#truthy?" do
+    it "returns false if the raw value is false" do
+      Marten::Template::Value.from(false).truthy?.should be_false
+    end
+
+    it "returns false if the raw value is equal to 0" do
+      Marten::Template::Value.from(0).truthy?.should be_false
+    end
+
+    it "returns false if the raw value is nil" do
+      Marten::Template::Value.from(nil).truthy?.should be_false
+    end
+
+    it "returns true for an empty string" do
+      Marten::Template::Value.from("").truthy?.should be_true
+    end
+
+    it "returns true for strings" do
+      Marten::Template::Value.from("foo bar").truthy?.should be_true
+    end
+
+    it "returns true for other objects" do
+      Marten::Template::Value.from(42).truthy?.should be_true
+      Marten::Template::Value.from({"foo" => "bar", "test" => 42, "nested" => {"test" => 1}}).truthy?.should be_true
     end
   end
 end

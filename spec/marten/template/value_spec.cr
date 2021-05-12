@@ -200,8 +200,8 @@ describe Marten::Template::Value do
       value.each { |v| arr << v }
 
       arr.size.should eq 2
-      arr[0].should eq Marten::Template::Value.from("foo")
-      arr[1].should eq Marten::Template::Value.from("test")
+      arr[0].should eq Marten::Template::Value.from(["foo", "bar"])
+      arr[1].should eq Marten::Template::Value.from(["test", 42])
     end
 
     it "yields the value of a specific array" do

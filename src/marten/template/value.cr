@@ -83,8 +83,6 @@ module Marten
 
       private def yield_each_from_raw
         case object = raw
-        when Hash
-          object.keys.each { |k| yield k.as(Value).raw }
         when Iterable(Value)
           object.each { |v| yield v.as(Value).raw }
         when Iterable

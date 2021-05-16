@@ -9,10 +9,18 @@ module Marten
       @lookups : Array(String)? = nil
 
       def initialize(raw : String)
-        # First try to see of the raw variable is literal number.
+        # First try to see if the raw variable is a literal integer.
         begin
-          @literal = Value.from(raw.to_f)
+          @literal = Value.from(raw.to_i)
         rescue ArgumentError
+        end
+
+        # Then try to see uf the raw variable is a literal float.
+        if @literal.nil?
+          begin
+            @literal = Value.from(raw.to_f)
+          rescue ArgumentError
+          end
         end
 
         # Then, try to see if it is a literal string (single-quoted or double-quoted) and otherwise consider that it is

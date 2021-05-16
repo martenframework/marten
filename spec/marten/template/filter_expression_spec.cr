@@ -32,7 +32,7 @@ describe Marten::Template::FilterExpression do
 
     it "initializes a filter expression for a simple number literal with filters" do
       expr_1 = Marten::Template::FilterExpression.new("42 | upcase")
-      expr_1.resolve(Marten::Template::Context{"foo" => "bar"}).should eq "42.0"
+      expr_1.resolve(Marten::Template::Context{"foo" => "bar"}).should eq "42"
 
       expr_2 = Marten::Template::FilterExpression.new("42.44|upcase")
       expr_2.resolve(Marten::Template::Context{"foo" => "bar"}).should eq "42.44"

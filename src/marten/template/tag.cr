@@ -27,6 +27,7 @@ module Marten
       register "for", For
       register "if", If
       register "spaceless", Spaceless
+      register "url", Url
     end
   end
 end

@@ -1,7 +1,7 @@
 module Marten
   module Template
     module Tag
-      # The spaceless template tag.
+      # The `spaceless` template tag.
       #
       # The `{% spaceless %}...{% endspaceless %}` template tag allows remove whitespaces, tabs and new lines between
       # HTML tags. Whitespaces inside tags are left untouched.

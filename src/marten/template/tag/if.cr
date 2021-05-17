@@ -3,10 +3,10 @@ require "./concerns/*"
 module Marten
   module Template
     module Tag
-      # The if template tag.
-      #
-      # The if template tags allows to define conditions allowing to control which blocks should be executed. An if tag
-      # must always start with an `if` condition, followed by any number of intermediate `elsif` conditions and an
+      # The `if` template tag.
+      # `
+      # The `if` template tags allows to define conditions allowing to control which blocks should be executed. An if
+      # tag must always start with an `if` condition, followed by any number of intermediate `elsif` conditions and an
       # optional (and final) `else` block.
       class If < Base
         include CanSplitSmartly

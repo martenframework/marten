@@ -3,7 +3,7 @@ require "./concerns/*"
 module Marten
   module Template
     module Tag
-      # The for template tag.
+      # The `for` template tag.
       #
       # The `for` template tag allows to loop over the items of iterable objects. It supports unpacking multiple items
       # when applicable (eg. when iterating over hashes) and also handles fallbacks through the use of the `else` inner

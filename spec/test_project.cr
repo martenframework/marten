@@ -63,4 +63,5 @@ end
 Marten.routes.draw do
   path "/dummy", DummyView, name: "dummy"
   path "/dummy/<id:int>", DummyView, name: "dummy_with_id"
+  path "/dummy/<id:int>/and/<scope:slug>", DummyView, name: "dummy_with_id_and_scope"
 end

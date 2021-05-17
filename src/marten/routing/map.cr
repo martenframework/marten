@@ -76,8 +76,8 @@ module Marten
       # The URL lookup mechanism tries to identify the route matching the given name and tries to apply any extra
       # parameters passed in the method call. If no route is found or if the arguments can't be applied to the route, a
       # `Marten::Routing::Errors::NoReverseMatch` exception is raised.
-      def reverse(name : String, **kwargs) : String
-        perform_reverse(name, kwargs.to_h)
+      def reverse(name : String | Symbol, **kwargs) : String
+        perform_reverse(name.to_s, kwargs.to_h)
       end
 
       # Reverses a URL - returns the URL corresponding to a specific route name and hash of parameters.
@@ -85,8 +85,8 @@ module Marten
       # The URL lookup mechanism tries to identify the route matching the given name and tries to apply the parameters
       # defined in the parameters hash passed in the method call. If no route is found or if the arguments can't be
       # applied to the route, a `Marten::Routing::Errors::NoReverseMatch` exception is raised.
-      def reverse(name : String, params : Hash(String | Symbol, Parameter::Types))
-        perform_reverse(name, params)
+      def reverse(name : String | Symbol, params : Hash(String | Symbol, Parameter::Types))
+        perform_reverse(name.to_s, params)
       end
 
       protected getter reversers

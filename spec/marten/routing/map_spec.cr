@@ -92,6 +92,13 @@ describe Marten::Routing::Match do
       map.reverse("home").should eq "/home/test"
     end
 
+    it "can be used with a route name symbol" do
+      map = Marten::Routing::Map.new
+      map.path("/home/test", Marten::Views::Base, name: "home")
+
+      map.reverse(:home).should eq "/home/test"
+    end
+
     it "returns the interpolated path for a top-level given route name with parameters" do
       map = Marten::Routing::Map.new
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
@@ -151,6 +158,13 @@ describe Marten::Routing::Match do
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
 
       map.reverse("home", {"sid" => "hello-world", "number" => 42}).should eq "/home/hello-world/test/42"
+    end
+
+    it "can be used with a route name symbol" do
+      map = Marten::Routing::Map.new
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+
+      map.reverse(:home, {"sid" => "hello-world", "number" => 42}).should eq "/home/hello-world/test/42"
     end
 
     it "returns the interpolated path for a sub given route name without parameters" do

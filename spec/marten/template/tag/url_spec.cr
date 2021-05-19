@@ -70,5 +70,15 @@ describe Marten::Template::Tag::Url do
         tag.render(Marten::Template::Context{"arg" => {"foo" => "bar"}})
       end
     end
+
+    it "is able to asign the resolved URL t a specific variable" do
+      parser = Marten::Template::Parser.new("")
+
+      tag = Marten::Template::Tag::Url.new(parser, %{url rname id: 42, scope: "ns" as resolved_url})
+      context = Marten::Template::Context{"rname" => "dummy_with_id_and_scope"}
+
+      tag.render(context).should eq ""
+      context["resolved_url"].should eq Marten.routes.reverse(:dummy_with_id_and_scope, id: 42, scope: "ns")
+    end
   end
 end

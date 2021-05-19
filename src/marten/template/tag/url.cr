@@ -16,8 +16,16 @@ module Marten
       #
       # URL names and parameter values can be resolved as template variables too, but they can also be defined as
       # literal values if necessary.
+      #
+      # Optionally, resolved URLs can be assigned to a specific variable using the `as` keyword:
+      #
+      # ```
+      # {% url "my_other_view" arg1: var1, arg2: var2 as my_var %}
+      # ```
       class Url < Base
         include CanSplitSmartly
+
+        @assigned_to : String? = nil
 
         def initialize(parser : Parser, source : String)
           parts = split_smartly(source)
@@ -27,6 +35,11 @@ module Marten
           end
 
           @url_name_expression = FilterExpression.new(parts[1])
+
+          # Identify possible assigned variable name.
+          if parts.size > 2 && parts[-2] == "as"
+            @assigned_to = parts[-1]
+          end
 
           # Identify and extract optional URL parameters.
           @kwargs = {} of String => FilterExpression
@@ -50,7 +63,14 @@ module Marten
             url_params[param_name] = raw_param_value
           end
 
-          Marten.routes.reverse(url_name, url_params)
+          url = Marten.routes.reverse(url_name, url_params)
+
+          if @assigned_to.nil?
+            url
+          else
+            context[@assigned_to.not_nil!] = url
+            ""
+          end
         end
 
         private KWARG_RE = /

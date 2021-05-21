@@ -10,6 +10,9 @@ module Marten
       class Tag < Base
         @tag : Marten::Template::Tag::Base
 
+        # Returns the tag instance initialized for the current node.
+        getter tag
+
         def initialize(parser : Parser, source : String)
           @tag = Marten::Template::Tag.get(source.split.first).new(parser, source)
         end

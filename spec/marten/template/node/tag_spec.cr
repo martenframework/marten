@@ -21,4 +21,14 @@ describe Marten::Template::Node::Tag do
       )
     end
   end
+
+  describe "#tag" do
+    it "returns the tag instance associated with the current node" do
+      parser = Marten::Template::Parser.new(
+        "<strong>Hello {{ user }}</strong>      <span>Test</span>{% endspaceless %}"
+      )
+      node = Marten::Template::Node::Tag.new(parser, "spaceless")
+      node.tag.should be_a Marten::Template::Tag::Spaceless
+    end
+  end
 end

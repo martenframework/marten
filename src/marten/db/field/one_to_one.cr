@@ -74,7 +74,7 @@ module Marten
           {% end %}
 
           {% if !kwargs.is_a?(NilLiteral) && kwargs[:unique].is_a?(BoolLiteral) && !kwargs[:unique] %}
-            {% raise "One to one fields cannot set 'unique: false' (use 'one_to_many' fields instead)" %}
+            {% raise "One to one fields cannot set 'unique: false' (use 'many_to_one' fields instead)" %}
           {% end %}
         end
 

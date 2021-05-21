@@ -52,7 +52,7 @@ module Marten
         end
 
         private def raw_deleteable?(model_klass)
-          model_klass.reverse_relations.select { |r| r.one_to_many? || r.one_to_one? }.all? do |reverse_relation|
+          model_klass.reverse_relations.select { |r| r.many_to_one? || r.one_to_one? }.all? do |reverse_relation|
             reverse_relation.on_delete.do_nothing?
           end
         end

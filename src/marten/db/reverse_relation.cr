@@ -24,7 +24,7 @@ module Marten
       end
 
       # Returns `true` if the reverse relation is associated with a many to one field.
-      def one_to_many?
+      def many_to_one?
         field.is_a?(Field::ManyToOne)
       end
 

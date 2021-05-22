@@ -2,15 +2,18 @@ module Marten
   module Template
     # A compiled template.
     class Template
-      @node_set : NodeSet
+      @nodes : NodeSet
+
+      # Returns the nodes corresponding to the parsed template.
+      getter nodes
 
       def initialize(source : String)
-        @node_set = Parser.new(source).parse
+        @nodes = Parser.new(source).parse
       end
 
       # Renders the template for a specific context.
-      def render(context : Context?) : String
-        @node_set.render(context || Context.new)
+      def render(context : Context? = nil) : String
+        @nodes.render(context || Context.new)
       end
 
       # :ditto:

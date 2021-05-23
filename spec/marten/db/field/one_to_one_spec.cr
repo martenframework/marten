@@ -1,6 +1,13 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::OneToOne do
+  describe "#default" do
+    it "returns nil" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)
+      field.default.should be_nil
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read an integer value from a DB result set" do
       field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)

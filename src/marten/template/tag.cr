@@ -24,9 +24,12 @@ module Marten
         @@registry
       end
 
+      register "block", Block
+      register "extend", Extend
       register "for", For
       register "if", If
       register "spaceless", Spaceless
+      register "super", Super
       register "url", Url
     end
   end

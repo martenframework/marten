@@ -58,6 +58,11 @@ Marten.configure :test do |config|
       db.name = ":memory:"
     end
   {% end %}
+
+  config.templates.app_dirs = true
+  config.templates.dirs = [
+    "test_project/templates",
+  ]
 end
 
 Marten.routes.draw do

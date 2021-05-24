@@ -11,8 +11,11 @@ module Marten
     class Parser
       @tokens : Array(Parser::Token)
 
+      getter encountered_block_names
+
       def initialize(@source : String)
         @tokens = Lexer.new(@source).tokenize
+        @encountered_block_names = [] of String
       end
 
       # Generates a set of nodes from the lexical tokens.

@@ -2,6 +2,13 @@ require "./spec_helper"
 
 describe Marten::Template::Tag do
   describe "::get" do
+    it "returns the right built-in tag classes for the expected tag names" do
+      Marten::Template::Tag.get("for").should eq Marten::Template::Tag::For
+      Marten::Template::Tag.get("if").should eq Marten::Template::Tag::If
+      Marten::Template::Tag.get("spaceless").should eq Marten::Template::Tag::Spaceless
+      Marten::Template::Tag.get("url").should eq Marten::Template::Tag::Url
+    end
+
     it "returns a registered tag class for a given name string" do
       Marten::Template::Tag.get("spaceless").should eq Marten::Template::Tag::Spaceless
     end

@@ -1,3 +1,5 @@
+require "./concerns/*"
+
 module Marten
   module Template
     module Tag

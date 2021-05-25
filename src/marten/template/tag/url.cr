@@ -23,6 +23,7 @@ module Marten
       # {% url "my_other_view" arg1: var1, arg2: var2 as my_var %}
       # ```
       class Url < Base
+        include CanExtractKwargs
         include CanSplitSmartly
 
         @assigned_to : String? = nil
@@ -43,8 +44,8 @@ module Marten
 
           # Identify and extract optional URL parameters.
           @kwargs = {} of String => FilterExpression
-          parts[2..].join(' ').scan(KWARG_RE) do |m|
-            @kwargs[m.captures[0].not_nil!] = FilterExpression.new(m.captures[1].not_nil!)
+          extract_kwargs(parts[2..].join(' ')).each do |key, value|
+            @kwargs[key] = FilterExpression.new(value)
           end
         end
 
@@ -72,19 +73,6 @@ module Marten
             ""
           end
         end
-
-        private KWARG_RE = /
-          (\w+)\s*\:\s*(
-            (?:
-              [^\s'"]*
-              (?:
-                (?:"(?:[^"\\]|\\.)*" | '(?:[^'\\]|\\.)*')
-                [^\s'"]*
-              )+
-            )
-            | \w+
-          )\s*,?
-        /x
       end
     end
   end

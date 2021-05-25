@@ -7,8 +7,8 @@ module Marten
       # double-quoted expressions (which can themselves contain spaces):
       #
       # ```
-      # Tag.split("This is a 'simple test'")   # => ["This", "is", "a", "'simple test'"]
-      # Tag.split("This is a \"simple test\"") # => ["This", "is", "a", "\"simple test/""]
+      # Tag.split_smartly("This is a 'simple test'")   # => ["This", "is", "a", "'simple test'"]
+      # Tag.split_smartly("This is a \"simple test\"") # => ["This", "is", "a", "\"simple test/""]
       # ```
       module CanSplitSmartly
         # Split a string expression and returns an array of strings.

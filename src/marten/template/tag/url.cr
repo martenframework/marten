@@ -40,11 +40,14 @@ module Marten
           # Identify possible assigned variable name.
           if parts.size > 2 && parts[-2] == "as"
             @assigned_to = parts[-1]
+            kwargs_parts = parts[2...-2]
+          else
+            kwargs_parts = parts[2..]
           end
 
           # Identify and extract optional URL parameters.
           @kwargs = {} of String => FilterExpression
-          extract_kwargs(parts[2..].join(' ')).each do |key, value|
+          extract_kwargs(kwargs_parts.join(' ')).each do |key, value|
             @kwargs[key] = FilterExpression.new(value)
           end
         end

@@ -92,7 +92,7 @@ describe Marten::Apps::Config do
     end
 
     it "returns nil if the app does not define locales data" do
-      app_config = TestApp.new
+      app_config = Marten::Apps::ConfigSpec::AppWithoutTranslations::App.new
       app_config.translations_loader.should be_nil
     end
   end

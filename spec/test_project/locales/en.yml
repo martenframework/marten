@@ -1,0 +1,7 @@
+en:
+  simple:
+    translation: "This is a simple translation"
+    interpolation: "Hello, %{name}!"
+    pluralization:
+      one: "One item"
+      other: "%{count} items"

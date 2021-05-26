@@ -30,6 +30,9 @@ module Marten
       register "if", If
       register "spaceless", Spaceless
       register "super", Super
+      register "translate", Translate
+      register "trans", Translate
+      register "t", Translate
       register "url", Url
     end
   end

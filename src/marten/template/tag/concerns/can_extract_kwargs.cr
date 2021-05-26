@@ -22,7 +22,7 @@ module Marten
                 [^\s'",]*
               )+
             )
-            | \w+
+            | [\w\.]+
           )\s*,?
         /x
       end

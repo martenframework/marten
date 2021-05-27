@@ -3,6 +3,7 @@ require "./spec_helper"
 describe Marten::Template::Tag do
   describe "::get" do
     it "returns the right built-in tag classes for the expected tag names" do
+      Marten::Template::Tag.get("assign").should eq Marten::Template::Tag::Assign
       Marten::Template::Tag.get("block").should eq Marten::Template::Tag::Block
       Marten::Template::Tag.get("extend").should eq Marten::Template::Tag::Extend
       Marten::Template::Tag.get("for").should eq Marten::Template::Tag::For

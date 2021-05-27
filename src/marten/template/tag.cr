@@ -24,6 +24,7 @@ module Marten
         @@registry
       end
 
+      register "assign", Assign
       register "block", Block
       register "extend", Extend
       register "for", For

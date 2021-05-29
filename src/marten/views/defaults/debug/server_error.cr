@@ -2,6 +2,7 @@ module Marten
   module Views
     module Defaults
       module Debug
+        # Handles server errors in debug mode.
         class ServerError < View
           @error : Exception?
           @frames : Array(Frame)?

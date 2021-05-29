@@ -18,7 +18,7 @@
 
       header {
         padding: 3rem 4rem;
-        background-color: #df691a;
+        background-color: #2780e3;
       }
 
       header > h1 {
@@ -29,7 +29,7 @@
       }
 
       header > h1 > .exception-class {
-        color: #282c34;
+        color: #333;
       }
 
       header > .exception-message {
@@ -47,30 +47,44 @@
       }
 
       section.exception-details {
-        background-color: #1f2d3b;
-        color: #dee5ed;
+        background-color: #fff;
+        color: #4a4a4a;
         white-space: nowrap;
+      }
+
+      section.exception-details .template-preview {
+        margin: 0 1rem;
       }
 
       section.exception-details .template-preview > h2{
         margin-top: 0;
-        margin-left: 1rem;
+        color: #333;
       }
 
       section.exception-details .template-preview > .filepath {
-        padding: 1rem;
+        padding: 0.5rem 1rem;
         font-size: 0.8rem;
         font-weight: bold;
+        background-color: #2780e3;
+        color: #fff;
+      }
+
+      section.exception-details .template-preview > .snippet {
+        margin-bottom: 2.5rem;
+        padding-top: 0.5rem;
+        background-color: #edf4fd;
       }
 
       section.exception-details .template-preview > .snippet > pre.lines-wrapper {
+        margin: 0;
         line-height: 1.2rem;
+        overflow: scroll;
       }
 
       section.exception-details .template-preview > .snippet > .lines-wrapper > .line {
         display: inline-block;
         white-space: pre;
-        padding: 0.1rem 1rem;
+        padding: 0 1rem;
         font-size: 0.8rem;
         width: calc(100% - 2rem);
       }
@@ -78,21 +92,33 @@
       section.exception-details .template-preview > .snippet > .lines-wrapper > .line > .number {
         margin-right: 1rem;
         display: inline-block;
+        width: 42px;
+        color: #134f91;
+      }
+
+      section.exception-details .template-preview > .snippet > .lines-wrapper > .line > .code {
+        margin-right: 1rem;
+        display: inline-block;
+        color: #4a4a4a;
       }
 
       section.exception-details .template-preview > .snippet > .lines-wrapper > .highlighted {
-        background-color: #2b3e50;
+        background-color: #a8caf5;
+      }
+
+      section.exception-details .code-previews-and-traces {
+        margin: 0 1rem;
       }
 
       section.exception-details .code-previews {
         display: inline-block;
-        width: 40%;
+        width: 50%;
         vertical-align: top;
       }
 
       section.exception-details .code-previews > h2 {
         margin-top: 0;
-        margin-left: 1rem;
+        color: #333;
       }
 
       section.exception-details .code-previews > .code-preview {
@@ -104,34 +130,52 @@
       }
 
       section.exception-details .code-previews > .code-preview > .filepath {
-        padding: 1rem;
+        padding: 0.5rem 1rem;
         font-size: 0.8rem;
         font-weight: bold;
+        background-color: #2780e3;
+        color: #fff;
+      }
+
+       section.exception-details .code-previews > .code-preview > .snippet {
+        margin-bottom: 1.5rem;
+        padding-top: 0.5rem;
+        background-color: #edf4fd;
       }
 
       section.exception-details .code-previews > .code-preview > .snippet > pre.lines-wrapper {
+        margin: 0;
         line-height: 1.2rem;
+        overflow: scroll;
       }
 
       section.exception-details .code-previews > .code-preview > .snippet > .lines-wrapper > .line {
         display: inline-block;
         white-space: pre;
-        padding: 0.1rem 1rem;
+        padding: 0 1rem;
         font-size: 0.8rem;
       }
 
       section.exception-details .code-previews > .code-preview > .snippet > .lines-wrapper > .line > .number {
         margin-right: 1rem;
         display: inline-block;
+        width: 42px;
+        color: #134f91;
+      }
+
+      section.exception-details .code-previews > .code-preview > .snippet > .lines-wrapper > .line > .code {
+        margin-right: 1rem;
+        display: inline-block;
+        color: #4a4a4a;
       }
 
       section.exception-details .code-previews > .code-preview > .snippet > .lines-wrapper > .highlighted {
-        background-color: #2b3e50;
+        background-color: #a8caf5;
       }
 
       section.exception-details .back-trace {
         display: inline-block;
-        width: 60%;
+        width: 50%;
         vertical-align: top;
       }
 
@@ -141,12 +185,11 @@
       }
 
       section.exception-details .back-trace > .traces {
-        padding: 1rem;
+        padding: 0.5rem 1rem;
       }
 
       section.exception-details .back-trace > .traces > label {
         position: relative;
-        margin-bottom: 1rem;
         padding-left: 2rem;
         display: block;
         font-size: 0.8rem;
@@ -175,7 +218,7 @@
       }
 
       section.exception-details .back-trace > .traces > label input:checked ~ .checkmark {
-        background-color: #df691a;
+        background-color: #2780e3;
       }
 
       section.exception-details .back-trace > .traces > label .checkmark:after {
@@ -232,20 +275,20 @@
         text-align: left;
         overflow: hidden;
         white-space: nowrap;
-        color: #dee5ed;
+        color: #666;
       }
 
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace:hover,
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace:focus {
-        background-color: #2b3e50;
+        background-color: #dbdbdb;
       }
 
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace:active {
-        background-color: #8694a4;
+        background-color: #dbdbdb;
       }
 
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace.selected {
-        background-color: #8694a4;
+        background-color: #a8caf5;
       }
 
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace > .wrapper:before {
@@ -261,26 +304,26 @@
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace > .dep-filename {
         float: right;
         max-width: 30%;
-        color: #d9534f;
+        color: #2780e3;
       }
 
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace.selected > .wrapper:before {
-        background-color: #df691a;
+        background-color: #2780e3;
       }
 
       section.exception-details .back-trace > .traces > ul.trace-list > li >.trace.selected > .dep-filename {
-        color: #fff;
+        color: #2780e3;
       }
 
       section.information {
-        background-color: #fff;
+        background-color: #fafafa;
         color: rgba(10,10,10,.9);
         white-space: nowrap;
       }
 
       section.information h2 {
         margin-top: 0;
-        color: #1f2d3b;
+        color: #333;
       }
 
       section.information dl {
@@ -294,7 +337,7 @@
         float: left;
         overflow: hidden;
         font-weight: bold;
-        color: #2b3e50;
+        color: #2780e3;
       }
 
       section.information dl pre {
@@ -346,14 +389,11 @@
           <h2>Template</h2>
           <div class="filepath"><%= error.as(Marten::Template::Errors::InvalidSyntax).filepath.to_s %></div>
           <div class="snippet">
-            <pre class="lines-wrapper">
-              <%- template_snippet_lines.not_nil!.each do |snippet_line| -%><span class="line <% if snippet_line[2] %>highlighted<% end %>"><span class="number"><%= snippet_line[1] %></span><span class="code"><%= snippet_line[0].rstrip %></span></span>
-              <%- end -%>
-            </pre>
+            <pre class="lines-wrapper"><%- template_snippet_lines.not_nil!.each do |snippet_line| -%><span class="line <% if snippet_line[2] %>highlighted<% end %>"><span class="number"><%= snippet_line[1] %></span><span class="code"><%= HTML.escape(snippet_line[0].rstrip) %></span></span><br /><%- end -%></pre>
           </div>
         </div>
       <% end %>
-      <div>
+      <div class="code-previews-and-traces">
         <div class="code-previews">
           <h2>Snippet</h2>
           <% frames.each do |frame| %>
@@ -363,10 +403,7 @@
               <%- if frame.snippet_lines.empty? -%>
                 <div class="lines-wrapper">No code available.</div>
               <%- else -%>
-                <pre class="lines-wrapper">
-                  <%- frame.snippet_lines.each do |snippet_line| -%><span class="line <% if snippet_line[2] %>highlighted<% end %>"><span class="number"><%= snippet_line[1] %></span><span class="code"><%= snippet_line[0].rstrip %></span></span>
-                  <%- end -%>
-                </pre>
+                <pre class="lines-wrapper"><%- frame.snippet_lines.each do |snippet_line| -%><span class="line <% if snippet_line[2] %>highlighted<% end %>"><span class="number"><%= snippet_line[1] %></span><span class="code"><%= snippet_line[0].rstrip %></span></span><br /><%- end -%></pre>
               <%- end -%>
             </div>
           </div>
@@ -427,7 +464,7 @@
         </dl>
       </div>
       <div class="request-details">
-        <h2>Request detail</h2>
+        <h2>Request details</h2>
         <dl>
           <dt>Query params</dt>
           <dd>

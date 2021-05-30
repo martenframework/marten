@@ -41,7 +41,10 @@ module Marten
           end
 
           def columns : Array(String)
-            to_model.fields.map { |f| column_name(f.db_column) } + children.flat_map(&.columns)
+            to_model.fields.compact_map do |f|
+              next unless f.db_column?
+              column_name(f.db_column)
+            end + children.flat_map(&.columns)
           end
 
           def selected?

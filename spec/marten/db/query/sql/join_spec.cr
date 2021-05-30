@@ -84,7 +84,29 @@ describe Marten::DB::Query::SQL::Join do
 
       parent_join.columns.should eq(
         Post.fields.map { |f| parent_join.column_name(f.db_column) } +
-        TestUser.fields.map { |f| child_join.column_name(f.db_column) }
+        TestUser.fields.compact_map do |f|
+          next unless f.db_column?
+          child_join.column_name(f.db_column)
+        end
+      )
+    end
+
+    it "ignores field without associated DB column" do
+      join = Marten::DB::Query::SQL::Join.new(
+        1,
+        Marten::DB::Query::SQL::JoinType::INNER,
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true
+      )
+
+      join.columns.should eq(
+        TestUser.fields.compact_map do |f|
+          next unless f.db_column?
+          join.column_name(f.db_column)
+        end
       )
     end
   end

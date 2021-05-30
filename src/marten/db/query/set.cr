@@ -1,6 +1,16 @@
 module Marten
   module DB
     module Query
+      # The main query set class.
+      #
+      # A query set is an object that matches a collection of records in the database. Those objects are matched through
+      # the use of optional filters that allow to explicitly query the database based on specific parameters. Query sets
+      # also allow to configure how these objects should be returned (for example in which order).
+      #
+      # The most important characteristic of a query set is that it is lazily evaluated: unless the code that resulted
+      # in the creation of the query set explicitly asks for the underlying objects, no actual query is made to the
+      # considered database. Querying the database is always deferred to the last possible moment: that is, when the
+      # actual records are requested.
       class Set(Model)
         include Enumerable(Model)
 

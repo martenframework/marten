@@ -519,7 +519,9 @@ describe Marten::DB::Query::Set do
       Tag.create!(name: "coding", is_active: true)
 
       expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Delete with sliced queries is not supported") do
-        Marten::DB::Query::Set(Tag).new[..1].as?(Marten::DB::Query::Set(Tag)).not_nil!.delete
+        if (qset = Marten::DB::Query::Set(Tag).new[..1]).is_a?(Marten::DB::Query::Set(Tag))
+          qset.delete
+        end
       end
     end
 

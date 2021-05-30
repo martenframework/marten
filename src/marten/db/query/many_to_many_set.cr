@@ -3,6 +3,7 @@ require "./set"
 module Marten
   module DB
     module Query
+      # Represents a query set resulting from a many-to-many relation.
       class ManyToManySet(Model) < Set(Model)
         @m2m_field : Field::Base? = nil
         @m2m_through_from_field : Field::Base? = nil

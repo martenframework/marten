@@ -24,6 +24,7 @@ module Marten
         @@registry
       end
 
+      register "capitalize", Capitalize
       register "default", Default
       register "downcase", DownCase
       register "upcase", UpCase

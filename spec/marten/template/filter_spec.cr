@@ -3,6 +3,7 @@ require "./spec_helper"
 describe Marten::Template::Filter do
   describe "::get" do
     it "returns the right built-in filter classes for the expected filter names" do
+      Marten::Template::Filter.get("capitalize").should be_a Marten::Template::Filter::Capitalize
       Marten::Template::Filter.get("default").should be_a Marten::Template::Filter::Default
       Marten::Template::Filter.get("downcase").should be_a Marten::Template::Filter::DownCase
       Marten::Template::Filter.get("upcase").should be_a Marten::Template::Filter::UpCase

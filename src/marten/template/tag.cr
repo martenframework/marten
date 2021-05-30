@@ -29,6 +29,7 @@ module Marten
       register "extend", Extend
       register "for", For
       register "if", If
+      register "include", Include
       register "spaceless", Spaceless
       register "super", Super
       register "translate", Translate

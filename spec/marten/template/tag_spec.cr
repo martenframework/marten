@@ -8,6 +8,7 @@ describe Marten::Template::Tag do
       Marten::Template::Tag.get("extend").should eq Marten::Template::Tag::Extend
       Marten::Template::Tag.get("for").should eq Marten::Template::Tag::For
       Marten::Template::Tag.get("if").should eq Marten::Template::Tag::If
+      Marten::Template::Tag.get("include").should eq Marten::Template::Tag::Include
       Marten::Template::Tag.get("spaceless").should eq Marten::Template::Tag::Spaceless
       Marten::Template::Tag.get("super").should eq Marten::Template::Tag::Super
       Marten::Template::Tag.get("translate").should eq Marten::Template::Tag::Translate

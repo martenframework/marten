@@ -11,8 +11,12 @@ module Marten
             if request.path == "/"
               render_welcome_page
             else
-              HTTP::Response::NotFound.new("The requested resource was not found.", content_type: "text/html")
+              render_not_found_page
             end
+          end
+
+          private def render_not_found_page
+            HTTP::Response.new(ECR.render("#{__DIR__}/templates/page_not_found.html.ecr"))
           end
 
           private def render_welcome_page

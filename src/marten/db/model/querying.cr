@@ -101,6 +101,13 @@ module Marten
             default_queryset.first
           end
 
+          # Returns the first record for the considered model.
+          #
+          # A `NilAssertionError` error will be raised if no records can be found.
+          def first!
+            first.not_nil!
+          end
+
           # Returns the model instance matching the given set of filters.
           #
           # Model fields such as primary keys or fields with a unique constraint should be used here in order to
@@ -210,6 +217,13 @@ module Marten
           # `nil` will be returned if no records can be found.
           def last
             default_queryset.last
+          end
+
+          # Returns the last record for the considered model.
+          #
+          # A `NilAssertionError` error will be raised if no records can be found.
+          def last!
+            last.not_nil!
           end
 
           # Returns a queryset that will be evaluated using the specified database.

@@ -163,6 +163,31 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::first!" do
+    before_each do
+      TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "fb@example.com", first_name: "Foo", last_name: "Bar")
+
+      Tag.create!(name: "crystal", is_active: false)
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+    end
+
+    it "returns the first object" do
+      TestUser.first!.should eq TestUser.get!(username: "jd1")
+    end
+
+    it "makes use of the default queryset" do
+      Tag.first!.should eq Tag.get!(name: "ruby")
+    end
+
+    it "raises a NilAssertionError if no record is found" do
+      Tag.all.delete
+      expect_raises(NilAssertionError) { Tag.first! }
+    end
+  end
+
   describe "::get" do
     before_each do
       TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
@@ -268,6 +293,31 @@ describe Marten::DB::Model::Querying do
 
     it "makes use of the default queryset" do
       Tag.last.should eq Tag.get!(name: "coding")
+    end
+  end
+
+  describe "::last!" do
+    before_each do
+      TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "fb@example.com", first_name: "Foo", last_name: "Bar")
+
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "crystal", is_active: false)
+    end
+
+    it "returns the last object" do
+      TestUser.last!.should eq TestUser.get!(username: "foo")
+    end
+
+    it "makes use of the default queryset" do
+      Tag.last!.should eq Tag.get!(name: "coding")
+    end
+
+    it "raises a NilAssertionError error if no record is found" do
+      Tag.all.delete
+      expect_raises(NilAssertionError) { Tag.last! }
     end
   end
 

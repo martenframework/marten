@@ -119,7 +119,7 @@ module Marten
             default_queryset.get(**kwargs)
           end
 
-          # Returns the model instance matching a specifc set of advanced filters.
+          # Returns the model instance matching a specific set of advanced filters.
           #
           # Model fields such as primary keys or fields with a unique constraint should be used here in order to
           # retrieve a specific record:
@@ -158,7 +158,7 @@ module Marten
             default_queryset.get!(**kwargs)
           end
 
-          # Returns the model instance matching a specifc set of advanced filters.
+          # Returns the model instance matching a specific set of advanced filters.
           #
           # Model fields such as primary keys or fields with a unique constraint should be used here in order to
           # retrieve a specific record:

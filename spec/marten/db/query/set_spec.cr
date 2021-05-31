@@ -752,6 +752,33 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#first!" do
+    it "returns the first result for an ordered queryset" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.order(:name)
+
+      qset.first!.should eq tag_2
+    end
+
+    it "returns the first result ordered according to primary keys for an unordered queryset" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.first!.should eq tag_1
+    end
+
+    it "raises a NilAssertionError error if the queryset doesn't match any records" do
+      qset = Marten::DB::Query::Set(Tag).new
+      expect_raises(NilAssertionError) { qset.first!.should be_nil }
+    end
+  end
+
   describe "#get" do
     it "returns the record corresponding to predicates expressed as keyword arguments" do
       tag = Tag.create!(name: "crystal", is_active: true)
@@ -1140,6 +1167,33 @@ describe Marten::DB::Query::Set do
     it "returns nil if the queryset doesn't match any records" do
       qset = Marten::DB::Query::Set(Tag).new
       qset.last.should be_nil
+    end
+  end
+
+  describe "#last!" do
+    it "returns the last result for an ordered queryset" do
+      Tag.create!(name: "crystal", is_active: true)
+      tag_2 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.order(:name)
+
+      qset.last!.should eq tag_2
+    end
+
+    it "returns the last result ordered according to primary keys for an unordered queryset" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.last!.should eq tag_3
+    end
+
+    it "raises a NilAssertionError error if the queryset doesn't match any records" do
+      qset = Marten::DB::Query::Set(Tag).new
+      expect_raises(NilAssertionError) { qset.last!.should be_nil }
     end
   end
 

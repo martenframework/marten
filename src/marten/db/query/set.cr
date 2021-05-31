@@ -285,6 +285,11 @@ module Marten
           (query.ordered? ? self : order(Constants::PRIMARY_KEY_ALIAS))[0]?
         end
 
+        # Returns the first record that is matched by the query set, or raises a `NilAssertionError` error otherwise.
+        def first!
+          first.not_nil!
+        end
+
         # Returns the model instance matching the given set of filters.
         #
         # Model fields such as primary keys or fields with a unique constraint should be used here in order to retrieve
@@ -427,6 +432,11 @@ module Marten
         # Returns the last record that is matched by the query set, or `nil` if no records are found.
         def last
           (query.ordered? ? reverse : order("-#{Constants::PRIMARY_KEY_ALIAS}"))[0]?
+        end
+
+        # Returns the last record that is matched by the query set, or raises a `NilAssertionError` error otherwise.
+        def last!
+          last.not_nil!
         end
 
         # Returns the model class associated with the query set.

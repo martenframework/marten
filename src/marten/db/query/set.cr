@@ -16,11 +16,15 @@ module Marten
 
         @result_cache : Array(Model)?
 
+        # :nodoc:
         getter query
 
         def initialize(@query = SQL::Query(Model).new)
         end
 
+        # Returns the record at the given index.
+        #
+        # If no record can be found at the given index, then an `IndexError` exception is raised.
         def [](index : Int)
           raise_negative_indexes_not_supported if index < 0
 
@@ -33,12 +37,20 @@ module Marten
           qs.result_cache.not_nil![0]
         end
 
+        # Returns the record at the given index.
+        #
+        # `nil` is returned if no record can be found at the given index.
         def []?(index : Int)
           self[index]
         rescue IndexError
           nil
         end
 
+        # Returns the records corresponding to the passed range.
+        #
+        # If no records match the passed range, an `IndexError` exception is raised. If the current query set was
+        # already "consumed" (records were retrieved from the database), an array of records will be returned.
+        # Otherwise, another sliced query set will be returned.
         def [](range : Range)
           raise_negative_indexes_not_supported if !range.begin.nil? && range.begin.not_nil! < 0
           raise_negative_indexes_not_supported if !range.end.nil? && range.end.not_nil! < 0
@@ -59,26 +71,55 @@ module Marten
           qs
         end
 
+        # Returns the records corresponding to the passed range.
+        #
+        # `nil` is returned if no records match the passed range. If the current query set was already "consumed"
+        # (records were retrieved from the database), an array of records will be returned. Otherwise, another sliced
+        # query set will be returned.
         def []?(range : Range)
           self[range]
         rescue IndexError
           nil
         end
 
+        # Returns a cloned version of the current query set matching all records.
         def all
           clone
         end
 
+        # Returns the number of records that are targeted by the current query set.
         def count
           @query.count
         end
 
+        # Creates a model instance and saves it to the database if it is valid.
+        #
+        # The new model instance is initialized by using the attributes defined in the `kwargs` double splat argument.
+        # Regardless of whether it is valid or not (and thus persisted to the database or not), the initialized model
+        # instance is returned by this method:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.create(title: "My blog post")
+        # ```
         def create(**kwargs)
           object = Model.new(**kwargs)
           object.save(using: @query.using)
           object
         end
 
+        # Creates a model instance and saves it to the database if it is valid.
+        #
+        # This method provides the exact same behaviour as `create` with the ability to define a block that is executed
+        # for the new object. This block can be used to directly initialize the object before it is persisted to the
+        # database:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.create(title: "My blog post") do |post|
+        #   post.complex_attribute = compute_complex_attribute
+        # end
+        # ```
         def create(**kwargs, &block)
           object = Model.new(**kwargs)
           yield object
@@ -86,12 +127,34 @@ module Marten
           object
         end
 
+        # Creates a model instance and saves it to the database if it is valid.
+        #
+        # The model instance is initialized using the attributes defined in the `kwargs` double splat argument. If the
+        # model instance is valid, it is persisted to the database ; otherwise a `Marten::DB::Errors::InvalidRecord`
+        # exception is raised.
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.create!(title: "My blog post")
+        # ```
         def create!(**kwargs)
           object = Model.new(**kwargs)
           object.save!(using: @query.using)
           object
         end
 
+        # Creates a model instance and saves it to the database if it is valid.
+        #
+        # This method provides the exact same behaviour as `create!` with the ability to define a block that is executed
+        # for the new object. This block can be used to directly initialize the object before it is persisted to the
+        # database:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.create!(title: "My blog post") do |post|
+        #   post.complex_attribute = compute_complex_attribute
+        # end
+        # ```
         def create!(**kwargs, &block)
           object = Model.new(**kwargs)
           yield object
@@ -99,7 +162,7 @@ module Marten
           object
         end
 
-        # Deletes the records corresponding to the current queryset and returns the number of deleted records.
+        # Deletes the records corresponding to the current query set and returns the number of deleted records.
         #
         # By default, related objects will be deleted by following the deletion strategy defined in each foreign key
         # field if applicable, unless the `raw` argument is set to `true`.
@@ -122,6 +185,15 @@ module Marten
           end
         end
 
+        # Allows to iterate over the records that are targeted by the current query set.
+        #
+        # This method can be used to define a block that iterates over the records that are targeted by a query set:
+        #
+        # ```
+        # Post.all.each do |post|
+        #   # Do something
+        # end
+        # ```
         def each
           fetch if @result_cache.nil?
           @result_cache.not_nil!.each do |r|
@@ -129,68 +201,180 @@ module Marten
           end
         end
 
+        # Returns a query set whose records do not match the given set of filters.
+        #
+        # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be
+        # specified using the predicate format:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.exclude(title: "Test")
+        # query_set.exclude(title__startswith: "A")
+        # ```
+        #
+        # If multiple filters are specified, they will be joined using an **AND** operator at the SQL level.
         def exclude(**kwargs)
           exclude(Node.new(**kwargs))
         end
 
+        # Returns a query set whose records do not match the given set of advanced filters.
+        #
+        # This method returns a `Marten::DB::Query::Set` object and allows to define complex database queries involving
+        # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
+        # expression. These expressions can then be used to build complex queries such as:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.exclude { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
+        # ```
         def exclude(&block)
           expr = Expression::Filter.new
           query : Node = with expr yield
           exclude(query)
         end
 
+        # Returns a query set whose records do not match the given query node object.
         def exclude(query_node : Node)
           add_query_node(-query_node)
         end
 
+        # Returns `true` if the current query set matches at least one record, or `false` otherwise.
         def exists?
           @result_cache.nil? ? @query.exists? : !@result_cache.not_nil!.empty?
         end
 
+        # Returns a query set matching a specific set of filters.
+        #
+        # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be
+        # specified using the predicate format:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter(title: "Test")
+        # query_set.filter(title__startswith: "A")
+        # ```
+        #
+        # If multiple filters are specified, they will be joined using an **AND** operator at the SQL level.
         def filter(**kwargs)
           filter(Node.new(**kwargs))
         end
 
+        # Returns a query set matching a specific set of advanced filters.
+        #
+        # This method returns a `Marten::DB::Query::Set` object and allows to define complex database queries involving
+        # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
+        # expression. These expressions can then be used to build complex queries such as:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
+        # ```
         def filter(&block)
           expr = Expression::Filter.new
           query : Node = with expr yield
           filter(query)
         end
 
+        # Returns a query set whose records match the given query node object.
         def filter(query_node : Node)
           add_query_node(query_node)
         end
 
+        # Returns the first record that is matched by the query set, or `nil` if no records are found.
         def first
           (query.ordered? ? self : order(Constants::PRIMARY_KEY_ALIAS))[0]?
         end
 
+        # Returns the model instance matching the given set of filters.
+        #
+        # Model fields such as primary keys or fields with a unique constraint should be used here in order to retrieve
+        # a specific record:
+        #
+        # ```
+        # query_set = Post.all
+        # post_1 = query_set.get(id: 123)
+        # post_2 = query_set.get(id: 456, is_published: false)
+        # ```
+        #
+        # If the specified set of filters doesn't match any records, the returned value will be `nil`.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
         def get(**kwargs)
           get(Node.new(**kwargs))
         end
 
+        # Returns the model instance matching a specific set of advanced filters.
+        #
+        # Model fields such as primary keys or fields with a unique constraint should be used here in order to retrieve
+        # a specific record:
+        #
+        # ```
+        # query_set = Post.all
+        # post_1 = query_set.get { q(id: 123) }
+        # post_2 = query_set.get { q(id: 456, is_published: false) }
+        # ```
+        #
+        # If the specified set of filters doesn't match any records, the returned value will be `nil`.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
         def get(&block)
           expr = Expression::Filter.new
           query : Node = with expr yield
           get(query)
         end
 
+        # Returns the model instance matching a specific query node object, or `nil` if no record is found.
         def get(query_node : Node)
           get!(query_node)
         rescue Model::NotFound
           nil
         end
 
+        # Returns the model instance matching the given set of filters.
+        #
+        # Model fields such as primary keys or fields with a unique constraint should be used here in order to retrieve
+        # a specific record:
+        #
+        # ```
+        # query_set = Post.all
+        # post_1 = query_set.get!(id: 123)
+        # post_2 = query_set.get!(id: 456, is_published: false)
+        # ```
+        #
+        # If the specified set of filters doesn't match any records, a `Marten::DB::Errors::RecordNotFound` exception
+        # will be raised.
+        #
+        # In order to ensure data consistency, this method will also raise a
+        # `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
         def get!(**kwargs)
           get!(Node.new(**kwargs))
         end
 
+        # Returns the model instance matching a specific set of advanced filters.
+        #
+        # Model fields such as primary keys or fields with a unique constraint should be used here in order to retrieve
+        # a specific record:
+        #
+        # ```
+        # query_set = Post.all
+        # post_1 = query_set.get! { q(id: 123) }
+        # post_2 = query_set.get! { q(id: 456, is_published: false) }
+        # ```
+        #
+        # If the specified set of filters doesn't match any records, a `Marten::DB::Errors::RecordNotFound` exception
+        # will be raised.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
         def get!(&block)
           expr = Expression::Filter.new
           query : Node = with expr yield
           get!(query)
         end
 
+        # Returns the model instance matching a specific query node object, or raise an error otherwise.
         def get!(query_node : Node)
           results = filter(query_node)[..GET_RESULTS_LIMIT].to_a
           return results.first if results.size == 1
@@ -198,6 +382,7 @@ module Marten
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
         end
 
+        # Appends a string representation of the query set to the passed `io`.
         def inspect(io)
           results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
           io << "<#{self.class.name} ["
@@ -206,6 +391,31 @@ module Marten
           io << "]>"
         end
 
+        # Returns a queryset whose specified `relations` are "followed" and joined to each result.
+        #
+        # When using `#join`, the specified foreign-key relationships will be followed and each record returned by the
+        # queryset will have the corresponding related objects already selected and populated. Using `#join` can result
+        # in performance improvements since it can help reduce the number of SQL queries, as illustrated by the
+        # following example:
+        #
+        # ```
+        # query_set = Post.all
+        #
+        # p1 = query_set.get(id: 1)
+        # puts p1.author # hits the database to retrieved the related "author"
+        #
+        # p2 = query_set.join(:author).get(id: 1)
+        # puts p2.author # doesn't hit the database since the related "author" was already selected
+        # ```
+        #
+        # It should be noted that it is also possible to follow foreign keys of direct related models too by using the
+        # double underscores notation(`__`). For example the following query will select the joined "author" and its
+        # associated "profile":
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.join(:author__profile)
+        # ```
         def join(*relations : String | Symbol)
           qs = clone
           relations.each do |relation|
@@ -214,6 +424,7 @@ module Marten
           qs
         end
 
+        # Returns the last record that is matched by the query set, or `nil` if no records are found.
         def last
           (query.ordered? ? reverse : order("-#{Constants::PRIMARY_KEY_ALIAS}"))[0]?
         end
@@ -223,26 +434,52 @@ module Marten
           Model
         end
 
+        # Allows to specify the ordering in which records should be returned when evaluating the query set.
+        #
+        # Multiple fields can be specified in order to define the final ordering. For example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.order("-published_at", "title")
+        # ```
+        #
+        # In the above example, records would be ordered by descending publication date, and then by title (ascending).
         def order(*fields : String | Symbol)
           qs = clone
           qs.query.order(*fields.map(&.to_s))
           qs
         end
 
+        # Allows to reverse the order of the current query set.
         def reverse
           qs = clone
           qs.query.default_ordering = !@query.default_ordering
           qs
         end
 
+        # Returns the number of records that are targeted by the current query set.
         def size
           count
         end
 
+        # Appends a string representation of the query set to the passed `io`.
         def to_s(io)
           inspect(io)
         end
 
+        # Updates all the records matched by the current query set with the passed values.
+        #
+        # This method allows to update all the records that are matched by the current query set with a hash or a named
+        # tuple of values. It returns the number of records that were updated:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.update({"title" => "Updated"})
+        # ```
+        #
+        # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+        # are updated through  the use of this method won't be validated, and no callbacks will be executed for them
+        # either.
         def update(values : Hash | NamedTuple)
           update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
           update_hash.merge!(values.to_h)
@@ -251,10 +488,24 @@ module Marten
           qs.query.update_with(update_hash)
         end
 
+        # Updates all the records matched by the current query set with the passed values.
+        #
+        # This method allows to update all the records that are matched by the current query set with the values defined
+        # in the `kwargs` double splat argument. It returns the number of records that were updated:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.update(title: "Updated")
+        # ```
+        #
+        # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+        # are updated through  the use of this method won't be validated, and no callbacks will be executed for them
+        # either.
         def update(**kwargs)
           update(kwargs.to_h)
         end
 
+        # Allows to define which database alias should be used when evaluating the query set.
         def using(db : String | Symbol)
           qs = clone
           qs.query.using = db.to_s

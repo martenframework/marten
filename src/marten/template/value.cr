@@ -6,7 +6,7 @@ module Marten
       include Enumerable(self)
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) | Nil | String |
-                  Time
+                  Marten::Template::Object | Time
 
       # Returns the raw value associated with the template value.
       getter raw
@@ -76,6 +76,8 @@ module Marten
             return object[key.to_s]
           rescue KeyError
           end
+        elsif object.responds_to?(:resolve_template_attribute)
+          return object.resolve_template_attribute(key.to_s)
         end
 
         raise Errors::UnknownVariable.new

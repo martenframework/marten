@@ -133,7 +133,7 @@ describe Marten::Template::Value do
   end
 
   describe "#[]" do
-    it "returns a value corresponding to the passed object attribute" do
+    it "returns a value corresponding to the passed attribute for a hash" do
       value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})
 
       value["foo"].should be_a Marten::Template::Value
@@ -141,6 +141,13 @@ describe Marten::Template::Value do
 
       value["test"].should be_a Marten::Template::Value
       value["test"].should eq Marten::Template::Value.from(42)
+    end
+
+    it "returns a value corresponding to the passed attribute for a template object" do
+      value = Marten::Template::Value.from(Marten::Template::ValueSpec::Test.new)
+
+      value["test_attr"].should be_a Marten::Template::Value
+      value["test_attr"].should eq Marten::Template::Value.from("hello")
     end
 
     it "raises an unknown variable error if the attribute does not exist" do
@@ -258,6 +265,16 @@ describe Marten::Template::Value do
     it "returns true for other objects" do
       Marten::Template::Value.from(42).truthy?.should be_true
       Marten::Template::Value.from({"foo" => "bar", "test" => 42, "nested" => {"test" => 1}}).truthy?.should be_true
+    end
+  end
+end
+
+module Marten::Template::ValueSpec
+  class Test
+    include Marten::Template::Object
+
+    def test_attr
+      "hello"
     end
   end
 end

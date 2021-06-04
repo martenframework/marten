@@ -5,8 +5,8 @@ module Marten
       include Comparable(self)
       include Enumerable(self)
 
-      alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) | Nil | String |
-                  Marten::Template::Object | Time
+      alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) |
+                  Marten::Template::Object | Nil | SafeString | String | Time
 
       # Returns the raw value associated with the template value.
       getter raw

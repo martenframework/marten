@@ -13,7 +13,9 @@ module Marten
         end
 
         def render(context : Context) : String
-          @expression.resolve(context).raw.to_s
+          raw_value = @expression.resolve(context).try(&.raw)
+          # Escapes the final value, except for safe strings.
+          raw_value.is_a?(SafeString) ? raw_value.to_s : HTML.escape(raw_value.to_s)
         end
       end
     end

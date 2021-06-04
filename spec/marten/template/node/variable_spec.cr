@@ -27,5 +27,19 @@ describe Marten::Template::Node::Variable do
       node_2 = Marten::Template::Node::Variable.new("user.name|upcase")
       node_2.render(ctx).should eq "JOHN DOE"
     end
+
+    it "automatically escape values" do
+      ctx = Marten::Template::Context{"body" => "<div>Hello</div>"}
+
+      node = Marten::Template::Node::Variable.new("body")
+      node.render(ctx).should eq "&lt;div&gt;Hello&lt;/div&gt;"
+    end
+
+    it "does not escape safe strings" do
+      ctx = Marten::Template::Context{"body" => Marten::Template::SafeString.new("<div>Hello</div>")}
+
+      node = Marten::Template::Node::Variable.new("body")
+      node.render(ctx).should eq "<div>Hello</div>"
+    end
   end
 end

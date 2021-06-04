@@ -3,6 +3,7 @@
 require "db"
 require "digest/md5"
 require "ecr/macros"
+require "html"
 require "http"
 require "i18n"
 require "log"

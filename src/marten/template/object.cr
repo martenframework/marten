@@ -11,12 +11,16 @@ module Marten
         {% begin %}
           value = case key
           {% if !@type.abstract? %}
+            {% already_processed = [] of String %}
             {% for type in [@type] + @type.ancestors %}
               {% if type.name != "Object" && type.name != "Reference" %}
                 {% for method in type.methods %}
-                  {% if method.visibility == :public && !method.accepts_block? && method.args.empty? %}
-                    when {{ method.name.id.stringify }}
-                      self.{{ method.name.id }}
+                  {% if !already_processed.includes?(method.name.id.stringify) %}
+                    {% if method.visibility == :public && !method.accepts_block? && method.args.empty? %}
+                      when {{ method.name.id.stringify }}
+                        self.{{ method.name.id }}
+                      {% already_processed << method.name.id.stringify %}
+                    {% end %}
                   {% end %}
                 {% end %}
               {% end %}

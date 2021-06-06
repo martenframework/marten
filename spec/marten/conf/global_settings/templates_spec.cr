@@ -32,6 +32,37 @@ describe Marten::Conf::GlobalSettings::Templates do
     end
   end
 
+  describe "#cached" do
+    it "returns false by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.cached.should be_false
+    end
+
+    it "returns true if configured accordingly" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.cached = true
+      templates_conf.cached.should be_true
+    end
+
+    it "returns false if configured accordingly" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.cached = false
+      templates_conf.cached.should be_false
+    end
+  end
+
+  describe "#cached=" do
+    it "allows to change the cached configuration as expected" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.cached = true
+      templates_conf.cached.should be_true
+
+      templates_conf.cached = false
+      templates_conf.cached.should be_false
+    end
+  end
+
   describe "#dirs" do
     it "returns an empty array of strings by default" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new

@@ -83,7 +83,11 @@ module Marten
     # Then generate any new templates loader based on the configured templates dirs.
     loaders += settings.templates.dirs.map { |d| Template::Loader::FileSystem.new(d) }
 
-    templates.loaders = loaders
+    templates.loaders = if settings.templates.cached
+                          [Template::Loader::Cached.new(loaders)] of Marten::Template::Loader::Base
+                        else
+                          loaders
+                        end
   end
 
   # :nodoc:

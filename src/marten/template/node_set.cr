@@ -4,7 +4,7 @@ module Marten
   module Template
     # Represents a set of nodes.
     #
-    # A set of nodes is simply a enumerable holding `Marten::Template::Node` objects. It provides convenient methods
+    # A set of nodes is simply an enumerable holding `Marten::Template::Node` objects. It provides convenient methods
     # allowing to render the underlying nodes.
     class NodeSet
       include Enumerable(Node::Base)

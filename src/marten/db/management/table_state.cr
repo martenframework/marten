@@ -6,6 +6,7 @@ module Marten
         getter app_label
         getter columns
         getter name
+        getter unique_constraints
 
         setter name
 
@@ -14,14 +15,16 @@ module Marten
           new(
             app_label: model.app_config.label,
             name: model.db_table,
-            columns: model.fields.compact_map(&.to_column)
+            columns: model.fields.compact_map(&.to_column),
+            unique_constraints: model.db_unique_constraints.map(&.to_management_constraint)
           )
         end
 
         def initialize(
           @app_label : String,
           @name : String,
-          @columns : Array(Column::Base)
+          @columns : Array(Column::Base),
+          @unique_constraints : Array(Management::Constraint::Unique)
         )
         end
 

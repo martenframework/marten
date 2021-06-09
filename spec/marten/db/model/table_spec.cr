@@ -21,6 +21,41 @@ describe Marten::DB::Model::Table do
     end
   end
 
+  describe "::db_unique_constraint" do
+    it "allows to configure new unique constraints" do
+      unique_constraints = Post.db_unique_constraints
+      unique_constraints.size.should eq 1
+      unique_constraints[0].name.should eq "author_title"
+      unique_constraints[0].fields.size.should eq 2
+      unique_constraints[0].fields[0].id.should eq "author_id"
+      unique_constraints[0].fields[1].id.should eq "title"
+    end
+
+    it "raises if the passed field does not correspond to any of the model's fields" do
+      expect_raises(
+        Marten::DB::Errors::UnknownField,
+        "Unknown field 'unknown' in unique constraint definition"
+      ) do
+        Post.db_unique_constraint("new_unique", ["unknown", "author"])
+      end
+    end
+  end
+
+  describe "::db_unique_constraints" do
+    it "returns an empty array if no unique constraints are defined" do
+      TestUser.db_unique_constraints.should be_empty
+    end
+
+    it "returns an array of the configured unique constraints when unique constraints are defined" do
+      unique_constraints = Post.db_unique_constraints
+      unique_constraints.size.should eq 1
+      unique_constraints[0].name.should eq "author_title"
+      unique_constraints[0].fields.size.should eq 2
+      unique_constraints[0].fields[0].id.should eq "author_id"
+      unique_constraints[0].fields[1].id.should eq "title"
+    end
+  end
+
   describe "::fields" do
     it "returns the field instances associated with the considered model class" do
       Tag.fields.size.should eq 3

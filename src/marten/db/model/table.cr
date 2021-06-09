@@ -9,6 +9,7 @@ module Marten
           LOOKUP_SEP = {{ Marten::DB::Constants::LOOKUP_SEP }}
 
           @@db_table : String?
+          @@db_unique_constraints : Array(Constraint::Unique) = [] of Constraint::Unique
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
           @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
           @@relation_fields_per_relation_name : Hash(String, Field::Base) = {} of String => Field::Base
@@ -50,6 +51,27 @@ module Marten
           # Allows to explicitely define the name of the table associated with the model.
           def db_table(db_table : String | Symbol)
             @@db_table = db_table.to_s
+          end
+
+          # Allows to explicitly configure a new unique constraint for a specific set of fields.
+          #
+          # This method allows to configure a new unique constraint targetting a specific set of `fields`. Unique
+          # constraints must be associated with a mandatory `name` that must be unique accross all the constraints of
+          # the considered model.
+          def db_unique_constraint(name : String | Symbol, field_names : Array(String) | Array(Symbol)) : Nil
+            @@db_unique_constraints << Constraint::Unique.new(
+              name.to_s,
+              field_names.map do |fname|
+                get_field(fname.to_s)
+              rescue Errors::UnknownField
+                raise Errors::UnknownField.new("Unknown field '#{fname}' in unique constraint definition")
+              end
+            )
+          end
+
+          # Returns the configured unique database constraints.
+          def db_unique_constraints
+            @@db_unique_constraints
           end
 
           # Returns all the fields instances associated with the current model.
@@ -159,10 +181,6 @@ module Marten
             {{ field_ann }},
             {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
           )
-        end
-
-        def self.db_unique_constraint(fields : Array(String) | Array(Symbol), name : String | Symbol) : Nil
-          # @unique_constraints << Constraint::Unique.new(...)
         end
 
         # Allows to read the value of a specific field.

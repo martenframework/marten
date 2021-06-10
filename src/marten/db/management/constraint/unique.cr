@@ -8,6 +8,10 @@ module Marten
 
           def initialize(@name : String, @column_names : Array(String))
           end
+
+          def clone
+            self.class.new(@name.dup, @column_names.clone)
+          end
         end
       end
     end

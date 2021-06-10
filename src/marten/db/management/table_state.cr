@@ -49,7 +49,7 @@ module Marten
         end
 
         def clone
-          TableState.new(@app_label.dup, @name.dup, @columns.clone)
+          TableState.new(@app_label.dup, @name.dup, @columns.clone, @unique_constraints.clone)
         end
       end
     end

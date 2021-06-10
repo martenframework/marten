@@ -6,7 +6,7 @@ module Marten
           include IsBuiltInColumn
 
           def clone
-            self.class.new(@name, @primary_key, @null, @unique, @index)
+            self.class.new(@name, @primary_key, @null, @unique, @index, @default)
           end
         end
       end

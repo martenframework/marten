@@ -1,6 +1,26 @@
 require "./spec_helper"
 
 describe Marten::DB::Management::Constraint::Unique do
+  describe "::new" do
+    it "allows to initialize a unique constraint from name and column names strings" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new(
+        "new_constraint",
+        column_names: ["author_id", "title"]
+      )
+      unique_constraint.name.should eq "new_constraint"
+      unique_constraint.column_names.should eq ["author_id", "title"]
+    end
+
+    it "allows to initialize a unique constraint from name and column names symbols" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new(
+        :new_constraint,
+        column_names: [:author_id, :title]
+      )
+      unique_constraint.name.should eq "new_constraint"
+      unique_constraint.column_names.should eq ["author_id", "title"]
+    end
+  end
+
   describe "#name" do
     it "returns the unique constraint name" do
       unique_constraint = Marten::DB::Management::Constraint::Unique.new(

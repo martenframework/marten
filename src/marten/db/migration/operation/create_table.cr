@@ -5,6 +5,7 @@ module Marten
         class CreateTable < Base
           getter name
           getter columns
+          getter unique_constraints
 
           def initialize(
             @name : String,

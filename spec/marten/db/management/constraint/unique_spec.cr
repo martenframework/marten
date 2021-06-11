@@ -55,4 +55,14 @@ describe Marten::DB::Management::Constraint::Unique do
       cloned_unique_constraint.column_names.should_not be unique_constraint.column_names
     end
   end
+
+  describe "#serialize_args" do
+    it "returns a serialized version of the unique constraint arguments" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new(
+        "new_constraint",
+        column_names: ["author_id", "title"]
+      )
+      unique_constraint.serialize_args.should eq %{"new_constraint", ["author_id", "title"]}
+    end
+  end
 end

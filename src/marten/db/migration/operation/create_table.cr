@@ -6,7 +6,11 @@ module Marten
           getter name
           getter columns
 
-          def initialize(@name : String, @columns : Array(Management::Column::Base))
+          def initialize(
+            @name : String,
+            @columns : Array(Management::Column::Base),
+            @unique_constraints : Array(Management::Constraint::Unique)
+          )
           end
 
           def describe : String
@@ -38,7 +42,8 @@ module Marten
               Management::TableState.new(
                 app_label,
                 @name,
-                @columns.dup
+                @columns.dup,
+                @unique_constraints.dup
               )
             )
           end

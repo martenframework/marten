@@ -15,7 +15,8 @@ module Marten
               TableState.new(
                 app_label: "marten",
                 name: Record.db_table,
-                columns: Record.fields.compact_map(&.to_column)
+                columns: Record.fields.compact_map(&.to_column),
+                unique_constraints: Record.db_unique_constraints.map(&.to_management_constraint)
               )
             )
           end

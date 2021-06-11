@@ -269,7 +269,8 @@ module Marten
                 created_table.app_label,
                 DB::Migration::Operation::CreateTable.new(
                   created_table.name,
-                  created_table.columns.dup
+                  created_table.columns.dup,
+                  created_table.unique_constraints.dup
                 ),
                 dependencies,
                 beginning: true

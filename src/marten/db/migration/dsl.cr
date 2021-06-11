@@ -64,6 +64,10 @@ module Marten
             {% unless kwargs.is_a?(NilLiteral) || kwargs.empty? %}**{{ kwargs }}{% end %}
           )
         end
+
+        macro _init_unique_constraint(name, column_names)
+          Marten::DB::Management::Constraint::Unique.new({{ name }}, {{ column_names }})
+        end
       end
     end
   end

@@ -29,7 +29,7 @@ module Marten
             return
           end
 
-          print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n\n")
+          print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n")
 
           runner.execute(app_config, migration_name, @fake) do |progress|
             process_execution_progress(progress)

@@ -29,7 +29,7 @@ module Marten
           abstract def create_index_deferred_statement(table : TableState, columns : Array(Column::Base)) : Statement
 
           # Returns the SQL statement allowing to create a database table.
-          abstract def create_table_statement(table_name : String, column_definitions : String) : String
+          abstract def create_table_statement(table_name : String, definitions : String) : String
 
           # Returns a boolean indicating if the schema editor implementation supports rollbacking DDL statements.
           abstract def ddl_rollbackable? : Bool
@@ -92,7 +92,7 @@ module Marten
 
           # Creates a new table from a migration table state.
           def create_table(table : TableState) : Nil
-            column_definitions = [] of String
+            definitions = [] of String
 
             table.columns.each do |column|
               column_type = column_sql_for(column)
@@ -102,10 +102,14 @@ module Marten
                 column_definition = prepare_foreign_key_for_new_table(table, column, column_definition)
               end
 
-              column_definitions << column_definition
+              definitions << column_definition
             end
 
-            execute(create_table_statement(quote(table.name), column_definitions.join(", ")))
+            table.unique_constraints.each do |unique_constraint|
+              definitions << unique_constraint_sql_for(unique_constraint)
+            end
+
+            execute(create_table_statement(quote(table.name), definitions.join(", ")))
 
             # Forwards indexes configured as part of specific columns and the corresponding SQL statements to the array
             # of deferred SQL statements.
@@ -262,6 +266,16 @@ module Marten
 
           private def statement_table(*args, **kwargs)
             Statement::Table.new(->quote(String), *args, **kwargs)
+          end
+
+          private def unique_constraint_sql_for(unique_constraint)
+            String.build do |s|
+              s << "CONSTRAINT #{unique_constraint.name} "
+              s << "UNIQUE "
+              s << "("
+              s << unique_constraint.column_names.join(", ") { |cname| quote(cname) }
+              s << ")"
+            end
           end
         end
       end

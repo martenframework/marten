@@ -20,8 +20,8 @@ module Marten
             )
           end
 
-          def create_table_statement(table_name : String, column_definitions : String) : String
-            "CREATE TABLE #{table_name} (#{column_definitions})"
+          def create_table_statement(table_name : String, definitions : String) : String
+            "CREATE TABLE #{table_name} (#{definitions})"
           end
 
           def ddl_rollbackable? : Bool

@@ -18,6 +18,11 @@ module Marten
             @column_names = column_names.map(&.to_s)
           end
 
+          # Returns true if the other unique constraint corresponds to the same unique constraint configuration.
+          def ==(other : self)
+            super || (name == other.name && column_names == other.column_names)
+          end
+
           # Returns a copy of the unique constraint.
           def clone
             self.class.new(@name.dup, @column_names.clone)

@@ -21,6 +21,54 @@ describe Marten::DB::Management::Constraint::Unique do
     end
   end
 
+  describe "#==" do
+    it "returns true if the other object is the same object" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new(
+        :new_constraint,
+        column_names: [:author_id, :title]
+      )
+      other_unique_constraint = unique_constraint
+
+      other_unique_constraint.should eq unique_constraint
+    end
+
+    it "returns true if the other objects corresponds to the same unique constraint configuration" do
+      Marten::DB::Management::Constraint::Unique.new(
+        :new_constraint,
+        column_names: [:author_id, :title]
+      ).should eq(
+        Marten::DB::Management::Constraint::Unique.new(
+          :new_constraint,
+          column_names: [:author_id, :title]
+        )
+      )
+    end
+
+    it "returns false if the other unique constraint has a different name" do
+      Marten::DB::Management::Constraint::Unique.new(
+        :new_constraint,
+        column_names: [:author_id, :title]
+      ).should_not eq(
+        Marten::DB::Management::Constraint::Unique.new(
+          :other_constraint,
+          column_names: [:author_id, :title]
+        )
+      )
+    end
+
+    it "returns false if the other unique constraint has not the same columns names" do
+      Marten::DB::Management::Constraint::Unique.new(
+        :new_constraint,
+        column_names: [:author_id, :title]
+      ).should_not eq(
+        Marten::DB::Management::Constraint::Unique.new(
+          :new_constraint,
+          column_names: [:author_id]
+        )
+      )
+    end
+  end
+
   describe "#name" do
     it "returns the unique constraint name" do
       unique_constraint = Marten::DB::Management::Constraint::Unique.new(

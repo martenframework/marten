@@ -19,15 +19,13 @@ module Marten
           end
 
           def ==(other : self)
-            super || (
-              name == other.name &&
-                max_size == other.max_size &&
-                primary_key? == other.primary_key? &&
-                null? == other.null? &&
-                unique? == other.unique? &&
-                index? == other.index? &&
-                default == other.default
-            )
+            name == other.name &&
+              max_size == other.max_size &&
+              primary_key? == other.primary_key? &&
+              null? == other.null? &&
+              unique? == other.unique? &&
+              index? == other.index? &&
+              default == other.default
           end
 
           def clone

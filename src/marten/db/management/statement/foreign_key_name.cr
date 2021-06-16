@@ -3,6 +3,11 @@ module Marten
     module Management
       class Statement
         class ForeignKeyName < Reference
+          getter table
+          getter column
+          getter to_table
+          getter to_column
+
           def initialize(
             @index_name_proc : Proc(String, Array(String), String, String),
             @table : String,

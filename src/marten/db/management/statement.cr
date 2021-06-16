@@ -10,6 +10,7 @@ module Marten
         alias ReferenceTypes = Columns | ForeignKeyName | IndexName | Table
 
         getter params
+        getter template
 
         def initialize(@template : String, **kwargs)
           @params = Hash(String, ReferenceTypes).new

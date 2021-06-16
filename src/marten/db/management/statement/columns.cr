@@ -3,6 +3,9 @@ module Marten
     module Management
       class Statement
         class Columns < Reference
+          getter table
+          getter columns
+
           def initialize(@quote_proc : Proc(String, String), @table : String, @columns : Array(String))
           end
 

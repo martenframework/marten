@@ -3,6 +3,8 @@ module Marten
     module Management
       class Statement
         class Table < Reference
+          getter name
+
           def initialize(@quote_proc : Proc(String, String), @name : String)
           end
 

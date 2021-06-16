@@ -10,6 +10,8 @@ module Marten
           delegate build_sql, to: @connection
           delegate quote, to: @connection
 
+          getter deferred_statements
+
           def initialize(@connection : Connection::Base)
             @deferred_statements = [] of Statement
           end

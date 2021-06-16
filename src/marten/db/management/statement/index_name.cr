@@ -3,6 +3,10 @@ module Marten
     module Management
       class Statement
         class IndexName < Reference
+          getter table
+          getter columns
+          getter suffix
+
           def initialize(
             @index_name_proc : Proc(String, Array(String), String, String),
             @table : String,

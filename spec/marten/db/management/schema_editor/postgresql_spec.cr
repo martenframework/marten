@@ -120,7 +120,7 @@ require "./spec_helper"
     describe "#flush_tables_statements" do
       it "returns the expected statements" do
         Marten::DB::Connection.default.schema_editor.flush_tables_statements(["foo", "bar"]).should eq(
-          ["TRUNCATE foo, bar RESTART IDENTITY;"]
+          ["TRUNCATE foo, bar RESTART IDENTITY CASCADE;"]
         )
       end
     end

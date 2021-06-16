@@ -41,7 +41,7 @@ module Marten
           end
 
           def flush_tables_statements(table_names : Array(String)) : Array(String)
-            ["TRUNCATE #{table_names.join(", ")} RESTART IDENTITY;"]
+            ["TRUNCATE #{table_names.join(", ")} RESTART IDENTITY CASCADE;"]
           end
 
           def prepare_foreign_key_for_new_column(

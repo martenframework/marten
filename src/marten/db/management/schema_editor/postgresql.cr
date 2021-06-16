@@ -90,7 +90,7 @@ module Marten
                       when String
                         PG::EscapeHelper.escape_literal(value)
                       when Time
-                        "'#{String.new(PQ::Param.encode(Time.local).slice)}'"
+                        "'#{String.new(PQ::Param.encode(value).slice)}'"
                       else
                         value.to_s
                       end

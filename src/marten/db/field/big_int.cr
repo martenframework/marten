@@ -17,7 +17,7 @@ module Marten
         )
         end
 
-        def from_db_result_set(result_set : ::DB::ResultSet) : Int64?
+        def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
           result_set.read(Int32 | Int64 | Nil).try(&.to_i64)
         end
 

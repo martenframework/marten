@@ -86,6 +86,6 @@ jobs:
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
-      run: make tests
+      run: crystal spec --error-trace
       env:
         MARTEN_SPEC_DB_CONNECTION: ${{ matrix.db }}

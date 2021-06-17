@@ -63,7 +63,8 @@ jobs:
       if: matrix.db == 'sqlite'
       run: |
         apt-get update
-        apt-get -yqq install libsqlite3-dev
+        apt-get -yqq install sqlite libsqlite3-dev
+        sqlite3 --version
     - name: Create additional DB for MySQL
       if: matrix.db == 'mysql'
       run: |

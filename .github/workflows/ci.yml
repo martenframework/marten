@@ -8,7 +8,7 @@ on:
 
 jobs:
   qa:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container:
       image: crystallang/crystal:1.0.0
     steps:
@@ -18,9 +18,9 @@ jobs:
       - name: QA checks
         run: make qa
   specs:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.0.0
+      image: crystallang/crystal:ci-nightly-fix-curl-dev
     services:
       postgres:
         image: postgres:10.8
@@ -63,8 +63,7 @@ jobs:
       if: matrix.db == 'sqlite'
       run: |
         apt-get update
-        apt-get -yqq install sqlite libsqlite3-dev
-        sqlite3 --version
+        apt-get -yqq install libsqlite3-dev
     - name: Create additional DB for MySQL
       if: matrix.db == 'mysql'
       run: |
@@ -87,6 +86,6 @@ jobs:
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
-      run: crystal spec --error-trace
+      run: make tests
       env:
         MARTEN_SPEC_DB_CONNECTION: ${{ matrix.db }}

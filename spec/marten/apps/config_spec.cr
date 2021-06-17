@@ -1,5 +1,5 @@
-require "./config_spec/**"
 require "./spec_helper"
+require "./config_spec/**"
 
 describe Marten::Apps::Config do
   describe "::new" do

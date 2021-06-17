@@ -1,5 +1,5 @@
-require "./registry_spec/**"
 require "./spec_helper"
+require "./registry_spec/**"
 
 describe Marten::Apps::Registry do
   describe "::new" do

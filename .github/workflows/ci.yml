@@ -8,7 +8,7 @@ on:
 
 jobs:
   qa:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: crystallang/crystal:1.0.0
     steps:
@@ -18,7 +18,7 @@ jobs:
       - name: QA checks
         run: make qa
   specs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: crystallang/crystal:1.0.0
     services:

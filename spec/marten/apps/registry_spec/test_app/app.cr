@@ -1,5 +1,5 @@
 module Marten::Apps::RegistrySpec::TestApp
-  class App < Marten::Apps::Config
+  class App < Marten::App
     label :test_config
   end
 end

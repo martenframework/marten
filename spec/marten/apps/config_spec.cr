@@ -99,10 +99,10 @@ describe Marten::Apps::Config do
 end
 
 module Marten::Apps::ConfigSpec
-  class TestConfig < Marten::Apps::Config
+  class TestConfig < Marten::App
     label :test
   end
 
-  class DummyConfig < Marten::Apps::Config
+  class DummyConfig < Marten::App
   end
 end

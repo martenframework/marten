@@ -119,15 +119,15 @@ describe Marten::Apps::Registry do
 end
 
 module Marten::Apps::RegistrySpec
-  class Test1Config < Marten::Apps::Config
+  class Test1Config < Marten::App
     label :test_a
   end
 
-  class DupTest1Config < Marten::Apps::Config
+  class DupTest1Config < Marten::App
     label :test_a
   end
 
-  class Test2Config < Marten::Apps::Config
+  class Test2Config < Marten::App
     label :test_b
   end
 

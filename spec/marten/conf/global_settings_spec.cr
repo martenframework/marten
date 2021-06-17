@@ -476,7 +476,7 @@ module Marten::Conf::GlobalSettingsSpec
     getter target_env
   end
 
-  class TestAppConfig < Marten::Apps::Config
+  class TestAppConfig < Marten::App
     label :test
   end
 

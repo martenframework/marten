@@ -35,7 +35,7 @@ module Marten
 
           def rename_table(old_name : String, new_name : String)
             @table = new_name if @table == old_name
-            @to_table = new_name if @to_table == new_name
+            @to_table = new_name if @to_table == old_name
           end
 
           def to_s

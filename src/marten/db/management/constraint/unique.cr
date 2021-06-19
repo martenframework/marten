@@ -1,9 +1,13 @@
+require "../../concerns/can_format_strings_or_symbols"
+
 module Marten
   module DB
     module Management
       module Constraint
         # Represents a unique constraint used when creating or altering tables.
         class Unique
+          include CanFormatStringsOrSymbols
+
           @name : String
           @column_names : Array(String)
 
@@ -33,7 +37,7 @@ module Marten
           # The returned string will be used in the context of `add_unique_constraint` / `unique_constraint` statements
           # in generated migrations.
           def serialize_args : ::String
-            "#{name.inspect}, #{column_names.inspect}"
+            "#{format_string_or_symbol(name)}, [#{column_names.map { |n| format_string_or_symbol(n) }.join(", ")}]"
           end
         end
       end

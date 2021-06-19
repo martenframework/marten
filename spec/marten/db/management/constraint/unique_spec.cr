@@ -110,7 +110,7 @@ describe Marten::DB::Management::Constraint::Unique do
         "new_constraint",
         column_names: ["author_id", "title"]
       )
-      unique_constraint.serialize_args.should eq %{"new_constraint", ["author_id", "title"]}
+      unique_constraint.serialize_args.should eq %{:new_constraint, [:author_id, :title]}
     end
   end
 end

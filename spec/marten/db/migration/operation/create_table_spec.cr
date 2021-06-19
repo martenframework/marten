@@ -153,7 +153,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
             column :foo, :int
             column :bar, :int
 
-            unique_constraint "test_constraint", ["foo", "bar"]
+            unique_constraint :test_constraint, [:foo, :bar]
           end
           OPERATION
         ).strip

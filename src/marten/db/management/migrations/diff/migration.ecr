@@ -1,8 +1,10 @@
 class Migration::<%= @app_label.camelcase %>::V<%= @version %> < Marten::Migration
+  <%- if !@dependencies.empty? -%>
   <%- @dependencies.each do |app_label, migration_name| -%>
   depends_on "<%= app_label %>", "<%= migration_name %>"
   <%- end -%>
 
+  <%- end -%>
   def plan
 <%- @operations.each_with_index do |op, i| -%>
 <%- op.serialize.each_line do |line| -%>

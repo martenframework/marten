@@ -2,8 +2,10 @@ create_table <%= format_string_or_symbol(@name) %> do
   <%- @columns.each do |column| -%>
   column <%= column.serialize_args %>
   <%- end -%>
+  <%- if !@unique_constraints.empty? -%>
 
   <%- @unique_constraints.each do |unique_constraint| -%>
   unique_constraint <%= unique_constraint.serialize_args %>
+  <%- end -%>
   <%- end -%>
 end

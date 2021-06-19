@@ -33,7 +33,7 @@ module Marten
           end
 
           def serialize_args : ::String
-            args = [%{"#{name}"}, %{"#{type}"}]
+            args = [%{#{format_string_or_symbol(name)}}, %{#{format_string_or_symbol(type)}}]
             args << %{max_size: #{max_size}}
             args << %{primary_key: #{@primary_key}} if primary_key?
             args << %{null: #{@null}} if null?

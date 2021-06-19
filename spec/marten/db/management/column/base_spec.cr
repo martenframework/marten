@@ -131,32 +131,32 @@ describe Marten::DB::Management::Column::Base do
   describe "#serialize_args" do
     it "returns the expected serialized version of a simple column" do
       column = Marten::DB::Management::Column::BaseSpec::Test.new("test")
-      column.serialize_args.should eq %{"test", "test_col"}
+      column.serialize_args.should eq %{:test, :test_col}
     end
 
     it "returns the expected serialized version of a simple column that is a primary key" do
       column = Marten::DB::Management::Column::BaseSpec::Test.new("test", primary_key: true)
-      column.serialize_args.should eq %{"test", "test_col", primary_key: true}
+      column.serialize_args.should eq %{:test, :test_col, primary_key: true}
     end
 
     it "returns the expected serialized version of a simple column that is a nullable" do
       column = Marten::DB::Management::Column::BaseSpec::Test.new("test", null: true)
-      column.serialize_args.should eq %{"test", "test_col", null: true}
+      column.serialize_args.should eq %{:test, :test_col, null: true}
     end
 
     it "returns the expected serialized version of a simple column that is unique" do
       column = Marten::DB::Management::Column::BaseSpec::Test.new("test", unique: true)
-      column.serialize_args.should eq %{"test", "test_col", unique: true}
+      column.serialize_args.should eq %{:test, :test_col, unique: true}
     end
 
     it "returns the expected serialized version of a simple column that is indexed" do
       column = Marten::DB::Management::Column::BaseSpec::Test.new("test", index: true)
-      column.serialize_args.should eq %{"test", "test_col", index: true}
+      column.serialize_args.should eq %{:test, :test_col, index: true}
     end
 
     it "returns the expected serialized version of a simple column that has a default value" do
       column = Marten::DB::Management::Column::BaseSpec::Test.new("test", default: 42)
-      column.serialize_args.should eq %{"test", "test_col", default: 42}
+      column.serialize_args.should eq %{:test, :test_col, default: 42}
     end
   end
 

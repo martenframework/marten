@@ -1,4 +1,4 @@
-create_table "<%= @name %>" do
+create_table <%= format_string_or_symbol(@name) %> do
   <%- @columns.each do |column| -%>
   column <%= column.serialize_args %>
   <%- end -%>

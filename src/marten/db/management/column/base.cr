@@ -1,9 +1,13 @@
+require "../../concerns/can_format_strings_or_symbols"
+
 module Marten
   module DB
     module Management
       module Column
         # Abstract base migration column implementation.
         abstract class Base
+          include CanFormatStringsOrSymbols
+
           getter default
           getter name
 
@@ -61,7 +65,7 @@ module Marten
           # The returned string will be used in the context of `add_column` / `column` statements in generated
           # migrations.
           def serialize_args : ::String
-            args = [%{"#{name}"}, %{"#{type}"}]
+            args = [%{#{format_string_or_symbol(name)}}, %{#{format_string_or_symbol(type)}}]
             args << %{primary_key: #{@primary_key}} if primary_key?
             args << %{null: #{@null}} if null?
             args << %{unique: #{@unique}} if unique?

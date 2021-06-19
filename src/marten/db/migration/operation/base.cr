@@ -1,8 +1,12 @@
+require "../../concerns/can_format_strings_or_symbols"
+
 module Marten
   module DB
     abstract class Migration
       module Operation
         abstract class Base
+          include CanFormatStringsOrSymbols
+
           abstract def describe : String
 
           abstract def mutate_db_backward(

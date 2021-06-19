@@ -185,7 +185,7 @@ describe Marten::DB::Management::Column::ForeignKey do
         to_table: "other_table",
         to_column: "other_column"
       )
-      column.serialize_args.should eq %{"test", "foreign_key", to_table: "other_table", to_column: "other_column"}
+      column.serialize_args.should eq %{:test, :foreign_key, to_table: :other_table, to_column: :other_column}
     end
 
     it "returns the expected serialized version of a simple column that is a nullable" do
@@ -196,7 +196,7 @@ describe Marten::DB::Management::Column::ForeignKey do
         null: true
       )
       column.serialize_args.should eq(
-        %{"test", "foreign_key", to_table: "other_table", to_column: "other_column", null: true}
+        %{:test, :foreign_key, to_table: :other_table, to_column: :other_column, null: true}
       )
     end
 
@@ -208,7 +208,7 @@ describe Marten::DB::Management::Column::ForeignKey do
         unique: true
       )
       column.serialize_args.should eq(
-        %{"test", "foreign_key", to_table: "other_table", to_column: "other_column", unique: true}
+        %{:test, :foreign_key, to_table: :other_table, to_column: :other_column, unique: true}
       )
     end
 
@@ -220,7 +220,7 @@ describe Marten::DB::Management::Column::ForeignKey do
         index: false
       )
       column.serialize_args.should eq(
-        %{"test", "foreign_key", to_table: "other_table", to_column: "other_column", index: false}
+        %{:test, :foreign_key, to_table: :other_table, to_column: :other_column, index: false}
       )
     end
   end

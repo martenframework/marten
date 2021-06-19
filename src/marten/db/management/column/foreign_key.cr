@@ -40,9 +40,9 @@ module Marten
           end
 
           def serialize_args : ::String
-            args = [%{"#{name}"}, %{"#{type}"}]
-            args << %{to_table: "#{to_table}"}
-            args << %{to_column: "#{to_column}"}
+            args = [%{#{format_string_or_symbol(name)}}, %{#{format_string_or_symbol(type)}}]
+            args << %{to_table: #{format_string_or_symbol(to_table)}}
+            args << %{to_column: #{format_string_or_symbol(to_column)}}
             args << %{primary_key: #{@primary_key}} if primary_key?
             args << %{null: #{@null}} if null?
             args << %{unique: #{@unique}} if unique?

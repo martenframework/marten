@@ -200,7 +200,7 @@ describe Marten::DB::Migration::Operation::AddColumn do
         "my_table",
         Marten::DB::Management::Column::Int.new("my_column", default: 42)
       )
-      operation.serialize.strip.should eq %{add_column "my_table", "my_column", "int", default: 42}
+      operation.serialize.strip.should eq %{add_column :my_table, :my_column, :int, default: 42}
     end
   end
 end

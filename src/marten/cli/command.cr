@@ -48,7 +48,7 @@ module Marten
 
       private USAGE_FOOTER = <<-USAGE_FOOTER
         Run a command followed by --help to see command specific information, ex:
-        manage <command> --help
+        %s [command] --help
 
         USAGE_FOOTER
 
@@ -71,7 +71,7 @@ module Marten
           usage << "\n"
         end
 
-        usage << USAGE_FOOTER
+        usage << USAGE_FOOTER % @name
 
         puts usage.join("")
       end

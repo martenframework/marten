@@ -28,7 +28,7 @@ development_dependencies:
     github: crystal-community/timecop.cr
 
 targets:
-  marten-admin:
+  marten-cli:
     main: src/marten_cli.cr
 
 scripts:

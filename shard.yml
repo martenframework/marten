@@ -29,9 +29,9 @@ development_dependencies:
 
 targets:
   marten-admin:
-    main: src/admin_cli.cr
+    main: src/marten_cli.cr
 
 scripts:
-  postinstall: scripts/precompile_admin_cli
+  postinstall: scripts/precompile_marten_cli
 
 license: MIT

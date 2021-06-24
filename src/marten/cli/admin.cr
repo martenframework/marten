@@ -48,7 +48,7 @@ module Marten
           s << " --error-trace" if options.includes?("--error-trace")
         end
 
-        stdout.print("⌛ Compiling...")
+        stdout.print("⧖ Compiling...")
 
         tmp_stdout = IO::Memory.new
         tmp_stderr = IO::Memory.new

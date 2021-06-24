@@ -18,6 +18,9 @@ module Marten
 
           class_getter help
 
+          getter stdout
+          getter stderr
+
           def self.command_name
             return @@command_name unless @@command_name.empty?
             @@command_name = name.split("::").last.underscore
@@ -39,6 +42,7 @@ module Marten
           @argument_handlers = [] of ArgumentHandler
           @color = true
           @parser : OptionParser?
+          @show_error_trace = false
 
           def initialize(
             @options : Array(String),
@@ -58,6 +62,10 @@ module Marten
             @parser = OptionParser.new
 
             setup
+
+            parser.on("--error-trace", "Show full error trace (if a compilation is involved)") do
+              @show_error_trace = true
+            end
 
             parser.on("--no-color", "Disable colored output") do
               @color = false
@@ -92,8 +100,12 @@ module Marten
           private getter color
           private getter options
 
-          private def parser
-            @parser.not_nil!
+          private def append_argument(name, description)
+            if name.size >= 33
+              @arguments << "    #{name}\n#{" " * 37}#{description}"
+            else
+              @arguments << "    #{name}#{" " * (33 - name.size)}#{description}"
+            end
           end
 
           private def banner_parts
@@ -142,12 +154,8 @@ module Marten
             parser.on("-#{short_flag}", "--#{long_flag}", description, &block)
           end
 
-          private def append_argument(name, description)
-            if name.size >= 33
-              @arguments << "    #{name}\n#{" " * 37}#{description}"
-            else
-              @arguments << "    #{name}#{" " * (33 - name.size)}#{description}"
-            end
+          private def parser
+            @parser.not_nil!
           end
 
           private def print(msg, ending = "\n")
@@ -164,6 +172,10 @@ module Marten
             @stderr.print(style("Error: ", fore: :red, mode: :bold))
             print_error(msg)
             exit(exit_code)
+          end
+
+          private def show_error_trace?
+            @show_error_trace
           end
 
           private def style(msg, fore = nil, mode = nil)

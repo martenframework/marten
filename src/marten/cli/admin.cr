@@ -12,7 +12,7 @@ module Marten
 
       def run
         if inside_project?
-          build_and_run_manage_command
+          handle_inside_of_project_invocation
         else
           handle_outside_of_project_invocation
         end
@@ -61,6 +61,17 @@ module Marten
         stderr.print(tmp_stderr.to_s)
 
         build_status
+      end
+
+      private def handle_inside_of_project_invocation
+        case options.first?
+        when "init"
+          Manage::Command::Init.new(options: options[1..], stdout: stdout, stderr: stderr).handle
+        when "runserver"
+          Manage::Command::RunServer.new(options: options[1..], stdout: stdout, stderr: stderr).handle
+        else
+          build_and_run_manage_command
+        end
       end
 
       private def handle_outside_of_project_invocation

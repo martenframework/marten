@@ -5,6 +5,9 @@ module Marten
         class AddColumn < Base
           @table_name : String
 
+          getter table_name
+          getter column
+
           def initialize(table_name : String | Symbol, @column : Management::Column::Base)
             @table_name = table_name.to_s
           end

@@ -5,6 +5,8 @@ module Marten
         class DeleteTable < Base
           @name : String
 
+          getter name
+
           def initialize(name : String | Symbol)
             @name = name.to_s
           end

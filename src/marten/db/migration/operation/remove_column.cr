@@ -6,6 +6,9 @@ module Marten
           @table_name : String
           @column_name : String
 
+          getter table_name
+          getter column_name
+
           def initialize(table_name : String | Symbol, column_name : String | Symbol)
             @table_name = table_name.to_s
             @column_name = column_name.to_s

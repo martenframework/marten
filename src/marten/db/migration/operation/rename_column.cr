@@ -7,6 +7,10 @@ module Marten
           @old_name : String
           @new_name : String
 
+          getter table_name
+          getter old_name
+          getter new_name
+
           def initialize(table_name : String | Symbol, old_name : String | Symbol, new_name : String | Symbol)
             @table_name = table_name.to_s
             @old_name = old_name.to_s

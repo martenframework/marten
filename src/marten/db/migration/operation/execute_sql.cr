@@ -3,6 +3,9 @@ module Marten
     abstract class Migration
       module Operation
         class ExecuteSQL < Base
+          getter forward_sql
+          getter backward_sql
+
           def initialize(@forward_sql : String, @backward_sql : String? = nil)
           end
 

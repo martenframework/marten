@@ -6,6 +6,9 @@ module Marten
           @old_name : String
           @new_name : String
 
+          getter old_name
+          getter new_name
+
           def initialize(old_name : String | Symbol, new_name : String | Symbol)
             @old_name = old_name.to_s
             @new_name = new_name.to_s

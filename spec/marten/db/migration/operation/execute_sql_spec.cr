@@ -107,12 +107,16 @@ describe Marten::DB::Migration::Operation::ExecuteSQL do
       (
         <<-OPERATION
         execute(
-          <<-SQL
-            SELECT 1
-          SQL,
-          <<-SQL
-            SELECT 2
-          SQL
+          (
+            <<-SQL
+              SELECT 1
+            SQL
+          ),
+          (
+            <<-SQL
+              SELECT 2
+            SQL
+          )
         )
         OPERATION
       ).strip

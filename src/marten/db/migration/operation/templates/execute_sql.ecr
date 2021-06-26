@@ -4,11 +4,15 @@ execute <<-SQL
 SQL
 <%- else -%>
 execute(
-  <<-SQL
-    <%= @forward_sql %>
-  SQL,
-  <<-SQL
-    <%= @backward_sql %>
-  SQL
+  (
+    <<-SQL
+      <%= @forward_sql %>
+    SQL
+  ),
+  (
+    <<-SQL
+      <%= @backward_sql %>
+    SQL
+  )
 )
 <%- end %>

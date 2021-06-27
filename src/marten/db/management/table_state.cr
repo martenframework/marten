@@ -28,8 +28,12 @@ module Marten
         )
         end
 
-        def add_column(column : Column::Base)
+        def add_column(column : Column::Base) : Nil
           @columns << column
+        end
+
+        def add_unique_constraint(unique_constraint : Management::Constraint::Unique) : Nil
+          @unique_constraints << unique_constraint
         end
 
         def get_column(name : String) : Column::Base

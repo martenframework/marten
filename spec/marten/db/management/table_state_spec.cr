@@ -64,6 +64,27 @@ describe Marten::DB::Management::TableState do
     end
   end
 
+  describe "#add_unique_constraint" do
+    it "adds a unique constraint to the table state" do
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::Int.new("foo"),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new(name: "cname", column_names: ["foo", "bar"])
+
+      table_state.add_unique_constraint(unique_constraint)
+
+      table_state.unique_constraints.should eq [unique_constraint]
+    end
+  end
+
   describe "#get_column" do
     it "returns the column corresponding to the passed name" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)

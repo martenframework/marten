@@ -87,6 +87,17 @@ module Marten
             end
           end
 
+          # Adds a unique constraint to a specific table.
+          def add_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
+            execute(
+              build_sql do |s|
+                s << "ALTER TABLE #{table.name}"
+                s << "ADD"
+                s << unique_constraint_sql_for(unique_constraint)
+              end
+            )
+          end
+
           # Creates a new table directly from a model class.
           def create_model(model : Model.class) : Nil
             create_table(TableState.from_model(model))

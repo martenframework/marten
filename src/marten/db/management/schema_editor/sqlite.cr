@@ -7,6 +7,10 @@ module Marten
             remake_table_with_added_column(table, column)
           end
 
+          def add_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
+            remake_table_with_added_unique_constraint(table, unique_constraint)
+          end
+
           def column_type_for_built_in_column(id)
             BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
           end
@@ -141,6 +145,12 @@ module Marten
               end
 
               remade_table.add_column(column)
+            end
+          end
+
+          private def remake_table_with_added_unique_constraint(table, unique_constraint)
+            with_remade_table(table) do |remade_table, _column_names_mapping|
+              remade_table.add_unique_constraint(unique_constraint)
             end
           end
 

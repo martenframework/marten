@@ -4,7 +4,7 @@ module Marten
       module SchemaEditor
         class SQLite < Base
           def add_column(table : TableState, column : Column::Base)
-            remake_table_with_column_change(table, column, change_type: :add)
+            remake_table_with_added_column(table, column)
           end
 
           def column_type_for_built_in_column(id)
@@ -100,7 +100,7 @@ module Marten
           end
 
           def remove_column(table : TableState, column : Column::Base) : Nil
-            remake_table_with_column_change(table, column, change_type: :delete)
+            remake_table_with_removed_column(table, column)
           end
 
           def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
@@ -129,16 +129,8 @@ module Marten
             "Marten::DB::Management::Column::BigAuto" => "AUTOINCREMENT",
           }
 
-          private def remake_table_with_column_change(table, column, change_type)
-            # Set up a mapping that will hold the link between columns from the original table to the columns of the
-            # new table.
-            column_names_mapping = {} of String => String
-            table.columns.each { |c| column_names_mapping[c.name] = c.name }
-
-            remade_table = table.clone
-            remade_table.name = "new_#{remade_table.name}"
-
-            if change_type == :add
+          private def remake_table_with_added_column(table, column)
+            with_remade_table(table) do |remade_table, column_names_mapping|
               # If the new column is a primary key, remove the primary key constraint from the the old primary key
               # column.
               if column.primary_key?
@@ -149,10 +141,26 @@ module Marten
               end
 
               remade_table.add_column(column)
-            elsif change_type == :delete
+            end
+          end
+
+          private def remake_table_with_removed_column(table, column)
+            with_remade_table(table) do |remade_table, column_names_mapping|
               remade_table.remove_column(column)
               column_names_mapping.delete(column.name)
             end
+          end
+
+          def with_remade_table(table)
+            # Set up a mapping that will hold the link between columns from the original table to the columns of the
+            # new table.
+            column_names_mapping = {} of String => String
+            table.columns.each { |c| column_names_mapping[c.name] = c.name }
+
+            remade_table = table.clone
+            remade_table.name = "new_#{remade_table.name}"
+
+            yield remade_table, column_names_mapping
 
             # Create the new table.
             create_table(remade_table)

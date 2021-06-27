@@ -120,6 +120,27 @@ describe Marten::DB::Management::TableState do
     end
   end
 
+  describe "#remove_unique_constraint" do
+    it "removes the passed unique constraint from the table state" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new(name: "cname", column_names: ["foo", "bar"])
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::Int.new("foo"),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        [unique_constraint]
+      )
+
+      table_state.remove_unique_constraint(unique_constraint)
+
+      table_state.unique_constraints.should be_empty
+    end
+  end
+
   describe "#rename_column" do
     it "allows to rename a column" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)

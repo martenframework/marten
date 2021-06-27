@@ -48,6 +48,10 @@ module Marten
           @columns.reject! { |c| c.name == column_name }
         end
 
+        def remove_unique_constraint(unique_constraint : Management::Constraint::Unique) : Nil
+          @unique_constraints.reject! { |c| c.name == unique_constraint.name }
+        end
+
         def rename_column(old_name : String, new_name : String)
           get_column(old_name).name = new_name
         end

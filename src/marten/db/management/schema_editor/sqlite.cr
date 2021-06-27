@@ -130,7 +130,7 @@ module Marten
           }
 
           private def remake_table_with_added_column(table, column)
-            with_remade_table(table) do |remade_table, column_names_mapping|
+            with_remade_table(table) do |remade_table, _column_names_mapping|
               # If the new column is a primary key, remove the primary key constraint from the the old primary key
               # column.
               if column.primary_key?

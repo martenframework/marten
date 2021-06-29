@@ -107,6 +107,19 @@ module Marten
             remake_table_with_removed_column(table, column)
           end
 
+          def remove_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
+            remake_table_with_removed_unique_constraint(table, unique_constraint)
+          end
+
+          def remove_unique_constraint_statement(
+            table : TableState,
+            unique_constraint : Management::Constraint::Unique
+          ) : String
+            raise NotImplementedError.new(
+              "Removing unique constraints from tables through SQL is not supported by the SQLite schema editor"
+            )
+          end
+
           def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
             "ALTER TABLE #{quote(table.name)} RENAME COLUMN #{quote(column.name)} TO #{quote(new_name)}"
           end
@@ -158,6 +171,12 @@ module Marten
             with_remade_table(table) do |remade_table, column_names_mapping|
               remade_table.remove_column(column)
               column_names_mapping.delete(column.name)
+            end
+          end
+
+          private def remake_table_with_removed_unique_constraint(table, unique_constraint)
+            with_remade_table(table) do |remade_table, _column_names_mapping|
+              remade_table.remove_unique_constraint(unique_constraint)
             end
           end
 

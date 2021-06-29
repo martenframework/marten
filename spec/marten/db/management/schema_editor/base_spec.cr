@@ -1206,6 +1206,91 @@ describe Marten::DB::Management::SchemaEditor::Base do
     {% end %}
   end
 
+  describe "#add_unique_constraint" do
+    before_each do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("schema_editor_test_table")))
+      end
+    end
+
+    it "adds a unique constraint to a table" do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [unique_constraint]
+      )
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.remove_unique_constraint(table_state, unique_constraint)
+
+      constraint_names = [] of String
+
+      Marten::DB::Connection.default.open do |db|
+        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+          db.query(
+            <<-SQL
+              SELECT
+                CONSTRAINT_NAME,
+                CONSTRAINT_TYPE
+              FROM information_schema.TABLE_CONSTRAINTS
+              WHERE TABLE_NAME = 'schema_editor_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_names << rs.read(String)
+            end
+          end
+        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+          db.query(
+            <<-SQL
+              SELECT con.conname, con.contype
+              FROM pg_catalog.pg_constraint con
+              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+              WHERE rel.relname = 'schema_editor_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_names << rs.read(String)
+            end
+          end
+        {% else %}
+          db.query(
+            <<-SQL
+              SELECT
+                il.name AS constraint_name,
+                ii.name AS column_name
+              FROM
+                sqlite_master AS m,
+                pragma_index_list(m.name) AS il,
+                pragma_index_info(il.name) AS ii
+              WHERE
+                m.type = 'table' AND
+                il.origin = 'u' AND
+                m.tbl_name = 'schema_editor_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_names << rs.read(String)
+            end
+          end
+        {% end %}
+      end
+
+      constraint_names.includes?("test_constraint").should be_false
+    end
+  end
+
   describe "#rename_column" do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor

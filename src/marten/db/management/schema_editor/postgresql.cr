@@ -107,6 +107,18 @@ module Marten
             "ALTER TABLE #{old_name} RENAME TO #{new_name}"
           end
 
+          def remove_unique_constraint_statement(
+            table : TableState,
+            unique_constraint : Management::Constraint::Unique
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE"
+              s << table.name
+              s << "DROP CONSTRAINT"
+              s << unique_constraint.name
+            end
+          end
+
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Management::Column::Auto"       => "serial",
             "Marten::DB::Management::Column::BigAuto"    => "bigserial",

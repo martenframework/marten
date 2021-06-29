@@ -230,6 +230,27 @@ require "./spec_helper"
       end
     end
 
+    describe "#remove_unique_constraint_statement" do
+      it "returns the expected statement" do
+        unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+        table_state = Marten::DB::Management::TableState.new(
+          "my_app",
+          "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          unique_constraints: [unique_constraint]
+        )
+
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.remove_unique_constraint_statement(table_state, unique_constraint).should eq(
+          "ALTER TABLE test_table DROP CONSTRAINT test_constraint"
+        )
+      end
+    end
+
     describe "#rename_column_statement" do
       it "returns the expected statement" do
         table_state = Marten::DB::Management::TableState.from_model(TestUser)

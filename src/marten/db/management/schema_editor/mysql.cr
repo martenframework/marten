@@ -106,6 +106,18 @@ module Marten
             value.to_s
           end
 
+          def remove_unique_constraint_statement(
+            table : TableState,
+            unique_constraint : Management::Constraint::Unique
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE"
+              s << table.name
+              s << "DROP INDEX"
+              s << unique_constraint.name
+            end
+          end
+
           def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
             "ALTER TABLE #{quote(table.name)} CHANGE #{quote(column.name)} #{quote(new_name)} #{column_sql_for(column)}"
           end

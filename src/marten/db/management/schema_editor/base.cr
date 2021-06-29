@@ -65,6 +65,12 @@ module Marten
           # Returns a prepared default value that can be inserted in a column definition.
           abstract def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
 
+          # Returns the SQL statement allowing to remove a unique constraint from a given table.
+          abstract def remove_unique_constraint_statement(
+            table : TableState,
+            unique_constraint : Management::Constraint::Unique
+          ) : String
+
           # Returns the SQL statement allowing to rename a column.
           abstract def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
 
@@ -176,6 +182,11 @@ module Marten
 
             # Removes all deferred statements that still reference the deleted column.
             @deferred_statements.reject! { |s| s.references_column?(table.name, column.name) }
+          end
+
+          # Removes a unique constraint from a specific table.
+          def remove_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
+            execute(remove_unique_constraint_statement(table, unique_constraint))
           end
 
           # Renames a specific column.

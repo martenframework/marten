@@ -94,6 +94,19 @@ describe Marten::DB::Migration::DSL do
     end
   end
 
+  describe "#remove_unique_constraint" do
+    it "allows to initialize a RemoveUniqueConstraint operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_remove_unique_constraint
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::RemoveUniqueConstraint
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::RemoveUniqueConstraint)
+      operation.table_name.should eq "test_table"
+      operation.unique_constraint_name.should eq "test_constraint"
+    end
+  end
+
   describe "#rename_column" do
     it "allows to initialize a RenameColumn operation" do
       test = Marten::DB::Migration::DSLSpec::Test.new
@@ -167,6 +180,10 @@ module Marten::DB::Migration::DSLSpec
 
     def run_remove_column
       remove_column :test_table, :test_column
+    end
+
+    def run_remove_unique_constraint
+      remove_unique_constraint :test_table, :test_constraint
     end
 
     def run_rename_column

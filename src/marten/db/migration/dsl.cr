@@ -34,6 +34,10 @@ module Marten
           operations << Operation::RemoveColumn.new({{ table_name }}, {{ column_name }})
         end
 
+        macro remove_unique_constraint(table_name, constraint_name)
+          operations << Operation::RemoveUniqueConstraint.new({{ table_name }}, {{ constraint_name }})
+        end
+
         macro rename_column(table_name, old_name, new_name)
           operations << Operation::RenameColumn.new({{ table_name }}, {{ old_name }}, {{ new_name }})
         end

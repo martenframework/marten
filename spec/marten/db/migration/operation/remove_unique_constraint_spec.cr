@@ -1,120 +1,17 @@
 require "./spec_helper"
 
-describe Marten::DB::Migration::Operation::AddUniqueConstraint do
+describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
   describe "#describe" do
     it "returns the expected description" do
-      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
         "test_table",
-        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+        "test_constraint"
       )
-      operation.describe.should eq "Add test_constraint unique constraint to test_table table"
+      operation.describe.should eq "Remove test_constraint unique constraint from test_table table"
     end
   end
 
   describe "#mutate_db_backward" do
-    before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("operation_test_table")))
-      end
-    end
-
-    it "removes the unique constraint from the table" do
-      unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
-
-      from_table_state = Marten::DB::Management::TableState.new(
-        "my_app",
-        "operation_test_table",
-        columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
-          Marten::DB::Management::Column::BigInt.new("foo"),
-          Marten::DB::Management::Column::BigInt.new("bar"),
-        ] of Marten::DB::Management::Column::Base,
-        unique_constraints: [unique_constraint]
-      )
-      from_project_state = Marten::DB::Management::ProjectState.new([from_table_state])
-
-      to_table_state = Marten::DB::Management::TableState.new(
-        "my_app",
-        "operation_test_table",
-        columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
-          Marten::DB::Management::Column::BigInt.new("foo"),
-          Marten::DB::Management::Column::BigInt.new("bar"),
-        ] of Marten::DB::Management::Column::Base,
-        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
-      )
-      to_project_state = Marten::DB::Management::ProjectState.new([to_table_state])
-
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      schema_editor.create_table(from_table_state)
-
-      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
-        "operation_test_table",
-        unique_constraint
-      )
-
-      operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
-
-      constraint_names = [] of String
-
-      Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-          db.query(
-            <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'operation_test_table';
-            SQL
-          ) do |rs|
-            rs.each do
-              constraint_names << rs.read(String)
-            end
-          end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-          db.query(
-            <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'operation_test_table';
-            SQL
-          ) do |rs|
-            rs.each do
-              constraint_names << rs.read(String)
-            end
-          end
-        {% else %}
-          db.query(
-            <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'operation_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              constraint_names << rs.read(String)
-            end
-          end
-        {% end %}
-      end
-
-      constraint_names.includes?("test_constraint").should be_false
-    end
-  end
-
-  describe "#mutate_db_forward" do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
@@ -152,12 +49,12 @@ describe Marten::DB::Migration::Operation::AddUniqueConstraint do
       schema_editor = Marten::DB::Connection.default.schema_editor
       schema_editor.create_table(from_table_state)
 
-      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
         "operation_test_table",
-        unique_constraint
+        "test_constraint"
       )
 
-      operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
+      operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
 
       Marten::DB::Connection.default.open do |db|
         {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
@@ -278,6 +175,109 @@ describe Marten::DB::Migration::Operation::AddUniqueConstraint do
     end
   end
 
+  describe "#mutate_db_forward" do
+    before_each do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+      if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
+        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("operation_test_table")))
+      end
+    end
+
+    it "removes the unique constraint from the table" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+
+      from_table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [unique_constraint]
+      )
+      from_project_state = Marten::DB::Management::ProjectState.new([from_table_state])
+
+      to_table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      to_project_state = Marten::DB::Management::ProjectState.new([to_table_state])
+
+      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor.create_table(from_table_state)
+
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "operation_test_table",
+        "test_constraint"
+      )
+
+      operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
+
+      constraint_names = [] of String
+
+      Marten::DB::Connection.default.open do |db|
+        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+          db.query(
+            <<-SQL
+              SELECT
+                CONSTRAINT_NAME,
+                CONSTRAINT_TYPE
+              FROM information_schema.TABLE_CONSTRAINTS
+              WHERE TABLE_NAME = 'operation_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_names << rs.read(String)
+            end
+          end
+        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+          db.query(
+            <<-SQL
+              SELECT con.conname, con.contype
+              FROM pg_catalog.pg_constraint con
+              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+              WHERE rel.relname = 'operation_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_names << rs.read(String)
+            end
+          end
+        {% else %}
+          db.query(
+            <<-SQL
+              SELECT
+                il.name AS constraint_name,
+                ii.name AS column_name
+              FROM
+                sqlite_master AS m,
+                pragma_index_list(m.name) AS il,
+                pragma_index_info(il.name) AS ii
+              WHERE
+                m.type = 'table' AND
+                il.origin = 'u' AND
+                m.tbl_name = 'operation_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_names << rs.read(String)
+            end
+          end
+        {% end %}
+      end
+
+      constraint_names.includes?("test_constraint").should be_false
+    end
+  end
+
   describe "#mutate_state_forward" do
     it "mutates a project state as expected" do
       unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
@@ -290,28 +290,28 @@ describe Marten::DB::Migration::Operation::AddUniqueConstraint do
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
-        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+        unique_constraints: [unique_constraint]
       )
       project_state = Marten::DB::Management::ProjectState.new([table_state])
 
-      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
         "operation_test_table",
-        unique_constraint
+        "test_constraint"
       )
 
       operation.mutate_state_forward("my_app", project_state)
 
-      table_state.get_unique_constraint("test_constraint").should eq unique_constraint
+      table_state.unique_constraints.should be_empty
     end
   end
 
   describe "#serialize" do
     it "returns the expected serialized version of the operation" do
-      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
         "my_table",
-        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+        "test_constraint"
       )
-      operation.serialize.strip.should eq %{add_unique_constraint :my_table, :test_constraint, [:foo, :bar]}
+      operation.serialize.strip.should eq %{remove_unique_constraint :my_table, :test_constraint}
     end
   end
 end

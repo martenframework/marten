@@ -1,0 +1,19 @@
+name: QA
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: "*"
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:1.0.0
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install shards
+        run: shards install --ignore-crystal-version
+      - name: QA checks
+        run: make qa

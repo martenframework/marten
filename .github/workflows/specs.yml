@@ -1,0 +1,108 @@
+name: Specs
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: "*"
+
+jobs:
+  mysql:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:ci-nightly-fix-curl-dev
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: "mysql"
+          MYSQL_DATABASE: marten_test
+        ports:
+          - 3307:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for MySQL
+      run: |
+        apt-get update
+        apt-get -yqq install mysql-client libmysqlclient-dev
+    - name: Create additional DB for MySQL
+      run: |
+        mysql -u root -h mysql --password=mysql -e 'create database marten_other_test;'
+      env:
+        PGPASSWORD: mysql
+    - name: Install shards
+      run: shards install --ignore-crystal-version
+    - name: Cache Crystal
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/crystal
+        key: ${{ runner.os }}-crystal
+    - name: Setup env JSON file
+      run: cp .spec.env.json.ci .spec.env.json
+    - name: Run tests
+      run: make tests
+      env:
+        MARTEN_SPEC_DB_CONNECTION: mysql
+  postgresql:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:ci-nightly-fix-curl-dev
+    services:
+      postgres:
+        image: postgres:${{ matrix.db_version }}
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: marten_test
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    strategy:
+      matrix:
+        db_version: ['10', '11', '12', 'latest']
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for PostgreSQL
+      run: |
+        apt-get update
+        apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev
+    - name: Create additional DB for PostgreSQL
+      run: |
+        createdb marten_other_test -h postgres -U postgres
+      env:
+        PGPASSWORD: postgres
+    - name: Install shards
+      run: shards install --ignore-crystal-version
+    - name: Cache Crystal
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/crystal
+        key: ${{ runner.os }}-crystal
+    - name: Setup env JSON file
+      run: cp .spec.env.json.ci .spec.env.json
+    - name: Run tests
+      run: make tests
+      env:
+        MARTEN_SPEC_DB_CONNECTION: postgresql
+  sqlite:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:ci-nightly-fix-curl-dev
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for SQLite
+      run: |
+        apt-get update
+        apt-get -yqq install libsqlite3-dev
+    - name: Install shards
+      run: shards install --ignore-crystal-version
+    - name: Cache Crystal
+      uses: actions/cache@v1
+      with:
+        path: ~/.cache/crystal
+        key: ${{ runner.os }}-crystal
+    - name: Setup env JSON file
+      run: cp .spec.env.json.ci .spec.env.json
+    - name: Run tests
+      run: make tests

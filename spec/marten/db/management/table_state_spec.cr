@@ -98,6 +98,30 @@ describe Marten::DB::Management::TableState do
     end
   end
 
+  describe "#get_unique_constraint" do
+    it "returns the unique constraint corresponding to the passed name" do
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [unique_constraint]
+      )
+
+      table_state.get_unique_constraint("test_constraint").should eq unique_constraint
+    end
+
+    it "raises NilAssertionError if the unique constraint is not found" do
+      table_state = Marten::DB::Management::TableState.from_model(TestUser)
+      expect_raises(NilAssertionError) { table_state.get_unique_constraint("unknown") }
+    end
+  end
+
   describe "#remove_column" do
     it "removes the passed column from the table state" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)

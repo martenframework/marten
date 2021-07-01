@@ -40,6 +40,10 @@ module Marten
           @columns.find { |c| c.name == name }.not_nil!
         end
 
+        def get_unique_constraint(name : String) : Management::Constraint::Unique
+          unique_constraints.find { |c| c.name == name }.not_nil!
+        end
+
         def remove_column(column : Column::Base)
           @columns.reject! { |c| c.name == column.name }
         end

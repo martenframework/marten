@@ -9,6 +9,13 @@ module Marten
           )
         end
 
+        macro add_unique_constraint(table_name, name, column_names)
+          operations << Operation::AddUniqueConstraint.new(
+            {{ table_name }},
+            _init_unique_constraint({{ name }}, {{ column_names }})
+          )
+        end
+
         macro create_table(name)
           operations << CreateTable.new({{ name }}).build do
             {{ yield }}

@@ -19,6 +19,22 @@ describe Marten::DB::Migration::DSL do
     end
   end
 
+  describe "#add_unique_constraint" do
+    it "allows to initialize an AddUniqueConstraint operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_add_unique_constraint
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::AddUniqueConstraint
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+      operation.table_name.should eq "test_table"
+      operation.unique_constraint.should be_a Marten::DB::Management::Constraint::Unique
+
+      operation.unique_constraint.name.should eq "test_constraint"
+      operation.unique_constraint.column_names.should eq ["foo", "bar"]
+    end
+  end
+
   describe "#create_table" do
     it "allows to initialize a CreateTable operation" do
       test = Marten::DB::Migration::DSLSpec::Test.new
@@ -114,6 +130,10 @@ module Marten::DB::Migration::DSLSpec
 
     def run_add_column
       add_column :test_table, :test_column, :string, max_size: 155, null: true
+    end
+
+    def run_add_unique_constraint
+      add_unique_constraint :test_table, :test_constraint, [:foo, :bar]
     end
 
     def run_create_table

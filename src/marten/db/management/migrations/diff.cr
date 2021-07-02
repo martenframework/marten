@@ -13,12 +13,16 @@ module Marten
 
           @from_state : ProjectState
           @to_state : ProjectState
+          @reader : Reader? = nil
+          @detected_operations = {} of String => Array(DetectedOperation)
 
           def initialize
             @reader = Reader.new
-            @from_state = @reader.graph.to_project_state
+            @from_state = @reader.not_nil!.graph.to_project_state
             @to_state = DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
-            @detected_operations = {} of String => Array(DetectedOperation)
+          end
+
+          def initialize(@from_state : DB::Management::ProjectState, @to_state : DB::Management::ProjectState)
           end
 
           def detect(apps : Array(Apps::Config)? = nil)
@@ -78,7 +82,7 @@ module Marten
             #    of the underlying operations are resolved (either because the dependencies are in the current
             #    application itself or because the dependencies point toward applications which already had their
             #    migrations generated). At this point we don't try to generate migrations from "subsets" of the app's
-            #    detected set of operations
+            #    detected set of operations.
             #
             # 2. Secondly, at least after one iteration over all the applications operations (or right after we identify
             #    that migrations can no longer be generated without using subsets of operations), we try to identify
@@ -112,14 +116,17 @@ module Marten
                       elsif migrations_from_operations_subsets_allowed
                         # If the app the operation depends on is not considered in the set of detected operations, we
                         # use either the first or last migration of the application.
-                        app_migrations = @reader.graph.leaves.map(&.migration).select do |m|
-                          m.class.app_config.label == dependency[0]
-                        end
 
-                        resolved_operation_dependencies << if app_migrations.empty?
+                        app_migrations = if !@reader.nil?
+                                           @reader.not_nil!.graph.leaves.map(&.migration).select do |m|
+                                             m.class.app_config.label == dependency[0]
+                                           end
+                                         end
+
+                        resolved_operation_dependencies << if app_migrations.nil? || app_migrations.not_nil!.empty?
                           {dependency[0], "__first__"}
                         else
-                          {dependency[0], app_migrations.first.class.migration_name}
+                          {dependency[0], app_migrations.not_nil!.first.class.migration_name}
                         end
                       else
                         deps_satisfied = false
@@ -180,9 +187,11 @@ module Marten
             migrations_per_app.each do |app_label, migrations|
               next if migrations.empty?
 
-              last_migration = @reader.graph.leaves.map(&.migration).find do |m|
-                m.class.app_config.label == app_label
-              end
+              last_migration = if !@reader.nil?
+                                 @reader.not_nil!.graph.leaves.map(&.migration).find do |m|
+                                   m.class.app_config.label == app_label
+                                 end
+                               end
 
               next if last_migration.nil?
 

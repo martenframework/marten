@@ -67,8 +67,8 @@ module Marten
         case options.first?
         when "init"
           Manage::Command::Init.new(options: options[1..], stdout: stdout, stderr: stderr).handle
-        when "runserver"
-          Manage::Command::RunServer.new(options: options[1..], stdout: stdout, stderr: stderr).handle
+        when "server"
+          Manage::Command::Serve.new(options: options[1..], stdout: stdout, stderr: stderr).handle
         else
           build_and_run_manage_command
         end

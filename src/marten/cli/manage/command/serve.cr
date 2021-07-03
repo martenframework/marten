@@ -2,8 +2,7 @@ module Marten
   module CLI
     class Manage
       module Command
-        class RunServer < Base
-          command_name :runserver
+        class Serve < Base
           help "Start a development server that is automatically recompiled when source files change."
 
           def run

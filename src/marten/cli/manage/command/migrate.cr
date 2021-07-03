@@ -42,11 +42,11 @@ module Marten
           private def process_execution_progress(progress)
             case progress.type
             when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_BACKWARD_START
-              print("  › Unapplying #{progress.migration.not_nil!.id}...", ending: "")
+              print("  › Unapplying #{style(progress.migration.not_nil!.id, mode: :dim)}...", ending: "")
             when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_BACKWARD_SUCCESS
               print(style(@fake ? " FAKED" : " DONE", fore: :light_green, mode: :bold))
             when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_FORWARD_START
-              print("  › Applying #{progress.migration.not_nil!.id}...", ending: "")
+              print("  › Applying #{style(progress.migration.not_nil!.id, mode: :dim)}...", ending: "")
             when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_FORWARD_SUCCESS
               print(style(@fake ? " FAKED" : " DONE", fore: :light_green, mode: :bold))
             end

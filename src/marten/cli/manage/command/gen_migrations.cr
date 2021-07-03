@@ -36,7 +36,7 @@ module Marten
                 migration_filepath = app_config.migrations_path.join("#{migration.name}.cr")
 
                 print(
-                  "  › Creating #{style(migration_filepath.to_s.gsub("#{Dir.current}/", ""), mode: :dim)}...",
+                  "  › Creating [#{style(migration_filepath.to_s.gsub("#{Dir.current}/", ""), mode: :dim)}]...",
                   ending: ""
                 )
 

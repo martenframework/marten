@@ -149,16 +149,6 @@ module Marten
         new_state
       end
 
-      def operations_backward
-        load_plan unless plan_loaded?
-        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
-      end
-
-      def operations_forward
-        load_plan unless plan_loaded?
-        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
-      end
-
       def plan
       end
 
@@ -177,6 +167,16 @@ module Marten
         when :forward
           @operations_forward
         end.not_nil!
+      end
+
+      private def operations_backward
+        load_plan unless plan_loaded?
+        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
+      end
+
+      private def operations_forward
+        load_plan unless plan_loaded?
+        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
       end
 
       private def load_plan

@@ -6,7 +6,7 @@ describe Marten::DB::Management::Migrations::Diff do
       from_project_state = Marten::DB::Management::ProjectState.new
 
       new_table_state = Marten::DB::Management::TableState.new(
-        app_label: "my_app",
+        app_label: "app",
         name: "new_table",
         columns: [
           Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -23,14 +23,14 @@ describe Marten::DB::Management::Migrations::Diff do
       changes = diff.detect
 
       changes.size.should eq 1
-      changes["my_app"].size.should eq 1
+      changes["app"].size.should eq 1
 
-      changes["my_app"][0].name.ends_with?("create_new_table_table").should be_true
+      changes["app"][0].name.ends_with?("create_new_table_table").should be_true
 
-      changes["my_app"][0].operations.size.should eq 1
-      changes["my_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
 
-      operation = changes["my_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
       operation.name.should eq "new_table"
 
       operation.columns.size.should eq 3
@@ -51,7 +51,7 @@ describe Marten::DB::Management::Migrations::Diff do
       from_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
-            app_label: "my_app",
+            app_label: "app",
             name: "test_table",
             columns: [
               Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -64,7 +64,7 @@ describe Marten::DB::Management::Migrations::Diff do
       to_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
-            app_label: "my_app",
+            app_label: "app",
             name: "test_table",
             columns: [
               Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -79,14 +79,14 @@ describe Marten::DB::Management::Migrations::Diff do
       changes = diff.detect
 
       changes.size.should eq 1
-      changes["my_app"].size.should eq 1
+      changes["app"].size.should eq 1
 
-      changes["my_app"][0].name.ends_with?("add_newcol_to_test_table_table").should be_true
+      changes["app"][0].name.ends_with?("add_newcol_to_test_table_table").should be_true
 
-      changes["my_app"][0].operations.size.should eq 1
-      changes["my_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddColumn
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddColumn
 
-      operation = changes["my_app"][0].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
       operation.table_name.should eq "test_table"
       operation.column.should be_a Marten::DB::Management::Column::BigInt
       operation.column.name.should eq "newcol"
@@ -96,7 +96,7 @@ describe Marten::DB::Management::Migrations::Diff do
       from_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
-            app_label: "my_app",
+            app_label: "app",
             name: "test_table",
             columns: [
               Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -110,7 +110,7 @@ describe Marten::DB::Management::Migrations::Diff do
       to_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
-            app_label: "my_app",
+            app_label: "app",
             name: "test_table",
             columns: [
               Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -124,14 +124,14 @@ describe Marten::DB::Management::Migrations::Diff do
       changes = diff.detect
 
       changes.size.should eq 1
-      changes["my_app"].size.should eq 1
+      changes["app"].size.should eq 1
 
-      changes["my_app"][0].name.ends_with?("remove_oldcol_on_test_table_table").should be_true
+      changes["app"][0].name.ends_with?("remove_oldcol_on_test_table_table").should be_true
 
-      changes["my_app"][0].operations.size.should eq 1
-      changes["my_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveColumn
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveColumn
 
-      operation = changes["my_app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveColumn)
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveColumn)
       operation.table_name.should eq "test_table"
       operation.column_name.should eq "oldcol"
     end
@@ -140,7 +140,7 @@ describe Marten::DB::Management::Migrations::Diff do
       from_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
-            app_label: "my_app",
+            app_label: "app",
             name: "old_table",
             columns: [
               Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -153,7 +153,7 @@ describe Marten::DB::Management::Migrations::Diff do
       to_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
-            app_label: "my_app",
+            app_label: "app",
             name: "new_table",
             columns: [
               Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
@@ -167,16 +167,273 @@ describe Marten::DB::Management::Migrations::Diff do
       changes = diff.detect
 
       changes.size.should eq 1
-      changes["my_app"].size.should eq 1
+      changes["app"].size.should eq 1
 
-      changes["my_app"][0].name.ends_with?("rename_old_table_table_to_new_table").should be_true
+      changes["app"][0].name.ends_with?("rename_old_table_table_to_new_table").should be_true
 
-      changes["my_app"][0].operations.size.should eq 1
-      changes["my_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RenameTable
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RenameTable
 
-      operation = changes["my_app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameTable)
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameTable)
       operation.old_name.should eq "old_table"
       operation.new_name.should eq "new_table"
+    end
+
+    it "is able to detect the addition of new unique constraints to existing tables" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].name.ends_with?("add_test_constraint_unique_constraint_to_test_table_table").should be_true
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddUniqueConstraint
+
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+      operation.table_name.should eq "test_table"
+      operation.unique_constraint.name.should eq "test_constraint"
+      operation.unique_constraint.column_names.should eq ["foo", "bar"]
+    end
+
+    it "is able to detect the removal unique constraints from existing tables" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].name.ends_with?("remove_test_constraint_unique_constraint_from_test_table_table").should be_true
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveUniqueConstraint
+
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveUniqueConstraint)
+      operation.table_name.should eq "test_table"
+      operation.unique_constraint_name.should eq "test_constraint"
+    end
+
+    it "generates one addition operation and one removal operation when a unique constraint is changed" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("renamed_test_constraint", ["foo", "bar"]),
+            ] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].operations.size.should eq 2
+
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveUniqueConstraint
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveUniqueConstraint)
+      operation_1.table_name.should eq "test_table"
+      operation_1.unique_constraint_name.should eq "test_constraint"
+
+      changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::AddUniqueConstraint
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+      operation_2.table_name.should eq "test_table"
+      operation_2.unique_constraint.name.should eq "renamed_test_constraint"
+      operation_2.unique_constraint.column_names.should eq ["foo", "bar"]
+    end
+
+    it "generates the expected operation for unique constraints added to a renamed table" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "renamed_test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].operations.size.should eq 2
+
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameTable)
+      operation_1.old_name.should eq "test_table"
+      operation_1.new_name.should eq "renamed_test_table"
+
+      changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::AddUniqueConstraint
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+      operation_2.table_name.should eq "renamed_test_table"
+      operation_2.unique_constraint.name.should eq "test_constraint"
+      operation_2.unique_constraint.column_names.should eq ["foo", "bar"]
+    end
+
+    it "generates the expected operation for unique constraints removed from a renamed table" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "renamed_test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].operations.size.should eq 2
+
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameTable)
+      operation_1.old_name.should eq "test_table"
+      operation_1.new_name.should eq "renamed_test_table"
+
+      changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::RemoveUniqueConstraint
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::RemoveUniqueConstraint)
+      operation_2.table_name.should eq "renamed_test_table"
+      operation_2.unique_constraint_name.should eq "test_constraint"
     end
   end
 end

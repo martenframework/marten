@@ -9,6 +9,8 @@ module Marten
         class Diff
           # :nodoc:
           alias OperationDependency = Tuple(String, String, Symbol)
+
+          # :nodoc:
           alias DetectedOperation = Tuple(DB::Migration::Operation::Base, Array(OperationDependency))
 
           @from_state : ProjectState
@@ -43,7 +45,7 @@ module Marten
               next unless kept_tables.includes?(tid)
               t.columns.map { |c| {t.app_label, t.name, c.name} }
             end.flatten.to_set
-            renamed_tables.each do |tid|
+            renamed_tables.keys.each do |tid|
               table = @to_state.get_table(tid)
               from_columns += table.columns.map { |c| {table.app_label, table.name, c.name} }.to_set
             end
@@ -54,9 +56,23 @@ module Marten
               t.columns.map { |c| {t.app_label, t.name, c.name} }
             end.flatten.to_set
 
+            # Generate table-level operations.
             handle_created_tables(from_tables, to_tables)
+
+            # Identify altered constraints and indexes.
+            unique_constraint_changes = identify_added_and_removed_unique_constraints(
+              from_tables,
+              to_tables,
+              renamed_tables
+            )
+
+            # Generate column-level operations.
             handle_removed_columns(from_columns, to_columns)
             handle_added_columns(from_columns, to_columns)
+
+            # Generate altered constraints and indexes operations.
+            handle_removed_unique_constraints(unique_constraint_changes)
+            handle_added_unique_constraints(unique_constraint_changes)
 
             changes = generate_migrations
             changes = select_changes_for_apps(changes, apps) if !apps.nil?
@@ -221,8 +237,20 @@ module Marten
             end
           end
 
+          private def handle_added_unique_constraints(unique_constraint_changes)
+            unique_constraint_changes.each do |app_label, changes|
+              changes[:added].each do |table_name, unique_constraint|
+                insert_operation(
+                  app_label,
+                  DB::Migration::Operation::AddUniqueConstraint.new(table_name, unique_constraint.dup),
+                  [] of OperationDependency
+                )
+              end
+            end
+          end
+
           private def handle_and_identify_renamed_tables(from_tables, to_tables)
-            renamed_tables = Set(String).new
+            renamed_tables = {} of String => String
 
             (to_tables - from_tables).each do |created_table_id|
               created_table = @to_state.get_table(created_table_id)
@@ -253,7 +281,8 @@ module Marten
 
                 from_tables.delete(deleted_table_id)
                 from_tables.add(created_table_id)
-                renamed_tables.add(created_table_id)
+
+                renamed_tables[created_table_id] = deleted_table_id
               end
             end
 
@@ -292,9 +321,52 @@ module Marten
               insert_operation(
                 app_label,
                 DB::Migration::Operation::RemoveColumn.new(table_name, column_name),
-                [OperationDependency.new(app_label, table_name, :altered_table_constraints)]
+                [] of OperationDependency
               )
             end
+          end
+
+          private def handle_removed_unique_constraints(unique_constraint_changes)
+            unique_constraint_changes.each do |app_label, changes|
+              changes[:removed].each do |table_name, unique_constraint|
+                insert_operation(
+                  app_label,
+                  DB::Migration::Operation::RemoveUniqueConstraint.new(table_name, unique_constraint.name),
+                  [] of OperationDependency
+                )
+              end
+            end
+          end
+
+          private def identify_added_and_removed_unique_constraints(from_tables, to_tables, renamed_tables)
+            changed_unique_constraints_per_app = {} of String => NamedTuple(
+              added: Array(Tuple(String, Management::Constraint::Unique)),
+              removed: Array(Tuple(String, Management::Constraint::Unique)))
+
+            (from_tables & to_tables).each do |remaining_table_id|
+              from_table_state = @from_state.get_table(renamed_tables.fetch(remaining_table_id, remaining_table_id))
+              to_table_state = @to_state.get_table(remaining_table_id)
+
+              from_unique_constraints = from_table_state.unique_constraints
+              to_unique_constraints = to_table_state.unique_constraints
+
+              added_constraints = to_unique_constraints.reject { |c| from_unique_constraints.includes?(c) }
+              removed_constraints = from_unique_constraints.reject { |c| to_unique_constraints.includes?(c) }
+
+              changed_unique_constraints_per_app[to_table_state.app_label] ||= {
+                added:   [] of Tuple(String, Management::Constraint::Unique),
+                removed: [] of Tuple(String, Management::Constraint::Unique),
+              }
+
+              changed_unique_constraints_per_app[to_table_state.app_label][:added].concat(
+                added_constraints.map { |c| {to_table_state.name, c} }
+              )
+              changed_unique_constraints_per_app[to_table_state.app_label][:removed].concat(
+                removed_constraints.map { |c| {to_table_state.name, c} }
+              )
+            end
+
+            changed_unique_constraints_per_app
           end
 
           private def insert_operation(app_label, operation, dependencies, beginning = false)
@@ -306,8 +378,6 @@ module Marten
             case dependency[2]
             when :created_table
               operation.is_a?(DB::Migration::Operation::CreateTable) && operation.name == dependency[1]
-            when :altered_table_constraints
-              raise NotImplementedError.new("Requires operations to change table constraints")
             else
               false
             end

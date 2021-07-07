@@ -123,6 +123,24 @@ module Marten
               )
             end
           end
+
+          {% related_field_name = kwargs[:related] %}
+
+          {% if !related_field_name.is_a?(NilLiteral) %}
+          class ::{{ model_klass }}
+            macro finished
+              class ::{{ related_model_klass }}
+                def {{ related_field_name.id }}
+                  Marten::DB::Query::Set({{ model_klass }}).new.filter(
+                    Marten::DB::Query::Node.new(
+                      {"{{ through_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
+                    )
+                  )
+                end
+              end
+            end
+          end
+          {% end %}
         end
       end
     end

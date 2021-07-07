@@ -7,7 +7,7 @@ class TestUser < Marten::Model
   field :first_name, :string, blank: false, null: false, max_size: 150
   field :last_name, :string, blank: false, null: false, max_size: 150
 
-  field :tags, :many_to_many, to: Tag
+  field :tags, :many_to_many, to: Tag, related: :test_users
 
   field :is_admin, :bool, null: true, default: false, blank: true
 

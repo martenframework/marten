@@ -8,6 +8,7 @@ module Marten
         macro included
           LOOKUP_SEP = {{ Marten::DB::Constants::LOOKUP_SEP }}
 
+          @@db_indexes : Array(Index) = [] of Index
           @@db_table : String?
           @@db_unique_constraints : Array(Constraint::Unique) = [] of Constraint::Unique
           @@fields : Hash(String, Field::Base) = {} of String => Field::Base
@@ -35,6 +36,26 @@ module Marten
         end
 
         module ClassMethods
+          # Allows to explicitly configure a new index for a specific set of fields.
+          #
+          # This method allows to configure a new index targetting a specific set of `fields`. Indexes must be
+          # associated with a mandatory `name` that must be unique accross all the indexes of the considered model.
+          def db_index(name : String | Symbol, field_names : Array(String) | Array(Symbol)) : Nil
+            @@db_indexes << Index.new(
+              name.to_s,
+              field_names.map do |fname|
+                get_field(fname.to_s)
+              rescue Errors::UnknownField
+                raise Errors::UnknownField.new("Unknown field '#{fname}' in index definition")
+              end
+            )
+          end
+
+          # Returns the configured database indexes.
+          def db_indexes
+            @@db_indexes
+          end
+
           # Returns the name of the table associated with the considered model.
           #
           # Unless explicitely specified, the table name is automatically generated based on the label of the app

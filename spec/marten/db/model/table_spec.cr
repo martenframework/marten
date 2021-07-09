@@ -1,6 +1,41 @@
 require "./spec_helper"
 
 describe Marten::DB::Model::Table do
+  describe "::db_index" do
+    it "allows to configure new index" do
+      indexes = Post.db_indexes
+      indexes.size.should eq 1
+      indexes[0].name.should eq "author_title"
+      indexes[0].fields.size.should eq 2
+      indexes[0].fields[0].id.should eq "author_id"
+      indexes[0].fields[1].id.should eq "title"
+    end
+
+    it "raises if the passed field does not correspond to any of the model's fields" do
+      expect_raises(
+        Marten::DB::Errors::UnknownField,
+        "Unknown field 'unknown' in index definition"
+      ) do
+        Post.db_index("new_unique", ["unknown", "author"])
+      end
+    end
+  end
+
+  describe "::db_indexes" do
+    it "returns an empty array if no indexes are defined" do
+      TestUser.db_indexes.should be_empty
+    end
+
+    it "returns an array of the configured indexes" do
+      indexes = Post.db_indexes
+      indexes.size.should eq 1
+      indexes[0].name.should eq "author_title"
+      indexes[0].fields.size.should eq 2
+      indexes[0].fields[0].id.should eq "author_id"
+      indexes[0].fields[1].id.should eq "title"
+    end
+  end
+
   describe "::db_table" do
     it "returns the name of the model table based on the class name by default" do
       TestUser.db_table.should eq "app_test_users"

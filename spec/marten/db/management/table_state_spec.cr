@@ -3,19 +3,27 @@ require "./spec_helper"
 describe Marten::DB::Management::TableState do
   describe "::from_model" do
     it "allows to initialize a table state from a given model" do
-      table_state = Marten::DB::Management::TableState.from_model(TestUser)
+      table_state = Marten::DB::Management::TableState.from_model(Post)
 
-      table_state.app_label.should eq TestUser.app_config.label
-      table_state.name.should eq TestUser.db_table
+      table_state.app_label.should eq Post.app_config.label
+      table_state.name.should eq Post.db_table
 
       table_state.columns.each do |column|
-        TestUser.fields.find { |f| f.db_column == column.name }.should be_truthy
+        Post.fields.find { |f| f.db_column == column.name }.should be_truthy
       end
 
+      table_state.unique_constraints.size.should eq Post.db_unique_constraints.size
       table_state.unique_constraints.each do |unique_constraint|
-        original_constraint = TestUser.db_unique_constraints.find { |c| c.name == unique_constraint }
+        original_constraint = Post.db_unique_constraints.find { |c| c.name == unique_constraint.name }
         original_constraint.should be_truthy
         unique_constraint.column_names.should eq original_constraint.not_nil!.fields.map(&.db_column)
+      end
+
+      table_state.indexes.size.should eq Post.db_indexes.size
+      table_state.indexes.each do |index|
+        original_index = Post.db_indexes.find { |i| i.name == index.name }
+        original_index.should be_truthy
+        index.column_names.should eq original_index.not_nil!.fields.map(&.db_column)
       end
     end
   end
@@ -44,6 +52,19 @@ describe Marten::DB::Management::TableState do
     end
   end
 
+  describe "#indexes" do
+    it "returns the table indexes" do
+      table_state = Marten::DB::Management::TableState.from_model(Post)
+
+      table_state.indexes.size.should eq Post.db_indexes.size
+      table_state.indexes.each do |index|
+        original_index = Post.db_indexes.find { |i| i.name == index.name }
+        original_index.should be_truthy
+        index.column_names.should eq original_index.not_nil!.fields.map(&.db_column)
+      end
+    end
+  end
+
   describe "#unique_constraints" do
     it "returns the table unique constraints" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
@@ -61,6 +82,26 @@ describe Marten::DB::Management::TableState do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
       table_state.add_column(Marten::DB::Management::Column::Int.new("test_number"))
       table_state.columns.last.name.should eq "test_number"
+    end
+  end
+
+  describe "#add_index" do
+    it "adds an index to the table state" do
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::Int.new("foo"),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base
+      )
+
+      index = Marten::DB::Management::Index.new(name: "test_index", column_names: ["foo", "bar"])
+
+      table_state.add_index(index)
+
+      table_state.indexes.should eq [index]
     end
   end
 
@@ -95,6 +136,30 @@ describe Marten::DB::Management::TableState do
     it "raises NilAssertionError if the column is not found" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
       expect_raises(NilAssertionError) { table_state.get_column("unknown") }
+    end
+  end
+
+  describe "#get_index" do
+    it "returns the index corresponding to the passed name" do
+      index = Marten::DB::Management::Index.new("test_index", ["foo", "bar"])
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [index]
+      )
+
+      table_state.get_index("test_index").should eq index
+    end
+
+    it "raises NilAssertionError if the index is not found" do
+      table_state = Marten::DB::Management::TableState.from_model(TestUser)
+      expect_raises(NilAssertionError) { table_state.get_index("unknown") }
     end
   end
 
@@ -141,6 +206,27 @@ describe Marten::DB::Management::TableState do
       table_state.remove_column("test_number")
 
       expect_raises(NilAssertionError) { table_state.get_column("test_number") }
+    end
+  end
+
+  describe "#remove_index" do
+    it "removes the passed index from the table state" do
+      index = Marten::DB::Management::Index.new(name: "test_index", column_names: ["foo", "bar"])
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::Int.new("foo"),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [index]
+      )
+
+      table_state.remove_index(index)
+
+      table_state.indexes.should be_empty
     end
   end
 

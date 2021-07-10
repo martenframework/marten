@@ -5,6 +5,7 @@ module Marten
       class TableState
         getter app_label
         getter columns
+        getter indexes
         getter name
         getter unique_constraints
 
@@ -16,7 +17,8 @@ module Marten
             app_label: model.app_config.label,
             name: model.db_table,
             columns: model.fields.compact_map(&.to_column),
-            unique_constraints: model.db_unique_constraints.map(&.to_management_constraint)
+            unique_constraints: model.db_unique_constraints.map(&.to_management_constraint),
+            indexes: model.db_indexes.map(&.to_management_index)
           )
         end
 
@@ -24,12 +26,17 @@ module Marten
           @app_label : String,
           @name : String,
           @columns : Array(Column::Base),
-          @unique_constraints : Array(Management::Constraint::Unique)
+          @unique_constraints : Array(Management::Constraint::Unique) = [] of Management::Constraint::Unique,
+          @indexes : Array(Management::Index) = [] of Management::Index
         )
         end
 
         def add_column(column : Column::Base) : Nil
           @columns << column
+        end
+
+        def add_index(index : Management::Index) : Nil
+          @indexes << index
         end
 
         def add_unique_constraint(unique_constraint : Management::Constraint::Unique) : Nil
@@ -38,6 +45,10 @@ module Marten
 
         def get_column(name : String) : Column::Base
           @columns.find { |c| c.name == name }.not_nil!
+        end
+
+        def get_index(name : String) : Management::Index
+          indexes.find { |i| i.name == name }.not_nil!
         end
 
         def get_unique_constraint(name : String) : Management::Constraint::Unique
@@ -50,6 +61,10 @@ module Marten
 
         def remove_column(column_name : String)
           @columns.reject! { |c| c.name == column_name }
+        end
+
+        def remove_index(index : Management::Index) : Nil
+          @indexes.reject! { |i| i.name == index.name }
         end
 
         def remove_unique_constraint(unique_constraint : Management::Constraint::Unique) : Nil

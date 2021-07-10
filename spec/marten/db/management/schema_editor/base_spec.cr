@@ -996,6 +996,148 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.deferred_statements.first.params["name"].should be_a Marten::DB::Management::Statement::IndexName
     end
 
+    it "generates a deferred statement for custom indexes" do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [
+          Marten::DB::Management::Index.new("index_name", ["foo", "bar"]),
+        ]
+      )
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.deferred_statements.size.should eq 1
+      schema_editor.deferred_statements.first.params["name"].should eq "index_name"
+    end
+
+    it "properly creates custom indexes" do
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [
+          Marten::DB::Management::Index.new("index_name", ["foo", "bar"]),
+        ]
+      )
+
+      Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
+        schema_editor.create_table(table_state)
+      end
+
+      Marten::DB::Connection.default.open do |db|
+        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+          index_name = nil
+          index_columns = [] of String
+
+          db.query(
+            <<-SQL
+              SHOW INDEX FROM schema_editor_test_table;
+            SQL
+          ) do |rs|
+            rs.each do
+              rs.read(String) # table
+              rs.read(Bool)   # non_unique
+
+              current_index_name = rs.read(String)
+              next unless current_index_name == "index_name"
+
+              index_name = current_index_name
+
+              rs.read(Int64) # seq_in_index
+
+              index_columns << rs.read(String)
+            end
+          end
+
+          index_name.should eq "index_name"
+          index_columns.to_set.should eq ["foo", "bar"].to_set
+        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+          index_name = nil
+          index_columns = [] of String
+
+          db.query(
+            <<-SQL
+              SELECT
+                i.relname AS index_name,
+                a.attname AS column_name
+              FROM
+                pg_class t,
+                pg_class i,
+                pg_index ix,
+                pg_attribute a
+              WHERE
+                t.oid = ix.indrelid
+                AND i.oid = ix.indexrelid
+                AND a.attrelid = t.oid
+                AND a.attnum = ANY(ix.indkey)
+                AND t.relkind = 'r'
+                AND t.relname = 'schema_editor_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              current_index_name = rs.read(String)
+              next unless current_index_name == "index_name"
+
+              index_name = current_index_name
+              index_columns << rs.read(String)
+            end
+          end
+
+          index_name.should eq "index_name"
+          index_columns.to_set.should eq ["foo", "bar"].to_set
+        {% else %}
+          index_name = nil
+
+          db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              current_index_name = rs.read(String)
+              index_name = current_index_name if current_index_name == "index_name"
+            end
+          end
+
+          index_name.should eq "index_name"
+
+          index_columns = [] of String
+
+          db.query(
+            <<-SQL
+              SELECT
+                il.name AS index_name,
+                ii.name AS column_name
+              FROM
+                sqlite_master AS m,
+                pragma_index_list(m.name) AS il,
+                pragma_index_info(il.name) AS ii
+              WHERE
+                m.type = 'table' AND
+                m.tbl_name = 'schema_editor_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              rs.read(String)
+              column_name = rs.read(String)
+              index_columns << column_name
+            end
+          end
+
+          index_columns.to_set.should eq ["foo", "bar"].to_set
+        {% end %}
+      end
+    end
+
     {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" || env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
       it "generates a deferred statement for foreign key columns" do
         schema_editor = Marten::DB::Connection.default.schema_editor

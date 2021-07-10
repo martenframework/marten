@@ -19,10 +19,14 @@ module Marten
             BUILT_IN_COLUMN_TO_DB_TYPE_SUFFIX_MAPPING[id]?
           end
 
-          def create_index_deferred_statement(table : TableState, columns : Array(Column::Base)) : Statement
+          def create_index_deferred_statement(
+            table : TableState,
+            columns : Array(Column::Base),
+            name : String? = nil
+          ) : Statement
             Statement.new(
               "CREATE INDEX %{name} ON %{table} (%{columns})",
-              name: statement_index_name(table.name, columns.map(&.name)),
+              name: name.try(&.to_s) || statement_index_name(table.name, columns.map(&.name)),
               table: statement_table(table.name),
               columns: statement_columns(table.name, columns.map(&.name)),
             )

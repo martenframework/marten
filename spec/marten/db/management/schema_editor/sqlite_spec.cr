@@ -76,6 +76,22 @@ require "./spec_helper"
         )
       end
 
+      it "returns the expected index statement for a given set of table, columns and fixed name" do
+        table_state = Marten::DB::Management::TableState.from_model(TestUser)
+        columns = [
+          Marten::DB::Management::Column::String.new("foo", 255),
+          Marten::DB::Management::Column::String.new("bar", 128),
+        ]
+
+        index_statement = Marten::DB::Connection.default.schema_editor.create_index_deferred_statement(
+          table_state,
+          columns,
+          name: "index_name"
+        )
+
+        index_statement.to_s.should eq "CREATE INDEX index_name ON \"app_test_users\" (\"foo\", \"bar\")"
+      end
+
       it "returns the expected index statement for a given table and columns when the index name is too long" do
         table_state = Marten::DB::Management::TableState.from_model(TestUser)
         columns = [

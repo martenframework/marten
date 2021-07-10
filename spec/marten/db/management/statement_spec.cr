@@ -66,6 +66,11 @@ describe Marten::DB::Management::Statement do
 
       statement.references_column?("new_table", "new_column").should be_false
     end
+
+    it "returns false for string parameters" do
+      statement = Marten::DB::Management::Statement.new("template", raw_name: "raw_name")
+      statement.references_column?("new_table", "new_column").should be_false
+    end
   end
 
   describe "#references_table?" do
@@ -113,6 +118,11 @@ describe Marten::DB::Management::Statement do
         )
       )
 
+      statement.references_table?("new_table").should be_false
+    end
+
+    it "returns false for string parameters" do
+      statement = Marten::DB::Management::Statement.new("template", raw_name: "raw_name")
       statement.references_table?("new_table").should be_false
     end
   end
@@ -171,6 +181,12 @@ describe Marten::DB::Management::Statement do
       statement.params["column_2"].as(Marten::DB::Management::Statement::Columns).columns.should eq ["bar"]
       statement.params["column_3"].as(Marten::DB::Management::Statement::Columns).columns.should eq ["other_column"]
     end
+
+    it "does nothing to string parameters" do
+      statement = Marten::DB::Management::Statement.new("template", raw_name: "raw_name")
+      statement.rename_column("new_table", "new_column", "renamed_new_column")
+      statement.params["raw_name"].should eq "raw_name"
+    end
   end
 
   describe "#rename_table" do
@@ -226,6 +242,12 @@ describe Marten::DB::Management::Statement do
       statement.params["column_1"].as(Marten::DB::Management::Statement::Columns).table.should eq "test_table"
       statement.params["column_2"].as(Marten::DB::Management::Statement::Columns).table.should eq "test_table"
       statement.params["column_3"].as(Marten::DB::Management::Statement::Columns).table.should eq "other_table"
+    end
+
+    it "does nothing to string parameters" do
+      statement = Marten::DB::Management::Statement.new("template", raw_name: "raw_name")
+      statement.rename_table("new_table", "renamed_new_table")
+      statement.params["raw_name"].should eq "raw_name"
     end
   end
 

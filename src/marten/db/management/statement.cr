@@ -13,26 +13,28 @@ module Marten
         getter template
 
         def initialize(@template : String, **kwargs)
-          @params = Hash(String, ReferenceTypes).new
+          @params = Hash(String, ReferenceTypes | String).new
           @params.merge!(kwargs.to_h.transform_keys(&.to_s))
         end
 
         def references_column?(table : String, column : String) : Bool
-          @params.values.any? { |ref| ref.references_column?(table, column) }
+          @params.values.any? { |ref| ref.is_a?(ReferenceTypes) && ref.references_column?(table, column) }
         end
 
         def references_table?(name : String) : Bool
-          @params.values.any? { |ref| ref.references_table?(name) }
+          @params.values.any? { |ref| ref.is_a?(ReferenceTypes) && ref.references_table?(name) }
         end
 
         def rename_column(table : String, old_name : String, new_name : String)
           @params.values.each do |ref|
+            next unless ref.is_a?(ReferenceTypes)
             ref.rename_column(table, old_name, new_name)
           end
         end
 
         def rename_table(old_name : String, new_name : String)
           @params.values.each do |ref|
+            next unless ref.is_a?(ReferenceTypes)
             ref.rename_table(old_name, new_name)
           end
         end

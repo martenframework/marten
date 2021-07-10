@@ -6,6 +6,6 @@ class Post < Marten::Model
   field :published, :bool, default: true
 
   db_table :posts
-  db_index :author_title, field_names: [:author, :title]
-  db_unique_constraint :author_title, field_names: [:author, :title]
+  db_index :author_title_index, field_names: [:author, :title]
+  db_unique_constraint :author_title_constraint, field_names: [:author, :title]
 end

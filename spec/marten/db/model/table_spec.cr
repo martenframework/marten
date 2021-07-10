@@ -5,7 +5,7 @@ describe Marten::DB::Model::Table do
     it "allows to configure new index" do
       indexes = Post.db_indexes
       indexes.size.should eq 1
-      indexes[0].name.should eq "author_title"
+      indexes[0].name.should eq "author_title_index"
       indexes[0].fields.size.should eq 2
       indexes[0].fields[0].id.should eq "author_id"
       indexes[0].fields[1].id.should eq "title"
@@ -29,7 +29,7 @@ describe Marten::DB::Model::Table do
     it "returns an array of the configured indexes" do
       indexes = Post.db_indexes
       indexes.size.should eq 1
-      indexes[0].name.should eq "author_title"
+      indexes[0].name.should eq "author_title_index"
       indexes[0].fields.size.should eq 2
       indexes[0].fields[0].id.should eq "author_id"
       indexes[0].fields[1].id.should eq "title"
@@ -60,7 +60,7 @@ describe Marten::DB::Model::Table do
     it "allows to configure new unique constraints" do
       unique_constraints = Post.db_unique_constraints
       unique_constraints.size.should eq 1
-      unique_constraints[0].name.should eq "author_title"
+      unique_constraints[0].name.should eq "author_title_constraint"
       unique_constraints[0].fields.size.should eq 2
       unique_constraints[0].fields[0].id.should eq "author_id"
       unique_constraints[0].fields[1].id.should eq "title"
@@ -84,7 +84,7 @@ describe Marten::DB::Model::Table do
     it "returns an array of the configured unique constraints when unique constraints are defined" do
       unique_constraints = Post.db_unique_constraints
       unique_constraints.size.should eq 1
-      unique_constraints[0].name.should eq "author_title"
+      unique_constraints[0].name.should eq "author_title_constraint"
       unique_constraints[0].fields.size.should eq 2
       unique_constraints[0].fields[0].id.should eq "author_id"
       unique_constraints[0].fields[1].id.should eq "title"

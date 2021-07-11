@@ -19,11 +19,14 @@ module Marten
               @dependencies : Array(Tuple(String, String))
             )
               @version = @name.dup
-              if @operations.size == 1
-                @name += "_#{@operations.first.describe.downcase.gsub(" ", "_")}"
-              else
-                @name += "_auto"
-              end
+
+              name = if @operations.size == 1
+                       @name + "_#{@operations.first.describe.downcase.gsub(" ", "_")}"
+                     else
+                       @name + "_auto"
+                     end
+
+              @name = name.size > Record::NAME_MAX_SIZE ? @name + "_auto" : name
             end
 
             def serialize

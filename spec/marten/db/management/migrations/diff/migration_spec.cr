@@ -96,6 +96,28 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
       )
       migration.name.should eq "202107031819361_auto"
     end
+
+    it "returns au automatic name if the single operation name size is greater than the allowed limit" do
+      migration = Marten::DB::Management::Migrations::Diff::Migration.new(
+        app_label: "my_app",
+        name: "202107031819361",
+        operations: [
+          Marten::DB::Migration::Operation::CreateTable.new(
+            name: "x" * 255,
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::Int.new("foo"),
+              Marten::DB::Management::Column::Int.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ] of Marten::DB::Migration::Operation::Base,
+        dependencies: [{"other_app", "other_migration"}]
+      )
+      migration.name.should eq "202107031819361_auto"
+    end
   end
 
   describe "#version" do

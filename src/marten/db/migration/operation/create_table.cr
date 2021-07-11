@@ -5,12 +5,14 @@ module Marten
         class CreateTable < Base
           getter name
           getter columns
+          getter indexes
           getter unique_constraints
 
           def initialize(
             @name : String,
             @columns : Array(Management::Column::Base),
-            @unique_constraints : Array(Management::Constraint::Unique)
+            @unique_constraints : Array(Management::Constraint::Unique) = [] of Management::Constraint::Unique,
+            @indexes : Array(Management::Index) = [] of Management::Index
           )
           end
 
@@ -41,10 +43,11 @@ module Marten
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
             state.add_table(
               Management::TableState.new(
-                app_label,
-                @name,
-                @columns.dup,
-                @unique_constraints.dup
+                app_label: app_label,
+                name: name,
+                columns: columns.dup,
+                unique_constraints: unique_constraints.dup,
+                indexes: indexes.dup
               )
             )
           end

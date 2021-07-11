@@ -76,6 +76,10 @@ module Marten
           )
         end
 
+        macro _init_index(name, column_names)
+          Marten::DB::Management::Index.new({{ name }}, {{ column_names }})
+        end
+
         macro _init_unique_constraint(name, column_names)
           Marten::DB::Management::Constraint::Unique.new({{ name }}, {{ column_names }})
         end

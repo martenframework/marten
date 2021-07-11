@@ -8,4 +8,10 @@ create_table <%= format_string_or_symbol(@name) %> do
   unique_constraint <%= unique_constraint.serialize_args %>
   <%- end -%>
   <%- end -%>
+  <%- if !@indexes.empty? -%>
+
+  <%- @indexes.each do |index| -%>
+  index <%= index.serialize_args %>
+  <%- end -%>
+  <%- end -%>
 end

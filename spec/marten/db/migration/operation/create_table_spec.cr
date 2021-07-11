@@ -130,6 +130,33 @@ describe Marten::DB::Migration::Operation::CreateTable do
       table_state.columns.should eq columns
       table_state.unique_constraints.should eq unique_constraints
     end
+
+    it "properly configure custom indexes into the generated table state" do
+      columns = [
+        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::Int.new("foo"),
+        Marten::DB::Management::Column::Int.new("bar"),
+      ] of Marten::DB::Management::Column::Base
+      indexes = [
+        Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+      ]
+
+      project_state = Marten::DB::Management::ProjectState.new
+
+      operation = Marten::DB::Migration::Operation::CreateTable.new(
+        name: "operation_test_table",
+        columns: columns,
+        indexes: indexes
+      )
+
+      operation.mutate_state_forward("my_app", project_state)
+
+      table_state = project_state.get_table("my_app", "operation_test_table")
+      table_state.app_label.should eq "my_app"
+      table_state.name.should eq "operation_test_table"
+      table_state.columns.should eq columns
+      table_state.indexes.should eq indexes
+    end
   end
 
   describe "#serialize" do
@@ -154,6 +181,33 @@ describe Marten::DB::Migration::Operation::CreateTable do
             column :bar, :int
 
             unique_constraint :test_constraint, [:foo, :bar]
+          end
+          OPERATION
+        ).strip
+      )
+    end
+
+    it "properly includes indexes when the operation contains custom indexes" do
+      operation = Marten::DB::Migration::Operation::CreateTable.new(
+        name: "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::Int.new("foo"),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [
+          Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+        ]
+      )
+      operation.serialize.strip.should eq(
+        (
+          <<-OPERATION
+          create_table :operation_test_table do
+            column :id, :big_auto, primary_key: true
+            column :foo, :int
+            column :bar, :int
+
+            index :test_index, [:foo, :bar]
           end
           OPERATION
         ).strip

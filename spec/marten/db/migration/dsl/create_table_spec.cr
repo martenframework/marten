@@ -34,6 +34,10 @@ describe Marten::DB::Migration::DSL::CreateTable do
       operation.unique_constraints.size.should eq 1
       operation.unique_constraints[0].name.should eq "cname"
       operation.unique_constraints[0].column_names.should eq ["foo", "bar"]
+
+      operation.indexes.size.should eq 1
+      operation.indexes[0].name.should eq "index_name"
+      operation.indexes[0].column_names.should eq ["foo", "bar"]
     end
   end
 end
@@ -61,6 +65,7 @@ module Marten::DB::Migration::DSL::CreateTableSpec
         column :bar, :int, null: true
 
         unique_constraint :cname, [:foo, :bar]
+        index :index_name, [:foo, :bar]
       end
     end
   end

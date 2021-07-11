@@ -12,11 +12,20 @@ module Marten
           end
 
           def operation
-            Operation::CreateTable.new(name: @name.to_s, columns: columns, unique_constraints: unique_constraints)
+            Operation::CreateTable.new(
+              name: @name.to_s,
+              columns: columns,
+              unique_constraints: unique_constraints,
+              indexes: indexes
+            )
           end
 
           macro column(*args, **kwargs)
             columns << _init_column({{ args.splat }}, {{ kwargs.double_splat }})
+          end
+
+          macro index(name, column_names)
+            indexes << _init_index({{ name }}, {{ column_names }})
           end
 
           macro unique_constraint(name, column_names)
@@ -24,6 +33,7 @@ module Marten
           end
 
           private getter columns = [] of Management::Column::Base
+          private getter indexes = [] of Management::Index
           private getter unique_constraints = [] of Management::Constraint::Unique
         end
       end

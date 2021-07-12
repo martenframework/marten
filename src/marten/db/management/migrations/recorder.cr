@@ -2,6 +2,12 @@ module Marten
   module DB
     module Management
       module Migrations
+        # The migration recorder class.
+        #
+        # The migration recorder is responsible for recording the fact that specific migrations where applied to the DB.
+        # It does so by creating a "migration record" for each of the applied migration that is persisted in the
+        # `marten_migrations` table of the current database. The whole migration mechanism relies on the recorder in
+        # order to know which migrations where previously applied for each installed application.
         class Recorder
           @introspector : Introspector::Base?
           @schema_editor : SchemaEditor::Base?

@@ -29,6 +29,12 @@ describe Marten::DB::Management::Index do
       )
     end
 
+    it "returns true if the column names of the other objects are ordered differently" do
+      Marten::DB::Management::Index.new(:new_index, column_names: [:author_id, :title]).should eq(
+        Marten::DB::Management::Index.new(:new_index, column_names: [:title, :author_id])
+      )
+    end
+
     it "returns false if the other index has a different name" do
       Marten::DB::Management::Index.new(:new_index, column_names: [:author_id, :title]).should_not eq(
         Marten::DB::Management::Index.new(:other_index, column_names: [:author_id, :title])

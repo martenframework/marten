@@ -44,6 +44,18 @@ describe Marten::DB::Management::Constraint::Unique do
       )
     end
 
+    it "returns true if the column names of the other object are ordered differently" do
+      Marten::DB::Management::Constraint::Unique.new(
+        :new_constraint,
+        column_names: [:author_id, :title]
+      ).should eq(
+        Marten::DB::Management::Constraint::Unique.new(
+          :new_constraint,
+          column_names: [:title, :author_id]
+        )
+      )
+    end
+
     it "returns false if the other unique constraint has a different name" do
       Marten::DB::Management::Constraint::Unique.new(
         :new_constraint,

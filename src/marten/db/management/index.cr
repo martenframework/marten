@@ -23,7 +23,7 @@ module Marten
 
         # Returns true if the other index corresponds to the same index configuration.
         def ==(other : self)
-          super || (name == other.name && column_names == other.column_names)
+          super || (name == other.name && column_names.to_set == other.column_names.to_set)
         end
 
         # Returns a copy of the index.

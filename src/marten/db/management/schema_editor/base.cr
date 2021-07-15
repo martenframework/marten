@@ -69,6 +69,9 @@ module Marten
           # Returns a prepared default value that can be inserted in a column definition.
           abstract def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
 
+          # Returns the SQL statement allowing to remove an index from a given table.
+          abstract def remove_index_statement(table : TableState, index : Management::Index) : String
+
           # Returns the SQL statement allowing to remove a unique constraint from a given table.
           abstract def remove_unique_constraint_statement(
             table : TableState,
@@ -95,6 +98,17 @@ module Marten
             if column.index? && !column.unique?
               @deferred_statements << create_index_deferred_statement(table, [column])
             end
+          end
+
+          # Adds an index to a specific table.
+          def add_index(table : TableState, index : Management::Index) : Nil
+            execute(
+              create_index_deferred_statement(
+                table,
+                columns: index.column_names.map { |cname| table.get_column(cname) },
+                name: index.name
+              ).to_s
+            )
           end
 
           # Adds a unique constraint to a specific table.
@@ -195,6 +209,11 @@ module Marten
 
             # Removes all deferred statements that still reference the deleted column.
             @deferred_statements.reject! { |s| s.references_column?(table.name, column.name) }
+          end
+
+          # Removes an index from a specific table.
+          def remove_index(table : TableState, index : Management::Index) : Nil
+            execute(remove_index_statement(table, index))
           end
 
           # Removes a unique constraint from a specific table.

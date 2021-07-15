@@ -110,6 +110,15 @@ module Marten
             value.to_s
           end
 
+          def remove_index_statement(table : TableState, index : Management::Index) : String
+            build_sql do |s|
+              s << "DROP INDEX"
+              s << quote(index.name)
+              s << "ON"
+              s << table.name
+            end
+          end
+
           def remove_unique_constraint_statement(
             table : TableState,
             unique_constraint : Management::Constraint::Unique

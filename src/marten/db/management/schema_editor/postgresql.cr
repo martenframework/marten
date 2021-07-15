@@ -111,6 +111,13 @@ module Marten
             "ALTER TABLE #{old_name} RENAME TO #{new_name}"
           end
 
+          def remove_index_statement(table : TableState, index : Management::Index) : String
+            build_sql do |s|
+              s << "DROP INDEX IF EXISTS"
+              s << quote(index.name)
+            end
+          end
+
           def remove_unique_constraint_statement(
             table : TableState,
             unique_constraint : Management::Constraint::Unique

@@ -111,6 +111,13 @@ module Marten
             remake_table_with_removed_column(table, column)
           end
 
+          def remove_index_statement(table : TableState, index : Management::Index) : String
+            build_sql do |s|
+              s << "DROP INDEX"
+              s << quote(index.name)
+            end
+          end
+
           def remove_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
             remake_table_with_removed_unique_constraint(table, unique_constraint)
           end
@@ -184,7 +191,7 @@ module Marten
             end
           end
 
-          def with_remade_table(table)
+          private def with_remade_table(table)
             # Set up a mapping that will hold the link between columns from the original table to the columns of the
             # new table.
             column_names_mapping = {} of String => String

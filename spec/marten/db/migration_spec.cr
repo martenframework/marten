@@ -403,7 +403,7 @@ module Marten::DB::MigrationSpec
   end
 
   class MigrationToCreateTwoNewTablesWithExplicitDirectedOperations < Marten::DB::Migration
-    def plan_forward
+    def apply
       create_table :migration_test_table1 do
         column :id, :big_auto, primary_key: true
         column :label, :string, max_size: 255
@@ -416,7 +416,7 @@ module Marten::DB::MigrationSpec
       end
     end
 
-    def plan_backward
+    def unapply
       delete_table :migration_test_table2
       delete_table :migration_test_table1
     end

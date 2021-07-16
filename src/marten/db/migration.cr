@@ -152,10 +152,10 @@ module Marten
       def plan
       end
 
-      def plan_backward
+      def apply
       end
 
-      def plan_forward
+      def unapply
       end
 
       private def operations
@@ -184,10 +184,10 @@ module Marten
         plan
 
         @plan_loading_direction = :backward
-        plan_backward
+        unapply
 
         @plan_loading_direction = :forward
-        plan_forward
+        apply
 
         @plan_loaded = true
       end

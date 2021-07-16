@@ -20,6 +20,22 @@ describe Marten::DB::Migration::DSL do
   end
 
   describe "#add_unique_constraint" do
+    it "allows to initialize an AddIndex operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_add_index
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::AddIndex
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::AddIndex)
+      operation.table_name.should eq "test_table"
+      operation.index.should be_a Marten::DB::Management::Index
+
+      operation.index.name.should eq "test_index"
+      operation.index.column_names.should eq ["foo", "bar"]
+    end
+  end
+
+  describe "#add_unique_constraint" do
     it "allows to initialize an AddUniqueConstraint operation" do
       test = Marten::DB::Migration::DSLSpec::Test.new
       test.run_add_unique_constraint
@@ -143,6 +159,10 @@ module Marten::DB::Migration::DSLSpec
 
     def run_add_column
       add_column :test_table, :test_column, :string, max_size: 155, null: true
+    end
+
+    def run_add_index
+      add_index :test_table, :test_index, [:foo, :bar]
     end
 
     def run_add_unique_constraint

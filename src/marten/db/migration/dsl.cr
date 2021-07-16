@@ -9,6 +9,13 @@ module Marten
           )
         end
 
+        macro add_index(table_name, name, column_names)
+          operations << Operation::AddIndex.new(
+            {{ table_name }},
+            _init_index({{ name }}, {{ column_names }})
+          )
+        end
+
         macro add_unique_constraint(table_name, name, column_names)
           operations << Operation::AddUniqueConstraint.new(
             {{ table_name }},

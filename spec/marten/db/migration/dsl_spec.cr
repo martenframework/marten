@@ -110,6 +110,19 @@ describe Marten::DB::Migration::DSL do
     end
   end
 
+  describe "#remove_index" do
+    it "allows to initialize a RemoveIndex operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_remove_index
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::RemoveIndex
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::RemoveIndex)
+      operation.table_name.should eq "test_table"
+      operation.index_name.should eq "test_index"
+    end
+  end
+
   describe "#remove_unique_constraint" do
     it "allows to initialize a RemoveUniqueConstraint operation" do
       test = Marten::DB::Migration::DSLSpec::Test.new
@@ -200,6 +213,10 @@ module Marten::DB::Migration::DSLSpec
 
     def run_remove_column
       remove_column :test_table, :test_column
+    end
+
+    def run_remove_index
+      remove_index :test_table, :test_index
     end
 
     def run_remove_unique_constraint

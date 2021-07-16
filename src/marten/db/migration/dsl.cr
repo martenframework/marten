@@ -41,6 +41,10 @@ module Marten
           operations << Operation::RemoveColumn.new({{ table_name }}, {{ column_name }})
         end
 
+        macro remove_index(table_name, index_name)
+          operations << Operation::RemoveIndex.new({{ table_name }}, {{ index_name }})
+        end
+
         macro remove_unique_constraint(table_name, constraint_name)
           operations << Operation::RemoveUniqueConstraint.new({{ table_name }}, {{ constraint_name }})
         end

@@ -435,5 +435,258 @@ describe Marten::DB::Management::Migrations::Diff do
       operation_2.table_name.should eq "renamed_test_table"
       operation_2.unique_constraint_name.should eq "test_constraint"
     end
+
+    it "is able to detect the addition of new index to existing tables" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            indexes: [
+              Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+            ]
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].name.ends_with?("add_test_index_index_to_test_table_table").should be_true
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddIndex
+
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::AddIndex)
+      operation.table_name.should eq "test_table"
+      operation.index.name.should eq "test_index"
+      operation.index.column_names.should eq ["foo", "bar"]
+    end
+  end
+
+  it "is able to detect the removal indexes from existing tables" do
+    from_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          indexes: [
+            Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+          ]
+        ),
+      ]
+    )
+
+    to_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base
+        ),
+      ]
+    )
+
+    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+    changes = diff.detect
+
+    changes.size.should eq 1
+    changes["app"].size.should eq 1
+
+    changes["app"][0].name.ends_with?("remove_test_index_index_from_test_table_table").should be_true
+
+    changes["app"][0].operations.size.should eq 1
+    changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveIndex
+
+    operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveIndex)
+    operation.table_name.should eq "test_table"
+    operation.index_name.should eq "test_index"
+  end
+
+  it "generates one addition operation and one removal operation when an index is changed" do
+    from_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          indexes: [
+            Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+          ]
+        ),
+      ]
+    )
+
+    to_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          indexes: [
+            Marten::DB::Management::Index.new("renamed_test_index", ["foo", "bar"]),
+          ]
+        ),
+      ]
+    )
+
+    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+    changes = diff.detect
+
+    changes.size.should eq 1
+    changes["app"].size.should eq 1
+
+    changes["app"][0].operations.size.should eq 2
+
+    changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveIndex
+    operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveIndex)
+    operation_1.table_name.should eq "test_table"
+    operation_1.index_name.should eq "test_index"
+
+    changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::AddIndex
+    operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::AddIndex)
+    operation_2.table_name.should eq "test_table"
+    operation_2.index.name.should eq "renamed_test_index"
+    operation_2.index.column_names.should eq ["foo", "bar"]
+  end
+
+  it "generates the expected operation for indexes added to a renamed table" do
+    from_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base
+        ),
+      ]
+    )
+
+    to_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "renamed_test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          indexes: [
+            Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+          ]
+        ),
+      ]
+    )
+
+    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+    changes = diff.detect
+
+    changes.size.should eq 1
+    changes["app"].size.should eq 1
+
+    changes["app"][0].operations.size.should eq 2
+
+    operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameTable)
+    operation_1.old_name.should eq "test_table"
+    operation_1.new_name.should eq "renamed_test_table"
+
+    changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::AddIndex
+    operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::AddIndex)
+    operation_2.table_name.should eq "renamed_test_table"
+    operation_2.index.name.should eq "test_index"
+    operation_2.index.column_names.should eq ["foo", "bar"]
+  end
+
+  it "generates the expected operation for indexes removed from a renamed table" do
+    from_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          indexes: [
+            Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+          ]
+        ),
+      ]
+    )
+
+    to_project_state = Marten::DB::Management::ProjectState.new(
+      tables: [
+        Marten::DB::Management::TableState.new(
+          app_label: "app",
+          name: "renamed_test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base
+        ),
+      ]
+    )
+
+    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+    changes = diff.detect
+
+    changes.size.should eq 1
+    changes["app"].size.should eq 1
+
+    changes["app"][0].operations.size.should eq 2
+
+    operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameTable)
+    operation_1.old_name.should eq "test_table"
+    operation_1.new_name.should eq "renamed_test_table"
+
+    changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::RemoveIndex
+    operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::RemoveIndex)
+    operation_2.table_name.should eq "renamed_test_table"
+    operation_2.index_name.should eq "test_index"
   end
 end

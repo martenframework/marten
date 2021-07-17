@@ -60,6 +60,7 @@ module Marten
             handle_created_tables(from_tables, to_tables)
 
             # Identify altered constraints and indexes.
+            index_changes = identify_added_and_removed_indexes(from_tables, to_tables, renamed_tables)
             unique_constraint_changes = identify_added_and_removed_unique_constraints(
               from_tables,
               to_tables,
@@ -71,7 +72,9 @@ module Marten
             handle_added_columns(from_columns, to_columns)
 
             # Generate altered constraints and indexes operations.
+            handle_removed_indexes(index_changes)
             handle_removed_unique_constraints(unique_constraint_changes)
+            handle_added_indexes(index_changes)
             handle_added_unique_constraints(unique_constraint_changes)
 
             changes = generate_migrations
@@ -237,6 +240,18 @@ module Marten
             end
           end
 
+          private def handle_added_indexes(index_changes)
+            index_changes.each do |app_label, changes|
+              changes[:added].each do |table_name, index|
+                insert_operation(
+                  app_label,
+                  DB::Migration::Operation::AddIndex.new(table_name, index.dup),
+                  [] of OperationDependency
+                )
+              end
+            end
+          end
+
           private def handle_added_unique_constraints(unique_constraint_changes)
             unique_constraint_changes.each do |app_label, changes|
               changes[:added].each do |table_name, unique_constraint|
@@ -326,6 +341,18 @@ module Marten
             end
           end
 
+          private def handle_removed_indexes(index_changes)
+            index_changes.each do |app_label, changes|
+              changes[:removed].each do |table_name, index|
+                insert_operation(
+                  app_label,
+                  DB::Migration::Operation::RemoveIndex.new(table_name, index.name),
+                  [] of OperationDependency
+                )
+              end
+            end
+          end
+
           private def handle_removed_unique_constraints(unique_constraint_changes)
             unique_constraint_changes.each do |app_label, changes|
               changes[:removed].each do |table_name, unique_constraint|
@@ -336,6 +363,37 @@ module Marten
                 )
               end
             end
+          end
+
+          private def identify_added_and_removed_indexes(from_tables, to_tables, renamed_tables)
+            changed_indexes_per_app = {} of String => NamedTuple(
+              added: Array(Tuple(String, Management::Index)),
+              removed: Array(Tuple(String, Management::Index)))
+
+            (from_tables & to_tables).each do |remaining_table_id|
+              from_table_state = @from_state.get_table(renamed_tables.fetch(remaining_table_id, remaining_table_id))
+              to_table_state = @to_state.get_table(remaining_table_id)
+
+              from_indexes = from_table_state.indexes
+              to_indexes = to_table_state.indexes
+
+              added_indexes = to_indexes.reject { |i| from_indexes.includes?(i) }
+              removed_indexes = from_indexes.reject { |i| to_indexes.includes?(i) }
+
+              changed_indexes_per_app[to_table_state.app_label] ||= {
+                added:   [] of Tuple(String, Management::Index),
+                removed: [] of Tuple(String, Management::Index),
+              }
+
+              changed_indexes_per_app[to_table_state.app_label][:added].concat(
+                added_indexes.map { |i| {to_table_state.name, i} }
+              )
+              changed_indexes_per_app[to_table_state.app_label][:removed].concat(
+                removed_indexes.map { |i| {to_table_state.name, i} }
+              )
+            end
+
+            changed_indexes_per_app
           end
 
           private def identify_added_and_removed_unique_constraints(from_tables, to_tables, renamed_tables)

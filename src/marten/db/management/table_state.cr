@@ -22,6 +22,10 @@ module Marten
           )
         end
 
+        def self.gen_id(app_label : String, table_name : String)
+          "#{app_label}_#{table_name}"
+        end
+
         def initialize(
           @app_label : String,
           @name : String,
@@ -53,6 +57,10 @@ module Marten
 
         def get_unique_constraint(name : String) : Management::Constraint::Unique
           unique_constraints.find { |c| c.name == name }.not_nil!
+        end
+
+        def id : String
+          self.class.gen_id(app_label, name)
         end
 
         def remove_column(column : Column::Base)

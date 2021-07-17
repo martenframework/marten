@@ -28,6 +28,12 @@ describe Marten::DB::Management::TableState do
     end
   end
 
+  describe "::gen_id" do
+    it "returns a table state ID from an app label and table name" do
+      Marten::DB::Management::TableState.gen_id("app_label", "table_name").should eq "app_label_table_name"
+    end
+  end
+
   describe "#app_label" do
     it "returns the app config label of the table" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
@@ -184,6 +190,21 @@ describe Marten::DB::Management::TableState do
     it "raises NilAssertionError if the unique constraint is not found" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
       expect_raises(NilAssertionError) { table_state.get_unique_constraint("unknown") }
+    end
+  end
+
+  describe "#id" do
+    it "returns the table state ID" do
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::Int.new("foo"),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base
+      )
+      table_state.id.should eq "my_app_my_table"
     end
   end
 

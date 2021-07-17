@@ -22,7 +22,7 @@ module Marten
 
         def initialize(tables = [] of TableState)
           @tables = {} of String => TableState
-          tables.each { |t| @tables[table_id(t.as(TableState))] = t }
+          tables.each { |t| @tables[t.as(TableState).id] = t }
         end
 
         # Returns a clone of the current project state.
@@ -32,7 +32,7 @@ module Marten
 
         # Adds a table state to the current project state.
         def add_table(table : TableState)
-          @tables[table_id(table)] = table
+          @tables[table.id] = table
         end
 
         # Deletes a table state from the current project state.
@@ -57,12 +57,8 @@ module Marten
           @tables[table_id(app_label, new_name)] = table.not_nil!
         end
 
-        private def table_id(table)
-          table_id(table.app_label, table.name)
-        end
-
         private def table_id(app_label, table_name)
-          "#{app_label}_#{table_name}"
+          TableState.gen_id(app_label, table_name)
         end
       end
     end

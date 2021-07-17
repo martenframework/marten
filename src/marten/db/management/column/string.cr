@@ -18,18 +18,17 @@ module Marten
           )
           end
 
-          def ==(other : self)
-            name == other.name &&
-              max_size == other.max_size &&
+          def clone
+            self.class.new(@name, @max_size, @primary_key, @null, @unique, @index, @default)
+          end
+
+          def same_config?(other : self)
+            max_size == other.max_size &&
               primary_key? == other.primary_key? &&
               null? == other.null? &&
               unique? == other.unique? &&
               index? == other.index? &&
               default == other.default
-          end
-
-          def clone
-            self.class.new(@name, @max_size, @primary_key, @null, @unique, @index, @default)
           end
 
           def serialize_args : ::String

@@ -95,6 +95,58 @@ describe Marten::DB::Management::Column::String do
     end
   end
 
+  describe "#same_config?" do
+    it "returns true if two column objects have different names but have the same properties" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128)
+      ).should be_true
+
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, null: true).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, null: true)
+      ).should be_true
+
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, unique: true, default: "test").same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, unique: true, default: "test")
+      ).should be_true
+    end
+
+    it "returns false if two column objects don't have the same max size" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 255)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same primary key configuration" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, primary_key: true).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, primary_key: false)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same null configuration" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, null: false).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, null: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same unique configuration" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, unique: false).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, unique: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same index configuration" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, index: false).same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, index: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same default value" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128, default: "foo").same_config?(
+        Marten::DB::Management::Column::String.new("bar", max_size: 128, default: "bar")
+      ).should be_false
+    end
+  end
+
   describe "#max_size" do
     it "returns the string column max size" do
       column = Marten::DB::Management::Column::String.new("test", max_size: 128)

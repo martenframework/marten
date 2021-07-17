@@ -35,14 +35,7 @@ module Marten
 
           # Returns true if the other column corresponds to the same column configuration.
           def ==(other : self)
-            super || (
-              name == other.name &&
-                primary_key? == other.primary_key? &&
-                null? == other.null? &&
-                unique? == other.unique? &&
-                index? == other.index? &&
-                default == other.default
-            )
+            super || (name == other.name && same_config?(other))
           end
 
           # Returns true if an index should be created at the database level for the column.
@@ -58,6 +51,15 @@ module Marten
           # Returns a boolean indicating whether the column is a primary key.
           def primary_key?
             @primary_key
+          end
+
+          # Returns true if the other column (which can have a different name) corresponds to the same configuration.
+          def same_config?(other : self)
+            primary_key? == other.primary_key? &&
+              null? == other.null? &&
+              unique? == other.unique? &&
+              index? == other.index? &&
+              default == other.default
           end
 
           # Returns a serialized version of the column arguments to be used when generating migrations.
@@ -87,6 +89,14 @@ module Marten
           # Returns a boolean indicating whether the column value should be unique throughout the associated table.
           def unique?
             @unique
+          end
+
+          private def equivalent_to?(other)
+            primary_key? == other.primary_key? &&
+              null? == other.null? &&
+              unique? == other.unique? &&
+              index? == other.index? &&
+              default == other.default
           end
         end
       end

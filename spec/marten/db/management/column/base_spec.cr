@@ -98,6 +98,52 @@ describe Marten::DB::Management::Column::Base do
     end
   end
 
+  describe "#same_config?" do
+    it "returns true if two column objects have the same properties but different names" do
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo").same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar")
+      ).should be_true
+
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", null: true).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", null: true)
+      ).should be_true
+
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", unique: true, default: 42).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", unique: true, default: 42)
+      ).should be_true
+    end
+
+    it "returns false if two column objects don't have the same primary key configuration" do
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", primary_key: false).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", primary_key: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same null configuration" do
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", null: false).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", null: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same unique configuration" do
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", unique: false).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", unique: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same index configuration" do
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", index: false).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", index: true)
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same default value" do
+      Marten::DB::Management::Column::BaseSpec::Test.new("foo", default: 42).same_config?(
+        Marten::DB::Management::Column::BaseSpec::Test.new("bar", default: 10)
+      ).should be_false
+    end
+  end
+
   describe "#index?" do
     it "returns true when the column is indexed" do
       Marten::DB::Management::Column::BaseSpec::Test.new("test", index: true).index?.should be_true

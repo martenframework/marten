@@ -24,19 +24,18 @@ module Marten
             @to_column = to_column.to_s
           end
 
-          def ==(other : self)
-            name == other.name &&
-              to_table == other.to_table &&
+          def clone
+            self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
+          end
+
+          def same_config?(other : self)
+            to_table == other.to_table &&
               to_column == other.to_column &&
               primary_key? == other.primary_key? &&
               null? == other.null? &&
               unique? == other.unique? &&
               index? == other.index? &&
               default == other.default
-          end
-
-          def clone
-            self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
           end
 
           def serialize_args : ::String

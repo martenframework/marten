@@ -178,6 +178,110 @@ describe Marten::DB::Management::Column::ForeignKey do
     end
   end
 
+  describe "#same_config?" do
+    it "returns true if two column objects have different names but have the same properties" do
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column"
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "other_table",
+          to_column: "other_column"
+        )
+      ).should be_true
+
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column",
+        null: true
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "other_table",
+          to_column: "other_column",
+          null: true
+        )
+      ).should be_true
+
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column",
+        unique: true
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "other_table",
+          to_column: "other_column",
+          unique: true
+        )
+      ).should be_true
+    end
+
+    it "returns false if two column objects don't have the same target table" do
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column"
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "new_table",
+          to_column: "other_column"
+        )
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same target column" do
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column"
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "other_table",
+          to_column: "new_column"
+        )
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same null configuration" do
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column",
+        null: true
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "other_table",
+          to_column: "other_column",
+          null: false
+        )
+      ).should be_false
+    end
+
+    it "returns false if two column objects don't have the same unique configuration" do
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column",
+        unique: true
+      ).same_config?(
+        Marten::DB::Management::Column::ForeignKey.new(
+          "bar",
+          to_table: "other_table",
+          to_column: "other_column",
+          unique: false
+        )
+      ).should be_false
+    end
+  end
+
   describe "#serialize_args" do
     it "returns the expected serialized version of a simple column" do
       column = Marten::DB::Management::Column::ForeignKey.new(

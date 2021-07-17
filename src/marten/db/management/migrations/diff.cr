@@ -43,17 +43,17 @@ module Marten
             # Generate a set of columns that are present in the original state.
             from_columns = @from_state.tables.compact_map do |tid, t|
               next unless kept_tables.includes?(tid)
-              t.columns.map { |c| {t.app_label, t.name, c.name} }
+              t.columns.map { |c| {t.id, c.name} }
             end.flatten.to_set
             renamed_tables.keys.each do |tid|
               table = @to_state.get_table(tid)
-              from_columns += table.columns.map { |c| {table.app_label, table.name, c.name} }.to_set
+              from_columns += table.columns.map { |c| {table.id, c.name} }.to_set
             end
 
             # Generate a set of columns that are present in the destination state.
             to_columns = @to_state.tables.compact_map do |tid, t|
               next unless kept_tables.includes?(tid)
-              t.columns.map { |c| {t.app_label, t.name, c.name} }
+              t.columns.map { |c| {t.id, c.name} }
             end.flatten.to_set
 
             # Generate table-level operations.
@@ -67,13 +67,16 @@ module Marten
               renamed_tables
             )
 
+            # Generate removed constraints and indexes operations.
+            handle_removed_indexes(index_changes)
+            handle_removed_unique_constraints(unique_constraint_changes)
+
             # Generate column-level operations.
+            handle_renamed_columns(from_columns, to_columns, renamed_tables)
             handle_removed_columns(from_columns, to_columns)
             handle_added_columns(from_columns, to_columns)
 
-            # Generate altered constraints and indexes operations.
-            handle_removed_indexes(index_changes)
-            handle_removed_unique_constraints(unique_constraint_changes)
+            # Generate added constraints and indexes operations.
             handle_added_indexes(index_changes)
             handle_added_unique_constraints(unique_constraint_changes)
 
@@ -221,8 +224,9 @@ module Marten
           end
 
           private def handle_added_columns(from_columns, to_columns)
-            (to_columns - from_columns).each do |app_label, table_name, column_name|
-              column = @to_state.get_table(app_label, table_name).get_column(column_name)
+            (to_columns - from_columns).each do |table_id, column_name|
+              table_state = @to_state.get_table(table_id)
+              column = table_state.get_column(column_name)
               dependencies = [] of OperationDependency
 
               if column.is_a?(Column::ForeignKey)
@@ -233,8 +237,8 @@ module Marten
               end
 
               insert_operation(
-                app_label,
-                DB::Migration::Operation::AddColumn.new(table_name, column.dup),
+                table_state.app_label,
+                DB::Migration::Operation::AddColumn.new(table_state.name, column.dup),
                 dependencies
               )
             end
@@ -245,8 +249,7 @@ module Marten
               changes[:added].each do |table_name, index|
                 insert_operation(
                   app_label,
-                  DB::Migration::Operation::AddIndex.new(table_name, index.dup),
-                  [] of OperationDependency
+                  DB::Migration::Operation::AddIndex.new(table_name, index.dup)
                 )
               end
             end
@@ -257,8 +260,7 @@ module Marten
               changes[:added].each do |table_name, unique_constraint|
                 insert_operation(
                   app_label,
-                  DB::Migration::Operation::AddUniqueConstraint.new(table_name, unique_constraint.dup),
-                  [] of OperationDependency
+                  DB::Migration::Operation::AddUniqueConstraint.new(table_name, unique_constraint.dup)
                 )
               end
             end
@@ -332,11 +334,11 @@ module Marten
           end
 
           private def handle_removed_columns(from_columns, to_columns)
-            (from_columns - to_columns).each do |app_label, table_name, column_name|
+            (from_columns - to_columns).each do |table_id, column_name|
+              table_state = @from_state.get_table(table_id)
               insert_operation(
-                app_label,
-                DB::Migration::Operation::RemoveColumn.new(table_name, column_name),
-                [] of OperationDependency
+                table_state.app_label,
+                DB::Migration::Operation::RemoveColumn.new(table_state.name, column_name)
               )
             end
           end
@@ -346,8 +348,7 @@ module Marten
               changes[:removed].each do |table_name, index|
                 insert_operation(
                   app_label,
-                  DB::Migration::Operation::RemoveIndex.new(table_name, index.name),
-                  [] of OperationDependency
+                  DB::Migration::Operation::RemoveIndex.new(table_name, index.name)
                 )
               end
             end
@@ -358,11 +359,43 @@ module Marten
               changes[:removed].each do |table_name, unique_constraint|
                 insert_operation(
                   app_label,
-                  DB::Migration::Operation::RemoveUniqueConstraint.new(table_name, unique_constraint.name),
-                  [] of OperationDependency
+                  DB::Migration::Operation::RemoveUniqueConstraint.new(table_name, unique_constraint.name)
                 )
               end
             end
+          end
+
+          private def handle_renamed_columns(from_columns, to_columns, renamed_tables)
+            renamed_columns = {} of Tuple(String, String) => String
+
+            (to_columns - from_columns).each do |table_id, column_name|
+              # Identifies the original table state by taking into account renamed tables.
+              from_table_state = @from_state.get_table(renamed_tables.fetch(table_id, table_id))
+              to_table_state = @to_state.get_table(table_id)
+              to_column = to_table_state.get_column(column_name)
+
+              (from_columns - to_columns).each do |removed_table_id, removed_column_name|
+                next unless removed_table_id == table_id
+                from_column = from_table_state.get_column(removed_column_name)
+
+                if from_column.same_config?(to_column)
+                  insert_operation(
+                    to_table_state.app_label,
+                    DB::Migration::Operation::RenameColumn.new(
+                      table_name: to_table_state.name,
+                      old_name: from_column.name,
+                      new_name: to_column.name
+                    )
+                  )
+
+                  from_columns.delete({removed_table_id, removed_column_name})
+                  from_columns.add({table_id, column_name})
+                  renamed_columns[{table_id, column_name}] = removed_column_name
+                end
+              end
+            end
+
+            renamed_columns
           end
 
           private def identify_added_and_removed_indexes(from_tables, to_tables, renamed_tables)
@@ -427,7 +460,12 @@ module Marten
             changed_unique_constraints_per_app
           end
 
-          private def insert_operation(app_label, operation, dependencies, beginning = false)
+          private def insert_operation(
+            app_label,
+            operation,
+            dependencies = [] of OperationDependency,
+            beginning = false
+          )
             ops = (@detected_operations[app_label] ||= [] of DetectedOperation)
             beginning ? ops.unshift({operation, dependencies}) : ops.push({operation, dependencies})
           end

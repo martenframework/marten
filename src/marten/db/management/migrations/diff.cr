@@ -8,10 +8,7 @@ module Marten
         # state. This is mostly used to generate new migration files when changes have been made to existing models.
         class Diff
           # :nodoc:
-          alias OperationDependency = Tuple(String, String, Symbol)
-
-          # :nodoc:
-          alias DetectedOperation = Tuple(DB::Migration::Operation::Base, Array(OperationDependency))
+          alias DetectedOperation = Tuple(DB::Migration::Operation::Base, Array(Dependency::Base))
 
           @from_state : ProjectState
           @to_state : ProjectState
@@ -116,7 +113,7 @@ module Marten
             # means that dependencies cannot be resolved.
             while operations_count > 0
               @detected_operations.each do |app_label, operations|
-                resolved_operations = [] of Tuple(DB::Migration::Operation::Base, Array(OperationDependency))
+                resolved_operations = [] of Tuple(DB::Migration::Operation::Base, Array(Dependency::Base))
                 resolved_dependencies = Set(Tuple(String, String)).new
 
                 operations.dup.each do |operation, dependencies|
@@ -124,31 +121,34 @@ module Marten
                   deps_satisfied = true
 
                   dependencies.each do |dependency|
-                    if dependency[0] != app_label
-                      @detected_operations[dependency[0]].each do |other_operation, _|
-                        next unless operation_depends_on_dependency?(other_operation, dependency)
+                    if dependency.app_label != app_label
+                      @detected_operations[dependency.app_label].each do |other_operation, _|
+                        next unless dependency.dependent?(other_operation)
                         deps_satisfied = false
                         break
                       end
 
                       break unless deps_satisfied
 
-                      if migrations_per_app.includes?(dependency[0])
-                        resolved_operation_dependencies << {dependency[0], migrations_per_app[dependency[0]].last.name}
+                      if migrations_per_app.includes?(dependency.app_label)
+                        resolved_operation_dependencies << {
+                          dependency.app_label,
+                          migrations_per_app[dependency.app_label].last.name,
+                        }
                       elsif migrations_from_operations_subsets_allowed
                         # If the app the operation depends on is not considered in the set of detected operations, we
                         # use either the first or last migration of the application.
 
                         app_migrations = if !@reader.nil?
                                            @reader.not_nil!.graph.leaves.map(&.migration).select do |m|
-                                             m.class.app_config.label == dependency[0]
+                                             m.class.app_config.label == dependency.app_label
                                            end
                                          end
 
                         resolved_operation_dependencies << if app_migrations.nil? || app_migrations.not_nil!.empty?
-                          {dependency[0], "__first__"}
+                          {dependency.app_label, "__first__"}
                         else
-                          {dependency[0], app_migrations.not_nil!.first.class.migration_name}
+                          {dependency.app_label, app_migrations.not_nil!.first.class.migration_name}
                         end
                       else
                         deps_satisfied = false
@@ -227,13 +227,14 @@ module Marten
             (to_columns - from_columns).each do |table_id, column_name|
               table_state = @to_state.get_table(table_id)
               column = table_state.get_column(column_name)
-              dependencies = [] of OperationDependency
+              dependencies = [] of Dependency::Base
 
+              # Foreign key columns depend on the targeted table being created first.
               if column.is_a?(Column::ForeignKey)
                 related_table = @to_state.tables.values
                   .find { |t| t.name == column.as(Column::ForeignKey).to_table }
                   .not_nil!
-                dependencies << OperationDependency.new(related_table.app_label, related_table.name, :created_table)
+                dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
 
               insert_operation(
@@ -277,14 +278,14 @@ module Marten
                 next unless created_table.app_label == deleted_table.app_label
                 next unless created_table.columns == deleted_table.columns
 
-                dependencies = [] of OperationDependency
+                dependencies = [] of Dependency::Base
 
                 # Extract dependencies for all the foreign key columns associated with the considered table.
                 created_table.columns.select(Column::ForeignKey).each do |fk_column|
                   related_table = @to_state.tables.values
                     .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
                     .not_nil!
-                  dependencies << OperationDependency.new(related_table.app_label, related_table.name, :created_table)
+                  dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
                 end
 
                 insert_operation(
@@ -310,14 +311,14 @@ module Marten
             (to_tables - from_tables).each do |created_table_id|
               created_table = @to_state.get_table(created_table_id)
 
-              dependencies = [] of OperationDependency
+              dependencies = [] of Dependency::Base
 
               # Extract dependencies for all the foreign key columns associated with the considered table.
               created_table.columns.select(Column::ForeignKey).each do |fk_column|
                 related_table = @to_state.tables.values
                   .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
                   .not_nil!
-                dependencies << OperationDependency.new(related_table.app_label, related_table.name, :created_table)
+                dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
 
               insert_operation(
@@ -463,20 +464,11 @@ module Marten
           private def insert_operation(
             app_label,
             operation,
-            dependencies = [] of OperationDependency,
+            dependencies = [] of Dependency::Base,
             beginning = false
           )
             ops = (@detected_operations[app_label] ||= [] of DetectedOperation)
             beginning ? ops.unshift({operation, dependencies}) : ops.push({operation, dependencies})
-          end
-
-          private def operation_depends_on_dependency?(operation, dependency)
-            case dependency[2]
-            when :created_table
-              operation.is_a?(DB::Migration::Operation::CreateTable) && operation.name == dependency[1]
-            else
-              false
-            end
           end
 
           private def select_changes_for_apps(changes, apps)

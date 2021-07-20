@@ -731,5 +731,104 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.old_name.should eq "col"
       operation.new_name.should eq "renamed_col"
     end
+
+    it "properly generates a dependency between an added table containing a foreign key and the target table" do
+      from_project_state = Marten::DB::Management::ProjectState.new
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::ForeignKey.new("other_id", "other_table", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 2
+      changes["app"].size.should eq 1
+      changes["other_app"].size.should eq 1
+
+      changes["other_app"][0].operations.size.should eq 1
+      changes["other_app"][0].dependencies.should be_empty
+      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_1.name.should eq "other_table"
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+      changes["app"][0].dependencies.size.should eq 1
+      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
+      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_2.name.should eq "test_table"
+    end
+
+    it "properly generates a dependency between an added foreign key and the target table" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::ForeignKey.new("other_id", "other_table", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 2
+      changes["app"].size.should eq 1
+      changes["other_app"].size.should eq 1
+
+      changes["other_app"][0].operations.size.should eq 1
+      changes["other_app"][0].dependencies.should be_empty
+      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_1.name.should eq "other_table"
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].dependencies.size.should eq 1
+      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddColumn
+      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
+      operation_2.table_name.should eq "test_table"
+      operation_2.column.name.should eq "other_id"
+    end
   end
 end

@@ -165,7 +165,7 @@ module Marten
                   end
                 end
 
-                if resolved_dependencies || resolved_operations
+                if !resolved_dependencies.empty? || !resolved_operations.empty?
                   if @detected_operations[app_label].empty? || migrations_from_operations_subsets_allowed
                     migrations_per_app[app_label] ||= [] of Migration
                     migrations_per_app[app_label] << Migration.new(

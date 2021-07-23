@@ -61,8 +61,8 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
-          def list_table_names_statement : String
-            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;"
+          def table_names : Array(String)
+            list_table_names
           end
 
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
@@ -92,6 +92,10 @@ module Marten
             end
 
             names
+          end
+
+          protected def list_table_names_statement
+            "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;"
           end
         end
       end

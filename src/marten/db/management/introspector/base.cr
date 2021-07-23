@@ -1,15 +1,12 @@
 module Marten
   module DB
     module Management
-      # Base implementation of a database introspector.
-      #
-      # The database introspector is used in the context of DB management in order to fetch operation regarding existing
-      # tables such as table names, index / constraint names, etc.
       module Introspector
+        # Base implementation of a database introspector.
+        #
+        # The database introspector is used in the context of DB management in order to fetch operation regarding
+        # existing tables such as table names, index / constraint names, etc.
         abstract class Base
-          delegate build_sql, to: @connection
-          delegate quote, to: @connection
-
           def initialize(@connection : Connection::Base)
           end
 
@@ -25,8 +22,11 @@ module Marten
           # Returns an array of all the unique constraints for a specific table and column.
           abstract def unique_constraint_names(table_name : String, column_name : String) : Array(String)
 
+          # Returns all the tables names in the considered database.
+          abstract def table_names : Array(String)
+
           # Returns all the table names associated with models of the installed applications only.
-          def model_table_names
+          def model_table_names : Array(String)
             table_names = [] of String
 
             Marten.apps.app_configs.each do |app_config|
@@ -38,8 +38,7 @@ module Marten
             table_names
           end
 
-          # Returns all the tables names in the considered database.
-          def table_names
+          protected def list_table_names
             names = [] of String
 
             @connection.open do |db|
@@ -52,6 +51,13 @@ module Marten
 
             names
           end
+
+          protected def list_table_names_statement
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private delegate build_sql, to: @connection
+          private delegate quote, to: @connection
         end
       end
     end

@@ -32,8 +32,8 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
-          def list_table_names_statement : String
-            "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
+          def table_names : Array(String)
+            list_table_names
           end
 
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
@@ -57,6 +57,10 @@ module Marten
             end
 
             unique_indexes_to_columns.select { |_k, v| v == [column_name] }.keys
+          end
+
+          protected def list_table_names_statement : String
+            "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
           end
         end
       end

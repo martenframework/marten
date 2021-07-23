@@ -19,12 +19,13 @@ require "./spec_helper"
       end
     end
 
-    describe "#list_table_names_statement" do
-      it "returns the expected statement" do
-        introspector = Marten::DB::Connection.default.introspector
-        introspector.list_table_names_statement.should eq(
-          "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
-        )
+    describe "#table_names" do
+      it "returns the table names of the associated database connection" do
+        connection = Marten::DB::Connection.default
+        introspector = connection.introspector
+
+        introspector.table_names.should contain(TestUser.db_table)
+        introspector.table_names.should_not contain("unknown_table")
       end
     end
 

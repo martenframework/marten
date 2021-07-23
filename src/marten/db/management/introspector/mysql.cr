@@ -46,8 +46,8 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
-          def list_table_names_statement : String
-            "SHOW TABLES"
+          def table_names : Array(String)
+            list_table_names
           end
 
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
@@ -74,6 +74,10 @@ module Marten
             end
 
             names
+          end
+
+          protected def list_table_names_statement
+            "SHOW TABLES"
           end
         end
       end

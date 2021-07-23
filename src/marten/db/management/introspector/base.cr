@@ -1,6 +1,10 @@
 module Marten
   module DB
     module Management
+      # Base implementation of a database introspector.
+      #
+      # The database introspector is used in the context of DB management in order to fetch operation regarding existing
+      # tables such as table names, index / constraint names, etc.
       module Introspector
         abstract class Base
           delegate build_sql, to: @connection
@@ -9,29 +13,17 @@ module Marten
           def initialize(@connection : Connection::Base)
           end
 
-          # Returns the SQL statement allowing to list the foreign key constraints for a specific table.
-          abstract def get_foreign_key_constraint_names_statement(table_name : String, column_name : String) : String
+          # Returns an array of all the foreign key constraints of a specific table and column.
+          abstract def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
 
-          # Returns the SQL statement allowing to list the unique constraints for a specific table.
-          abstract def get_unique_constraint_names_statement(table_name : String, column_name : String) : String
+          # Returns an array of all the index names for a specific table and column.
+          abstract def index_names(table_name : String, column_name : String) : Array(String)
 
           # Returns the SQL statement allowing to list all table names.
           abstract def list_table_names_statement : String
 
-          # Returns an array of all the foreign key constraints of a specific table.
-          def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
-            names = [] of String
-
-            @connection.open do |db|
-              db.query(get_foreign_key_constraint_names_statement(table_name, column_name)) do |rs|
-                rs.each do
-                  names << rs.read(String)
-                end
-              end
-            end
-
-            names
-          end
+          # Returns an array of all the unique constraints for a specific table and column.
+          abstract def unique_constraint_names(table_name : String, column_name : String) : Array(String)
 
           # Returns all the table names associated with models of the installed applications only.
           def model_table_names
@@ -52,21 +44,6 @@ module Marten
 
             @connection.open do |db|
               db.query(list_table_names_statement) do |rs|
-                rs.each do
-                  names << rs.read(String)
-                end
-              end
-            end
-
-            names
-          end
-
-          # Returns an array of all the unique constraints for a specific table and column.
-          def unique_constraint_names(table_name : String, column_name : String) : Array(String)
-            names = [] of String
-
-            @connection.open do |db|
-              db.query(get_unique_constraint_names_statement(table_name, column_name)) do |rs|
                 rs.each do
                   names << rs.read(String)
                 end

@@ -7,12 +7,29 @@ module Marten
             [] of String
           end
 
-          def get_foreign_key_constraint_names_statement(table_name : String, column_name : String) : String
-            raise NotImplementedError.new("SQLite foreign keys are not associated with constraints")
-          end
+          def index_names(table_name : String, column_name : String) : Array(String)
+            indexes_to_columns = {} of String => Array(String)
 
-          def get_unique_constraint_names_statement(table_name : String, column_name : String) : String
-            raise NotImplementedError.new("Not implemented as #unique_constraint_names is overriden")
+            @connection.open do |db|
+              db.query(
+                build_sql do |s|
+                  s << "SELECT il.name, ii.name"
+                  s << "FROM sqlite_master AS m, pragma_index_list(m.name) AS il, pragma_index_info(il.name) AS ii"
+                  s << "WHERE m.type='table' AND m.tbl_name='#{table_name}'"
+                  s << "ORDER BY 1;"
+                end
+              ) do |rs|
+                rs.each do
+                  index_name = rs.read(String)
+                  index_column_name = rs.read(String)
+
+                  indexes_to_columns[index_name] ||= [] of String
+                  indexes_to_columns[index_name] << index_column_name
+                end
+              end
+            end
+
+            indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
           def list_table_names_statement : String
@@ -39,7 +56,7 @@ module Marten
               end
             end
 
-            unique_indexes_to_columns.select { |_k, v| v == [column_name] }.map(&.first)
+            unique_indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
         end
       end

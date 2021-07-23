@@ -3,32 +3,77 @@ module Marten
     module Management
       module Introspector
         class MySQL < Base
-          def get_foreign_key_constraint_names_statement(table_name : String, column_name : String) : String
-            build_sql do |s|
-              s << "SELECT c.constraint_name"
-              s << "FROM information_schema.key_column_usage AS c"
-              s << "WHERE c.table_schema = DATABASE() AND c.table_name = '#{table_name}'"
-              s << "AND c.column_name = '#{column_name}'"
-              s << "AND c.referenced_column_name IS NOT NULL"
+          def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
+            names = [] of String
+
+            @connection.open do |db|
+              db.query(
+                build_sql do |s|
+                  s << "SELECT c.constraint_name"
+                  s << "FROM information_schema.key_column_usage AS c"
+                  s << "WHERE c.table_schema = DATABASE() AND c.table_name = '#{table_name}'"
+                  s << "AND c.column_name = '#{column_name}'"
+                  s << "AND c.referenced_column_name IS NOT NULL"
+                end
+              ) do |rs|
+                rs.each do
+                  names << rs.read(String)
+                end
+              end
             end
+
+            names
           end
 
-          def get_unique_constraint_names_statement(table_name : String, column_name : String) : String
-            build_sql do |s|
-              s << "SELECT kc.constraint_name"
-              s << "FROM information_schema.key_column_usage AS kc, "
-              s << "information_schema.table_constraints AS c"
-              s << "WHERE kc.table_schema = DATABASE() AND kc.table_name = '#{table_name}'"
-              s << "AND kc.column_name = '#{column_name}'"
-              s << "AND c.table_schema = kc.table_schema"
-              s << "AND c.table_name = kc.table_name"
-              s << "AND c.constraint_name = kc.constraint_name"
-              s << "AND (c.constraint_type = 'PRIMARY KEY' OR c.constraint_type = 'UNIQUE')"
+          def index_names(table_name : String, column_name : String) : Array(String)
+            indexes_to_columns = {} of String => Array(String)
+
+            @connection.open do |db|
+              db.query("SHOW INDEX FROM #{quote(table_name)}") do |rs|
+                rs.each do
+                  rs.read(String) # table
+                  rs.read(Bool)   # non_unique
+                  index_name = rs.read(String)
+                  rs.read(Int64) # seq_in_index
+                  index_column_name = rs.read(String)
+
+                  indexes_to_columns[index_name] ||= [] of String
+                  indexes_to_columns[index_name] << index_column_name
+                end
+              end
             end
+
+            indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
           def list_table_names_statement : String
             "SHOW TABLES"
+          end
+
+          def unique_constraint_names(table_name : String, column_name : String) : Array(String)
+            names = [] of String
+
+            @connection.open do |db|
+              db.query(
+                build_sql do |s|
+                  s << "SELECT kc.constraint_name"
+                  s << "FROM information_schema.key_column_usage AS kc, "
+                  s << "information_schema.table_constraints AS c"
+                  s << "WHERE kc.table_schema = DATABASE() AND kc.table_name = '#{table_name}'"
+                  s << "AND kc.column_name = '#{column_name}'"
+                  s << "AND c.table_schema = kc.table_schema"
+                  s << "AND c.table_name = kc.table_name"
+                  s << "AND c.constraint_name = kc.constraint_name"
+                  s << "AND (c.constraint_type = 'PRIMARY KEY' OR c.constraint_type = 'UNIQUE')"
+                end
+              ) do |rs|
+                rs.each do
+                  names << rs.read(String)
+                end
+              end
+            end
+
+            names
           end
         end
       end

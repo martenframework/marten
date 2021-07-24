@@ -280,6 +280,16 @@ describe Marten::DB::Management::Column::ForeignKey do
         )
       ).should be_false
     end
+
+    it "returns false if two column objects have the same properties but are of different classes" do
+      Marten::DB::Management::Column::ForeignKey.new(
+        "foo",
+        to_table: "other_table",
+        to_column: "other_column"
+      ).same_config?(
+        Marten::DB::Management::Column::Int.new("foo")
+      ).should be_false
+    end
   end
 
   describe "#serialize_args" do

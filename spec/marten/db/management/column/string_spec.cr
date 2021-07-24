@@ -145,6 +145,12 @@ describe Marten::DB::Management::Column::String do
         Marten::DB::Management::Column::String.new("bar", max_size: 128, default: "bar")
       ).should be_false
     end
+
+    it "returns false if two column objects have the same properties but are of different classes" do
+      Marten::DB::Management::Column::String.new("foo", max_size: 128).same_config?(
+        Marten::DB::Management::Column::Int.new("foo")
+      ).should be_false
+    end
   end
 
   describe "#max_size" do

@@ -22,8 +22,9 @@ module Marten
             self.class.new(@name, @max_size, @primary_key, @null, @unique, @index, @default)
           end
 
-          def same_config?(other : self)
-            max_size == other.max_size &&
+          def same_config?(other : Base)
+            other.is_a?(String) &&
+              max_size == other.max_size &&
               primary_key? == other.primary_key? &&
               null? == other.null? &&
               unique? == other.unique? &&

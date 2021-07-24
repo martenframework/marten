@@ -142,6 +142,12 @@ describe Marten::DB::Management::Column::Base do
         Marten::DB::Management::Column::BaseSpec::Test.new("bar", default: 10)
       ).should be_false
     end
+
+    it "returns false if two column objects have the same properties but are of different classes" do
+      Marten::DB::Management::Column::BigInt.new("foo").same_config?(
+        Marten::DB::Management::Column::Int.new("foo")
+      ).should be_false
+    end
   end
 
   describe "#index?" do

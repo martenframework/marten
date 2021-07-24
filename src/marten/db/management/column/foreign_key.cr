@@ -28,8 +28,9 @@ module Marten
             self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
           end
 
-          def same_config?(other : self)
-            to_table == other.to_table &&
+          def same_config?(other : Base)
+            other.is_a?(ForeignKey) &&
+              to_table == other.to_table &&
               to_column == other.to_column &&
               primary_key? == other.primary_key? &&
               null? == other.null? &&

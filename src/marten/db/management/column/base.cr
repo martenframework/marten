@@ -54,8 +54,9 @@ module Marten
           end
 
           # Returns true if the other column (which can have a different name) corresponds to the same configuration.
-          def same_config?(other : self)
-            primary_key? == other.primary_key? &&
+          def same_config?(other : Base)
+            other.class == self.class &&
+              primary_key? == other.primary_key? &&
               null? == other.null? &&
               unique? == other.unique? &&
               index? == other.index? &&

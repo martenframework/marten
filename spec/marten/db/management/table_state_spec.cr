@@ -132,6 +132,36 @@ describe Marten::DB::Management::TableState do
     end
   end
 
+  describe "#change_column" do
+    it "changes the column in the considered table state" do
+      old_column = Marten::DB::Management::Column::Int.new("foo")
+      new_column = Marten::DB::Management::Column::String.new("foo", max_size: 100)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          old_column,
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      table_state.change_column(new_column)
+
+      table_state.columns.includes?(old_column).should be_false
+      table_state.columns.includes?(new_column).should be_true
+    end
+
+    it "raises NilAssertionError if the column is not found" do
+      table_state = Marten::DB::Management::TableState.from_model(TestUser)
+      expect_raises(NilAssertionError) do
+        table_state.change_column(Marten::DB::Management::Column::Int.new("unknown"))
+      end
+    end
+  end
+
   describe "#get_column" do
     it "returns the column corresponding to the passed name" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)

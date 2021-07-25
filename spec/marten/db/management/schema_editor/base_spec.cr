@@ -1855,6 +1855,39 @@ describe Marten::DB::Management::SchemaEditor::Base do
       table_statement_2.name.should eq "other_table"
     end
   end
+
+  describe "#change_column" do
+    before_each do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("schema_editor_test_table")))
+      end
+    end
+
+    it "can perform a column alteration that does not involve a type change" do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("foo", null: false),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(
+        project_state,
+        table_state,
+        Marten::DB::Management::Column::BigInt.new("foo", null: false),
+        Marten::DB::Management::Column::BigInt.new("foo", null: true)
+      )
+    end
+  end
 end
 
 module Marten::DB::Management::BaseSpec

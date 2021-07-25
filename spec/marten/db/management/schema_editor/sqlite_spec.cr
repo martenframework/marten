@@ -252,7 +252,7 @@ require "./spec_helper"
         schema_editor = Marten::DB::Connection.default.schema_editor
 
         expect_raises(NotImplementedError) do
-          schema_editor.remove_unique_constraint_statement(table_state, unique_constraint)
+          schema_editor.remove_unique_constraint_statement(table_state, unique_constraint.name)
         end
       end
     end

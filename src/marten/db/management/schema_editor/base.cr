@@ -70,13 +70,10 @@ module Marten
           abstract def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
 
           # Returns the SQL statement allowing to remove an index from a given table.
-          abstract def remove_index_statement(table : TableState, index : Management::Index) : String
+          abstract def remove_index_statement(table : TableState, name : String) : String
 
           # Returns the SQL statement allowing to remove a unique constraint from a given table.
-          abstract def remove_unique_constraint_statement(
-            table : TableState,
-            unique_constraint : Management::Constraint::Unique
-          ) : String
+          abstract def remove_unique_constraint_statement(table : TableState, name : String) : String
 
           # Returns the SQL statement allowing to rename a column.
           abstract def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
@@ -120,6 +117,75 @@ module Marten
                 s << unique_constraint_sql_for(unique_constraint)
               end
             )
+          end
+
+          # Changes a column on a specific table.
+          def change_column(
+            project : ProjectState,
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : Nil
+            fk_constraint_names = [] of String
+
+            # Step 1: drop possible foreign key constraints if applicable.
+            if old_column.is_a?(Column::ForeignKey)
+              fk_constraint_names += @connection.introspector.foreign_key_constraint_names(table.name, old_column.name)
+              fk_constraint_names.each do |constraint_name|
+                execute(delete_foreign_key_constraint_statement(table, constraint_name))
+              end
+            end
+
+            # Step 2: drop unique constraints if the new column is no longer unique (or if it became a primary key).
+            if old_column.unique? && (!new_column.unique? || (!old_column.primary_key? && new_column.primary_key?))
+              constraint_names = @connection.introspector.unique_constraint_names(table.name, old_column.name)
+              constraint_names.select! { |cname| !table.unique_constraints.map(&.name).includes?(cname) }
+              constraint_names.each do |cname|
+                execute(remove_unique_constraint_statement(table, cname))
+              end
+            end
+
+            # Step 3: drop incoming FK constraints if the field is primary key that is going to be updated.
+            remake_fk_columns = (
+              old_column.class != new_column.class &&
+              old_column.primary_key? &&
+              new_column.primary_key?
+            )
+
+            incoming_foreign_keys = project.tables.values.flat_map do |other_table|
+              incoming_fk_columns = other_table.columns.select(Column::ForeignKey).select do |fk_column|
+                fk_column.to_table == table.name && fk_column.to_column == old_column.name
+              end
+
+              incoming_fk_columns.map { |fk_column| {other_table, fk_column} }
+            end
+
+            if remake_fk_columns
+              incoming_foreign_keys.each do |other_table, fk_column|
+                constraint_names = @connection.introspector.foreign_key_constraint_names(
+                  other_table.name,
+                  fk_column.name
+                )
+
+                constraint_names.each do |constraint_name|
+                  execute(delete_foreign_key_constraint_statement(other_table, constraint_name))
+                end
+              end
+            end
+
+            # Step 4: delete column index if it was previously indexed (but not unique) and if the new column is not
+            # indexed or is unique.
+            if old_column.index? && !old_column.unique? && (!new_column.index? || new_column.unique?)
+              index_names = @connection.introspector.index_names(table.name, old_column.name)
+              index_names.select! { |iname| !table.indexes.map(&.name).includes?(iname) }
+              index_names.each do |iname|
+                execute(remove_index_statement(table, iname))
+              end
+            end
+
+            # Step 5: alter the column type if the column type changed.
+            # Step 6: alter the column default value if it changed.
+            # Step 7: alter the column nullability if it changed.
           end
 
           # Creates a new table directly from a model class.
@@ -306,6 +372,17 @@ module Marten
 
               s << index_suffix
             end
+          end
+
+          private def remove_index_statement(table : TableState, index : Management::Index) : String
+            remove_index_statement(table, index.name)
+          end
+
+          private def remove_unique_constraint_statement(
+            table : TableState,
+            unique_constraint : Management::Constraint::Unique
+          ) : String
+            remove_unique_constraint_statement(table, unique_constraint.name)
           end
 
           private def statement_columns(*args, **kwargs)

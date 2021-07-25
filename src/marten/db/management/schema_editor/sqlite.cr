@@ -11,6 +11,10 @@ module Marten
             remake_table_with_added_unique_constraint(table, unique_constraint)
           end
 
+          def change_column(table : TableState, old_column : Column::Base, new_column : Column::Base) : Nil
+            remake_table_with_changed_column(table, old_column, new_column)
+          end
+
           def column_type_for_built_in_column(id)
             BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
           end
@@ -111,10 +115,10 @@ module Marten
             remake_table_with_removed_column(table, column)
           end
 
-          def remove_index_statement(table : TableState, index : Management::Index) : String
+          def remove_index_statement(table : TableState, name : String) : String
             build_sql do |s|
               s << "DROP INDEX"
-              s << quote(index.name)
+              s << quote(name)
             end
           end
 
@@ -122,10 +126,7 @@ module Marten
             remake_table_with_removed_unique_constraint(table, unique_constraint)
           end
 
-          def remove_unique_constraint_statement(
-            table : TableState,
-            unique_constraint : Management::Constraint::Unique
-          ) : String
+          def remove_unique_constraint_statement(table : TableState, name : String) : String
             raise NotImplementedError.new(
               "Removing unique constraints from tables through SQL is not supported by the SQLite schema editor"
             )
@@ -175,6 +176,22 @@ module Marten
           private def remake_table_with_added_unique_constraint(table, unique_constraint)
             with_remade_table(table) do |remade_table, _column_names_mapping|
               remade_table.add_unique_constraint(unique_constraint)
+            end
+          end
+
+          private def remake_table_with_changed_column(table, old_column, new_column)
+            with_remade_table(table) do |remade_table, _column_names_mapping|
+              # If the new column is a primary key, remove the primary key constraint from the the old primary key
+              # column.
+              if new_column.primary_key?
+                remade_table.columns.each do |c|
+                  next unless c.primary_key?
+                  c.primary_key = false
+                end
+              end
+
+              remade_table.remove_column(old_column)
+              remade_table.add_column(new_column)
             end
           end
 

@@ -261,7 +261,7 @@ require "./spec_helper"
         )
 
         schema_editor = Marten::DB::Connection.default.schema_editor
-        schema_editor.remove_unique_constraint_statement(table_state, unique_constraint).should eq(
+        schema_editor.remove_unique_constraint_statement(table_state, unique_constraint.name).should eq(
           "ALTER TABLE test_table DROP CONSTRAINT test_constraint"
         )
       end

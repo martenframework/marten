@@ -5,7 +5,7 @@ describe Marten::DB::Management::SchemaEditor do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("schema_editor_test_table")))
+        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
       end
     end
 

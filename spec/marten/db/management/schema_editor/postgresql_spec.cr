@@ -96,7 +96,7 @@ require "./spec_helper"
           "my_table",
           ["last_name varchar(255)", "first_name varchar(255)"].join(", ")
         )
-        statement.should eq "CREATE TABLE my_table (last_name varchar(255), first_name varchar(255))"
+        statement.should eq "CREATE TABLE \"my_table\" (last_name varchar(255), first_name varchar(255))"
       end
     end
 
@@ -128,7 +128,7 @@ require "./spec_helper"
     describe "#delete_table_statement" do
       it "returns the expected statement" do
         Marten::DB::Connection.default.schema_editor.delete_table_statement("test_table").should eq(
-          "DROP TABLE test_table CASCADE"
+          "DROP TABLE \"test_table\" CASCADE"
         )
       end
     end
@@ -286,7 +286,7 @@ require "./spec_helper"
     describe "#rename_table_statement" do
       it "returns the expected statement" do
         Marten::DB::Connection.default.schema_editor.rename_table_statement("old_name", "new_name").should eq(
-          "ALTER TABLE old_name RENAME TO new_name"
+          "ALTER TABLE \"old_name\" RENAME TO \"new_name\""
         )
       end
     end

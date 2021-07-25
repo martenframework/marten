@@ -25,7 +25,7 @@ module Marten
           end
 
           def create_table_statement(table_name : String, definitions : String) : String
-            "CREATE TABLE #{table_name} (#{definitions})"
+            "CREATE TABLE #{quote(table_name)} (#{definitions})"
           end
 
           def ddl_rollbackable? : Bool
@@ -41,7 +41,7 @@ module Marten
           end
 
           def delete_table_statement(table_name : String) : String
-            "DROP TABLE #{table_name} CASCADE"
+            "DROP TABLE #{quote(table_name)} CASCADE"
           end
 
           def flush_tables_statements(table_names : Array(String)) : Array(String)
@@ -133,7 +133,7 @@ module Marten
           end
 
           def rename_table_statement(old_name : String, new_name : String) : String
-            "RENAME TABLE #{old_name} TO #{new_name}"
+            "RENAME TABLE #{quote(old_name)} TO #{quote(new_name)}"
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {

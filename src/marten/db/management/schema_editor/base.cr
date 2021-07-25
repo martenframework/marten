@@ -7,9 +7,6 @@ module Marten
         # The database schema editor is used in the context of DB management in order to perform operation on models:
         # create / delete models, add new fields, etc. It's heavily used by the migrations mechanism.
         abstract class Base
-          delegate build_sql, to: @connection
-          delegate quote, to: @connection
-
           getter deferred_statements
 
           def initialize(@connection : Connection::Base)
@@ -212,7 +209,7 @@ module Marten
               definitions << unique_constraint_sql_for(unique_constraint)
             end
 
-            execute(create_table_statement(quote(table.name), definitions.join(", ")))
+            execute(create_table_statement(table.name, definitions.join(", ")))
 
             # Forwards indexes configured as part of specific columns and the corresponding SQL statements to the array
             # of deferred SQL statements.
@@ -238,7 +235,7 @@ module Marten
 
           # Deletes the table corresponding to a migration table state.
           def delete_table(table : TableState)
-            execute(delete_table_statement(quote(table.name)))
+            execute(delete_table_statement(table.name))
 
             # Removes all deferred statements that still reference the deleted table.
             @deferred_statements.reject! { |s| s.references_table?(table.name) }
@@ -297,7 +294,7 @@ module Marten
 
           # Renames a specific table.
           def rename_table(table : TableState, new_name : String) : Nil
-            execute(rename_table_statement(quote(table.name), quote(new_name)))
+            execute(rename_table_statement(table.name, new_name))
             @deferred_statements.each do |statement|
               statement.rename_table(table.name, new_name)
             end
@@ -324,6 +321,9 @@ module Marten
             end
             @deferred_statements.clear
           end
+
+          private delegate build_sql, to: @connection
+          private delegate quote, to: @connection
 
           private macro defined?(t)
             {% if t.resolve? %}

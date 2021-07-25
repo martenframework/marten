@@ -22,7 +22,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("operation_test_table")))
+        schema_editor.execute(schema_editor.delete_table_statement("operation_test_table"))
       end
     end
 
@@ -65,7 +65,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement(schema_editor.quote("operation_test_table")))
+        schema_editor.execute(schema_editor.delete_table_statement("operation_test_table"))
       end
     end
 

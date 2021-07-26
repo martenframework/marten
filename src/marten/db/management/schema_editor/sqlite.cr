@@ -1,9 +1,13 @@
+require "./concerns/*"
+
 module Marten
   module DB
     module Management
       module SchemaEditor
         class SQLite < Base
-          def add_column(table : TableState, column : Column::Base)
+          include Core
+
+          def add_column(table : TableState, column : Column::Base) : Nil
             remake_table_with_added_column(table, column)
           end
 
@@ -23,77 +27,8 @@ module Marten
             BUILT_IN_COLUMN_TO_DB_TYPE_SUFFIX_MAPPING[id]?
           end
 
-          def create_index_deferred_statement(
-            table : TableState,
-            columns : Array(Column::Base),
-            name : String? = nil
-          ) : Statement
-            Statement.new(
-              "CREATE INDEX %{name} ON %{table} (%{columns})",
-              name: name.try(&.to_s) || statement_index_name(table.name, columns.map(&.name)),
-              table: statement_table(table.name),
-              columns: statement_columns(table.name, columns.map(&.name)),
-            )
-          end
-
-          def create_table_statement(table_name : String, definitions : String) : String
-            "CREATE TABLE #{quote(table_name)} (#{definitions})"
-          end
-
           def ddl_rollbackable? : Bool
             true
-          end
-
-          def delete_column_statement(table : TableState, column : Column::Base) : String
-            raise NotImplementedError.new(
-              "Deleting columns from tables through SQL is not supported by the SQLite schema editor"
-            )
-          end
-
-          def delete_foreign_key_constraint_statement(table : TableState, name : String) : String
-            raise NotImplementedError.new(
-              "Removing foreign keys from tables is not supported by the SQLite schema editor"
-            )
-          end
-
-          def delete_table_statement(table_name : String) : String
-            "DROP TABLE #{quote(table_name)}"
-          end
-
-          def flush_tables_statements(table_names : Array(String)) : Array(String)
-            statements = [] of String
-
-            table_names.each do |table_name|
-              statements << "DELETE FROM #{table_name}"
-            end
-
-            # Add a statement to reset table sequences.
-            statements << build_sql do |s|
-              s << "UPDATE #{quote("sqlite_sequence")}"
-              s << "SET #{quote("seq")} = 0"
-              s << "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
-            end
-
-            statements
-          end
-
-          def prepare_foreign_key_for_new_column(
-            table : TableState,
-            column : Column::ForeignKey,
-            column_definition : String
-          ) : String
-            raise NotImplementedError.new("Adding foreign keys to tables is not supported by the SQLite schema editor")
-          end
-
-          def prepare_foreign_key_for_new_table(
-            table : TableState,
-            column : Column::ForeignKey,
-            column_definition : String
-          ) : String
-            "#{column_definition} " + build_sql do |s|
-              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
-              s << "DEFERRABLE INITIALLY DEFERRED"
-            end
           end
 
           def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
@@ -115,29 +50,8 @@ module Marten
             remake_table_with_removed_column(table, column)
           end
 
-          def remove_index_statement(table : TableState, name : String) : String
-            build_sql do |s|
-              s << "DROP INDEX"
-              s << quote(name)
-            end
-          end
-
           def remove_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
             remake_table_with_removed_unique_constraint(table, unique_constraint)
-          end
-
-          def remove_unique_constraint_statement(table : TableState, name : String) : String
-            raise NotImplementedError.new(
-              "Removing unique constraints from tables through SQL is not supported by the SQLite schema editor"
-            )
-          end
-
-          def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
-            "ALTER TABLE #{quote(table.name)} RENAME COLUMN #{quote(column.name)} TO #{quote(new_name)}"
-          end
-
-          def rename_table_statement(old_name : String, new_name : String) : String
-            "ALTER TABLE #{quote(old_name)} RENAME TO #{quote(new_name)}"
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
@@ -157,6 +71,55 @@ module Marten
             "Marten::DB::Management::Column::Auto"    => "AUTOINCREMENT",
             "Marten::DB::Management::Column::BigAuto" => "AUTOINCREMENT",
           }
+
+          private def create_index_deferred_statement(
+            table : TableState,
+            columns : Array(Column::Base),
+            name : String? = nil
+          ) : Statement
+            Statement.new(
+              "CREATE INDEX %{name} ON %{table} (%{columns})",
+              name: name.try(&.to_s) || statement_index_name(table.name, columns.map(&.name)),
+              table: statement_table(table.name),
+              columns: statement_columns(table.name, columns.map(&.name)),
+            )
+          end
+
+          private def create_table_statement(table_name : String, definitions : String) : String
+            "CREATE TABLE #{quote(table_name)} (#{definitions})"
+          end
+
+          private def delete_table_statement(table_name : String) : String
+            "DROP TABLE #{quote(table_name)}"
+          end
+
+          private def flush_tables_statements(table_names : Array(String)) : Array(String)
+            statements = [] of String
+
+            table_names.each do |table_name|
+              statements << "DELETE FROM #{table_name}"
+            end
+
+            # Add a statement to reset table sequences.
+            statements << build_sql do |s|
+              s << "UPDATE #{quote("sqlite_sequence")}"
+              s << "SET #{quote("seq")} = 0"
+              s << "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
+            end
+
+            statements
+          end
+
+          private def prepare_foreign_key_for_new_table(
+            table : TableState,
+            column : Column::ForeignKey,
+            column_definition : String
+          ) : String
+            "#{column_definition} " + build_sql do |s|
+              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+              s << "DEFERRABLE INITIALLY DEFERRED"
+            end
+          end
 
           private def remake_table_with_added_column(table, column)
             with_remade_table(table) do |remade_table, _column_names_mapping|
@@ -206,6 +169,21 @@ module Marten
             with_remade_table(table) do |remade_table, _column_names_mapping|
               remade_table.remove_unique_constraint(unique_constraint)
             end
+          end
+
+          private def remove_index_statement(table : TableState, name : String) : String
+            build_sql do |s|
+              s << "DROP INDEX"
+              s << quote(name)
+            end
+          end
+
+          private def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
+            "ALTER TABLE #{quote(table.name)} RENAME COLUMN #{quote(column.name)} TO #{quote(new_name)}"
+          end
+
+          private def rename_table_statement(old_name : String, new_name : String) : String
+            "ALTER TABLE #{quote(old_name)} RENAME TO #{quote(new_name)}"
           end
 
           private def with_remade_table(table)

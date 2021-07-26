@@ -1,8 +1,12 @@
+require "./concerns/*"
+
 module Marten
   module DB
     module Management
       module SchemaEditor
         class MySQL < Base
+          include Core
+
           def column_type_for_built_in_column(id)
             BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
           end
@@ -11,7 +15,39 @@ module Marten
             nil
           end
 
-          def create_index_deferred_statement(
+          def ddl_rollbackable? : Bool
+            false
+          end
+
+          def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
+            defined?(::MySql) do
+              value = case value
+                      when Bytes
+                        "X'#{value.hexstring}'"
+                      when String, Time
+                        "'#{::MySql::Type.to_mysql(value)}'"
+                      else
+                        ::MySql::Type.to_mysql(value).to_s
+                      end
+            end
+
+            value.to_s
+          end
+
+          private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
+            "Marten::DB::Management::Column::Auto"       => "integer AUTO_INCREMENT",
+            "Marten::DB::Management::Column::BigAuto"    => "bigint AUTO_INCREMENT",
+            "Marten::DB::Management::Column::BigInt"     => "bigint",
+            "Marten::DB::Management::Column::Bool"       => "bool",
+            "Marten::DB::Management::Column::DateTime"   => "datetime(6)",
+            "Marten::DB::Management::Column::ForeignKey" => "bigint",
+            "Marten::DB::Management::Column::Int"        => "integer",
+            "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
+            "Marten::DB::Management::Column::Text"       => "longtext",
+            "Marten::DB::Management::Column::UUID"       => "char(32)",
+          }
+
+          private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
             name : String? = nil
@@ -24,27 +60,23 @@ module Marten
             )
           end
 
-          def create_table_statement(table_name : String, definitions : String) : String
+          private def create_table_statement(table_name : String, definitions : String) : String
             "CREATE TABLE #{quote(table_name)} (#{definitions})"
           end
 
-          def ddl_rollbackable? : Bool
-            false
-          end
-
-          def delete_column_statement(table : TableState, column : Column::Base) : String
+          private def delete_column_statement(table : TableState, column : Column::Base) : String
             "ALTER TABLE #{quote(table.name)} DROP COLUMN #{quote(column.name)}"
           end
 
-          def delete_foreign_key_constraint_statement(table : TableState, name : String) : String
+          private def delete_foreign_key_constraint_statement(table : TableState, name : String) : String
             "ALTER TABLE #{quote(table.name)} DROP CONSTRAINT #{quote(name)}"
           end
 
-          def delete_table_statement(table_name : String) : String
+          private def delete_table_statement(table_name : String) : String
             "DROP TABLE #{quote(table_name)} CASCADE"
           end
 
-          def flush_tables_statements(table_names : Array(String)) : Array(String)
+          private def flush_tables_statements(table_names : Array(String)) : Array(String)
             statements = [] of String
 
             statements << "SET FOREIGN_KEY_CHECKS = 0"
@@ -58,7 +90,7 @@ module Marten
             statements
           end
 
-          def prepare_foreign_key_for_new_column(
+          private def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::ForeignKey,
             column_definition : String
@@ -72,7 +104,7 @@ module Marten
             end
           end
 
-          def prepare_foreign_key_for_new_table(
+          private def prepare_foreign_key_for_new_table(
             table : TableState,
             column : Column::ForeignKey,
             column_definition : String
@@ -95,22 +127,7 @@ module Marten
             column_definition
           end
 
-          def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
-            defined?(::MySql) do
-              value = case value
-                      when Bytes
-                        "X'#{value.hexstring}'"
-                      when String, Time
-                        "'#{::MySql::Type.to_mysql(value)}'"
-                      else
-                        ::MySql::Type.to_mysql(value).to_s
-                      end
-            end
-
-            value.to_s
-          end
-
-          def remove_index_statement(table : TableState, name : String) : String
+          private def remove_index_statement(table : TableState, name : String) : String
             build_sql do |s|
               s << "DROP INDEX"
               s << quote(name)
@@ -119,7 +136,7 @@ module Marten
             end
           end
 
-          def remove_unique_constraint_statement(table : TableState, name : String) : String
+          private def remove_unique_constraint_statement(table : TableState, name : String) : String
             build_sql do |s|
               s << "ALTER TABLE"
               s << table.name
@@ -128,26 +145,13 @@ module Marten
             end
           end
 
-          def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
+          private def rename_column_statement(table : TableState, column : Column::Base, new_name : String) : String
             "ALTER TABLE #{quote(table.name)} CHANGE #{quote(column.name)} #{quote(new_name)} #{column_sql_for(column)}"
           end
 
-          def rename_table_statement(old_name : String, new_name : String) : String
+          private def rename_table_statement(old_name : String, new_name : String) : String
             "RENAME TABLE #{quote(old_name)} TO #{quote(new_name)}"
           end
-
-          private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Management::Column::Auto"       => "integer AUTO_INCREMENT",
-            "Marten::DB::Management::Column::BigAuto"    => "bigint AUTO_INCREMENT",
-            "Marten::DB::Management::Column::BigInt"     => "bigint",
-            "Marten::DB::Management::Column::Bool"       => "bool",
-            "Marten::DB::Management::Column::DateTime"   => "datetime(6)",
-            "Marten::DB::Management::Column::ForeignKey" => "bigint",
-            "Marten::DB::Management::Column::Int"        => "integer",
-            "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
-            "Marten::DB::Management::Column::Text"       => "longtext",
-            "Marten::DB::Management::Column::UUID"       => "char(32)",
-          }
         end
       end
     end

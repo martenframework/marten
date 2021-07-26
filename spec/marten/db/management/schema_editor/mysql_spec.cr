@@ -34,148 +34,28 @@ require "./spec_helper"
       end
     end
 
-    describe "#create_table_statement" do
-      it "returns the expected statement" do
-        statement = Marten::DB::Connection.default.schema_editor.create_table_statement(
-          "my_table",
-          ["last_name varchar(255)", "first_name varchar(255)"].join(", ")
-        )
-        statement.should eq "CREATE TABLE `my_table` (last_name varchar(255), first_name varchar(255))"
-      end
-    end
-
-    describe "#create_index_deferred_statement" do
-      it "returns the expected index statement for a given table and columns" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        columns = [
-          Marten::DB::Management::Column::String.new("foo", 255),
-          Marten::DB::Management::Column::String.new("bar", 128),
-        ]
-
-        index_statement = Marten::DB::Connection.default.schema_editor.create_index_deferred_statement(
-          table_state,
-          columns
-        )
-
-        index_statement.to_s.should eq(
-          "CREATE INDEX index_#{TestUser.db_table}_on_foo_bar ON `app_test_users` (`foo`, `bar`)"
-        )
-      end
-
-      it "returns the expected index statement for a given set of table, columns and fixed name" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        columns = [
-          Marten::DB::Management::Column::String.new("foo", 255),
-          Marten::DB::Management::Column::String.new("bar", 128),
-        ]
-
-        index_statement = Marten::DB::Connection.default.schema_editor.create_index_deferred_statement(
-          table_state,
-          columns,
-          name: "index_name"
-        )
-
-        index_statement.to_s.should eq "CREATE INDEX index_name ON `app_test_users` (`foo`, `bar`)"
-      end
-
-      it "returns the expected index statement for a given table and columns when the index name is too long" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        columns = [
-          Marten::DB::Management::Column::String.new("this_is_very_very_long_column_name", 255),
-          Marten::DB::Management::Column::String.new("another_very_long_column_name", 128),
-        ]
-
-        index_statement = Marten::DB::Connection.default.schema_editor.create_index_deferred_statement(
-          table_state,
-          columns
-        )
-
-        index_name = index_statement.params["name"].to_s
-        index_name.size.should be <= Marten::DB::Connection.default.max_name_size
-
-        index_statement.to_s.should eq(
-          "CREATE INDEX #{index_name} ON `app_test_users` (`this_is_very_very_long_column_name`, " \
-          "`another_very_long_column_name`)"
-        )
-      end
-    end
-
-    describe "#ddl_rollbackable?" do
-      it "returns false" do
-        Marten::DB::Connection.default.schema_editor.ddl_rollbackable?.should be_false
-      end
-    end
-
-    describe "#delete_column_statement" do
-      it "returns the expected statement" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        column = Marten::DB::Management::Column::String.new("foo", 255)
-
-        Marten::DB::Connection.default.schema_editor.delete_column_statement(table_state, column).should eq(
-          "ALTER TABLE `#{TestUser.db_table}` DROP COLUMN `foo`"
-        )
-      end
-    end
-
-    describe "#delete_foreign_key_constraint_statement" do
-      it "returns the expected statement" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        Marten::DB::Connection.default.schema_editor.delete_foreign_key_constraint_statement(table_state, "test")
-          .should eq "ALTER TABLE `#{TestUser.db_table}` DROP CONSTRAINT `test`"
-      end
-    end
-
-    describe "#delete_table_statement" do
-      it "returns the expected statement" do
-        Marten::DB::Connection.default.schema_editor.delete_table_statement("test_table").should eq(
-          "DROP TABLE `test_table` CASCADE"
-        )
-      end
-    end
-
-    describe "#flush_tables_statements" do
-      it "returns the expected statements" do
-        Marten::DB::Connection.default.schema_editor.flush_tables_statements(["foo", "bar"]).should eq(
-          [
-            "SET FOREIGN_KEY_CHECKS = 0",
-            "TRUNCATE foo",
-            "TRUNCATE bar",
-            "SET FOREIGN_KEY_CHECKS = 1",
-          ]
-        )
-      end
-    end
-
-    describe "#prepare_foreign_key_for_new_column" do
-      it "returns the expected statement" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        column = Marten::DB::Management::Column::ForeignKey.new(
-          "test",
-          to_table: "other_table",
-          to_column: "other_column"
-        )
-
+    describe "#create_table" do
+      before_each do
         schema_editor = Marten::DB::Connection.default.schema_editor
-        schema_editor.prepare_foreign_key_for_new_column(table_state, column, "test bigint").should eq(
-          "test bigint, " \
-          "ADD CONSTRAINT `index_#{TestUser.db_table}_on_test_fk_other_table_other_column` " \
-          "FOREIGN KEY (`test`) " \
-          "REFERENCES `other_table` (`other_column`)"
-        )
+        if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+          schema_editor.delete_table("schema_editor_test_table")
+        end
       end
-    end
 
-    describe "#prepare_foreign_key_for_new_table" do
-      it "returns the initial column definition and generate a deferred statement to add the foreign key constraint" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        column = Marten::DB::Management::Column::ForeignKey.new(
-          "test",
-          to_table: "other_table",
-          to_column: "other_column"
+      it "generates a deferred statement for foreign key columns" do
+        schema_editor = Marten::DB::Connection.default.schema_editor
+
+        table_state = Marten::DB::Management::TableState.new(
+          "my_app",
+          "schema_editor_test_table",
+          columns: [
+            Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+            Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id"),
+          ] of Marten::DB::Management::Column::Base,
+          unique_constraints: [] of Marten::DB::Management::Constraint::Unique
         )
 
-        schema_editor = Marten::DB::Connection.default.schema_editor
-        schema_editor.prepare_foreign_key_for_new_table(table_state, column, "test bigint").should eq "test bigint"
+        schema_editor.create_table(table_state)
 
         statement = schema_editor.deferred_statements[0]
 
@@ -188,28 +68,34 @@ require "./spec_helper"
 
         statement.params["table"].should be_a Marten::DB::Management::Statement::Table
         table_statement = statement.params["table"].as(Marten::DB::Management::Statement::Table)
-        table_statement.name.should eq TestUser.db_table
+        table_statement.name.should eq "schema_editor_test_table"
 
         statement.params["constraint"].should be_a Marten::DB::Management::Statement::ForeignKeyName
         fk_name_statement = statement.params["constraint"].as(Marten::DB::Management::Statement::ForeignKeyName)
-        fk_name_statement.table.should eq TestUser.db_table
-        fk_name_statement.column.should eq "test"
-        fk_name_statement.to_table.should eq "other_table"
-        fk_name_statement.to_column.should eq "other_column"
+        fk_name_statement.table.should eq "schema_editor_test_table"
+        fk_name_statement.column.should eq "foo"
+        fk_name_statement.to_table.should eq TestUser.db_table
+        fk_name_statement.to_column.should eq "id"
 
         statement.params["column"].should be_a Marten::DB::Management::Statement::Columns
         column_statement = statement.params["column"].as(Marten::DB::Management::Statement::Columns)
-        column_statement.table.should eq TestUser.db_table
-        column_statement.columns.should eq ["test"]
+        column_statement.table.should eq "schema_editor_test_table"
+        column_statement.columns.should eq ["foo"]
 
         statement.params["to_table"].should be_a Marten::DB::Management::Statement::Table
         to_table_statement = statement.params["to_table"].as(Marten::DB::Management::Statement::Table)
-        to_table_statement.name.should eq "other_table"
+        to_table_statement.name.should eq TestUser.db_table
 
         statement.params["to_column"].should be_a Marten::DB::Management::Statement::Columns
         to_column_statement = statement.params["to_column"].as(Marten::DB::Management::Statement::Columns)
-        to_column_statement.table.should eq "other_table"
-        to_column_statement.columns.should eq ["other_column"]
+        to_column_statement.table.should eq TestUser.db_table
+        to_column_statement.columns.should eq ["id"]
+      end
+    end
+
+    describe "#ddl_rollbackable?" do
+      it "returns false" do
+        Marten::DB::Connection.default.schema_editor.ddl_rollbackable?.should be_false
       end
     end
 
@@ -245,51 +131,6 @@ require "./spec_helper"
       it "returns the expected string representation for a float value" do
         schema_editor = Marten::DB::Connection.default.schema_editor
         schema_editor.quoted_default_value_for_built_in_column(42.44).should eq "42.44"
-      end
-    end
-
-    describe "#remove_unique_constraint_statement" do
-      it "returns the expected statement" do
-        unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
-        table_state = Marten::DB::Management::TableState.new(
-          "my_app",
-          "test_table",
-          columns: [
-            Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
-            Marten::DB::Management::Column::BigInt.new("foo"),
-            Marten::DB::Management::Column::BigInt.new("bar"),
-          ] of Marten::DB::Management::Column::Base,
-          unique_constraints: [unique_constraint]
-        )
-
-        schema_editor = Marten::DB::Connection.default.schema_editor
-        schema_editor.remove_unique_constraint_statement(table_state, unique_constraint.name).should eq(
-          "ALTER TABLE test_table DROP INDEX test_constraint"
-        )
-      end
-    end
-
-    describe "#rename_column_statement" do
-      it "returns the expected statement" do
-        table_state = Marten::DB::Management::TableState.from_model(TestUser)
-        column = Marten::DB::Management::Column::ForeignKey.new(
-          "test",
-          to_table: "other_table",
-          to_column: "other_column"
-        )
-
-        schema_editor = Marten::DB::Connection.default.schema_editor
-        schema_editor.rename_column_statement(table_state, column, "new_name").should eq(
-          "ALTER TABLE `#{TestUser.db_table}` CHANGE `test` `new_name` bigint NOT NULL"
-        )
-      end
-    end
-
-    describe "#rename_table_statement" do
-      it "returns the expected statement" do
-        Marten::DB::Connection.default.schema_editor.rename_table_statement("old_name", "new_name").should eq(
-          "RENAME TABLE `old_name` TO `new_name`"
-        )
       end
     end
   end

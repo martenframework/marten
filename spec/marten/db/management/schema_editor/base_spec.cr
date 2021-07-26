@@ -5,7 +5,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -506,9 +506,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_model_table")
-        schema_editor.execute(
-          schema_editor.delete_table_statement("schema_editor_test_model_table")
-        )
+        schema_editor.delete_table("schema_editor_test_model_table")
       end
     end
 
@@ -597,7 +595,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -728,7 +726,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -876,7 +874,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -1266,29 +1264,6 @@ describe Marten::DB::Management::SchemaEditor::Base do
         {% end %}
       end
     end
-
-    {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" || env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-      it "generates a deferred statement for foreign key columns" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
-
-        table_state = Marten::DB::Management::TableState.new(
-          "my_app",
-          "schema_editor_test_table",
-          columns: [
-            Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
-            Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id"),
-          ] of Marten::DB::Management::Column::Base,
-          unique_constraints: [] of Marten::DB::Management::Constraint::Unique
-        )
-
-        schema_editor.create_table(table_state)
-
-        schema_editor.deferred_statements.size.should eq 2
-        schema_editor.deferred_statements.first.params["constraint"].should be_a(
-          Marten::DB::Management::Statement::ForeignKeyName
-        )
-      end
-    {% end %}
   end
 
   describe "#delete_model" do
@@ -1304,7 +1279,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -1332,7 +1307,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -1481,7 +1456,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -1565,7 +1540,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -1650,7 +1625,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
@@ -1755,13 +1730,11 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
 
       if Marten::DB::Connection.default.introspector.table_names.includes?("renamed_schema_editor_test_table")
-        schema_editor.execute(
-          schema_editor.delete_table_statement("renamed_schema_editor_test_table")
-        )
+        schema_editor.delete_table("renamed_schema_editor_test_table")
       end
     end
 
@@ -1858,7 +1831,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
-        schema_editor.execute(schema_editor.delete_table_statement("schema_editor_test_table"))
+        schema_editor.delete_table("schema_editor_test_table")
       end
     end
 

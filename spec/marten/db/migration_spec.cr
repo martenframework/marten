@@ -72,12 +72,13 @@ describe Marten::DB::Migration do
       introspector = Marten::DB::Connection.default.introspector
 
       Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
-        schema_editor.execute(
-          schema_editor.delete_table_statement("migration_test_table1")
-        ) if introspector.table_names.includes?("migration_test_table1")
-        schema_editor.execute(
-          schema_editor.delete_table_statement("migration_test_table2")
-        ) if introspector.table_names.includes?("migration_test_table2")
+        if introspector.table_names.includes?("migration_test_table1")
+          schema_editor.delete_table("migration_test_table1")
+        end
+
+        if introspector.table_names.includes?("migration_test_table2")
+          schema_editor.delete_table("migration_test_table2")
+        end
       end
     end
 
@@ -198,12 +199,13 @@ describe Marten::DB::Migration do
       introspector = Marten::DB::Connection.default.introspector
 
       Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
-        schema_editor.execute(
-          schema_editor.delete_table_statement("migration_test_table1")
-        ) if introspector.table_names.includes?("migration_test_table1")
-        schema_editor.execute(
-          schema_editor.delete_table_statement("migration_test_table2")
-        ) if introspector.table_names.includes?("migration_test_table2")
+        if introspector.table_names.includes?("migration_test_table1")
+          schema_editor.delete_table("migration_test_table1")
+        end
+
+        if introspector.table_names.includes?("migration_test_table2")
+          schema_editor.delete_table("migration_test_table2")
+        end
       end
     end
 

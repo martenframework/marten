@@ -1,8 +1,12 @@
+require "./concerns/*"
+
 module Marten
   module DB
     module Management
       module Introspector
         class PostgreSQL < Base
+          include Core
+
           def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
             names = [] of String
 
@@ -61,10 +65,6 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
-          def table_names : Array(String)
-            list_table_names
-          end
-
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
             names = [] of String
 
@@ -94,7 +94,7 @@ module Marten
             names
           end
 
-          protected def list_table_names_statement
+          private def list_table_names_statement
             "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' ORDER BY table_name;"
           end
         end

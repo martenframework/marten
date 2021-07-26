@@ -1,8 +1,12 @@
+require "./concerns/*"
+
 module Marten
   module DB
     module Management
       module Introspector
         class SQLite < Base
+          include Core
+
           def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
             [] of String
           end
@@ -32,10 +36,6 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
-          def table_names : Array(String)
-            list_table_names
-          end
-
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
             unique_indexes_to_columns = {} of String => Array(String)
 
@@ -59,7 +59,7 @@ module Marten
             unique_indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
-          protected def list_table_names_statement : String
+          private def list_table_names_statement : String
             "SELECT name FROM sqlite_master WHERE type = 'table' ORDER BY name"
           end
         end

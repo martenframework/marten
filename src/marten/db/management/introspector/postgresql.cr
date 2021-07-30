@@ -65,6 +65,35 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
+          def primary_key_constraint_names(table_name : String, column_name : String) : Array(String)
+            names = [] of String
+
+            @connection.open do |db|
+              db.query(
+                build_sql do |s|
+                  s << "SELECT c.conname"
+                  s << "FROM pg_constraint AS c"
+                  s << "JOIN pg_class AS cl ON c.conrelid = cl.oid"
+                  s << "WHERE cl.relname = '#{table_name}'"
+                  s << "AND pg_catalog.pg_table_is_visible(cl.oid) AND c.contype = 'p'"
+                  s << "AND '#{column_name}'=ANY(array("
+                  s << "  SELECT attname"
+                  s << "  FROM unnest(c.conkey) WITH ORDINALITY cols(colid, arridx)"
+                  s << "  JOIN pg_attribute AS ca ON cols.colid = ca.attnum"
+                  s << "  WHERE ca.attrelid = c.conrelid"
+                  s << "  ORDER BY cols.arridx"
+                  s << "))"
+                end
+              ) do |rs|
+                rs.each do
+                  names << rs.read(String)
+                end
+              end
+            end
+
+            names
+          end
+
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
             names = [] of String
 

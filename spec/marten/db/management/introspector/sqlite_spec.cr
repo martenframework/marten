@@ -19,6 +19,16 @@ require "./spec_helper"
       end
     end
 
+    describe "#primary_key_constraint_names" do
+      it "returns an empty array" do
+        connection = Marten::DB::Connection.default
+        introspector = connection.introspector
+
+        introspector.primary_key_constraint_names(Post.db_table, "id").should be_empty
+        introspector.primary_key_constraint_names(Post.db_table, "author_id").should be_empty
+      end
+    end
+
     describe "#table_names" do
       it "returns the table names of the associated database connection" do
         connection = Marten::DB::Connection.default

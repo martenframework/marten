@@ -36,6 +36,12 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
+          def primary_key_constraint_names(table_name : String, column_name : String) : Array(String)
+            # SQLite does not name primary key constraints. We also don't really need them as they are never dropped by
+            # the framework (tables are re-created in the context of column changes).
+            [] of String
+          end
+
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
             unique_indexes_to_columns = {} of String => Array(String)
 

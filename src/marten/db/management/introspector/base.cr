@@ -16,11 +16,14 @@ module Marten
           # Returns an array of all the index names for a specific table and column.
           abstract def index_names(table_name : String, column_name : String) : Array(String)
 
-          # Returns an array of all the unique constraints for a specific table and column.
-          abstract def unique_constraint_names(table_name : String, column_name : String) : Array(String)
+          # Returns an array of all the primary key constraints of a specific table and column.
+          abstract def primary_key_constraint_names(table_name : String, column_name : String) : Array(String)
 
           # Returns all the tables names in the considered database.
           abstract def table_names : Array(String)
+
+          # Returns an array of all the unique constraints for a specific table and column.
+          abstract def unique_constraint_names(table_name : String, column_name : String) : Array(String)
 
           # Returns all the table names associated with models of the installed applications only.
           def model_table_names : Array(String)

@@ -37,6 +37,16 @@ require "./spec_helper"
       end
     end
 
+    describe "#primary_key_constraint_names" do
+      it "returns the primary key constraint names of a specific table and column" do
+        connection = Marten::DB::Connection.default
+        introspector = connection.introspector
+
+        introspector.primary_key_constraint_names(Post.db_table, "id").should eq ["PRIMARY"]
+        introspector.primary_key_constraint_names(Post.db_table, "author_id").should be_empty
+      end
+    end
+
     describe "#unique_constraint_names" do
       it "returns the unique constraint names of a specific table" do
         connection = Marten::DB::Connection.default

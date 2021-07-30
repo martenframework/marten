@@ -50,6 +50,32 @@ module Marten
             indexes_to_columns.select { |_k, v| v == [column_name] }.keys
           end
 
+          def primary_key_constraint_names(table_name : String, column_name : String) : Array(String)
+            names = [] of String
+
+            @connection.open do |db|
+              db.query(
+                build_sql do |s|
+                  s << "SELECT kcu.constraint_name"
+                  s << "FROM information_schema.key_column_usage AS kcu, information_schema.table_constraints AS tc"
+                  s << "WHERE kcu.table_schema = DATABASE()"
+                  s << "AND tc.table_schema = kcu.table_schema"
+                  s << "AND tc.constraint_name = kcu.constraint_name"
+                  s << "AND tc.table_name = kcu.table_name"
+                  s << "AND tc.constraint_type = 'PRIMARY KEY'"
+                  s << "AND kcu.table_name = '#{table_name}'"
+                  s << "AND kcu.column_name = '#{column_name}'"
+                end
+              ) do |rs|
+                rs.each do
+                  names << rs.read(String)
+                end
+              end
+            end
+
+            names
+          end
+
           def unique_constraint_names(table_name : String, column_name : String) : Array(String)
             names = [] of String
 

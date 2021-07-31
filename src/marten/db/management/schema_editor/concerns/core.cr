@@ -45,6 +45,8 @@ module Marten
             old_column : Column::Base,
             new_column : Column::Base
           ) : Nil
+            old_type = old_column.sql_type(@connection)
+            new_type = new_column.sql_type(@connection)
             fk_constraint_names = [] of String
 
             # Step 1: drop possible foreign key constraints if applicable.
@@ -66,7 +68,7 @@ module Marten
 
             # Step 3: drop incoming FK constraints if the field is primary key that is going to be updated.
             remake_fk_columns = (
-              old_column.class != new_column.class &&
+              old_type != new_type &&
               old_column.primary_key? &&
               new_column.primary_key?
             )
@@ -102,9 +104,82 @@ module Marten
               end
             end
 
-            # Step 5: alter the column type if the column type changed.
-            # Step 6: alter the column default value if it changed.
-            # Step 7: alter the column nullability if it changed.
+            # Step 5: alter the column type if applicable.
+            if old_type != new_type
+              execute(change_column_type_statement(table, old_column, new_column))
+            end
+
+            # Step 6: alter the column default value if applicable.
+            if old_column.default != new_column.default
+              if new_column.default.nil?
+                execute(drop_column_default_statement(table, old_column, new_column))
+              else
+                execute(change_column_default_statement(table, old_column, new_column))
+              end
+            end
+
+            # Step 7: if the column became non-null with a default, updates existing rows with the default value.
+            if old_column.null? && !new_column.null? && !new_column.default.nil?
+              execute(update_null_columns_with_default_value_statement(table, old_column, new_column))
+            end
+
+            # Step 8: alter the column nullability if applicable.
+            if !old_column.null? && new_column.null?
+              execute(set_up_null_column_statement(table, old_column, new_column))
+            elsif old_column.null? && !new_column.null?
+              execute(set_up_not_null_column_statement(table, old_column, new_column))
+            end
+
+            # Step 9: run post column type update statements.
+            if old_type != new_type
+              post_change_column_type_statements(table, old_column, new_column).each do |statement|
+                execute(statement)
+              end
+            end
+
+            # Step 10: delete primary key constraints if the column is no longer a primary key.
+            if old_column.primary_key? && !new_column.primary_key?
+              pk_constraint_names = @connection.introspector.primary_key_constraint_names(table.name, old_column.name)
+              pk_constraint_names.each do |constraint_name|
+                execute(delete_primary_key_constraint_statement(table, constraint_name))
+              end
+            end
+
+            # Step 11: add a new unique constraint if applicable.
+            if (!old_column.unique? && new_column.unique?) ||
+               (old_column.primary_key? && !new_column.primary_key? && new_column.unique?)
+              execute(
+                build_sql do |s|
+                  s << "ALTER TABLE #{table.name}"
+                  s << "ADD"
+                  s << unique_constraint_sql_for(
+                    index_name(table.name, [new_column.name], "_uniq"),
+                    [new_column.name]
+                  )
+                end
+              )
+            end
+
+            # Step 12: create a new index if applicable (only if the new column is not unique, because this already
+            # implies the creation of an index).
+            if (!old_column.index? || new_column.unique?) && new_column.index? && !new_column.unique?
+              execute(create_index_deferred_statement(table, [new_column]).to_s)
+            end
+
+            # Step 13: set up the new primary key constraint if the field became a primary key.
+            if !old_column.primary_key? && new_column.primary_key?
+              execute(add_primary_key_constraint_statement(table, new_column))
+            end
+
+            # Step 14: set up the new foreign key constraint if applicable.
+            if new_column.is_a?(Column::ForeignKey)
+              execute(add_foreign_key_constraint_statement(table, new_column))
+            end
+
+            # Step 15: update and rebuild incoming foreign keys.
+            if remake_fk_columns || (!old_column.primary_key? && new_column.primary_key?)
+              # TODO.
+            end
           end
 
           def create_table(table : TableState) : Nil
@@ -196,6 +271,30 @@ module Marten
             end
           end
 
+          private def add_foreign_key_constraint_statement(table : TableState, column : Column::ForeignKey) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private def add_primary_key_constraint_statement(table : TableState, column : Column::Base) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private def change_column_default_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private def change_column_type_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
           private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
@@ -237,11 +336,31 @@ module Marten
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
+          private def delete_primary_key_constraint_statement(table : TableState, name : String) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
           private def delete_table_statement(table_name : String) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
+          private def drop_column_default_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
           private def flush_tables_statements(table_names : Array(String)) : Array(String)
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private def post_change_column_type_statements(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : Array(String)
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
@@ -288,14 +407,42 @@ module Marten
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
+          private def set_up_not_null_column_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private def set_up_null_column_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
           private def unique_constraint_sql_for(unique_constraint)
+            unique_constraint_sql_for(unique_constraint.name, unique_constraint.column_names)
+          end
+
+          private def unique_constraint_sql_for(name : String, column_names : Array(String))
             String.build do |s|
-              s << "CONSTRAINT #{unique_constraint.name} "
+              s << "CONSTRAINT #{name} "
               s << "UNIQUE "
               s << "("
-              s << unique_constraint.column_names.join(", ") { |cname| quote(cname) }
+              s << column_names.join(", ") { |cname| quote(cname) }
               s << ")"
             end
+          end
+
+          private def update_null_columns_with_default_value_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            raise NotImplementedError.new("Should be implemented by subclasses")
           end
         end
       end

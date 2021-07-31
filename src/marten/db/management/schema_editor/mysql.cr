@@ -47,6 +47,48 @@ module Marten
             "Marten::DB::Management::Column::UUID"       => "char(32)",
           }
 
+          private def add_foreign_key_constraint_statement(table : TableState, column : Column::ForeignKey) : String
+            constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ADD CONSTRAINT #{quote(constraint_name)}"
+              s << "FOREIGN KEY (#{quote(column.name)})"
+              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+            end
+          end
+
+          private def add_primary_key_constraint_statement(table : TableState, column : Column::Base) : String
+            constraint_name = index_name(table.name, [column.name], "_pk")
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ADD CONSTRAINT #{quote(constraint_name)}"
+              s << "PRIMARY KEY (#{quote(column.name)})"
+            end
+          end
+
+          private def change_column_default_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)}"
+              s << "SET DEFAULT #{new_column.sql_quoted_default_value(@connection)}"
+            end
+          end
+
+          private def change_column_type_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "MODIFY #{quote(new_column.name)} #{new_column.sql_type(@connection)}"
+            end
+          end
+
           private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
@@ -72,8 +114,28 @@ module Marten
             "ALTER TABLE #{quote(table.name)} DROP CONSTRAINT #{quote(name)}"
           end
 
+          private def delete_primary_key_constraint_statement(table : TableState, name : String) : String
+            "ALTER TABLE #{quote(table.name)} DROP PRIMARY KEY"
+          end
+
           private def delete_table_statement(table_name : String) : String
             "DROP TABLE #{quote(table_name)} CASCADE"
+          end
+
+          private def drop_column_default_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)}"
+              s << if new_column.null?
+                "SET DEFAULT NULL"
+              else
+                "DROP DEFAULT"
+              end
+            end
           end
 
           private def flush_tables_statements(table_names : Array(String)) : Array(String)
@@ -127,6 +189,14 @@ module Marten
             column_definition
           end
 
+          private def post_change_column_type_statements(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : Array(String)
+            [] of String
+          end
+
           private def remove_index_statement(table : TableState, name : String) : String
             build_sql do |s|
               s << "DROP INDEX"
@@ -151,6 +221,40 @@ module Marten
 
           private def rename_table_statement(old_name : String, new_name : String) : String
             "RENAME TABLE #{quote(old_name)} TO #{quote(new_name)}"
+          end
+
+          private def set_up_not_null_column_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "MODIFY #{quote(new_column.name)} #{new_column.sql_type(@connection)} NOT NULL"
+            end
+          end
+
+          private def set_up_null_column_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "MODIFY #{quote(new_column.name)} #{new_column.sql_type(@connection)} NULL"
+            end
+          end
+
+          private def update_null_columns_with_default_value_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "UPDATE #{quote(table.name)}"
+              s << "SET #{quote(new_column.name)} = #{new_column.sql_quoted_default_value(@connection)}"
+              s << "WHERE #{quote(new_column.name)} IS NULL"
+            end
           end
         end
       end

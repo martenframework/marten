@@ -49,6 +49,62 @@ module Marten
             "Marten::DB::Management::Column::UUID"       => "uuid",
           }
 
+          private def add_foreign_key_constraint_statement(table : TableState, column : Column::ForeignKey) : String
+            constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ADD CONSTRAINT #{quote(constraint_name)}"
+              s << "FOREIGN KEY (#{quote(column.name)})"
+              s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"
+              s << "DEFERRABLE INITIALLY DEFERRED"
+            end
+          end
+
+          private def add_primary_key_constraint_statement(table : TableState, column : Column::Base) : String
+            constraint_name = index_name(table.name, [column.name], "_pk")
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ADD CONSTRAINT #{quote(constraint_name)}"
+              s << "PRIMARY KEY (#{quote(column.name)})"
+            end
+          end
+
+          private def change_column_default_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)}"
+              s << "SET DEFAULT #{new_column.sql_quoted_default_value(@connection)}"
+            end
+          end
+
+          private def change_column_type_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            old_type = BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING.fetch(old_column.class.name, old_column.sql_type(@connection))
+            new_type = BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING.fetch(new_column.class.name, new_column.sql_type(@connection))
+            new_interpolated_type = new_column.sql_type(@connection)
+
+            new_interpolated_type = if new_interpolated_type == "serial"
+                                      "integer"
+                                    elsif new_interpolated_type == "bigserial"
+                                      "bigint"
+                                    else
+                                      new_interpolated_type
+                                    end
+
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)} TYPE #{new_interpolated_type}"
+              s << "USING #{quote(new_column.name)}::#{new_interpolated_type}" if old_type != new_type
+            end
+          end
+
           private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
@@ -74,8 +130,24 @@ module Marten
             "ALTER TABLE #{quote(table.name)} DROP CONSTRAINT #{quote(name)}"
           end
 
+          private def delete_primary_key_constraint_statement(table : TableState, name : String) : String
+            "ALTER TABLE #{quote(table.name)} DROP CONSTRAINT #{quote(name)}"
+          end
+
           private def delete_table_statement(table_name : String) : String
             "DROP TABLE #{quote(table_name)} CASCADE"
+          end
+
+          private def drop_column_default_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)}"
+              s << "DROP DEFAULT"
+            end
           end
 
           private def flush_tables_statements(table_names : Array(String)) : Array(String)
@@ -120,6 +192,47 @@ module Marten
             column_definition
           end
 
+          private def post_change_column_type_statements(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : Array(String)
+            statements = [] of String
+
+            old_type = old_column.sql_type(@connection)
+            new_type = new_column.sql_type(@connection)
+
+            if %w(bigserial serial).includes?(new_type.downcase)
+              # If the column became a primary key, a new sequence needs to be created and configured.
+              sequence_name = "#{table.name}_#{new_column.name}_seq"
+
+              statements << "DROP SEQUENCE IF EXISTS #{quote(sequence_name)} CASCADE"
+              statements << "CREATE SEQUENCE #{quote(sequence_name)}"
+
+              statements << build_sql do |s|
+                s << "ALTER TABLE #{quote(table.name)}"
+                s << "ALTER COLUMN #{quote(new_column.name)}"
+                s << "SET DEFAULT nextval('#{quote(sequence_name)}')"
+              end
+
+              statements << build_sql do |s|
+                s << "SELECT setval('#{quote(sequence_name)}', MAX(#{quote(new_column.name)}))"
+                s << "FROM #{quote(table.name)}"
+              end
+
+              statements << build_sql do |s|
+                s << "ALTER SEQUENCE #{quote(sequence_name)}"
+                s << "OWNED BY #{quote(table.name)}.#{quote(new_column.name)}"
+              end
+            elsif %w(bigserial serial).includes?(old_type.downcase)
+              # If the column was previously a primary key, the associated sequence needs to be dropped.
+              sequence_name = "#{table.name}_#{old_column.name}_seq"
+              statements << "DROP SEQUENCE IF EXISTS #{quote(sequence_name)} CASCADE"
+            end
+
+            statements
+          end
+
           private def remove_index_statement(table : TableState, name : String) : String
             build_sql do |s|
               s << "DROP INDEX IF EXISTS"
@@ -142,6 +255,42 @@ module Marten
 
           private def rename_table_statement(old_name : String, new_name : String) : String
             "ALTER TABLE #{quote(old_name)} RENAME TO #{quote(new_name)}"
+          end
+
+          private def set_up_not_null_column_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)}"
+              s << "SET NOT NULL"
+            end
+          end
+
+          private def set_up_null_column_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ALTER COLUMN #{quote(new_column.name)}"
+              s << "DROP NOT NULL"
+            end
+          end
+
+          private def update_null_columns_with_default_value_statement(
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : String
+            build_sql do |s|
+              s << "UPDATE #{quote(table.name)}"
+              s << "SET #{quote(new_column.name)} = #{new_column.sql_quoted_default_value(@connection)}"
+              s << "WHERE #{quote(new_column.name)} IS NULL"
+            end
           end
         end
       end

@@ -15,7 +15,12 @@ module Marten
             remake_table_with_added_unique_constraint(table, unique_constraint)
           end
 
-          def change_column(table : TableState, old_column : Column::Base, new_column : Column::Base) : Nil
+          def change_column(
+            project : ProjectState,
+            table : TableState,
+            old_column : Column::Base,
+            new_column : Column::Base
+          ) : Nil
             remake_table_with_changed_column(table, old_column, new_column)
           end
 

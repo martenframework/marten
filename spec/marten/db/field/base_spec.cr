@@ -11,7 +11,7 @@ describe Marten::DB::Field::Base do
       field.unique?.should be_false
       field.editable?.should be_true
       field.db_column.should eq field.id
-      field.db_index?.should be_false
+      field.index?.should be_false
     end
   end
 
@@ -46,15 +46,15 @@ describe Marten::DB::Field::Base do
     end
   end
 
-  describe "#db_index?" do
+  describe "#index?" do
     it "returns true if the field is indexed" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", db_index: true)
-      field.db_index?.should be_true
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", index: true)
+      field.index?.should be_true
     end
 
     it "returns false if the field is not indexed" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", db_index: false)
-      field.db_index?.should be_false
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", index: false)
+      field.index?.should be_false
     end
   end
 
@@ -271,7 +271,7 @@ module Marten::DB::Field::BaseSpec
         primary_key?,
         null?,
         unique?,
-        db_index?
+        index?
       )
     end
 

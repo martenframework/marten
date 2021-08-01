@@ -7,7 +7,6 @@ module Marten
         @blank : ::Bool
         @null : ::Bool
         @db_column : ::String | Symbol | Nil
-        @db_index : ::Bool
 
         # Returns the ID of the field used in the associated model.
         getter id
@@ -18,9 +17,9 @@ module Marten
           @blank = false,
           @null = false,
           @unique = false,
+          @index = false,
           @editable = true,
-          @db_column = nil,
-          @db_index = false
+          @db_column = nil
         )
         end
 
@@ -57,8 +56,8 @@ module Marten
         end
 
         # Returns true if an index should be created at the database level for the field.
-        def db_index?
-          @db_index
+        def index?
+          @index
         end
 
         # Returns a boolean indicating whether the field is editable.

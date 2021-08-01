@@ -12,9 +12,9 @@ module Marten
           @blank = false,
           @null = false,
           @unique = false,
+          @index = true,
           @editable = true,
           @db_column = nil,
-          @db_index = true,
           @related : Nil | ::String | Symbol = nil,
           on_delete : ::String | Symbol = :do_nothing
         )
@@ -50,7 +50,7 @@ module Marten
             primary_key: primary_key?,
             null: null?,
             unique: unique?,
-            index: db_index?
+            index: index?
           )
         end
 

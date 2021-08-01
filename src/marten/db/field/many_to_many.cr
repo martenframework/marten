@@ -12,9 +12,9 @@ module Marten
           @blank = false,
           @null = false,
           @unique = false,
+          @index = false,
           @editable = true,
           @db_column = nil,
-          @db_index = true,
           @related : Nil | ::String | Symbol = nil
         )
           @related = @related.try(&.to_s)

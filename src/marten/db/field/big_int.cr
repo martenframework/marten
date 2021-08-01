@@ -11,9 +11,9 @@ module Marten
           @blank = false,
           @null = false,
           @unique = false,
+          @index = false,
           @editable = true,
-          @db_column = nil,
-          @db_index = false
+          @db_column = nil
         )
         end
 
@@ -27,7 +27,7 @@ module Marten
             primary_key?,
             null?,
             unique?,
-            db_index?,
+            index?,
             to_db(default)
           )
         end

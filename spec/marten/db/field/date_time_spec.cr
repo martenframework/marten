@@ -11,7 +11,7 @@ describe Marten::DB::Field::DateTime do
       field.unique?.should be_false
       field.editable?.should be_true
       field.db_column.should eq field.id
-      field.db_index?.should be_false
+      field.index?.should be_false
       field.auto_now?.should be_false
       field.auto_now_add?.should be_false
     end

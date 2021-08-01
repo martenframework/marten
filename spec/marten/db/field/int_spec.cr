@@ -1,6 +1,18 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::Int do
+  describe "#auto?" do
+    it "returns true if the field is auto incremented" do
+      field = Marten::DB::Field::Int.new("my_field", primary_key: true, auto: true)
+      field.auto?.should be_true
+    end
+
+    it "returns false if the field is not auto incremented" do
+      field = Marten::DB::Field::Int.new("my_field")
+      field.auto?.should be_false
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read an integer value from a DB result set" do
       field = Marten::DB::Field::Int.new("my_field", db_column: "my_field_col", primary_key: true)
@@ -29,6 +41,17 @@ describe Marten::DB::Field::Int do
     end
   end
 
+  describe "#perform_validation" do
+    it "does not add any errors for nil values when the field is auto incremented" do
+      obj = Tag.new(id: nil)
+
+      field = Marten::DB::Field::Int.new("id", primary_key: true, auto: true)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 0
+    end
+  end
+
   describe "#to_column" do
     it "returns the expected column" do
       field = Marten::DB::Field::Int.new("my_field", db_column: "my_field_col")
@@ -36,6 +59,20 @@ describe Marten::DB::Field::Int do
       column.should be_a Marten::DB::Management::Column::Int
       column.name.should eq "my_field_col"
       column.primary_key?.should be_false
+      column.auto?.should be_false
+      column.null?.should be_false
+      column.unique?.should be_false
+      column.index?.should be_false
+      column.default.should be_nil
+    end
+
+    it "returns the expected column for a primary key with auto increment" do
+      field = Marten::DB::Field::Int.new("my_field", primary_key: true, auto: true)
+      column = field.to_column
+      column.should be_a Marten::DB::Management::Column::Int
+      column.name.should eq "my_field"
+      column.primary_key?.should be_true
+      column.auto?.should be_true
       column.null?.should be_false
       column.unique?.should be_false
       column.index?.should be_false

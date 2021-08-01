@@ -3,48 +3,78 @@ require "./spec_helper"
 {% if env("MARTEN_SPEC_DB_CONNECTION").id == "sqlite" || !env("MARTEN_SPEC_DB_CONNECTION") %}
   describe Marten::DB::Management::SchemaEditor::SQLite do
     describe "#column_type_for_built_in_column" do
-      it "returns the expected column types" do
+      it "returns the expected column type for a big int column" do
+        column = Marten::DB::Management::Column::BigInt.new("test")
         schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "integer"
+      end
 
-        expected_mapping = {
-          "Marten::DB::Management::Column::Auto"       => "integer",
-          "Marten::DB::Management::Column::BigAuto"    => "integer",
-          "Marten::DB::Management::Column::BigInt"     => "integer",
-          "Marten::DB::Management::Column::Bool"       => "bool",
-          "Marten::DB::Management::Column::DateTime"   => "datetime",
-          "Marten::DB::Management::Column::ForeignKey" => "integer",
-          "Marten::DB::Management::Column::Int"        => "integer",
-          "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
-          "Marten::DB::Management::Column::Text"       => "text",
-          "Marten::DB::Management::Column::UUID"       => "char(32)",
-        }
+      it "returns the expected column type for a big int column with auto increment" do
+        column = Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true)
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "integer"
+      end
 
-        expected_mapping.each do |column_id, column_type|
-          schema_editor.column_type_for_built_in_column(column_id).should eq column_type
-        end
+      it "returns the expected column type for a bool column" do
+        column = Marten::DB::Management::Column::Bool.new("test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "bool"
+      end
+
+      it "returns the expected column type for a datetime column" do
+        column = Marten::DB::Management::Column::DateTime.new("test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "datetime"
+      end
+
+      it "returns the expected column type for a foreign key column" do
+        column = Marten::DB::Management::Column::ForeignKey.new("test", to_table: "test", to_column: "test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "integer"
+      end
+
+      it "returns the expected column type for an int column" do
+        column = Marten::DB::Management::Column::Int.new("test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "integer"
+      end
+
+      it "returns the expected column type for an int column with auto increment" do
+        column = Marten::DB::Management::Column::Int.new("test", primary_key: true, auto: true)
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "integer"
+      end
+
+      it "returns the expected column type for a string column" do
+        column = Marten::DB::Management::Column::String.new("test", max_size: 155)
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "varchar(%{max_size})"
+      end
+
+      it "returns the expected column type for a text column" do
+        column = Marten::DB::Management::Column::Text.new("test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "text"
+      end
+
+      it "returns the expected column type for a uuid column" do
+        column = Marten::DB::Management::Column::UUID.new("test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "char(32)"
       end
     end
 
     describe "#column_type_suffix_for_built_in_column" do
-      it "returns nil" do
+      it "returns the expected suffix for a big int column with auto increment" do
+        column = Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true)
         schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_suffix_for_built_in_column(column).should eq "AUTOINCREMENT"
+      end
 
-        expected_mapping = {
-          "Marten::DB::Management::Column::Auto"       => "AUTOINCREMENT",
-          "Marten::DB::Management::Column::BigAuto"    => "AUTOINCREMENT",
-          "Marten::DB::Management::Column::BigInt"     => nil,
-          "Marten::DB::Management::Column::Bool"       => nil,
-          "Marten::DB::Management::Column::DateTime"   => nil,
-          "Marten::DB::Management::Column::ForeignKey" => nil,
-          "Marten::DB::Management::Column::Int"        => nil,
-          "Marten::DB::Management::Column::String"     => nil,
-          "Marten::DB::Management::Column::Text"       => nil,
-          "Marten::DB::Management::Column::UUID"       => nil,
-        }
-
-        expected_mapping.each do |column_id, column_suffix|
-          schema_editor.column_type_suffix_for_built_in_column(column_id).should eq column_suffix
-        end
+      it "returns the expected suffix for an int column with auto increment" do
+        column = Marten::DB::Management::Column::Int.new("test", primary_key: true, auto: true)
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_suffix_for_built_in_column(column).should eq "AUTOINCREMENT"
       end
     end
 

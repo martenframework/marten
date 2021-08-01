@@ -7,6 +7,7 @@ module Marten
         def initialize(
           @id : ::String,
           @primary_key = false,
+          @auto = false,
           @default : Int32 | Int64 | Nil = nil,
           @blank = false,
           @null = false,
@@ -17,18 +18,28 @@ module Marten
         )
         end
 
+        # Returns `true` if the field is automatically incremented.
+        def auto?
+          @auto
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
           result_set.read(Int32 | Int64 | Nil).try(&.to_i64)
+        end
+
+        def perform_validation(record : Model)
+          super unless auto?
         end
 
         def to_column : Management::Column::Base?
           Management::Column::BigInt.new(
             db_column!,
-            primary_key?,
-            null?,
-            unique?,
-            index?,
-            to_db(default)
+            primary_key: primary_key?,
+            auto: auto?,
+            null: null?,
+            unique: unique?,
+            index: index?,
+            default: to_db(default)
           )
         end
 

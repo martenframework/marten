@@ -50,7 +50,7 @@ module Marten::DB::Migration::DSL::CreateTableSpec
       table_dsl = Marten::DB::Migration::DSL::CreateTable.new("my_table")
 
       table_dsl.build do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :foo, :int, null: true
         column :bar, :int, null: true
       end
@@ -60,7 +60,7 @@ module Marten::DB::Migration::DSL::CreateTableSpec
       table_dsl = Marten::DB::Migration::DSL::CreateTable.new("my_table")
 
       table_dsl.build do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :foo, :int, null: true
         column :bar, :int, null: true
 

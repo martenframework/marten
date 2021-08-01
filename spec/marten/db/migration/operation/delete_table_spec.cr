@@ -18,7 +18,7 @@ describe Marten::DB::Migration::Operation::DeleteTable do
 
     it "creates the table" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base
@@ -56,7 +56,7 @@ describe Marten::DB::Migration::Operation::DeleteTable do
 
     it "deletes the table" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base
@@ -88,7 +88,7 @@ describe Marten::DB::Migration::Operation::DeleteTable do
   describe "#mutate_state_forward" do
     it "mutates a project state as expected" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base

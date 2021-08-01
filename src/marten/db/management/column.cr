@@ -9,9 +9,6 @@ require "./column/string"
 require "./column/text"
 require "./column/uuid"
 
-require "./column/auto"
-require "./column/big_auto"
-
 require "./column/foreign_key"
 
 module Marten
@@ -35,8 +32,6 @@ module Marten
           add_column_to_registry({{ id }}, {{ klass }})
         end
 
-        register "auto", Auto
-        register "big_auto", BigAuto
         register "big_int", BigInt
         register "bool", Bool
         register "date_time", DateTime

@@ -1,5 +1,5 @@
 class TestUser < Marten::Model
-  field :id, :big_auto, primary_key: true
+  field :id, :big_int, primary_key: true, auto: true
 
   field :username, :string, blank: false, null: false, max_size: 155, unique: true
   field :email, :string, blank: false, null: false, max_size: 254, index: true

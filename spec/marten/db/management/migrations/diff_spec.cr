@@ -9,7 +9,7 @@ describe Marten::DB::Management::Migrations::Diff do
         app_label: "app",
         name: "new_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -34,9 +34,10 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.name.should eq "new_table"
 
       operation.columns.size.should eq 3
-      operation.columns[0].should be_a Marten::DB::Management::Column::BigAuto
+      operation.columns[0].should be_a Marten::DB::Management::Column::BigInt
       operation.columns[0].name.should eq "id"
-      operation.columns[0].as(Marten::DB::Management::Column::BigAuto).primary_key?.should be_true
+      operation.columns[0].as(Marten::DB::Management::Column::BigInt).primary_key?.should be_true
+      operation.columns[0].as(Marten::DB::Management::Column::BigInt).auto?.should be_true
       operation.columns[1].should be_a Marten::DB::Management::Column::BigInt
       operation.columns[1].name.should eq "foo"
       operation.columns[2].should be_a Marten::DB::Management::Column::BigInt
@@ -54,7 +55,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
           ),
@@ -67,7 +68,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("newcol"),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -99,7 +100,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("oldcol"),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -113,7 +114,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
           ),
@@ -143,7 +144,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "old_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
           ),
@@ -156,7 +157,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "new_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
           ),
@@ -186,7 +187,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -201,7 +202,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -236,7 +237,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -253,7 +254,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -285,7 +286,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -302,7 +303,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -340,7 +341,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -355,7 +356,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "renamed_test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -392,7 +393,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -409,7 +410,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "renamed_test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -443,7 +444,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base
@@ -457,7 +458,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -492,7 +493,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -509,7 +510,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base
@@ -540,7 +541,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -557,7 +558,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -595,7 +596,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base
@@ -609,7 +610,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "renamed_test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -646,7 +647,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -663,7 +664,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "renamed_test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("foo"),
               Marten::DB::Management::Column::BigInt.new("bar"),
             ] of Marten::DB::Management::Column::Base
@@ -696,7 +697,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("col", null: false, default: 42),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -710,7 +711,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::BigInt.new("renamed_col", null: false, default: 42),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -741,7 +742,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::ForeignKey.new("other_id", "other_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
@@ -749,7 +750,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "other_app",
             name: "other_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base
           ),
         ]
@@ -783,7 +784,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base
           ),
         ]
@@ -795,7 +796,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "app",
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::ForeignKey.new("other_id", "other_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
@@ -803,7 +804,7 @@ describe Marten::DB::Management::Migrations::Diff do
             app_label: "other_app",
             name: "other_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base
           ),
         ]

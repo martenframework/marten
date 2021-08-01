@@ -6,7 +6,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
       operation = Marten::DB::Migration::Operation::CreateTable.new(
         name: "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -28,7 +28,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
     it "deletes the table" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base
@@ -71,7 +71,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
     it "creates the new table" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base
@@ -106,7 +106,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
   describe "#mutate_state_forward" do
     it "mutates a project state as expected" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base
@@ -133,7 +133,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
     it "properly configure custom indexes into the generated table state" do
       columns = [
-        Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+        Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         Marten::DB::Management::Column::Int.new("foo"),
         Marten::DB::Management::Column::Int.new("bar"),
       ] of Marten::DB::Management::Column::Base
@@ -164,7 +164,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
       operation = Marten::DB::Migration::Operation::CreateTable.new(
         name: "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -176,7 +176,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
         (
           <<-OPERATION
           create_table :operation_test_table do
-            column :id, :big_auto, primary_key: true
+            column :id, :big_int, primary_key: true, auto: true
             column :foo, :int
             column :bar, :int
 
@@ -191,7 +191,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
       operation = Marten::DB::Migration::Operation::CreateTable.new(
         name: "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -203,7 +203,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
         (
           <<-OPERATION
           create_table :operation_test_table do
-            column :id, :big_auto, primary_key: true
+            column :id, :big_int, primary_key: true, auto: true
             column :foo, :int
             column :bar, :int
 

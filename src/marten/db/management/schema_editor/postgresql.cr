@@ -7,11 +7,19 @@ module Marten
         class PostgreSQL < Base
           include Core
 
-          def column_type_for_built_in_column(id)
-            BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
+          def column_type_for_built_in_column(column : Column::Base) : String
+            column_type = BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[column.class.name]
+
+            if column.is_a?(Column::BigInt) && column.auto?
+              column_type = "bigserial"
+            elsif column.is_a?(Column::Int) && column.auto?
+              column_type = "serial"
+            end
+
+            column_type
           end
 
-          def column_type_suffix_for_built_in_column(id)
+          def column_type_suffix_for_built_in_column(column : Column::Base) : String?
             nil
           end
 
@@ -37,8 +45,6 @@ module Marten
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Management::Column::Auto"       => "serial",
-            "Marten::DB::Management::Column::BigAuto"    => "bigserial",
             "Marten::DB::Management::Column::BigInt"     => "bigint",
             "Marten::DB::Management::Column::Bool"       => "boolean",
             "Marten::DB::Management::Column::DateTime"   => "timestamp with time zone",

@@ -37,12 +37,12 @@ module Marten
           #
           # Note that this method is only used when handling column types of Marten built-in types as custom column
           # implementations must define a `#db_type` method.
-          abstract def column_type_for_built_in_column(id)
+          abstract def column_type_for_built_in_column(column : Column::Base) : String
 
           # Returns the database type suffix for a specific built-in column implementation.
           #
           # Note that this method is only used when handling column types of Marten built-in types.
-          abstract def column_type_suffix_for_built_in_column(id)
+          abstract def column_type_suffix_for_built_in_column(column : Column::Base) : String?
 
           # Creates a new table from a migration table state.
           abstract def create_table(table : TableState) : Nil

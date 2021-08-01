@@ -184,7 +184,7 @@ module Marten::DB::Migration::DSLSpec
 
     def run_create_table
       create_table :test_table do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :foo, :int, null: true
         column :bar, :int, null: true
 

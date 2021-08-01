@@ -44,7 +44,7 @@ describe Marten::DB::Management::ProjectState do
         "my_app",
         "my_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )

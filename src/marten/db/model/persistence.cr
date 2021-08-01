@@ -182,8 +182,9 @@ module Marten
 
           values = field_db_values
 
-          if self.class.pk_field.is_a?(Field::AutoTypes)
-            pk_field_to_fetch = self.class.pk_field.db_column!
+          pk_field = self.class.pk_field
+          if (pk_field.is_a?(Field::BigInt) || pk_field.is_a?(Field::Int)) && pk_field.auto?
+            pk_field_to_fetch = pk_field.db_column!
             values.delete(pk_field_to_fetch)
           else
             pk_field_to_fetch = nil

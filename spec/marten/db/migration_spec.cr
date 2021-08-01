@@ -87,7 +87,7 @@ describe Marten::DB::Migration do
         "app",
         "migration_test_table1",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("label", max_size: 255),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -97,7 +97,7 @@ describe Marten::DB::Migration do
         "app",
         "migration_test_table2",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("name", max_size: 255),
           Marten::DB::Management::Column::ForeignKey.new("other_id", "migration_test_table1", "id"),
         ] of Marten::DB::Management::Column::Base,
@@ -128,7 +128,7 @@ describe Marten::DB::Migration do
         "app",
         "migration_test_table1",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("label", max_size: 255),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -138,7 +138,7 @@ describe Marten::DB::Migration do
         "app",
         "migration_test_table2",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("name", max_size: 255),
           Marten::DB::Management::Column::ForeignKey.new("other_id", "migration_test_table1", "id"),
         ] of Marten::DB::Management::Column::Base,
@@ -169,7 +169,7 @@ describe Marten::DB::Migration do
         "app",
         "migration_test_table1",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("label", max_size: 255),
           Marten::DB::Management::Column::Bool.new("published", default: false),
         ] of Marten::DB::Management::Column::Base,
@@ -373,12 +373,12 @@ module Marten::DB::MigrationSpec
   class MigrationToCreateTwoNewTables < Marten::DB::Migration
     def plan
       create_table :migration_test_table1 do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :label, :string, max_size: 255
       end
 
       create_table :migration_test_table2 do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :name, :string, max_size: 255
         column :other_id, :foreign_key, to_table: :migration_test_table1, to_column: :id
       end
@@ -392,7 +392,7 @@ module Marten::DB::MigrationSpec
   class MigrationToCreateOneTableAndToAddAColumn < Marten::DB::Migration
     def plan
       create_table :migration_test_table1 do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :label, :string, max_size: 255
       end
 
@@ -407,12 +407,12 @@ module Marten::DB::MigrationSpec
   class MigrationToCreateTwoNewTablesWithExplicitDirectedOperations < Marten::DB::Migration
     def apply
       create_table :migration_test_table1 do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :label, :string, max_size: 255
       end
 
       create_table :migration_test_table2 do
-        column :id, :big_auto, primary_key: true
+        column :id, :big_int, primary_key: true, auto: true
         column :name, :string, max_size: 255
         column :other_id, :foreign_key, to_table: :migration_test_table1, to_column: :id
       end

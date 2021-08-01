@@ -1,5 +1,3 @@
-require "./field/concerns/**"
-
 require "./field/base"
 require "./field/big_int"
 require "./field/bool"
@@ -8,9 +6,6 @@ require "./field/int"
 require "./field/string"
 require "./field/text"
 require "./field/uuid"
-
-require "./field/auto"
-require "./field/big_auto"
 
 require "./field/many_to_many"
 require "./field/many_to_one"
@@ -63,8 +58,6 @@ module Marten
         add_field_to_registry({{ id }}, {{ klass }})
       end
 
-      register "auto", Auto
-      register "big_auto", BigAuto
       register "big_int", BigInt
       register "bool", Bool
       register "date_time", DateTime
@@ -75,8 +68,6 @@ module Marten
       register "string", String
       register "text", Text
       register "uuid", UUID
-
-      alias AutoTypes = Auto | BigAuto
 
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
         @@registry[id.to_s] = field_klass

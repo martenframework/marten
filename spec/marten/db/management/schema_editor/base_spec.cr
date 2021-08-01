@@ -16,7 +16,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -70,7 +70,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -95,7 +95,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -151,7 +151,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -315,7 +315,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -378,7 +378,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -488,7 +488,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           "my_app",
           "schema_editor_test_table",
           columns: [
-            Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           ] of Marten::DB::Management::Column::Base,
           unique_constraints: [] of Marten::DB::Management::Constraint::Unique
         )
@@ -606,7 +606,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base
@@ -737,7 +737,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -883,7 +883,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo", default: 42),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -975,7 +975,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -1111,7 +1111,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo", index: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1130,7 +1130,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -1150,7 +1150,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -1288,7 +1288,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo", default: 42),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1317,7 +1317,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1367,7 +1367,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1418,7 +1418,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           "my_app",
           "schema_editor_test_table",
           columns: [
-            Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             column,
           ] of Marten::DB::Management::Column::Base,
           unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1466,7 +1466,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -1552,7 +1552,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -1635,7 +1635,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1686,7 +1686,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1743,7 +1743,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -1789,7 +1789,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1842,7 +1842,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "my_app",
         "schema_editor_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo", null: false),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -1863,7 +1863,7 @@ end
 
 module Marten::DB::Management::BaseSpec
   class TestModel < Marten::DB::Model
-    field :id, :big_auto, primary_key: true
+    field :id, :big_int, primary_key: true, auto: true
     field :foo, :int, default: 42
 
     db_table :schema_editor_test_model_table

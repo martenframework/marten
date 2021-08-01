@@ -10,7 +10,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::Int.new("foo"),
               Marten::DB::Management::Column::Int.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -34,7 +34,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::Int.new("foo"),
               Marten::DB::Management::Column::Int.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -58,7 +58,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::Int.new("foo"),
               Marten::DB::Management::Column::Int.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -80,14 +80,14 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table_1",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
           ),
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table_2",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
             ] of Marten::DB::Management::Column::Base,
             unique_constraints: [] of Marten::DB::Management::Constraint::Unique
           ),
@@ -105,7 +105,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "x" * 255,
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::Int.new("foo"),
               Marten::DB::Management::Column::Int.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -129,7 +129,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::Int.new("foo"),
               Marten::DB::Management::Column::Int.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -153,7 +153,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
           Marten::DB::Migration::Operation::CreateTable.new(
             name: "test_table",
             columns: [
-              Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
               Marten::DB::Management::Column::Int.new("foo"),
               Marten::DB::Management::Column::Int.new("bar"),
             ] of Marten::DB::Management::Column::Base,
@@ -172,7 +172,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
 
             def plan
               create_table :test_table do
-                column :id, :big_auto, primary_key: true
+                column :id, :big_int, primary_key: true, auto: true
                 column :foo, :int
                 column :bar, :int
 

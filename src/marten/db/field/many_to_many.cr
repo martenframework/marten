@@ -87,7 +87,7 @@ module Marten
           {% end %}
 
           class ::{{ through_model_name.id }} < Marten::DB::Model
-            field :id, :big_auto, primary_key: true
+            field :id, :big_int, primary_key: true, auto: true
             field(
               :{{ through_model_from_field_id.id }},
               :many_to_one,

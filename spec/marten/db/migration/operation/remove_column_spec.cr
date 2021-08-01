@@ -23,7 +23,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
         "my_app",
         "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -33,7 +33,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
         "my_app",
         "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -109,7 +109,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
         "my_app",
         "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
@@ -120,7 +120,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
         "my_app",
         "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -170,7 +170,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
   describe "#mutate_state_forward" do
     it "mutates a project state as expected" do
       column_to_remove = Marten::DB::Management::Column::Int.new("foo", default: 42)
-      other_column = Marten::DB::Management::Column::BigAuto.new("id", primary_key: true)
+      other_column = Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",

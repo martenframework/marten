@@ -11,7 +11,7 @@ module Marten
 
           db_table :marten_migrations
 
-          field :id, :big_auto, primary_key: true
+          field :id, :big_int, primary_key: true, auto: true
           field :app, :string, max_size: 255
           field :name, :string, max_size: NAME_MAX_SIZE
           field :applied_at, :date_time, auto_now_add: true

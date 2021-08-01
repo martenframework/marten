@@ -97,7 +97,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "my_table",
         [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base
@@ -117,7 +117,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "my_table",
         [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -141,7 +141,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "my_table",
         [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           old_column,
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -183,7 +183,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -207,7 +207,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "operation_test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("test", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
           Marten::DB::Management::Column::BigInt.new("foo"),
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -229,7 +229,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "my_table",
         [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base
@@ -268,7 +268,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "my_table",
         [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,
@@ -289,7 +289,7 @@ describe Marten::DB::Management::TableState do
         "my_app",
         "my_table",
         [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base,

@@ -20,7 +20,7 @@ describe Marten::DB::Management::Migrations::Diff::Dependency::CreatedTable do
       operation = Marten::DB::Migration::Operation::CreateTable.new(
         name: "test_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base
@@ -35,7 +35,7 @@ describe Marten::DB::Management::Migrations::Diff::Dependency::CreatedTable do
       operation = Marten::DB::Migration::Operation::CreateTable.new(
         name: "other_table",
         columns: [
-          Marten::DB::Management::Column::BigAuto.new("id", primary_key: true),
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::Int.new("foo"),
           Marten::DB::Management::Column::Int.new("bar"),
         ] of Marten::DB::Management::Column::Base

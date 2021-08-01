@@ -24,12 +24,18 @@ module Marten
             remake_table_with_changed_column(table, old_column, new_column)
           end
 
-          def column_type_for_built_in_column(id)
-            BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[id]
+          def column_type_for_built_in_column(column : Column::Base) : String
+            BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[column.class.name]
           end
 
-          def column_type_suffix_for_built_in_column(id)
-            BUILT_IN_COLUMN_TO_DB_TYPE_SUFFIX_MAPPING[id]?
+          def column_type_suffix_for_built_in_column(column : Column::Base) : String?
+            column_type_suffix = nil
+
+            if (column.is_a?(Column::BigInt) || column.is_a?(Column::Int)) && column.auto?
+              column_type_suffix = "AUTOINCREMENT"
+            end
+
+            column_type_suffix
           end
 
           def ddl_rollbackable? : Bool
@@ -60,8 +66,6 @@ module Marten
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Management::Column::Auto"       => "integer",
-            "Marten::DB::Management::Column::BigAuto"    => "integer",
             "Marten::DB::Management::Column::BigInt"     => "integer",
             "Marten::DB::Management::Column::Bool"       => "bool",
             "Marten::DB::Management::Column::DateTime"   => "datetime",
@@ -70,11 +74,6 @@ module Marten
             "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
             "Marten::DB::Management::Column::Text"       => "text",
             "Marten::DB::Management::Column::UUID"       => "char(32)",
-          }
-
-          private BUILT_IN_COLUMN_TO_DB_TYPE_SUFFIX_MAPPING = {
-            "Marten::DB::Management::Column::Auto"    => "AUTOINCREMENT",
-            "Marten::DB::Management::Column::BigAuto" => "AUTOINCREMENT",
           }
 
           private def create_index_deferred_statement(

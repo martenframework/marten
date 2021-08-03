@@ -77,16 +77,6 @@ module Marten
           # Renames a specific table.
           abstract def rename_table(table : TableState, new_name : String) : Nil
 
-          # Creates a new table directly from a model class.
-          def create_model(model : Model.class) : Nil
-            create_table(TableState.from_model(model))
-          end
-
-          # Deletes the table of a specific model.
-          def delete_model(model : Model.class) : Nil
-            delete_table(TableState.from_model(model))
-          end
-
           # Deletes the table corresponding to a specific table state.
           def delete_table(table : TableState) : Nil
             delete_table(table.name)
@@ -104,11 +94,10 @@ module Marten
           # initializing a database for the first time in development or when running tests.
           def sync_models : Nil
             table_names = @connection.introspector.table_names
-            Marten.apps.app_configs.each do |app|
-              app.models.each do |model|
-                next if table_names.includes?(model.db_table)
-                create_model(model)
-              end
+            project_state = ProjectState.from_apps(Marten.apps.app_configs)
+            project_state.tables.values.each do |table|
+              next if table_names.includes?(table.name)
+              create_table(table)
             end
           end
 

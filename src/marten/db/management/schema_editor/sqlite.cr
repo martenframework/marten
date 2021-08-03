@@ -66,14 +66,13 @@ module Marten
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Management::Column::BigInt"     => "integer",
-            "Marten::DB::Management::Column::Bool"       => "bool",
-            "Marten::DB::Management::Column::DateTime"   => "datetime",
-            "Marten::DB::Management::Column::ForeignKey" => "integer",
-            "Marten::DB::Management::Column::Int"        => "integer",
-            "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
-            "Marten::DB::Management::Column::Text"       => "text",
-            "Marten::DB::Management::Column::UUID"       => "char(32)",
+            "Marten::DB::Management::Column::BigInt"   => "integer",
+            "Marten::DB::Management::Column::Bool"     => "bool",
+            "Marten::DB::Management::Column::DateTime" => "datetime",
+            "Marten::DB::Management::Column::Int"      => "integer",
+            "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
+            "Marten::DB::Management::Column::Text"     => "text",
+            "Marten::DB::Management::Column::UUID"     => "char(32)",
           }
 
           private def create_index_deferred_statement(

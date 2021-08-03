@@ -23,6 +23,7 @@ module Marten
         def initialize(tables = [] of TableState)
           @tables = {} of String => TableState
           tables.each { |t| @tables[t.as(TableState).id] = t }
+          @tables.values.each { |t| t.contribute_to_project(self) }
         end
 
         # Returns a clone of the current project state.
@@ -31,8 +32,9 @@ module Marten
         end
 
         # Adds a table state to the current project state.
-        def add_table(table : TableState)
+        def add_table(table : TableState) : Nil
           @tables[table.id] = table
+          table.contribute_to_project(self)
         end
 
         # Deletes a table state from the current project state.

@@ -383,11 +383,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
+      new_column = Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id")
+      new_column.contribute_to_project(project_state)
+
       schema_editor.create_table(table_state)
-      schema_editor.add_column(
-        table_state,
-        Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id")
-      )
+      schema_editor.add_column(table_state, new_column)
 
       Marten::DB::Connection.default.open do |db|
         {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
@@ -500,95 +501,6 @@ describe Marten::DB::Management::SchemaEditor::Base do
         schema_editor.deferred_statements.first.params["name"].should be_a Marten::DB::Management::Statement::IndexName
       end
     {% end %}
-  end
-
-  describe "#create_model" do
-    before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_model_table")
-        schema_editor.delete_table("schema_editor_test_model_table")
-      end
-    end
-
-    it "is able to create the table corresponding to a given model" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      schema_editor.create_model(Marten::DB::Management::BaseSpec::TestModel)
-
-      Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-          db.query("SHOW COLUMNS FROM schema_editor_test_model_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_type = rs.read(String)
-              nullable = rs.read(String)
-              key = rs.read(String)
-              default = rs.read(Nil | String)
-
-              if column_name == "foo"
-                column_type.should eq "int(11)"
-                nullable.should eq "NO"
-                key.should be_empty
-                default.should eq "42"
-              elsif column_name == "id"
-                column_type.should eq "bigint(20)"
-                nullable.should eq "NO"
-                key.should eq "PRI"
-                default.should be_nil
-              end
-            end
-          end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_model_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_type = rs.read(String)
-              nullable = rs.read(String)
-              default = rs.read(String)
-
-              if column_name == "foo"
-                column_type.should eq "integer"
-                nullable.should eq "NO"
-                default.should eq "42"
-              elsif column_name == "id"
-                column_type.should eq "bigint"
-                nullable.should eq "NO"
-                default.starts_with?("nextval").should be_true
-              end
-            end
-          end
-        {% else %}
-          db.query("PRAGMA table_info(schema_editor_test_model_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-
-              column_name = rs.read(String)
-              column_type = rs.read(String)
-              not_null = rs.read(Int32 | Int64)
-              default_value = rs.read(Nil | String)
-              primary_key = rs.read(Int32 | Int64)
-
-              if column_name == "foo"
-                column_type.should eq "integer"
-                not_null.should eq 1
-                default_value.should eq "42"
-                primary_key.should eq 0
-              elsif column_name == "id"
-                column_type.should eq "integer"
-                not_null.should eq 1
-                default_value.should be_nil
-                primary_key.should eq 1
-              end
-            end
-          end
-        {% end %}
-      end
-    end
   end
 
   describe "#add_index" do
@@ -1266,15 +1178,6 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
   end
 
-  describe "#delete_model" do
-    it "deletes the table associated with a given model" do
-      Marten::DB::Connection.default.schema_editor.delete_model(Marten::DB::Management::BaseSpec::TestModel)
-      Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_model_table")
-        .should be_false
-      Marten::DB::Connection.default.schema_editor.create_model(Marten::DB::Management::BaseSpec::TestModel)
-    end
-  end
-
   describe "#delete_table" do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
@@ -1362,7 +1265,11 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "removes a foreign key column from a specific table" do
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
+
       column = Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id")
+      column.contribute_to_project(project_state)
+
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
         "schema_editor_test_table",
@@ -1857,19 +1764,6 @@ describe Marten::DB::Management::SchemaEditor::Base do
         Marten::DB::Management::Column::BigInt.new("foo", null: false),
         Marten::DB::Management::Column::BigInt.new("foo", null: true)
       )
-    end
-  end
-end
-
-module Marten::DB::Management::BaseSpec
-  class TestModel < Marten::DB::Model
-    field :id, :big_int, primary_key: true, auto: true
-    field :foo, :int, default: 42
-
-    db_table :schema_editor_test_model_table
-
-    def self.app_config
-      Marten.apps.app_configs.first
     end
   end
 end

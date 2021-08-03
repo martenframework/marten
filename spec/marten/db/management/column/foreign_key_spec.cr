@@ -341,11 +341,14 @@ describe Marten::DB::Management::Column::ForeignKey do
 
   describe "#sql_type" do
     it "returns the expected SQL type" do
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
       column = Marten::DB::Management::Column::ForeignKey.new(
         "test",
-        to_table: "other_table",
-        to_column: "other_column"
+        to_table: TestUser.db_table,
+        to_column: "id"
       )
+      column.contribute_to_project(project_state)
+
       {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
         column.sql_type(Marten::DB::Connection.default).should eq "bigint"
       {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
@@ -358,11 +361,14 @@ describe Marten::DB::Management::Column::ForeignKey do
 
   describe "#sql_type_suffix" do
     it "returns the expected SQL type suffix" do
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
       column = Marten::DB::Management::Column::ForeignKey.new(
         "test",
-        to_table: "other_table",
-        to_column: "other_column"
+        to_table: TestUser.db_table,
+        to_column: "id"
       )
+      column.contribute_to_project(project_state)
+
       column.sql_type_suffix(Marten::DB::Connection.default).should be_nil
     end
   end

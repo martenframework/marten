@@ -92,6 +92,10 @@ module Marten
             @unique
           end
 
+          # :nodoc:
+          def contribute_to_project(project : ProjectState) : Nil
+          end
+
           private def equivalent_to?(other)
             primary_key? == other.primary_key? &&
               null? == other.null? &&

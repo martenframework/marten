@@ -91,6 +91,11 @@ module Marten
         def clone
           TableState.new(@app_label.dup, @name.dup, @columns.clone, @unique_constraints.clone)
         end
+
+        # :nodoc:
+        def contribute_to_project(project : ProjectState) : Nil
+          columns.each { |c| c.contribute_to_project(project) }
+        end
       end
     end
   end

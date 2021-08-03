@@ -19,6 +19,8 @@ describe Marten::DB::Management::SchemaEditor do
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
+      project_state.add_table(table_state)
 
       Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
         schema_editor.create_table(table_state)
@@ -121,7 +123,7 @@ describe Marten::DB::Management::SchemaEditor do
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
-          Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id"),
+          Marten::DB::Management::Column::String.new("foo", max_size: 155),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -144,7 +146,7 @@ describe Marten::DB::Management::SchemaEditor do
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
-          Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id"),
+          Marten::DB::Management::Column::String.new("foo", max_size: 155),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )

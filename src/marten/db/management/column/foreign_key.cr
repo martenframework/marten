@@ -5,6 +5,7 @@ module Marten
         class ForeignKey < Base
           include IsBuiltInColumn
 
+          @target_column : Base? = nil
           @to_table : ::String
           @to_column : ::String
 
@@ -49,6 +50,32 @@ module Marten
             args << %{index: #{@index}} if !index?
             args << %{default: #{default.inspect}} if !default.nil?
             args.join(", ")
+          end
+
+          def sql_type(connection : Connection::Base) : ::String
+            ensured_target_column.sql_type(connection)
+          end
+
+          def sql_type_suffix(connection : Connection::Base) : ::String?
+            ensured_target_column.sql_type_suffix(connection)
+          end
+
+          # :nodoc:
+          def contribute_to_project(project : ProjectState) : Nil
+            target_table = project.tables.values.find { |t| t.name == to_table }.not_nil!
+            @target_column = target_table.get_column(to_column).clone
+
+            if @target_column.is_a?(BigInt)
+              @target_column.as(BigInt).primary_key = false
+              @target_column.as(BigInt).auto = false
+            elsif @target_column.is_a?(Int)
+              @target_column.as(Int).primary_key = false
+              @target_column.as(Int).auto = false
+            end
+          end
+
+          private def ensured_target_column
+            @target_column.not_nil!
           end
         end
       end

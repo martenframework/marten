@@ -5,6 +5,8 @@ module Marten
         class BigInt < Base
           include IsBuiltInColumn
 
+          setter auto
+
           def initialize(
             @name : ::String,
             @primary_key = false,

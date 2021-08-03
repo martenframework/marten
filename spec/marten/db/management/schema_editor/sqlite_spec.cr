@@ -27,12 +27,6 @@ require "./spec_helper"
         schema_editor.column_type_for_built_in_column(column).should eq "datetime"
       end
 
-      it "returns the expected column type for a foreign key column" do
-        column = Marten::DB::Management::Column::ForeignKey.new("test", to_table: "test", to_column: "test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
-        schema_editor.column_type_for_built_in_column(column).should eq "integer"
-      end
-
       it "returns the expected column type for an int column" do
         column = Marten::DB::Management::Column::Int.new("test")
         schema_editor = Marten::DB::Connection.default.schema_editor

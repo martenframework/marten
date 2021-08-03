@@ -41,14 +41,13 @@ module Marten
           end
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
-            "Marten::DB::Management::Column::BigInt"     => "bigint",
-            "Marten::DB::Management::Column::Bool"       => "bool",
-            "Marten::DB::Management::Column::DateTime"   => "datetime(6)",
-            "Marten::DB::Management::Column::ForeignKey" => "bigint",
-            "Marten::DB::Management::Column::Int"        => "integer",
-            "Marten::DB::Management::Column::String"     => "varchar(%{max_size})",
-            "Marten::DB::Management::Column::Text"       => "longtext",
-            "Marten::DB::Management::Column::UUID"       => "char(32)",
+            "Marten::DB::Management::Column::BigInt"   => "bigint",
+            "Marten::DB::Management::Column::Bool"     => "bool",
+            "Marten::DB::Management::Column::DateTime" => "datetime(6)",
+            "Marten::DB::Management::Column::Int"      => "integer",
+            "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
+            "Marten::DB::Management::Column::Text"     => "longtext",
+            "Marten::DB::Management::Column::UUID"     => "char(32)",
           }
 
           private def add_foreign_key_constraint_statement(table : TableState, column : Column::ForeignKey) : String

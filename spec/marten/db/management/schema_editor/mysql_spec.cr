@@ -77,6 +77,8 @@ require "./spec_helper"
       it "generates a deferred statement for foreign key columns" do
         schema_editor = Marten::DB::Connection.default.schema_editor
 
+        project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
+
         table_state = Marten::DB::Management::TableState.new(
           "my_app",
           "schema_editor_test_table",
@@ -86,6 +88,8 @@ require "./spec_helper"
           ] of Marten::DB::Management::Column::Base,
           unique_constraints: [] of Marten::DB::Management::Constraint::Unique
         )
+
+        table_state.contribute_to_project(project_state)
 
         schema_editor.create_table(table_state)
 

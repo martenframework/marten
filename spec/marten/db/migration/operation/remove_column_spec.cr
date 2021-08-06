@@ -50,7 +50,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
       Marten::DB::Connection.default.open do |db|
         last_column_checked = nil
 
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM operation_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -60,7 +60,9 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
               column_type.should eq "int(11)"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type
@@ -76,7 +78,9 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
               column_type.should eq "integer"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(operation_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -87,7 +91,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
               column_type.should eq "integer"
             end
           end
-        {% end %}
+        end
 
         last_column_checked.should eq "foo"
       end
@@ -134,14 +138,16 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM operation_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
               column_name.should eq "id"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -154,7 +160,9 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
               column_name.should eq "id"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(operation_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -162,7 +170,7 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
               column_name.should eq "id"
             end
           end
-        {% end %}
+        end
       end
     end
   end

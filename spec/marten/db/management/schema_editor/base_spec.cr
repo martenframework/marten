@@ -25,7 +25,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo"))
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -34,7 +34,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_type.should eq "int(11)"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type
@@ -49,7 +51,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_type.should eq "integer"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -59,7 +63,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_type.should eq "integer"
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -104,7 +108,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: true))
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -114,7 +118,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               nullable.should eq "YES"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, is_nullable
@@ -129,7 +135,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               nullable.should eq "YES"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -140,7 +148,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               not_null.should eq 0
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -160,7 +168,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: false))
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -170,7 +178,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               nullable.should eq "NO"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, is_nullable
@@ -185,7 +195,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               nullable.should eq "NO"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -196,7 +208,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               not_null.should eq 1
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -216,7 +228,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", primary_key: true))
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -226,7 +238,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               primary_key.should eq "PRI"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
             SELECT a.attname
@@ -239,7 +253,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               rs.read(String).should eq "foo"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -250,7 +266,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               primary_key.should eq 1
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -270,7 +286,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", primary_key: false))
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -280,7 +296,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               primary_key.should be_empty
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
             SELECT a.attname
@@ -293,7 +311,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               rs.read(String).should eq "test"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -304,7 +324,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               primary_key.should eq 0
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -324,7 +344,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", unique: true))
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query(
             <<-SQL
               SELECT
@@ -341,7 +361,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               constraint_type.should eq "UNIQUE"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT con.conname, con.contype
@@ -358,7 +380,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               constraint_type.should eq 'u'
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -367,7 +391,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               unique.should eq 1
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -391,7 +415,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, new_column)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -413,7 +437,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name.should eq "foo"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             "SELECT column_name, data_type FROM information_schema.columns " \
             "WHERE table_name = 'schema_editor_test_table'"
@@ -451,7 +477,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               to_column.should eq "id"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -477,11 +505,11 @@ describe Marten::DB::Management::SchemaEditor::Base do
               to_column.should eq "id"
             end
           end
-        {% end %}
+        end
       end
     end
 
-    {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" || env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+    for_db_backends :mysql, :postgresql do
       it "generates a deferred statement if the column is indexed" do
         schema_editor = Marten::DB::Connection.default.schema_editor
 
@@ -500,7 +528,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         schema_editor.deferred_statements.size.should eq 1
         schema_editor.deferred_statements.first.params["name"].should be_a Marten::DB::Management::Statement::IndexName
       end
-    {% end %}
+    end
   end
 
   describe "#add_index" do
@@ -532,7 +560,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       )
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           index_name = nil
           index_columns = [] of String
 
@@ -558,7 +586,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           index_name.should eq "index_name"
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           index_name = nil
           index_columns = [] of String
 
@@ -592,7 +622,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           index_name.should eq "index_name"
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% else %}
+        end
+
+        for_sqlite do
           index_name = nil
 
           db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
@@ -629,7 +661,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% end %}
+        end
       end
     end
   end
@@ -664,7 +696,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       )
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query(
             <<-SQL
               SELECT
@@ -700,7 +732,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT con.conname, con.contype
@@ -742,7 +776,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -777,7 +813,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% end %}
+        end
       end
     end
   end
@@ -805,7 +841,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -827,7 +863,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               end
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -852,7 +890,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               end
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -876,7 +916,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               end
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -899,7 +939,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query(
             <<-SQL
               SELECT
@@ -935,7 +975,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT con.conname, con.contype
@@ -977,7 +1019,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -1012,7 +1056,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% end %}
+        end
       end
     end
 
@@ -1076,7 +1120,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       end
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           index_name = nil
           index_columns = [] of String
 
@@ -1102,7 +1146,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           index_name.should eq "index_name"
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           index_name = nil
           index_columns = [] of String
 
@@ -1136,7 +1182,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           index_name.should eq "index_name"
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% else %}
+        end
+
+        for_sqlite do
           index_name = nil
 
           db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
@@ -1173,7 +1221,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           end
 
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% end %}
+        end
       end
     end
   end
@@ -1232,14 +1280,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.remove_column(table_state, column)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
               column_name.should eq "id"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -1252,7 +1302,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name.should eq "id"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -1260,7 +1312,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name.should eq "id"
             end
           end
-        {% end %}
+        end
       end
     end
 
@@ -1286,14 +1338,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.remove_column(table_state, column)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
               column_name.should eq "id"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -1306,7 +1360,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name.should eq "id"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -1314,11 +1370,11 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name.should eq "id"
             end
           end
-        {% end %}
+        end
       end
     end
 
-    {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" || env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+    for_db_backends :mysql, :postgresql do
       it "removes deferred statements referencing the removed column" do
         column = Marten::DB::Management::Column::Int.new("foo", default: 42)
         table_state = Marten::DB::Management::TableState.new(
@@ -1356,7 +1412,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         schema_editor.deferred_statements.size.should eq 1
         schema_editor.deferred_statements.first.template.should eq "tpl2"
       end
-    {% end %}
+    end
   end
 
   describe "#remove_index" do
@@ -1391,7 +1447,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       index_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           index_names = [] of String
 
           db.query(
@@ -1405,7 +1461,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               index_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT
@@ -1429,14 +1487,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
               index_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
               index_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       index_names.includes?("index_name").should be_false
@@ -1473,7 +1533,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       constraint_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query(
             <<-SQL
               SELECT
@@ -1487,7 +1547,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               constraint_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT con.conname, con.contype
@@ -1501,7 +1563,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
               constraint_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query(
             <<-SQL
               SELECT
@@ -1521,7 +1585,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               constraint_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       constraint_names.includes?("test_constraint").should be_false
@@ -1556,13 +1620,15 @@ describe Marten::DB::Management::SchemaEditor::Base do
       column_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -1574,14 +1640,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
               column_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       column_names.to_set.should eq ["id", "new_name"].to_set
@@ -1661,13 +1729,15 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.rename_table(table_state, "renamed_schema_editor_test_table")
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM renamed_schema_editor_test_table") do |rs|
             rs.each do
               rs.read(String).should eq "id"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -1679,14 +1749,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
               rs.read(String).should eq "id"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(renamed_schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
               rs.read(String).should eq "id"
             end
           end
-        {% end %}
+        end
       end
     end
 

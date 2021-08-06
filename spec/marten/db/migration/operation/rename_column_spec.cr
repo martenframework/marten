@@ -49,13 +49,15 @@ describe Marten::DB::Migration::Operation::RenameColumn do
       column_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM operation_test_table") do |rs|
             rs.each do
               column_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -67,14 +69,16 @@ describe Marten::DB::Migration::Operation::RenameColumn do
               column_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(operation_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
               column_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       column_names.to_set.should eq ["id", "old_column"].to_set
@@ -122,13 +126,15 @@ describe Marten::DB::Migration::Operation::RenameColumn do
       column_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM operation_test_table") do |rs|
             rs.each do
               column_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT column_name, data_type, is_nullable, column_default
@@ -140,14 +146,16 @@ describe Marten::DB::Migration::Operation::RenameColumn do
               column_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(operation_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
               column_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       column_names.to_set.should eq ["id", "new_column"].to_set

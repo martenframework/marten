@@ -4,19 +4,24 @@ describe Marten::DB::Query::SQL::Predicate::Contains do
   describe "#to_sql" do
     it "returns the expected SQL statement" do
       predicate = Marten::DB::Query::SQL::Predicate::Contains.new(Post.get_field("title"), "foo", "table")
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        predicate.to_sql(Marten::DB::Connection.default).should eq(
-          {"table.title LIKE %s", ["%foo%"]}
-        )
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+
+      for_mysql do
         predicate.to_sql(Marten::DB::Connection.default).should eq(
           {"table.title LIKE BINARY %s", ["%foo%"]}
         )
-      {% else %}
+      end
+
+      for_postgresql do
+        predicate.to_sql(Marten::DB::Connection.default).should eq(
+          {"table.title LIKE %s", ["%foo%"]}
+        )
+      end
+
+      for_sqlite do
         predicate.to_sql(Marten::DB::Connection.default).should eq(
           {"table.title LIKE %s ESCAPE '\\'", ["%foo%"]}
         )
-      {% end %}
+      end
     end
   end
 end

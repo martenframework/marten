@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-{% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+for_mysql do
   describe Marten::DB::Connection::MySQL do
     describe "#quote" do
       it "produces expected quoted strings" do
@@ -30,7 +30,7 @@ require "./spec_helper"
         conn.limit_value(123_456_789).should eq 123_456_789
       end
 
-      it "returns the 2**64 if the passed value is nil" do
+      it "returns 2**64 if the passed value is nil" do
         conn = Marten::DB::Connection.default
         conn.limit_value(nil).should eq 18_446_744_073_709_551_615
       end
@@ -116,4 +116,4 @@ require "./spec_helper"
       end
     end
   end
-{% end %}
+end

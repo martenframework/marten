@@ -33,13 +33,9 @@ describe Marten::DB::Management::Column::Text do
   describe "#sql_type" do
     it "returns the expected SQL type" do
       column = Marten::DB::Management::Column::Text.new("test")
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "text"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "longtext"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "text"
-      {% end %}
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "longtext" }
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "text" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "text" }
     end
   end
 

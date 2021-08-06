@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-{% if env("MARTEN_SPEC_DB_CONNECTION").id == "sqlite" || !env("MARTEN_SPEC_DB_CONNECTION") %}
+for_sqlite do
   describe Marten::DB::Management::SchemaEditor::SQLite do
     describe "#column_type_for_built_in_column" do
       it "returns the expected column type for a big int column" do
@@ -115,4 +115,4 @@ require "./spec_helper"
       end
     end
   end
-{% end %}
+end

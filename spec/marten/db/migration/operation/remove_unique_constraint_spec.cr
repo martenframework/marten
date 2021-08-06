@@ -57,7 +57,7 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
       operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query(
             <<-SQL
               SELECT
@@ -93,7 +93,9 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT con.conname, con.contype
@@ -135,7 +137,9 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA index_list(operation_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -170,7 +174,7 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
           end
 
           constraint_columns.to_set.should eq ["foo", "bar"].to_set
-        {% end %}
+        end
       end
     end
   end
@@ -223,7 +227,7 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
       constraint_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query(
             <<-SQL
               SELECT
@@ -237,7 +241,9 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
               constraint_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT con.conname, con.contype
@@ -251,7 +257,9 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
               constraint_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query(
             <<-SQL
               SELECT
@@ -271,7 +279,7 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
               constraint_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       constraint_names.includes?("test_constraint").should be_false

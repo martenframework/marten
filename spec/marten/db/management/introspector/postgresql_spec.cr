@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-{% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+for_postgresql do
   describe Marten::DB::Management::Introspector::PostgreSQL do
     describe "#foreign_key_constraint_names" do
       it "returns the foreign key constraint names of a specific table" do
@@ -81,4 +81,4 @@ require "./spec_helper"
       end
     end
   end
-{% end %}
+end

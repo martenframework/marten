@@ -34,13 +34,10 @@ describe Marten::DB::Management::Column::DateTime do
   describe "#sql_type" do
     it "returns the expected SQL type" do
       column = Marten::DB::Management::Column::DateTime.new("test")
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "timestamp with time zone"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "datetime(6)"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "datetime"
-      {% end %}
+
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "datetime(6)" }
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "timestamp with time zone" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "datetime" }
     end
   end
 

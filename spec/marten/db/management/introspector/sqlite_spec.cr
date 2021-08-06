@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-{% if env("MARTEN_SPEC_DB_CONNECTION").id == "sqlite" || !env("MARTEN_SPEC_DB_CONNECTION") %}
+for_sqlite do
   describe Marten::DB::Management::Introspector::SQLite do
     describe "foreign_key_constraint_names" do
       it "returns an empty array" do
@@ -74,4 +74,4 @@ require "./spec_helper"
       end
     end
   end
-{% end %}
+end

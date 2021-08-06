@@ -219,24 +219,18 @@ describe Marten::DB::Management::Column::BigInt do
   describe "#sql_type" do
     it "returns the expected SQL type" do
       column = Marten::DB::Management::Column::BigInt.new("test")
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bigint"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bigint"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "integer"
-      {% end %}
+
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "bigint" }
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "bigint" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "integer" }
     end
 
     it "returns the expected SQL type for a column that is auto incremented" do
       column = Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true)
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bigserial"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bigint AUTO_INCREMENT"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "integer"
-      {% end %}
+
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "bigint AUTO_INCREMENT" }
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "bigserial" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "integer" }
     end
   end
 
@@ -248,13 +242,10 @@ describe Marten::DB::Management::Column::BigInt do
 
     it "returns the expected SQL type suffix for a column that is auto incremented" do
       column = Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true)
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type_suffix(Marten::DB::Connection.default).should be_nil
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type_suffix(Marten::DB::Connection.default).should be_nil
-      {% else %}
-        column.sql_type_suffix(Marten::DB::Connection.default).should eq "AUTOINCREMENT"
-      {% end %}
+
+      for_mysql { column.sql_type_suffix(Marten::DB::Connection.default).should be_nil }
+      for_postgresql { column.sql_type_suffix(Marten::DB::Connection.default).should be_nil }
+      for_sqlite { column.sql_type_suffix(Marten::DB::Connection.default).should eq "AUTOINCREMENT" }
     end
   end
 end

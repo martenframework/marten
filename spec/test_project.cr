@@ -15,23 +15,7 @@ Marten.configure :test do |config|
     TestApp,
   ]
 
-  {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-    config.database do |db|
-      db.backend = :postgresql
-      db.name = env_settings["POSTGRESQL_DEFAULT_DB_NAME"].as(String)
-      db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
-      db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
-      db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
-    end
-
-    config.database :other do |db|
-      db.backend = :postgresql
-      db.name = env_settings["POSTGRESQL_OTHER_DB_NAME"].as(String)
-      db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
-      db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
-      db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
-    end
-  {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+  for_mysql do
     config.database do |db|
       db.backend = :mysql
       db.name = env_settings["MYSQL_DEFAULT_DB_NAME"].as(String)
@@ -47,7 +31,27 @@ Marten.configure :test do |config|
       db.password = env_settings["MYSQL_DB_PASSWORD"].as(String)
       db.host = env_settings["MYSQL_DB_HOST"].as(String)
     end
-  {% else %}
+  end
+
+  for_postgresql do
+    config.database do |db|
+      db.backend = :postgresql
+      db.name = env_settings["POSTGRESQL_DEFAULT_DB_NAME"].as(String)
+      db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
+      db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
+      db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
+    end
+
+    config.database :other do |db|
+      db.backend = :postgresql
+      db.name = env_settings["POSTGRESQL_OTHER_DB_NAME"].as(String)
+      db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
+      db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
+      db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
+    end
+  end
+
+  for_sqlite do
     config.database do |db|
       db.backend = :sqlite
       db.name = ":memory:"
@@ -57,7 +61,7 @@ Marten.configure :test do |config|
       db.backend = :sqlite
       db.name = ":memory:"
     end
-  {% end %}
+  end
 
   config.templates.app_dirs = true
   config.templates.dirs = [

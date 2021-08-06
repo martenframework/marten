@@ -60,17 +60,23 @@ describe Marten::DB::Field::DateTime do
       field = Marten::DB::Field::DateTime.new("my_field")
 
       Marten::DB::Connection.default.open do |db|
-        db.query(
-          {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" || env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-            "SELECT now()"
-          {% else %}
-            "SELECT '2017-09-28 02:57:14.839000'"
-          {% end %}
-        ) do |rs|
-          rs.each do
-            value = field.from_db_result_set(rs)
-            value.should be_a Time
-            value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+        for_db_backends :mysql, :postgresql do
+          db.query("SELECT now()") do |rs|
+            rs.each do
+              value = field.from_db_result_set(rs)
+              value.should be_a Time
+              value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+            end
+          end
+        end
+
+        for_sqlite do
+          db.query("SELECT '2017-09-28 02:57:14.839000'") do |rs|
+            rs.each do
+              value = field.from_db_result_set(rs)
+              value.should be_a Time
+              value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+            end
           end
         end
       end

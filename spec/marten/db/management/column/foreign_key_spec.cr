@@ -349,13 +349,9 @@ describe Marten::DB::Management::Column::ForeignKey do
       )
       column.contribute_to_project(project_state)
 
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bigint"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bigint"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "integer"
-      {% end %}
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "bigint" }
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "bigint" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "integer" }
     end
   end
 

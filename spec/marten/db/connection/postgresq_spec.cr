@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-{% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+for_postgresql do
   describe Marten::DB::Connection::PostgreSQL do
     describe "#quote" do
       it "produces expected quoted strings" do
@@ -136,4 +136,4 @@ require "./spec_helper"
       end
     end
   end
-{% end %}
+end

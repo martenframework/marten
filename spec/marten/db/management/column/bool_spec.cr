@@ -33,13 +33,9 @@ describe Marten::DB::Management::Column::Bool do
   describe "#sql_type" do
     it "returns the expected SQL type" do
       column = Marten::DB::Management::Column::Bool.new("test")
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "boolean"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bool"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "bool"
-      {% end %}
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "boolean" }
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "bool" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "bool" }
     end
   end
 

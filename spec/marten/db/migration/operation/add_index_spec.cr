@@ -64,7 +64,7 @@ describe Marten::DB::Migration::Operation::AddIndex do
       index_names = [] of String
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           index_names = [] of String
 
           db.query(
@@ -78,7 +78,9 @@ describe Marten::DB::Migration::Operation::AddIndex do
               index_names << rs.read(String)
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             <<-SQL
               SELECT
@@ -102,14 +104,16 @@ describe Marten::DB::Migration::Operation::AddIndex do
               index_names << rs.read(String)
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA index_list(operation_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
               index_names << rs.read(String)
             end
           end
-        {% end %}
+        end
       end
 
       index_names.includes?("test_index").should be_false
@@ -161,7 +165,7 @@ describe Marten::DB::Migration::Operation::AddIndex do
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           index_name = nil
           index_columns = [] of String
 
@@ -187,7 +191,9 @@ describe Marten::DB::Migration::Operation::AddIndex do
 
           index_name.should eq "test_index"
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           index_name = nil
           index_columns = [] of String
 
@@ -221,7 +227,9 @@ describe Marten::DB::Migration::Operation::AddIndex do
 
           index_name.should eq "test_index"
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% else %}
+        end
+
+        for_sqlite do
           index_name = nil
 
           db.query("PRAGMA index_list(operation_test_table)") do |rs|
@@ -258,7 +266,7 @@ describe Marten::DB::Migration::Operation::AddIndex do
           end
 
           index_columns.to_set.should eq ["foo", "bar"].to_set
-        {% end %}
+        end
       end
     end
   end

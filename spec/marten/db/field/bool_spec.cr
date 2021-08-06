@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::DB::Field::Bool do
   describe "#from_db_result_set" do
-    {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" || env("MARTEN_SPEC_DB_CONNECTION") == "mysql" %}
+    for_db_backends :mysql, :postgresql do
       it "is able to read a true boolean value from a DB result set" do
         field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")
 
@@ -26,7 +26,7 @@ describe Marten::DB::Field::Bool do
           end
         end
       end
-    {% end %}
+    end
 
     it "assumes that \"true\" is truthy" do
       field = Marten::DB::Field::Bool.new("my_field", db_column: "my_field_col")

@@ -27,7 +27,7 @@ describe Marten::DB::Management::SchemaEditor do
       end
 
       Marten::DB::Connection.default.open do |db|
-        {% if env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+        for_mysql do
           db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -49,7 +49,9 @@ describe Marten::DB::Management::SchemaEditor do
               column_name.should eq "foo"
             end
           end
-        {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
+        end
+
+        for_postgresql do
           db.query(
             "SELECT column_name, data_type FROM information_schema.columns " \
             "WHERE table_name = 'schema_editor_test_table'"
@@ -87,7 +89,9 @@ describe Marten::DB::Management::SchemaEditor do
               to_column.should eq "id"
             end
           end
-        {% else %}
+        end
+
+        for_sqlite do
           db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
             rs.each do
               rs.read(Int32 | Int64)
@@ -113,7 +117,7 @@ describe Marten::DB::Management::SchemaEditor do
               to_column.should eq "id"
             end
           end
-        {% end %}
+        end
       end
     end
 

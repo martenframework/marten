@@ -33,13 +33,9 @@ describe Marten::DB::Management::Column::UUID do
   describe "#sql_type" do
     it "returns the expected SQL type" do
       column = Marten::DB::Management::Column::UUID.new("test")
-      {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "uuid"
-      {% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
-        column.sql_type(Marten::DB::Connection.default).should eq "char(32)"
-      {% else %}
-        column.sql_type(Marten::DB::Connection.default).should eq "char(32)"
-      {% end %}
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "char(32)" }
+      for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "uuid" }
+      for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "char(32)" }
     end
   end
 

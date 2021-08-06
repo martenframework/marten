@@ -1814,7 +1814,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       end
     end
 
-    it "can perform a column alteration that does not involve a type change" do
+    it "can perform a column alteration that simply sets a column as nullable" do
       schema_editor = Marten::DB::Connection.default.schema_editor
 
       table_state = Marten::DB::Management::TableState.new(
@@ -1836,6 +1836,52 @@ describe Marten::DB::Management::SchemaEditor::Base do
         Marten::DB::Management::Column::BigInt.new("foo", null: false),
         Marten::DB::Management::Column::BigInt.new("foo", null: true)
       )
+
+      is_nullable = nil
+
+      Marten::DB::Connection.default.open do |db|
+        for_mysql do
+          db.query(
+            <<-SQL
+              SELECT is_nullable
+              FROM information_schema.columns
+              WHERE table_name = 'schema_editor_test_table' AND column_name = 'foo'
+            SQL
+          ) do |rs|
+            rs.each do
+              is_nullable = (rs.read(String) == "YES")
+            end
+          end
+        end
+
+        for_postgresql do
+          db.query(
+            <<-SQL
+            SELECT is_nullable
+            FROM information_schema.columns
+            WHERE table_name = 'schema_editor_test_table' AND column_name = 'foo'
+            SQL
+          ) do |rs|
+            rs.each do
+              is_nullable = (rs.read(String) == "YES")
+            end
+          end
+        end
+
+        for_sqlite do
+          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              column_name = rs.read(String)
+              next unless column_name == "foo"
+              rs.read(String)
+              is_nullable = (rs.read(Int32) == 0)
+            end
+          end
+        end
+      end
+
+      is_nullable.should be_true
     end
   end
 end

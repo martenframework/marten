@@ -74,6 +74,8 @@ module Marten
             end
           end
 
+          protected setter target_column
+
           private def ensured_target_column
             @target_column.not_nil!
           end

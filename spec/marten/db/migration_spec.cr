@@ -255,42 +255,9 @@ describe Marten::DB::Migration do
 
       Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
 
-      column_names = [] of String
-
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM migration_test_table1") do |rs|
-            rs.each do
-              column_names << rs.read(String)
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'migration_test_table1'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_names << rs.read(String)
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(migration_test_table1)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_names << rs.read(String)
-            end
-          end
-        end
-      end
-
-      column_names.to_set.should eq ["id", "label", "published"].to_set
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details("migration_test_table1")
+      columns_details.map(&.name).sort!.should eq ["id", "label", "published"]
     end
   end
 

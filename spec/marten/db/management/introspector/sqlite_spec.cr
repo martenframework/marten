@@ -2,6 +2,53 @@ require "./spec_helper"
 
 for_sqlite do
   describe Marten::DB::Management::Introspector::SQLite do
+    describe "#columns_info" do
+      before_each do
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        if Marten::DB::Connection.default.introspector.table_names.includes?("schema_introspector_test_table")
+          schema_editor.delete_table("schema_introspector_test_table")
+        end
+      end
+
+      it "returns the details of the columns of a specific table" do
+        schema_editor = Marten::DB::Connection.default.schema_editor
+
+        table_state = Marten::DB::Management::TableState.new(
+          "my_app",
+          "schema_introspector_test_table",
+          columns: [
+            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            Marten::DB::Management::Column::BigInt.new("foo", null: true),
+            Marten::DB::Management::Column::String.new("bar", max_size: 155, null: false, default: "hello"),
+          ] of Marten::DB::Management::Column::Base
+        )
+
+        schema_editor.create_table(table_state)
+
+        introspector = Marten::DB::Connection.default.introspector
+
+        columns_details = introspector.columns_details(table_state.name)
+        columns_details.sort_by!(&.name)
+
+        columns_details.size.should eq 3
+
+        columns_details[0].name.should eq "bar"
+        columns_details[0].type.should eq "varchar(155)"
+        columns_details[0].nullable?.should be_false
+        columns_details[0].default.should eq "'hello'"
+
+        columns_details[1].name.should eq "foo"
+        columns_details[1].type.should eq "integer"
+        columns_details[1].nullable?.should be_true
+        columns_details[1].default.should be_nil
+
+        columns_details[2].name.should eq "id"
+        columns_details[2].type.should eq "integer"
+        columns_details[2].nullable?.should be_false
+        columns_details[2].default.should be_nil
+      end
+    end
+
     describe "foreign_key_constraint_names" do
       it "returns an empty array" do
         introspector = Marten::DB::Connection.default.introspector

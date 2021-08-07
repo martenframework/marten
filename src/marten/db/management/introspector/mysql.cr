@@ -7,6 +7,35 @@ module Marten
         class MySQL < Base
           include Core
 
+          def columns_details(table_name : String) : Array(ColumnInfo)
+            results = [] of ColumnInfo
+
+            @connection.open do |db|
+              db.query(
+                build_sql do |s|
+                  s << "SELECT column_name, data_type, is_nullable, column_default"
+                  s << "FROM information_schema.columns"
+                  s << "WHERE table_name = '#{table_name}' AND table_schema = DATABASE()"
+                end
+              ) do |rs|
+                rs.each do
+                  column_name = rs.read(String)
+                  type = rs.read(String)
+                  is_nullable = (rs.read(String) == "YES")
+                  column_default = rs.read(::DB::Any)
+                  results << ColumnInfo.new(
+                    name: column_name,
+                    type: type,
+                    nullable: is_nullable,
+                    default: column_default
+                  )
+                end
+              end
+            end
+
+            results
+          end
+
           def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
             names = [] of String
 

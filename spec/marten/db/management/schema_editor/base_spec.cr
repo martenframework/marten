@@ -24,47 +24,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo"))
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              column_type = rs.read(String)
-              column_type.should eq "int(11)"
-            end
-          end
-        end
+      introspector = Marten::DB::Connection.default.introspector
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              column_type = rs.read(String)
-              column_type.should eq "integer"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              column_type = rs.read(String)
-              column_type.should eq "integer"
-            end
-          end
-        end
-      end
+      for_mysql { db_column.type.should eq "int" }
+      for_postgresql { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.should eq "integer" }
     end
 
     it "can add a column with a default value to an existing table" do
@@ -107,49 +72,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: true))
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              rs.read(String)
-              nullable = rs.read(String)
-              nullable.should eq "YES"
-            end
-          end
-        end
+      introspector = Marten::DB::Connection.default.introspector
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, is_nullable
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              nullable = rs.read(String)
-              nullable.should eq "YES"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              rs.read(String)
-              not_null = rs.read(Int32)
-              not_null.should eq 0
-            end
-          end
-        end
-      end
+      db_column.nullable?.should be_true
     end
 
     it "can add a non-nullable column to an existing table" do
@@ -167,49 +93,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: false))
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              rs.read(String)
-              nullable = rs.read(String)
-              nullable.should eq "NO"
-            end
-          end
-        end
+      introspector = Marten::DB::Connection.default.introspector
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, is_nullable
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              nullable = rs.read(String)
-              nullable.should eq "NO"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              rs.read(String)
-              not_null = rs.read(Int32)
-              not_null.should eq 1
-            end
-          end
-        end
-      end
+      db_column.nullable?.should be_false
     end
 
     it "can add a primary key column to an existing table" do
@@ -840,83 +727,44 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor = Marten::DB::Connection.default.schema_editor
       schema_editor.create_table(table_state)
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_type = rs.read(String)
-              nullable = rs.read(String)
-              key = rs.read(String)
-              default = rs.read(Nil | String)
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details(table_state.name)
+      columns_details.sort_by!(&.name)
 
-              if column_name == "foo"
-                column_type.should eq "int(11)"
-                nullable.should eq "NO"
-                key.should be_empty
-                default.should eq "42"
-              elsif column_name == "id"
-                column_type.should eq "bigint(20)"
-                nullable.should eq "NO"
-                key.should eq "PRI"
-                default.should be_nil
-              end
-            end
-          end
-        end
+      for_mysql do
+        columns_details[0].name.should eq "foo"
+        columns_details[0].type.should eq "int"
+        columns_details[0].nullable?.should be_false
+        columns_details[0].default.should eq "42"
 
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_type = rs.read(String)
-              nullable = rs.read(String)
-              default = rs.read(String)
+        columns_details[1].name.should eq "id"
+        columns_details[1].type.should eq "bigint"
+        columns_details[1].nullable?.should be_false
+        columns_details[1].default.should be_nil
+      end
 
-              if column_name == "foo"
-                column_type.should eq "integer"
-                nullable.should eq "NO"
-                default.should eq "42"
-              elsif column_name == "id"
-                column_type.should eq "bigint"
-                nullable.should eq "NO"
-                default.starts_with?("nextval").should be_true
-              end
-            end
-          end
-        end
+      for_postgresql do
+        columns_details[0].name.should eq "foo"
+        columns_details[0].type.should eq "integer"
+        columns_details[0].nullable?.should be_false
+        columns_details[0].default.should eq "42"
 
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
+        columns_details[1].name.should eq "id"
+        columns_details[1].type.should eq "bigint"
+        columns_details[1].nullable?.should be_false
+        columns_details[1].default.should eq "nextval('schema_editor_test_table_id_seq1'::regclass)"
+      end
 
-              column_name = rs.read(String)
-              column_type = rs.read(String)
-              not_null = rs.read(Int32 | Int64)
-              default_value = rs.read(Nil | String)
-              primary_key = rs.read(Int32 | Int64)
+      for_sqlite do
+        columns_details[0].name.should eq "foo"
+        columns_details[0].type.should eq "integer"
+        columns_details[0].nullable?.should be_false
+        columns_details[0].default.should eq "42"
 
-              if column_name == "foo"
-                column_type.should eq "integer"
-                not_null.should eq 1
-                default_value.should eq "42"
-                primary_key.should eq 0
-              elsif column_name == "id"
-                column_type.should eq "integer"
-                not_null.should eq 1
-                default_value.should be_nil
-                primary_key.should eq 1
-              end
-            end
-          end
-        end
+        columns_details[1].name.should eq "id"
+        columns_details[1].type.should eq "integer"
+        columns_details[1].nullable?.should be_false
+        columns_details[1].default.should be_nil
       end
     end
 
@@ -1279,41 +1127,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.remove_column(table_state, column)
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-      end
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details(table_state.name)
+      columns_details.map(&.name).should eq ["id"]
     end
 
     it "removes a foreign key column from a specific table" do
@@ -1337,41 +1153,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.remove_column(table_state, column)
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-      end
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details(table_state.name)
+      columns_details.map(&.name).should eq ["id"]
     end
 
     for_db_backends :mysql, :postgresql do
@@ -1617,42 +1401,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.rename_column(table_state, column, "new_name")
 
-      column_names = [] of String
-
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
-            rs.each do
-              column_names << rs.read(String)
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_names << rs.read(String)
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_names << rs.read(String)
-            end
-          end
-        end
-      end
-
-      column_names.to_set.should eq ["id", "new_name"].to_set
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details(table_state.name)
+      columns_details.map(&.name).sort!.should eq ["id", "new_name"]
     end
 
     it "mutates deferred deferred statements referencing the renamed column" do
@@ -1728,38 +1479,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.rename_table(table_state, "renamed_schema_editor_test_table")
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM renamed_schema_editor_test_table") do |rs|
-            rs.each do
-              rs.read(String).should eq "id"
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'renamed_schema_editor_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              rs.read(String).should eq "id"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(renamed_schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              rs.read(String).should eq "id"
-            end
-          end
-        end
-      end
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details("renamed_schema_editor_test_table")
+      columns_details.map(&.name).should eq ["id"]
     end
 
     it "mutates deferred deferred statements referencing the renamed table" do
@@ -1837,51 +1559,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
         Marten::DB::Management::Column::BigInt.new("foo", null: true)
       )
 
-      is_nullable = nil
+      introspector = Marten::DB::Connection.default.introspector
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query(
-            <<-SQL
-              SELECT is_nullable
-              FROM information_schema.columns
-              WHERE table_name = 'schema_editor_test_table' AND column_name = 'foo'
-            SQL
-          ) do |rs|
-            rs.each do
-              is_nullable = (rs.read(String) == "YES")
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-            SELECT is_nullable
-            FROM information_schema.columns
-            WHERE table_name = 'schema_editor_test_table' AND column_name = 'foo'
-            SQL
-          ) do |rs|
-            rs.each do
-              is_nullable = (rs.read(String) == "YES")
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              next unless column_name == "foo"
-              rs.read(String)
-              is_nullable = (rs.read(Int32) == 0)
-            end
-          end
-        end
-      end
-
-      is_nullable.should be_true
+      db_column.nullable?.should be_true
     end
   end
 end

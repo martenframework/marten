@@ -10,6 +10,9 @@ module Marten
           def initialize(@connection : Connection::Base)
           end
 
+          # Returns the details of the columns of a specific table.
+          abstract def columns_details(table_name : String) : Array(ColumnInfo)
+
           # Returns an array of all the foreign key constraints of a specific table and column.
           abstract def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
 

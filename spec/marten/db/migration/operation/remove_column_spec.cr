@@ -47,54 +47,12 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
 
       operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
 
-      Marten::DB::Connection.default.open do |db|
-        last_column_checked = nil
+      introspector = Marten::DB::Connection.default.introspector
+      db_column = introspector.columns_details(to_table_state.name).find { |c| c.name == "foo" }.not_nil!
 
-        for_mysql do
-          db.query("SHOW COLUMNS FROM operation_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              last_column_checked = column_name
-              next unless column_name == "foo"
-              column_type = rs.read(String)
-              column_type.should eq "int(11)"
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type
-              FROM information_schema.columns
-              WHERE table_name = 'operation_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              last_column_checked = column_name
-              next unless column_name == "foo"
-              column_type = rs.read(String)
-              column_type.should eq "integer"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(operation_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              last_column_checked = column_name
-              next unless column_name == "foo"
-              column_type = rs.read(String)
-              column_type.should eq "integer"
-            end
-          end
-        end
-
-        last_column_checked.should eq "foo"
-      end
+      for_mysql { db_column.type.should eq "int" }
+      for_postgresql { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.should eq "integer" }
     end
   end
 
@@ -137,41 +95,9 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
 
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
-      Marten::DB::Connection.default.open do |db|
-        for_mysql do
-          db.query("SHOW COLUMNS FROM operation_test_table") do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-
-        for_postgresql do
-          db.query(
-            <<-SQL
-              SELECT column_name, data_type, is_nullable, column_default
-              FROM information_schema.columns
-              WHERE table_name = 'operation_test_table'
-            SQL
-          ) do |rs|
-            rs.each do
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-
-        for_sqlite do
-          db.query("PRAGMA table_info(operation_test_table)") do |rs|
-            rs.each do
-              rs.read(Int32 | Int64)
-              column_name = rs.read(String)
-              column_name.should eq "id"
-            end
-          end
-        end
-      end
+      introspector = Marten::DB::Connection.default.introspector
+      columns_details = introspector.columns_details(to_table_state.name)
+      columns_details.map(&.name).sort!.should eq ["id"]
     end
   end
 

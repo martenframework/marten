@@ -7,6 +7,30 @@ module Marten
         class SQLite < Base
           include Core
 
+          def columns_details(table_name : String) : Array(ColumnInfo)
+            results = [] of ColumnInfo
+
+            @connection.open do |db|
+              db.query("PRAGMA table_info(#{table_name})") do |rs|
+                rs.each do
+                  rs.read(::DB::Any) # column index
+                  column_name = rs.read(String)
+                  type = rs.read(String)
+                  is_nullable = (rs.read(Int64) == 0)
+                  column_default = rs.read(::DB::Any)
+                  results << ColumnInfo.new(
+                    name: column_name,
+                    type: type,
+                    nullable: is_nullable,
+                    default: column_default
+                  )
+                end
+              end
+            end
+
+            results
+          end
+
           def foreign_key_constraint_names(table_name : String, column_name : String) : Array(String)
             [] of String
           end

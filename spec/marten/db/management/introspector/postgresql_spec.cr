@@ -45,7 +45,7 @@ for_postgresql do
         columns_details[2].name.should eq "id"
         columns_details[2].type.should eq "bigint"
         columns_details[2].nullable?.should be_false
-        columns_details[2].default.should eq "nextval('schema_introspector_test_table_id_seq'::regclass)"
+        columns_details[2].default.to_s.starts_with?("nextval").should be_true
       end
     end
 

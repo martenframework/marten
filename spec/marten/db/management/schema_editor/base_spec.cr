@@ -752,7 +752,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         columns_details[1].name.should eq "id"
         columns_details[1].type.should eq "bigint"
         columns_details[1].nullable?.should be_false
-        columns_details[1].default.should eq "nextval('schema_editor_test_table_id_seq1'::regclass)"
+        columns_details[1].default.to_s.starts_with?("nextval").should be_true
       end
 
       for_sqlite do

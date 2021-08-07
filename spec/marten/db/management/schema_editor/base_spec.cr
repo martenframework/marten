@@ -1537,7 +1537,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can perform a column alteration that simply sets a column as nullable" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -1559,10 +1561,113 @@ describe Marten::DB::Management::SchemaEditor::Base do
         Marten::DB::Management::Column::BigInt.new("foo", null: true)
       )
 
-      introspector = Marten::DB::Connection.default.introspector
       db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
       db_column.nullable?.should be_true
+    end
+
+    it "can perform a column alteration that simply sets a column as nullable when there are existing records" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo", null: false),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open do |db|
+        db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (42)")
+      end
+
+      schema_editor.change_column(
+        project_state,
+        table_state,
+        Marten::DB::Management::Column::BigInt.new("foo", null: false),
+        Marten::DB::Management::Column::BigInt.new("foo", null: true)
+      )
+
+      introspector = connection.introspector
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+
+      db_column.nullable?.should be_true
+    end
+
+    it "can perform a column alteration that simply sets a column as not nullable" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo", null: true),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(
+        project_state,
+        table_state,
+        Marten::DB::Management::Column::BigInt.new("foo", null: true),
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+
+      db_column.nullable?.should be_false
+    end
+
+    it "can perform a column alteration that simply sets a column as not nullable when there are existing records" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo", null: true),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open do |db|
+        db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (NULL)")
+      end
+
+      schema_editor.change_column(
+        project_state,
+        table_state,
+        Marten::DB::Management::Column::BigInt.new("foo", null: true),
+        Marten::DB::Management::Column::BigInt.new("foo", null: false, default: 42)
+      )
+
+      introspector = connection.introspector
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+
+      db_column.nullable?.should be_false
+
+      connection.open do |db|
+        db.scalar("SELECT foo FROM schema_editor_test_table").should eq 42
+      end
     end
   end
 end

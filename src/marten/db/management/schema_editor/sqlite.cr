@@ -146,7 +146,7 @@ module Marten
           end
 
           private def remake_table_with_changed_column(table, old_column, new_column)
-            with_remade_table(table) do |remade_table, _column_names_mapping|
+            with_remade_table(table) do |remade_table, column_names_mapping|
               # If the new column is a primary key, remove the primary key constraint from the the old primary key
               # column.
               if new_column.primary_key?
@@ -158,6 +158,13 @@ module Marten
 
               remade_table.remove_column(old_column)
               remade_table.add_column(new_column)
+
+              # Enforces new default value (in case the column became not nullable).
+              unless new_column.default.nil?
+                column_names_mapping[new_column.name] = (
+                  "coalesce(#{quote(new_column.name)}, #{new_column.sql_quoted_default_value(@connection)})"
+                )
+              end
             end
           end
 
@@ -209,7 +216,7 @@ module Marten
                 build_sql do |s|
                   s << "INSERT INTO #{remade_table.name}"
                   s << "(#{column_names_mapping.keys.join(", ") { |name| quote(name) }})"
-                  s << "SELECT #{column_names_mapping.values.join(", ") { |name| quote(name) }}"
+                  s << "SELECT #{column_names_mapping.values.join(", ")}"
                   s << "FROM #{table.name}"
                 end
               )

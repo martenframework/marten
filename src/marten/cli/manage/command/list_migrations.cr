@@ -21,6 +21,11 @@ module Marten
           end
 
           private def list_migrations(reader, app_configs)
+            if app_configs.empty?
+              print("No migrations")
+              return
+            end
+
             app_configs.each do |app_config|
               print(style("[#{app_config.label}]", fore: :green))
 

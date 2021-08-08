@@ -13,7 +13,7 @@ module Marten
             @connection.open do |db|
               db.query(
                 build_sql do |s|
-                  s << "SELECT column_name, data_type, is_nullable, column_default"
+                  s << "SELECT column_name, data_type, is_nullable, column_default, character_maximum_length"
                   s << "FROM information_schema.columns"
                   s << "WHERE table_name = '#{table_name}' AND table_schema = DATABASE()"
                 end
@@ -23,11 +23,13 @@ module Marten
                   type = rs.read(String)
                   is_nullable = (rs.read(String) == "YES")
                   column_default = rs.read(::DB::Any)
+                  character_maximum_length = rs.read(Int32 | Int64 | Nil)
                   results << ColumnInfo.new(
                     name: column_name,
                     type: type,
                     nullable: is_nullable,
-                    default: column_default
+                    default: column_default,
+                    character_maximum_length: character_maximum_length
                   )
                 end
               end

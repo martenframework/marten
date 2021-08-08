@@ -36,16 +36,19 @@ for_postgresql do
         columns_details[0].type.should eq "character varying"
         columns_details[0].nullable?.should be_false
         columns_details[0].default.should eq "'hello'::character varying"
+        columns_details[0].character_maximum_length.should eq 155
 
         columns_details[1].name.should eq "foo"
         columns_details[1].type.should eq "bigint"
         columns_details[1].nullable?.should be_true
         columns_details[1].default.should be_nil
+        columns_details[1].character_maximum_length.should be_nil
 
         columns_details[2].name.should eq "id"
         columns_details[2].type.should eq "bigint"
         columns_details[2].nullable?.should be_false
         columns_details[2].default.to_s.starts_with?("nextval").should be_true
+        columns_details[2].character_maximum_length.should be_nil
       end
     end
 

@@ -51,6 +51,24 @@ describe Marten::DB::Migration::DSL do
     end
   end
 
+  describe "#change_column" do
+    it "allows to initialize a ChangeColumn operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_change_column
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::ChangeColumn
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::ChangeColumn)
+      operation.table_name.should eq "test_table"
+      operation.column.should be_a Marten::DB::Management::Column::String
+
+      column = operation.column.as(Marten::DB::Management::Column::String)
+      column.name.should eq "test_column"
+      column.max_size.should eq 155
+      column.null?.should be_true
+    end
+  end
+
   describe "#create_table" do
     it "allows to initialize a CreateTable operation" do
       test = Marten::DB::Migration::DSLSpec::Test.new
@@ -180,6 +198,10 @@ module Marten::DB::Migration::DSLSpec
 
     def run_add_unique_constraint
       add_unique_constraint :test_table, :test_constraint, [:foo, :bar]
+    end
+
+    def run_change_column
+      change_column :test_table, :test_column, :string, max_size: 155, null: true
     end
 
     def run_create_table

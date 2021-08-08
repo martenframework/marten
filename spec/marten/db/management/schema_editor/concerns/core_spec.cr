@@ -1541,12 +1541,15 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor = connection.schema_editor
       introspector = connection.introspector
 
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
+
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          Marten::DB::Management::Column::BigInt.new("foo", null: false),
+          old_column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -1554,12 +1557,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.create_table(table_state)
 
-      schema_editor.change_column(
-        project_state,
-        table_state,
-        Marten::DB::Management::Column::BigInt.new("foo", null: false),
-        Marten::DB::Management::Column::BigInt.new("foo", null: true)
-      )
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
 
       db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
@@ -1571,12 +1569,15 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor = connection.schema_editor
       introspector = connection.introspector
 
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
+
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          Marten::DB::Management::Column::BigInt.new("foo", null: false),
+          old_column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -1588,12 +1589,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (42)")
       end
 
-      schema_editor.change_column(
-        project_state,
-        table_state,
-        Marten::DB::Management::Column::BigInt.new("foo", null: false),
-        Marten::DB::Management::Column::BigInt.new("foo", null: true)
-      )
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
 
       db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
@@ -1605,12 +1601,15 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor = connection.schema_editor
       introspector = connection.introspector
 
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", null: false)
+
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          Marten::DB::Management::Column::BigInt.new("foo", null: true),
+          old_column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -1618,12 +1617,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.create_table(table_state)
 
-      schema_editor.change_column(
-        project_state,
-        table_state,
-        Marten::DB::Management::Column::BigInt.new("foo", null: true),
-        Marten::DB::Management::Column::BigInt.new("foo", null: false)
-      )
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
 
       db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
@@ -1635,12 +1629,15 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor = connection.schema_editor
       introspector = connection.introspector
 
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", null: false, default: 42)
+
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          Marten::DB::Management::Column::BigInt.new("foo", null: true),
+          old_column,
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -1652,12 +1649,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (NULL)")
       end
 
-      schema_editor.change_column(
-        project_state,
-        table_state,
-        Marten::DB::Management::Column::BigInt.new("foo", null: true),
-        Marten::DB::Management::Column::BigInt.new("foo", null: false, default: 42)
-      )
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
 
       db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
@@ -1666,6 +1658,394 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       connection.open do |db|
         db.scalar("SELECT foo FROM schema_editor_test_table").should eq 42
+      end
+    end
+
+    it "can perform a column alteration that removes a column index" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", index: true)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", index: false)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+
+      introspector.index_names(table_state.name, "foo").should be_empty
+    end
+
+    it "can perform a column alteration that adds a column index" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", index: false)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", index: true)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+
+      introspector.index_names(table_state.name, "foo").size.should eq 1
+    end
+
+    it "can perform a column alteration that adds a unique constraint" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", unique: false)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", unique: true)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open { |db| db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (42)") }
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+
+      introspector.unique_constraint_names(table_state.name, "foo").size.should eq 1
+    end
+
+    it "can perform a column alteration that removes a unique constraint" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", unique: true)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", unique: false)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open { |db| db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (42)") }
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+
+      introspector.unique_constraint_names(table_state.name, "foo").should be_empty
+    end
+
+    it "can perform a column alteration that changes the column type precision for integers" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::Int.new("foo")
+      new_column = Marten::DB::Management::Column::BigInt.new("foo")
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open { |db| db.exec("INSERT INTO schema_editor_test_table (foo) VALUES (42)") }
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+      db_column = db_column.not_nil!
+
+      for_mysql { db_column.type.should eq "bigint" }
+      for_postgresql { db_column.type.should eq "bigint" }
+      for_sqlite { db_column.type.should eq "integer" }
+
+      connection.open do |db|
+        db.scalar("SELECT foo FROM schema_editor_test_table").should eq 42
+      end
+    end
+
+    it "can perform a column alteration that changes the maximum string size for string columns" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::String.new("foo", max_size: 155)
+      new_column = Marten::DB::Management::Column::String.new("foo", max_size: 255)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open { |db| db.exec("INSERT INTO schema_editor_test_table (foo) VALUES ('hello')") }
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+      db_column = db_column.not_nil!
+
+      for_mysql do
+        db_column.type.should eq "varchar"
+        db_column.character_maximum_length.should eq 255
+      end
+
+      for_postgresql do
+        db_column.type.should eq "character varying"
+        db_column.character_maximum_length.should eq 255
+      end
+
+      for_sqlite { db_column.type.should eq "varchar(255)" }
+
+      connection.open do |db|
+        db.scalar("SELECT foo FROM schema_editor_test_table").should eq "hello"
+      end
+    end
+
+    it "can perform a column alteration that changes a column from a string type to a text type" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::String.new("foo", max_size: 155)
+      new_column = Marten::DB::Management::Column::Text.new("foo")
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      connection.open { |db| db.exec("INSERT INTO schema_editor_test_table (foo) VALUES ('hello')") }
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+      db_column = db_column.not_nil!
+
+      for_mysql { db_column.type.should eq "longtext" }
+      for_postgresql { db_column.type.should eq "text" }
+      for_sqlite { db_column.type.should eq "text" }
+
+      connection.open do |db|
+        db.scalar("SELECT foo FROM schema_editor_test_table").should eq "hello"
+      end
+    end
+
+    it "can perform a column alteration that adds a default value" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo")
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", default: 42)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+      db_column = db_column.not_nil!
+
+      db_column.nullable?.should be_false
+      db_column.default.should eq "42"
+    end
+
+    it "can perform a column alteration that removes a default value" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", default: 42)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo")
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }
+      db_column.should be_truthy
+      db_column = db_column.not_nil!
+
+      db_column.nullable?.should be_false
+      db_column.default.should be_nil
+    end
+
+    it "can add a primary key constraint to a column" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo")
+      new_column = Marten::DB::Management::Column::BigInt.new("foo", primary_key: true)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      for_db_backends :mysql, :postgresql do
+        introspector.primary_key_constraint_names(table_state.name, "foo").size.should eq 1
+      end
+
+      for_sqlite do
+        is_primary_key = false
+
+        connection.open do |db|
+          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
+            rs.each do
+              5.times { rs.read(String | Int32 | Int64 | Nil) }
+              is_primary_key = (rs.read(Int64) == 1)
+            end
+          end
+        end
+
+        is_primary_key.should be_true
+      end
+    end
+
+    it "can remove a primary key constraint from a column" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("foo", primary_key: true)
+      new_column = Marten::DB::Management::Column::BigInt.new("foo")
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      for_db_backends :mysql, :postgresql do
+        introspector.primary_key_constraint_names(table_state.name, "foo").should be_empty
+      end
+
+      for_sqlite do
+        is_primary_key = true
+
+        connection.open do |db|
+          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
+            rs.each do
+              5.times { rs.read(String | Int32 | Int64 | Nil) }
+              is_primary_key = (rs.read(Int64) == 1)
+            end
+          end
+        end
+
+        is_primary_key.should be_false
       end
     end
   end

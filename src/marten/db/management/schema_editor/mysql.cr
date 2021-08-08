@@ -233,7 +233,10 @@ module Marten
           ) : String
             build_sql do |s|
               s << "ALTER TABLE #{quote(table.name)}"
-              s << "MODIFY #{quote(new_column.name)} #{new_column.sql_type(@connection)} NOT NULL"
+              s << "MODIFY #{quote(new_column.name)} #{new_column.sql_type(@connection)}"
+              # Re-enforces the new default since MySQL won't set a default if the column is nullable.
+              s << "DEFAULT #{new_column.sql_quoted_default_value(@connection)}" if !new_column.default.nil?
+              s << "NOT NULL"
             end
           end
 

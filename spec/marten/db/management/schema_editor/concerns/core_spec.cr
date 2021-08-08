@@ -1662,6 +1662,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
 
       db_column.nullable?.should be_false
+      db_column.default.should eq "42"
 
       connection.open do |db|
         db.scalar("SELECT foo FROM schema_editor_test_table").should eq 42

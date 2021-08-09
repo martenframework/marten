@@ -27,6 +27,12 @@ for_mysql do
         schema_editor.column_type_for_built_in_column(column).should eq "datetime(6)"
       end
 
+      it "returns the expected column type for a float column" do
+        column = Marten::DB::Management::Column::Float.new("test")
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.column_type_for_built_in_column(column).should eq "double precision"
+      end
+
       it "returns the expected column type for an int column" do
         column = Marten::DB::Management::Column::Int.new("test")
         schema_editor = Marten::DB::Connection.default.schema_editor
@@ -162,6 +168,11 @@ for_mysql do
       it "returns the expected string representation for an integer value" do
         schema_editor = Marten::DB::Connection.default.schema_editor
         schema_editor.quoted_default_value_for_built_in_column(42).should eq "42"
+      end
+
+      it "returns the expected string representation for a float value" do
+        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor.quoted_default_value_for_built_in_column(42.45).should eq "42.45"
       end
 
       it "returns the expected string representation for a float value" do

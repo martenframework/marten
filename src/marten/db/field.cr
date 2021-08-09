@@ -2,6 +2,7 @@ require "./field/base"
 require "./field/big_int"
 require "./field/bool"
 require "./field/date_time"
+require "./field/float"
 require "./field/int"
 require "./field/string"
 require "./field/text"
@@ -61,6 +62,7 @@ module Marten
       register "big_int", BigInt
       register "bool", Bool
       register "date_time", DateTime
+      register "float", Float
       register "int", Int
       register "many_to_many", ManyToMany
       register "many_to_one", ManyToOne

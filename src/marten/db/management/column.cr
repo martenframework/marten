@@ -4,6 +4,7 @@ require "./column/base"
 require "./column/big_int"
 require "./column/bool"
 require "./column/date_time"
+require "./column/float"
 require "./column/int"
 require "./column/string"
 require "./column/text"
@@ -35,6 +36,7 @@ module Marten
         register "big_int", BigInt
         register "bool", Bool
         register "date_time", DateTime
+        register "float", Float
         register "foreign_key", ForeignKey
         register "int", Int
         register "string", String

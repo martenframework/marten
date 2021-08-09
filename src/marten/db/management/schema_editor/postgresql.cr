@@ -48,6 +48,7 @@ module Marten
             "Marten::DB::Management::Column::BigInt"   => "bigint",
             "Marten::DB::Management::Column::Bool"     => "boolean",
             "Marten::DB::Management::Column::DateTime" => "timestamp with time zone",
+            "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",
             "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
             "Marten::DB::Management::Column::Text"     => "text",

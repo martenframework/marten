@@ -44,6 +44,7 @@ module Marten
             "Marten::DB::Management::Column::BigInt"   => "bigint",
             "Marten::DB::Management::Column::Bool"     => "bool",
             "Marten::DB::Management::Column::DateTime" => "datetime(6)",
+            "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",
             "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
             "Marten::DB::Management::Column::Text"     => "longtext",

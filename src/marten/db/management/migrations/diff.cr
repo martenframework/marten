@@ -77,6 +77,8 @@ module Marten
             handle_added_indexes(index_changes)
             handle_added_unique_constraints(unique_constraint_changes)
 
+            sort_detected_operations
+
             changes = generate_migrations
             changes = select_changes_for_apps(changes, apps) if !apps.nil?
 
@@ -318,6 +320,7 @@ module Marten
                 related_table = @to_state.tables.values
                   .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
                   .not_nil!
+                next if related_table == created_table
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
 
@@ -500,6 +503,42 @@ module Marten
             changes.reject! { |app_label, _| !required_apps.includes?(app_label) }
 
             changes
+          end
+
+          private def sort_detected_operations
+            # Prior to running the generation algorithm, it is necessary that the operations that are in the same app
+            # are properly ordered (so that foreign keys are created after their targeted tables for example).
+            @detected_operations.each do |app_label, operations|
+              in_app_dependencies = {} of DB::Migration::Operation::Base => Set(DB::Migration::Operation::Base)
+              operations.each do |operation, dependencies|
+                in_app_dependencies[operation] = Set(DB::Migration::Operation::Base).new
+                dependencies.each do |dependency|
+                  next unless dependency.app_label == app_label
+                  operations.each do |other_operation, _other_dependencies|
+                    next unless dependency.dependent?(other_operation)
+                    in_app_dependencies[operation] << other_operation
+                  end
+                end
+              end
+
+              # Perform a topological sort in orrder to ensure that operations are processed when all their dependencies
+              # have already been processed.
+              ordered_operations = [] of Tuple(DB::Migration::Operation::Base, Array(Dependency::Base))
+              remaining_deps = in_app_dependencies.dup
+              while !remaining_deps.empty?
+                ops_without_deps = remaining_deps.select { |_op, deps| deps.empty? }.keys
+                operations.each do |operation, dependencies|
+                  next unless ops_without_deps.includes?(operation)
+                  ordered_operations << {operation, dependencies}
+                end
+
+                remaining_deps
+                  .reject! { |op, _deps| ops_without_deps.includes?(op) }
+                  .transform_values! { |deps| deps - ops_without_deps.to_set }
+              end
+
+              @detected_operations[app_label] = ordered_operations
+            end
           end
         end
       end

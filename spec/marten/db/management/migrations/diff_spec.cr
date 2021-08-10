@@ -831,5 +831,60 @@ describe Marten::DB::Management::Migrations::Diff do
       operation_2.table_name.should eq "test_table"
       operation_2.column.name.should eq "other_id"
     end
+
+    it "properly orders operations that have in-app dependencies" do
+      from_project_state = Marten::DB::Management::ProjectState.new
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "articles",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::String.new("title", max_size: 255),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "article_tags",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::ForeignKey.new("article_id", "articles", "id"),
+              Marten::DB::Management::Column::ForeignKey.new("tag_id", "tags", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "tags",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::String.new("label", max_size: 255),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].operations.size.should eq 3
+      changes["app"][0].dependencies.size.should eq 0
+
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_1.name.should eq "tags"
+
+      changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::CreateTable
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_2.name.should eq "articles"
+
+      changes["app"][0].operations[2].should be_a Marten::DB::Migration::Operation::CreateTable
+      operation_3 = changes["app"][0].operations[2].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_3.name.should eq "article_tags"
+    end
   end
 end

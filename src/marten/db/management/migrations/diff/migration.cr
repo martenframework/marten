@@ -4,6 +4,8 @@ module Marten
       module Migrations
         class Diff
           class Migration
+            include CanFormatStringsOrSymbols
+
             @version : String
 
             getter app_label

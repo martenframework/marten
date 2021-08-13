@@ -1,7 +1,7 @@
 class Migration::<%= @app_label.camelcase %>::V<%= @version %> < Marten::Migration
   <%- if !@dependencies.empty? -%>
   <%- @dependencies.each do |app_label, migration_name| -%>
-  depends_on "<%= app_label %>", "<%= migration_name %>"
+  depends_on <%= format_string_or_symbol(app_label) %>, <%= format_string_or_symbol(migration_name) %>
   <%- end -%>
 
   <%- end -%>

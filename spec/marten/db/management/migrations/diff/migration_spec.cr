@@ -168,7 +168,7 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
         (
           <<-MIGRATION
           class Migration::MyApp::V202107031819361 < Marten::Migration
-            depends_on "other_app", "other_migration"
+            depends_on :other_app, :other_migration
 
             def plan
               create_table :test_table do

@@ -886,5 +886,51 @@ describe Marten::DB::Management::Migrations::Diff do
       operation_3 = changes["app"][0].operations[2].as(Marten::DB::Migration::Operation::CreateTable)
       operation_3.name.should eq "article_tags"
     end
+
+    it "is able to detect the change of a specific column" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::String.new("foo", max_size: 255),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      changed_column = Marten::DB::Management::Column::String.new("foo", max_size: 255, null: true)
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              changed_column,
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].name.ends_with?("change_foo_on_test_table_table").should be_true
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::ChangeColumn
+
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::ChangeColumn)
+      operation.table_name.should eq "test_table"
+      operation.column.should eq changed_column
+    end
   end
 end

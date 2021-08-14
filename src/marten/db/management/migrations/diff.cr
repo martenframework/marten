@@ -69,9 +69,10 @@ module Marten
             handle_removed_unique_constraints(unique_constraint_changes)
 
             # Generate column-level operations.
-            handle_renamed_columns(from_columns, to_columns, renamed_tables)
+            renamed_columns = handle_renamed_columns(from_columns, to_columns, renamed_tables)
             handle_removed_columns(from_columns, to_columns)
             handle_added_columns(from_columns, to_columns)
+            handle_changed_columns(from_columns, to_columns, renamed_tables, renamed_columns)
 
             # Generate added constraints and indexes operations.
             handle_added_indexes(index_changes)
@@ -115,7 +116,7 @@ module Marten
             # means that dependencies cannot be resolved.
             while operations_count > 0
               @detected_operations.each do |app_label, operations|
-                resolved_operations = [] of Tuple(DB::Migration::Operation::Base, Array(Dependency::Base))
+                resolved_operations = [] of DetectedOperation
                 resolved_dependencies = Set(Tuple(String, String)).new
 
                 operations.dup.each do |operation, dependencies|
@@ -307,6 +308,33 @@ module Marten
             end
 
             renamed_tables
+          end
+
+          private def handle_changed_columns(from_columns, to_columns, renamed_tables, renamed_columns)
+            (from_columns & to_columns).each do |table_id, column_name|
+              from_table_state = @from_state.get_table(renamed_tables.fetch(table_id, table_id))
+              from_column = from_table_state.get_column(renamed_columns.fetch({table_id, column_name}, column_name))
+              to_table_state = @to_state.get_table(table_id)
+              to_column = to_table_state.get_column(column_name)
+
+              next if from_column.same_config?(to_column)
+
+              dependencies = [] of Dependency::Base
+
+              # Foreign key columns depend on the targeted table being created first.
+              if to_column.is_a?(Column::ForeignKey)
+                related_table = @to_state.tables.values
+                  .find { |t| t.name == to_column.as(Column::ForeignKey).to_table }
+                  .not_nil!
+                dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
+              end
+
+              insert_operation(
+                to_table_state.app_label,
+                DB::Migration::Operation::ChangeColumn.new(to_table_state.name, to_column),
+                dependencies
+              )
+            end
           end
 
           private def handle_created_tables(from_tables, to_tables)
@@ -523,7 +551,7 @@ module Marten
 
               # Perform a topological sort in orrder to ensure that operations are processed when all their dependencies
               # have already been processed.
-              ordered_operations = [] of Tuple(DB::Migration::Operation::Base, Array(Dependency::Base))
+              ordered_operations = [] of DetectedOperation
               remaining_deps = in_app_dependencies.dup
               while !remaining_deps.empty?
                 ops_without_deps = remaining_deps.select { |_op, deps| deps.empty? }.keys

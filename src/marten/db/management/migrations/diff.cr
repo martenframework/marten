@@ -54,6 +54,7 @@ module Marten
             end.flatten.to_set
 
             # Generate table-level operations.
+            handle_deleted_tables(from_tables, to_tables)
             handle_created_tables(from_tables, to_tables)
 
             # Identify altered constraints and indexes.
@@ -361,6 +362,44 @@ module Marten
                 ),
                 dependencies,
                 beginning: true
+              )
+            end
+          end
+
+          private def handle_deleted_tables(from_tables, to_tables)
+            (from_tables - to_tables).each do |deleted_table_id|
+              deleted_table = @from_state.get_table(deleted_table_id)
+
+              dependencies = [] of Dependency::Base
+
+              # Generate a dependencies on changes / removals of foreign keys pointing to the deleted table (those
+              # should be applied first).
+              @from_state.tables.values.flat_map do |other_table|
+                next if other_table.name == deleted_table.name
+
+                incoming_fk_columns = other_table.columns.select(Column::ForeignKey).select do |fk_column|
+                  fk_column.to_table == deleted_table.name
+                end
+
+                incoming_fk_columns.each do |fk_column|
+                  dependencies << Dependency::ChangedColumn.new(
+                    other_table.app_label,
+                    other_table.name,
+                    fk_column.name
+                  )
+
+                  dependencies << Dependency::RemovedColumn.new(
+                    other_table.app_label,
+                    other_table.name,
+                    fk_column.name
+                  )
+                end
+              end
+
+              insert_operation(
+                deleted_table.app_label,
+                DB::Migration::Operation::DeleteTable.new(deleted_table.name),
+                dependencies
               )
             end
           end

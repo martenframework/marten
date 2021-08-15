@@ -176,6 +176,22 @@ describe Marten::DB::Management::Column::ForeignKey do
         unique: true
       )
     end
+
+    it "clones the underlying target column" do
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
+      column = Marten::DB::Management::Column::ForeignKey.new(
+        "test",
+        to_table: TestUser.db_table,
+        to_column: "id"
+      )
+      column.contribute_to_project(project_state)
+
+      cloned_column = column.clone
+
+      for_mysql { cloned_column.sql_type(Marten::DB::Connection.default).should eq "bigint" }
+      for_postgresql { cloned_column.sql_type(Marten::DB::Connection.default).should eq "bigint" }
+      for_sqlite { cloned_column.sql_type(Marten::DB::Connection.default).should eq "integer" }
+    end
   end
 
   describe "#same_config?" do

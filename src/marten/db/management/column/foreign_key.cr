@@ -26,7 +26,14 @@ module Marten
           end
 
           def clone
-            self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
+            cloned = self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
+
+            # Ensures the target column is cloned too.
+            if !@target_column.nil?
+              cloned.target_column = @target_column.try(&.clone)
+            end
+
+            cloned
           end
 
           def same_config?(other : Base)
@@ -64,6 +71,7 @@ module Marten
           def contribute_to_project(project : ProjectState) : Nil
             target_table = project.tables.values.find { |t| t.name == to_table }.not_nil!
             @target_column = target_table.get_column(to_column).clone
+            @target_column.not_nil!.primary_key = false
 
             if @target_column.is_a?(BigInt)
               @target_column.as(BigInt).primary_key = false

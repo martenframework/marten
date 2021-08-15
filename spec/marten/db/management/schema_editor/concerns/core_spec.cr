@@ -1531,9 +1531,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
   describe "#change_column" do
     before_each do
       schema_editor = Marten::DB::Connection.default.schema_editor
+      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_other_test_table")
+        schema_editor.delete_table("schema_editor_other_test_table")
+      end
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
+    end
+
+    after_each do
+      schema_editor = Marten::DB::Connection.default.schema_editor
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_other_test_table")
         schema_editor.delete_table("schema_editor_other_test_table")
       end

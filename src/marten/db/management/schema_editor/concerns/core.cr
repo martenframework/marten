@@ -182,7 +182,7 @@ module Marten
                 new_fk_column = old_fk_column.clone
                 new_fk_column.target_column = new_column
 
-                execute(change_column_type_statement(table, old_fk_column, new_fk_column))
+                execute(change_column_type_statement(other_table, old_fk_column, new_fk_column))
                 execute(add_foreign_key_constraint_statement(other_table, new_fk_column))
               end
             end

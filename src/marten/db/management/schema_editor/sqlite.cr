@@ -22,6 +22,30 @@ module Marten
             new_column : Column::Base
           ) : Nil
             remake_table_with_changed_column(table, old_column, new_column)
+
+            old_type = old_column.sql_type(@connection)
+            new_type = new_column.sql_type(@connection)
+
+            # Identifies whether incoming FKs need to be recreated and then recreate the corresponding tables if this is
+            # the case.
+            remake_fk_columns = old_type != new_type && old_column.primary_key? && new_column.primary_key?
+            if remake_fk_columns
+              incoming_foreign_keys = project.tables.values.flat_map do |other_table|
+                incoming_fk_columns = other_table.columns.select(Column::ForeignKey).select do |fk_column|
+                  fk_column.to_table == table.name && fk_column.to_column == old_column.name
+                end
+
+                incoming_fk_columns.map { |fk_column| {other_table, fk_column} }
+              end
+
+              incoming_foreign_keys.each do |other_table, old_fk_column|
+                new_fk_column = old_fk_column.clone
+                new_fk_column.target_column = new_column
+                new_other_table = other_table.clone
+                new_other_table.change_column(new_fk_column)
+                with_remade_table(new_other_table) { }
+              end
+            end
           end
 
           def column_type_for_built_in_column(column : Column::Base) : String

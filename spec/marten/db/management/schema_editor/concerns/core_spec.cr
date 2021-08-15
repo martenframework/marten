@@ -1534,6 +1534,9 @@ describe Marten::DB::Management::SchemaEditor::Base do
       if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
+      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_other_test_table")
+        schema_editor.delete_table("schema_editor_other_test_table")
+      end
     end
 
     it "can perform a column alteration that simply sets a column as nullable" do
@@ -2047,6 +2050,74 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
         is_primary_key.should be_false
       end
+    end
+
+    it "can change a primary key column type and update the incoming foreign keys accordingly" do
+      connection = Marten::DB::Connection.default
+      schema_editor = connection.schema_editor
+      introspector = connection.introspector
+
+      old_column = Marten::DB::Management::Column::BigInt.new("id", primary_key: true)
+      new_column = Marten::DB::Management::Column::String.new("id", max_size: 255, primary_key: true)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          old_column,
+        ] of Marten::DB::Management::Column::Base
+      )
+      other_table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_other_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true),
+          Marten::DB::Management::Column::ForeignKey.new("table_id", "schema_editor_test_table", "id"),
+        ] of Marten::DB::Management::Column::Base
+      )
+      project_state = Marten::DB::Management::ProjectState.new(
+        [
+          table_state,
+          other_table_state,
+        ]
+      )
+
+      schema_editor.create_table(table_state)
+      schema_editor.create_table(other_table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      pk_db_column = introspector.columns_details(table_state.name).find { |c| c.name == "id" }
+      pk_db_column.should be_truthy
+      pk_db_column = pk_db_column.not_nil!
+
+      for_mysql do
+        pk_db_column.type.should eq "varchar"
+        pk_db_column.character_maximum_length.should eq 255
+      end
+
+      for_postgresql do
+        pk_db_column.type.should eq "character varying"
+        pk_db_column.character_maximum_length.should eq 255
+      end
+
+      for_sqlite { pk_db_column.type.should eq "varchar(255)" }
+
+      fk_db_column = introspector.columns_details(other_table_state.name).find { |c| c.name == "table_id" }
+      fk_db_column.should be_truthy
+      fk_db_column = fk_db_column.not_nil!
+
+      for_mysql do
+        fk_db_column.type.should eq "varchar"
+        fk_db_column.character_maximum_length.should eq 255
+      end
+
+      for_postgresql do
+        fk_db_column.type.should eq "character varying"
+        fk_db_column.character_maximum_length.should eq 255
+      end
+
+      for_sqlite { fk_db_column.type.should eq "varchar(255)" }
     end
   end
 end

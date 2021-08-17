@@ -94,5 +94,29 @@ describe Marten::Conf::GlobalSettings::Templates do
         "src/path2/templates",
       ])
     end
+
+    it "can allow to set the array of templates directories from symbols" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.dirs = [
+        :"src/path1/templates",
+        :"src/path2/templates",
+      ]
+      templates_conf.dirs.should eq([
+        "src/path1/templates",
+        "src/path2/templates",
+      ])
+    end
+
+    it "can allow to set the array of templates directories from paths" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.dirs = [
+        Path["src/path1/templates"],
+        Path["src/path2/templates"],
+      ]
+      templates_conf.dirs.should eq([
+        Path["src/path1/templates"].expand.to_s,
+        Path["src/path2/templates"].expand.to_s,
+      ])
+    end
   end
 end

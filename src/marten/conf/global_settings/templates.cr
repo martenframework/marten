@@ -29,7 +29,16 @@ module Marten
         setter cached
 
         # Allows to set the directories where templates should be looked for.
-        setter dirs
+        def dirs=(dirs : Array(Path | String | Symbol))
+          @dirs = dirs.map do |dir|
+            case dir
+            when Path
+              dir.expand.to_s
+            else
+              dir.to_s
+            end
+          end
+        end
       end
     end
   end

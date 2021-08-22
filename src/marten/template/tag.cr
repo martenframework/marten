@@ -24,6 +24,7 @@ module Marten
         @@registry
       end
 
+      register "asset", Asset
       register "assign", Assign
       register "block", Block
       register "extend", Extend

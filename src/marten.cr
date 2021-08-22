@@ -12,6 +12,7 @@ require "uuid"
 
 require "./marten/app"
 require "./marten/apps/**"
+require "./marten/asset/**"
 require "./marten/conf/**"
 require "./marten/core/**"
 require "./marten/db/**"
@@ -42,6 +43,10 @@ module Marten
     @@apps ||= Apps::Registry.new
   end
 
+  def self.assets
+    @@assets.not_nil!
+  end
+
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
     settings.with_target_env(env.try(&.to_s)) { |settings_with_target_env| yield settings_with_target_env }
@@ -67,8 +72,19 @@ module Marten
     settings.setup
     apps.populate(settings.installed_apps)
     apps.setup
+    setup_assets
     setup_templates
     setup_i18n
+  end
+
+  # :nodoc:
+  def self.setup_assets : Nil
+    @@assets = Asset::Engine.new(
+      storage: (
+        settings.assets.storage ||
+        Core::Storage::FileSystem.new(root: settings.assets.root, base_url: settings.assets.url)
+      )
+    )
   end
 
   # :nodoc:

@@ -48,6 +48,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#assets" do
+    it "returns the assets configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.assets.should be_a Marten::Conf::GlobalSettings::Assets
+    end
+  end
+
   describe "#databases" do
     it "returns an empty list by default" do
       global_settings = Marten::Conf::GlobalSettings.new

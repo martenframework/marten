@@ -160,6 +160,11 @@ module Marten
         @view500 = Views::Defaults::ServerError
       end
 
+      # Provides access to assets settings.
+      def assets
+        @assets ||= GlobalSettings::Assets.new
+      end
+
       # Allows to configure a specific database connection for the application.
       def database(id = DB::Connection::DEFAULT_CONNECTION_NAME)
         db_config = @databases.find { |d| d.id.to_s == id.to_s }

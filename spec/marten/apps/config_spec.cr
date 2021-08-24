@@ -31,6 +31,21 @@ describe Marten::Apps::Config do
     end
   end
 
+  describe "#assets_finder" do
+    it "returns an assets finder targetting the app assets folder" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      assets_finder = app_config.assets_finder
+      assets_finder.should be_a Marten::Asset::Finder::FileSystem
+
+      assets_finder.not_nil!.root.should eq Path[__DIR__].join("assets").to_s
+    end
+
+    it "returns nil if the app does not define an assets directory" do
+      app_config = Marten::Apps::ConfigSpec::AppWithoutAssets::App.new
+      app_config.assets_finder.should be_nil
+    end
+  end
+
   describe "#label" do
     it "returns the app config label" do
       app_config = Marten::Apps::ConfigSpec::TestConfig.new

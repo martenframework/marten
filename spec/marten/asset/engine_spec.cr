@@ -38,7 +38,7 @@ end
 
 module Marten::Asset::EngineSpec
   class TestFinder < Marten::Asset::Finder::Base
-    def find(filepath : String) : String
+    def find(filepath : String) : String?
       ""
     end
 

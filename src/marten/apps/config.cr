@@ -25,6 +25,15 @@ module Marten
         @models = [] of DB::Model.class
       end
 
+      # Returns the assets finder of the application.
+      #
+      # If the application doesn't have a dedicated assets directory, `nil` is returned.
+      def assets_finder
+        assets_dir = Path[self.class._marten_app_location].join(ASSETS_DIR)
+        return unless Dir.exists?(assets_dir)
+        Asset::Finder::FileSystem.new(assets_dir.to_s)
+      end
+
       # Returns the migrations path for the application.
       def migrations_path
         Path[self.class._marten_app_location].join(MIGRATIONS_DIR)
@@ -61,6 +70,7 @@ module Marten
         I18n::Loader::YAML.new(locales_dir.to_s)
       end
 
+      private ASSETS_DIR     = "assets"
       private LABEL_RE       = /^[a-z_]+$/
       private LOCALES_DIR    = "locales"
       private MIGRATIONS_DIR = "migrations"

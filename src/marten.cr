@@ -85,6 +85,12 @@ module Marten
         Core::Storage::FileSystem.new(root: settings.assets.root, base_url: settings.assets.url)
       )
     )
+
+    finders = [] of Asset::Finder::Base
+    finders << Asset::Finder::AppDirs.new if settings.assets.app_dirs
+    finders += settings.assets.dirs.map { |d| Asset::Finder::FileSystem.new(d) }
+
+    assets.finders = finders
   end
 
   # :nodoc:

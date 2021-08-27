@@ -59,6 +59,11 @@ module Marten
         get
       end
 
+      # Returns an empty response associated with a given status code.
+      def head(status : Int32) : HTTP::Response
+        HTTP::Response.new(content: "", content_type: "", status: status)
+      end
+
       def options
         # Responds to requests for the OPTIONS HTTP verb.
         response = HTTP::Response.new

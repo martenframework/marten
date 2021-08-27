@@ -361,6 +361,29 @@ describe Marten::Views::Base do
     end
   end
 
+  describe "#head" do
+    it "returns an empty HTTP response associated with a specific status code" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::BaseSpec::Test1View.new(request)
+
+      response_1 = view.head(404)
+      response_1.content.should be_empty
+      response_1.content_type.should be_empty
+      response_1.status.should eq 404
+
+      response_2 = view.head(403)
+      response_2.content.should be_empty
+      response_2.content_type.should be_empty
+      response_2.status.should eq 403
+    end
+  end
+
   describe "#reverse" do
     it "provides a shortcut allowing to perform route lookups" do
       request = Marten::HTTP::Request.new(

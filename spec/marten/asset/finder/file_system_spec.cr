@@ -14,7 +14,9 @@ describe Marten::Asset::Finder::FileSystem do
 
     it "returns nil if no asset corresponds to the passed file name" do
       finder = Marten::Asset::Finder::FileSystem.new(File.join(__DIR__, "assets"))
-      finder.find("css/unknown.css").should be_nil
+      expect_raises(Marten::Asset::Errors::AssetNotFound) do
+        finder.find("css/unknown.css")
+      end
     end
   end
 

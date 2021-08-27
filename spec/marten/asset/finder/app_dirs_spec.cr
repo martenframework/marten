@@ -12,9 +12,11 @@ describe Marten::Asset::Finder::AppDirs do
       finder.find("css/test.css").should eq File.join(TestApp.new.assets_finder.not_nil!.root, "css/test.css")
     end
 
-    it "returns nil if no asset corresponds to the passed file name" do
+    it "raises if no asset corresponds to the passed file name" do
       finder = Marten::Asset::Finder::AppDirs.new
-      finder.find("css/unknown.css").should be_nil
+      expect_raises(Marten::Asset::Errors::AssetNotFound) do
+        finder.find("css/unknown.css")
+      end
     end
   end
 

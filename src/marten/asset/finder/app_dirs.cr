@@ -13,11 +13,13 @@ module Marten
           @app_finders += Marten.apps.app_configs.compact_map(&.assets_finder)
         end
 
-        def find(filepath : String) : String?
+        def find(filepath : String) : String
           app_finders.each do |finder|
-            result = finder.find(filepath)
-            return result unless result.nil?
+            return finder.find(filepath)
+          rescue Errors::AssetNotFound
           end
+
+          raise Errors::AssetNotFound.new("Asset #{filepath} could not be found")
         end
 
         def list : Array(String)

@@ -8,9 +8,10 @@ module Marten
         def initialize(@root : String)
         end
 
-        def find(filepath : String) : String?
+        def find(filepath : String) : String
           fullpath = File.join(root, filepath)
-          File.exists?(fullpath) ? fullpath : nil
+          return fullpath if File.exists?(fullpath)
+          raise Errors::AssetNotFound.new("Asset #{filepath} could not be found")
         end
 
         def list : Array(String)

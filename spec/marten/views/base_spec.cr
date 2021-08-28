@@ -405,6 +405,40 @@ describe Marten::Views::Base do
       response_2.content.should eq Marten.routes.reverse("dummy_with_id", {"id" => 42})
     end
   end
+
+  describe "#respond" do
+    it "returns an HTTP response with an associated content and content type" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::BaseSpec::Test1View.new(request)
+
+      response = view.respond(content: "hello world!", content_type: "text/plain")
+      response.content.should eq "hello world!"
+      response.content_type.should eq "text/plain"
+      response.status.should eq 200
+    end
+
+    it "returns an HTTP response with an associated status" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::BaseSpec::Test1View.new(request)
+
+      response = view.respond(content: "unauthorized!", content_type: "text/plain", status: 401)
+      response.content.should eq "unauthorized!"
+      response.content_type.should eq "text/plain"
+      response.status.should eq 401
+    end
+  end
 end
 
 module Marten::Views::BaseSpec

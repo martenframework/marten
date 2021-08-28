@@ -72,6 +72,11 @@ module Marten
         response
       end
 
+      # Returns an HTTP response generated from a content string, content type and status code.
+      def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status = 200)
+        HTTP::Response.new(content: content, content_type: content_type, status: status)
+      end
+
       protected delegate reverse, to: Marten.routes
 
       private def handle_http_method_not_allowed

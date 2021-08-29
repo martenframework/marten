@@ -126,10 +126,13 @@ module Marten
 
                   dependencies.each do |dependency|
                     if dependency.app_label != app_label
-                      @detected_operations[dependency.app_label].each do |other_operation, _|
-                        next unless dependency.dependent?(other_operation)
-                        deps_satisfied = false
-                        break
+                      dependency_app_detected_operations = @detected_operations.fetch(dependency.app_label, nil)
+                      if !dependency_app_detected_operations.nil?
+                        dependency_app_detected_operations.each do |other_operation, _|
+                          next unless dependency.dependent?(other_operation)
+                          deps_satisfied = false
+                          break
+                        end
                       end
 
                       break unless deps_satisfied

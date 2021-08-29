@@ -932,149 +932,206 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.table_name.should eq "test_table"
       operation.column.should eq changed_column
     end
-  end
 
-  it "is able to detect the deletion of a table" do
-    from_project_state = Marten::DB::Management::ProjectState.new(
-      tables: [
-        Marten::DB::Management::TableState.new(
-          app_label: "app",
-          name: "test_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-            Marten::DB::Management::Column::BigInt.new("foo"),
-            Marten::DB::Management::Column::BigInt.new("bar"),
-          ] of Marten::DB::Management::Column::Base,
-          unique_constraints: [] of Marten::DB::Management::Constraint::Unique
-        ),
-      ]
-    )
+    it "is able to detect the deletion of a table" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("foo"),
+              Marten::DB::Management::Column::BigInt.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
 
-    to_project_state = Marten::DB::Management::ProjectState.new
+      to_project_state = Marten::DB::Management::ProjectState.new
 
-    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-    changes = diff.detect
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
 
-    changes.size.should eq 1
-    changes["app"].size.should eq 1
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
 
-    changes["app"][0].name.ends_with?("delete_test_table_table").should be_true
+      changes["app"][0].name.ends_with?("delete_test_table_table").should be_true
 
-    changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations.size.should eq 1
 
-    operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
-    operation.name.should eq "test_table"
-  end
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
+      operation.name.should eq "test_table"
+    end
 
-  it "properly generates a dependency between a deleted table and the change of a FK  pointing to the deleted table" do
-    from_project_state = Marten::DB::Management::ProjectState.new(
-      tables: [
-        Marten::DB::Management::TableState.new(
-          app_label: "app",
-          name: "test_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          ] of Marten::DB::Management::Column::Base
-        ),
-        Marten::DB::Management::TableState.new(
-          app_label: "other_app",
-          name: "other_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-            Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
-          ] of Marten::DB::Management::Column::Base
-        ),
-      ]
-    )
+    it "properly generates a dependency between a deleted table and the change of a FK to the deleted table" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
 
-    changed_column = Marten::DB::Management::Column::BigInt.new("test_table_id")
-    to_project_state = Marten::DB::Management::ProjectState.new(
-      tables: [
-        Marten::DB::Management::TableState.new(
-          app_label: "other_app",
-          name: "other_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-            changed_column,
-          ] of Marten::DB::Management::Column::Base
-        ),
-      ]
-    )
+      changed_column = Marten::DB::Management::Column::BigInt.new("test_table_id")
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              changed_column,
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
 
-    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-    changes = diff.detect
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
 
-    changes.size.should eq 2
-    changes["app"].size.should eq 1
-    changes["other_app"].size.should eq 1
+      changes.size.should eq 2
+      changes["app"].size.should eq 1
+      changes["other_app"].size.should eq 1
 
-    changes["other_app"][0].operations.size.should eq 1
-    changes["other_app"][0].dependencies.should be_empty
-    changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::ChangeColumn
-    operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::ChangeColumn)
-    operation_1.table_name.should eq "other_table"
-    operation_1.column.should eq changed_column
+      changes["other_app"][0].operations.size.should eq 1
+      changes["other_app"][0].dependencies.should be_empty
+      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::ChangeColumn
+      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::ChangeColumn)
+      operation_1.table_name.should eq "other_table"
+      operation_1.column.should eq changed_column
 
-    changes["app"][0].operations.size.should eq 1
-    changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
-    changes["app"][0].dependencies.size.should eq 1
-    changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
-    operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
-    operation_2.name.should eq "test_table"
-  end
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
+      changes["app"][0].dependencies.size.should eq 1
+      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
+      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
+      operation_2.name.should eq "test_table"
+    end
 
-  it "properly generates a dependency between a deleted table and the removal of a FK pointing to the deleted table" do
-    from_project_state = Marten::DB::Management::ProjectState.new(
-      tables: [
-        Marten::DB::Management::TableState.new(
-          app_label: "app",
-          name: "test_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          ] of Marten::DB::Management::Column::Base
-        ),
-        Marten::DB::Management::TableState.new(
-          app_label: "other_app",
-          name: "other_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-            Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
-          ] of Marten::DB::Management::Column::Base
-        ),
-      ]
-    )
+    it "properly generates a dependency between a deleted table and the removal of a FK to the deleted table" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
 
-    to_project_state = Marten::DB::Management::ProjectState.new(
-      tables: [
-        Marten::DB::Management::TableState.new(
-          app_label: "other_app",
-          name: "other_table",
-          columns: [
-            Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-          ] of Marten::DB::Management::Column::Base
-        ),
-      ]
-    )
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
 
-    diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-    changes = diff.detect
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
 
-    changes.size.should eq 2
-    changes["app"].size.should eq 1
-    changes["other_app"].size.should eq 1
+      changes.size.should eq 2
+      changes["app"].size.should eq 1
+      changes["other_app"].size.should eq 1
 
-    changes["other_app"][0].operations.size.should eq 1
-    changes["other_app"][0].dependencies.should be_empty
-    changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveColumn
-    operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveColumn)
-    operation_1.table_name.should eq "other_table"
-    operation_1.column_name.should eq "test_table_id"
+      changes["other_app"][0].operations.size.should eq 1
+      changes["other_app"][0].dependencies.should be_empty
+      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveColumn
+      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveColumn)
+      operation_1.table_name.should eq "other_table"
+      operation_1.column_name.should eq "test_table_id"
 
-    changes["app"][0].operations.size.should eq 1
-    changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
-    changes["app"][0].dependencies.size.should eq 1
-    changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
-    operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
-    operation_2.name.should eq "test_table"
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
+      changes["app"][0].dependencies.size.should eq 1
+      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
+      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
+      operation_2.name.should eq "test_table"
+    end
+
+    it "is able to detect the creation of a table that depends on an existing table from another app" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "other_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["other_app"].size.should eq 1
+
+      changes["other_app"][0].operations.size.should eq 1
+      changes["other_app"][0].dependencies.size.should eq 1
+      changes["other_app"][0].dependencies[0].should eq({"app", "__first__"})
+      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+      operation = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation.name.should eq "other_table"
+
+      operation.columns.size.should eq 2
+      operation.columns[0].should be_a Marten::DB::Management::Column::BigInt
+      operation.columns[0].name.should eq "id"
+      operation.columns[0].as(Marten::DB::Management::Column::BigInt).primary_key?.should be_true
+      operation.columns[0].as(Marten::DB::Management::Column::BigInt).auto?.should be_true
+      operation.columns[1].should be_a Marten::DB::Management::Column::ForeignKey
+      operation.columns[1].name.should eq "test_table_id"
+      operation.columns[1].as(Marten::DB::Management::Column::ForeignKey).to_table.should eq "test_table"
+      operation.columns[1].as(Marten::DB::Management::Column::ForeignKey).to_column.should eq "id"
+    end
   end
 end

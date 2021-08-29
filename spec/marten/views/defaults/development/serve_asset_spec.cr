@@ -16,7 +16,7 @@ describe Marten::Views::Defaults::Development::ServeAsset do
       response = view.dispatch
 
       response.status.should eq 200
-      response.content_type.should eq "text/css"
+      response.content_type.should eq MIME.from_filename("css/test.css")
       response.content.should eq File.read(Marten.assets.find("css/test.css"))
     end
 

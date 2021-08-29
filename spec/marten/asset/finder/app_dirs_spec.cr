@@ -27,6 +27,7 @@ describe Marten::Asset::Finder::AppDirs do
         [
           File.join(TestApp.new.assets_finder.not_nil!.root, "test.css"),
           File.join(TestApp.new.assets_finder.not_nil!.root, "css/test.css"),
+          File.join(TestApp.new.assets_finder.not_nil!.root, "unidentified_file"),
         ].to_set
       )
     end

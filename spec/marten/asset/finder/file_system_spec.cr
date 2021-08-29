@@ -12,7 +12,7 @@ describe Marten::Asset::Finder::FileSystem do
       finder.find("css/test.css").should eq File.join(__DIR__, "assets/css/test.css")
     end
 
-    it "returns nil if no asset corresponds to the passed file name" do
+    it "raises if no asset corresponds to the passed file name" do
       finder = Marten::Asset::Finder::FileSystem.new(File.join(__DIR__, "assets"))
       expect_raises(Marten::Asset::Errors::AssetNotFound) do
         finder.find("css/unknown.css")
@@ -26,6 +26,7 @@ describe Marten::Asset::Finder::FileSystem do
       finder.list.to_set.should eq(
         [
           File.join(__DIR__, "assets/test.css"),
+          File.join(__DIR__, "assets/css/other.css"),
           File.join(__DIR__, "assets/css/test.css"),
         ].to_set
       )

@@ -14,6 +14,16 @@ module Marten
 
       def initialize(@storage : Core::Storage::Base)
       end
+
+      # Returns the absolute path corresponding to the passed asset file path.
+      def find(filepath : String) : String
+        finders.each do |finder|
+          return finder.find(filepath)
+        rescue Errors::AssetNotFound
+        end
+
+        raise Errors::AssetNotFound.new("Asset #{filepath} could not be found")
+      end
     end
   end
 end

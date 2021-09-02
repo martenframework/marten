@@ -25,5 +25,10 @@ describe Marten::Template::Template do
       template = Marten::Template::Template.new("{% if answer == 42 %}ok{% endif %}")
       template.render({"answer" => 42}).should eq "ok"
     end
+
+    it "can render a template from a given context named tuple" do
+      template = Marten::Template::Template.new("{% if answer == 42 %}ok{% endif %}")
+      template.render({answer: 42}).should eq "ok"
+    end
   end
 end

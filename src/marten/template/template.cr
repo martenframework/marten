@@ -17,7 +17,7 @@ module Marten
       end
 
       # :ditto:
-      def render(context : Hash) : String
+      def render(context : Hash | NamedTuple) : String
         render(Context.from(context))
       end
     end

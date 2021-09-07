@@ -579,7 +579,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.add_unique_constraint(
         table_state,
-        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+        Marten::DB::Management::Constraint::Unique.new("test_constraint_to_add", ["foo", "bar"])
       )
 
       Marten::DB::Connection.default.open do |db|
@@ -595,7 +595,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_add"
               constraint_type = rs.read(String)
               constraint_type.should eq "UNIQUE"
             end
@@ -613,7 +613,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
             rs.each do
               column_name = rs.read(String)
               constraint_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_add"
               constraint_columns << column_name
             end
           end
@@ -633,7 +633,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_add"
               constraint_type = rs.read(Char)
               constraint_type.should eq 'u'
             end
@@ -657,7 +657,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
             rs.each do
               constraint_name = rs.read(String)
               column_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_add"
               constraint_columns << column_name
             end
           end
@@ -780,7 +780,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           Marten::DB::Management::Column::BigInt.new("bar"),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [
-          Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+          Marten::DB::Management::Constraint::Unique.new("test_constraint_to_create", ["foo", "bar"]),
         ]
       )
 
@@ -799,7 +799,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_create"
               constraint_type = rs.read(String)
               constraint_type.should eq "UNIQUE"
             end
@@ -817,7 +817,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
             rs.each do
               column_name = rs.read(String)
               constraint_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_create"
               constraint_columns << column_name
             end
           end
@@ -837,7 +837,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_create"
               constraint_type = rs.read(Char)
               constraint_type.should eq 'u'
             end
@@ -861,7 +861,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
             rs.each do
               constraint_name = rs.read(String)
               column_name = rs.read(String)
-              next unless constraint_name == "test_constraint"
+              next unless constraint_name == "test_constraint_to_create"
               constraint_columns << column_name
             end
           end
@@ -1298,7 +1298,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     it "remove a unique constraint from a table" do
       schema_editor = Marten::DB::Connection.default.schema_editor
 
-      unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint_to_remove", ["foo", "bar"])
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
         "schema_editor_test_table",
@@ -1372,7 +1372,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         end
       end
 
-      constraint_names.includes?("test_constraint").should be_false
+      constraint_names.includes?("test_constraint_to_remove").should be_false
     end
   end
 

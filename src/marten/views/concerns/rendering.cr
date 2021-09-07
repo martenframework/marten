@@ -22,8 +22,8 @@ module Marten
         nil
       end
 
-      # Renders the configured template for a specific `context`.
-      def render_to_response(context : Hash?)
+      # Renders the configured template for a specific `context` object.
+      def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context)
         HTTP::Response.new(Marten.templates.get_template(self.class.template.not_nil!).render(context))
       end
     end

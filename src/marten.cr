@@ -98,11 +98,7 @@ module Marten
     @@templates = Template::Engine.new
 
     loaders = [] of Marten::Template::Loader::Base
-
-    # Add per-app templates loaders first.
-    loaders += apps.app_configs.compact_map(&.templates_loader) if settings.templates.app_dirs
-
-    # Then generate any new templates loader based on the configured templates dirs.
+    loaders << Template::Loader::AppDirs.new if settings.templates.app_dirs
     loaders += settings.templates.dirs.map { |d| Template::Loader::FileSystem.new(d) }
 
     templates.loaders = if settings.templates.cached

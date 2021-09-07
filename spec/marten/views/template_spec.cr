@@ -36,7 +36,7 @@ end
 
 module Marten::Views::TemplateSpec
   class TestView < Marten::Views::Template
-    template "specs/views/template/test.html"
+    template_name "specs/views/template/test.html"
 
     def context
       {name: "John Doe"}

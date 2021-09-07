@@ -72,7 +72,7 @@ describe Marten::Views::Rendering do
         )
       )
 
-      response = Marten::Views::RenderingSpec::TestView.new(request).render_to_response({ "name" => "John Doe"})
+      response = Marten::Views::RenderingSpec::TestView.new(request).render_to_response({"name" => "John Doe"})
 
       response.status.should eq 200
       response.content_type.should eq "text/html"
@@ -89,7 +89,7 @@ describe Marten::Views::Rendering do
       )
 
       response = Marten::Views::RenderingSpec::TestView.new(request).render_to_response(
-        Marten::Template::Context{ "name" => "John Doe"}
+        Marten::Template::Context{"name" => "John Doe"}
       )
 
       response.status.should eq 200

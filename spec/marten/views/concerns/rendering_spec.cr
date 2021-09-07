@@ -17,19 +17,6 @@ describe Marten::Views::Rendering do
     end
   end
 
-  describe "#context" do
-    it "returns nil by default" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      Marten::Views::RenderingSpec::TestViewWithoutTemplate.new(request).context.should be_nil
-    end
-  end
-
   describe "#render_to_response" do
     it "returns an HTTP response containing the template rendered using the configured context" do
       request = Marten::HTTP::Request.new(

@@ -15,13 +15,6 @@ module Marten
         end
       end
 
-      # Returns a hash containing the template context or `nil`.
-      #
-      # The default implementation returns `nil`.
-      def context
-        nil
-      end
-
       # Renders the configured template for a specific `context` object.
       def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context)
         HTTP::Response.new(Marten.templates.get_template(self.class.template.not_nil!).render(context))

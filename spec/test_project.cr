@@ -67,6 +67,8 @@ Marten.configure :test do |config|
   config.templates.dirs = [
     "test_project/templates",
   ]
+
+  config.assets.root = "spec/assets"
 end
 
 Marten.routes.draw do

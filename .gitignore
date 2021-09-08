@@ -16,3 +16,4 @@
 *.db
 /shard.lock
 .spec.env.json
+/spec/assets/

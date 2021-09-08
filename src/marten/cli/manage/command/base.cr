@@ -59,13 +59,7 @@ module Marten
           )
           end
 
-          def setup
-          end
-
-          def run
-          end
-
-          protected def handle
+          def handle
             @parser = OptionParser.new
 
             setup
@@ -100,6 +94,12 @@ module Marten
             parser.parse(options)
 
             run
+          end
+
+          def run
+          end
+
+          def setup
           end
 
           private getter arguments

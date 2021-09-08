@@ -18,7 +18,13 @@ module Marten
 
           class_getter help
 
+          # Returns the `IO` object that should be used by the command as the main input file descriptor.
+          getter stdin
+
+          # Returns the `IO` object that should be used by the command as the main output file descriptor.
           getter stdout
+
+          # Returns the `IO` object that should be used by the command as the main error file descriptor.
           getter stderr
 
           def self.command_name
@@ -46,6 +52,7 @@ module Marten
 
           def initialize(
             @options : Array(String),
+            @stdin : IO = STDIN,
             @stdout : IO = STDOUT,
             @stderr : IO = STDERR,
             @main_command_name = Marten::CLI::DEFAULT_COMMAND_NAME

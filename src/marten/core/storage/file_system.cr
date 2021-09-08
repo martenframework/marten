@@ -6,6 +6,16 @@ module Marten
         def initialize(@root : String, @base_url : String)
         end
 
+        def save(filepath : String, content : IO) : Nil
+          new_path = File.join(root, filepath)
+
+          FileUtils.mkdir_p(Path[new_path].dirname)
+
+          File.open(new_path, "wb") do |new_file|
+            IO.copy(content, new_file)
+          end
+        end
+
         def url(filepath : String) : String
           URI.encode(File.join(base_url, filepath))
         end

@@ -70,8 +70,8 @@ module Marten::Asset::EngineSpec
       ""
     end
 
-    def list : Array(String)
-      [] of String
+    def list : Array({String, String})
+      [] of {String, String}
     end
   end
 end

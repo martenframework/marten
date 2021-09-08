@@ -25,9 +25,9 @@ describe Marten::Asset::Finder::FileSystem do
       finder = Marten::Asset::Finder::FileSystem.new(File.join(__DIR__, "assets"))
       finder.list.to_set.should eq(
         [
-          File.join(__DIR__, "assets/test.css"),
-          File.join(__DIR__, "assets/css/other.css"),
-          File.join(__DIR__, "assets/css/test.css"),
+          {"test.css", File.join(__DIR__, "assets/test.css")},
+          {"css/other.css", File.join(__DIR__, "assets/css/other.css")},
+          {"css/test.css", File.join(__DIR__, "assets/css/test.css")},
         ].to_set
       )
     end

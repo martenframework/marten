@@ -21,13 +21,13 @@ describe Marten::Asset::Finder::AppDirs do
   end
 
   describe "#list" do
-    it "lists the absolute paths of all the app assets" do
+    it "lists the relative and absolute paths of all the app assets" do
       finder = Marten::Asset::Finder::AppDirs.new
       finder.list.to_set.should eq(
         [
-          File.join(TestApp.new.assets_finder.not_nil!.root, "test.css"),
-          File.join(TestApp.new.assets_finder.not_nil!.root, "css/test.css"),
-          File.join(TestApp.new.assets_finder.not_nil!.root, "unidentified_file"),
+          {"test.css", File.join(TestApp.new.assets_finder.not_nil!.root, "test.css")},
+          {"css/test.css", File.join(TestApp.new.assets_finder.not_nil!.root, "css/test.css")},
+          {"unidentified_file", File.join(TestApp.new.assets_finder.not_nil!.root, "unidentified_file")},
         ].to_set
       )
     end

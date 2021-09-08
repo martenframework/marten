@@ -14,8 +14,14 @@ module Marten
           raise Errors::AssetNotFound.new("Asset #{filepath} could not be found")
         end
 
-        def list : Array(String)
-          Dir.glob(File.join(root, "/**/*")).reject { |fn| File.directory?(fn) }
+        def list : Array({String, String})
+          Dir.glob(File.join(root, "/**/*")).reject { |fn| File.directory?(fn) }.map do |path|
+            {Path[path].relative_to(root_path).to_s, path}
+          end
+        end
+
+        private def root_path
+          @root_path ||= Path[root]
         end
       end
     end

@@ -9,8 +9,8 @@ module Marten
             getter parents
 
             def initialize(@migration : Migration)
-              @parents = [] of self
-              @children = [] of self
+              @parents = Set(self).new
+              @children = Set(self).new
             end
 
             def add_child(child : self)

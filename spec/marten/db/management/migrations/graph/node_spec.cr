@@ -10,7 +10,7 @@ describe Marten::DB::Management::Migrations::Graph::Node do
       node_2 = Marten::DB::Management::Migrations::Graph::Node.new(migration_2)
       node_2.add_child(node_1)
 
-      node_2.children.should eq [node_1]
+      node_2.children.should eq [node_1].to_set
     end
   end
 
@@ -23,7 +23,7 @@ describe Marten::DB::Management::Migrations::Graph::Node do
       node_2 = Marten::DB::Management::Migrations::Graph::Node.new(migration_2)
       node_2.add_parent(node_1)
 
-      node_2.parents.should eq [node_1]
+      node_2.parents.should eq [node_1].to_set
     end
   end
 
@@ -42,7 +42,7 @@ describe Marten::DB::Management::Migrations::Graph::Node do
       node_2 = Marten::DB::Management::Migrations::Graph::Node.new(migration_2)
       node_2.add_child(node_1)
 
-      node_2.children.should eq [node_1]
+      node_2.children.should eq [node_1].to_set
     end
   end
 
@@ -61,7 +61,7 @@ describe Marten::DB::Management::Migrations::Graph::Node do
       node_2 = Marten::DB::Management::Migrations::Graph::Node.new(migration_2)
       node_2.add_parent(node_1)
 
-      node_2.parents.should eq [node_1]
+      node_2.parents.should eq [node_1].to_set
     end
   end
 

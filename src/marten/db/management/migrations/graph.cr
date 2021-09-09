@@ -17,6 +17,7 @@ module Marten
 
           # Configures a migration dependency.
           def add_dependency(migration : Migration, dependency_id : String)
+            raise_unknown_node(migration.id) unless @nodes.has_key?(migration.id)
             raise_unknown_node(dependency_id) unless @nodes.has_key?(dependency_id)
             @nodes[migration.id].add_parent(@nodes[dependency_id])
             @nodes[dependency_id].add_child(@nodes[migration.id])
@@ -34,12 +35,13 @@ module Marten
 
           # Returns the node associated with a given migration ID.
           def find_node(id : String)
-            @nodes[id]
+            @nodes[id]? || raise_unknown_node(id)
           end
 
           # Return the leaves of the graph.
           #
-          # Leaves correspond to migration nodes that don't have any child (that is no other migrations depend on them).
+          # Leaves correspond to migration nodes that don't have any child (that is no other migrations depend on them)
+          # inside their app.
           def leaves
             leaves = Set(Node).new
             @nodes.values.each do |node|
@@ -49,7 +51,7 @@ module Marten
             leaves.to_a.sort { |n1, n2| n1.migration.id <=> n2.migration.id }
           end
 
-          # Returns an array of migration nodes to unapply starting from a specific node migration.
+          # Returns an array of migration nodes to unapply in order to unapply a specific migration node node.
           #
           # The returned array will start with the nodes that depend on the target node and will end with the target
           # node. The resulting "path" should be followed in order to unapply the migration corresponding to the target
@@ -59,7 +61,7 @@ module Marten
             path.map { |id| @nodes[id] }
           end
 
-          # Returns an array of migration nodes to apply starting from a specific node migration.
+          # Returns an array of migration nodes to apply in order to apply a specific migration node.
           #
           # The returned array will start with the depdendencies of the target node and will end with the target node.
           # The resulting "path" should be followed in order to apply the migration corresponding to the target node.
@@ -97,7 +99,7 @@ module Marten
                   # The replacement node should now have the replaced node child as its own child, the considered child
                   # node should have the replacement node as its parent. This should only be done when the child is not
                   # replaced by the current replacement node too.
-                  if migration.class.replacement_ids.includes?(child.migration.id)
+                  if !migration.class.replacement_ids.includes?(child.migration.id)
                     replacement_node.add_child(child)
                     child.add_parent(replacement_node)
                   end
@@ -108,7 +110,7 @@ module Marten
                   # The replacement node should now have the replaced node parent as its own parent, and the considered
                   # parent node should have the replacement node as a child. This should only be done if the parent is
                   # not going to be replaced too.
-                  if migration.class.replacement_ids.includes?(parent.migration.id)
+                  if !migration.class.replacement_ids.includes?(parent.migration.id)
                     replacement_node.add_parent(parent)
                     parent.add_child(replacement_node)
                   end
@@ -154,7 +156,7 @@ module Marten
             end
           end
 
-          # Returns the project state corresponding to the considered graph of mutation nodes.
+          # Returns the project state corresponding to the considered graph of migration nodes.
           def to_project_state
             leaf_nodes = leaves
             project_state = ProjectState.new

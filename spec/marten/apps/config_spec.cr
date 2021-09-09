@@ -31,6 +31,23 @@ describe Marten::Apps::Config do
     end
   end
 
+  describe "#==" do
+    it "returns true if the other app config is the same object" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.should eq app_config
+    end
+
+    it "returns true if the other app config corresponds to the same app config" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.should eq Marten::Apps::ConfigSpec::TestConfig.new
+    end
+
+    it "returns false if the other app config does not correspond to the same app config" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.should_not eq Marten::Apps::ConfigSpec::DummyConfig.new
+    end
+  end
+
   describe "#assets_finder" do
     it "returns an assets finder targetting the app assets folder" do
       app_config = Marten::Apps::ConfigSpec::TestConfig.new

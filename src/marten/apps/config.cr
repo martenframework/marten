@@ -25,6 +25,11 @@ module Marten
         @models = [] of DB::Model.class
       end
 
+      # Returns true if the other app config corresponds to the current app config.
+      def ==(other : self)
+        super || (label == other.label && models == other.models)
+      end
+
       # Returns the assets finder of the application.
       #
       # If the application doesn't have a dedicated assets directory, `nil` is returned.

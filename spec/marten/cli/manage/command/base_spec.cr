@@ -127,7 +127,7 @@ describe Marten::CLI::Manage::Command::Base do
       command.print_error("This is bad")
 
       stderr.rewind
-      stderr.gets_to_end.should eq "This is bad".colorize.bright.to_s + '\n'
+      stderr.gets_to_end.should eq "\e[1mThis is bad\e[0m\n"
     end
 
     it "allows to print a specific message to the error file descriptor without color if the no-color flag is set" do
@@ -153,7 +153,7 @@ describe Marten::CLI::Manage::Command::Base do
       command.print(command.style("Hello World!", fore: :light_blue, mode: :bold))
 
       stdout.rewind
-      stdout.gets_to_end.should eq "Hello World!".colorize.fore(:light_blue).mode(:bold).to_s + '\n'
+      stdout.gets_to_end.should eq "\e[94;1mHello World!\e[0m\n"
     end
 
     it "does nothing if the no-color flag is set" do

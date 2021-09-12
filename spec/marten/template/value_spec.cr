@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::Template::Value do
   describe "::from" do
-    it "is able to initialize a new template value from a hash" do
+    it "is able to initialize a new value value from a hash" do
       value = Marten::Template::Value.from({"foo" => "bar", "test" => 42, "nested" => {"test" => 1}})
 
       value.raw.should be_a Hash(Marten::Template::Value, Marten::Template::Value)
@@ -19,7 +19,7 @@ describe Marten::Template::Value do
       raw[Marten::Template::Value.from("nested")].should eq Marten::Template::Value.from({"test" => 1})
     end
 
-    it "is able to initialize a new template value from a named tuple" do
+    it "is able to initialize a new value value from a named tuple" do
       value = Marten::Template::Value.from({foo: "bar", test: 42, nested: {test: 1}})
 
       value.raw.should be_a Hash(Marten::Template::Value, Marten::Template::Value)
@@ -36,7 +36,7 @@ describe Marten::Template::Value do
       raw[Marten::Template::Value.from("nested")].should eq Marten::Template::Value.from({"test" => 1})
     end
 
-    it "is able to initialize a new template value from an array" do
+    it "is able to initialize a new value value from an array" do
       value = Marten::Template::Value.from(["foo", "bar", 42, {"test" => 1}])
 
       value.raw.should be_a Array(Marten::Template::Value)
@@ -50,7 +50,7 @@ describe Marten::Template::Value do
       ])
     end
 
-    it "is able to initialize a new template value from a tuple" do
+    it "is able to initialize a new value value from a tuple" do
       value = Marten::Template::Value.from({"foo", "bar", 42, {"test" => 1}})
 
       value.raw.should be_a Array(Marten::Template::Value)
@@ -64,7 +64,7 @@ describe Marten::Template::Value do
       ])
     end
 
-    it "is able to initialize a new template value from a range" do
+    it "is able to initialize a new value value from a range" do
       value = Marten::Template::Value.from((1..4))
 
       value.raw.should be_a Array(Marten::Template::Value)
@@ -78,48 +78,62 @@ describe Marten::Template::Value do
       ])
     end
 
-    it "is able to initialize a new template value from a char" do
+    it "is able to initialize a new value value from a char" do
       value = Marten::Template::Value.from('x')
       value.raw.should eq "x"
     end
 
-    it "is able to initialize a new template value from an array of template values" do
+    it "is able to initialize a new value value from an array of template values" do
       other_value = Marten::Template::Value.from(["foo", "bar", 42])
       value = Marten::Template::Value.from(other_value)
       value.should eq Marten::Template::Value.from(["foo", "bar", 42])
     end
 
-    it "is able to initialize a new template value from a bool" do
+    it "is able to initialize a new value value from a bool" do
       Marten::Template::Value.from(true).raw.should eq true
       Marten::Template::Value.from(false).raw.should eq false
     end
 
-    it "is able to initialize a new template value from a float" do
+    it "is able to initialize a new value value from a float" do
       Marten::Template::Value.from(12.42).raw.should eq 12.42
     end
 
-    it "is able to initialize a new template value from a hash of template values" do
+    it "is able to initialize a new value value from a hash of template values" do
       other_value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})
       value = Marten::Template::Value.from(other_value)
       value.should eq Marten::Template::Value.from({"foo" => "bar", "test" => 42})
     end
 
-    it "is able to initialize a new template value from an integer" do
+    it "is able to initialize a new value value from an integer" do
       Marten::Template::Value.from(12).raw.should eq 12
       Marten::Template::Value.from(12_i64).raw.should eq 12_i64
     end
 
-    it "is able to initialize a new template value from nil" do
+    it "is able to initialize a new value value from nil" do
       Marten::Template::Value.from(nil).raw.should be_nil
     end
 
-    it "is able to initialize a new template value from a string" do
+    it "is able to initialize a new value value from a string" do
       Marten::Template::Value.from("foo bar").raw.should eq "foo bar"
     end
 
-    it "is able to initialize a new template value from a time" do
+    it "is able to initialize a new value value from a time" do
       time = Time.local
       Marten::Template::Value.from(time).raw.should eq time
+    end
+
+    it "is able to initialize a new value value from a query set" do
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "ruby", is_active: true)
+
+      value = Marten::Template::Value.from(Tag.all)
+
+      value.raw.should eq [
+        Marten::Template::Value.from(tag_1),
+        Marten::Template::Value.from(tag_2),
+        Marten::Template::Value.from(tag_3),
+      ]
     end
 
     it "raises an unsupported value error if the passed value is not supported" do

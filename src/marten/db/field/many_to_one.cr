@@ -99,6 +99,9 @@ module Marten
             # Getter and setter methods for the raw related object ID and the plain related object need to be created.
 
             {% related_model_klass = kwargs[:to] %}
+            {% if related_model_klass.stringify == "self" %}
+              {% related_model_klass = model_klass %}
+            {% end %}
 
             @[Marten::DB::Model::Table::FieldInstanceVariable(
               field_klass: {{ @type }},

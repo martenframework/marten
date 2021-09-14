@@ -1,6 +1,6 @@
 # Marten
 
-![logo](docs/files/hero.svg)
+![logo](docs/static/img/hero.svg)
 
 [![CI](https://github.com/martenframework/marten/workflows/CI/badge.svg)](https://github.com/martenframework/marten/actions)
 

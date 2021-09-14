@@ -15,8 +15,8 @@ init:
 .PHONY: docs
 ## Builds the documentation.
 docs:
-	crystal docs --output=docs/ref
-
+	crystal docs --output=docs/static/api
+	cd docs && npm run build
 
 # QUALITY ASSURANCE
 # ~~~~~~~~~~~~~~~~~

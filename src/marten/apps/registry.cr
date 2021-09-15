@@ -1,5 +1,8 @@
 module Marten
   module Apps
+    # The applications registry.
+    #
+    # The applications registry is responsible for managing all the application config classes of a given project.
     class Registry
       def initialize
         @app_configs = {} of String => Config

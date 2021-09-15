@@ -1,5 +1,10 @@
 module Marten
   module Apps
+    # Base application config class.
+    #
+    # This class can be subclassed on a per-application basis in order to configure the considered application. Things
+    # like the application label can be configured this way. Moreover, app config classes are also used in order to
+    # retrieve various abstractions associated with applications (such as models for example).
     abstract class Config
       include Association
 

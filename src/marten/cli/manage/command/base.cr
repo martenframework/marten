@@ -149,8 +149,6 @@ module Marten
           #
           # Note that the `--` must not be included in the option name.
           def on_option(flag : String | Symbol, description : String, &block : String ->)
-            flag = flag.to_s
-            # TODO: validate flag format
             parser.on("--#{flag}", description, &block)
           end
 
@@ -177,10 +175,60 @@ module Marten
             description : String,
             &block : String ->
           )
-            short_flag = short_flag.to_s
-            long_flag = long_flag.to_s
-            # TODO: validate short_flag and long_flag format
             parser.on("-#{short_flag}", "--#{long_flag}", description, &block)
+          end
+
+          # Allows to configure a specific command option with an associated argument.
+          #
+          # This method will configure a command option (eg. `--option`) and an associated argument. It expects a flag
+          # name, an argument name, a description, and it yields a block to let the command properly assign the option
+          # value to the command object:
+          #
+          # ```
+          # class MyCommand < Marten::CLI::Command
+          #   def setup
+          #     on_option(:option, :arg, "The name of the option") do |arg|
+          #       @arg = arg
+          #     end
+          #   end
+          # end
+          # ```
+          #
+          # Note that the `--` must not be included in the option name.
+          def on_option_with_arg(
+            flag : String | Symbol,
+            arg : String | Symbol,
+            description : String,
+            &block : String ->
+          )
+            parser.on("--#{flag}=#{arg.to_s.upcase}", description, &block)
+          end
+
+          # Allows to configure a specific command option with an associated argument.
+          #
+          # This method will configure a command option (eg. `--option`) and an associated argument. It expects a flag
+          # name, a short flag name, an argument name, a description, and it yields a block to let the command properly
+          # assign the option value to the command object:
+          #
+          # ```
+          # class MyCommand < Marten::CLI::Command
+          #   def setup
+          #     on_option("option", "o", "arg", "The name of the option") do |arg|
+          #       @arg = arg
+          #     end
+          #   end
+          # end
+          # ```
+          #
+          # Note that the `--` must not be included in the option name.
+          def on_option_with_arg(
+            short_flag : String | Symbol,
+            long_flag : String | Symbol,
+            arg : String | Symbol,
+            description : String,
+            &block : String ->
+          )
+            parser.on("-#{short_flag} #{arg.to_s.upcase}", "--#{long_flag}=#{arg.to_s.upcase}", description, &block)
           end
 
           # Allows to print a message to the output file descriptor.

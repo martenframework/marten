@@ -81,13 +81,45 @@ describe Marten::CLI::Manage::Command::Base do
       command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(options: ["-o", "value1"])
       command.setup
 
-      command.on_option("option", "o", "Option") do
+      command.on_option("o", "option", "Option") do
         option_set = true
       end
 
       command.handle
 
       option_set.should be_true
+    end
+  end
+
+  describe "#on_option_with_arg" do
+    it "allows to configure a new command option with an argument" do
+      arg = nil
+
+      command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(options: ["--option=hello"])
+      command.setup
+
+      command.on_option_with_arg("option", :arg, "Option") do |v|
+        arg = v
+      end
+
+      command.handle
+
+      arg.should eq "hello"
+    end
+
+    it "allows to configure a new command option with a short flag and an associated argument" do
+      arg = nil
+
+      command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(options: ["-o", "hello"])
+      command.setup
+
+      command.on_option_with_arg("o", "option", :arg, "Option") do |v|
+        arg = v
+      end
+
+      command.handle
+
+      arg.should eq "hello"
     end
   end
 

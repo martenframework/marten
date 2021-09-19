@@ -6,6 +6,28 @@ describe Marten::HTTP::Headers do
       headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
       headers["Content-Type"].should eq "application/json"
     end
+
+    it "allows to initializes an empty headers set" do
+      headers = Marten::HTTP::Headers.new
+      headers.should be_empty
+    end
+  end
+
+  describe "#==" do
+    it "returns true if the other headers set is the same object" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.should eq headers
+    end
+
+    it "returns true if the other headers set corresponds to the same headers" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.should eq Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+    end
+
+    it "returns false if the other headers does not correspond to the same headers" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.should_not eq Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "text/html"})
+    end
   end
 
   describe "#[]" do
@@ -55,6 +77,20 @@ describe Marten::HTTP::Headers do
       headers[:"X-Foo-Bar"]?.should be_nil
       headers[:X_FOO_BAR]?.should be_nil
       headers[:x_foo_bar]?.should be_nil
+    end
+  end
+
+  describe "#[]=" do
+    it "sets a specific header value from a name string" do
+      headers = Marten::HTTP::Headers.new
+      headers["Content-Type"] = "text/html"
+      headers["Content-Type"].should eq "text/html"
+    end
+
+    it "sets a specific header value from a name symbol" do
+      headers = Marten::HTTP::Headers.new
+      headers[:CONTENT_TYPE] = "text/html"
+      headers["Content-Type"].should eq "text/html"
     end
   end
 

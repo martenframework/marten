@@ -60,15 +60,23 @@ describe Marten::HTTP::Response do
       response = Marten::HTTP::Response.new
       response["Allow"] = "GET, POST"
       response["Content-Length"] = "0"
-      response.headers.should eq(HTTP::Headers{"Allow" => "GET, POST", "Content-Length" => "0"})
+      response.headers.should be_a Marten::HTTP::Headers
+      response.headers["Allow"].should eq "GET, POST"
+      response.headers["Content-Length"].should eq "0"
     end
   end
 
   describe "#[]=" do
-    it "sets a specific header value" do
+    it "sets a specific header value from a header name string" do
       response = Marten::HTTP::Response.new
       response["Allow"] = "GET, POST"
       response.headers["Allow"].should eq "GET, POST"
+    end
+
+    it "sets a specific header value from a header name symbol" do
+      response = Marten::HTTP::Response.new
+      response[:CONTENT_TYPE] = "text/html"
+      response.headers["Content-Type"].should eq "text/html"
     end
   end
 end

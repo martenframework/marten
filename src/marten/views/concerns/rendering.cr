@@ -1,5 +1,6 @@
 module Marten
   module Views
+    # Provides the ability to generate HTTP responses with the content of rendered templates.
     module Rendering
       macro included
         # Returns the configured template name.

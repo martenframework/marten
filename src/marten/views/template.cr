@@ -2,6 +2,7 @@ require "./concerns/rendering"
 
 module Marten
   module Views
+    # View allowing to respond to `GET` request with the content of a rendered HTML template.
     class Template < Base
       include Rendering
 

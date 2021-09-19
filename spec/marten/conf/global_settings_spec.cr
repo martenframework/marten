@@ -144,23 +144,23 @@ describe Marten::Conf::GlobalSettings do
   end
 
   describe "#host" do
-    it "returns localhost by default" do
+    it "returns 127.0.0.1 by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.host.should eq "localhost"
+      global_settings.host.should eq "127.0.0.1"
     end
 
     it "returns the configured HTTP server host value" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.host = "0.0.0.0"
-      global_settings.host.should eq "0.0.0.0"
+      global_settings.host = "192.168.1.1"
+      global_settings.host.should eq "192.168.1.1"
     end
   end
 
   describe "#host=" do
     it "allows to configure the HTTP server host" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.host = "0.0.0.0"
-      global_settings.host.should eq "0.0.0.0"
+      global_settings.host = "192.168.1.1"
+      global_settings.host.should eq "192.168.1.1"
     end
   end
 

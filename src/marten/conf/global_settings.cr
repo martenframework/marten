@@ -133,7 +133,7 @@ module Marten
         @allowed_hosts = [] of String
         @databases = [] of Database
         @debug = false
-        @host = "localhost"
+        @host = "127.0.0.1"
         @installed_apps = Array(Marten::Apps::Config.class).new
         log_formatter = ::Log::Formatter.new do |entry, io|
           io << "[#{entry.severity.to_s[0]}] "

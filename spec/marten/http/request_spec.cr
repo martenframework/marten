@@ -171,6 +171,19 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#cookies" do
+    it "returns the request cookies" do
+      raw_request = ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+      raw_request.cookies["test"] = "value"
+
+      request = Marten::HTTP::Request.new(raw_request)
+
+      request.cookies.should be_a Marten::HTTP::Cookies
+      request.cookies.size.should eq 1
+      request.cookies["test"].should eq "value"
+    end
+  end
+
   describe "#data" do
     it "returns an object containing the params extracted from application/x-www-form-urlencoded inputs" do
       request = Marten::HTTP::Request.new(

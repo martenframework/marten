@@ -34,6 +34,11 @@ module Marten
         @body ||= @request.body.nil? ? "" : @request.body.as(IO).gets_to_end
       end
 
+      # Returns the cookies associated with the request.
+      def cookies
+        @cookies ||= Cookies.new(@request.cookies)
+      end
+
       # Returns the parsed request data.
       def data : Params::Data
         @data ||= Params::Data.new(extract_raw_data_params)

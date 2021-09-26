@@ -48,6 +48,13 @@ describe Marten::HTTP::Response do
     end
   end
 
+  describe "#cookies" do
+    it "returns the response cookies" do
+      response = Marten::HTTP::Response.new
+      response.cookies.should be_a Marten::HTTP::Cookies
+    end
+  end
+
   describe "#status" do
     it "returns the response status" do
       response = Marten::HTTP::Response.new(status: 404)

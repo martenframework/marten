@@ -13,6 +13,9 @@ module Marten
       # Returns the content type associated with the HTTP response.
       getter content_type
 
+      # Returns the cookies associated with the HTTP response.
+      getter cookies
+
       # Returns the headers associated with the HTTP response.
       getter headers
 
@@ -24,6 +27,7 @@ module Marten
         @content_type : String = DEFAULT_CONTENT_TYPE,
         @status : Int32 = 200
       )
+        @cookies = Cookies.new
         @headers = Headers.new
       end
 

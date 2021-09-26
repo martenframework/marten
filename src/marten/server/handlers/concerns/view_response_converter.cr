@@ -6,6 +6,7 @@ module Marten
           context.response.status_code = response.status
           context.response.headers.merge!(response.headers.to_stdlib)
           context.response.content_type = response.content_type.to_s
+          response.cookies.to_stdlib.each { |cookie| context.response.cookies << cookie }
           context.response.print(response.content)
         end
       end

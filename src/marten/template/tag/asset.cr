@@ -45,7 +45,7 @@ module Marten
         def render(context : Context) : String
           asset_name = @asset_name_expression.resolve(context).to_s
 
-          url = Marten.assets.storage.url(asset_name)
+          url = Marten.assets.url(asset_name)
 
           if @assigned_to.nil?
             url

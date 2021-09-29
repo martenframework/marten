@@ -5,6 +5,7 @@ module Marten
       class Assets
         @app_dirs : Bool = true
         @dirs : Array(String) = [] of String
+        @manifests : Array(String) = [] of String
         @root : String = "assets"
         @storage : Core::Storage::Base? = nil
         @url : String = "/assets/"
@@ -16,6 +17,9 @@ module Marten
         #
         # The order of these directories is important as it defines the order in which assets are searched for.
         getter dirs
+
+        # Returns the configured paths to manifest JSON files to use to resolve assets URLs.
+        getter manifests
 
         # Returns the absolute path where collected assets will be persisted.
         getter root
@@ -40,6 +44,18 @@ module Marten
               dir.expand.to_s
             else
               dir.to_s
+            end
+          end
+        end
+
+        # Allows to set paths to manifest JSON files to use in order to resolve asset URLs.
+        def manifests=(manifests : Array(Path | String | Symbol))
+          @manifests = manifests.map do |path|
+            case path
+            when Path
+              path.expand.to_s
+            else
+              path.to_s
             end
           end
         end

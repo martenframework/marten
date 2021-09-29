@@ -62,6 +62,32 @@ describe Marten::Asset::Engine do
       engine.storage.should eq storage
     end
   end
+
+  describe "#url" do
+    it "returns the storage URL by default if no manifests are configured" do
+      storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "/assets/")
+      engine = Marten::Asset::Engine.new(storage: storage)
+      engine.url("css/app.css").should eq "/assets/css/app.css"
+    end
+
+    it "returns the storage URL computed using the file name retrieved from the manifest if applicable" do
+      storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "/assets/")
+
+      engine = Marten::Asset::Engine.new(storage: storage)
+      engine.manifests << File.join(__DIR__, "engine_spec/manifest.json")
+
+      engine.url("css/app.css").should eq "/assets/css/app.12345.css"
+    end
+
+    it "uses the passed file path as is if a manifest is configured but it does not contain the file path" do
+      storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "/assets/")
+
+      engine = Marten::Asset::Engine.new(storage: storage)
+      engine.manifests << File.join(__DIR__, "engine_spec/manifest.json")
+
+      engine.url("css/other.css").should eq "/assets/css/other.css"
+    end
+  end
 end
 
 module Marten::Asset::EngineSpec

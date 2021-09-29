@@ -89,6 +89,63 @@ describe Marten::Conf::GlobalSettings::Assets do
     end
   end
 
+  describe "#manifests" do
+    it "returns an empty array of strings by default" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.manifests.should be_empty
+    end
+
+    it "returns the configured array of manifest file paths" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.manifests = [
+        "src/path1/manifest1.json",
+        "src/path1/manifest2.json",
+      ]
+      assets_conf.manifests.should eq([
+        "src/path1/manifest1.json",
+        "src/path1/manifest2.json",
+      ])
+    end
+  end
+
+  describe "#manifests=" do
+    it "allows to set the array of manifest files to load" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.manifests = [
+        "src/path1/manifest1.json",
+        "src/path1/manifest2.json",
+      ]
+      assets_conf.manifests.should eq([
+        "src/path1/manifest1.json",
+        "src/path1/manifest2.json",
+      ])
+    end
+
+    it "can allow to set the array of manifest files from symbols" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.manifests = [
+        :"src/path1/manifest1.json",
+        :"src/path1/manifest2.json",
+      ]
+      assets_conf.manifests.should eq([
+        "src/path1/manifest1.json",
+        "src/path1/manifest2.json",
+      ])
+    end
+
+    it "can allow to set the array of manifest files from path objects" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.manifests = [
+        Path["src/path1/manifest1.json"],
+        Path["src/path1/manifest2.json"],
+      ]
+      assets_conf.manifests.should eq([
+        Path["src/path1/manifest1.json"].expand.to_s,
+        Path["src/path1/manifest2.json"].expand.to_s,
+      ])
+    end
+  end
+
   describe "#root" do
     it "returns the expected default value by default" do
       assets_conf = Marten::Conf::GlobalSettings::Assets.new

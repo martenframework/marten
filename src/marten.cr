@@ -90,6 +90,8 @@ module Marten
     finders << Asset::Finder::AppDirs.new if settings.assets.app_dirs
     finders += settings.assets.dirs.map { |d| Asset::Finder::FileSystem.new(d) }
 
+    assets.manifests = settings.assets.manifests
+
     assets.finders = finders
   end
 

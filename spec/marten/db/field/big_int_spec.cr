@@ -124,6 +124,19 @@ describe Marten::DB::Field::BigInt do
       field.to_db(42.to_i32).should eq 42.to_i64
     end
 
+    it "returns a casted Int64 value if the value is a valid integer expressed as a string" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+      field.to_db("42").should eq 42.to_i64
+    end
+
+    it "raises UnexpectedFieldValue if the value is a string that cannot be converted to an Int64" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.to_db("hello world")
+      end
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::BigInt.new("my_field")
 

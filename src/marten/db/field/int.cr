@@ -51,6 +51,8 @@ module Marten
             value
           when Int8, Int16, Int64
             value.as(Int8 | Int16 | Int64).to_i32
+          when ::String
+            value.to_i32? || raise_unexpected_field_value(value)
           else
             raise_unexpected_field_value(value)
           end

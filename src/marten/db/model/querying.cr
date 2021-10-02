@@ -30,7 +30,11 @@ module Marten
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
             {% begin %}
+            {% if @type.abstract? %}
+            raise "Records can only be queried from non-abstract model classes"
+            {% else %}
             Query::Set({{ @type }}).new
+            {% end %}
             {% end %}
           end
 

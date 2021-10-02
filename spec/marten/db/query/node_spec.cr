@@ -123,6 +123,18 @@ describe Marten::DB::Query::Node do
         }
       )
     end
+
+    it "converts unexpected filter values to their string representations" do
+      node = Marten::DB::Query::Node.new(path: Path["foo/bar"])
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+      node.filters.should eq(
+        Marten::DB::Query::Node::FilterHash{
+          "path" => "foo/bar",
+        }
+      )
+    end
   end
 
   describe "#==" do

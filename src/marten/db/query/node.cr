@@ -89,11 +89,20 @@ module Marten
             @filters[key.to_s] = case value
                                  when Array
                                    arr = Array(Field::Any).new
-                                   value.each { |v| arr << v }
+                                   value.each { |v| arr << prepare_filter_value(v) }
                                    arr
                                  else
-                                   value
+                                   prepare_filter_value(value)
                                  end
+          end
+        end
+
+        private def prepare_filter_value(value)
+          case value
+          when DB::Model, Field::Any
+            value
+          else
+            value.to_s
           end
         end
       end

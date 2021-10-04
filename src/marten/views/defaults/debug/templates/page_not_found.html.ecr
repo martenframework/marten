@@ -111,7 +111,7 @@
         </svg>
       </div>
       <h1><span class="exception-class">Page not found</h1>
-      <div class="status-code">404</div>
+      <div class="status-code">404<% if !error.nil? && error.not_nil!.message %>&nbsp;-&nbsp;<%= error.not_nil!.message %><% end %></div>
     </header>
     <section class="information">
       <div class="general">

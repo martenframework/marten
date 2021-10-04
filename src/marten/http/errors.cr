@@ -1,6 +1,12 @@
 module Marten
   module HTTP
     module Errors
+      # Represents an error raised when a not found response (404) should be returned by the server.
+      #
+      # This error can be raised in order to indicate to the Marten server that a not found response (404) should be
+      # returned to the client.
+      class NotFound < Exception; end
+
       # Represents an error raised when a suspicious operation is identified.
       #
       # This exception is raised when a user has performed an operation that should be considered suspicious because it

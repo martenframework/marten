@@ -7,6 +7,11 @@ module Marten
         # A "welcome" page is returned by this view if the requested path corresponds to the root of the application.
         # Otherwise, a standard "Page not found" response is returned.
         class PageNotFound < View
+          @error : Exception? = nil
+
+          getter error
+          setter error
+
           def dispatch
             if request.path == "/"
               render_welcome_page

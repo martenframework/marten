@@ -9,9 +9,14 @@ module Marten
 
         def call(context : ::HTTP::Server::Context)
           call_next(context)
-        rescue Marten::Routing::Errors::NoResolveMatch
-          view_klass = Marten.settings.debug ? Marten::Views::Defaults::Debug::PageNotFound : Marten.settings.view404
-          view = view_klass.new(context.marten.request)
+        rescue error : Marten::HTTP::Errors::NotFound | Marten::Routing::Errors::NoResolveMatch
+          if Marten.settings.debug
+            view = Marten::Views::Defaults::Debug::PageNotFound.new(context.marten.request)
+            view.error = error
+          else
+            view = Marten.settings.view404.new(context.marten.request)
+          end
+
           convert_view_response(context, view.dispatch.as(HTTP::Response))
         rescue Marten::HTTP::Errors::SuspiciousOperation
           view = Marten.settings.view400.new(context.marten.request)

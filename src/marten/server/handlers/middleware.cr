@@ -13,38 +13,35 @@ module Marten
           response : HTTP::Response? = nil
 
           # Call each middleware in order to let them process the incoming request and optionnaly bypass the routing
-          # mechanism by returning an early response.
-          middleware_chain.each do |middleware|
-            result = middleware.process_request(context.marten.request).as(HTTP::Response?)
+          # mechanism by returning an early response. Each middleware should have access to the final response in order
+          # to process it if necessary (or to completely replace it!).
+          response = if middleware_chain.empty?
+                       get_final_response(context)
+                     else
+                       middleware_chain.first.chain(context.marten.request, ->{ get_final_response(context) })
+                     end
 
-            unless result.nil?
-              response = result
-              break
-            end
-          end
-
-          # No response means that the next HTTP handler (routing, likely) must be called.
-          if response.nil?
-            call_next(context)
-          end
-
-          response = response.nil? ? context.marten.response : response
-          return context if response.nil?
-
-          # Call each middleware in order to let them process the response in order to alter it or completely replace it
-          # if applicable.
-          middleware_chain.each do |middleware|
-            response = middleware.process_response(context.marten.request, response).as(HTTP::Response)
-          end
-
-          # At this point the final HTTP response has to be written the server response.
+          # At this point the final HTTP response has to be written to the server response.
           convert_view_response(context, response)
 
           context
         end
 
+        private def get_final_response(context)
+          call_next(context)
+          context.marten.response.not_nil!
+        end
+
         private def middleware_chain
-          @middleware_chain ||= Marten.settings.middleware.map { |middleware_klass| middleware_klass.new }
+          @middleware_chain ||= begin
+            chain = Marten.settings.middleware.map { |middleware_klass| middleware_klass.new }
+
+            chain.each_cons_pair do |middleware, next_middleware|
+              middleware.next = next_middleware
+            end
+
+            chain
+          end
         end
       end
     end

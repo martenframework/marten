@@ -16,7 +16,7 @@ describe Marten::Middleware::I18n do
     Marten.setup_i18n
   end
 
-  describe "#process_request" do
+  describe "#call" do
     it "is able to activate the right locale for a simple tag" do
       Marten.settings.i18n.default_locale = :en
       Marten.settings.i18n.available_locales = [:en, :fr]
@@ -24,14 +24,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -44,14 +45,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-CA,en;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -64,14 +66,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-FR,en;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr-CA"
@@ -84,14 +87,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.2,en;q=0.5,es;q=0.7"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "es"
@@ -104,14 +108,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "it-IT,it;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "en"
@@ -124,14 +129,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -144,14 +150,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "FR"
@@ -164,14 +171,15 @@ describe Marten::Middleware::I18n do
 
       middleware = Marten::Middleware::I18n.new
 
-      middleware.process_request(
+      middleware.call(
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
             resource: "",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-FR,en;q=0.5"}
           )
-        )
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "FR-CA"

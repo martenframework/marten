@@ -1,9 +1,10 @@
 module Marten
-  class Middleware
+  abstract class Middleware
     class I18n < Middleware
-      def process_request(request : Marten::HTTP::Request) : Nil
+      def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         locale = get_locale_from(request)
         ::I18n.activate(locale)
+        get_response.call
       end
 
       private ACCEPT_LANGUAGE_RE = %r{

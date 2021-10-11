@@ -2,37 +2,53 @@ module Marten
   module Core
     # Provides validation to objects.
     module Validation
-      annotation Method
-      end
-
       @validation_context : Symbol?
 
       # Returns the error set containing the errors generated during a validation.
       getter errors : ErrorSet = ErrorSet.new
 
-      macro validate(method)
-        {% if !(method.is_a?(StringLiteral) || method.is_a?(SymbolLiteral)) ||
-                !(method.id =~ /^[a-zA-Z_][a-zA-AZ_0-9]*$/) %}
-          {% raise "Cannot use '#{method}' as a validation method" %}
-        {% end %}
-
-        @[Marten::Core::Validation::Method(name: {{ method }})]
-        class ::{{ @type }}
-        end
-      end
-
-      macro setup_validation
-        macro included
-          setup_validation
-        end
+      macro included
+        begin_validation_methods_setup
 
         macro inherited
-          setup_validation
+          begin_validation_methods_setup
+
+          macro finished
+            finish_validation_methods_setup
+          end
+        end
+
+        macro finished
+          finish_validation_methods_setup
         end
       end
 
-      macro included
-        setup_validation
+      # Registers validation methods.
+      macro validate(*names)
+        {%
+          names.reduce(VALIDATION_METHODS) do |array, name|
+            array << name.id.stringify
+            array
+          end
+        %}
+      end
+
+      # :nodoc:
+      macro begin_validation_methods_setup
+        # :nodoc:
+        VALIDATION_METHODS = [] of String
+      end
+
+      # :nodoc:
+      macro finish_validation_methods_setup
+        {% verbatim do %}
+          {% if !VALIDATION_METHODS.empty? %}
+            protected def run_validation_methods
+              super
+              {{ VALIDATION_METHODS.join("\n").id }}
+            end
+          {% end %}
+        {% end %}
       end
 
       # Returns a boolean indicating whether the object is valid.
@@ -57,25 +73,15 @@ module Marten
       def validate
       end
 
+      protected def run_validation_methods
+      end
+
       private getter validation_context
 
       private def perform_validation
         validate
         run_validation_methods
         errors.empty?
-      end
-
-      private def run_validation_methods
-        {% begin %}
-          {% for ancestor_klass in @type.ancestors %}
-            {% for ann, idx in ancestor_klass.annotations(Marten::Core::Validation::Method) %}
-              {% if ann %}{{ ann[:name].id }}{% end %}
-            {% end %}
-          {% end %}
-          {% for ann, idx in @type.annotations(Marten::Core::Validation::Method) %}
-            {% if ann %}{{ ann[:name].id }}{% end %}
-          {% end %}
-        {% end %}
       end
 
       private def validation_context=(context)

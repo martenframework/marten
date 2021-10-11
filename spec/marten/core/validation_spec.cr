@@ -1,6 +1,21 @@
 require "./spec_helper"
 
 describe Marten::Core::Validation do
+  describe "::validate" do
+    it "can register multiple validation methods" do
+      c = Marten::Core::ValidationSpec::C.new
+
+      c.valid?.should be_false
+      c.errors[0].message.should eq "The content is nil!"
+      c.errors[0].field.should eq "content"
+
+      c.content = ""
+      c.valid?.should be_false
+      c.errors[0].message.should eq "The content is blank!"
+      c.errors[0].field.should eq "content"
+    end
+  end
+
   describe "#errors" do
     it "returns an ErrorSet object" do
       foo = Marten::Core::ValidationSpec::Foo.new
@@ -137,6 +152,24 @@ module Marten::Core::ValidationSpec
 
     private def validate_content
       errors.add(:content, "The content is blank!") if @content.empty?
+    end
+  end
+
+  class C
+    include Marten::Core::Validation
+
+    @content : String? = nil
+
+    setter content
+
+    validate :validate_content_is_not_nil, :validate_content_is_not_blank
+
+    private def validate_content_is_not_nil
+      errors.add(:content, "The content is nil!") if @content.nil?
+    end
+
+    private def validate_content_is_not_blank
+      errors.add(:content, "The content is blank!") if @content.try(&.empty?)
     end
   end
 end

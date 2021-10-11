@@ -1,3 +1,5 @@
+require "./concerns/callbacks"
+
 module Marten
   module Views
     # Base view implementation.
@@ -5,6 +7,8 @@ module Marten
     # This class defines the behaviour of a view. A view is initialized from an HTTP request and it is responsible for
     # processing a request in order to produce an HTTP response (which can be an HTML content, a redirection, etc).
     class Base
+      include Callbacks
+
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
@@ -111,6 +115,16 @@ module Marten
         response["Allow"] = self.class.http_method_names.join(", ") { |m| m.upcase }
         response["Content-Length"] = "0"
         response
+      end
+
+      # :nodoc:
+      def process_dispatch : Marten::HTTP::Response
+        before_callbacks_response = run_before_dispatch_callbacks
+
+        response = before_callbacks_response || dispatch
+
+        after_callbacks_response = run_after_dispatch_callbacks
+        after_callbacks_response || response
       end
 
       # Returns an HTTP response generated from a content string, content type and status code.

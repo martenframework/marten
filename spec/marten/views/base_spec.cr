@@ -384,6 +384,79 @@ describe Marten::Views::Base do
     end
   end
 
+  describe "#process_dispatch" do
+    it "runs before_dispatch and after_dispatch callbacks as expected" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithCallbacks.new(request)
+
+      view.foo.should be_nil
+      view.bar.should be_nil
+
+      view.process_dispatch
+
+      view.foo.should eq "set_foo"
+      view.bar.should eq "set_bar"
+    end
+
+    it "returns the expected dispatch response if dispatch callbacks don't return custom responses" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithCallbacks.new(request)
+
+      response = view.process_dispatch
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "Regular response"
+    end
+
+    it "returns any early response returned by the before_dispatch callbacks" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithBeforeDispatchResponse.new(request)
+
+      response = view.process_dispatch
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "before_dispatch response"
+    end
+
+    it "returns any overridden response returned by the after_dispatch callbacks" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithAfterDispatchResponse.new(request)
+
+      response = view.process_dispatch
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "after_dispatch response"
+    end
+  end
+
   describe "#reverse" do
     it "provides a shortcut allowing to perform route lookups" do
       request = Marten::HTTP::Request.new(
@@ -505,6 +578,50 @@ module Marten::Views::BaseSpec
 
     def get
       Marten::HTTP::Response.new(reverse("dummy_with_id", {"id" => 10}), content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestViewWithCallbacks < Marten::Views::Base
+    property foo : String? = nil
+    property bar : String? = nil
+
+    before_dispatch :set_foo
+    after_dispatch :set_bar
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
+  end
+
+  class TestViewWithBeforeDispatchResponse < Marten::Views::Base
+    before_dispatch :return_before_dispatch_response
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_before_dispatch_response
+      Marten::HTTP::Response.new("before_dispatch response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestViewWithAfterDispatchResponse < Marten::Views::Base
+    before_dispatch :return_after_dispatch_response
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_after_dispatch_response
+      Marten::HTTP::Response.new("after_dispatch response", content_type: "text/plain", status: 200)
     end
   end
 end

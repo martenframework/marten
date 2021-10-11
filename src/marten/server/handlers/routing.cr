@@ -12,7 +12,7 @@ module Marten
           matched = Marten.routes.resolve(context.request.path)
 
           view = matched.view.new(context.marten.request, matched.kwargs)
-          context.marten.response = view.dispatch.as(HTTP::Response)
+          context.marten.response = view.process_dispatch.as(HTTP::Response)
 
           context
         end

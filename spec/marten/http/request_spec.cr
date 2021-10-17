@@ -687,6 +687,98 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#scheme" do
+    around_each do |t|
+      original_use_x_forwarded_proto = Marten.settings.use_x_forwarded_proto
+
+      t.run
+
+      Marten.settings.use_x_forwarded_proto = original_use_x_forwarded_proto
+    end
+
+    it "returns http by default if the use_x_forwarded_proto setting is set to false" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.scheme.should eq "http"
+    end
+
+    it "returns https if the use_x_forwarded_proto setting is set to true and the header has the right value" do
+      Marten.settings.use_x_forwarded_proto = true
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{
+            "Host"              => "example.com",
+            "X-Forwarded-Proto" => "https",
+          }
+        )
+      )
+      request.scheme.should eq "https"
+    end
+
+    it "returns http if the use_x_forwarded_proto setting is set to true and the header doesn't have the right value" do
+      Marten.settings.use_x_forwarded_proto = true
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{
+            "Host"              => "example.com",
+            "X-Forwarded-Proto" => "https",
+          }
+        )
+      )
+      request.scheme.should eq "https"
+    end
+  end
+
+  describe "#secure?" do
+    around_each do |t|
+      original_use_x_forwarded_proto = Marten.settings.use_x_forwarded_proto
+
+      t.run
+
+      Marten.settings.use_x_forwarded_proto = original_use_x_forwarded_proto
+    end
+
+    it "returns false if the scheme is not HTTPS" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      request.secure?.should be_false
+    end
+
+    it "returns true if the scheme is HTTPS" do
+      Marten.settings.use_x_forwarded_proto = true
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{
+            "Host"              => "example.com",
+            "X-Forwarded-Proto" => "https",
+          }
+        )
+      )
+
+      request.secure?.should be_true
+    end
+  end
+
   describe "#trace?" do
     it "returns true if the request is a TRACE" do
       request = Marten::HTTP::Request.new(

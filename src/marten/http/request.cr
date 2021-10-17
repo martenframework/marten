@@ -8,6 +8,7 @@ module Marten
       @accepted_media_types : Array(MIME::MediaType)?
       @host : String?
       @port : String?
+      @scheme : String?
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
@@ -111,6 +112,22 @@ module Marten
       # Returns the HTTP GET parameters embedded in the request.
       def query_params : Params::Query
         @query_parans ||= Params::Query.new(extract_raw_query_params)
+      end
+
+      # Returns the scheme of the request (either `"http"` or `"https"`).
+      def scheme : String
+        @scheme ||= begin
+          if Marten.settings.use_x_forwarded_proto && headers[:X_FORWARDED_PROTO] == "https"
+            "https"
+          else
+            "http"
+          end
+        end
+      end
+
+      # Returns `true` if the request is secure (if it is an HTTPS request).
+      def secure?
+        scheme == "https"
       end
 
       # Returns `true` if the request is a TRACE.

@@ -53,6 +53,9 @@ module Marten
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
 
+      # Returns a boolean indicating if the X-Forwarded-Proto header is used to determine whether a request is secure.
+      getter use_x_forwarded_proto
+
       # Returns the configured view class that should generate responses for Bad Request responses (HTTP 400).
       getter view400
 
@@ -102,6 +105,9 @@ module Marten
 
       # Allows to set whether the X-Forwarded-Host header is used to look for the host.
       setter use_x_forwarded_host
+
+      # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
+      setter use_x_forwarded_proto
 
       # Allows to set the view class that should generate responses for Bad Request responses (HTTP 400).
       setter view400
@@ -154,6 +160,7 @@ module Marten
         @secret_key = ""
         @time_zone = Time::Location.load("UTC")
         @use_x_forwarded_host = false
+        @use_x_forwarded_proto = false
         @view400 = Views::Defaults::BadRequest
         @view403 = Views::Defaults::PermissionDenied
         @view404 = Views::Defaults::PageNotFound
@@ -194,6 +201,11 @@ module Marten
       def middleware=(v)
         @middleware = Array(Marten::Middleware.class).new
         @middleware.concat(v)
+      end
+
+      # Provides access to request forgery protection settings.
+      def request_forgery_protection
+        @request_forgery_protection ||= GlobalSettings::RequestForgeryProtection.new
       end
 
       # Provides access to templates settings.

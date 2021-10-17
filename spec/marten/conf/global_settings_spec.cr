@@ -373,6 +373,27 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#use_x_forwarded_proto" do
+    it "returns false by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_proto.should be_false
+    end
+
+    it "returns the configured boolean value if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_proto = true
+      global_settings.use_x_forwarded_proto.should be_true
+    end
+  end
+
+  describe "#use_x_forwarded_proto=" do
+    it "allows to configure whether the X-Forwarded-Proto header should be used" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_proto = true
+      global_settings.use_x_forwarded_proto.should be_true
+    end
+  end
+
   describe "#view400" do
     it "#returns Marten::Views::Defaults::BadRequest by default" do
       global_settings = Marten::Conf::GlobalSettings.new

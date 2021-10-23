@@ -623,6 +623,55 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#port" do
+    around_each do |t|
+      original_use_x_forwarded_proto = Marten.settings.use_x_forwarded_proto
+
+      t.run
+
+      Marten.settings.use_x_forwarded_proto = original_use_x_forwarded_proto
+    end
+
+    it "returns the request port" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com:8080"}
+        )
+      )
+      request.port.should eq "8080"
+    end
+
+    it "returns 80 by default if the host does not contain any port for an HTTP request" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.port.should eq "80"
+    end
+
+    it "returns 443 by default if the host does not contain any port for an HTTPS request" do
+      Marten.settings.use_x_forwarded_proto = true
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{
+            "Host"              => "example.com",
+            "X-Forwarded-Proto" => "https",
+          }
+        )
+      )
+
+      request.port.should eq "443"
+    end
+  end
+
   describe "#post?" do
     it "returns true if the request is a POST" do
       request = Marten::HTTP::Request.new(

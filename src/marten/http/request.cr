@@ -179,6 +179,13 @@ module Marten
         raise Errors::UnexpectedHost.new("No host specified") if host.nil? || host.as(String).empty?
 
         domain, port = extract_domain_and_port(host)
+
+        if Marten.settings.use_x_forwarded_port &&
+           headers.has_key?(:X_FORWARDED_PORT) &&
+           !headers[:X_FORWARDED_PORT].empty?
+          port = headers[:X_FORWARDED_PORT]
+        end
+
         if port.empty?
           port = secure? ? "443" : "80"
         end

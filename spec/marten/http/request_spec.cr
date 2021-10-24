@@ -670,6 +670,41 @@ describe Marten::HTTP::Request do
 
       request.port.should eq "443"
     end
+
+    it "returns the X-Forwarded-Port header value if the corresponding setting is set to true" do
+      Marten.settings.use_x_forwarded_port = true
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "X-Forwarded-Port" => "8080"}
+        )
+      )
+      request.port.should eq "8080"
+    end
+
+    it "fallbacks to the default port if the X-Forwarded-Port header should be used but does not contain any value" do
+      Marten.settings.use_x_forwarded_port = true
+
+      request_1 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "X-Forwarded-Port" => ""}
+        )
+      )
+      request_1.port.should eq "80"
+
+      request_2 = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request_2.port.should eq "80"
+    end
   end
 
   describe "#post?" do

@@ -53,6 +53,9 @@ module Marten
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
 
+      # Returns a boolean indicating if the X-Forwarded-Port header is used to determine the port of a request.
+      getter use_x_forwarded_port
+
       # Returns a boolean indicating if the X-Forwarded-Proto header is used to determine whether a request is secure.
       getter use_x_forwarded_proto
 
@@ -105,6 +108,9 @@ module Marten
 
       # Allows to set whether the X-Forwarded-Host header is used to look for the host.
       setter use_x_forwarded_host
+
+      # Allows to set whether the X-Forwarded-Port header is used to determine the port of a request.
+      setter use_x_forwarded_port
 
       # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
       setter use_x_forwarded_proto
@@ -160,6 +166,7 @@ module Marten
         @secret_key = ""
         @time_zone = Time::Location.load("UTC")
         @use_x_forwarded_host = false
+        @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
         @view400 = Views::Defaults::BadRequest
         @view403 = Views::Defaults::PermissionDenied

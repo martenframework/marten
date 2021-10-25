@@ -17,7 +17,7 @@ module Marten
         end
 
         def url(filepath : String) : String
-          URI.encode(File.join(base_url, filepath))
+          URI.encode_path(File.join(base_url, filepath))
         end
 
         private getter root

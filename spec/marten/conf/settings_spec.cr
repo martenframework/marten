@@ -28,5 +28,8 @@ module Marten::Conf::SettingsSpec
 
   class CustomSettings2 < Marten::Conf::Settings
     namespace :custom2
+
+    def initialize
+    end
   end
 end

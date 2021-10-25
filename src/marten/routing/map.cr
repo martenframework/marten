@@ -77,7 +77,11 @@ module Marten
       # parameters passed in the method call. If no route is found or if the arguments can't be applied to the route, a
       # `Marten::Routing::Errors::NoReverseMatch` exception is raised.
       def reverse(name : String | Symbol, **kwargs) : String
-        perform_reverse(name.to_s, kwargs.to_h)
+        params = Hash(String | Symbol, Parameter::Types).new
+        kwargs.each do |key, value|
+          params[key] = value
+        end
+        perform_reverse(name.to_s, params)
       end
 
       # Reverses a URL - returns the URL corresponding to a specific route name and hash of parameters.
@@ -105,7 +109,7 @@ module Marten
 
         begin
           reverser = @reversers[name]
-          reversed = reverser.reverse(params.is_a?(Hash(NoReturn, NoReturn)) ? nil : params)
+          reversed = reverser.reverse(params)
         rescue KeyError
           raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")
         end

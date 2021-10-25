@@ -10,7 +10,7 @@ jobs:
   mysql:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.1.1
+      image: crystallang/crystal:1.2.1
     services:
       mysql:
         image: mysql:5.7
@@ -47,7 +47,7 @@ jobs:
   postgresql:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.1.1
+      image: crystallang/crystal:1.2.1
     services:
       postgres:
         image: postgres:${{ matrix.db_version }}
@@ -89,7 +89,7 @@ jobs:
   sqlite:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.1.1
+      image: crystallang/crystal:1.2.1
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite

@@ -455,6 +455,91 @@ describe Marten::Views::Base do
       response.content_type.should eq "text/plain"
       response.content.should eq "after_dispatch response"
     end
+
+    it "sets the returned HTTP response as expected" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithAfterDispatchResponse.new(request)
+      view.process_dispatch
+
+      view.response!.status.should eq 200
+      view.response!.content_type.should eq "text/plain"
+      view.response!.content.should eq "after_dispatch response"
+    end
+  end
+
+  describe "#response" do
+    it "returns nil if the view was not dispatched yet" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithAfterDispatchResponse.new(request)
+
+      view.response.should be_nil
+    end
+
+    it "returns the response if the view was dispatched" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithAfterDispatchResponse.new(request)
+      view.process_dispatch
+
+      view.response.not_nil!.status.should eq 200
+      view.response.not_nil!.content_type.should eq "text/plain"
+      view.response.not_nil!.content.should eq "after_dispatch response"
+    end
+  end
+
+  describe "#response!" do
+    it "raise NilAssertionError if the view was not dispatched yet" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithAfterDispatchResponse.new(request)
+
+      expect_raises(NilAssertionError) do
+        view.response!
+      end
+    end
+
+    it "returns the response if the view was dispatched" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::TestViewWithAfterDispatchResponse.new(request)
+      view.process_dispatch
+
+      view.response!.status.should eq 200
+      view.response!.content_type.should eq "text/plain"
+      view.response!.content.should eq "after_dispatch response"
+    end
   end
 
   describe "#reverse" do

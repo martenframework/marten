@@ -13,11 +13,19 @@ module Marten
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
 
+      @response : HTTP::Response? = nil
+
       # Returns the HTTP method names that are allowed for the view.
       class_getter http_method_names
 
       # Returns the associated HTTP request.
       getter request
+
+      # Returns the HTTP response.
+      #
+      # This method will return the `Marten::HTTP::Response` object that is returned by the `#dispatch` method, so that
+      # it can be used in the context of `#after_dispatch` callbacks.
+      getter response
 
       # Returns the associated route parameters.
       getter params
@@ -121,15 +129,20 @@ module Marten
       def process_dispatch : Marten::HTTP::Response
         before_callbacks_response = run_before_dispatch_callbacks
 
-        response = before_callbacks_response || dispatch
+        @response = before_callbacks_response || dispatch
 
         after_callbacks_response = run_after_dispatch_callbacks
-        after_callbacks_response || response
+        after_callbacks_response || response!
       end
 
       # Returns an HTTP response generated from a content string, content type and status code.
       def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status = 200)
         HTTP::Response.new(content: content, content_type: content_type, status: status)
+      end
+
+      # Same as `#response` but with a nil-safety check.
+      def response!
+        response.not_nil!
       end
 
       # Convenient helper method to resolve a route name.

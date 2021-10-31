@@ -94,6 +94,25 @@ describe Marten::HTTP::Headers do
     end
   end
 
+  describe "#delete" do
+    it "deletes a header from a header name string and returns the associated value" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.delete("Content-Type").should eq "application/json"
+      headers.has_key?("Content-Type").should be_false
+    end
+
+    it "deletes a header from a header name symbol and returns the associated value" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.delete(:CONTENT_TYPE).should eq "application/json"
+      headers.has_key?(:CONTENT_TYPE).should be_false
+    end
+
+    it "returns nil if the header does not exist" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.delete("unknown").should be_nil
+    end
+  end
+
   describe "#each" do
     it "allows to iterate over the keys and values" do
       headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
@@ -101,6 +120,18 @@ describe Marten::HTTP::Headers do
         key.should eq "Content-Type"
         value.should eq ["application/json"]
       end
+    end
+  end
+
+  describe "#empty?" do
+    it "returns true if no headers are set" do
+      headers = Marten::HTTP::Headers.new
+      headers.empty?.should be_true
+    end
+
+    it "returns false if headers are set" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.empty?.should be_false
     end
   end
 

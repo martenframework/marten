@@ -31,6 +31,11 @@ module Marten
         headers[name.to_s] = value.to_s
       end
 
+      # Deletes a specific header and return its value, or `nil` if the header does not exist.
+      def delete(name : String | Symbol) : String?
+        headers.delete(name.to_s)
+      end
+
       # Returns `true` if the header with the provided name exists.
       def has_key?(name : String | Symbol) # ameba:disable Style/PredicateName
         headers.has_key?(name.to_s)
@@ -44,6 +49,9 @@ module Marten
 
       # Allows to iterate over all the headers.
       delegate each, to: headers
+
+      # Returns `true` if there are no headers.
+      delegate empty?, to: headers
 
       # Returns the number of headers.
       delegate size, to: headers

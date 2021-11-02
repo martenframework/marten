@@ -13,6 +13,17 @@ describe Marten::Template::Context do
       ctx.empty?.should be_false
       ctx["foo"].should eq "bar"
     end
+
+    it "can be used to initialize a context from a nil value" do
+      ctx = Marten::Template::Context.from(nil)
+      ctx.empty?.should be_true
+    end
+
+    it "returns any existing context object it receives as argument" do
+      ctx1 = Marten::Template::Context.from({"foo" => "bar"})
+      ctx2 = Marten::Template::Context.from(ctx1)
+      ctx2.should be ctx1
+    end
   end
 
   describe "::new" do

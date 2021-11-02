@@ -8,8 +8,15 @@ module Marten
       getter blocks
 
       # Initializes a context from a hash or a named tuple.
-      def self.from(values : Hash | NamedTuple)
-        new(Hash(String, Value).new.tap { |ctx_values| values.each { |k, v| ctx_values[k.to_s] = Value.from(v) } })
+      def self.from(values : Context | Hash | NamedTuple | Nil)
+        case values
+        when Context
+          values
+        when Nil
+          new
+        else
+          new(Hash(String, Value).new.tap { |ctx_values| values.each { |k, v| ctx_values[k.to_s] = Value.from(v) } })
+        end
       end
 
       # Allows to initialize an empty context.

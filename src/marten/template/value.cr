@@ -6,7 +6,7 @@ module Marten
       include Enumerable(self)
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) |
-                  Marten::Template::Object | Nil | SafeString | String | Time
+                  Marten::Template::Object | Nil | SafeString | String | Time | Views::Base
 
       # Returns the raw value associated with the template value.
       getter raw

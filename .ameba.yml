@@ -90,7 +90,7 @@ Style/MethodNames:
   Enabled: true
 
 Style/NegatedConditionsInUnless:
-  Enabled: true
+  Enabled: false
 
 Style/PredicateName:
   Enabled: true

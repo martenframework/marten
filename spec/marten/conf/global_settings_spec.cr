@@ -55,6 +55,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#csrf" do
+    it "returns the CSRF configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.csrf.should be_a Marten::Conf::GlobalSettings::CSRF
+    end
+  end
+
   describe "#databases" do
     it "returns an empty list by default" do
       global_settings = Marten::Conf::GlobalSettings.new

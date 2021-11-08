@@ -211,8 +211,8 @@ module Marten
       end
 
       # Provides access to request forgery protection settings.
-      def request_forgery_protection
-        @request_forgery_protection ||= GlobalSettings::RequestForgeryProtection.new
+      def csrf
+        @csrf ||= GlobalSettings::CSRF.new
       end
 
       # Provides access to templates settings.

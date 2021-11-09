@@ -83,6 +83,23 @@ describe Marten::Views::Rendering do
       response.content_type.should eq "text/html"
       response.content.strip.should eq "Hello World, John Doe!"
     end
+
+    it "includes the view in the context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::RenderingSpec::TestViewWithViewTemplate.new(request)
+      response = view.render_to_response(nil)
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq HTML.escape(view.to_s)
+    end
   end
 
   describe "#template_name" do
@@ -125,6 +142,12 @@ module Marten::Views::RenderingSpec
     include Marten::Views::Rendering
 
     template_name "specs/views/concerns/rendering/test.html"
+  end
+
+  class TestViewWithViewTemplate < Marten::View
+    include Marten::Views::Rendering
+
+    template_name "specs/views/concerns/rendering/view.html"
   end
 
   class TestViewWithoutTemplate < Marten::View

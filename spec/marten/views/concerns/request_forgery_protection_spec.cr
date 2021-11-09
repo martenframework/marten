@@ -61,6 +61,46 @@ describe Marten::Views::RequestForgeryProtection do
         response.content.should eq "OK_#{safe_method}"
         response.status.should eq 200
       end
+
+      it "does not set the CSRF token cookie on #{safe_method} requests if the CSRF token is not used" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: safe_method,
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        view = Marten::Views::RequestForgeryProtectionSpec::TestView.new(request)
+        response = view.process_dispatch
+
+        response.cookies["csrftoken"]?.should be_nil
+      end
+    end
+
+    %w(DELETE PATCH POST PUT).each do |unsafe_method|
+      it "allows #{unsafe_method} requests if the X-CSRF-Token header is specified and matches the CSRF token cookie" do
+        token = Marten::Views::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
+
+        raw_request = ::HTTP::Request.new(
+          method: unsafe_method,
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => "application/x-www-form-urlencoded",
+            "X-CSRF-Token" => token,
+          },
+          body: "foo=bar"
+        )
+        raw_request.cookies["csrftoken"] = token
+        request = Marten::HTTP::Request.new(raw_request)
+
+        view = Marten::Views::RequestForgeryProtectionSpec::TestView.new(request)
+        response = view.process_dispatch
+
+        response.content.should eq "OK_#{unsafe_method}"
+        response.status.should eq 200
+      end
     end
 
     it "allows unsafe requests if CSRF protection is disabled and requests does not contain the CSRF token" do
@@ -742,6 +782,10 @@ module Marten::Views::RequestForgeryProtectionSpec
   class TestView < Marten::View
     include Marten::Views::RequestForgeryProtection
 
+    def delete
+      respond "OK_DELETE"
+    end
+
     def get
       respond "OK_GET"
     end
@@ -754,8 +798,16 @@ module Marten::Views::RequestForgeryProtectionSpec
       respond "OK_OPTIONS"
     end
 
+    def patch
+      respond "OK_PATCH"
+    end
+
     def post
       respond "OK_POST"
+    end
+
+    def put
+      respond "OK_PUT"
     end
 
     def trace

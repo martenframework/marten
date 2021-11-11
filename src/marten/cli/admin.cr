@@ -77,7 +77,7 @@ module Marten
       private def handle_outside_of_project_invocation
         command = options.first?
 
-        if comment == "version" || command == "--version" || command == "-v"
+        if command == "version" || command == "--version" || command == "-v"
           show_version
           exit
         end

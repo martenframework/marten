@@ -38,6 +38,11 @@ module Marten
           exit
         end
 
+        if command == "--version" || command == "-v"
+          show_version
+          exit
+        end
+
         command_klass = @commands_per_name.fetch(command) do
           stderr.puts("Unknown command")
           exit
@@ -87,6 +92,10 @@ module Marten
         usage << USAGE_FOOTER % @name
 
         stdout.puts(usage.join(""))
+      end
+
+      private def show_version
+        Manage::Command::Version.new(options: [] of String, stdout: stdout, stderr: stderr).handle
       end
     end
   end

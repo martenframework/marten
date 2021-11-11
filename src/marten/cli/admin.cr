@@ -77,6 +77,11 @@ module Marten
       private def handle_outside_of_project_invocation
         command = options.first?
 
+        if comment == "version" || command == "--version" || command == "-v"
+          show_version
+          exit
+        end
+
         if !command || command == "--help" || command == "-h" || command != "init"
           show_init_command_usage
           exit
@@ -97,6 +102,10 @@ module Marten
 
       private def show_init_command_usage
         Manage::Command::Init.new(options: ["--help"], stdout: stdout, stderr: stderr).handle
+      end
+
+      private def show_version
+        Manage::Command::Version.new(options: [] of String, stdout: stdout, stderr: stderr).handle
       end
     end
   end

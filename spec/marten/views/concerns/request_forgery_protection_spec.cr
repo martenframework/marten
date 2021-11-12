@@ -771,6 +771,28 @@ describe Marten::Views::RequestForgeryProtection do
       new_token.should_not eq token
       view._perform_unmasking(new_token).should eq Marten::Views::RequestForgeryProtectionSpec::EXAMPLE_SECRET
     end
+
+    it "does not change the initial value of the cookie if it was already set" do
+      token = Marten::Views::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
+
+      raw_request = ::HTTP::Request.new(
+        method: "GET",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+      raw_request.cookies["csrftoken"] = token
+      request = Marten::HTTP::Request.new(raw_request)
+
+      view = Marten::Views::RequestForgeryProtectionSpec::TestViewWithTokenAccess.new(request)
+      response = view.process_dispatch
+
+      new_token = response.content
+
+      new_token.should_not eq token
+      view._perform_unmasking(new_token).should eq Marten::Views::RequestForgeryProtectionSpec::EXAMPLE_SECRET
+
+      response.cookies["csrftoken"].should eq token
+    end
   end
 end
 
@@ -831,8 +853,15 @@ module Marten::Views::RequestForgeryProtectionSpec
     include Marten::Views::RequestForgeryProtection
 
     def get
-      get_csrf_token
-      respond "OK_GET"
+      respond get_csrf_token
+    end
+
+    def _perform_masking(v)
+      mask_cipher_secret(v)
+    end
+
+    def _perform_unmasking(v)
+      unmask_cipher_token(v)
     end
   end
 

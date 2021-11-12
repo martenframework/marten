@@ -55,16 +55,18 @@ module Marten
       # Calling this method will force the CSRF token to be generated if it wasn't set already. It will also result in
       # the token cookie to be set as part of the HTTP response returned by the view.
       def get_csrf_token
-        if csrf_token.nil?
-          self.csrf_token = gen_new_token
-        else
-          # Re-generate the CSRF token mask so that it varies on each request. This masking is used to mitigate SSL
-          # attacks like BREACH.
-          self.csrf_token = mask_cipher_secret(unmask_cipher_token(self.csrf_token.not_nil!))
-        end
+        returned_csrf_token = if csrf_token.nil?
+                                gen_new_token
+                              else
+                                # Re-generate the CSRF token mask so that it varies on each request. This masking is
+                                # used to mitigate SSL attacks like BREACH.
+                                mask_cipher_secret(unmask_cipher_token(self.csrf_token.not_nil!))
+                              end
 
+        self.csrf_token ||= returned_csrf_token
         self.csrf_token_update_required = true
-        self.csrf_token.not_nil!
+
+        returned_csrf_token
       end
 
       private CSRF_SAFE_HTTP_METHODS      = %w(get head options trace)

@@ -4,7 +4,10 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      items: ['getting_started/installation'],
+      items: [
+        'getting_started/installation',
+        'getting_started/tutorial',
+      ],
     },
     {
       type: 'category',

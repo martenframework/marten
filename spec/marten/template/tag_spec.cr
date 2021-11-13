@@ -3,10 +3,11 @@ require "./spec_helper"
 describe Marten::Template::Tag do
   describe "::get" do
     it "returns the right built-in tag classes for the expected tag names" do
-      Marten::Template::Tag.registry.size.should eq 13
+      Marten::Template::Tag.registry.size.should eq 14
       Marten::Template::Tag.get("asset").should eq Marten::Template::Tag::Asset
       Marten::Template::Tag.get("assign").should eq Marten::Template::Tag::Assign
       Marten::Template::Tag.get("block").should eq Marten::Template::Tag::Block
+      Marten::Template::Tag.get("csrf_token").should eq Marten::Template::Tag::CsrfToken
       Marten::Template::Tag.get("extend").should eq Marten::Template::Tag::Extend
       Marten::Template::Tag.get("for").should eq Marten::Template::Tag::For
       Marten::Template::Tag.get("if").should eq Marten::Template::Tag::If

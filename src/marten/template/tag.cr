@@ -27,6 +27,7 @@ module Marten
       register "asset", Asset
       register "assign", Assign
       register "block", Block
+      register "csrf_token", CsrfToken
       register "extend", Extend
       register "for", For
       register "if", If

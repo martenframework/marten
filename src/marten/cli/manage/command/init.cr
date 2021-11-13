@@ -89,6 +89,7 @@ module Marten
           project_template "project/src/project.cr.ecr", "src/project.cr"
           project_template "project/src/server.cr.ecr", "src/server.cr"
           project_template "project/manage.cr.ecr", "manage.cr"
+          project_template "project/shard.yml.ecr", "shard.yml"
 
           private def create_files(templates, context)
             templates.each do |template_klass|

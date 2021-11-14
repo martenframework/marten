@@ -1204,6 +1204,22 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#none" do
+    it "returns an empty queryset" do
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "typing", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.none.query.should be_a Marten::DB::Query::SQL::EmptyQuery(Tag)
+      qset.none.exists?.should be_false
+      qset.none.size.should eq 0
+      qset.none.should be_empty
+    end
+  end
+
   describe "#order" do
     it "allows to order using a specific column specified as a string" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

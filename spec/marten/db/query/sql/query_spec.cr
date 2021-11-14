@@ -798,6 +798,64 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#to_empty" do
+    it "results in a new EmptyQuery object" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.to_empty.should be_a Marten::DB::Query::SQL::EmptyQuery(Tag)
+    end
+
+    it "properly creates an empty query by respecting the default ordering" do
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.default_ordering = true
+      query_1.to_empty.default_ordering.should be_true
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.default_ordering = false
+      query_2.to_empty.default_ordering.should be_false
+    end
+
+    it "properly creates an empty query a query by respecting joins" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_selected_join("author")
+
+      query.to_empty.joins.should eq query.joins
+    end
+
+    it "properly creates an empty query by respecting limits and offsets" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("id")
+      query.slice(1, 2)
+
+      query.to_empty.limit.should eq query.limit
+      query.to_empty.offset.should eq query.offset
+    end
+
+    it "properly creates an empty query by respecting order clauses" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.order("name")
+
+      query.to_empty.order_clauses.should eq query.order_clauses
+    end
+
+    it "properly creates an empty query by respecting predicates" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+
+      query.to_empty.predicate_node.should eq query.predicate_node
+    end
+
+    it "properly creates an empty query by respecting the active DB alias" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.using(:other).create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.using = "other"
+
+      query.to_empty.using.should eq query.using
+    end
+  end
+
   describe "#update_with" do
     it "allows to update the records matching a given query and returns the number of affected rows" do
       user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")

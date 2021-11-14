@@ -444,6 +444,14 @@ module Marten
           Model
         end
 
+        # Returns a queryset that will always return an empty array of record, without querying the database.
+        #
+        # Once this method is used, any subsequent method call (such as extra filters) will continue returning an empty
+        # array of records.
+        def none
+          clone(query.to_empty)
+        end
+
         # Allows to specify the ordering in which records should be returned when evaluating the query set.
         #
         # Multiple fields can be specified in order to define the final ordering. For example:
@@ -524,8 +532,8 @@ module Marten
 
         protected getter result_cache
 
-        protected def clone
-          cloned = self.class.new(query: @query.clone)
+        protected def clone(other_query = nil)
+          cloned = self.class.new(query: other_query.nil? ? @query.clone : other_query.not_nil!)
           cloned
         end
 

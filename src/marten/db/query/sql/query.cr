@@ -12,6 +12,11 @@ module Marten
           @using = nil
 
           getter default_ordering
+          getter joins
+          getter limit
+          getter offset
+          getter order_clauses
+          getter predicate_node
           getter using
 
           setter default_ordering
@@ -152,6 +157,18 @@ module Marten
 
           def sliced?
             !(@limit.nil? && @offset.nil?)
+          end
+
+          def to_empty
+            EmptyQuery(Model).new(
+              default_ordering: @default_ordering,
+              joins: @joins,
+              limit: @limit,
+              offset: @offset,
+              order_clauses: @order_clauses,
+              predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
+              using: @using
+            )
           end
 
           def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))

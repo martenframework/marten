@@ -21,6 +21,15 @@ module Marten
           )
           end
 
+          def ==(other : self)
+            (
+              (other.predicates == predicates) &&
+                (other.children == children) &&
+                (other.connector == connector) &&
+                (other.negated == negated)
+            )
+          end
+
           def add(other : self, conn : SQL::PredicateConnector)
             return if @children.includes?(other)
 

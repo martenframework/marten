@@ -58,6 +58,122 @@ describe Marten::DB::Query::SQL::PredicateNode do
     end
   end
 
+  describe "#==" do
+    it "returns true if two nodes are the same" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_1.should eq node_2
+    end
+
+    it "returns false if the predicates are not the same" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1
+      )
+
+      node_1.should_not eq node_2
+    end
+
+    it "returns false if the children are not the same" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        [node_1],
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_1.should_not eq node_2
+    end
+
+    it "returns false if the connectors are not the same" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::OR,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_1.should_not eq node_2
+    end
+
+    it "returns false if the negated flags are not the same" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        true,
+        predicate_1,
+        predicate_2
+      )
+
+      node_1.should_not eq node_2
+    end
+  end
+
   describe "#add" do
     it "does nothing if the passed node is already in the parent's children" do
       predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")

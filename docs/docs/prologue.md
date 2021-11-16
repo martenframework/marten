@@ -8,4 +8,9 @@ slug: /
 
 ## Getting started
 
+Are you new to the Marten web framework? The following resources will help you get started:
+
+* The [installation guide](./getting_started/installation.md) will help you install Crystal and the Marten CLI
+* The [tutorial](./getting_started/tutorial.md) will help you discover the main features of the framework by creating a simple web application
+
 ## Browsing the documentation

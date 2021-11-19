@@ -359,7 +359,7 @@ describe Marten::DB::Management::Migrations::Reader do
         Marten::DB::Management::Migrations::Errors::MigrationNotFound,
         "No migration '202108092226111_auto' associated with app 'reader_spec_other_app'"
       ) do
-        puts reader.get_migration(other_app, "202108092226111_auto")
+        reader.get_migration(other_app, "202108092226111_auto")
       end
     end
   end

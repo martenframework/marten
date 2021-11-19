@@ -84,7 +84,10 @@ module Marten
 
           # Flushes all model tables.
           def flush_model_tables : Nil
-            flush_tables(@connection.introspector.model_table_names.map { |n| quote(n) })
+            tables_to_flush = @connection.introspector.model_table_names.map { |n| quote(n) }
+            return if tables_to_flush.empty?
+
+            flush_tables(tables_to_flush)
           end
 
           # Syncs all models for the current database connection.

@@ -16,6 +16,7 @@ require "../src/marten"
 require "../src/marten/cli"
 require "../src/marten/spec"
 
+require "./ext/**"
 require "./test_project"
 
 def for_mysql(&block)

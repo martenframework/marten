@@ -10,7 +10,7 @@ require "./column/string"
 require "./column/text"
 require "./column/uuid"
 
-require "./column/foreign_key"
+require "./column/reference"
 
 module Marten
   module DB
@@ -37,7 +37,7 @@ module Marten
         register "bool", Bool
         register "date_time", DateTime
         register "float", Float
-        register "foreign_key", ForeignKey
+        register "reference", Reference
         register "int", Int
         register "string", String
         register "text", Text

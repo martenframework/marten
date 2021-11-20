@@ -237,9 +237,9 @@ module Marten
               dependencies = [] of Dependency::Base
 
               # Foreign key columns depend on the targeted table being created first.
-              if column.is_a?(Column::ForeignKey)
+              if column.is_a?(Column::Reference)
                 related_table = @to_state.tables.values
-                  .find { |t| t.name == column.as(Column::ForeignKey).to_table }
+                  .find { |t| t.name == column.as(Column::Reference).to_table }
                   .not_nil!
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
@@ -288,9 +288,9 @@ module Marten
                 dependencies = [] of Dependency::Base
 
                 # Extract dependencies for all the foreign key columns associated with the considered table.
-                created_table.columns.select(Column::ForeignKey).each do |fk_column|
+                created_table.columns.select(Column::Reference).each do |fk_column|
                   related_table = @to_state.tables.values
-                    .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
+                    .find { |t| t.name == fk_column.as(Column::Reference).to_table }
                     .not_nil!
                   dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
                 end
@@ -326,9 +326,9 @@ module Marten
               dependencies = [] of Dependency::Base
 
               # Foreign key columns depend on the targeted table being created first.
-              if to_column.is_a?(Column::ForeignKey)
+              if to_column.is_a?(Column::Reference)
                 related_table = @to_state.tables.values
-                  .find { |t| t.name == to_column.as(Column::ForeignKey).to_table }
+                  .find { |t| t.name == to_column.as(Column::Reference).to_table }
                   .not_nil!
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
@@ -348,9 +348,9 @@ module Marten
               dependencies = [] of Dependency::Base
 
               # Extract dependencies for all the foreign key columns associated with the considered table.
-              created_table.columns.select(Column::ForeignKey).each do |fk_column|
+              created_table.columns.select(Column::Reference).each do |fk_column|
                 related_table = @to_state.tables.values
-                  .find { |t| t.name == fk_column.as(Column::ForeignKey).to_table }
+                  .find { |t| t.name == fk_column.as(Column::Reference).to_table }
                   .not_nil!
                 next if related_table == created_table
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
@@ -380,7 +380,7 @@ module Marten
               @from_state.tables.values.flat_map do |other_table|
                 next if other_table.name == deleted_table.name
 
-                incoming_fk_columns = other_table.columns.select(Column::ForeignKey).select do |fk_column|
+                incoming_fk_columns = other_table.columns.select(Column::Reference).select do |fk_column|
                   fk_column.to_table == deleted_table.name
                 end
 

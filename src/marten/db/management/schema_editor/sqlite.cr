@@ -31,7 +31,7 @@ module Marten
             remake_fk_columns = old_type != new_type && old_column.primary_key? && new_column.primary_key?
             if remake_fk_columns
               incoming_foreign_keys = project.tables.values.flat_map do |other_table|
-                incoming_fk_columns = other_table.columns.select(Column::ForeignKey).select do |fk_column|
+                incoming_fk_columns = other_table.columns.select(Column::Reference).select do |fk_column|
                   fk_column.to_table == table.name && fk_column.to_column == old_column.name
                 end
 
@@ -140,7 +140,7 @@ module Marten
 
           private def prepare_foreign_key_for_new_table(
             table : TableState,
-            column : Column::ForeignKey,
+            column : Column::Reference,
             column_definition : String
           ) : String
             "#{column_definition} " + build_sql do |s|

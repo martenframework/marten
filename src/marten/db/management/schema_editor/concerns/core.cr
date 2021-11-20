@@ -8,7 +8,7 @@ module Marten
             column_type = column_sql_for(column)
             column_definition = "#{quote(column.name)} #{column_type}"
 
-            if column.is_a?(Column::ForeignKey)
+            if column.is_a?(Column::Reference) && column.foreign_key?
               column_definition = prepare_foreign_key_for_new_column(table, column, column_definition)
             end
 
@@ -50,7 +50,7 @@ module Marten
             fk_constraint_names = [] of String
 
             # Step 1: drop possible foreign key constraints if applicable.
-            if old_column.is_a?(Column::ForeignKey)
+            if old_column.is_a?(Column::Reference) && old_column.foreign_key?
               fk_constraint_names += @connection.introspector.foreign_key_constraint_names(table.name, old_column.name)
               fk_constraint_names.each do |constraint_name|
                 execute(delete_foreign_key_constraint_statement(table, constraint_name))
@@ -74,7 +74,7 @@ module Marten
             )
 
             incoming_foreign_keys = project.tables.values.flat_map do |other_table|
-              incoming_fk_columns = other_table.columns.select(Column::ForeignKey).select do |fk_column|
+              incoming_fk_columns = other_table.columns.select(Column::Reference).select do |fk_column|
                 fk_column.to_table == table.name && fk_column.to_column == old_column.name
               end
 
@@ -172,7 +172,7 @@ module Marten
             end
 
             # Step 14: set up the new foreign key constraint if applicable.
-            if new_column.is_a?(Column::ForeignKey)
+            if new_column.is_a?(Column::Reference) && new_column.foreign_key?
               execute(add_foreign_key_constraint_statement(table, new_column))
             end
 
@@ -195,7 +195,7 @@ module Marten
               column_type = column_sql_for(column)
               column_definition = "#{quote(column.name)} #{column_type}"
 
-              if column.is_a?(Column::ForeignKey)
+              if column.is_a?(Column::Reference) && column.foreign_key?
                 column_definition = prepare_foreign_key_for_new_table(table, column, column_definition)
               end
 
@@ -277,7 +277,7 @@ module Marten
             end
           end
 
-          private def add_foreign_key_constraint_statement(table : TableState, column : Column::ForeignKey) : String
+          private def add_foreign_key_constraint_statement(table : TableState, column : Column::Reference) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
@@ -372,7 +372,7 @@ module Marten
 
           private def prepare_foreign_key_for_new_column(
             table : TableState,
-            column : Column::ForeignKey,
+            column : Column::Reference,
             column_definition : String
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
@@ -380,7 +380,7 @@ module Marten
 
           private def prepare_foreign_key_for_new_table(
             table : TableState,
-            column : Column::ForeignKey,
+            column : Column::Reference,
             column_definition : String
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")

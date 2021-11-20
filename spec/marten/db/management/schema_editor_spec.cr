@@ -15,7 +15,7 @@ describe Marten::DB::Management::SchemaEditor do
         "schema_editor_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
-          Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id"),
+          Marten::DB::Management::Column::Reference.new("foo", TestUser.db_table, "id"),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )

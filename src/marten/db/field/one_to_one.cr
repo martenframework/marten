@@ -9,6 +9,7 @@ module Marten
           @relation_name : ::String,
           @to : Model.class,
           @primary_key = false,
+          @foreign_key = true,
           @blank = false,
           @null = false,
           @unique = true,
@@ -30,6 +31,11 @@ module Marten
           result_set.read(Int32 | Int64 | Nil)
         end
 
+        # Returns a boolean indicating whether the column is a foreign key.
+        def foreign_key?
+          @foreign_key
+        end
+
         def related_model
           @to
         end
@@ -43,11 +49,12 @@ module Marten
         end
 
         def to_column : Management::Column::Base?
-          Management::Column::ForeignKey.new(
+          Management::Column::Reference.new(
             name: db_column!,
             to_table: @to.db_table,
             to_column: @to.pk_field.db_column!,
             primary_key: primary_key?,
+            foreign_key: foreign_key?,
             null: null?,
             unique: unique?,
             index: index?

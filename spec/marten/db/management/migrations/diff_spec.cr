@@ -743,7 +743,7 @@ describe Marten::DB::Management::Migrations::Diff do
             name: "test_table",
             columns: [
               Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-              Marten::DB::Management::Column::ForeignKey.new("other_id", "other_table", "id"),
+              Marten::DB::Management::Column::Reference.new("other_id", "other_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
           Marten::DB::Management::TableState.new(
@@ -797,7 +797,7 @@ describe Marten::DB::Management::Migrations::Diff do
             name: "test_table",
             columns: [
               Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-              Marten::DB::Management::Column::ForeignKey.new("other_id", "other_table", "id"),
+              Marten::DB::Management::Column::Reference.new("other_id", "other_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
           Marten::DB::Management::TableState.new(
@@ -850,8 +850,8 @@ describe Marten::DB::Management::Migrations::Diff do
             name: "article_tags",
             columns: [
               Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-              Marten::DB::Management::Column::ForeignKey.new("article_id", "articles", "id"),
-              Marten::DB::Management::Column::ForeignKey.new("tag_id", "tags", "id"),
+              Marten::DB::Management::Column::Reference.new("article_id", "articles", "id"),
+              Marten::DB::Management::Column::Reference.new("tag_id", "tags", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
           Marten::DB::Management::TableState.new(
@@ -980,7 +980,7 @@ describe Marten::DB::Management::Migrations::Diff do
             name: "other_table",
             columns: [
               Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-              Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
+              Marten::DB::Management::Column::Reference.new("test_table_id", "test_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
         ]
@@ -1037,7 +1037,7 @@ describe Marten::DB::Management::Migrations::Diff do
             name: "other_table",
             columns: [
               Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-              Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
+              Marten::DB::Management::Column::Reference.new("test_table_id", "test_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
         ]
@@ -1104,7 +1104,7 @@ describe Marten::DB::Management::Migrations::Diff do
             name: "other_table",
             columns: [
               Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
-              Marten::DB::Management::Column::ForeignKey.new("test_table_id", "test_table", "id"),
+              Marten::DB::Management::Column::Reference.new("test_table_id", "test_table", "id"),
             ] of Marten::DB::Management::Column::Base
           ),
         ]
@@ -1128,10 +1128,10 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.columns[0].name.should eq "id"
       operation.columns[0].as(Marten::DB::Management::Column::BigInt).primary_key?.should be_true
       operation.columns[0].as(Marten::DB::Management::Column::BigInt).auto?.should be_true
-      operation.columns[1].should be_a Marten::DB::Management::Column::ForeignKey
+      operation.columns[1].should be_a Marten::DB::Management::Column::Reference
       operation.columns[1].name.should eq "test_table_id"
-      operation.columns[1].as(Marten::DB::Management::Column::ForeignKey).to_table.should eq "test_table"
-      operation.columns[1].as(Marten::DB::Management::Column::ForeignKey).to_column.should eq "id"
+      operation.columns[1].as(Marten::DB::Management::Column::Reference).to_table.should eq "test_table"
+      operation.columns[1].as(Marten::DB::Management::Column::Reference).to_column.should eq "id"
     end
   end
 end

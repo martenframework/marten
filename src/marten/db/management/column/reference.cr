@@ -2,7 +2,7 @@ module Marten
   module DB
     module Management
       module Column
-        class ForeignKey < Base
+        class Reference < Base
           include IsBuiltInColumn
 
           @target_column : Base? = nil
@@ -17,6 +17,7 @@ module Marten
             to_table : ::String | Symbol,
             to_column : ::String | Symbol,
             @primary_key = false,
+            @foreign_key = true,
             @null = false,
             @unique = false,
             @index = true
@@ -26,7 +27,16 @@ module Marten
           end
 
           def clone
-            cloned = self.class.new(@name, @to_table, @to_column, @primary_key, @null, @unique, @index)
+            cloned = self.class.new(
+              name: name,
+              to_table: to_table,
+              to_column: to_column,
+              primary_key: primary_key?,
+              foreign_key: foreign_key?,
+              null: null?,
+              unique: unique?,
+              index: index?
+            )
 
             # Ensures the target column is cloned too.
             if !@target_column.nil?
@@ -36,11 +46,17 @@ module Marten
             cloned
           end
 
+          # Returns a boolean indicating whether the column is a foreign key.
+          def foreign_key?
+            @foreign_key
+          end
+
           def same_config?(other : Base)
-            other.is_a?(ForeignKey) &&
+            other.is_a?(Reference) &&
               to_table == other.to_table &&
               to_column == other.to_column &&
               primary_key? == other.primary_key? &&
+              foreign_key? == other.foreign_key? &&
               null? == other.null? &&
               unique? == other.unique? &&
               index? == other.index? &&
@@ -52,6 +68,7 @@ module Marten
             args << %{to_table: #{format_string_or_symbol(to_table)}}
             args << %{to_column: #{format_string_or_symbol(to_column)}}
             args << %{primary_key: #{@primary_key}} if primary_key?
+            args << %{foreign_key: #{@foreign_key}} if !foreign_key?
             args << %{null: #{@null}} if null?
             args << %{unique: #{@unique}} if unique?
             args << %{index: #{@index}} if !index?

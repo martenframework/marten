@@ -8,6 +8,23 @@ describe Marten::DB::Field::OneToOne do
     end
   end
 
+  describe "#foreign_key?" do
+    it "returns true by default" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)
+      field.foreign_key?.should be_true
+    end
+
+    it "returns true if explicitly set to false" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, foreign_key: true)
+      field.foreign_key?.should be_true
+    end
+
+    it "returns false if explicitly set to false" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, foreign_key: false)
+      field.foreign_key?.should be_false
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read an integer value from a DB result set" do
       field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)
@@ -62,14 +79,25 @@ describe Marten::DB::Field::OneToOne do
       field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, db_column: "origin_tag_id")
 
       column = field.to_column
-      column.should be_a Marten::DB::Management::Column::ForeignKey
+      column.should be_a Marten::DB::Management::Column::Reference
       column.name.should eq "origin_tag_id"
       column.to_table.should eq Tag.db_table
       column.to_column.should eq "id"
       column.primary_key?.should be_false
+      column.foreign_key?.should be_true
       column.null?.should be_false
       column.unique?.should be_true
       column.index?.should be_true
+    end
+
+    it "properly initializes the column if the field is configured to use a foreign key" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, db_column: "origin_tag_id", foreign_key: true)
+      field.to_column.foreign_key?.should be_true
+    end
+
+    it "properly initializes the column if the field is configured to not use a foreign key" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, db_column: "origin_tag_id", foreign_key: false)
+      field.to_column.foreign_key?.should be_false
     end
   end
 

@@ -99,7 +99,7 @@ describe Marten::DB::Migration do
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("name", max_size: 255),
-          Marten::DB::Management::Column::ForeignKey.new("other_id", "migration_test_table1", "id"),
+          Marten::DB::Management::Column::Reference.new("other_id", "migration_test_table1", "id"),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -140,7 +140,7 @@ describe Marten::DB::Migration do
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
           Marten::DB::Management::Column::String.new("name", max_size: 255),
-          Marten::DB::Management::Column::ForeignKey.new("other_id", "migration_test_table1", "id"),
+          Marten::DB::Management::Column::Reference.new("other_id", "migration_test_table1", "id"),
         ] of Marten::DB::Management::Column::Base,
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
@@ -351,7 +351,7 @@ module Marten::DB::MigrationSpec
       create_table :migration_test_table2 do
         column :id, :big_int, primary_key: true, auto: true
         column :name, :string, max_size: 255
-        column :other_id, :foreign_key, to_table: :migration_test_table1, to_column: :id
+        column :other_id, :reference, to_table: :migration_test_table1, to_column: :id
       end
     end
 
@@ -385,7 +385,7 @@ module Marten::DB::MigrationSpec
       create_table :migration_test_table2 do
         column :id, :big_int, primary_key: true, auto: true
         column :name, :string, max_size: 255
-        column :other_id, :foreign_key, to_table: :migration_test_table1, to_column: :id
+        column :other_id, :reference, to_table: :migration_test_table1, to_column: :id
       end
     end
 

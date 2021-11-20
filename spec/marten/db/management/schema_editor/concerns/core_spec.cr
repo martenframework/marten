@@ -295,7 +295,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       )
 
       project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
-      new_column = Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id")
+      new_column = Marten::DB::Management::Column::Reference.new("foo", TestUser.db_table, "id")
       new_column.contribute_to_project(project_state)
 
       schema_editor.create_table(table_state)
@@ -390,6 +390,117 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
               to_column = rs.read(String)
               to_column.should eq "id"
+            end
+          end
+        end
+      end
+    end
+
+    it "can add a non-foreign key reference column to an existing table" do
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
+      new_column = Marten::DB::Management::Column::Reference.new("foo", TestUser.db_table, "id", foreign_key: false)
+      new_column.contribute_to_project(project_state)
+
+      schema_editor.create_table(table_state)
+      schema_editor.add_column(table_state, new_column)
+
+      Marten::DB::Connection.default.open do |db|
+        for_mysql do
+          db.query("SHOW COLUMNS FROM schema_editor_test_table") do |rs|
+            rs.each do
+              column_name = rs.read(String)
+              next unless column_name == "foo"
+              column_type = rs.read(String)
+              column_type.should eq "bigint(20)"
+            end
+          end
+
+          db.query(
+            "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME, REFERENCED_TABLE_NAME, REFERENCED_COLUMN_NAME " \
+            "FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE " \
+            "WHERE REFERENCED_TABLE_NAME = '#{TestUser.db_table}' AND REFERENCED_COLUMN_NAME = 'id'"
+          ) do |rs|
+            rs.each do
+              table_name = rs.read(String)
+              column_name = rs.read(String)
+              table_name.should_not eq "schema_editor_test_table"
+              column_name.should_not eq "foo"
+            end
+          end
+        end
+
+        for_postgresql do
+          db.query(
+            "SELECT column_name, data_type FROM information_schema.columns " \
+            "WHERE table_name = 'schema_editor_test_table'"
+          ) do |rs|
+            rs.each do
+              column_name = rs.read(String)
+              next unless column_name == "foo"
+              column_type = rs.read(String)
+              column_type.should eq "bigint"
+            end
+          end
+
+          db.query(
+            <<-SQL
+              SELECT
+                kcu.column_name,
+                ccu.table_name AS foreign_table_name,
+                ccu.column_name AS foreign_column_name
+              FROM information_schema.table_constraints AS tc
+              JOIN information_schema.key_column_usage AS kcu
+                ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+              JOIN information_schema.constraint_column_usage AS ccu
+                ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
+              WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              column_name = rs.read(String)
+              column_name.should_not eq "foo"
+
+              to_table = rs.read(String)
+              to_table.should_not eq TestUser.db_table
+            end
+          end
+        end
+
+        for_sqlite do
+          db.query("PRAGMA table_info(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              column_name = rs.read(String)
+              next unless column_name == "foo"
+              column_type = rs.read(String)
+              column_type.should eq "integer"
+            end
+          end
+
+          db.query("PRAGMA foreign_key_list(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              rs.read(Int32 | Int64)
+
+              to_table = rs.read(String)
+              to_table.should_not eq TestUser.db_table
+
+              from_column = rs.read(String)
+              from_column.should_not eq "foo"
+
+              to_column = rs.read(String)
+              to_column.should_not eq "id"
             end
           end
         end
@@ -1135,7 +1246,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     it "removes a foreign key column from a specific table" do
       project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
 
-      column = Marten::DB::Management::Column::ForeignKey.new("foo", TestUser.db_table, "id")
+      column = Marten::DB::Management::Column::Reference.new("foo", TestUser.db_table, "id")
       column.contribute_to_project(project_state)
 
       table_state = Marten::DB::Management::TableState.new(
@@ -2079,7 +2190,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
         "schema_editor_other_test_table",
         columns: [
           Marten::DB::Management::Column::BigInt.new("id", primary_key: true),
-          Marten::DB::Management::Column::ForeignKey.new("table_id", "schema_editor_test_table", "id"),
+          Marten::DB::Management::Column::Reference.new("table_id", "schema_editor_test_table", "id"),
         ] of Marten::DB::Management::Column::Base
       )
       project_state = Marten::DB::Management::ProjectState.new(

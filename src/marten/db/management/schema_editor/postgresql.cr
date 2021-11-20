@@ -55,7 +55,7 @@ module Marten
             "Marten::DB::Management::Column::UUID"     => "uuid",
           }
 
-          private def add_foreign_key_constraint_statement(table : TableState, column : Column::ForeignKey) : String
+          private def add_foreign_key_constraint_statement(table : TableState, column : Column::Reference) : String
             constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
             build_sql do |s|
               s << "ALTER TABLE #{quote(table.name)}"
@@ -162,7 +162,7 @@ module Marten
 
           private def prepare_foreign_key_for_new_column(
             table : TableState,
-            column : Column::ForeignKey,
+            column : Column::Reference,
             column_definition : String
           ) : String
             constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
@@ -176,7 +176,7 @@ module Marten
 
           private def prepare_foreign_key_for_new_table(
             table : TableState,
-            column : Column::ForeignKey,
+            column : Column::Reference,
             column_definition : String
           ) : String
             @deferred_statements << Statement.new(

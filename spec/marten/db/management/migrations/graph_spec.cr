@@ -393,7 +393,7 @@ module Marten::DB::Management::Migrations::GraphSpec
       create_table :migration_test_table2 do
         column :id, :big_int, primary_key: true, auto: true
         column :name, :string, max_size: 255
-        column :other_id, :foreign_key, to_table: :migration_test_table1, to_column: :id
+        column :other_id, :reference, to_table: :migration_test_table1, to_column: :id
       end
     end
   end
@@ -409,7 +409,7 @@ module Marten::DB::Management::Migrations::GraphSpec
 
     def plan
       add_column :migration_test_table1, :foo, :string, max_size: 255
-      add_column :migration_test_table2, :new_id, :foreign_key, to_table: :migration_test_table3, to_column: :id
+      add_column :migration_test_table2, :new_id, :reference, to_table: :migration_test_table3, to_column: :id
     end
   end
 

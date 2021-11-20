@@ -24,6 +24,7 @@ module Marten
           ) : Nil
             table = from_state.get_table(app_label, @table_name)
             old_column = to_state.get_table(app_label, @table_name).get_column(column.name)
+            column.contribute_to_project(to_state)
             schema_editor.change_column(from_state, table, column, old_column)
           end
 
@@ -35,6 +36,7 @@ module Marten
           ) : Nil
             table = from_state.get_table(app_label, @table_name)
             old_column = table.get_column(column.name)
+            column.contribute_to_project(to_state)
             schema_editor.change_column(from_state, table, old_column, column)
           end
 

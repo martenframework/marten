@@ -14,5 +14,10 @@ describe Marten::Core::Storage::FileSystem do
       storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "/assets/")
       storage.url("css/app.css").should eq "/assets/css/app.css"
     end
+
+    it "only escape the filepath" do
+      storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "http://localhost:8080/assets/")
+      storage.url("css/app:test.css").should eq "http://localhost:8080/assets/css/app%3Atest.css"
+    end
   end
 end

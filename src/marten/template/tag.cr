@@ -32,6 +32,7 @@ module Marten
       register "for", For
       register "if", If
       register "include", Include
+      register "local_time", LocalTime
       register "spaceless", Spaceless
       register "super", Super
       register "translate", Translate

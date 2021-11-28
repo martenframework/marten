@@ -5,13 +5,14 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
   title: 'Marten',
-  url: 'https://martenframework.com/docs',
+  url: 'https://docs.martenframework.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'martenframework',
   projectName: 'marten',
+  noIndex: true,
 
   presets: [
     [

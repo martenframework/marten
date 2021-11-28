@@ -70,7 +70,7 @@ marten serve
 
 This will start a Marten development server. To verify that it's working as expected, you can open a browser and navigate to [http://localhost:8000](http://localhost:8000). When doing so, you should be greated by the Marten "welcome" page:
 
-![Marten welcome page](/img/getting_started/tutorial/marten_welcome_page.png)
+![Marten welcome page](/img/getting-started/tutorial/marten_welcome_page.png)
 
 :::info
 Your project development server will automatically be available on the internal IP at port 8000. The server port and IP can be changed easily by modifying the `config/settings/development.cr` file:

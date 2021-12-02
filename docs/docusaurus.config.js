@@ -57,5 +57,8 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
         darkTheme: darkCodeTheme,
         additionalLanguages: ['ruby', 'crystal'],
       },
+      colorMode: {
+        disableSwitch: true,
+      },
     }),
 });

@@ -12,17 +12,17 @@ module.exports = {
     {
       type: 'category',
       label: 'Models',
-      items: ['models/introduction'],
+      items: ['models/overview'],
     },
     {
       type: 'category',
       label: 'Views',
-      items: ['views/introduction'],
+      items: ['views/overview'],
     },
     {
       type: 'category',
       label: 'Templates',
-      items: ['templates/introduction'],
+      items: ['templates/overview'],
     },
   ],
 };

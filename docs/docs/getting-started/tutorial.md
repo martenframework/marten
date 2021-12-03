@@ -87,3 +87,73 @@ end
 Once started, the development server will watch your project source files and will automatically recompile them when they are updated; it will also take care of restarting your project server. As such you don't have to manually restart the server when making changes to your application source files.
 
 ## Creating the blog application
+
+Now that you have a working project, it's time to create the `blog` app, that is where your actual blog implementation will live.
+
+Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contribute specific behaviours to a project. For example apps can provide [models](../models/introduction) or [views](../views/introduction). They allow to separate a project into a set of logical and reusable components.
+
+:::info
+Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects.
+:::
+
+In order to create your app, you can use the `marten init` command as follows:
+
+```bash
+marten init app blog src/blog
+```
+
+The above command instructs the Marten CLI to create the structure of an app named `blog` inside the `src/blog` folder. This directory will have the following content:
+
+```
+src/blog
+├── migrations
+├── models
+├── views
+├── app.cr
+└── cli.cr
+```
+
+These files and folders are described below:
+
+| Path | Description |
+| ----------- | ----------- |
+| migrations/ | Empty directory that will store the migrations that will be generated for the models of the application. |
+| models/ | Empty directory where the models of the application will be defined. |
+| views/ | Empty directory where the views of the application will be defined. |
+| app.cr | Definition of the application configuration abstraction; this is also where application files requirements should be defined. |
+| cli.cr | Requirements of CLI-related files, such as migrations for example. |
+
+Once the `blog` application structure is created, the next step is to ensure that your Marten project is actually configured to use the app. 
+
+To do so, it is first necessary to ensure that the app files are required properly. Hence, you can update the `src/project.cr` file with the following content:
+
+```crystal title="src/project.cr"
+# Third party requirements.
+require "marten"
+require "sqlite3"
+
+# Project requirements.
+require "./blog/app"
+
+# Configuration requirements.
+require "../config/routes"
+require "../config/settings/base"
+require "../config/settings/**"
+```
+
+It is also necessary to ensure that Marten itself is configured to use your new `blog` application, which can be done by updating the `installed_apps` setting in the `config/settings/base.cr` configuration file:
+
+```crystal title="config/settings/base.cr"
+Marten.configure do |config|
+  config.secret_key = "notsecure"
+
+  config.installed_apps = [
+    BlogApp,
+  ]
+
+  config.database do |db|
+    db.backend = :sqlite
+    db.name = Path["myblog.db"].expand
+  end
+end
+```

@@ -38,6 +38,13 @@ module Marten
             )
           end
 
+          # Returns the latest migration class (if any) for a given app config.
+          def latest_migration(app_config : Apps::Config) : Migration.class | Nil
+            migrations_per_app_configs[app_config].last
+          rescue KeyError
+            nil
+          end
+
           private def build_graph
             defined_migrations = {} of String => Migration
             replacements = {} of String => Migration

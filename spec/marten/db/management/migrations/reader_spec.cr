@@ -363,4 +363,47 @@ describe Marten::DB::Management::Migrations::Reader do
       end
     end
   end
+
+  describe "#latest_migration" do
+    it "returns the latest migration for a given app config" do
+      foo_app = Marten::DB::Management::Migrations::ReaderSpec::FooApp.new
+      bar_app = Marten::DB::Management::Migrations::ReaderSpec::BarApp.new
+
+      Marten.apps.app_configs_store = {
+        "reader_spec_foo_app" => foo_app,
+        "reader_spec_bar_app" => bar_app,
+      }
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.latest_migration(foo_app).should eq Migration::FooApp::V202108092226113
+      reader.latest_migration(bar_app).should eq Migration::BarApp::V202108092226111
+    end
+
+    it "returns nil if the app config does not have any migrations" do
+      app = Marten::DB::Management::Migrations::ReaderSpec::AppWithoutMigrations.new
+
+      Marten.apps.app_configs_store = {
+        "reader_spec_foo_app"                => Marten::DB::Management::Migrations::ReaderSpec::FooApp.new,
+        "reader_spec_app_without_migrations" => app,
+      }
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.latest_migration(app).should be_nil
+    end
+
+    it "returns nil if the app config does not exist in the apps registry" do
+      app = Marten::DB::Management::Migrations::ReaderSpec::AppWithoutMigrations.new
+
+      Marten.apps.app_configs_store = {
+        "reader_spec_foo_app" => Marten::DB::Management::Migrations::ReaderSpec::FooApp.new,
+        "reader_spec_bar_app" => Marten::DB::Management::Migrations::ReaderSpec::BarApp.new,
+      }
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.latest_migration(app).should be_nil
+    end
+  end
 end

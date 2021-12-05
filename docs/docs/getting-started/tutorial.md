@@ -90,7 +90,7 @@ Once started, the development server will watch your project source files and wi
 
 Now that you have a working project, it's time to create the `blog` app, that is where your actual blog implementation will live.
 
-Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contribute specific behaviours to a project. For example apps can provide [models](../models/introduction) or [views](../views/introduction). They allow to separate a project into a set of logical and reusable components.
+Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contribute specific behaviours to a project. For example apps can provide [models](../models/overview) or [views](../views/overview). They allow to separate a project into a set of logical and reusable components.
 
 :::info
 Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects.

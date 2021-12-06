@@ -9,6 +9,7 @@ require "http"
 require "i18n"
 require "log"
 require "mime/media_type"
+require "openssl/hmac"
 require "uuid"
 
 require "./marten/app"

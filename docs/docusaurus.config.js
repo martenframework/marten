@@ -46,15 +46,14 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             position: 'right',
           },
         ],
-        hideOnScroll: true,
+        hideOnScroll: false,
       },
       footer: {
         style: 'dark',
         copyright: `Copyright © ${new Date().getFullYear()} Marten Framework. Built with Docusaurus.`,
       },
       prism: {
-        theme: darkCodeTheme,
-        darkTheme: darkCodeTheme,
+        theme: require('prism-react-renderer/themes/okaidia'),
         additionalLanguages: ['ruby', 'crystal'],
       },
       colorMode: {

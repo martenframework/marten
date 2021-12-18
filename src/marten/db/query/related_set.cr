@@ -15,9 +15,12 @@ module Marten
                    end
         end
 
-        protected def clone
-          cloned = self.class.new(@instance, @related_field_id, @query.clone)
-          cloned
+        protected def clone(other_query = nil)
+          RelatedSet(Model).new(
+            instance: @instance,
+            related_field_id: @related_field_id,
+            query: other_query.nil? ? @query.clone : other_query.not_nil!
+          )
         end
       end
     end

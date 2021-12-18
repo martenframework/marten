@@ -41,6 +41,13 @@ module Marten
 
         assign_field_values(values)
       end
+
+      macro finished
+        {% model_types = Marten::DB::Model.all_subclasses.map(&.name) %}
+        {% if model_types.size > 1 %}
+          alias Any = {% for t, i in model_types %}{{ t }}{% if i + 1 < model_types.size %} | {% end %}{% end %}
+        {% end %}
+      end
     end
   end
 end

@@ -53,16 +53,15 @@ module Marten
           end
         end
 
-        protected def clone
-          cloned = self.class.new(
-            @instance,
-            @field_id,
-            @through_related_name,
-            @through_model_from_field_id,
-            @through_model_to_field_id,
-            @query.clone
+        protected def clone(other_query = nil)
+          ManyToManySet(Model).new(
+            instance: @instance,
+            field_id: @field_id,
+            through_related_name: @through_related_name,
+            through_model_from_field_id: @through_model_from_field_id,
+            through_model_to_field_id: @through_model_to_field_id,
+            query: other_query.nil? ? @query.clone : other_query.not_nil!
           )
-          cloned
         end
 
         private def m2m_field

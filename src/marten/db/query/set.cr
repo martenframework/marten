@@ -530,11 +530,17 @@ module Marten
           qs
         end
 
+        macro finished
+          {% model_types = Marten::DB::Model.all_subclasses.map(&.name) %}
+          {% if model_types.size > 1 %}
+            alias Any = {% for t, i in model_types %}Set({{ t }}){% if i + 1 < model_types.size %} | {% end %}{% end %}
+          {% end %}
+        end
+
         protected getter result_cache
 
         protected def clone(other_query = nil)
-          cloned = self.class.new(query: other_query.nil? ? @query.clone : other_query.not_nil!)
-          cloned
+          Set(Model).new(query: other_query.nil? ? @query.clone : other_query.not_nil!)
         end
 
         protected def fetch

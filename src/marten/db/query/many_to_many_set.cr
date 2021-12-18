@@ -4,7 +4,7 @@ module Marten
   module DB
     module Query
       # Represents a query set resulting from a many-to-many relation.
-      class ManyToManySet(Model) < Set(Model)
+      class ManyToManySet(M) < Set(M)
         @m2m_field : Field::Base? = nil
         @m2m_through_from_field : Field::Base? = nil
         @m2m_through_to_field : Field::Base? = nil
@@ -15,10 +15,10 @@ module Marten
           @through_related_name : String,
           @through_model_from_field_id : String,
           @through_model_to_field_id : String,
-          query : SQL::Query(Model)? = nil
+          query : SQL::Query(M)? = nil
         )
           @query = if query.nil?
-                     q = SQL::Query(Model).new
+                     q = SQL::Query(M).new
                      q.add_query_node(
                        Node.new({"#{@through_related_name}__#{@through_model_from_field_id}" => @instance})
                      )
@@ -28,7 +28,7 @@ module Marten
                    end
         end
 
-        def add(*objs : Model)
+        def add(*objs : M)
           query.connection.transaction do
             # Identify which objects are already added to the many to many relationship and skip them.
             # TODO: leverage the ability to only retrieve specific column values from the DB.
@@ -54,7 +54,7 @@ module Marten
         end
 
         protected def clone(other_query = nil)
-          ManyToManySet(Model).new(
+          ManyToManySet(M).new(
             instance: @instance,
             field_id: @field_id,
             through_related_name: @through_related_name,

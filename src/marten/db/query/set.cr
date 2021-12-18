@@ -11,15 +11,15 @@ module Marten
       # in the creation of the query set explicitly asks for the underlying objects, no actual query is made to the
       # considered database. Querying the database is always deferred to the last possible moment: that is, when the
       # actual records are requested.
-      class Set(Model)
-        include Enumerable(Model)
+      class Set(M)
+        include Enumerable(M)
 
-        @result_cache : Array(Model)?
+        @result_cache : Array(M)?
 
         # :nodoc:
         getter query
 
-        def initialize(@query = SQL::Query(Model).new)
+        def initialize(@query = SQL::Query(M).new)
         end
 
         # Returns the record at the given index.
@@ -103,7 +103,7 @@ module Marten
         # query_set.create(title: "My blog post")
         # ```
         def create(**kwargs)
-          object = Model.new(**kwargs)
+          object = M.new(**kwargs)
           object.save(using: @query.using)
           object
         end
@@ -121,7 +121,7 @@ module Marten
         # end
         # ```
         def create(**kwargs, &block)
-          object = Model.new(**kwargs)
+          object = M.new(**kwargs)
           yield object
           object.save(using: @query.using)
           object
@@ -138,7 +138,7 @@ module Marten
         # query_set.create!(title: "My blog post")
         # ```
         def create!(**kwargs)
-          object = Model.new(**kwargs)
+          object = M.new(**kwargs)
           object.save!(using: @query.using)
           object
         end
@@ -156,7 +156,7 @@ module Marten
         # end
         # ```
         def create!(**kwargs, &block)
-          object = Model.new(**kwargs)
+          object = M.new(**kwargs)
           yield object
           object.save!(using: @query.using)
           object
@@ -333,7 +333,7 @@ module Marten
         # Returns the model instance matching a specific query node object, or `nil` if no record is found.
         def get(query_node : Node)
           get!(query_node)
-        rescue Model::NotFound
+        rescue M::NotFound
           nil
         end
 
@@ -383,7 +383,7 @@ module Marten
         def get!(query_node : Node)
           results = filter(query_node)[..GET_RESULTS_LIMIT].to_a
           return results.first if results.size == 1
-          raise Model::NotFound.new("#{Model.name} query didn't return any results") if results.empty?
+          raise M::NotFound.new("#{M.name} query didn't return any results") if results.empty?
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
         end
 
@@ -441,7 +441,7 @@ module Marten
 
         # Returns the model class associated with the query set.
         def model
-          Model
+          M
         end
 
         # Returns a queryset that will always return an empty array of record, without querying the database.
@@ -540,7 +540,7 @@ module Marten
         protected getter result_cache
 
         protected def clone(other_query = nil)
-          Set(Model).new(query: other_query.nil? ? @query.clone : other_query.not_nil!)
+          Set(M).new(query: other_query.nil? ? @query.clone : other_query.not_nil!)
         end
 
         protected def fetch

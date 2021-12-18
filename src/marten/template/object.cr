@@ -10,7 +10,7 @@ module Marten
       def resolve_template_attribute(key : String)
         {% begin %}
           value = case key
-          {% if !@type.abstract? %}
+          {% if !@type.abstract? && !@type.type_vars.any?(&.abstract?) %}
             {% already_processed = [] of String %}
             {% for type in [@type] + @type.ancestors %}
               {% if type.name != "Object" && type.name != "Reference" %}

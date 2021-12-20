@@ -82,6 +82,11 @@ module Marten
           nil
         end
 
+        # :nodoc:
+        def accumulate
+          raise NotImplementedError.new("#accumulate is not supported for query sets")
+        end
+
         # Returns a cloned version of the current query set matching all records.
         def all
           clone
@@ -468,6 +473,11 @@ module Marten
           qs
         end
 
+        # :nodoc:
+        def product
+          raise NotImplementedError.new("#product is not supported for query sets")
+        end
+
         # Allows to reverse the order of the current query set.
         def reverse
           qs = clone
@@ -478,6 +488,16 @@ module Marten
         # Returns the number of records that are targeted by the current query set.
         def size
           count
+        end
+
+        # :nodoc:
+        def sum
+          raise NotImplementedError.new("#sum is not supported for query sets")
+        end
+
+        # :nodoc:
+        def to_h
+          raise NotImplementedError.new("#to_h is not supported for query sets")
         end
 
         # Appends a string representation of the query set to the passed `io`.

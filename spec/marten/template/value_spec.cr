@@ -129,11 +129,8 @@ describe Marten::Template::Value do
 
       value = Marten::Template::Value.from(Tag.all)
 
-      value.raw.should eq [
-        Marten::Template::Value.from(tag_1),
-        Marten::Template::Value.from(tag_2),
-        Marten::Template::Value.from(tag_3),
-      ]
+      value.raw.should be_a Marten::DB::Query::Set(Tag)
+      value.raw.as(Marten::DB::Query::Set(Tag)).to_a.should eq [tag_1, tag_2, tag_3]
     end
 
     it "raises an unsupported value error if the passed value is not supported" do
@@ -235,6 +232,22 @@ describe Marten::Template::Value do
       arr[0].should eq Marten::Template::Value.from(42)
       arr[1].should eq Marten::Template::Value.from("foo")
       arr[2].should eq Marten::Template::Value.from("bar")
+    end
+
+    it "yields the value of a specific query set" do
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "ruby", is_active: true)
+
+      value = Marten::Template::Value.from(Tag.all)
+
+      arr = [] of Marten::Template::Value
+      value.each { |v| arr << v }
+
+      arr.size.should eq 3
+      arr[0].should eq tag_1
+      arr[1].should eq tag_2
+      arr[2].should eq tag_3
     end
 
     it "raises an unsupported type exception if the underlying object is not iterable" do

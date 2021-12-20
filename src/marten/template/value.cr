@@ -6,6 +6,7 @@ module Marten
       include Enumerable(self)
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) |
+                  Marten::DB::Model | Marten::DB::Query::Set::Any |
                   Marten::Template::Object | Nil | SafeString | String | Time | Views::Base
 
       # Returns the raw value associated with the template value.
@@ -13,8 +14,6 @@ module Marten
 
       def self.from(raw)
         case raw
-        when DB::Query::Set
-          from(raw.to_a)
         when Hash, NamedTuple
           new(Hash(Value, Value).new.tap { |values| raw.each { |k, v| values[new(k.to_s)] = from(v) } })
         when Array, Tuple
@@ -88,9 +87,9 @@ module Marten
 
       private def yield_each_from_raw
         case object = raw
-        when Iterable(Value)
+        when Enumerable(Value), Iterable(Value)
           object.each { |v| yield v.as(Value).raw }
-        when Iterable
+        when Enumerable, Iterable
           object.each { |v| yield v }
         else
           raise Errors::UnsupportedType.new("#{object.class} objects are not iterable")

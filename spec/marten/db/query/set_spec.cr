@@ -330,6 +330,12 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#accumulate" do
+    it "raises NotImplementedError" do
+      expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.accumulate }
+    end
+  end
+
   describe "#all" do
     it "returns a clone of the current query set" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
@@ -1267,6 +1273,12 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#product" do
+    it "raises NotImplementedError" do
+      expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.product }
+    end
+  end
+
   describe "#reverse" do
     it "reverses the current order of the considered queryset" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
@@ -1296,6 +1308,18 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c).size.should eq 2
       Marten::DB::Query::Set(Tag).new.filter(name__startswith: "r").size.should eq 1
       Marten::DB::Query::Set(Tag).new.filter(name__startswith: "x").size.should eq 0
+    end
+  end
+
+  describe "#sum" do
+    it "raises NotImplementedError" do
+      expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.sum }
+    end
+  end
+
+  describe "#to_h" do
+    it "raises NotImplementedError" do
+      expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.to_h }
     end
   end
 

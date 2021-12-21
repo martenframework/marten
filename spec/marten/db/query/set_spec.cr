@@ -1254,6 +1254,19 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#paginator" do
+    it "returns a paginator for the query set" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username)
+      qset.paginator(2).should be_a Marten::DB::Query::Paginator(TestUser)
+      qset.paginator(2).page(1).size.should eq 2
+      qset.paginator(2).page(1).to_a.should eq [user_1, user_3]
+    end
+  end
+
   describe "#reverse" do
     it "reverses the current order of the considered queryset" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

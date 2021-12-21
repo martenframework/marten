@@ -478,6 +478,14 @@ module Marten
           raise NotImplementedError.new("#product is not supported for query sets")
         end
 
+        # Returns a paginator that can be used to paginate the current query set.
+        #
+        # This method returns a `Marten::DB::Query::Paginator` object, which can then be used to retrieve specific
+        # pages.
+        def paginator(page_size : Int)
+          Paginator(M).new(self, page_size.to_i32)
+        end
+
         # Allows to reverse the order of the current query set.
         def reverse
           qs = clone

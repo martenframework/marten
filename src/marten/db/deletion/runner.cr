@@ -37,7 +37,7 @@ module Marten
 
             # Step 3: delete all the records that were registered for deletion.
             @records_to_delete.each do |model_klass, records|
-              node = records.reduce(Query::Node.new) { |acc, rec| acc | Query::Node.new(pk: rec.id) }
+              node = records.reduce(Query::Node.new) { |acc, rec| acc | Query::Node.new(pk: rec.pk) }
               count += model_klass._base_queryset.using(@connection.alias).filter(node).delete(raw: true)
             end
           end

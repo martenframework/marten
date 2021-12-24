@@ -40,6 +40,30 @@ describe Marten::DB::Management::Migrations::Reader do
       reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
     end
 
+    it "ignored already applied migrations that are no longer defined" do
+      foo_app = Marten::DB::Management::Migrations::ReaderSpec::FooApp.new
+      bar_app = Marten::DB::Management::Migrations::ReaderSpec::BarApp.new
+
+      Marten.apps.app_configs_store = {
+        "reader_spec_foo_app" => foo_app,
+        "reader_spec_bar_app" => bar_app,
+      }
+
+      Marten::DB::Management::Migrations::Record.create!(
+        app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
+        name: Migration::FooApp::V202108092226111.migration_name
+      )
+      Marten::DB::Management::Migrations::Record.create!(
+        app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
+        name: "very_old_migration"
+      )
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.applied_migrations.size.should eq 1
+      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
+    end
+
     it "identifies already applied migrations by respecting the considered DB connection" do
       foo_app = Marten::DB::Management::Migrations::ReaderSpec::FooApp.new
       bar_app = Marten::DB::Management::Migrations::ReaderSpec::BarApp.new

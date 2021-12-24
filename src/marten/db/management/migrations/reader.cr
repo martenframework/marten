@@ -59,6 +59,7 @@ module Marten
 
               recorder.applied_migrations.each do |migration|
                 migration_id = Migration.gen_id(migration.app, migration.name)
+                next unless defined_migrations.has_key?(migration_id)
                 @applied_migrations[migration_id] = defined_migrations[migration_id]
               end
             end

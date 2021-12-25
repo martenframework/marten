@@ -54,7 +54,7 @@ module Marten
         delegate each, to: @records
 
         macro finished
-          {% model_types = Marten::DB::Model.all_subclasses.map(&.name) %}
+          {% model_types = Marten::DB::Model.all_subclasses.reject(&.abstract?).map(&.name) %}
           {% if model_types.size > 0 %}
             alias Any = {% for t, i in model_types %}Page({{ t }}){% if i + 1 < model_types.size %} | {% end %}{% end %}
           {% else %}

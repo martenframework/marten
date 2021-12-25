@@ -10,7 +10,7 @@ module Marten
 
           macro inherited
             # Register the model class to make it available to the associated app config later on.
-            Marten.apps.register_model(self)
+            Marten.apps.register_model(self) unless abstract?
           end
         end
 

@@ -1,6 +1,7 @@
 require "./model/app_config"
 require "./model/comparison"
 require "./model/connection"
+require "./model/inheritance"
 require "./model/persistence"
 require "./model/querying"
 require "./model/table"
@@ -9,6 +10,8 @@ require "./model/validation"
 module Marten
   module DB
     abstract class Model
+      include Inheritance
+
       include AppConfig
 
       include Connection
@@ -43,7 +46,7 @@ module Marten
       end
 
       macro finished
-        {% model_types = Marten::DB::Model.all_subclasses.map(&.name) %}
+        {% model_types = Marten::DB::Model.all_subclasses.reject(&.abstract?).map(&.name) %}
         {% if model_types.size > 0 %}
           alias Any = {% for t, i in model_types %}{{ t }}{% if i + 1 < model_types.size %} | {% end %}{% end %}
         {% else %}

@@ -6,6 +6,11 @@ describe Marten::DB::Model::AppConfig do
       config = Tag.app_config
       config.models.includes?(Tag).should be_true
     end
+
+    it "does not register the model if it is abstract" do
+      config = Tag.app_config
+      config.models.includes?(AbstractArticle).should be_false
+    end
   end
 
   describe "::app_config" do

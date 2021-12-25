@@ -7,18 +7,24 @@ module Marten
 
           macro inherited
             class NotFound < Marten::DB::Errors::RecordNotFound; end
-
-            # :nodoc:
-            # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
-            # Although this method is public (because it's generated for all models), it is used internally by Marten to
-            # ensure correct behaviours when deleting records.
-            def self._base_queryset
-              Marten::DB::Query::Set(self).new
-            end
           end
         end
 
         module ClassMethods
+          # :nodoc:
+          # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
+          # Although this method is public (because it's generated for all models), it is used internally by Marten to
+          # ensure correct behaviours when deleting records.
+          def _base_queryset
+            {% begin %}
+            {% if @type.abstract? %}
+            raise "Records can only be queried from non-abstract model classes"
+            {% else %}
+            Query::Set({{ @type }}).new
+            {% end %}
+            {% end %}
+          end
+
           # Returns a queryset targetting all the records for the considered model.
           #
           # This method returns a `Marten::DB::Query::Set` object that - if evaluated - will return all the records for

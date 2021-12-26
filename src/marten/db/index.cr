@@ -7,6 +7,11 @@ module Marten
       def initialize(@name : String, @fields : Array(Field::Base))
       end
 
+      # Returns a clone of the current index.
+      def clone
+        Index.new(name: name, fields: fields)
+      end
+
       def to_management_index : Management::Index
         column_names = [] of String
         @fields.each do |field|

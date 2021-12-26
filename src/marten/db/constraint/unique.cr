@@ -8,6 +8,11 @@ module Marten
         def initialize(@name : String, @fields : Array(Field::Base))
         end
 
+        # Returns a clone of the current unique constraint.
+        def clone
+          Unique.new(name: name, fields: fields)
+        end
+
         def to_management_constraint : Management::Constraint::Unique
           column_names = [] of String
           @fields.each do |field|

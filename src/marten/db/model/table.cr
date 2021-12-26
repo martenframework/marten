@@ -60,7 +60,7 @@ module Marten
             @@db_table ||= String.build do |s|
               s << app_config.label.downcase
               s << '_'
-              s << (model_name = name.gsub("::", "_").underscore)
+              s << (model_name = name.split("::").last.underscore)
               s << 's' unless model_name.ends_with?('s')
             end
           end

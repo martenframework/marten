@@ -137,6 +137,18 @@ module Marten
         end
 
         # :nodoc:
+        macro contribute_to_inherited_model(model_klass, field_id, field_ann, kwargs)
+          class ::{{ model_klass }}
+            register_field(
+              {{ @type }}.new(
+                {{ field_id.stringify }},
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+              )
+            )
+          end
+        end
+
+        # :nodoc:
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           # Registers the field to the model class.
 

@@ -21,12 +21,8 @@ module Marten
           macro inherited
             FIELDS_ = {} of Nil => Nil
 
-            # Reset table-related class variables upon inheritance.
-            # TODO: model class inheritance.
-            @@fields = {} of String => Marten::DB::Field::Base
-            @@fields_per_column = {} of String => Marten::DB::Field::Base
-            @@relation_fields_per_relation_name = {} of String => Marten::DB::Field::Base
-            @@reverse_relations = [] of Marten::DB::ReverseRelation
+            _reset_table_attributes
+            _inherit_table_attributes
 
             macro finished
               _verify_model_name
@@ -189,7 +185,7 @@ module Marten
             {% raise "'#{sanitized_type}' is not a valid type for field '#{@type.id}##{sanitized_id}'" %}
           {% end %}
 
-          {% FIELDS_[sanitized_id.stringify] = kwargs %}
+          {% FIELDS_[sanitized_id.stringify] = {type: sanitized_type.stringify, kwargs: kwargs} %}
 
           {{ field_klass }}.check_definition(
             {{ sanitized_id }},
@@ -384,17 +380,50 @@ module Marten
         end
 
         # :nodoc:
-        macro _verify_model_name
-          {% if @type.id.includes?(LOOKUP_SEP) %}
-            {% raise "Cannot use '#{@type.id}' as a valid model name: model names cannot contain '#{LOOKUP_SEP.id}'" %}
+        macro _inherit_table_attributes
+          {% if @type.ancestors.first.has_constant?("FIELDS_") %}
+            {% for field_id, field_config in @type.ancestors.first.constant("FIELDS_") %}
+              {% FIELDS_[field_id] = field_config %}
+
+              {% field_klass = nil %}
+              {% field_ann = nil %}
+              {% for k in Marten::DB::Field::Base.all_subclasses %}
+                {% ann = k.annotation(Marten::DB::Field::Registration) %}
+                {% if ann && ann[:id] == field_config[:type] %}
+                  {% field_klass = k %}
+                  {% field_ann = ann %}
+                {% end %}
+              {% end %}
+
+              {{ field_klass }}.contribute_to_inherited_model(
+                {{ @type }},
+                {{ field_id.id }},
+                {{ field_ann }},
+                {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %}
+              )
+            {% end %}
+
+            @@db_indexes = {{ @type.ancestors.first.name }}.db_indexes.clone
+            @@db_unique_constraints = {{ @type.ancestors.first.name }}.db_unique_constraints.clone
           {% end %}
+        end
+
+        # :nodoc:
+        macro _reset_table_attributes
+          @@db_indexes = [] of Marten::DB::Index
+          @@db_table = nil
+          @@db_unique_constraints = [] of Marten::DB::Constraint::Unique
+          @@fields = {} of String => Marten::DB::Field::Base
+          @@fields_per_column = {} of String => Marten::DB::Field::Base
+          @@relation_fields_per_relation_name = {} of String => Marten::DB::Field::Base
+          @@reverse_relations = [] of Marten::DB::ReverseRelation
         end
 
         # :nodoc:
         macro _setup_primary_key
           {% pkeys = [] of StringLiteral %}
-          {% for id, kwargs in FIELDS_ %}
-            {% if kwargs && kwargs[:primary_key] %}{% pkeys << id %}{% end %}
+          {% for id, config in FIELDS_ %}
+            {% if config[:kwargs] && config[:kwargs][:primary_key] %}{% pkeys << id %}{% end %}
           {% end %}
 
           {% if pkeys.size == 0 %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}
@@ -413,6 +442,13 @@ module Marten
           def pk=(val)
             self.{{ pkeys[0].id }} = val
           end
+        end
+
+        # :nodoc:
+        macro _verify_model_name
+          {% if @type.id.includes?(LOOKUP_SEP) %}
+            {% raise "Cannot use '#{@type.id}' as a valid model name: model names cannot contain '#{LOOKUP_SEP.id}'" %}
+          {% end %}
         end
       end
     end

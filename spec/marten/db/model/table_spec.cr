@@ -1,6 +1,100 @@
 require "./spec_helper"
 
 describe Marten::DB::Model::Table do
+  describe "::inherited" do
+    it "ensures that the model inherits its parent fields" do
+      Marten::DB::Model::TableSpec::Article.fields.size.should eq 7
+      Marten::DB::Model::TableSpec::Article.fields.map(&.id).should eq(
+        ["id", "author_id", "moderator_id", "title", "content", "tags", "additional_content"]
+      )
+    end
+
+    it "ensures that the model inherits its parent indexes" do
+      Marten::DB::Model::TableSpec::Article.db_indexes.size.should eq 2
+      Marten::DB::Model::TableSpec::Article.db_indexes.map(&.name).should eq(
+        ["base_author_title_index", "other_author_title_index"]
+      )
+    end
+
+    it "ensures that the model inherits its parent unique constraints" do
+      Marten::DB::Model::TableSpec::Article.db_unique_constraints.size.should eq 2
+      Marten::DB::Model::TableSpec::Article.db_unique_constraints.map(&.name).should eq(
+        ["base_author_title_constraint", "other_author_title_constraint"]
+      )
+    end
+
+    it "produces models that can be used to create records" do
+      author = Marten::DB::Model::TableSpec::Author.create!(name: "Author")
+      moderator = Marten::DB::Model::TableSpec::Author.create!(name: "Moderator")
+
+      article = Marten::DB::Model::TableSpec::Article.create!(
+        title: "Article 1",
+        content: "Article content 1",
+        additional_content: "Article additional content 1",
+        author: author,
+        moderator: moderator
+      )
+      article.persisted?.should be_true
+
+      Marten::DB::Model::TableSpec::Article.all.to_a.should eq [article]
+    end
+
+    it "produces models that can be used to create records with many to one fields" do
+      author = Marten::DB::Model::TableSpec::Author.create!(name: "Author")
+      moderator = Marten::DB::Model::TableSpec::Author.create!(name: "Moderator")
+
+      article = Marten::DB::Model::TableSpec::Article.create!(
+        title: "Article 1",
+        content: "Article content 1",
+        additional_content: "Article additional content 1",
+        author: author,
+        moderator: moderator
+      )
+      article.persisted?.should be_true
+
+      author.articles.to_a.should eq [article]
+    end
+
+    it "produces models that can be used to create records with one to one fields" do
+      author = Marten::DB::Model::TableSpec::Author.create!(name: "Author")
+      moderator = Marten::DB::Model::TableSpec::Author.create!(name: "Moderator")
+
+      article = Marten::DB::Model::TableSpec::Article.create!(
+        title: "Article 1",
+        content: "Article content 1",
+        additional_content: "Article additional content 1",
+        author: author,
+        moderator: moderator
+      )
+      article.persisted?.should be_true
+
+      moderator.moderated_article.should eq article
+    end
+
+    it "produces models that can be used to create records with many many one fields" do
+      author = Marten::DB::Model::TableSpec::Author.create!(name: "Author")
+      moderator = Marten::DB::Model::TableSpec::Author.create!(name: "Moderator")
+
+      tag_1 = Marten::DB::Model::TableSpec::Tag.create!(name: "t1")
+      tag_2 = Marten::DB::Model::TableSpec::Tag.create!(name: "t2")
+
+      article = Marten::DB::Model::TableSpec::Article.create!(
+        title: "Article 1",
+        content: "Article content 1",
+        additional_content: "Article additional content 1",
+        author: author,
+        moderator: moderator
+      )
+      article.persisted?.should be_true
+
+      article.tags.add(tag_1)
+      article.tags.add(tag_2)
+
+      article.tags.to_a.should eq [tag_1, tag_2]
+      tag_1.articles.to_a.should eq [article]
+    end
+  end
+
   describe "::db_index" do
     it "allows to configure new index" do
       indexes = Post.db_indexes

@@ -86,6 +86,55 @@ module Marten
         end
 
         # :nodoc:
+        macro contribute_to_inherited_model(model_klass, field_id, field_ann, kwargs)
+          {% relation_attribute_name = field_id %}
+          {% field_id = (field_id.stringify + "_id").id %}
+
+          class ::{{ model_klass }}
+            register_field(
+              {{ @type }}.new(
+                {{ field_id.stringify }},
+                {{ relation_attribute_name.stringify }},
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+              )
+            )
+          end
+
+          {% if !model_klass.resolve.abstract? %}
+            {% related_field_name = kwargs[:related] %}
+            {% related_model_klass = kwargs[:to] %}
+
+            # Register the reverse relation.
+
+            ::{{ related_model_klass }}.register_reverse_relation(
+              Marten::DB::ReverseRelation.new(
+                {% if !related_field_name.is_a?(NilLiteral) %}
+                  {{ related_field_name.id.stringify }},
+                {% else %}
+                  nil,
+                {% end %}
+                ::{{ model_klass }},
+                {{ field_id.stringify }}
+              )
+            )
+
+            # Configure reverse relation methods if applicable (when the 'related' option is set).
+
+            {% if !related_field_name.is_a?(NilLiteral) %}
+              class ::{{ model_klass }}
+                macro finished
+                  class ::{{ related_model_klass }}
+                    def {{ related_field_name.id }}
+                      Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
+                    end
+                  end
+                end
+              end
+            {% end %}
+          {% end %}
+        end
+
+        # :nodoc:
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           {% relation_attribute_name = field_id %}
           {% field_id = (field_id.stringify + "_id").id %}
@@ -150,30 +199,36 @@ module Marten
             end
           end
 
-          {% related_field_name = kwargs[:related] %}
+          {% if !model_klass.resolve.abstract? %}
+            {% related_field_name = kwargs[:related] %}
 
-          # Register the reverse relation.
+            # Register the reverse relation.
 
-          ::{{ related_model_klass }}.register_reverse_relation(
-            Marten::DB::ReverseRelation.new(
-              {% if !related_field_name.is_a?(NilLiteral) %}{{ related_field_name.id.stringify }}{% else %}nil{% end %},
-              ::{{ model_klass }},
-              {{ field_id.stringify }}
+            ::{{ related_model_klass }}.register_reverse_relation(
+              Marten::DB::ReverseRelation.new(
+                {% if !related_field_name.is_a?(NilLiteral) %}
+                  {{ related_field_name.id.stringify }},
+                {% else %}
+                  nil,
+                {% end %}
+                ::{{ model_klass }},
+                {{ field_id.stringify }}
+              )
             )
-          )
 
-          # Configure reverse relation methods if applicable (when the 'related' option is set).
+            # Configure reverse relation methods if applicable (when the 'related' option is set).
 
-          {% if !related_field_name.is_a?(NilLiteral) %}
-          class ::{{ model_klass }}
-            macro finished
-              class ::{{ related_model_klass }}
-                def {{ related_field_name.id }}
-                  Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
+            {% if !related_field_name.is_a?(NilLiteral) %}
+              class ::{{ model_klass }}
+                macro finished
+                  class ::{{ related_model_klass }}
+                    def {{ related_field_name.id }}
+                      Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
+                    end
+                  end
                 end
               end
-            end
-          end
+            {% end %}
           {% end %}
         end
       end

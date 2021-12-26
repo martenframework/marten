@@ -64,82 +64,161 @@ module Marten
         end
 
         # :nodoc:
-        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
-          # Automatically creates a "through" model to manage the many-to-many relationship between the considered
-          # model and the related model.
+        macro contribute_to_inherited_model(model_klass, field_id, field_ann, kwargs)
+          {% if !model_klass.resolve.abstract? %}
+            {% related_model_klass = kwargs[:to] %}
 
-          {% related_model_klass = kwargs[:to] %}
+            {% from_model_name = model_klass.stringify.split("::").last %}
+            {% to_model_name = related_model_klass.stringify.split("::").last %}
 
-          {% from_model_name = model_klass.stringify %}
-          {% to_model_name = related_model_klass.stringify %}
+            {% field_id_string = field_id.stringify %}
 
-          {% field_id_string = field_id.stringify %}
+            {% through_model_name = "#{model_klass}#{field_id_string.capitalize.id}" %}
+            {% through_related_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
+            {% through_model_from_field_id = from_model_name.downcase %}
+            {% through_model_to_field_id = to_model_name.downcase %}
 
-          {% through_model_name = "#{model_klass}#{field_id_string.capitalize.id}" %}
-          {% through_related_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
-          {% through_model_table_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
-          {% through_model_from_field_id = from_model_name.downcase %}
-          {% through_model_to_field_id = to_model_name.downcase %}
+            {% if through_model_from_field_id == through_model_to_field_id %}
+              {% through_model_from_field_id = "from_#{through_model_from_field_id}" %}
+              {% through_model_to_field_id = "to_#{through_model_to_field_id}" %}
+            {% end %}
 
-          {% if through_model_from_field_id == through_model_to_field_id %}
-            {% through_model_from_field_id = "from_#{through_model_from_field_id}" %}
-            {% through_model_to_field_id = "to_#{through_model_to_field_id}" %}
-          {% end %}
-
-          class ::{{ through_model_name.id }} < Marten::DB::Model
-            field :id, :big_int, primary_key: true, auto: true
-            field(
-              :{{ through_model_from_field_id.id }},
-              :many_to_one,
-              to: {{ model_klass }},
-              on_delete: :cascade,
-              related: {{ through_related_name }}
-            )
-            field(
-              :{{ through_model_to_field_id.id }},
-              :many_to_one,
-              to: {{ related_model_klass }},
-              on_delete: :cascade,
-              related: {{ through_related_name }}
-            )
-          end
-
-          class ::{{ model_klass }}
-            register_field(
-              {{ @type }}.new(
-                {{ field_id.stringify }},
-                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
-                through: {{ through_model_name.id }}
+            class ::{{ model_klass }}
+              register_field(
+                {{ @type }}.new(
+                  {{ field_id.stringify }},
+                  {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }},{% end %}
+                  through: {{ through_model_name.id }}
+                )
               )
-            )
 
-            def {{ field_id }}
-              Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
-                self,
-                {{ field_id.stringify }},
-                {{ through_related_name }},
-                {{ through_model_from_field_id }},
-                {{ through_model_to_field_id }}
-              )
-            end
-          end
-
-          {% related_field_name = kwargs[:related] %}
-
-          {% if !related_field_name.is_a?(NilLiteral) %}
-          class ::{{ model_klass }}
-            macro finished
-              class ::{{ related_model_klass }}
-                def {{ related_field_name.id }}
-                  Marten::DB::Query::Set({{ model_klass }}).new.filter(
-                    Marten::DB::Query::Node.new(
-                      {"{{ through_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
-                    )
-                  )
-                end
+              def {{ field_id }}
+                Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
+                  self,
+                  {{ field_id.stringify }},
+                  {{ through_related_name }},
+                  {{ through_model_from_field_id }},
+                  {{ through_model_to_field_id }}
+                )
               end
             end
-          end
+
+            class ::{{ through_model_name.id }} < Marten::DB::Model
+              field :id, :big_int, primary_key: true, auto: true
+              field(
+                :{{ through_model_from_field_id.id }},
+                :many_to_one,
+                to: {{ model_klass }},
+                on_delete: :cascade,
+                related: {{ through_related_name }}
+              )
+              field(
+                :{{ through_model_to_field_id.id }},
+                :many_to_one,
+                to: {{ related_model_klass }},
+                on_delete: :cascade,
+                related: {{ through_related_name }}
+              )
+            end
+
+            {% related_field_name = kwargs[:related] %}
+
+            {% if !related_field_name.is_a?(NilLiteral) %}
+              class ::{{ model_klass }}
+                macro finished
+                  class ::{{ related_model_klass }}
+                    def {{ related_field_name.id }}
+                      Marten::DB::Query::Set({{ model_klass }}).new.filter(
+                        Marten::DB::Query::Node.new(
+                          {"{{ through_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
+                        )
+                      )
+                    end
+                  end
+                end
+              end
+            {% end %}
+          {% end %}
+        end
+
+        # :nodoc:
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
+          {% if !model_klass.resolve.abstract? %}
+            # Automatically creates a "through" model to manage the many-to-many relationship between the considered
+            # model and the related model.
+
+            {% related_model_klass = kwargs[:to] %}
+
+            {% from_model_name = model_klass.stringify.split("::").last %}
+            {% to_model_name = related_model_klass.stringify.split("::").last %}
+
+            {% field_id_string = field_id.stringify %}
+
+            {% through_model_name = "#{model_klass}#{field_id_string.capitalize.id}" %}
+            {% through_related_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
+            {% through_model_from_field_id = from_model_name.downcase %}
+            {% through_model_to_field_id = to_model_name.downcase %}
+
+            {% if through_model_from_field_id == through_model_to_field_id %}
+              {% through_model_from_field_id = "from_#{through_model_from_field_id}" %}
+              {% through_model_to_field_id = "to_#{through_model_to_field_id}" %}
+            {% end %}
+
+            class ::{{ model_klass }}
+              register_field(
+                {{ @type }}.new(
+                  {{ field_id.stringify }},
+                  {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
+                  through: {{ through_model_name.id }}
+                )
+              )
+
+              def {{ field_id }}
+                Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
+                  self,
+                  {{ field_id.stringify }},
+                  {{ through_related_name }},
+                  {{ through_model_from_field_id }},
+                  {{ through_model_to_field_id }}
+                )
+              end
+            end
+
+            class ::{{ through_model_name.id }} < Marten::DB::Model
+              field :id, :big_int, primary_key: true, auto: true
+              field(
+                :{{ through_model_from_field_id.id }},
+                :many_to_one,
+                to: {{ model_klass }},
+                on_delete: :cascade,
+                related: {{ through_related_name }}
+              )
+              field(
+                :{{ through_model_to_field_id.id }},
+                :many_to_one,
+                to: {{ related_model_klass }},
+                on_delete: :cascade,
+                related: {{ through_related_name }}
+              )
+            end
+
+            {% related_field_name = kwargs[:related] %}
+
+            {% if !related_field_name.is_a?(NilLiteral) %}
+              class ::{{ model_klass }}
+                macro finished
+                  class ::{{ related_model_klass }}
+                    def {{ related_field_name.id }}
+                      Marten::DB::Query::Set({{ model_klass }}).new.filter(
+                        Marten::DB::Query::Node.new(
+                          {"{{ through_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
+                        )
+                      )
+                    end
+                  end
+                end
+              end
+            {% end %}
           {% end %}
         end
       end

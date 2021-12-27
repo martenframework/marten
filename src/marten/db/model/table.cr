@@ -196,7 +196,8 @@ module Marten
             {{ @type }},
             {{ sanitized_id }},
             {{ field_ann }},
-            {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
+            {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %},
+            false
           )
         end
 
@@ -395,11 +396,12 @@ module Marten
                 {% end %}
               {% end %}
 
-              {{ field_klass }}.contribute_to_inherited_model(
+              {{ field_klass }}.contribute_to_model(
                 {{ @type }},
                 {{ field_id.id }},
                 {{ field_ann }},
-                {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %}
+                {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %},
+                true
               )
             {% end %}
 

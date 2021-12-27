@@ -86,62 +86,10 @@ module Marten
         end
 
         # :nodoc:
-        macro contribute_to_inherited_model(model_klass, field_id, field_ann, kwargs)
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs, inherited)
           {% relation_attribute_name = field_id %}
           {% field_id = (field_id.stringify + "_id").id %}
-
-          class ::{{ model_klass }}
-            register_field(
-              {{ @type }}.new(
-                {{ field_id.stringify }},
-                {{ relation_attribute_name.stringify }},
-                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
-              )
-            )
-          end
-
-          {% if !model_klass.resolve.abstract? %}
-            {% related_field_name = kwargs[:related] %}
-            {% related_model_klass = kwargs[:to] %}
-
-            # Register the reverse relation.
-
-            ::{{ related_model_klass }}.register_reverse_relation(
-              Marten::DB::ReverseRelation.new(
-                {% if !related_field_name.is_a?(NilLiteral) %}
-                  {{ related_field_name.id.stringify }},
-                {% else %}
-                  nil,
-                {% end %}
-                ::{{ model_klass }},
-                {{ field_id.stringify }}
-                )
-            )
-
-            # Configure reverse relation methods if applicable (when the 'related' option is set).
-
-            {% if !related_field_name.is_a?(NilLiteral) %}
-              class ::{{ model_klass }}
-                macro finished
-                  class ::{{ related_model_klass }}
-                    def {{ related_field_name.id }}
-                      {{ model_klass }}.get({{ field_id }}: pk)
-                    end
-
-                    def {{ related_field_name.id }}!
-                      {{ model_klass }}.get!({{ field_id }}: pk)
-                    end
-                  end
-                end
-              end
-            {% end %}
-          {% end %}
-        end
-
-        # :nodoc:
-        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
-          {% relation_attribute_name = field_id %}
-          {% field_id = (field_id.stringify + "_id").id %}
+          {% related_model_klass = kwargs[:to] %}
 
           # Registers a field corresponding to the related object ID to the considered model class. For example, if an
           # 'author' one to one field is defined in a 'post' model, an 'author_id' one to one field will actually be
@@ -156,51 +104,52 @@ module Marten
               )
             )
 
-            # Getter and setter methods for the raw related object ID and the plain related object need to be created.
+            {% if !inherited %}
+              # Getter and setter methods for the raw related object ID and the plain related object need to be created.
 
-            {% related_model_klass = kwargs[:to] %}
-            {% if related_model_klass.stringify == "self" %}
-              {% related_model_klass = model_klass %}
-            {% end %}
+              {% if related_model_klass.stringify == "self" %}
+                {% related_model_klass = model_klass %}
+              {% end %}
 
-            @[Marten::DB::Model::Table::FieldInstanceVariable(
-              field_klass: {{ @type }},
-              field_kwargs: {{ kwargs }},
-              field_type: {{ field_ann[:exposed_type] }},
-              relation_name: {{ relation_attribute_name }},
-              related_model: {{ related_model_klass }}
-            )]
-            @{{ field_id }} : {{ field_ann[:exposed_type] }}?
+              @[Marten::DB::Model::Table::FieldInstanceVariable(
+                field_klass: {{ @type }},
+                field_kwargs: {{ kwargs }},
+                field_type: {{ field_ann[:exposed_type] }},
+                relation_name: {{ relation_attribute_name }},
+                related_model: {{ related_model_klass }}
+              )]
+              @{{ field_id }} : {{ field_ann[:exposed_type] }}?
 
-            @{{ relation_attribute_name }} : {{ related_model_klass }}?
+              @{{ relation_attribute_name }} : {{ related_model_klass }}?
 
-            def {{ field_id }} : {{ field_ann[:exposed_type] }}?
-              @{{ field_id }}
-            end
-
-            def {{ field_id }}!
-              @{{ field_id }}.not_nil!
-            end
-
-            def {{ field_id }}=(related_id : {{ field_ann[:exposed_type] }}?)
-              @{{ field_id }} = related_id
-              @{{ relation_attribute_name }} = nil
-            end
-
-            def {{ relation_attribute_name }} : {{ related_model_klass }}?
-              @{{ relation_attribute_name }} ||= begin
-                {{ related_model_klass }}.get(pk: @{{ field_id }})
+              def {{ field_id }} : {{ field_ann[:exposed_type] }}?
+                @{{ field_id }}
               end
-            end
 
-            def {{ relation_attribute_name }}! : {{ related_model_klass }}
-              {{ relation_attribute_name }}.not_nil!
-            end
+              def {{ field_id }}!
+                @{{ field_id }}.not_nil!
+              end
 
-            def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)
-              @{{ field_id }} = related_object.try(&.id)
-              @{{ relation_attribute_name }} = related_object
-            end
+              def {{ field_id }}=(related_id : {{ field_ann[:exposed_type] }}?)
+                @{{ field_id }} = related_id
+                @{{ relation_attribute_name }} = nil
+              end
+
+              def {{ relation_attribute_name }} : {{ related_model_klass }}?
+                @{{ relation_attribute_name }} ||= begin
+                  {{ related_model_klass }}.get(pk: @{{ field_id }})
+                end
+              end
+
+              def {{ relation_attribute_name }}! : {{ related_model_klass }}
+                {{ relation_attribute_name }}.not_nil!
+              end
+
+              def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)
+                @{{ field_id }} = related_object.try(&.id)
+                @{{ relation_attribute_name }} = related_object
+              end
+            {% end %}
           end
 
           {% if !model_klass.resolve.abstract? %}

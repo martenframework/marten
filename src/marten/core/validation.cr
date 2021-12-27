@@ -8,18 +8,18 @@ module Marten
       getter errors : ErrorSet = ErrorSet.new
 
       macro included
-        begin_validation_methods_setup
+        _begin_validation_methods_setup
 
         macro inherited
-          begin_validation_methods_setup
+          _begin_validation_methods_setup
 
           macro finished
-            finish_validation_methods_setup
+            _finish_validation_methods_setup
           end
         end
 
         macro finished
-          finish_validation_methods_setup
+          _finish_validation_methods_setup
         end
       end
 
@@ -34,13 +34,13 @@ module Marten
       end
 
       # :nodoc:
-      macro begin_validation_methods_setup
+      macro _begin_validation_methods_setup
         # :nodoc:
         VALIDATION_METHODS = [] of String
       end
 
       # :nodoc:
-      macro finish_validation_methods_setup
+      macro _finish_validation_methods_setup
         {% verbatim do %}
           {% if !VALIDATION_METHODS.empty? %}
             protected def run_validation_methods

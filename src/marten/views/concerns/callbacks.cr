@@ -8,18 +8,18 @@ module Marten
     # `#dispatch` method while `after_dispatch` callbacks are executed after it.
     module Callbacks
       macro included
-        begin_callbacks_setup
+        _begin_callbacks_setup
 
         macro inherited
-          begin_callbacks_setup
+          _begin_callbacks_setup
 
           macro finished
-            finish_callbacks_setup
+            _finish_callbacks_setup
           end
         end
 
         macro finished
-          finish_callbacks_setup
+          _finish_callbacks_setup
         end
       end
 
@@ -52,7 +52,7 @@ module Marten
       end
 
       # :nodoc:
-      macro begin_callbacks_setup
+      macro _begin_callbacks_setup
         # :nodoc:
         DISPATCH_CALLBACKS = {
           before: [] of String,
@@ -61,7 +61,7 @@ module Marten
       end
 
       # :nodoc:
-      macro finish_callbacks_setup
+      macro _finish_callbacks_setup
         {% verbatim do %}
           {% if !DISPATCH_CALLBACKS[:before].empty? %}
             protected def run_before_dispatch_callbacks : Marten::HTTP::Response | Nil

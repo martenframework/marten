@@ -64,6 +64,7 @@ module Marten
           operations << Operation::RenameTable.new({{ old_name }}, {{ new_name }})
         end
 
+        # :nodoc:
         macro _init_column(*args, **kwargs)
           {% if args.size != 2 %}{% raise "A column name and type must be explicitly specified" %}{% end %}
 
@@ -94,10 +95,12 @@ module Marten
           )
         end
 
+        # :nodoc:
         macro _init_index(name, column_names)
           Marten::DB::Management::Index.new({{ name }}, {{ column_names }})
         end
 
+        # :nodoc:
         macro _init_unique_constraint(name, column_names)
           Marten::DB::Management::Constraint::Unique.new({{ name }}, {{ column_names }})
         end

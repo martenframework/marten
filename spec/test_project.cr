@@ -1,4 +1,3 @@
-require "./marten/db/model/table_spec/app"
 require "./test_project/**"
 
 ENV_SETTINGS_FILENAME = ".spec.env.json"
@@ -14,7 +13,6 @@ Marten.configure :test do |config|
 
   config.installed_apps = [
     TestApp,
-    Marten::DB::Model::TableSpec::App,
   ]
 
   for_mysql do

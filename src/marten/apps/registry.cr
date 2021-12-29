@@ -61,10 +61,8 @@ module Marten
         @unassigned_models.each do |model|
           config = model.app_config
           config.register_model(model)
-        rescue e : Errors::AppNotFound
-          # Special models (living) can be associated to no configured apps (eg. this is the case for built-in migration
-          # records) ; in those cases we don't try to associate the model with an existing app.
-          raise e unless model._marten_app_location.starts_with?(Marten.dir_location)
+        rescue Errors::AppNotFound
+          # Skip models that are associated with non-installed apps.
         end
       end
 

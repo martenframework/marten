@@ -14,6 +14,11 @@ module Marten
           @url = build_url
         end
 
+        # Returns a distinct clause to remove duplicates from a query's results.
+        #
+        # If column names are specified, only these specific columns will be checked to identify duplicates.
+        abstract def distinct_clause_for(columns : Array(String)) : String
+
         # Allows to insert a new row in a specific table.
         abstract def insert(
           table_name : String,

@@ -4,6 +4,8 @@ module Marten
       module SQL
         class Query(Model)
           @default_ordering = true
+          @distinct = false
+          @distinct_columns = [] of String
           @joins = [] of Join
           @limit = nil
           @offset = nil
@@ -12,6 +14,8 @@ module Marten
           @using = nil
 
           getter default_ordering
+          getter distinct
+          getter distinct_columns
           getter joins
           getter limit
           getter offset
@@ -20,6 +24,7 @@ module Marten
           getter using
 
           setter default_ordering
+          setter distinct
           setter using
 
           # :nodoc:
@@ -31,6 +36,8 @@ module Marten
 
           def initialize(
             @default_ordering : Bool,
+            @distinct : Bool,
+            @distinct_columns : Array(String),
             @joins : Array(Join),
             @limit : Int64?,
             @offset : Int64?,
@@ -59,6 +66,8 @@ module Marten
           def clone
             self.class.new(
               default_ordering: @default_ordering,
+              distinct: @distinct,
+              distinct_columns: @distinct_columns,
               joins: @joins,
               limit: @limit,
               offset: @offset,
@@ -131,6 +140,31 @@ module Marten
             end
           end
 
+          def setup_distinct_clause(fields : Array(String) | Nil = nil) : Nil
+            self.distinct = true
+
+            distinct_columns = [] of String
+
+            if !fields.nil?
+              fields.each do |raw_field|
+                field_path = verify_field(raw_field)
+                relation_field_path = field_path.select { |field, _r| field.relation? }
+
+                if relation_field_path.empty? || field_path.size == 1
+                  column = "#{Model.db_table}.#{field_path.first[0].db_column!}"
+                else
+                  join = ensure_join_for_field_path(relation_field_path)
+                  column = join.not_nil!.column_name(field_path.last[0].db_column!)
+                end
+
+                distinct_columns << column
+              end
+            end
+
+            @distinct = true
+            @distinct_columns = distinct_columns
+          end
+
           def slice(from, size = nil)
             # "from' is always relative to the currently set offset, while "from" + "limit" must not go further than the
             # currently set @offset + @limit for consistency reasons.
@@ -162,6 +196,8 @@ module Marten
           def to_empty
             EmptyQuery(Model).new(
               default_ordering: @default_ordering,
+              distinct: @distinct,
+              distinct_columns: @distinct_columns,
               joins: @joins,
               limit: @limit,
               offset: @offset,
@@ -204,7 +240,15 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT COUNT(*)"
               s << "FROM ("
-              s << "SELECT #{Model.db_table}.#{Model.pk_field.db_column!}"
+              s << "SELECT"
+
+              if distinct
+                s << connection.distinct_clause_for(distinct_columns)
+                s << columns
+              else
+                s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
+              end
+
               s << "FROM #{table_name}"
               s << @joins.join(" ") { |j| j.to_sql }
               s << where
@@ -269,7 +313,9 @@ module Marten
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << "SELECT #{columns}"
+              s << "SELECT"
+              s << connection.distinct_clause_for(distinct_columns) if distinct
+              s << columns
               s << "FROM #{table_name}"
               s << @joins.join(" ") { |j| j.to_sql }
               s << where

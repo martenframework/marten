@@ -2,6 +2,10 @@ module Marten
   module DB
     module Connection
       class PostgreSQL < Base
+        def distinct_clause_for(columns : Array(String)) : String
+          columns.empty? ? DISTINCT_CLAUSE : "#{DISTINCT_CLAUSE} ON (#{columns.join(", ")})"
+        end
+
         def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : Int64?
           column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
@@ -75,6 +79,8 @@ module Marten
             db.exec(statement, args: values.values + [pk_value])
           end
         end
+
+        private DISTINCT_CLAUSE = "DISTINCT"
 
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
           "icontains"   => "UPPER(%s)",

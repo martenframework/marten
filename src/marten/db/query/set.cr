@@ -190,6 +190,46 @@ module Marten
           end
         end
 
+        # Returns a new query set that will use SELECT DISTINCT in its query.
+        #
+        # By doing so it is possible to eliminate any duplicated row in the query set results:
+        #
+        # ```
+        # query_set = Post.all.distinct
+        # ```
+        def distinct
+          raise Errors::UnmetQuerySetCondition.new("Distinct on sliced queries is not supported") if query.sliced?
+
+          qs = clone
+          qs.query.setup_distinct_clause
+
+          qs
+        end
+
+        # Returns a new query set that will use SELECT DISTINCT ON in its query
+        #
+        # By doing so it is possible to eliminate any duplicated row based on the specified fields:
+        #
+        # ```
+        # query_set = Post.all.distinct(:title)
+        # ```
+        #
+        # It should be noted that it is also possible to follow associations of direct related models too by using the
+        # double underscores notation(`__`). For example the following query will select distinct records based on a
+        # joined "author" attribute:
+        #
+        # ```
+        # query_set = Post.all.distinct(:author__name)
+        # ```
+        def distinct(*fields : String | Symbol)
+          raise Errors::UnmetQuerySetCondition.new("Distinct on sliced queries is not supported") if query.sliced?
+
+          qs = clone
+          qs.query.setup_distinct_clause(fields.map(&.to_s).to_a)
+
+          qs
+        end
+
         # Allows to iterate over the records that are targeted by the current query set.
         #
         # This method can be used to define a block that iterates over the records that are targeted by a query set:

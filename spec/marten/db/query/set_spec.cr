@@ -541,6 +541,89 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#distinct" do
+    it "allows to return non-duplicated rows" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1", published: true)
+      Post.create!(author: user_1, title: "Post 2", published: true)
+      Post.create!(author: user_2, title: "Post 3", published: true)
+      Post.create!(author: user_1, title: "Post 4", published: false)
+
+      TestUser.filter(posts__published: true).distinct.size.should eq 2
+      TestUser.filter(posts__published: true).distinct.to_set.should eq [user_1, user_2].to_set
+    end
+
+    it "raises if a slice was already configured for the query set" do
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Distinct on sliced queries is not supported"
+      ) do
+        if (qset = Marten::DB::Query::Set(Tag).new[..1]).is_a?(Marten::DB::Query::Set(Tag))
+          qset.distinct
+        end
+      end
+    end
+  end
+
+  for_postgresql do
+    describe "#distinct(*fields)" do
+      it "allows to return non-duplicated rows based on a specific field expressed as a symbol" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.all.distinct(:first_name).size.should eq 2
+        TestUser.all.distinct(:first_name).to_set.should eq [user_1, user_3].to_set
+      end
+
+      it "allows to return non-duplicated rows based on a specific field expressed as a string" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.all.distinct("first_name").size.should eq 2
+        TestUser.all.distinct("first_name").to_set.should eq [user_1, user_3].to_set
+      end
+
+      it "allows to return non-duplicated rows based on multiple specific fields" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.all.distinct(:first_name, :last_name).size.should eq 2
+        TestUser.all.distinct(:first_name, :last_name).to_set.should eq [user_1, user_3].to_set
+      end
+
+      it "allows to return non-duplicated rows based on a specific fields by following associations" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        post_1 = Post.create!(author: user_1, title: "Post 1", published: true)
+        Post.create!(author: user_1, title: "Post 2", published: true)
+        Post.create!(author: user_2, title: "Post 3", published: true)
+        Post.create!(author: user_1, title: "Post 4", published: false)
+        post_5 = Post.create!(author: user_3, title: "Post 4", published: false)
+
+        Post.all.distinct(:author__first_name).size.should eq 2
+        Post.all.distinct(:author__first_name).to_set.should eq [post_1, post_5].to_set
+      end
+
+      it "raises if a slice was already configured for the query set" do
+        expect_raises(
+          Marten::DB::Errors::UnmetQuerySetCondition,
+          "Distinct on sliced queries is not supported"
+        ) do
+          if (qset = Marten::DB::Query::Set(Tag).new[..1]).is_a?(Marten::DB::Query::Set(Tag))
+            qset.distinct(:name)
+          end
+        end
+      end
+    end
+  end
+
   describe "#each" do
     it "allows to iterate over the records targetted by the query set if it wasn't already fetched" do
       Tag.create!(name: "ruby", is_active: true)

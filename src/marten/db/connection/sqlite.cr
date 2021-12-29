@@ -2,6 +2,11 @@ module Marten
   module DB
     module Connection
       class SQLite < Base
+        def distinct_clause_for(columns : Array(String)) : String
+          return DISTINCT_CLAUSE if columns.empty?
+          raise NotImplementedError.new("DISTINCT ON columns is not supported by this connection implementation")
+        end
+
         def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : Int64?
           column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
@@ -76,6 +81,8 @@ module Marten
         protected def build_url
           super.gsub(IN_MEMORY_ID, "")
         end
+
+        private DISTINCT_CLAUSE = "DISTINCT"
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains"    => "LIKE %s ESCAPE '\\'",

@@ -685,6 +685,68 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#setup_distinct_clause" do
+    it "allows to configure a global distinct clause for the query" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1", published: true)
+      Post.create!(author: user_1, title: "Post 2", published: true)
+      Post.create!(author: user_2, title: "Post 3", published: true)
+      Post.create!(author: user_1, title: "Post 4", published: false)
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.setup_distinct_clause
+
+      query.count.should eq 2
+      query.execute.to_set.should eq [user_1, user_2].to_set
+    end
+
+    for_postgresql do
+      it "allows to configure a distinct clause based on a specific field" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.setup_distinct_clause(["first_name"])
+
+        query.count.should eq 2
+        query.execute.to_set.should eq [user_1, user_3].to_set
+      end
+
+      it "allows to configure a distinct clause based on multiple fields" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.setup_distinct_clause(["first_name", "last_name"])
+
+        query.count.should eq 2
+        query.execute.to_set.should eq [user_1, user_3].to_set
+      end
+
+      it "allows to configure a distinct clause based on a specific field by following joins" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        post_1 = Post.create!(author: user_1, title: "Post 1", published: true)
+        Post.create!(author: user_1, title: "Post 2", published: true)
+        Post.create!(author: user_2, title: "Post 3", published: true)
+        Post.create!(author: user_1, title: "Post 4", published: false)
+        post_5 = Post.create!(author: user_3, title: "Post 4", published: false)
+
+        query = Marten::DB::Query::SQL::Query(Post).new
+        query.setup_distinct_clause(["author__first_name"])
+
+        query.count.should eq 2
+        query.execute.to_set.should eq [post_1, post_5].to_set
+      end
+    end
+  end
+
   describe "#slice" do
     it "allows to configure an offset on a non-sliced query" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

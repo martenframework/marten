@@ -116,6 +116,18 @@ describe Marten::Core::Validation do
       obj.errors[0].message.should eq "The content is bad!"
       obj.errors[0].field.should eq "content"
     end
+
+    it "runs before_validation and after_validation callbacks as expected" do
+      obj = Marten::Core::ValidationSpec::ObjectWithCallbacks.new
+
+      obj.foo.should be_nil
+      obj.bar.should be_nil
+
+      obj.valid?
+
+      obj.foo.should eq "set_foo"
+      obj.bar.should eq "set_bar"
+    end
   end
 
   describe "#invalid?" do
@@ -233,6 +245,24 @@ module Marten::Core::ValidationSpec
     private def validate_content_is_not_bad
       return unless validation_context == "expected_context"
       errors.add(:content, "The content is bad!") if @content == "bad"
+    end
+  end
+
+  class ObjectWithCallbacks
+    include Marten::Core::Validation
+
+    property foo : String? = nil
+    property bar : String? = nil
+
+    before_validation :set_foo
+    after_validation :set_bar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
     end
   end
 end

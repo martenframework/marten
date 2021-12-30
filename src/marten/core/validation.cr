@@ -8,6 +8,8 @@ module Marten
       getter errors : ErrorSet = ErrorSet.new
 
       macro included
+        include Callbacks
+
         _begin_validation_methods_setup
 
         macro inherited
@@ -85,9 +87,16 @@ module Marten
       private getter validation_context
 
       private def perform_validation
+        run_before_validation_callbacks
+
         validate
         run_validation_methods
-        errors.empty?
+
+        return false unless errors.empty?
+
+        run_after_validation_callbacks
+
+        true
       end
 
       private def validation_context=(context)

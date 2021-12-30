@@ -92,6 +92,30 @@ describe Marten::Core::Validation do
 
       b.errors.empty?.should be_true
     end
+
+    it "can run validations with an optional context expressed as a string" do
+      obj = Marten::Core::ValidationSpec::ObjectWithContextualValidation.new
+      obj.content = "bad"
+
+      obj.valid?.should be_true
+      obj.valid?("expected_context").should be_false
+
+      obj.errors.size.should eq 1
+      obj.errors[0].message.should eq "The content is bad!"
+      obj.errors[0].field.should eq "content"
+    end
+
+    it "can run validations with an optional context expressed as a symbol" do
+      obj = Marten::Core::ValidationSpec::ObjectWithContextualValidation.new
+      obj.content = "bad"
+
+      obj.valid?.should be_true
+      obj.valid?(:expected_context).should be_false
+
+      obj.errors.size.should eq 1
+      obj.errors[0].message.should eq "The content is bad!"
+      obj.errors[0].field.should eq "content"
+    end
   end
 
   describe "#invalid?" do
@@ -112,6 +136,30 @@ describe Marten::Core::Validation do
       foo.errors.first.message.should eq "This is invalid!"
       foo.errors.first.type.should eq Marten::Core::Validation::ErrorSet::DEFAULT_ERROR_TYPE.to_s
       foo.errors.first.field.should eq "bar"
+    end
+
+    it "can run validations with an optional context expressed as a string" do
+      obj = Marten::Core::ValidationSpec::ObjectWithContextualValidation.new
+      obj.content = "bad"
+
+      obj.invalid?.should be_false
+      obj.invalid?("expected_context").should be_true
+
+      obj.errors.size.should eq 1
+      obj.errors[0].message.should eq "The content is bad!"
+      obj.errors[0].field.should eq "content"
+    end
+
+    it "can run validations with an optional context expressed as a symbol" do
+      obj = Marten::Core::ValidationSpec::ObjectWithContextualValidation.new
+      obj.content = "bad"
+
+      obj.invalid?.should be_false
+      obj.invalid?(:expected_context).should be_true
+
+      obj.errors.size.should eq 1
+      obj.errors[0].message.should eq "The content is bad!"
+      obj.errors[0].field.should eq "content"
     end
   end
 end
@@ -170,6 +218,21 @@ module Marten::Core::ValidationSpec
 
     private def validate_content_is_not_blank
       errors.add(:content, "The content is blank!") if @content.try(&.empty?)
+    end
+  end
+
+  class ObjectWithContextualValidation
+    include Marten::Core::Validation
+
+    @content : String? = nil
+
+    setter content
+
+    validate :validate_content_is_not_bad
+
+    private def validate_content_is_not_bad
+      return unless validation_context == "expected_context"
+      errors.add(:content, "The content is bad!") if @content == "bad"
     end
   end
 end

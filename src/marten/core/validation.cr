@@ -2,7 +2,7 @@ module Marten
   module Core
     # Provides validation to objects.
     module Validation
-      @validation_context : Symbol?
+      @validation_context : String?
 
       # Returns the error set containing the errors generated during a validation.
       getter errors : ErrorSet = ErrorSet.new
@@ -52,9 +52,12 @@ module Marten
       end
 
       # Returns a boolean indicating whether the object is valid.
-      def valid?(context : Nil | Symbol = nil)
+      #
+      # An optional context can be specified using the `context` argument. When this option is used, additional
+      # validation rules that explicitly require a specific context might run.
+      def valid?(context : Nil | String | Symbol = nil)
         current_context = validation_context
-        self.validation_context = context
+        self.validation_context = context.try(&.to_s)
         @errors.clear
         perform_validation
       ensure
@@ -62,8 +65,11 @@ module Marten
       end
 
       # Returns a boolean indicating whether the object is invalid.
-      def invalid?
-        !valid?
+      #
+      # An optional context can be specified using the `context` argument. When this option is used, additional
+      # validation rules that explicitly require a specific context might run.
+      def invalid?(context : Nil | String | Symbol = nil)
+        !valid?(context)
       end
 
       # Allows to run custom validations for the considered object.

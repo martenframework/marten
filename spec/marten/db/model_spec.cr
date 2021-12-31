@@ -88,5 +88,31 @@ describe Marten::DB::Model do
       )
       TestUser.get!(username: "jd").is_admin.should be_true
     end
+
+    it "runs after_initialize callbacks as expected" do
+      obj = Marten::DB::ModelSpec::WithAfterInitializeCallbacks.new
+
+      obj.foo.should eq "set_foo"
+      obj.bar.should eq "set_bar"
+    end
+  end
+end
+
+module Marten::DB::ModelSpec
+  class WithAfterInitializeCallbacks < Marten::Model
+    field :id, :big_int, primary_key: true, auto: true
+    field :foo, :string, max_size: 255
+    field :bar, :string, max_size: 255
+
+    after_initialize :set_foo
+    after_initialize :set_bar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
   end
 end

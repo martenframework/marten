@@ -1,4 +1,5 @@
 require "./model/app_config"
+require "./model/callbacks"
 require "./model/comparison"
 require "./model/connection"
 require "./model/inheritance"
@@ -22,13 +23,17 @@ module Marten
       include Querying
       include Validation
 
+      include Callbacks
+
       def initialize(**kwargs)
         initialize_field_values(**kwargs)
+        run_after_initialize_callbacks
       end
 
       def initialize(**kwargs, &block)
         initialize_field_values(**kwargs)
         yield self
+        run_after_initialize_callbacks
       end
 
       private def initialize_field_values(**kwargs)

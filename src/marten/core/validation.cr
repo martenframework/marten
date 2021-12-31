@@ -8,7 +8,7 @@ module Marten
       getter errors : ErrorSet = ErrorSet.new
 
       macro included
-        include Callbacks
+        include Marten::Core::Validation::Callbacks
 
         _begin_validation_methods_setup
 

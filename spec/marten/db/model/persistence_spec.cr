@@ -1,6 +1,20 @@
 require "./spec_helper"
+require "./persistence_spec/app"
 
 describe Marten::DB::Model::Persistence do
+  around_each do |t|
+    original_app_configs_store = Marten.apps.app_configs_store
+
+    Marten.apps.app_configs_store = {} of String => Marten::Apps::Config
+    Marten.apps.populate(Marten.settings.installed_apps + [Marten::DB::Model::PersistenceSpec::App])
+    Marten::Spec.setup_databases
+
+    t.run
+
+    Marten::Spec.flush_databases
+    Marten.apps.app_configs_store = original_app_configs_store
+  end
+
   describe "::create" do
     it "returns the non-persisted model instance if it is invalid" do
       object = TestUser.create(username: nil)
@@ -46,6 +60,24 @@ describe Marten::DB::Model::Persistence do
         Post.create(author: existing_user, updated_by: new_user, title: "Test")
       end
     end
+
+    it "runs before_create and after_create callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create
+      obj.before_create_track.should eq "before_create"
+      obj.after_create_track.should eq "after_create"
+    end
+
+    it "runs before_save and after_save callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create
+      obj.before_save_track.should eq "before_save"
+      obj.after_save_track.should eq "after_save"
+    end
+
+    it "does not run before_update and after_update callbacks" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+    end
   end
 
   describe "::create!" do
@@ -70,6 +102,24 @@ describe Marten::DB::Model::Persistence do
       object.last_name.should eq "Doe"
       object.valid?.should be_true
       object.persisted?.should be_true
+    end
+
+    it "runs before_create and after_create callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.before_create_track.should eq "before_create"
+      obj.after_create_track.should eq "after_create"
+    end
+
+    it "runs before_save and after_save callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.before_save_track.should eq "before_save"
+      obj.after_save_track.should eq "after_save"
+    end
+
+    it "does not run before_update and after_update callbacks" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
     end
   end
 
@@ -111,6 +161,51 @@ describe Marten::DB::Model::Persistence do
         post.save!
       end
     end
+
+    it "runs before_create and after_create callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_create_track.should eq "unset"
+      obj.after_create_track.should eq "unset"
+
+      obj.save
+
+      obj.before_create_track.should eq "before_create"
+      obj.after_create_track.should eq "after_create"
+    end
+
+    it "runs before_save and after_save callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_save_track.should eq "unset"
+      obj.after_save_track.should eq "unset"
+
+      obj.save
+
+      obj.before_save_track.should eq "before_save"
+      obj.after_save_track.should eq "after_save"
+    end
+
+    it "runs before_update and after_update callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+
+      obj.name = "updated"
+      obj.save
+
+      obj.before_update_track.should eq "before_update"
+      obj.after_update_track.should eq "after_update"
+    end
+
+    it "does not run before_update and after_update callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+    end
   end
 
   describe "#save!" do
@@ -137,6 +232,51 @@ describe Marten::DB::Model::Persistence do
       object.email = nil
       expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
     end
+
+    it "runs before_create and after_create callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_create_track.should eq "unset"
+      obj.after_create_track.should eq "unset"
+
+      obj.save!
+
+      obj.before_create_track.should eq "before_create"
+      obj.after_create_track.should eq "after_create"
+    end
+
+    it "runs before_save and after_save callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_save_track.should eq "unset"
+      obj.after_save_track.should eq "unset"
+
+      obj.save!
+
+      obj.before_save_track.should eq "before_save"
+      obj.after_save_track.should eq "after_save"
+    end
+
+    it "runs before_update and after_update callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+
+      obj.name = "updated"
+      obj.save!
+
+      obj.before_update_track.should eq "before_update"
+      obj.after_update_track.should eq "after_update"
+    end
+
+    it "does not run before_update and after_update callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save!
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+    end
   end
 
   describe "#delete" do
@@ -153,9 +293,21 @@ describe Marten::DB::Model::Persistence do
       TestUser.get(username: "jd").should be_nil
       Post.get(id: sub_obj_2.id).should be_nil
     end
+
+    it "runs before_delete and after_delete callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.before_delete_track.should be_nil
+      obj.after_delete_track.should be_nil
+
+      obj.delete
+
+      obj.before_delete_track.should eq "before_delete"
+      obj.after_delete_track.should eq "after_delete"
+    end
   end
 
-  describe "#delete?" do
+  describe "#deleted?" do
     it "returns true when an object is deleted" do
       obj = Tag.create!(name: "crystal", is_active: true)
       obj.delete

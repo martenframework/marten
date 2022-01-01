@@ -24,5 +24,10 @@ module.exports = {
       label: 'Templates',
       items: ['templates/overview'],
     },
+    {
+      type: 'category',
+      label: 'Guides',
+      items: ['guides/overview'],
+    },
   ],
 };

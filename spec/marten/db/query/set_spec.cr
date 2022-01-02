@@ -1061,11 +1061,11 @@ describe Marten::DB::Query::Set do
       tag_qset = Marten::DB::Query::Set(Tag).new
       user_qset = Marten::DB::Query::Set(TestUser).new
 
-      expect_raises(Tag::NotFound) { tag_qset.get!(name: "ruby") }
-      expect_raises(Tag::NotFound) { tag_qset.get!(name: "crystal", is_active: false) }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { tag_qset.get!(name: "ruby") }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { tag_qset.get!(name: "crystal", is_active: false) }
 
-      expect_raises(TestUser::NotFound) { user_qset.get!(username: "foo") }
-      expect_raises(TestUser::NotFound) { user_qset.get!(username: "jd1", first_name: "Foo") }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { user_qset.get!(username: "foo") }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { user_qset.get!(username: "jd1", first_name: "Foo") }
     end
 
     it "raises if predicates expressed as q expressions does not match anything" do
@@ -1075,11 +1075,11 @@ describe Marten::DB::Query::Set do
       tag_qset = Marten::DB::Query::Set(Tag).new
       user_qset = Marten::DB::Query::Set(TestUser).new
 
-      expect_raises(Tag::NotFound) { tag_qset.get! { q(name: "ruby") } }
-      expect_raises(Tag::NotFound) { tag_qset.get! { q(name: "crystal") & q(is_active: false) } }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { tag_qset.get! { q(name: "ruby") } }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { tag_qset.get! { q(name: "crystal") & q(is_active: false) } }
 
-      expect_raises(TestUser::NotFound) { user_qset.get! { q(username: "foo") } }
-      expect_raises(TestUser::NotFound) { user_qset.get! { q(username: "jd1") & q(first_name: "Foo") } }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { user_qset.get! { q(username: "foo") } }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { user_qset.get! { q(username: "jd1") & q(first_name: "Foo") } }
     end
 
     it "raises if predicates expressed as query node objects does not match anything" do
@@ -1089,11 +1089,13 @@ describe Marten::DB::Query::Set do
       tag_qset = Marten::DB::Query::Set(Tag).new
       user_qset = Marten::DB::Query::Set(TestUser).new
 
-      expect_raises(Tag::NotFound) { tag_qset.get!(Marten::DB::Query::Node.new(name: "ruby")) }
-      expect_raises(Tag::NotFound) { tag_qset.get!(Marten::DB::Query::Node.new(name: "crystal", is_active: false)) }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { tag_qset.get!(Marten::DB::Query::Node.new(name: "ruby")) }
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        tag_qset.get!(Marten::DB::Query::Node.new(name: "crystal", is_active: false))
+      end
 
-      expect_raises(TestUser::NotFound) { user_qset.get!(Marten::DB::Query::Node.new(username: "foo")) }
-      expect_raises(TestUser::NotFound) do
+      expect_raises(Marten::DB::Errors::RecordNotFound) { user_qset.get!(Marten::DB::Query::Node.new(username: "foo")) }
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
         user_qset.get!(Marten::DB::Query::Node.new(username: "jd1", first_name: "Foo"))
       end
     end

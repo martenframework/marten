@@ -4,10 +4,6 @@ module Marten
       module Querying
         macro included
           extend Marten::DB::Model::Querying::ClassMethods
-
-          macro inherited
-            class NotFound < Marten::DB::Errors::RecordNotFound; end
-          end
         end
 
         module ClassMethods

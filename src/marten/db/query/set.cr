@@ -378,7 +378,7 @@ module Marten
         # Returns the model instance matching a specific query node object, or `nil` if no record is found.
         def get(query_node : Node)
           get!(query_node)
-        rescue M::NotFound
+        rescue Errors::RecordNotFound
           nil
         end
 
@@ -428,7 +428,7 @@ module Marten
         def get!(query_node : Node)
           results = filter(query_node)[..GET_RESULTS_LIMIT].to_a
           return results.first if results.size == 1
-          raise M::NotFound.new("#{M.name} query didn't return any results") if results.empty?
+          raise Errors::RecordNotFound.new("#{M.name} query didn't return any results") if results.empty?
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
         end
 

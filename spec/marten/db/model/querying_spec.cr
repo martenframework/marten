@@ -245,7 +245,7 @@ describe Marten::DB::Model::Querying do
     end
 
     it "raises if the record is not found" do
-      expect_raises(TestUser::NotFound) { TestUser.get!(username: "unknown") }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { TestUser.get!(username: "unknown") }
     end
 
     it "raises if multiple records match the given predicates" do
@@ -255,7 +255,7 @@ describe Marten::DB::Model::Querying do
     it "makes use of the default queryset" do
       tag = Tag.create!(name: "verbose", is_active: true)
       Tag.get!(name: "verbose").should eq tag
-      expect_raises(Tag::NotFound) { Tag.get!(name: "crystal") }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { Tag.get!(name: "crystal") }
     end
 
     it "returns the object matching the advanced predicates" do
@@ -264,7 +264,7 @@ describe Marten::DB::Model::Querying do
     end
 
     it "makes use of the default queryset when using a block defining an advanced predicates expression" do
-      expect_raises(Tag::NotFound) { Tag.get! { q(name: "crystal") } }
+      expect_raises(Marten::DB::Errors::RecordNotFound) { Tag.get! { q(name: "crystal") } }
     end
   end
 

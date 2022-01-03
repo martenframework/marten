@@ -12,7 +12,17 @@ module.exports = {
     {
       type: 'category',
       label: 'Models',
-      items: ['models/overview'],
+      /*link: {
+        type: 'generated-index',
+        title: 'Models',
+        description: 'Models define what data can be persisted and manipulated by a Marten application. They explicitly define fields and rules that map to database tables.',
+        slug: '/models',
+      },*/
+      link: {type: 'doc', id: 'models'},
+      items: [
+        'models/introduction',
+        'models/queries',
+      ],
     },
     {
       type: 'category',

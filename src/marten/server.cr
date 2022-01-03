@@ -5,6 +5,7 @@ module Marten
         ::HTTP::ErrorHandler.new,
         Handlers::Logger.new,
         Handlers::Error.new,
+        Handlers::HostVerification.new,
         Handlers::Middleware.new,
         Handlers::Routing.new,
       ]

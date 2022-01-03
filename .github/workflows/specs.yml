@@ -9,8 +9,6 @@ on:
 jobs:
   mysql:
     runs-on: ubuntu-latest
-    container:
-      image: crystallang/crystal:1.2.2
     services:
       mysql:
         image: mysql:5.7
@@ -20,6 +18,12 @@ jobs:
         ports:
           - 3307:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    strategy:
+      fail-fast: false
+      matrix:
+        crystal: ['1.2.2', 'nightly']
+    container:
+      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for MySQL
@@ -46,8 +50,6 @@ jobs:
         MARTEN_SPEC_DB_CONNECTION: mysql
   postgresql:
     runs-on: ubuntu-latest
-    container:
-      image: crystallang/crystal:1.2.2
     services:
       postgres:
         image: postgres:${{ matrix.db_version }}
@@ -62,6 +64,9 @@ jobs:
       fail-fast: false
       matrix:
         db_version: ['10', '11', '12', 'latest']
+        crystal: ['1.2.2', 'nightly']
+    container:
+      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for PostgreSQL
@@ -88,8 +93,12 @@ jobs:
         MARTEN_SPEC_DB_CONNECTION: postgresql
   sqlite:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        crystal: ['1.2.2', 'nightly']
     container:
-      image: crystallang/crystal:1.2.2
+      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite

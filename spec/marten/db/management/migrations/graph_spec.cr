@@ -182,6 +182,28 @@ describe Marten::DB::Management::Migrations::Graph do
       graph.path_backward(node_2).should eq [node_2]
       graph.path_backward(node_3).should eq [node_2, node_3]
     end
+
+    it "returns an array of migration nodes to unapply migrations up to the passed migration" do
+      migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
+      migration_2 = Marten::DB::Management::Migrations::GraphSpec::TestMigration2.new
+      migration_3 = Marten::DB::Management::Migrations::GraphSpec::TestMigration3.new
+
+      graph = Marten::DB::Management::Migrations::Graph.new
+      graph.add_node(migration_1)
+      graph.add_node(migration_2)
+      graph.add_node(migration_3)
+
+      graph.add_dependency(migration_2, migration_1.id)
+      graph.add_dependency(migration_2, migration_3.id)
+
+      node_1 = graph.find_node(migration_1.id)
+      node_2 = graph.find_node(migration_2.id)
+      node_3 = graph.find_node(migration_3.id)
+
+      graph.path_backward(migration_1).should eq [node_2, node_1]
+      graph.path_backward(migration_2).should eq [node_2]
+      graph.path_backward(migration_3).should eq [node_2, node_3]
+    end
   end
 
   describe "#path_forward" do
@@ -205,6 +227,28 @@ describe Marten::DB::Management::Migrations::Graph do
       graph.path_forward(node_1).should eq [node_1]
       graph.path_forward(node_2).should eq [node_1, node_3, node_2]
       graph.path_forward(node_3).should eq [node_3]
+    end
+
+    it "returns an array of migration nodes to apply migrations up to the passed migration" do
+      migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
+      migration_2 = Marten::DB::Management::Migrations::GraphSpec::TestMigration2.new
+      migration_3 = Marten::DB::Management::Migrations::GraphSpec::TestMigration3.new
+
+      graph = Marten::DB::Management::Migrations::Graph.new
+      graph.add_node(migration_1)
+      graph.add_node(migration_2)
+      graph.add_node(migration_3)
+
+      graph.add_dependency(migration_2, migration_1.id)
+      graph.add_dependency(migration_2, migration_3.id)
+
+      node_1 = graph.find_node(migration_1.id)
+      node_2 = graph.find_node(migration_2.id)
+      node_3 = graph.find_node(migration_3.id)
+
+      graph.path_forward(migration_1).should eq [node_1]
+      graph.path_forward(migration_2).should eq [node_1, node_3, node_2]
+      graph.path_forward(migration_3).should eq [node_3]
     end
   end
 

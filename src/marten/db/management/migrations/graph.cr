@@ -56,18 +56,28 @@ module Marten
           # The returned array will start with the nodes that depend on the target node and will end with the target
           # node. The resulting "path" should be followed in order to unapply the migration corresponding to the target
           # node.
-          def path_backward(target_node)
+          def path_backward(target_node : Node)
             path = acyclic_dfs_traversal(target_node.migration.id, forwards: false)
             path.map { |id| @nodes[id] }
+          end
+
+          # :ditto:
+          def path_backward(migration : Migration)
+            path_backward(find_node(migration.id))
           end
 
           # Returns an array of migration nodes to apply in order to apply a specific migration node.
           #
           # The returned array will start with the depdendencies of the target node and will end with the target node.
           # The resulting "path" should be followed in order to apply the migration corresponding to the target node.
-          def path_forward(target_node)
+          def path_forward(target_node : Node)
             path = acyclic_dfs_traversal(target_node.migration.id, forwards: true)
             path.map { |id| @nodes[id] }
+          end
+
+          # :ditto:
+          def path_forward(migration : Migration)
+            path_forward(find_node(migration.id))
           end
 
           # Return the roots of the graph.

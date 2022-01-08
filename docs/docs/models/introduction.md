@@ -293,7 +293,7 @@ class User < Marten::Model
   validate :validate_name
 
   private def validate_name
-    errors.add(:name, "Name must noe be less than 3 characters!") if name? && name!.size < 3
+    errors.add(:name, "Name must noe be less than 3 characters!") if name && name!.size < 3
   end
 end
 ```

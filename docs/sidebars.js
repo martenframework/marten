@@ -22,6 +22,23 @@ module.exports = {
       items: [
         'models/introduction',
         'models/queries',
+        'models/validations',
+        'models/callbacks',
+        'models/migrations',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'models/how-to/create-custom-model-fields',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'models/reference/fields',
+          ],
+        },
       ],
     },
     {

@@ -56,3 +56,8 @@ aside img + b {
   font-weight: 400;
   font-size: 0.875rem;
 }
+.theme-doc-sidebar-item-category-level-2 {
+  font-family: 'Inter';
+  font-weight: 400;
+  font-size: 0.875rem;
+}

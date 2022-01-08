@@ -3,9 +3,42 @@ title: Models
 sidebar_label: Overview
 ---
 
-Models define what data can be persisted and manipulated by a Marten application. They explicitly specify fields and rules that map to database tables.
+import DocCard from '@theme/DocCard';
 
-import DocCardList from '@theme/DocCardList';
-import {useCurrentSidebarCategory} from '@docusaurus/theme-common';
+Models define what data can be persisted and manipulated by a Marten application. They explicitly specify fields and rules that map to database tables and columns.
 
-<DocCardList items={useCurrentSidebarCategory().items}/>
+## Guides
+
+<div className="row">
+  <article key="introduction" className="col col--6">
+    <DocCard item={{type: "link", href: "./models/introduction", label: "Introduction", docId: "models/introduction" }} />
+  </article>
+  <article key="queries" className="col col--6">
+    <DocCard item={{type: "link", href: "./models/queries", label: "Queries", docId: "models/queries" }} />
+  </article>
+  <article key="validations" className="col col--6">
+    <DocCard item={{type: "link", href: "./models/validations", label: "Validations", docId: "models/validations" }} />
+  </article>
+  <article key="callbacks" className="col col--6">
+    <DocCard item={{type: "link", href: "./models/callbacks", label: "Callbacks", docId: "models/callbacks" }} />
+  </article>
+  <article key="migrations" className="col col--6">
+    <DocCard item={{type: "link", href: "./models/migrations", label: "Migrations", docId: "models/migrations" }} />
+  </article>
+</div>
+
+## How-to's
+
+<div className="row">
+  <article key="create-custom-model-fields" className="col col--6">
+    <DocCard item={{type: "link", href: "./how-to/create-custom-model-fields", label: "Create custom model fields", docId: "models/how-to/create-custom-model-fields" }} />
+  </article>
+</div>
+
+## Reference
+
+<div className="row">
+  <article key="fields" className="col col--6">
+    <DocCard item={{type: "link", href: "./models/reference/fields", label: "Model fields", docId: "models/reference/fields" }} />
+  </article>
+</div>

@@ -55,6 +55,28 @@ describe Marten::DB::Field::DateTime do
     end
   end
 
+  describe "#from_db" do
+    it "is able to process a time object" do
+      time = Time.local
+      field = Marten::DB::Field::DateTime.new("my_field")
+      field.from_db(time).should be_a Time
+      field.from_db(time).not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+    end
+
+    it "is able to process a nil value" do
+      field = Marten::DB::Field::DateTime.new("my_field")
+      field.from_db(nil).should be_nil
+    end
+
+    it "raises UnexpectedFieldValue if the value is not supported" do
+      field = Marten::DB::Field::DateTime.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.from_db(true)
+      end
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read a date time froma a DB result set" do
       field = Marten::DB::Field::DateTime.new("my_field")

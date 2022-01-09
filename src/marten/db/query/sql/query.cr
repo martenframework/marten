@@ -222,7 +222,7 @@ module Marten
                                                    when Field::Any
                                                      field.to_db(value)
                                                    when DB::Model
-                                                     value.pk
+                                                     Model.pk_field.to_db(value.pk)
                                                    end
             end
 

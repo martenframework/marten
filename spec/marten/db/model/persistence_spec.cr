@@ -195,6 +195,13 @@ describe Marten::DB::Model::Persistence do
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"
     end
+
+    it "properly handles new objects using non-integer IDs" do
+      obj = TagWithUUID.new(label: "my_tag")
+      obj.save
+      obj.pk.should be_a(UUID)
+      TagWithUUID.get!(pk: obj.pk).should eq obj
+    end
   end
 
   describe "#save!" do

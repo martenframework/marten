@@ -27,6 +27,15 @@ module Marten
           # No-op
         end
 
+        def from_db(value : ::DB::Any) : Int32 | Int64 | Nil
+          case value
+          when Int32 | Int64 | Nil
+            value.as?(Int32 | Int64 | Nil)
+          else
+            raise_unexpected_field_value(value)
+          end
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
           result_set.read(Int32 | Int64 | Nil)
         end

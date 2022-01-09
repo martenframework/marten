@@ -35,9 +35,19 @@ module Marten
           @auto_now_add
         end
 
+        def from_db(value : ::DB::Any) : Time?
+          case value
+          when Nil
+            value.as?(Nil)
+          when Time
+            value.in(Marten.settings.time_zone).as?(Time)
+          else
+            raise_unexpected_field_value(value)
+          end
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Time?
-          value = result_set.read(Time?)
-          value.in(Marten.settings.time_zone) unless value.nil?
+          from_db(result_set.read(Time?))
         end
 
         def prepare_save(record, new_record = false)

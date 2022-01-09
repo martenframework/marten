@@ -35,6 +35,13 @@ describe Marten::DB::Field::ManyToMany do
     end
   end
 
+  describe "#from_db" do
+    it "returns nil" do
+      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field.from_db(42).should be_nil
+    end
+  end
+
   describe "#from_db_result_set" do
     it "returns nil" do
       field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)

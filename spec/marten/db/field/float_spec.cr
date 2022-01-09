@@ -1,6 +1,26 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::Float do
+  describe "#from_db" do
+    it "is able to process a Float64 object" do
+      field = Marten::DB::Field::Float.new("my_field")
+      field.from_db(42.45).should be_a Float64
+    end
+
+    it "is able to process a nil value" do
+      field = Marten::DB::Field::Float.new("my_field")
+      field.from_db(nil).should be_nil
+    end
+
+    it "raises UnexpectedFieldValue if the value is not supported" do
+      field = Marten::DB::Field::Float.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.from_db(true)
+      end
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read a Float32 value from a DB result set" do
       field = Marten::DB::Field::Float.new("my_field", db_column: "my_field_col", primary_key: true)

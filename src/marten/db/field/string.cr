@@ -19,6 +19,15 @@ module Marten
         )
         end
 
+        def from_db(value : ::DB::Any) : ::String?
+          case value
+          when Nil | ::String
+            value.as?(Nil | ::String)
+          else
+            raise_unexpected_field_value(value)
+          end
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : ::String?
           result_set.read(::String?)
         end

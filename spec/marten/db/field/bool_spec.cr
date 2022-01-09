@@ -1,6 +1,48 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::Bool do
+  describe "#from_db" do
+    it "returns true if the value is true" do
+      field = Marten::DB::Field::Bool.new("my_field")
+      field.from_db(true).should be_true
+    end
+
+    it "returns false if the value is false" do
+      field = Marten::DB::Field::Bool.new("my_field")
+      field.from_db(false).should be_false
+    end
+
+    it "assumes that \"true\" is true" do
+      field = Marten::DB::Field::Bool.new("my_field")
+      field.from_db("true").should be_true
+    end
+
+    it "assumes that 1 is true" do
+      field = Marten::DB::Field::Bool.new("my_field")
+      field.from_db(1).should be_true
+    end
+
+    it "assumes that \"1\" is true" do
+      field = Marten::DB::Field::Bool.new("my_field")
+      field.from_db("1").should be_true
+    end
+
+    it "assumes that \"yes\" is true" do
+      field = Marten::DB::Field::Bool.new("my_field")
+      field.from_db("yes").should be_true
+    end
+
+    it "assumes that nil is false if the field does not allow null values" do
+      field = Marten::DB::Field::Bool.new("my_field", null: false)
+      field.from_db(nil).should be_false
+    end
+
+    it "assumes that nil is nil if the field allows null values" do
+      field = Marten::DB::Field::Bool.new("my_field", null: true)
+      field.from_db(nil).should be_nil
+    end
+  end
+
   describe "#from_db_result_set" do
     for_db_backends :mysql, :postgresql do
       it "is able to read a true boolean value from a DB result set" do

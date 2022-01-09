@@ -1,6 +1,26 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::UUID do
+  describe "#from_db" do
+    it "returns a UUI object if the value is a string" do
+      field = Marten::DB::Field::UUID.new("my_field")
+      field.from_db("d764c9a6-439b-11eb-b378-0242ac130002").should eq UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
+    end
+
+    it "returns nil if the value is nil" do
+      field = Marten::DB::Field::UUID.new("my_field")
+      field.from_db(nil).should be_nil
+    end
+
+    it "raises UnexpectedFieldValue if the value is not supported" do
+      field = Marten::DB::Field::UUID.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.from_db(true)
+      end
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read a UUID string value from a DB result set" do
       field = Marten::DB::Field::UUID.new("my_field", db_column: "my_field_col")

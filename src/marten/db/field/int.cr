@@ -23,8 +23,19 @@ module Marten
           @auto
         end
 
+        def from_db(value : ::DB::Any) : Int32 | Int64 | Nil
+          case value
+          when Int32 | Nil
+            value.as?(Int32 | Nil)
+          when Int64
+            value.as?(Int64).try(&.to_i32)
+          else
+            raise_unexpected_field_value(value)
+          end
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
-          result_set.read(Int32 | Int64 | Nil).try(&.to_i32)
+          from_db(result_set.read(Int32 | Int64 | Nil))
         end
 
         def perform_validation(record : Model)

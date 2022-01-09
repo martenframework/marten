@@ -17,8 +17,19 @@ module Marten
         )
         end
 
-        def from_db_result_set(result_set : ::DB::ResultSet) : Float64 | Nil
-          result_set.read(Float64 | Nil).try(&.to_f64)
+        def from_db(value : ::DB::Any) : Float64?
+          case value
+          when Nil
+            value.as?(Nil)
+          when Float64
+            value.as?(Float64)
+          else
+            raise_unexpected_field_value(value)
+          end
+        end
+
+        def from_db_result_set(result_set : ::DB::ResultSet) : Float64?
+          from_db(result_set.read(Float64 | Nil).try(&.to_f64))
         end
 
         def to_column : Management::Column::Base?

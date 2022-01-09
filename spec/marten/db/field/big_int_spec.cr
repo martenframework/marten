@@ -13,6 +13,35 @@ describe Marten::DB::Field::BigInt do
     end
   end
 
+  describe "#from_db" do
+    it "returns an Int64 if the value is an Int32" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+      result = field.from_db(42)
+      result.should eq 42
+      result.should be_a Int64
+    end
+
+    it "returns an Int64 if the value is an Int64" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+      result = field.from_db(42.to_i64)
+      result.should eq 42
+      result.should be_a Int64
+    end
+
+    it "returns nil if the value is nil" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+      field.from_db(nil).should be_nil
+    end
+
+    it "raises UnexpectedFieldValue if the value is not supported" do
+      field = Marten::DB::Field::BigInt.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.from_db(true)
+      end
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read an integer value from a DB result set" do
       field = Marten::DB::Field::BigInt.new("my_field", db_column: "my_field_col", primary_key: true)

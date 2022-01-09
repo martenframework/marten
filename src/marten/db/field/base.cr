@@ -26,6 +26,9 @@ module Marten
         # Returns the default value of the field if any.
         abstract def default
 
+        # Converts the raw DB value to the corresponding field value.
+        abstract def from_db(value : ::DB::Any)
+
         # Extracts the field value from a DB result set and returns the right object corresponding to this value.
         abstract def from_db_result_set(result_set : ::DB::ResultSet)
 

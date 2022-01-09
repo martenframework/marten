@@ -28,7 +28,11 @@ module Marten
           # No-op
         end
 
-        def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
+        def from_db(value : ::DB::Any) : Nil
+          # No-op
+        end
+
+        def from_db_result_set(result_set : ::DB::ResultSet) : Nil
           # No-op
         end
 

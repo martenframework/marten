@@ -6,7 +6,7 @@ module Marten
           columns.empty? ? DISTINCT_CLAUSE : "#{DISTINCT_CLAUSE} ON (#{columns.join(", ")})"
         end
 
-        def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : Int64?
+        def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : ::DB::Any
           column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
           statement = "INSERT INTO #{quote(table_name)} (#{column_names}) VALUES (#{numbered_values})"
@@ -16,7 +16,7 @@ module Marten
 
           open do |db|
             if pk_field_to_fetch
-              new_record_id = db.scalar(statement, args: values.values).as(Int32 | Int64).to_i64
+              new_record_id = db.scalar(statement, args: values.values).as(::DB::Any)
             else
               db.exec(statement, args: values.values)
             end

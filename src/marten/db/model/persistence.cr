@@ -200,9 +200,9 @@ module Marten
             pk_field_to_fetch = nil
           end
 
-          pk = connection.insert(self.class.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
+          inserted_pk = connection.insert(self.class.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
 
-          self.pk ||= pk
+          assign_field_values({pk_field.id => pk_field.from_db(inserted_pk)}) if pk.nil?
           self.new_record = false
 
           run_after_create_callbacks
@@ -223,7 +223,7 @@ module Marten
             self.class.db_table,
             values,
             pk_column_name: self.class.pk_field.db_column!,
-            pk_value: pk
+            pk_value: self.class.pk_field.to_db(pk)
           )
 
           run_after_update_callbacks

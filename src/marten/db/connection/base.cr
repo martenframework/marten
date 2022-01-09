@@ -24,7 +24,7 @@ module Marten
           table_name : String,
           values : Hash(String, ::DB::Any),
           pk_field_to_fetch : String? = nil
-        ) : Int64?
+        ) : ::DB::Any
 
         # Returns a `Marten::DB::Management::Introspector::Base` subclass instance to use to introspect the DB at hand.
         #

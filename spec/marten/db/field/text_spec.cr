@@ -1,6 +1,26 @@
 require "./spec_helper"
 
 describe Marten::DB::Field::Text do
+  describe "#from_db" do
+    it "returns a string if the value is a string" do
+      field = Marten::DB::Field::Text.new("my_field", max_size: 128)
+      field.from_db("foo").should eq "foo"
+    end
+
+    it "returns nil if the value is nil" do
+      field = Marten::DB::Field::Text.new("my_field", max_size: 128)
+      field.from_db(nil).should be_nil
+    end
+
+    it "raises UnexpectedFieldValue if the value is not supported" do
+      field = Marten::DB::Field::Text.new("my_field", max_size: 128)
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.from_db(true)
+      end
+    end
+  end
+
   describe "#from_db_result_set" do
     it "is able to read an string value from a DB result set" do
       field = Marten::DB::Field::Text.new("my_field", db_column: "my_field_col")

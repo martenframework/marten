@@ -17,9 +17,12 @@ module Marten
         )
         end
 
+        def from_db(value : ::DB::Any) : ::Bool?
+          null? && value.nil? ? nil : [true, "true", 1, "1", "yes"].includes?(value)
+        end
+
         def from_db_result_set(result_set : ::DB::ResultSet) : ::Bool?
-          val = result_set.read
-          null? && val.nil? ? nil : [true, "true", 1, "1", "yes"].includes?(val)
+          from_db(result_set.read)
         end
 
         def to_column : Management::Column::Base?

@@ -261,6 +261,17 @@ module Marten::DB::Field::BaseSpec
       # noop
     end
 
+    def from_db(value : ::DB::Any) : Int32 | Int64 | Nil
+      case value
+      when Int32
+        value.to_i64
+      when Int64 | Nil
+        value.as(Int64 | Nil)
+      else
+        raise_unexpected_field_value(value)
+      end
+    end
+
     def from_db_result_set(result_set : ::DB::ResultSet) : Int64?
       result_set.read(Int32 | Int64 | Nil).try(&.to_i64)
     end

@@ -22,7 +22,7 @@ module Marten
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : ::Bool?
-          from_db(result_set.read)
+          from_db(result_set.read(::Bool | Int32 | Int64 | Nil | ::String))
         end
 
         def to_column : Management::Column::Base?

@@ -2,18 +2,7 @@ require "./spec_helper"
 require "./persistence_spec/app"
 
 describe Marten::DB::Model::Persistence do
-  around_each do |t|
-    original_app_configs_store = Marten.apps.app_configs_store
-
-    Marten.apps.app_configs_store = {} of String => Marten::Apps::Config
-    Marten.apps.populate(Marten.settings.installed_apps + [Marten::DB::Model::PersistenceSpec::App])
-    Marten::Spec.setup_databases
-
-    t.run
-
-    Marten::Spec.flush_databases
-    Marten.apps.app_configs_store = original_app_configs_store
-  end
+  with_installed_apps Marten::DB::Model::PersistenceSpec::App
 
   describe "::create" do
     it "returns the non-persisted model instance if it is invalid" do

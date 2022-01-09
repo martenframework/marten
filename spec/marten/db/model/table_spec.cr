@@ -2,18 +2,7 @@ require "./spec_helper"
 require "./table_spec/app"
 
 describe Marten::DB::Model::Table do
-  around_each do |t|
-    original_app_configs_store = Marten.apps.app_configs_store
-
-    Marten.apps.app_configs_store = {} of String => Marten::Apps::Config
-    Marten.apps.populate(Marten.settings.installed_apps + [Marten::DB::Model::TableSpec::App])
-    Marten::Spec.setup_databases
-
-    t.run
-
-    Marten::Spec.flush_databases
-    Marten.apps.app_configs_store = original_app_configs_store
-  end
+  with_installed_apps Marten::DB::Model::TableSpec::App
 
   describe "::inherited" do
     it "ensures that the model inherits its parent fields" do

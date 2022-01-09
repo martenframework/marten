@@ -43,3 +43,18 @@ def for_db_backends(*backends : String | Symbol, &block)
     yield
   end
 end
+
+macro with_installed_apps(*apps)
+  around_each do |t|
+    original_app_configs_store = Marten.apps.app_configs_store
+
+    Marten.apps.app_configs_store = {} of String => Marten::Apps::Config
+    Marten.apps.populate(Marten.settings.installed_apps + {{ apps }}.to_a)
+    Marten::Spec.setup_databases
+
+    t.run
+
+    Marten::Spec.flush_databases
+    Marten.apps.app_configs_store = original_app_configs_store
+  end
+end

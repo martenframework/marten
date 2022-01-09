@@ -19,7 +19,7 @@ module Marten
         )
         end
 
-        def from_db(value : ::DB::Any) : ::String?
+        def from_db(value) : ::String?
           case value
           when Nil | ::String
             value.as?(Nil | ::String)

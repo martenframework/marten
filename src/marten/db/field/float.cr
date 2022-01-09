@@ -17,7 +17,7 @@ module Marten
         )
         end
 
-        def from_db(value : ::DB::Any) : Float64?
+        def from_db(value) : Float64?
           case value
           when Nil
             value.as?(Nil)

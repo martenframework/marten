@@ -17,19 +17,21 @@ module Marten
         )
         end
 
-        def from_db(value : ::DB::Any) : ::UUID?
+        def from_db(value) : ::UUID?
           case value
           when Nil
             value.as?(Nil)
           when ::String
             ::UUID.new(value.as(::String))
+          when ::UUID
+            value.as(::UUID)
           else
             raise_unexpected_field_value(value)
           end
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : ::UUID?
-          from_db(result_set.read(::String?))
+          from_db(result_set.read(Nil | ::String | ::UUID))
         end
 
         def to_column : Management::Column::Base?
@@ -48,7 +50,7 @@ module Marten
           when Nil
             nil
           when ::UUID
-            value.to_s
+            value.hexstring
           else
             raise_unexpected_field_value(value)
           end

@@ -7,6 +7,13 @@ describe Marten::DB::Field::UUID do
       field.from_db("d764c9a6-439b-11eb-b378-0242ac130002").should eq UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
     end
 
+    it "returns a UUI object if the value is a UUID object" do
+      field = Marten::DB::Field::UUID.new("my_field")
+      field.from_db(UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")).should eq(
+        UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
+      )
+    end
+
     it "returns nil if the value is nil" do
       field = Marten::DB::Field::UUID.new("my_field")
       field.from_db(nil).should be_nil
@@ -65,7 +72,7 @@ describe Marten::DB::Field::UUID do
       default_val = UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
       field = Marten::DB::Field::UUID.new("my_field", default: default_val)
       column = field.to_column
-      column.default.should eq default_val.to_s
+      column.default.should eq default_val.hexstring
     end
   end
 
@@ -90,7 +97,7 @@ describe Marten::DB::Field::UUID do
 
     it "returns a string value if the initial value is a UUID" do
       field = Marten::DB::Field::UUID.new("my_field")
-      field.to_db(UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")).should eq "d764c9a6-439b-11eb-b378-0242ac130002"
+      field.to_db(UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")).should eq "d764c9a6439b11ebb3780242ac130002"
     end
 
     it "raises UnexpectedFieldValue if the value is not supported" do

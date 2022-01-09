@@ -261,7 +261,7 @@ module Marten::DB::Field::BaseSpec
       # noop
     end
 
-    def from_db(value : ::DB::Any) : Int32 | Int64 | Nil
+    def from_db(value) : Int32 | Int64 | Nil
       case value
       when Int32
         value.to_i64

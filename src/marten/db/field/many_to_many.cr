@@ -28,7 +28,7 @@ module Marten
           # No-op
         end
 
-        def from_db(value : ::DB::Any) : Nil
+        def from_db(value) : Nil
           # No-op
         end
 

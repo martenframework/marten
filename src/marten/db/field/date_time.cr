@@ -35,7 +35,7 @@ module Marten
           @auto_now_add
         end
 
-        def from_db(value : ::DB::Any) : Time?
+        def from_db(value) : Time?
           case value
           when Nil
             value.as?(Nil)

@@ -4,6 +4,7 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
+      link: {type: 'doc', id: 'getting-started'},
       items: [
         'getting-started/installation',
         'getting-started/tutorial',
@@ -12,12 +13,6 @@ module.exports = {
     {
       type: 'category',
       label: 'Models',
-      /*link: {
-        type: 'generated-index',
-        title: 'Models',
-        description: 'Models define what data can be persisted and manipulated by a Marten application. They explicitly define fields and rules that map to database tables.',
-        slug: '/models',
-      },*/
       link: {type: 'doc', id: 'models'},
       items: [
         'models/introduction',
@@ -44,17 +39,14 @@ module.exports = {
     {
       type: 'category',
       label: 'Views',
-      items: ['views/overview'],
+      link: {type: 'doc', id: 'views'},
+      items: ['views/introduction'],
     },
     {
       type: 'category',
       label: 'Templates',
-      items: ['templates/overview'],
-    },
-    {
-      type: 'category',
-      label: 'Guides',
-      items: ['guides/overview'],
+      link: {type: 'doc', id: 'templates'},
+      items: ['templates/introduction'],
     },
   ],
 };

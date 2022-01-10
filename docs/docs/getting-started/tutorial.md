@@ -1,4 +1,7 @@
-# Tutorial
+---
+title: Tutorial
+description: Learn how to use Marten by creating a simple web application.
+---
 
 This guide will walk you though the creation of a simple weblog application, which will help you learn the basics of the Marten web framework. It is designed for beginners who want to get started by creating a Marten web project, so no prior experience with the framework is required.
 

@@ -1,4 +1,8 @@
-# Installation
+---
+title: Installation
+description: Get started by installing Marten and its dependencies.
+---
+
 
 This guide will help you get started in order to install Marten and its dependencies. Let's get started!
 

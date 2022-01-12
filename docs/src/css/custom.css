@@ -18,6 +18,8 @@
   --ifm-color-primary-lighter: rgb(102, 212, 189);
   --ifm-color-primary-lightest: rgb(146, 224, 208);
   --ifm-code-font-size: 90%;
+  --ifm-code-background: #eee;
+  --ifm-code-padding-horizontal: 4px;
   --ifm-font-family-base: 'Inter';
   --ifm-font-color-base: #4a4a4a;
 }
@@ -41,6 +43,10 @@ aside img {
 }
 aside img + b {
   font-family: Comfortaa;
+}
+
+code {
+  border: 1px solid var(--ifm-code-background);
 }
 
 .theme-doc-sidebar-item-link-level-1 > a {

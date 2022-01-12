@@ -18,7 +18,6 @@ module Marten
           @null = false,
           @unique = false,
           @index = false,
-          @editable = true,
           @db_column = nil
         )
         end
@@ -63,13 +62,6 @@ module Marten
           @index
         end
 
-        # Returns a boolean indicating whether the field is editable.
-        #
-        # Non-editable fields will be skipped at validation time.
-        def editable?
-          @editable
-        end
-
         # Returns a boolean indicating whether the field can be null at the database level.
         def null?
           @null
@@ -79,9 +71,9 @@ module Marten
         def perform_validation(record : Model)
           value = record.get_field_value(id)
 
-          if value.nil? && !@null && @editable
+          if value.nil? && !@null
             record.errors.add(id, null_error_message(record), type: :null)
-          elsif empty_value?(value) && !@blank && @editable
+          elsif empty_value?(value) && !@blank
             record.errors.add(id, blank_error_message(record), type: :blank)
           end
 

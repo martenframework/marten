@@ -9,7 +9,6 @@ describe Marten::DB::Field::Base do
       field.blank?.should be_false
       field.null?.should be_false
       field.unique?.should be_false
-      field.editable?.should be_true
       field.db_column.should eq field.id
       field.index?.should be_false
     end
@@ -58,18 +57,6 @@ describe Marten::DB::Field::Base do
     end
   end
 
-  describe "#editable?" do
-    it "returns true if the field is editable" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
-      field.editable?.should be_true
-    end
-
-    it "returns false if the field is not editable" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: false)
-      field.editable?.should be_false
-    end
-  end
-
   describe "#null?" do
     it "returns true if the field is nullable" do
       field = Marten::DB::Field::BaseSpec::TestField.new("my_field", null: true)
@@ -104,21 +91,21 @@ describe Marten::DB::Field::Base do
 
   describe "#related_model" do
     it "raises NotImplementedError by default" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
       expect_raises(NotImplementedError) { field.related_model }
     end
   end
 
   describe "#relation?" do
     it "returns false by default" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
       field.relation?.should be_false
     end
   end
 
   describe "#relation_name" do
     it "raises NotImplementedError by default" do
-      field = Marten::DB::Field::BaseSpec::TestField.new("my_field", editable: true)
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
       expect_raises(NotImplementedError) { field.relation_name }
     end
   end
@@ -188,15 +175,6 @@ describe Marten::DB::Field::Base do
       obj.errors.first.type.should eq "null"
     end
 
-    it "does not add an error to the record if the field is not nullable and not editable and the value is nil" do
-      obj = Tag.new(name: nil)
-
-      field = Marten::DB::Field::String.new("name", null: false, editable: false, max_size: 128)
-      field.perform_validation(obj)
-
-      obj.errors.size.should eq 0
-    end
-
     it "does not add an error to the record if the field is nullable and the value is nil" do
       obj = Tag.new(name: nil)
 
@@ -224,15 +202,6 @@ describe Marten::DB::Field::Base do
       obj.errors.size.should eq 1
       obj.errors.first.field.should eq "name"
       obj.errors.first.type.should eq "blank"
-    end
-
-    it "does not add an error to the record if the field cannot be blank and is not editable and the value is blank" do
-      obj = Tag.new(name: "")
-
-      field = Marten::DB::Field::String.new("name", blank: false, editable: false, max_size: 128)
-      field.perform_validation(obj)
-
-      obj.errors.size.should eq 0
     end
 
     it "does not add an error to the record if the field can be blank and the value is blank" do

@@ -9,25 +9,22 @@ describe Marten::DB::Field::DateTime do
       field.blank?.should be_false
       field.null?.should be_false
       field.unique?.should be_false
-      field.editable?.should be_true
       field.db_column.should eq field.id
       field.index?.should be_false
       field.auto_now?.should be_false
       field.auto_now_add?.should be_false
     end
 
-    it "sets the field as blankable and not editable if auto_now is set to true" do
+    it "sets the field as blankable if auto_now is set to true" do
       field = Marten::DB::Field::DateTime.new("my_field", auto_now: true)
       field.auto_now?.should be_true
       field.blank?.should be_true
-      field.editable?.should be_false
     end
 
-    it "sets the field as blankable and not editable if auto_now_add is set to true" do
+    it "sets the field as blankable if auto_now_add is set to true" do
       field = Marten::DB::Field::DateTime.new("my_field", auto_now_add: true)
       field.auto_now_add?.should be_true
       field.blank?.should be_true
-      field.editable?.should be_false
     end
   end
 

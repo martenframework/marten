@@ -14,14 +14,12 @@ module Marten
           @null = false,
           @unique = false,
           @index = false,
-          @editable = true,
           @db_column = nil,
           @auto_now = false,
           @auto_now_add = false
         )
           if @auto_now || @auto_now_add
             @blank = true
-            @editable = false
           end
         end
 
@@ -48,6 +46,12 @@ module Marten
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Time?
           from_db(result_set.read(Time?))
+        end
+
+        # :nodoc:
+        def perform_validation(record : Model)
+          return if auto_now? || auto_now_add?
+          super
         end
 
         def prepare_save(record, new_record = false)

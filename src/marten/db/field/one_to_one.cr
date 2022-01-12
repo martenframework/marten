@@ -14,7 +14,6 @@ module Marten
           @null = false,
           @unique = true,
           @index = true,
-          @editable = true,
           @db_column = nil,
           @related : Nil | ::String | Symbol = nil,
           on_delete : ::String | Symbol = :do_nothing

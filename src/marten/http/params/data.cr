@@ -1,8 +1,12 @@
+require "./concerns/*"
+
 module Marten
   module HTTP
     module Params
       # Represents the parsed content of a request's body, including both non-file and file inputs.
-      class Data < Base
+      class Data
+        include Core
+
         # :nodoc:
         alias Value = String | UploadedFile
 

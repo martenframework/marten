@@ -1,8 +1,12 @@
+require "./concerns/*"
+
 module Marten
   module HTTP
     module Params
       # Represents a set of GET parameters, extracted from a request's query string.
-      class Query < Base
+      class Query
+        include Core
+
         # :nodoc:
         alias Value = String
 

@@ -15,3 +15,12 @@ en:
         uuid:
           errors:
             invalid: "A valid UUID must be provided"
+    schema:
+      field:
+        base:
+          errors:
+            required: "This field is required."
+        string:
+          errors:
+            too_short: "The minimum allowed length is %{min_size}"
+            too_long: "The maximum allowed length is %{max_size}"

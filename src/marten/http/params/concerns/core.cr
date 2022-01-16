@@ -39,6 +39,8 @@ module Marten
           @params.reduce(0) { |acc, (_, v)| acc + (v.size > 0 ? v.size : 1) }
         end
 
+        delegate :[]=, to: @params
+
         # Allows to iterate over all the parameters.
         delegate each, to: @params
 

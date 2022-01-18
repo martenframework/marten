@@ -298,7 +298,7 @@ end
 
 module Marten::Template::ValueSpec
   class Test
-    include Marten::Template::Object
+    include Marten::Template::Object::Auto
 
     def test_attr
       "hello"

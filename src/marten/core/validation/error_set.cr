@@ -52,6 +52,11 @@ module Marten
           @errors << Error.new(type: type || DEFAULT_ERROR_TYPE, field: field, message: message)
         end
 
+        # Returns the global errors (errors that are not associated with a specific field).
+        def global
+          self[nil]
+        end
+
         # Iterates over all the `Marten::Core::Validation::Error` objects in this error set.
         delegate each, to: @errors
 

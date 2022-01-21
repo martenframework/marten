@@ -136,4 +136,24 @@ describe Marten::Core::Validation::ErrorSet do
       error_set.size.should eq 0
     end
   end
+
+  describe "#global" do
+    it "returns an array of all the global errors" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Size must be greater than 10 characters")
+      error_set.add("slug", "Cannot contain spaces")
+      error_set.add("This is invalid!")
+
+      error_set.global.size.should eq 1
+      error_set.global.first.message.should eq "This is invalid!"
+    end
+
+    it "returns an empty array if there are no global errors" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Size must be greater than 10 characters")
+      error_set.add("slug", "Cannot contain spaces")
+
+      error_set.global.should be_empty
+    end
+  end
 end

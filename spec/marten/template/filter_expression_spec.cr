@@ -66,6 +66,11 @@ describe Marten::Template::FilterExpression do
       expr_4.resolve(Marten::Template::Context{"foo" => "bar"}).should eq %{FOO 'BAR'}
     end
 
+    it "initializes a filter expression for a simple variable ending with a ? character" do
+      expr = Marten::Template::FilterExpression.new("foo.bar?")
+      expr.resolve(Marten::Template::Context{"foo" => {"bar?" => 42}}).should eq 42
+    end
+
     it "raises if the raw string is not a valid filter expression" do
       expect_raises(
         Marten::Template::Errors::InvalidSyntax,

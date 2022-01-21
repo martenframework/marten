@@ -56,7 +56,7 @@ module Marten
         result
       end
 
-      private VARIABLE_RE = /([\w\.]+|[-+\.]?\d[\d\.e]*)|(?:"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')/
+      private VARIABLE_RE = /([\w\.\?]+|[-+\.]?\d[\d\.e]*)|(?:"[^"\\]*(?:\\.[^"\\]*)*"|'[^'\\]*(?:\\.[^'\\]*)*')/
       private FILTER_RE   = /
         ^(?P<variable>#{VARIABLE_RE})|
         (?:\s*\|\s*

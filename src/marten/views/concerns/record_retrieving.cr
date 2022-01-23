@@ -47,10 +47,9 @@ module Marten
 
       # Returns the record that will be exposed by the view.
       def record
-        qs = queryset
-        @record ||= qs.get!(DB::Query::Node.new({self.class.lookup_field => params[self.class.lookup_param]}))
+        @record ||= queryset.get!(DB::Query::Node.new({self.class.lookup_field => params[self.class.lookup_param]}))
       rescue DB::Errors::RecordNotFound
-        raise HTTP::Errors::NotFound.new("No #{qs.not_nil!.model.name} record can be found for the given query")
+        raise HTTP::Errors::NotFound.new("No #{self.class.model.not_nil!.name} record can be found for the given query")
       end
     end
   end

@@ -45,7 +45,7 @@ module Marten
       def get
         url = redirect_url
         return HTTP::Response::Gone.new if url.nil?
-        self.class.permanent ? HTTP::Response::PermanentRedirect.new(url) : HTTP::Response::Redirect.new(url)
+        self.class.permanent ? HTTP::Response::MovedPermanently.new(url) : HTTP::Response::Found.new(url)
       end
 
       def head

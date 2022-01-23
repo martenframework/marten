@@ -151,7 +151,7 @@ module Marten
       delegate reverse, to: Marten.routes
 
       private def handle_http_method_not_allowed
-        HTTP::Response::NotAllowed.new(self.class.http_method_names)
+        HTTP::Response::MethodNotAllowed.new(self.class.http_method_names)
       end
 
       private def call_http_method

@@ -15,7 +15,7 @@ module Marten
             if request.accepts?("text/html")
               render_server_error_page
             else
-              HTTP::Response::ServerError.new(content: "Internal Server Error", content_type: "text/html")
+              HTTP::Response::InternalServerError.new(content: "Internal Server Error", content_type: "text/html")
             end
           end
 

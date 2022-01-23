@@ -1,7 +1,7 @@
 module Marten
   module HTTP
     class Response
-      class PermanentRedirect < Response
+      class MovedPermanently < Response
         def initialize(
           location : String,
           content : String = "",

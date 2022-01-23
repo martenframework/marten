@@ -1,7 +1,7 @@
 module Marten
   module HTTP
     class Response
-      class Redirect < Response
+      class Found < Response
         def initialize(
           location : String,
           content : String = "",

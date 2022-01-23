@@ -1,7 +1,7 @@
 module Marten
   module HTTP
     class Response
-      class NotAllowed < Response
+      class MethodNotAllowed < Response
         def initialize(
           allowed_methods : Array(String),
           content : String = "",

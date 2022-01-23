@@ -28,6 +28,72 @@ describe Marten::Schema do
     end
   end
 
+  describe "#[]" do
+    it "returns the bound field for the passed field identifier string" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      schema["foo"].should be_a Marten::Schema::BoundField
+      schema["foo"].id.should eq "foo"
+      schema["foo"].value.should eq "hello"
+
+      schema["bar"].should be_a Marten::Schema::BoundField
+      schema["bar"].id.should eq "bar"
+      schema["bar"].value.should be_nil
+    end
+
+    it "returns the bound field for the passed field identifier symbol" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      schema[:foo].should be_a Marten::Schema::BoundField
+      schema[:foo].id.should eq "foo"
+      schema[:foo].value.should eq "hello"
+
+      schema[:bar].should be_a Marten::Schema::BoundField
+      schema[:bar].id.should eq "bar"
+      schema[:bar].value.should be_nil
+    end
+
+    it "raises UnknownField if the field is unknown" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      expect_raises(Marten::Schema::Errors::UnknownField) { schema["unknown"] }
+      expect_raises(Marten::Schema::Errors::UnknownField) { schema[:unknown] }
+    end
+  end
+
+  describe "#[]?" do
+    it "returns the bound field for the passed field identifier string" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      schema["foo"]?.should be_a Marten::Schema::BoundField
+      schema["foo"]?.not_nil!.id.should eq "foo"
+      schema["foo"]?.not_nil!.value.should eq "hello"
+
+      schema["bar"]?.should be_a Marten::Schema::BoundField
+      schema["bar"]?.not_nil!.id.should eq "bar"
+      schema["bar"]?.not_nil!.value.should be_nil
+    end
+
+    it "returns the bound field for the passed field identifier symbol" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      schema[:foo]?.should be_a Marten::Schema::BoundField
+      schema[:foo]?.not_nil!.id.should eq "foo"
+      schema[:foo]?.not_nil!.value.should eq "hello"
+
+      schema[:bar]?.should be_a Marten::Schema::BoundField
+      schema[:bar]?.not_nil!.id.should eq "bar"
+      schema[:bar]?.not_nil!.value.should be_nil
+    end
+
+    it "returns nil if the field is unknown" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      schema["unknown"]?.should be_nil
+      schema[:unknown]?.should be_nil
+    end
+  end
+
   describe "#get_field_value" do
     it "returns the raw value associated with a given field identifier string" do
       schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})

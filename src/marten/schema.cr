@@ -13,6 +13,7 @@ module Marten
 
     @@fields : Hash(String, Field::Base) = {} of String => Field::Base
 
+    @bound_fields : Hash(String, BoundField) | Nil = nil
     @validated_data = {} of String => Field::Any
 
     macro inherited
@@ -86,6 +87,18 @@ module Marten
     def initialize(@data : DataHash)
     end
 
+    # Returns the bound field associated with the passed field name or raises if the field is not present.
+    def [](field_name : String | Symbol)
+      bound_fields[field_name.to_s]
+    rescue KeyError
+      raise Errors::UnknownField.new("Unknown field '#{field_name}'")
+    end
+
+    # Returns the bound field associated with the passed field name or `nil` if the field is not present.
+    def []?(field_name : String | Symbol)
+      bound_fields[field_name.to_s]?
+    end
+
     # Allows to read the value of a specific field.
     #
     # This methods returns the value of the field corresponding to `field_name`. If the passed `field_name` doesn't
@@ -95,7 +108,21 @@ module Marten
       @data[field.id]?
     end
 
+    protected getter data
+
     private getter validated_data
+
+    private def bound_fields
+      @bound_fields ||= begin
+        bound_fields_hash = {} of String => BoundField
+
+        self.class.fields.map do |field|
+          bound_fields_hash[field.id] = BoundField.new(schema: self, field: field)
+        end
+
+        bound_fields_hash
+      end
+    end
 
     private def perform_validation
       self.class.fields.each do |field|

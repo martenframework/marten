@@ -49,6 +49,11 @@ describe Marten::Schema::Field::String do
       field.serialize(42).should eq "42"
       field.serialize("foo bar").should eq "foo bar"
     end
+
+    it "returns nil if the passed value is nil" do
+      field = Marten::Schema::Field::String.new("test_field")
+      field.serialize(nil).should be_nil
+    end
   end
 
   describe "#strip?" do

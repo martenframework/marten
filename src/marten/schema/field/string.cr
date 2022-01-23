@@ -23,7 +23,7 @@ module Marten
         end
 
         def serialize(value) : ::String?
-          value.to_s
+          value.try(&.to_s)
         end
 
         # Returns `true` if the string value should be stripped of leading and trailing whitespaces.

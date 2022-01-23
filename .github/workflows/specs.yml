@@ -18,6 +18,7 @@ jobs:
         ports:
           - 3307:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
@@ -60,6 +61,7 @@ jobs:
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
@@ -93,6 +95,7 @@ jobs:
         MARTEN_SPEC_DB_CONNECTION: postgresql
   sqlite:
     runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:

@@ -7,7 +7,8 @@ module Marten
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) |
                   Marten::DB::Model | Marten::DB::Query::Page::Any | Marten::DB::Query::Set::Any |
-                  Marten::Template::Object | Nil | SafeString | String | Time | Views::Base
+                  Marten::Schema | Marten::Schema::BoundField | Marten::Schema::Field::Base | Marten::Template::Object |
+                  Nil | SafeString | String | Time | Views::Base
 
       # Returns the raw value associated with the template value.
       getter raw

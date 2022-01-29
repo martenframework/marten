@@ -115,6 +115,23 @@ describe Marten::Schema do
       expect_raises(Marten::Schema::Errors::UnknownField) { schema.get_field_value("unknown") }
     end
   end
+
+  describe "#validated_data" do
+    it "returns an empty hash if the validation did not run yet" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+      schema.validated_data.should be_empty
+    end
+
+    it "returns a hash containing the deserialized data if the validation ran previously" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(
+        Marten::HTTP::Params::Data{"foo" => ["  hello  "], "bar" => ["   world  "]}
+      )
+      schema.valid?
+      schema.validated_data.size.should eq 2
+      schema.validated_data["foo"].should eq "hello"
+      schema.validated_data["bar"].should eq "world"
+    end
+  end
 end
 
 module Marten::SchemaSpec

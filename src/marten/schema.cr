@@ -16,6 +16,8 @@ module Marten
     @bound_fields : Hash(String, BoundField) | Nil = nil
     @validated_data = {} of String => Field::Any
 
+    getter validated_data
+
     macro inherited
       FIELDS_ = {} of Nil => Nil
     end
@@ -109,8 +111,6 @@ module Marten
     end
 
     protected getter data
-
-    private getter validated_data
 
     private def bound_fields
       @bound_fields ||= begin

@@ -1,4 +1,5 @@
 require "./field/base"
+require "./field/bool"
 require "./field/string"
 
 module Marten
@@ -51,7 +52,7 @@ module Marten
       end
 
       macro finished
-        {% field_types = [] of String %}
+        {% field_types = [] of ::String %}
         {% for k in Marten::Schema::Field::Base.all_subclasses %}
           {% ann = k.annotation(Marten::Schema::Field::Registration) %}
           {% if ann %}
@@ -59,9 +60,10 @@ module Marten
           {% end %}
         {% end %}
 
-        alias Any = String | {% for t, i in field_types %}{{ t }}{% if i + 1 < field_types.size %} | {% end %}{% end %}
+        alias Any = {% for t, i in field_types %}{{ t }}{% if i + 1 < field_types.size %} | {% end %}{% end %}
       end
 
+      register "bool", Bool
       register "string", String
 
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)

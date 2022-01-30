@@ -26,17 +26,28 @@ module Marten
       include Callbacks
 
       def initialize(**kwargs)
-        initialize_field_values(**kwargs)
+        initialize_field_values(kwargs)
         run_after_initialize_callbacks
       end
 
       def initialize(**kwargs, &block)
-        initialize_field_values(**kwargs)
+        initialize_field_values(kwargs)
         yield self
         run_after_initialize_callbacks
       end
 
-      private def initialize_field_values(**kwargs)
+      def initialize(kwargs : Hash | NamedTuple)
+        initialize_field_values(kwargs)
+        run_after_initialize_callbacks
+      end
+
+      def initialize(kwargs : Hash | NamedTuple, &block)
+        initialize_field_values(kwargs)
+        yield self
+        run_after_initialize_callbacks
+      end
+
+      private def initialize_field_values(kwargs)
         values = Hash(String, Field::Any | Model).new
 
         kwargs.each { |key, value| values[key.to_s] = value }

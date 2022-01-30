@@ -30,6 +30,50 @@ describe Marten::DB::Model do
       user.persisted?.should be_false
     end
 
+    it "allows to initialize model objects with a hash of field values" do
+      user = TestUser.new({"username" => "jd", "first_name" => "John", "last_name" => "Doe"})
+      user.username.should eq "jd"
+      user.first_name.should eq "John"
+      user.last_name.should eq "Doe"
+      user.email.should be_nil
+      user.persisted?.should be_false
+    end
+
+    it "allows to initialize model objects with a hash of field values and a block" do
+      user = TestUser.new({"username" => "jd"}) do |u|
+        u.first_name = "John"
+        u.last_name = "Doe"
+      end
+
+      user.username.should eq "jd"
+      user.first_name.should eq "John"
+      user.last_name.should eq "Doe"
+      user.email.should be_nil
+      user.persisted?.should be_false
+    end
+
+    it "allows to initialize model objects with a named tuple of field values" do
+      user = TestUser.new({username: "jd", first_name: "John", last_name: "Doe"})
+      user.username.should eq "jd"
+      user.first_name.should eq "John"
+      user.last_name.should eq "Doe"
+      user.email.should be_nil
+      user.persisted?.should be_false
+    end
+
+    it "allows to initialize model objects with a named tuple of field values and a block" do
+      user = TestUser.new({username: "jd"}) do |u|
+        u.first_name = "John"
+        u.last_name = "Doe"
+      end
+
+      user.username.should eq "jd"
+      user.first_name.should eq "John"
+      user.last_name.should eq "Doe"
+      user.email.should be_nil
+      user.persisted?.should be_false
+    end
+
     it "allows to initialize model objects with related persisted objects" do
       user = TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
 

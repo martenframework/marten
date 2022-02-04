@@ -108,6 +108,20 @@ describe Marten::HTTP::Cookies do
     end
   end
 
+  describe "#encrypted" do
+    it "returns the encrypted cookies sub store" do
+      raw_cookies = ::HTTP::Request.new(method: "GET", resource: "/test/xyz").cookies
+      cookies = Marten::HTTP::Cookies.new(raw_cookies)
+
+      cookies.encrypted.should be_a Marten::HTTP::Cookies::SubStore::Encrypted
+
+      cookies.encrypted.set("foo", "bar", same_site: :strict)
+
+      cookies["foo"].should_not eq "bar"
+      cookies.encrypted["foo"].should eq "bar"
+    end
+  end
+
   describe "#fetch" do
     it "allows to retrieve a specific cookie value using its name" do
       cookies = Marten::HTTP::Cookies.new(HTTP::Cookies{"test" => "value"})

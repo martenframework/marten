@@ -6,6 +6,7 @@ module Marten
     class Cookies
       include Enumerable({String, Array(String)})
 
+      @encrypted : SubStore::Encrypted? = nil
       @signed : SubStore::Signed? = nil
 
       def initialize(@cookies : ::HTTP::Cookies)
@@ -39,6 +40,20 @@ module Marten
         cookies.each do |cookie|
           yield({cookie.name, cookie.value})
         end
+      end
+
+      # Returns the encrypted cookies store.
+      #
+      # The returned object allows to set or fetch encrypted cookies. This means that whenever a cookie is requested
+      # from this store, the raw value of this cookie will be decrypted. This is useful to create cookies whose values
+      # can't be read nor tampered by users.
+      #
+      # ```
+      # cookies.encrypted["foo"] = "bar"
+      # cookies.encrypted["foo"] # => "bar"
+      # ```
+      def encrypted
+        @encrypted ||= SubStore::Encrypted.new(self)
       end
 
       # Returns the value associated with the passed cookie name, or the passed `default` if the cookie is not present.
@@ -91,7 +106,7 @@ module Marten
 
       # Returns the signed cookies store.
       #
-      # The returned objects allow to set or fetch signed cookies. This means that whenever a cookie is requested from
+      # The returned object allows to set or fetch signed cookies. This means that whenever a cookie is requested from
       # this store, the signed representation of the corresponding value will be verified. This is useful to create
       # cookies that can't be tampered by users.
       #

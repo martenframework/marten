@@ -35,7 +35,7 @@ module Marten
           end
 
           private def signer
-            @signer ||= Core::Signer.new(key: "cookie_signer_" + Marten.settings.secret_key)
+            @signer ||= Core::Signer.new
           end
         end
       end

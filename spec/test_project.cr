@@ -9,7 +9,7 @@ else
 end
 
 Marten.configure :test do |config|
-  config.secret_key = "dummy"
+  config.secret_key = "__insecure_#{Random::Secure.random_bytes(32).hexstring}__"
 
   config.installed_apps = [
     TestApp,

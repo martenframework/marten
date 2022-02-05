@@ -1,4 +1,5 @@
 require "./concerns/callbacks"
+require "./concerns/cookies"
 require "./concerns/request_forgery_protection"
 
 module Marten
@@ -9,6 +10,7 @@ module Marten
     # processing a request in order to produce an HTTP response (which can be an HTML content, a redirection, etc).
     class Base
       include Callbacks
+      include Cookies
       include RequestForgeryProtection
 
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)

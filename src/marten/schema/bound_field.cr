@@ -28,7 +28,7 @@ module Marten
 
       # Returns the field value.
       def value
-        field.serialize(schema.data[id]?)
+        schema.data[id]?
       end
     end
   end

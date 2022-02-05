@@ -10,6 +10,8 @@ class Marten::Schema::BoundField
       errored?
     when "errors"
       errors
+    when "value"
+      value
     end
   end
 end

@@ -17,6 +17,19 @@ describe Marten::Schema::Field::Base do
       field.perform_validation(schema).should eq "hello"
     end
 
+    it "adds an error to the schema object if the serialization fails with an argument error" do
+      schema = Marten::Schema::Field::BaseSpec::TestSchema.new(
+        Marten::HTTP::Params::Data.new
+      )
+
+      field = Marten::Schema::Field::BaseSpec::TestFieldWithFailingDeserialization.new("test_field")
+      field.perform_validation(schema)
+
+      schema.errors.size.should eq 1
+      schema.errors.first.field.should eq "test_field"
+      schema.errors.first.type.should eq "invalid"
+    end
+
     it "adds an error to the schema object if the field is required and the value is nil" do
       schema = Marten::Schema::Field::BaseSpec::TestSchema.new(
         Marten::HTTP::Params::Data.new
@@ -63,6 +76,16 @@ module Marten::Schema::Field::BaseSpec
   class TestField < Marten::Schema::Field::Base
     def deserialize(value) : ::String?
       value.to_s.strip
+    end
+
+    def serialize(value) : ::String?
+      value.to_s
+    end
+  end
+
+  class TestFieldWithFailingDeserialization < Marten::Schema::Field::Base
+    def deserialize(value) : ::String?
+      raise ArgumentError.new("This is bad")
     end
 
     def serialize(value) : ::String?

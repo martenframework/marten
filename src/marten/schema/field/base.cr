@@ -20,7 +20,12 @@ module Marten
 
         # :nodoc:
         def perform_validation(schema : Schema)
-          value = deserialize(schema.get_field_value(id))
+          begin
+            value = deserialize(schema.get_field_value(id))
+          rescue ArgumentError
+            schema.errors.add(id, invalid_error_message(schema), type: :invalid)
+            return
+          end
 
           if empty_value?(value) && required?
             schema.errors.add(id, required_error_message(schema), type: :required)
@@ -46,6 +51,14 @@ module Marten
 
         private def empty_value?(value) : ::Bool
           EMPTY_VALUES.includes?(value)
+        end
+
+        private def invalid_error_message(_schema)
+          I18n.t("marten.schema.field.base.errors.invalid")
+        end
+
+        private def raise_unexpected_field_value(value)
+          raise Errors::UnexpectedFieldValue.new("Unexpected value received for field '#{id}': #{value}")
         end
 
         private def required_error_message(_schema)

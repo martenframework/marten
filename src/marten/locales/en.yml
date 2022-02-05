@@ -19,8 +19,9 @@ en:
       field:
         base:
           errors:
+            invalid: "The provided value is invalid."
             required: "This field is required."
         string:
           errors:
-            too_short: "The minimum allowed length is %{min_size}"
-            too_long: "The maximum allowed length is %{max_size}"
+            too_short: "The minimum allowed length is %{min_size}."
+            too_long: "The maximum allowed length is %{max_size}."

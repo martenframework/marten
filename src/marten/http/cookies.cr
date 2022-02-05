@@ -10,10 +10,12 @@ module Marten
       @signed : SubStore::Signed? = nil
 
       def initialize(@cookies : ::HTTP::Cookies)
+        @set_cookies = [] of ::HTTP::Cookie
       end
 
       def initialize
         @cookies = ::HTTP::Cookies.new
+        @set_cookies = [] of ::HTTP::Cookie
       end
 
       # Returns true if the other cookies object corresponds to the current cookies.
@@ -92,7 +94,7 @@ module Marten
         http_only : Bool = false,
         same_site : Nil | String | Symbol = nil
       ) : Nil
-        cookies << ::HTTP::Cookie.new(
+        new_cookie = ::HTTP::Cookie.new(
           name: name.to_s,
           value: value.to_s,
           expires: expires,
@@ -102,6 +104,9 @@ module Marten
           http_only: http_only,
           samesite: same_site.nil? ? nil : ::HTTP::Cookie::SameSite.parse(same_site.to_s)
         )
+
+        cookies << new_cookie
+        set_cookies << new_cookie
       end
 
       # Returns the signed cookies store.
@@ -123,6 +128,8 @@ module Marten
 
       # Returns the number of cookies.
       delegate size, to: cookies
+
+      protected getter set_cookies
 
       protected def to_stdlib
         cookies

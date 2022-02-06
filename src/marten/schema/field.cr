@@ -1,5 +1,6 @@
 require "./field/base"
 require "./field/bool"
+require "./field/int"
 require "./field/string"
 
 module Marten
@@ -64,6 +65,7 @@ module Marten
       end
 
       register "bool", Bool
+      register "int", Int
       register "string", String
 
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)

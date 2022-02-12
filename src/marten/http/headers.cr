@@ -47,6 +47,17 @@ module Marten
         headers.fetch(name.to_s, default)
       end
 
+      # Allows to add header names to the Vary header.
+      def patch_vary(*headers : String) : Nil
+        vary_headers = [] of String
+        vary_headers += self[:VARY].split(/\s*,\s*/) if has_key?(:VARY)
+
+        downcased_existing_headers = vary_headers.map(&.downcase)
+        vary_headers += headers.map(&.to_s).select { |h| !downcased_existing_headers.includes?(h.downcase) }
+
+        self[:VARY] = vary_headers.includes?("*") ? "*" : vary_headers.join(", ")
+      end
+
       # Allows to iterate over all the headers.
       delegate each, to: headers
 

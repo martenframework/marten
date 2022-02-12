@@ -197,6 +197,34 @@ describe Marten::HTTP::Headers do
     end
   end
 
+  describe "#patch_vary" do
+    it "allows to add a single header name to the headers" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers.new)
+      headers.patch_vary("Cookie")
+      headers[:VARY].should eq "Cookie"
+    end
+
+    it "allows to add multiple header names to the headers" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers.new)
+      headers.patch_vary("Cookie", "Accept-Encoding")
+      headers[:VARY].should eq "Cookie, Accept-Encoding"
+    end
+
+    it "does not result in duplicated header names in the Vary header" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers.new)
+      headers.patch_vary("Cookie", "Accept-Encoding")
+      headers.patch_vary("Cookie", "Accept-Encoding")
+      headers[:VARY].should eq "Cookie, Accept-Encoding"
+    end
+
+    it "is case-insensitive" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers.new)
+      headers.patch_vary("Cookie", "Accept-Encoding")
+      headers.patch_vary("cookie", "accept-encoding")
+      headers[:VARY].should eq "Cookie, Accept-Encoding"
+    end
+  end
+
   describe "#size" do
     it "returns the number of headers" do
       headers_0 = Marten::HTTP::Headers.new(HTTP::Headers.new)

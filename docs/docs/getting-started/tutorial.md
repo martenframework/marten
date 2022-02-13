@@ -163,4 +163,37 @@ end
 
 ## Writing a first view
 
+Let's start by creating a first view for your new `blog` application. To do so, create a `src/blog/views/home_view.cr`
+file with the following content:
+
+```crystal title="src/blog/views/home_view.cr"
+class HomeView < Marten::View
+  def get
+    respond("Hello World!")
+  end
+end
+```
+
+Views are classes that process a web request in order to produce a web response. This response can be a rendered HTML content or a redirection for example.
+
+In the above example, the `HomeView` view explicitly processes a `GET` HTTP request and returns a very simple `200 OK` response containing a short text. But in order to access this view via a browser, it is necessary to map it to a URL route. To do so, you can edit the `config/routes.cr` file as follows:
+
+```crystal title="config/routes.cr"
+Marten.routes.draw do
+  path "/", HomeView, name: "home"
+
+  if Marten.env.development?
+    path "#{Marten.settings.assets.url}<path:path>", Marten::Views::Defaults::Development::ServeAsset, name: "asset"
+  end
+end
+```
+
+The `config/routes.cr` file was automatically created earlier when you initialized the project structure. By using the `#path` method you wired the `HomeView` into the routes configuration. 
+
+The `#path` method accepts three arguments:
+
+* the first argument is the route pattern, which is a string like `/foo/bar`. When Marten needs to resolve a route, it starts at the beginning of the routes array and compares each of the configured routes until it finds a matching one
+* the second argment is the view class associated with the specified route. When a request URL is matched to a specific route, Marten executes the view that is associated with it
+* the last argument is the route name. This is an identifier that can later be used in your codebase to generate the full URL for a specific route, and optionally inject parameters in it
+
 ## Creating the Article model

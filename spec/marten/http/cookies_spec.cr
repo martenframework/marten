@@ -84,6 +84,20 @@ describe Marten::HTTP::Cookies do
       cookies = Marten::HTTP::Cookies.new(HTTP::Cookies{"test" => "value"})
       cookies.delete("unknown").should be_nil
     end
+
+    it "adds the deleted raw cookie to the cookies to set later on with a passed expiry and a blank value" do
+      time = Time.local
+      Timecop.freeze(time) do
+        cookies = Marten::HTTP::CookiesSpec::Wrapper.new(HTTP::Cookies{"test" => "value"})
+
+        cookies.delete(:test).should eq "value"
+        cookies.has_key?(:test).should be_false
+
+        cookies.set_cookies[0].name.should eq "test"
+        cookies.set_cookies[0].expires.should eq 1.year.ago
+        cookies.set_cookies[0].value.should eq ""
+      end
+    end
   end
 
   describe "#each" do
@@ -347,5 +361,11 @@ describe Marten::HTTP::Cookies do
       cookies_3 = Marten::HTTP::Cookies.new(HTTP::Cookies{"c1" => "v1", "c2" => "v2"})
       cookies_3.size.should eq 2
     end
+  end
+end
+
+module Marten::HTTP::CookiesSpec
+  class Wrapper < Marten::HTTP::Cookies
+    getter set_cookies
   end
 end

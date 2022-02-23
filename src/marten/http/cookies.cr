@@ -35,7 +35,16 @@ module Marten
 
       # Deletes a specific cookie and return its value, or `nil` if the cookie does not exist.
       def delete(name : String | Symbol) : String?
-        cookies.delete(name.to_s).try(&.value)
+        if raw_cookie = cookies.delete(name.to_s)
+          deleted_cookie_value = raw_cookie.value
+
+          # Removing a cookie involves assigning it a past expiry.
+          raw_cookie.expires = 1.year.ago
+          raw_cookie.value = ""
+          set_cookies << raw_cookie
+
+          deleted_cookie_value
+        end
       end
 
       def each

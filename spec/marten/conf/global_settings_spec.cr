@@ -331,6 +331,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#sessions" do
+    it "returns the sessions configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.sessions.should be_a Marten::Conf::GlobalSettings::Sessions
+    end
+  end
+
   describe "#templates" do
     it "returns the templates configuration" do
       global_settings = Marten::Conf::GlobalSettings.new

@@ -58,6 +58,11 @@ module Marten
         self[:VARY] = vary_headers.includes?("*") ? "*" : vary_headers.join(", ")
       end
 
+      # :nodoc:
+      def to_stdlib
+        headers
+      end
+
       # Allows to iterate over all the headers.
       delegate each, to: headers
 
@@ -66,10 +71,6 @@ module Marten
 
       # Returns the number of headers.
       delegate size, to: headers
-
-      protected def to_stdlib
-        headers
-      end
 
       private getter headers
     end

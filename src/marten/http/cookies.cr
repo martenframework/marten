@@ -123,6 +123,11 @@ module Marten
         @signed ||= SubStore::Signed.new(self)
       end
 
+      # :nodoc:
+      def to_stdlib
+        cookies
+      end
+
       # Returns `true` if there are no cookies.
       delegate empty?, to: cookies
 
@@ -130,10 +135,6 @@ module Marten
       delegate size, to: cookies
 
       protected getter set_cookies
-
-      protected def to_stdlib
-        cookies
-      end
 
       private getter cookies
     end

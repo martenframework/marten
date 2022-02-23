@@ -58,3 +58,15 @@ macro with_installed_apps(*apps)
     Marten.apps.app_configs_store = original_app_configs_store
   end
 end
+
+macro with_overridden_setting(setting_name, setting_value, nilable = false)
+  begin
+    {% old_setting_var_name = "old_#{setting_name.gsub(/\./, "_").id}_value" %}
+    {{ old_setting_var_name.id }} = Marten.settings.{{ setting_name.id }}
+    Marten.settings.{{ setting_name.id }} = {{ setting_value }}
+    {{ yield }}
+  ensure
+    {% old_setting_var_name = "old_#{setting_name.gsub(/\./, "_").id}_value" %}
+    Marten.settings.{{ setting_name.id }} = {{ old_setting_var_name.id }}{% unless nilable %}.not_nil!{% end %}
+  end
+end

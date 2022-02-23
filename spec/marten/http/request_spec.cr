@@ -863,6 +863,52 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#session" do
+    it "returns the session store if it was set previously" do
+      session_store = Marten::HTTP::Session::Store::Cookie.new(nil)
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.session = session_store
+
+      request.session.should eq session_store
+    end
+
+    it "raises a NilAssertionError if the session store was not set previously" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      expect_raises(NilAssertionError) { request.session }
+    end
+  end
+
+  describe "#session=" do
+    it "allows to set the session store associated with the request" do
+      session_store = Marten::HTTP::Session::Store::Cookie.new(nil)
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.session = session_store
+
+      request.session.should eq session_store
+    end
+  end
+
   describe "#trace?" do
     it "returns true if the request is a TRACE" do
       request = Marten::HTTP::Request.new(

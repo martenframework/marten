@@ -8,6 +8,7 @@ module Marten
       @accepted_media_types : Array(MIME::MediaType)?
       @host_and_port : NamedTuple(host: String, port: String)?
       @scheme : String?
+      @session : Session::Store::Base? = nil
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
@@ -132,6 +133,19 @@ module Marten
       # Returns `true` if the request is secure (if it is an HTTPS request).
       def secure?
         scheme == "https"
+      end
+
+      # Returns the session store for the considered request.
+      #
+      # If no session store was previously set (for example if the session middleware is not set), a `NilAssertionError`
+      # exception will be raised.
+      def session
+        @session.not_nil!
+      end
+
+      # Allows to set the session store for the request.
+      def session=(session_store : Session::Store::Base)
+        @session = session_store
       end
 
       # Returns `true` if the request is a TRACE.

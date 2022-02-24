@@ -1,5 +1,6 @@
 require "./field/base"
 require "./field/bool"
+require "./field/float"
 require "./field/int"
 require "./field/string"
 
@@ -65,6 +66,7 @@ module Marten
       end
 
       register "bool", Bool
+      register "float", Float
       register "int", Int
       register "string", String
 

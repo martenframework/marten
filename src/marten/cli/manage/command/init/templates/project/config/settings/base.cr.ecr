@@ -1,7 +1,12 @@
 Marten.configure do |config|
+  # IMPORTANT: please ensure the secret key value is kept secret!
   config.secret_key = "__insecure_#{Random::Secure.random_bytes(32).hexstring}__"
 
   # config.installed_apps = []
+
+  config.middleware = [
+    Marten::Middleware::Session,
+  ]
 
   config.database do |db|
     db.backend = :sqlite

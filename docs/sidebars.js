@@ -48,5 +48,11 @@ module.exports = {
       link: {type: 'doc', id: 'templates'},
       items: ['templates/introduction'],
     },
+    {
+      type: 'category',
+      label: 'Schemas',
+      link: {type: 'doc', id: 'schemas'},
+      items: ['schemas/introduction'],
+    },
   ],
 };

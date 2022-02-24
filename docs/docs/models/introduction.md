@@ -202,7 +202,7 @@ Article.create(title: "My article", content: "Learn how to build web apps with M
 The same `Article` record could be initialized (but not saved!) through the use of the `new` method as follows:
 
 ```crystal
-Article.create(title: "My article", content: "Learn how to build web apps with Marten!")
+Article.new(title: "My article", content: "Learn how to build web apps with Marten!")
 ```
 
 It should be noted that field values can be assigned after a model instance has been initialized. For example, the previous example is equivalent to the following snippet:

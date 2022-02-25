@@ -65,7 +65,7 @@ for_sqlite do
         introspector = connection.introspector
 
         index_names_1 = introspector.index_names(TestUser.db_table, "email")
-        index_names_1.should eq ["index_app_test_users_on_email"]
+        index_names_1.should eq ["index_app_test_user_on_email"]
       end
     end
 

@@ -61,9 +61,9 @@ for_postgresql do
         fk_constraint_names_2 = introspector.foreign_key_constraint_names(Post.db_table, "updated_by_id")
 
         fk_constraint_names_1.size.should eq 1
-        fk_constraint_names_1.should contain("index_posts_on_author_id_fk_app_test_users_id")
+        fk_constraint_names_1.should contain("index_posts_on_author_id_fk_app_test_user_id")
         fk_constraint_names_2.size.should eq 1
-        fk_constraint_names_2.should contain("index_posts_on_updated_by_id_fk_app_test_users_id")
+        fk_constraint_names_2.should contain("index_posts_on_updated_by_id_fk_app_test_user_id")
       end
     end
 
@@ -73,7 +73,7 @@ for_postgresql do
         introspector = connection.introspector
 
         index_names_1 = introspector.index_names(TestUser.db_table, "email")
-        index_names_1.should eq ["index_app_test_users_on_email"]
+        index_names_1.should eq ["index_app_test_user_on_email"]
       end
     end
 

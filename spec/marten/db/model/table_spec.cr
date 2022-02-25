@@ -135,7 +135,7 @@ describe Marten::DB::Model::Table do
 
   describe "::db_table" do
     it "returns the name of the model table based on the class name by default" do
-      TestUser.db_table.should eq "app_test_users"
+      TestUser.db_table.should eq "app_test_user"
     end
 
     it "does not append a s characters if model names already end by one" do

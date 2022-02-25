@@ -178,7 +178,7 @@ describe Marten::DB::Query::SQL::Join do
         true
       )
 
-      join.to_sql.should eq "INNER JOIN app_test_users t1 ON (posts.author_id = t1.id)"
+      join.to_sql.should eq "INNER JOIN app_test_user t1 ON (posts.author_id = t1.id)"
     end
 
     it "returns the expected SQL for a single left outer join" do
@@ -192,7 +192,7 @@ describe Marten::DB::Query::SQL::Join do
         true
       )
 
-      join.to_sql.should eq "LEFT OUTER JOIN app_test_users t1 ON (posts.author_id = t1.id)"
+      join.to_sql.should eq "LEFT OUTER JOIN app_test_user t1 ON (posts.author_id = t1.id)"
     end
 
     it "returns the expected SQL for a join node with children" do
@@ -218,8 +218,8 @@ describe Marten::DB::Query::SQL::Join do
       parent_join.add_child(child_join)
 
       parent_join.to_sql.should eq(
-        "INNER JOIN posts t1 ON (app_showcased_posts.post_id = t1.id) " \
-        "LEFT OUTER JOIN app_test_users t2 ON (t1.author_id = t2.id)"
+        "INNER JOIN posts t1 ON (app_showcased_post.post_id = t1.id) " \
+        "LEFT OUTER JOIN app_test_user t2 ON (t1.author_id = t2.id)"
       )
     end
   end

@@ -61,7 +61,6 @@ module Marten
               s << app_config.label.downcase
               s << '_'
               s << (model_name = name.split("::").last.underscore)
-              s << 's' unless model_name.ends_with?('s')
             end
           end
 

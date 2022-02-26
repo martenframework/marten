@@ -201,6 +201,15 @@ When the `related` argument is used, a method will be automatically created on t
 
 The default value is `nil`, which means that no reverse relation is defined on the targetted model by default.
 
+#### `on_delete`
+
+The `on_delete` argument allows to specify the deletion strategy to adopt when a related record (one that is targeted by the `many_to_one` field) is deleted. The following strategies can be specified (as symbols):
+
+* `:do_nothing`: is the default strategy. With this strategy, Marten won't do anything to ensure that records referencing the record being deleted are deleted or updated. If the database enforces referential integrity (which will be the case for foreign key fields), this means that deleting a record could result in database errors
+* `:cascade`: this strategy can be used to perform cascade deletions. When deleting a record, Marten will try to first destroy the other records that reference the object being deleted
+* `:protect`: this strategy allows to explicitly prevent the deletion of records if they are referenced by other records. This means that attempting to delete a "protected" record will result in a `Marten::DB::Errors::ProtectedRecord` error
+* `:set_null`: this strategy will set the reference column to `null` when the related is deleted
+
 ### `one_to_one`
 
 A `one_to_one` field allows to define a one-to-one relationship. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
@@ -242,3 +251,7 @@ end
 When the `related` argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record could be accessed through the use of the `Profile#user` method in the previous snippet.
 
 The default value is `nil`, which means that no reverse relation is defined on the targetted model by default.
+
+#### `on_delete`
+
+Same as [the similar option for the `#many_to_one` field](#on_delete).

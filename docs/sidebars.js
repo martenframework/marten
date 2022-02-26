@@ -32,6 +32,7 @@ module.exports = {
           label: 'Reference',
           items: [
             'models/reference/fields',
+            'models/reference/query_set',
           ],
         },
       ],

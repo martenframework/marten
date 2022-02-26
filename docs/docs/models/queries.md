@@ -340,4 +340,4 @@ Marten also provide the ability to delete the records that are targetted by a sp
 Article.filter(title: "My article").delete
 ```
 
-By default, related objects that are associated with the deleted records will also deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference] for more details). The method always returns the number of deleted records.
+By default, related objects that are associated with the deleted records will also deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference](./reference/fields#on_delete) for more details). The method always returns the number of deleted records.

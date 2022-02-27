@@ -64,6 +64,14 @@ module Marten
           operations << Operation::RenameTable.new({{ old_name }}, {{ new_name }})
         end
 
+        macro run_code(forward_method)
+          operations << Operation::RunCode.new(->{ {{ forward_method.id }} })
+        end
+
+        macro run_code(forward_method, backward_method)
+          operations << Operation::RunCode.new(->{ {{ forward_method.id }} }, -> { {{ backward_method.id }} })
+        end
+
         # :nodoc:
         macro _init_column(*args, **kwargs)
           {% if args.size != 2 %}{% raise "A column name and type must be explicitly specified" %}{% end %}

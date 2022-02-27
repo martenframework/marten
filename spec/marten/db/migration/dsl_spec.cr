@@ -180,6 +180,50 @@ describe Marten::DB::Migration::DSL do
       operation.new_name.should eq "new_table"
     end
   end
+
+  describe "#run_code" do
+    it "allows to initialize a RunCode operation with a forward proc and a backward proc" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_run_code_with_forward_and_backward_code
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::RunCode
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::RunCode)
+
+      from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
+      to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      test.run_code_direction.should be_nil
+
+      operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
+      test.run_code_direction.should eq "forward"
+
+      operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
+      test.run_code_direction.should eq "backward"
+    end
+
+    it "allows to initialize a RunCode operation with a forward proc only" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_run_code_with_forward_code_only
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::RunCode
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::RunCode)
+
+      from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
+      to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      test.run_code_direction.should be_nil
+
+      operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
+      test.run_code_direction.should eq "forward"
+
+      operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
+      test.run_code_direction.should eq "forward"
+    end
+  end
 end
 
 module Marten::DB::Migration::DSLSpec
@@ -187,6 +231,9 @@ module Marten::DB::Migration::DSLSpec
     include Marten::DB::Migration::DSL
 
     getter operations = [] of Marten::DB::Migration::Operation::Base
+    getter run_code_direction : String? = nil
+
+    setter run_code_direction
 
     def run_add_column
       add_column :test_table, :test_column, :string, max_size: 155, null: true
@@ -251,6 +298,22 @@ module Marten::DB::Migration::DSLSpec
 
     def run_rename_table
       rename_table :old_table, :new_table
+    end
+
+    def run_run_code_with_forward_and_backward_code
+      run_code :run_forward_code, :run_backward_code
+    end
+
+    def run_run_code_with_forward_code_only
+      run_code :run_forward_code
+    end
+
+    def run_forward_code
+      self.run_code_direction = "forward"
+    end
+
+    def run_backward_code
+      self.run_code_direction = "backward"
     end
   end
 end

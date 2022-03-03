@@ -3,6 +3,7 @@ require "./field/bool"
 require "./field/float"
 require "./field/int"
 require "./field/string"
+require "./field/uuid"
 
 module Marten
   abstract class Schema
@@ -69,6 +70,7 @@ module Marten
       register "float", Float
       register "int", Int
       register "string", String
+      register "uuid", UUID
 
       protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
         @@registry[id.to_s] = field_klass

@@ -35,3 +35,6 @@ en:
           errors:
             too_short: "The minimum allowed length is %{min_size}."
             too_long: "The maximum allowed length is %{max_size}."
+        uuid:
+          errors:
+            invalid: "Enter a valid UUID."

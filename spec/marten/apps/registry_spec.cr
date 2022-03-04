@@ -116,6 +116,17 @@ describe Marten::Apps::Registry do
       end
     end
   end
+
+  describe "#insert_main_app" do
+    it "inserts a main app config instance into the registry" do
+      registry = Marten::Apps::Registry.new
+
+      registry.insert_main_app
+
+      registry.app_configs.size.should eq 1
+      registry.app_configs[0].should be_a Marten::Apps::MainConfig
+    end
+  end
 end
 
 module Marten::Apps::RegistrySpec

@@ -13,7 +13,7 @@ require "openssl/hmac"
 require "uuid"
 
 require "./marten/app"
-require "./marten/apps/**"
+require "./marten/apps/*"
 require "./marten/asset/**"
 require "./marten/conf/**"
 require "./marten/core/**"
@@ -71,13 +71,22 @@ module Marten
     @@settings ||= Conf::GlobalSettings.new
   end
 
+  # Setups the Marten project.
+  #
+  # This involves setup-ing the configured settings, applications, assets, templates, and the I18n tooling.
   def self.setup
-    settings.setup
-    apps.populate(settings.installed_apps)
-    apps.setup
+    setup_settings
+    setup_apps
     setup_assets
     setup_templates
     setup_i18n
+  end
+
+  # :nodoc:
+  def self.setup_apps : Nil
+    apps.populate(settings.installed_apps)
+    apps.insert_main_app
+    apps.setup
   end
 
   # :nodoc:
@@ -96,6 +105,11 @@ module Marten
     assets.manifests = settings.assets.manifests
 
     assets.finders = finders
+  end
+
+  # :nodoc:
+  def self.setup_settings : Nil
+    settings.setup
   end
 
   # :nodoc:

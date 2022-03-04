@@ -29,6 +29,10 @@ describe Marten::Apps::Config do
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) { Marten::Apps::ConfigSpec::DummyConfig.label("ABC") }
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) { Marten::Apps::ConfigSpec::DummyConfig.label("123") }
     end
+
+    it "raises if the passed app label is reserved" do
+      expect_raises(Marten::Apps::Errors::InvalidAppConfig) { Marten::Apps::ConfigSpec::DummyConfig.label("main") }
+    end
   end
 
   describe "#==" do

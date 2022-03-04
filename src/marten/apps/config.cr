@@ -18,6 +18,11 @@ module Marten
         unless LABEL_RE.match(label.to_s)
           raise Errors::InvalidAppConfig.new("A label can only contain lowercase letters and underscores")
         end
+
+        if label.to_s == MainConfig::RESERVED_LABEL
+          raise Errors::InvalidAppConfig.new("App cannot use the 'main' reserved label")
+        end
+
         @@label = label.to_s
       end
 

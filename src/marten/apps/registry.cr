@@ -48,6 +48,10 @@ module Marten
         result.not_nil!
       end
 
+      def insert_main_app
+        populate([MainConfig])
+      end
+
       # Populate the app config registry from the list of the project installed apps.
       def populate(installed_apps : Array(Config.class)) : Nil
         installed_apps.each do |app|

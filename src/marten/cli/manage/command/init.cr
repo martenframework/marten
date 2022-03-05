@@ -76,9 +76,10 @@ module Marten
 
           app_template "app/app.cr.ecr", "app.cr"
           app_template "app/cli.cr.ecr", "cli.cr"
-          app_template "shared/.gitkeep", "views/.gitkeep"
           app_template "shared/.gitkeep", "migrations/.gitkeep"
           app_template "shared/.gitkeep", "models/.gitkeep"
+          app_template "shared/.gitkeep", "schemas/.gitkeep"
+          app_template "shared/.gitkeep", "views/.gitkeep"
 
           project_template "project/config/settings/base.cr.ecr", "config/settings/base.cr"
           project_template "project/config/settings/development.cr.ecr", "config/settings/development.cr"
@@ -86,8 +87,13 @@ module Marten
           project_template "project/config/settings/test.cr.ecr", "config/settings/test.cr"
           project_template "project/config/routes.cr.ecr", "config/routes.cr"
           project_template "project/spec/spec_helper.cr.ecr", "spec/spec_helper.cr"
+          project_template "project/src/cli.cr.ecr", "src/cli.cr"
           project_template "project/src/project.cr.ecr", "src/project.cr"
           project_template "project/src/server.cr.ecr", "src/server.cr"
+          project_template "shared/.gitkeep", "src/migrations/.gitkeep"
+          project_template "shared/.gitkeep", "src/models/.gitkeep"
+          project_template "shared/.gitkeep", "src/schemas/.gitkeep"
+          project_template "shared/.gitkeep", "src/views/.gitkeep"
           project_template "project/manage.cr.ecr", "manage.cr"
           project_template "project/shard.yml.ecr", "shard.yml"
 

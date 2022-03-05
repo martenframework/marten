@@ -41,6 +41,11 @@ myblog/
 ├── spec
 │   └── spec_helper.cr
 ├── src
+│   ├── migrations
+│   ├── models
+│   ├── schemas
+│   ├── views
+│   ├── cli.cr
 │   ├── project.cr
 │   └── server.cr
 ├── manage.cr
@@ -53,7 +58,7 @@ These files and folders are described below:
 | ----------- | ----------- |
 | config/ | Contains the configuration of the project. This includes environment-specific Marten configuration settings and the routes of the web application. |
 | spec/ | Contains the project specs, allowing to test your application. | 
-| src/ | Contains the source code of the application. By default this folder will include a `project.cr` file (where all dependencies - including Marten itself - are required) and a `server.cr` file (which starts the Marten web server). |
+| src/ | Contains the source code of the application. By default this folder will include a `project.cr` file (where all dependencies - including Marten itself - are required), a `server.cr` file (which starts the Marten web server), and empty `migrations`, `models`, `schemas`, and `views` folders. |
 | manage.cr | This file define a CLI that lets you interact with your Marten project in order to perform various actions (eg. running database migrations, collecting assets, etc). |
 | shard.yml | The standard [shard.yml](https://crystal-lang.org/reference/the_shards_command/index.html) file, that lists the dependencies that are required to build your application. |
 
@@ -62,6 +67,14 @@ Now that the project structure is created, you can change into the `myblog` dire
 ```bash
 shards install
 ```
+
+:::info
+Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example apps can provide [models](../models) or [views](../views). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects. The use of apps is activated by simply adding app classes to the `installed_apps` setting.
+
+By default, when creating a new project through the use of the `init` command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
+
+As projects grow in size and scope, it is generally encouraged to start thinking in terms of apps and how to split models, views, or features accross multiple apps depending on their intended responsibilities. Please refer to [Applications](../development/applications) to learn more about applications and how to structure your projects using them.
+:::
 
 ## Running the development server
 
@@ -89,84 +102,12 @@ end
 
 Once started, the development server will watch your project source files and will automatically recompile them when they are updated; it will also take care of restarting your project server. As such you don't have to manually restart the server when making changes to your application source files.
 
-## Creating the blog application
-
-Now that you have a working project, it's time to create the `blog` app, that is where your actual blog implementation will live.
-
-Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contribute specific behaviours to a project. For example apps can provide [models](../models) or [views](../views). They allow to separate a project into a set of logical and reusable components.
-
-:::info
-Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects.
-:::
-
-In order to create your app, you can use the `marten init` command as follows:
-
-```bash
-marten init app blog src/blog
-```
-
-The above command instructs the Marten CLI to create the structure of an app named `blog` inside the `src/blog` folder. This directory will have the following content:
-
-```
-src/blog
-├── migrations
-├── models
-├── views
-├── app.cr
-└── cli.cr
-```
-
-These files and folders are described below:
-
-| Path | Description |
-| ----------- | ----------- |
-| migrations/ | Empty directory that will store the migrations that will be generated for the models of the application. |
-| models/ | Empty directory where the models of the application will be defined. |
-| views/ | Empty directory where the views of the application will be defined. |
-| app.cr | Definition of the application configuration abstraction; this is also where application files requirements should be defined. |
-| cli.cr | Requirements of CLI-related files, such as migrations for example. |
-
-Once the `blog` application structure is created, the next step is to ensure that your Marten project is actually configured to use the app. 
-
-To do so, it is first necessary to ensure that the app files are required properly. Hence, you can update the `src/project.cr` file with the following content:
-
-```crystal title="src/project.cr"
-# Third party requirements.
-require "marten"
-require "sqlite3"
-
-# Project requirements.
-require "./blog/app"
-
-# Configuration requirements.
-require "../config/routes"
-require "../config/settings/base"
-require "../config/settings/**"
-```
-
-It is also necessary to ensure that Marten itself is configured to use your new `blog` application, which can be done by updating the `installed_apps` setting in the `config/settings/base.cr` configuration file:
-
-```crystal title="config/settings/base.cr"
-Marten.configure do |config|
-  config.secret_key = "notsecure"
-
-  config.installed_apps = [
-    BlogApp,
-  ]
-
-  config.database do |db|
-    db.backend = :sqlite
-    db.name = Path["myblog.db"].expand
-  end
-end
-```
-
 ## Writing a first view
 
-Let's start by creating a first view for your new `blog` application. To do so, create a `src/blog/views/home_view.cr`
+Let's start by creating a first view for your project. To do so, create a `src/views/home_view.cr`
 file with the following content:
 
-```crystal title="src/blog/views/home_view.cr"
+```crystal title="src/views/home_view.cr"
 class HomeView < Marten::View
   def get
     respond("Hello World!")

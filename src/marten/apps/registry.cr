@@ -4,6 +4,13 @@ module Marten
     #
     # The applications registry is responsible for managing all the application config classes of a given project.
     class Registry
+      @@app_config_registry = [] of Config.class
+
+      # :nodoc:
+      def self.register_app_config(app_config_klass : Config.class)
+        @@app_config_registry << app_config_klass
+      end
+
       def initialize
         @app_configs_store = {} of String => Config
         @unassigned_models = [] of DB::Model.class
@@ -25,27 +32,27 @@ module Marten
 
       # Returns the application config object contaning the passed class.
       def get_containing(klass)
-        candidates = [] of Config
+        candidates = [] of Config.class
 
-        @app_configs_store.values.each do |config|
-          if klass._marten_app_location.starts_with?(config.class._marten_app_location)
-            remaining = klass._marten_app_location[config.class._marten_app_location.size..]
+        @@app_config_registry.each do |app_config_klass|
+          if klass._marten_app_location.starts_with?(app_config_klass._marten_app_location)
+            remaining = klass._marten_app_location[app_config_klass._marten_app_location.size..]
             next unless remaining == "" || remaining[0] == '/'
-            candidates << config
+            candidates << app_config_klass
           end
         end
 
         result = unless candidates.empty?
-          candidates.sort_by { |config| config.class._marten_app_location.size }.reverse!.first
+          candidates.sort_by { |app_config_klass| app_config_klass._marten_app_location.size }.reverse!.first
         end
 
-        if result.nil?
+        if result.nil? || !@app_configs_store.has_key?(result.not_nil!.label)
           raise Errors::AppNotFound.new(
             "Class '#{klass}' is not part of an application defined in Marten.settings.installed_apps"
           )
         end
 
-        result.not_nil!
+        @app_configs_store[result.not_nil!.label]
       end
 
       def insert_main_app

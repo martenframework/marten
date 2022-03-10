@@ -77,12 +77,12 @@ describe Marten::Apps::Registry do
       registry = Marten::Apps::Registry.new
       registry.populate(
         [
-          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::Test2Config,
           Marten::Apps::RegistrySpec::TestApp::App,
         ]
       )
       registry.get_containing(Marten::Apps::RegistrySpec::TestEntity).should(
-        be_a(Marten::Apps::RegistrySpec::Test1Config)
+        be_a(Marten::Apps::RegistrySpec::Test2Config)
       )
     end
 
@@ -113,6 +113,23 @@ describe Marten::Apps::Registry do
         "Marten.settings.installed_apps"
       ) do
         registry.get_containing(Marten::Apps::RegistrySpec::InvalidEntity)
+      end
+    end
+
+    it "raises if the deepest app config that is found for the passed class is not installed" do
+      registry = Marten::Apps::Registry.new
+      registry.populate(
+        [
+          Marten::Apps::RegistrySpec::Test1Config,
+        ]
+      )
+
+      expect_raises(
+        Exception,
+        "Class 'Marten::Apps::RegistrySpec::TestApp::Entities::Test' is not part of an application defined in " \
+        "Marten.settings.installed_apps"
+      ) do
+        registry.get_containing(Marten::Apps::RegistrySpec::TestApp::Entities::Test)
       end
     end
   end

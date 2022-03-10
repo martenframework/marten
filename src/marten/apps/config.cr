@@ -85,6 +85,10 @@ module Marten
         I18n::Loader::YAML.new(locales_dir.to_s)
       end
 
+      macro inherited
+        Marten::Apps::Registry.register_app_config({{ @type }})
+      end
+
       private ASSETS_DIR     = "assets"
       private LABEL_RE       = /^[a-z_]+$/
       private LOCALES_DIR    = "locales"

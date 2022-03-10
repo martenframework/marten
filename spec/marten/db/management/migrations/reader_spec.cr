@@ -289,6 +289,33 @@ describe Marten::DB::Management::Migrations::Reader do
       node_2.parents.includes?(node_1).should be_true
       node_2.children.should be_empty
     end
+
+    it "assigns an empty set of replacements when apps do not have replacement migrations" do
+      Migration::FooApp::V202108092226113.reset_app_config
+
+      Marten.apps.app_configs_store = {
+        "reader_spec_bar_app"                => Marten::DB::Management::Migrations::ReaderSpec::BarApp.new,
+        "reader_spec_app_without_migrations" => (
+          Marten::DB::Management::Migrations::ReaderSpec::AppWithoutMigrations.new
+        ),
+      }
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.replacements.should be_empty
+    end
+
+    it "assigns the right replacement migrations when apps have replacement migrations" do
+      Marten.apps.app_configs_store = {
+        "reader_spec_foo_app" => Marten::DB::Management::Migrations::ReaderSpec::FooApp.new,
+        "reader_spec_bar_app" => Marten::DB::Management::Migrations::ReaderSpec::BarApp.new,
+      }
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.replacements.size.should eq 1
+      reader.replacements[Migration::FooApp::V202108092226113.id].should be_a Migration::FooApp::V202108092226113
+    end
   end
 
   describe "#apps_with_migrations" do

@@ -12,10 +12,12 @@ module Marten
 
           getter applied_migrations
           getter graph
+          getter replacements
 
           def initialize(@connection : Connection::Base? = nil)
             @applied_migrations = {} of String => Migration
             @graph = Graph.new
+            @replacements = {} of String => Migration
             build_graph
           end
 
@@ -47,7 +49,7 @@ module Marten
 
           private def build_graph
             defined_migrations = {} of String => Migration
-            replacements = {} of String => Migration
+            @replacements = {} of String => Migration
 
             migrations_per_app_configs.values.flatten.each do |migration_klass|
               defined_migrations[migration_klass.id] = migration_klass.new
@@ -67,7 +69,7 @@ module Marten
             # Adds each migration node to the graph.
             defined_migrations.values.each do |migration|
               @graph.add_node(migration)
-              replacements[migration.id] = migration unless migration.class.replaces.empty?
+              @replacements[migration.id] = migration unless migration.class.replaces.empty?
             end
 
             # Processes each migration node and adds the necessary dependency nodes that are in the same app first.
@@ -87,7 +89,7 @@ module Marten
             end
 
             # Processes identified migration replacements.
-            replacements.values.each do |migration|
+            @replacements.values.each do |migration|
               replacements_applied = migration.class.replacement_ids.map do |replaced_id|
                 @applied_migrations.has_key?(replaced_id)
               end
@@ -115,7 +117,12 @@ module Marten
               mapping = {} of Apps::Config => Array(Migration.class)
 
               Migrations.registry.each do |migration_klass|
-                app = migration_klass.app_config
+                app = begin
+                  migration_klass.app_config
+                rescue Marten::Apps::Errors::AppNotFound
+                  next
+                end
+
                 if mapping.has_key?(app)
                   mapping[app] << migration_klass
                 else

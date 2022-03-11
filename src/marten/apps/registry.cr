@@ -42,6 +42,8 @@ module Marten
           end
         end
 
+        puts candidates.inspect
+
         result = unless candidates.empty?
           candidates.sort_by { |app_config_klass| app_config_klass._marten_app_location.size }.reverse!.first
         end

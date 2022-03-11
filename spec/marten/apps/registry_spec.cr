@@ -65,7 +65,7 @@ describe Marten::Apps::Registry do
           [
             Marten::Apps::RegistrySpec::Test1Config,
             Marten::Apps::RegistrySpec::OtherApp::App,
-            Marten::Apps::RegistrySpec::DupTest1Config,
+            Marten::Apps::RegistrySpec::DupApp::App,
           ]
         )
       end
@@ -149,14 +149,6 @@ end
 module Marten::Apps::RegistrySpec
   class Test1Config < Marten::App
     label :test_a
-  end
-
-  class DupTest1Config < Marten::App
-    label :test_a
-
-    def self._marten_app_location
-      File.join(__DIR__, "dummy")
-    end
   end
 
   class TestEntity

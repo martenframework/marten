@@ -22,7 +22,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        crystal: ['1.3.2', 'nightly']
+        crystal: [
+          '1.3.2',
+          # 'nightly',
+        ]
     container:
       image: crystallang/crystal:${{ matrix.crystal }}
     steps:
@@ -66,7 +69,10 @@ jobs:
       fail-fast: false
       matrix:
         db_version: ['10', '11', '12', 'latest']
-        crystal: ['1.3.2', 'nightly']
+        crystal: [
+          '1.3.2',
+          #'nightly',
+        ]
     container:
       image: crystallang/crystal:${{ matrix.crystal }}
     steps:
@@ -99,7 +105,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        crystal: ['1.3.2', 'nightly']
+        crystal: [
+          '1.3.2',
+          # 'nightly',
+        ]
     container:
       image: crystallang/crystal:${{ matrix.crystal }}
     steps:

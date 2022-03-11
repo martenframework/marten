@@ -39,10 +39,10 @@ describe Marten::Apps::Registry do
   describe "#populate" do
     it "allows to populate a list of registered app configs" do
       registry = Marten::Apps::Registry.new
-      registry.populate([Marten::Apps::RegistrySpec::Test1Config, Marten::Apps::RegistrySpec::Test2Config])
+      registry.populate([Marten::Apps::RegistrySpec::Test1Config, Marten::Apps::RegistrySpec::OtherApp::App])
       registry.app_configs.size.should eq 2
       registry.app_configs[0].should be_a Marten::Apps::RegistrySpec::Test1Config
-      registry.app_configs[1].should be_a Marten::Apps::RegistrySpec::Test2Config
+      registry.app_configs[1].should be_a Marten::Apps::RegistrySpec::OtherApp::App
     end
 
     it "raises if the same app config is registered multiple times" do
@@ -51,7 +51,7 @@ describe Marten::Apps::Registry do
         registry.populate(
           [
             Marten::Apps::RegistrySpec::Test1Config,
-            Marten::Apps::RegistrySpec::Test2Config,
+            Marten::Apps::RegistrySpec::OtherApp::App,
             Marten::Apps::RegistrySpec::Test1Config,
           ]
         )
@@ -64,7 +64,7 @@ describe Marten::Apps::Registry do
         registry.populate(
           [
             Marten::Apps::RegistrySpec::Test1Config,
-            Marten::Apps::RegistrySpec::Test2Config,
+            Marten::Apps::RegistrySpec::OtherApp::App,
             Marten::Apps::RegistrySpec::DupTest1Config,
           ]
         )
@@ -77,12 +77,12 @@ describe Marten::Apps::Registry do
       registry = Marten::Apps::Registry.new
       registry.populate(
         [
-          Marten::Apps::RegistrySpec::Test2Config,
+          Marten::Apps::RegistrySpec::Test1Config,
           Marten::Apps::RegistrySpec::TestApp::App,
         ]
       )
       registry.get_containing(Marten::Apps::RegistrySpec::TestEntity).should(
-        be_a(Marten::Apps::RegistrySpec::Test2Config)
+        be_a(Marten::Apps::RegistrySpec::Test1Config)
       )
     end
 
@@ -153,10 +153,6 @@ module Marten::Apps::RegistrySpec
 
   class DupTest1Config < Marten::App
     label :test_a
-  end
-
-  class Test2Config < Marten::App
-    label :test_b
   end
 
   class TestEntity

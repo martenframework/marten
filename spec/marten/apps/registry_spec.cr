@@ -12,17 +12,17 @@ describe Marten::Apps::Registry do
   describe "#app_configs" do
     it "returns the registered app config instances" do
       registry = Marten::Apps::Registry.new
-      registry.populate([Marten::Apps::RegistrySpec::Test1Config])
+      registry.populate([Marten::Apps::RegistrySpec::App])
       registry.app_configs.size.should eq 1
-      registry.app_configs[0].should be_a Marten::Apps::RegistrySpec::Test1Config
+      registry.app_configs[0].should be_a Marten::Apps::RegistrySpec::App
     end
   end
 
   describe "#get" do
     it "returns the registered app corresponding to the passed app label" do
       registry = Marten::Apps::Registry.new
-      registry.populate([Marten::Apps::RegistrySpec::Test1Config])
-      registry.get("test_a").should be_a Marten::Apps::RegistrySpec::Test1Config
+      registry.populate([Marten::Apps::RegistrySpec::App])
+      registry.get("test_a").should be_a Marten::Apps::RegistrySpec::App
     end
 
     it "raises if the app label does not correspond to any registered apps" do
@@ -39,9 +39,9 @@ describe Marten::Apps::Registry do
   describe "#populate" do
     it "allows to populate a list of registered app configs" do
       registry = Marten::Apps::Registry.new
-      registry.populate([Marten::Apps::RegistrySpec::Test1Config, Marten::Apps::RegistrySpec::OtherApp::App])
+      registry.populate([Marten::Apps::RegistrySpec::App, Marten::Apps::RegistrySpec::OtherApp::App])
       registry.app_configs.size.should eq 2
-      registry.app_configs[0].should be_a Marten::Apps::RegistrySpec::Test1Config
+      registry.app_configs[0].should be_a Marten::Apps::RegistrySpec::App
       registry.app_configs[1].should be_a Marten::Apps::RegistrySpec::OtherApp::App
     end
 
@@ -50,9 +50,9 @@ describe Marten::Apps::Registry do
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
         registry.populate(
           [
-            Marten::Apps::RegistrySpec::Test1Config,
+            Marten::Apps::RegistrySpec::App,
             Marten::Apps::RegistrySpec::OtherApp::App,
-            Marten::Apps::RegistrySpec::Test1Config,
+            Marten::Apps::RegistrySpec::App,
           ]
         )
       end
@@ -63,7 +63,7 @@ describe Marten::Apps::Registry do
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
         registry.populate(
           [
-            Marten::Apps::RegistrySpec::Test1Config,
+            Marten::Apps::RegistrySpec::App,
             Marten::Apps::RegistrySpec::OtherApp::App,
             Marten::Apps::RegistrySpec::DupApp::App,
           ]
@@ -77,12 +77,12 @@ describe Marten::Apps::Registry do
       registry = Marten::Apps::Registry.new
       registry.populate(
         [
-          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::App,
           Marten::Apps::RegistrySpec::TestApp::App,
         ]
       )
       registry.get_containing(Marten::Apps::RegistrySpec::TestEntity).should(
-        be_a(Marten::Apps::RegistrySpec::Test1Config)
+        be_a(Marten::Apps::RegistrySpec::App)
       )
     end
 
@@ -90,7 +90,7 @@ describe Marten::Apps::Registry do
       registry = Marten::Apps::Registry.new
       registry.populate(
         [
-          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::App,
           Marten::Apps::RegistrySpec::TestApp::App,
         ]
       )
@@ -103,7 +103,7 @@ describe Marten::Apps::Registry do
       registry = Marten::Apps::Registry.new
       registry.populate(
         [
-          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::App,
           Marten::Apps::RegistrySpec::TestApp::App,
         ]
       )
@@ -120,7 +120,7 @@ describe Marten::Apps::Registry do
       registry = Marten::Apps::Registry.new
       registry.populate(
         [
-          Marten::Apps::RegistrySpec::Test1Config,
+          Marten::Apps::RegistrySpec::App,
         ]
       )
 
@@ -147,16 +147,6 @@ describe Marten::Apps::Registry do
 end
 
 module Marten::Apps::RegistrySpec
-  class Test1Config < Marten::App
-    label :test_a
-  end
-
-  class TestEntity
-    def self._marten_app_location
-      __DIR__
-    end
-  end
-
   class InvalidEntity
     def self._marten_app_location
       "/etc/xyz"

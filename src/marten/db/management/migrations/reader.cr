@@ -15,7 +15,7 @@ module Marten
           getter replacements
 
           def initialize(@connection : Connection::Base? = nil)
-            @applied_migrations = {} of String => Migration
+            @applied_migrations = {} of String => Migration?
             @graph = Graph.new
             @replacements = {} of String => Migration
             build_graph
@@ -61,8 +61,7 @@ module Marten
 
               recorder.applied_migrations.each do |migration|
                 migration_id = Migration.gen_id(migration.app, migration.name)
-                next unless defined_migrations.has_key?(migration_id)
-                @applied_migrations[migration_id] = defined_migrations[migration_id]
+                @applied_migrations[migration_id] = defined_migrations[migration_id]?
               end
             end
 

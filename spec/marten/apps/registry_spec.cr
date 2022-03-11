@@ -153,6 +153,10 @@ module Marten::Apps::RegistrySpec
 
   class DupTest1Config < Marten::App
     label :test_a
+
+    def self._marten_app_location
+      File.join(__DIR__, "dummy")
+    end
   end
 
   class TestEntity

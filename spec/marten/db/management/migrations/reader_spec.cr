@@ -95,7 +95,37 @@ describe Marten::DB::Management::Migrations::Reader do
       reader_2.applied_migrations.should be_empty
     end
 
-    it "identifies a replacement migration as applied if all the replaced migrations were already applied" do
+    it "identifies a recorded replacement migration as applied if all the replaced migrations were already applied" do
+      foo_app = Marten::DB::Management::Migrations::ReaderSpec::FooApp.new
+      bar_app = Marten::DB::Management::Migrations::ReaderSpec::BarApp.new
+
+      Marten.apps.app_configs_store = {
+        "reader_spec_foo_app" => foo_app,
+        "reader_spec_bar_app" => bar_app,
+      }
+
+      Marten::DB::Management::Migrations::Record.create!(
+        app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
+        name: Migration::FooApp::V202108092226111.migration_name
+      )
+      Marten::DB::Management::Migrations::Record.create!(
+        app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
+        name: Migration::FooApp::V202108092226112.migration_name
+      )
+      Marten::DB::Management::Migrations::Record.create!(
+        app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
+        name: Migration::FooApp::V202108092226113.migration_name
+      )
+
+      reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
+
+      reader.applied_migrations.size.should eq 3
+      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
+      reader.applied_migrations[Migration::FooApp::V202108092226112.id].should be_a Migration::FooApp::V202108092226112
+      reader.applied_migrations[Migration::FooApp::V202108092226113.id].should be_a Migration::FooApp::V202108092226113
+    end
+
+    it "does not identify a replacement migration if it is not recorded and the replaced migrations are applied" do
       foo_app = Marten::DB::Management::Migrations::ReaderSpec::FooApp.new
       bar_app = Marten::DB::Management::Migrations::ReaderSpec::BarApp.new
 
@@ -115,10 +145,9 @@ describe Marten::DB::Management::Migrations::Reader do
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      reader.applied_migrations.size.should eq 3
+      reader.applied_migrations.size.should eq 2
       reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
       reader.applied_migrations[Migration::FooApp::V202108092226112.id].should be_a Migration::FooApp::V202108092226112
-      reader.applied_migrations[Migration::FooApp::V202108092226113.id].should be_a Migration::FooApp::V202108092226113
     end
 
     it "does not identify a replacement migration as applied if not all the replaced migrations were applied" do

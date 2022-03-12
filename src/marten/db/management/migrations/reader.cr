@@ -95,9 +95,7 @@ module Marten
 
               # If all the migrations that are replaced by the current migration were already applied, the current
               # migration can be marked as applied too.
-              if replacements_applied.all?
-                @applied_migrations[migration.id] = migration
-              else
+              if !replacements_applied.all? || !@applied_migrations.has_key?(migration.id)
                 @applied_migrations.delete(migration.id)
               end
 

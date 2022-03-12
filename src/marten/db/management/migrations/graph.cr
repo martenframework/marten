@@ -57,7 +57,7 @@ module Marten
           # node. The resulting "path" should be followed in order to unapply the migration corresponding to the target
           # node.
           def path_backward(target_node : Node)
-            path = acyclic_dfs_traversal(target_node.migration.id, forwards: false)
+            path = acyclic_dfs_traversal(target_node.migration.id, forwards: false, silent: true)
             path.map { |id| @nodes[id] }
           end
 
@@ -71,7 +71,7 @@ module Marten
           # The returned array will start with the depdendencies of the target node and will end with the target node.
           # The resulting "path" should be followed in order to apply the migration corresponding to the target node.
           def path_forward(target_node : Node)
-            path = acyclic_dfs_traversal(target_node.migration.id, forwards: true)
+            path = acyclic_dfs_traversal(target_node.migration.id, forwards: true, silent: true)
             path.map { |id| @nodes[id] }
           end
 
@@ -188,16 +188,31 @@ module Marten
             project_state
           end
 
-          private def acyclic_dfs_traversal(node_id, seen = [] of String, chain = [] of String, forwards = true)
+          private def acyclic_dfs_traversal(
+            node_id,
+            seen = [] of String,
+            chain = [] of String,
+            forwards = true,
+            silent = false
+          )
             nodes_to_process = forwards ? @nodes[node_id].parents : @nodes[node_id].children
+
             nodes_to_process.each do |processed_node|
               processed_node_id = processed_node.migration.id
+
               if chain.includes?(processed_node_id)
-                raise Errors::CircularDependency.new("Circular dependency identified up to '#{processed_node_id}'")
+                if !silent
+                  raise Errors::CircularDependency.new("Circular dependency identified up to '#{processed_node_id}'")
+                end
+              else
+                chain << processed_node_id
               end
-              chain << processed_node_id
-              acyclic_dfs_traversal(processed_node_id, seen, chain, forwards) unless seen.includes?(processed_node_id)
+
+              if !seen.includes?(processed_node_id)
+                acyclic_dfs_traversal(processed_node_id, seen, chain, forwards, silent: silent)
+              end
             end
+
             seen << node_id
           end
 

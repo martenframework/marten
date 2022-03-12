@@ -250,6 +250,35 @@ describe Marten::DB::Management::Migrations::Graph do
       graph.path_forward(migration_2).should eq [node_1, node_3, node_2]
       graph.path_forward(migration_3).should eq [node_3]
     end
+
+    it "does not raise a circular dependency error if multiple nodes in path depends on the same older migration" do
+      migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
+      migration_2 = Marten::DB::Management::Migrations::GraphSpec::TestMigration2.new
+      migration_3 = Marten::DB::Management::Migrations::GraphSpec::TestMigration3.new
+      migration_4 = Marten::DB::Management::Migrations::GraphSpec::TestMigration4.new
+      migration_5 = Marten::DB::Management::Migrations::GraphSpec::TestMigration5.new
+
+      graph = Marten::DB::Management::Migrations::Graph.new
+      graph.add_node(migration_1)
+      graph.add_node(migration_2)
+      graph.add_node(migration_3)
+      graph.add_node(migration_4)
+      graph.add_node(migration_5)
+
+      graph.add_dependency(migration_2, migration_1.id)
+      graph.add_dependency(migration_2, migration_4.id)
+      graph.add_dependency(migration_3, migration_2.id)
+      graph.add_dependency(migration_5, migration_3.id)
+      graph.add_dependency(migration_5, migration_4.id)
+
+      node_1 = graph.find_node(migration_1.id)
+      node_2 = graph.find_node(migration_2.id)
+      node_3 = graph.find_node(migration_3.id)
+      node_4 = graph.find_node(migration_4.id)
+      node_5 = graph.find_node(migration_5.id)
+
+      graph.path_forward(migration_5).should eq [node_1, node_4, node_2, node_3, node_5]
+    end
   end
 
   describe "#roots" do
@@ -474,6 +503,32 @@ module Marten::DB::Management::Migrations::GraphSpec
     end
   end
 
+  class TestMigration4 < Marten::DB::Migration
+    def self.app_config
+      OtherTestApp.new
+    end
+
+    def self.migration_name
+      "test_migration_name_4"
+    end
+
+    def plan
+    end
+  end
+
+  class TestMigration5 < Marten::DB::Migration
+    def self.app_config
+      OtherTestApp.new
+    end
+
+    def self.migration_name
+      "test_migration_name_5"
+    end
+
+    def plan
+    end
+  end
+
   class TestReplacementMigration1 < Marten::DB::Migration
     replaces :graph_spec, :test_migration_name_1
     replaces :graph_spec, :test_migration_name_2
@@ -490,5 +545,7 @@ module Marten::DB::Management::Migrations::GraphSpec
   Marten::DB::Management::Migrations.registry.delete(TestMigration1)
   Marten::DB::Management::Migrations.registry.delete(TestMigration2)
   Marten::DB::Management::Migrations.registry.delete(TestMigration3)
+  Marten::DB::Management::Migrations.registry.delete(TestMigration4)
+  Marten::DB::Management::Migrations.registry.delete(TestMigration5)
   Marten::DB::Management::Migrations.registry.delete(TestReplacementMigration1)
 end

@@ -115,6 +115,20 @@ describe Marten::DB::Migration::DSL do
     end
   end
 
+  describe "#faked" do
+    it "allows to register faked operations" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_faked
+
+      test.faked_operations_registered.should be_true
+
+      test.operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
+      operation.name.should eq "test_table"
+    end
+  end
+
   describe "#remove_column" do
     it "allows to initialize a RemoveColumn operation" do
       test = Marten::DB::Migration::DSLSpec::Test.new
@@ -230,6 +244,9 @@ module Marten::DB::Migration::DSLSpec
   class Test
     include Marten::DB::Migration::DSL
 
+    @faked_operations_registered = false
+
+    getter faked_operations_registered
     getter operations = [] of Marten::DB::Migration::Operation::Base
     getter run_code_direction : String? = nil
 
@@ -280,6 +297,12 @@ module Marten::DB::Migration::DSLSpec
       )
     end
 
+    def run_faked
+      faked do
+        delete_table :test_table
+      end
+    end
+
     def run_remove_column
       remove_column :test_table, :test_column
     end
@@ -314,6 +337,15 @@ module Marten::DB::Migration::DSLSpec
 
     def run_backward_code
       self.run_code_direction = "backward"
+    end
+
+    private def register_operation(operation)
+      operations << operation
+    end
+
+    private def with_faked_operations_registration
+      @faked_operations_registered = true
+      yield
     end
   end
 end

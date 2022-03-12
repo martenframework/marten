@@ -3,73 +3,107 @@ module Marten
     abstract class Migration
       module DSL
         macro add_column(table_name, *args, **kwargs)
-          operations << Operation::AddColumn.new(
-            {{ table_name }},
-            _init_column({{ args.splat }}, {{ kwargs.double_splat }})
+          register_operation(
+            Operation::AddColumn.new(
+              {{ table_name }},
+              _init_column({{ args.splat }}, {{ kwargs.double_splat }})
+            )
           )
         end
 
         macro add_index(table_name, name, column_names)
-          operations << Operation::AddIndex.new(
-            {{ table_name }},
-            _init_index({{ name }}, {{ column_names }})
+          register_operation(
+            Operation::AddIndex.new(
+              {{ table_name }},
+              _init_index({{ name }}, {{ column_names }})
+            )
           )
         end
 
         macro add_unique_constraint(table_name, name, column_names)
-          operations << Operation::AddUniqueConstraint.new(
-            {{ table_name }},
-            _init_unique_constraint({{ name }}, {{ column_names }})
+          register_operation(
+            Operation::AddUniqueConstraint.new(
+              {{ table_name }},
+              _init_unique_constraint({{ name }}, {{ column_names }})
+            )
           )
         end
 
         macro change_column(table_name, *args, **kwargs)
-          operations << Operation::ChangeColumn.new(
-            {{ table_name }},
-            _init_column({{ args.splat }}, {{ kwargs.double_splat }})
+          register_operation(
+            Operation::ChangeColumn.new(
+              {{ table_name }},
+              _init_column({{ args.splat }}, {{ kwargs.double_splat }})
+            )
           )
         end
 
         macro create_table(name)
-          operations << CreateTable.new({{ name }}).build do
-            {{ yield }}
-          end.operation
+          register_operation(
+            CreateTable.new({{ name }}).build do
+              {{ yield }}
+            end.operation
+          )
         end
 
         macro delete_table(name)
-          operations << Operation::DeleteTable.new({{ name }})
+          register_operation(
+            Operation::DeleteTable.new({{ name }})
+          )
         end
 
         macro execute(forward_sql, backward_sql = nil)
-          operations << Operation::ExecuteSQL.new({{ forward_sql }}, {{ backward_sql }})
+          register_operation(
+            Operation::ExecuteSQL.new({{ forward_sql }}, {{ backward_sql }})
+          )
+        end
+
+        macro faked
+          with_faked_operations_registration do
+            {{ yield }}
+          end
         end
 
         macro remove_column(table_name, column_name)
-          operations << Operation::RemoveColumn.new({{ table_name }}, {{ column_name }})
+          register_operation(
+            Operation::RemoveColumn.new({{ table_name }}, {{ column_name }})
+          )
         end
 
         macro remove_index(table_name, index_name)
-          operations << Operation::RemoveIndex.new({{ table_name }}, {{ index_name }})
+          register_operation(
+            Operation::RemoveIndex.new({{ table_name }}, {{ index_name }})
+          )
         end
 
         macro remove_unique_constraint(table_name, constraint_name)
-          operations << Operation::RemoveUniqueConstraint.new({{ table_name }}, {{ constraint_name }})
+          register_operation(
+            Operation::RemoveUniqueConstraint.new({{ table_name }}, {{ constraint_name }})
+          )
         end
 
         macro rename_column(table_name, old_name, new_name)
-          operations << Operation::RenameColumn.new({{ table_name }}, {{ old_name }}, {{ new_name }})
+          register_operation(
+            Operation::RenameColumn.new({{ table_name }}, {{ old_name }}, {{ new_name }})
+          )
         end
 
         macro rename_table(old_name, new_name)
-          operations << Operation::RenameTable.new({{ old_name }}, {{ new_name }})
+          register_operation(
+            Operation::RenameTable.new({{ old_name }}, {{ new_name }})
+          )
         end
 
         macro run_code(forward_method)
-          operations << Operation::RunCode.new(->{ {{ forward_method.id }} })
+          register_operation(
+            Operation::RunCode.new(->{ {{ forward_method.id }} })
+          )
         end
 
         macro run_code(forward_method, backward_method)
-          operations << Operation::RunCode.new(->{ {{ forward_method.id }} }, -> { {{ backward_method.id }} })
+          register_operation(
+            Operation::RunCode.new(->{ {{ forward_method.id }} }, -> { {{ backward_method.id }} })
+          )
         end
 
         # :nodoc:

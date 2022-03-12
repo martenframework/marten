@@ -192,6 +192,62 @@ describe Marten::DB::Migration do
 
       Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
     end
+
+    it "unapplies the faked biderectional operations at the state level but not at the DB level" do
+      table_state = Marten::DB::Management::TableState.new(
+        "app",
+        "migration_test_table1",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::String.new("label", max_size: 255),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor.create_table(table_state)
+
+      migration = Marten::DB::MigrationSpec::MigrationWithBidirectionalFakedOperation.new
+      resulting_project_state = migration.apply_backward(
+        pre_forward_project_state: Marten::DB::Management::ProjectState.new,
+        project_state: project_state,
+        schema_editor: schema_editor
+      )
+
+      resulting_project_state.tables.should be_empty
+
+      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
+    end
+
+    it "unapplies the explicitly directed faked operations at the state level but not at the DB level" do
+      table_state = Marten::DB::Management::TableState.new(
+        "app",
+        "migration_test_table1",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::String.new("label", max_size: 255),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      project_state = Marten::DB::Management::ProjectState.new([table_state])
+
+      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor.create_table(table_state)
+
+      migration = Marten::DB::MigrationSpec::MigrationWithExplicitlyDirectedFakedOperation.new
+      resulting_project_state = migration.apply_backward(
+        pre_forward_project_state: Marten::DB::Management::ProjectState.new,
+        project_state: project_state,
+        schema_editor: schema_editor
+      )
+
+      resulting_project_state.tables.should be_empty
+
+      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
+    end
   end
 
   describe "#apply_forward" do
@@ -258,6 +314,40 @@ describe Marten::DB::Migration do
       introspector = Marten::DB::Connection.default.introspector
       columns_details = introspector.columns_details("migration_test_table1")
       columns_details.map(&.name).sort!.should eq ["id", "label", "published"]
+    end
+
+    it "applies the faked biderectional operations at the state level but not at the DB level" do
+      project_state = Marten::DB::Management::ProjectState.new
+
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      migration = Marten::DB::MigrationSpec::MigrationWithBidirectionalFakedOperation.new
+      resulting_project_state = migration.apply_forward(
+        project_state: project_state,
+        schema_editor: schema_editor
+      )
+
+      resulting_project_state.tables.size.should eq 1
+      resulting_project_state.tables.values[0].name.should eq "migration_test_table1"
+
+      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
+    end
+
+    it "applies the explicitly directed faked operations at the state level but not at the DB level" do
+      project_state = Marten::DB::Management::ProjectState.new
+
+      schema_editor = Marten::DB::Connection.default.schema_editor
+
+      migration = Marten::DB::MigrationSpec::MigrationWithExplicitlyDirectedFakedOperation.new
+      resulting_project_state = migration.apply_forward(
+        project_state: project_state,
+        schema_editor: schema_editor
+      )
+
+      resulting_project_state.tables.size.should eq 1
+      resulting_project_state.tables.values[0].name.should eq "migration_test_table1"
+
+      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
     end
   end
 
@@ -399,6 +489,42 @@ module Marten::DB::MigrationSpec
     end
   end
 
+  class MigrationWithBidirectionalFakedOperation < Marten::DB::Migration
+    def plan
+      faked do
+        create_table :migration_test_table1 do
+          column :id, :big_int, primary_key: true, auto: true
+          column :label, :string, max_size: 255
+        end
+      end
+    end
+
+    def self.app_config
+      TestApp.new
+    end
+  end
+
+  class MigrationWithExplicitlyDirectedFakedOperation < Marten::DB::Migration
+    def apply
+      faked do
+        create_table :migration_test_table1 do
+          column :id, :big_int, primary_key: true, auto: true
+          column :label, :string, max_size: 255
+        end
+      end
+    end
+
+    def unapply
+      faked do
+        delete_table :migration_test_table1
+      end
+    end
+
+    def self.app_config
+      TestApp.new
+    end
+  end
+
   Marten::DB::Management::Migrations.registry.delete(EmptyMigration)
   Marten::DB::Management::Migrations.registry.delete(AtomicMigration)
   Marten::DB::Management::Migrations.registry.delete(NonAtomicMigration)
@@ -407,4 +533,6 @@ module Marten::DB::MigrationSpec
   Marten::DB::Management::Migrations.registry.delete(MigrationToCreateTwoNewTables)
   Marten::DB::Management::Migrations.registry.delete(MigrationToCreateOneTableAndToAddAColumn)
   Marten::DB::Management::Migrations.registry.delete(MigrationToCreateTwoNewTablesWithExplicitDirectedOperations)
+  Marten::DB::Management::Migrations.registry.delete(MigrationWithBidirectionalFakedOperation)
+  Marten::DB::Management::Migrations.registry.delete(MigrationWithExplicitlyDirectedFakedOperation)
 end

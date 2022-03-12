@@ -7,6 +7,10 @@ module Marten
         abstract class Base
           include CanFormatStringsOrSymbols
 
+          @faked = false
+
+          setter faked
+
           abstract def describe : String
 
           abstract def mutate_db_backward(
@@ -26,6 +30,10 @@ module Marten
           abstract def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
 
           abstract def serialize : String
+
+          def faked? : Bool
+            @faked
+          end
         end
       end
     end

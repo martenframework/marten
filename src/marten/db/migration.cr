@@ -24,6 +24,7 @@ module Marten
       class_getter depends_on = [] of Tuple(String, String)
       class_getter replaces = [] of Tuple(String, String)
 
+      @faked_operations_registration : Bool = false
       @plan_loading_direction : Symbol?
 
       # Allows to specify whether the whole migration should run inside a single transaction or not.
@@ -93,6 +94,7 @@ module Marten
           ops_backward.not_nil!.each do |operation|
             old_state = project_state.clone
             operation.mutate_state_forward(self.class.app_config.label, project_state)
+            next if operation.faked?
             operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
           end
         else
@@ -111,7 +113,11 @@ module Marten
           # Now revert each of the defined operations in reverse order by using the previously computed states.
           ops_backward.not_nil!.each do |operation|
             to_state, from_state = pre_forward_operation_states.pop
-            operation.mutate_db_backward(self.class.app_config.label, schema_editor, from_state, to_state)
+
+            if !operation.faked?
+              operation.mutate_db_backward(self.class.app_config.label, schema_editor, from_state, to_state)
+            end
+
             project_state = to_state
           end
         end
@@ -126,6 +132,7 @@ module Marten
         operations_forward[0].not_nil!.each do |operation|
           old_state = project_state.clone
           operation.mutate_state_forward(self.class.app_config.label, project_state)
+          next if operation.faked?
           operation.mutate_db_forward(self.class.app_config.label, schema_editor, old_state, project_state)
         end
 
@@ -158,25 +165,8 @@ module Marten
       def unapply
       end
 
-      private def operations
-        case @plan_loading_direction
-        when :bidirectional
-          @operations_bidirectional
-        when :backward
-          @operations_backward
-        when :forward
-          @operations_forward
-        end.not_nil!
-      end
-
-      private def operations_backward
-        load_plan unless plan_loaded?
-        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
-      end
-
-      private def operations_forward
-        load_plan unless plan_loaded?
-        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
+      private def faked_operations_registration?
+        @faked_operations_registration
       end
 
       private def load_plan
@@ -192,8 +182,40 @@ module Marten
         @plan_loaded = true
       end
 
+      private def operations_backward
+        load_plan unless plan_loaded?
+        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
+      end
+
+      private def operations_forward
+        load_plan unless plan_loaded?
+        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
+      end
+
       private def plan_loaded?
         @plan_loaded
+      end
+
+      private def register_operation(operation) : Nil
+        operations = case @plan_loading_direction
+                     when :bidirectional
+                       @operations_bidirectional
+                     when :backward
+                       @operations_backward
+                     when :forward
+                       @operations_forward
+                     end.not_nil!
+
+        operation.faked = faked_operations_registration?
+        operations << operation
+      end
+
+      private def with_faked_operations_registration
+        previous_faked_operations_registration = faked_operations_registration?
+        @faked_operations_registration = true
+        yield
+      ensure
+        @faked_operations_registration = previous_faked_operations_registration.not_nil!
       end
     end
   end

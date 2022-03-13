@@ -89,7 +89,7 @@ describe Marten::DB::Migration::Operation::AddColumn do
       to_project_state.add_table(to_table_state)
 
       schema_editor = Marten::DB::Connection.default.schema_editor
-      schema_editor.create_table(from_table_state)
+      schema_editor.create_table(to_table_state)
 
       operation = Marten::DB::Migration::Operation::AddColumn.new("operation_test_table", new_column)
 

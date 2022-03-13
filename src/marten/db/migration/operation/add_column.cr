@@ -22,8 +22,11 @@ module Marten
             from_state : Management::ProjectState,
             to_state : Management::ProjectState
           ) : Nil
+            column = @column.clone
+            column.contribute_to_project(from_state)
+
             table = from_state.get_table(app_label, @table_name)
-            schema_editor.remove_column(table, @column)
+            schema_editor.remove_column(table, column)
           end
 
           def mutate_db_forward(
@@ -32,13 +35,18 @@ module Marten
             from_state : Management::ProjectState,
             to_state : Management::ProjectState
           ) : Nil
+            column = @column.clone
+            column.contribute_to_project(from_state)
+
             table = from_state.get_table(app_label, @table_name)
-            schema_editor.add_column(table, @column)
+            schema_editor.add_column(table, column)
           end
 
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
             table = state.get_table(app_label, @table_name)
-            table.add_column(@column)
+            column = @column.clone
+            column.contribute_to_project(state)
+            table.add_column(column)
           end
 
           def serialize : String

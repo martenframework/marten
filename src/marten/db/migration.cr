@@ -27,6 +27,11 @@ module Marten
       @faked_operations_registration : Bool = false
       @plan_loading_direction : Symbol?
 
+      # :nodoc:
+      def self.app_config
+        @@app_config ||= Marten.apps.get_containing(self)
+      end
+
       # Allows to specify whether the whole migration should run inside a single transaction or not.
       #
       # By default, for databases that support DDL transactions, each migration will run inside a single transaction.
@@ -62,10 +67,6 @@ module Marten
 
       def self.replacement_ids
         @@replacement_ids ||= @@replaces.map { |app_label, migration_name| gen_id(app_label, migration_name) }
-      end
-
-      protected def self.app_config
-        @@app_config ||= Marten.apps.get_containing(self)
       end
 
       protected def self.gen_id(app_label, migration_name)

@@ -10,8 +10,8 @@ module Marten
             @recorder = Recorder.new(@connection)
           end
 
-          def execute(app_config : Apps::Config? = nil, migration_name : String? = nil)
-            execute { }
+          def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false)
+            execute(app_config: app_config, migration_name: migration_name, fake: fake) { }
           end
 
           def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false, &block)
@@ -29,6 +29,8 @@ module Marten
             else
               execute_backward(plan, full_plan, fake) { |progress| yield progress }
             end
+
+            mark_elligible_replacements_as_applied { |progress| yield progress }
           end
 
           def execution_needed?(app_config : Apps::Config? = nil, migration_name : String? = nil) : Bool
@@ -156,6 +158,29 @@ module Marten
             plan
           end
 
+          private def get_applied_migration_ids
+            @recorder.applied_migrations.map do |migration|
+              Migration.gen_id(migration.app, migration.name)
+            end
+          end
+
+          def mark_elligible_replacements_as_applied
+            applied_migration_ids = get_applied_migration_ids
+
+            @reader.replacements.each do |replacement_migration_id, replacement_migration|
+              # Only records the fact that the replacement migration has been applied when all the migrations it
+              # replaces were already applied AND only if the replacement migration itself wasn't already recorded.
+              next unless replacement_migration.class.replacement_ids.all? { |id| applied_migration_ids.includes?(id) }
+              next if applied_migration_ids.includes?(replacement_migration_id)
+
+              yield Progress.new(ProgressType::MIGRATION_APPLY_FORWARD_START, replacement_migration)
+
+              @recorder.record(replacement_migration)
+
+              yield Progress.new(ProgressType::MIGRATION_APPLY_FORWARD_SUCCESS, replacement_migration)
+            end
+          end
+
           private def migrate_backward(pre_forward_state, state, migration, fake)
             if fake
               unrecord_migration(migration)
@@ -170,7 +195,7 @@ module Marten
           end
 
           private def migrate_forward(state, migration, fake)
-            if fake
+            if fake || replacement_migration_already_applied?(migration)
               record_migration(migration)
             else
               SchemaEditor.run_for(@connection, atomic: migration.atomic?) do |schema_editor|
@@ -187,9 +212,16 @@ module Marten
               migration.class.replaces.each do |app_label, name|
                 @recorder.record(app_label, name)
               end
-            else
-              @recorder.record(migration)
             end
+
+            @recorder.record(migration)
+          end
+
+          private def replacement_migration_already_applied?(migration)
+            (
+              !migration.class.replacement_ids.empty? &&
+                migration.class.replacement_ids.all? { |id| get_applied_migration_ids.includes?(id) }
+            )
           end
 
           private def unrecord_migration(migration)
@@ -197,9 +229,9 @@ module Marten
               migration.class.replaces.each do |app_label, name|
                 @recorder.unrecord(app_label, name)
               end
-            else
-              @recorder.unrecord(migration)
             end
+
+            @recorder.unrecord(migration)
           end
         end
       end

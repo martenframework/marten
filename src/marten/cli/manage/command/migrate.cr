@@ -43,10 +43,9 @@ module Marten
 
             if !runner.execution_needed?(app_config, migration_name)
               print("No pending migrations to apply")
-              return
+            else
+              print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n")
             end
-
-            print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n")
 
             runner.execute(app_config, migration_name, @fake) do |progress|
               process_execution_progress(progress)

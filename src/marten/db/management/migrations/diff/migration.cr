@@ -12,13 +12,17 @@ module Marten
             getter dependencies
             getter name
             getter operations
+            getter replacements
             getter version
+
+            setter replacements
 
             def initialize(
               @app_label : String,
               @name : String,
               @operations : Array(DB::Migration::Operation::Base),
-              @dependencies : Array(Tuple(String, String))
+              @dependencies : Array(Tuple(String, String)),
+              @replacements = Array(Tuple(String, String)).new
             )
               @version = @name.dup
 

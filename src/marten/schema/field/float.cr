@@ -18,6 +18,8 @@ module Marten
         end
 
         def deserialize(value) : Float64?
+          return if empty_value?(value)
+
           case value
           when Nil
             value

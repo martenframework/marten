@@ -9,6 +9,12 @@ describe Marten::Schema::Field::UUID do
       )
     end
 
+    it "returns nil if the passed value is an empty value" do
+      field = Marten::Schema::Field::UUID.new("test_field")
+      field.deserialize(nil).should be_nil
+      field.deserialize("").should be_nil
+    end
+
     it "returns nil if the value is nil" do
       field = Marten::Schema::Field::UUID.new("test_field")
       field.deserialize(nil).should be_nil

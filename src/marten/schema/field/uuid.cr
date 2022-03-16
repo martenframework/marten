@@ -4,6 +4,8 @@ module Marten
       # Represents a UUID schema field.
       class UUID < Base
         def deserialize(value) : ::UUID?
+          return if empty_value?(value)
+
           case value
           when Nil
             value

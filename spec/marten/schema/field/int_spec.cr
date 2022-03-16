@@ -7,6 +7,12 @@ describe Marten::Schema::Field::Int do
       field.deserialize(nil).should be_nil
     end
 
+    it "returns nil if the passed value is an empty value" do
+      field = Marten::Schema::Field::Int.new("test_field")
+      field.deserialize(nil).should be_nil
+      field.deserialize("").should be_nil
+    end
+
     it "returns the integer value corresponding to the passed string" do
       field = Marten::Schema::Field::Int.new("test_field")
       field.deserialize("1223112").should eq 1_223_112

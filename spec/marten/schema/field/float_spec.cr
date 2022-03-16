@@ -7,6 +7,12 @@ describe Marten::Schema::Field::Float do
       field.deserialize(nil).should be_nil
     end
 
+    it "returns nil if the passed value is an empty value" do
+      field = Marten::Schema::Field::Float.new("test_field")
+      field.deserialize(nil).should be_nil
+      field.deserialize("").should be_nil
+    end
+
     it "returns the float value corresponding to the passed string" do
       field = Marten::Schema::Field::Float.new("test_field")
       field.deserialize("12231.12").should eq 12_231.12

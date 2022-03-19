@@ -21,6 +21,16 @@ en:
           errors:
             invalid: "The provided value is invalid."
             required: "This field is required."
+        date_time:
+          errors:
+            invalid: "Enter a valid date time."
+          input_formats:
+            - "%Y-%m-%d %H:%M:%S"
+            - "%Y-%m-%d %H:%M:%S.%f"
+            - "%Y-%m-%d %H:%M"
+            - "%m/%d/%Y %H:%M:%S"
+            - "%m/%d/%Y %H:%M:%S.%f"
+            - "%m/%d/%Y %H:%M"
         float:
           errors:
             invalid: "Enter a valid number."

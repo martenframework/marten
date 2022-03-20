@@ -39,13 +39,13 @@ for_sqlite do
         columns_details[0].character_maximum_length.should be_nil
 
         columns_details[1].name.should eq "foo"
-        columns_details[1].type.should eq "integer"
+        columns_details[1].type.downcase.should eq "integer"
         columns_details[1].nullable?.should be_true
         columns_details[1].default.should be_nil
         columns_details[1].character_maximum_length.should be_nil
 
         columns_details[2].name.should eq "id"
-        columns_details[2].type.should eq "integer"
+        columns_details[2].type.downcase.should eq "integer"
         columns_details[2].nullable?.should be_false
         columns_details[2].default.should be_nil
         columns_details[2].character_maximum_length.should be_nil

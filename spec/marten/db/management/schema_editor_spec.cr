@@ -98,7 +98,7 @@ describe Marten::DB::Management::SchemaEditor do
               column_name = rs.read(String)
               next unless column_name == "foo"
               column_type = rs.read(String)
-              column_type.should eq "integer"
+              column_type.downcase.should eq "integer"
             end
           end
 

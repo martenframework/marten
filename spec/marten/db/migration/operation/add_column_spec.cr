@@ -148,7 +148,7 @@ describe Marten::DB::Migration::Operation::AddColumn do
 
       for_mysql { db_column.type.should eq "int" }
       for_postgresql { db_column.type.should eq "integer" }
-      for_sqlite { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.downcase.should eq "integer" }
     end
 
     it "contributes the column to the project" do

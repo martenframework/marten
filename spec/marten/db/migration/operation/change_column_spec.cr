@@ -60,7 +60,7 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
 
       for_mysql { db_column.type.should eq "int" }
       for_postgresql { db_column.type.should eq "integer" }
-      for_sqlite { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.downcase.should eq "integer" }
 
       db_column.nullable?.should be_true
     end
@@ -164,7 +164,7 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
 
       for_mysql { db_column.type.should eq "bigint" }
       for_postgresql { db_column.type.should eq "bigint" }
-      for_sqlite { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.downcase.should eq "integer" }
 
       db_column.nullable?.should be_false
     end

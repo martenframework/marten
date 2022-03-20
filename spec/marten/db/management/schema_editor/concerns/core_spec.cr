@@ -29,7 +29,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       for_mysql { db_column.type.should eq "int" }
       for_postgresql { db_column.type.should eq "integer" }
-      for_sqlite { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.downcase.should eq "integer" }
     end
 
     it "can add a column with a default value to an existing table" do
@@ -373,7 +373,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "foo"
               column_type = rs.read(String)
-              column_type.should eq "integer"
+              column_type.downcase.should eq "integer"
             end
           end
 
@@ -484,7 +484,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "foo"
               column_type = rs.read(String)
-              column_type.should eq "integer"
+              column_type.downcase.should eq "integer"
             end
           end
 
@@ -868,12 +868,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       for_sqlite do
         columns_details[0].name.should eq "foo"
-        columns_details[0].type.should eq "integer"
+        columns_details[0].type.downcase.should eq "integer"
         columns_details[0].nullable?.should be_false
         columns_details[0].default.should eq "42"
 
         columns_details[1].name.should eq "id"
-        columns_details[1].type.should eq "integer"
+        columns_details[1].type.downcase.should eq "integer"
         columns_details[1].nullable?.should be_false
         columns_details[1].default.should be_nil
       end
@@ -1933,7 +1933,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       for_mysql { db_column.type.should eq "bigint" }
       for_postgresql { db_column.type.should eq "bigint" }
-      for_sqlite { db_column.type.should eq "integer" }
+      for_sqlite { db_column.type.downcase.should eq "integer" }
 
       connection.open do |db|
         db.scalar("SELECT foo FROM schema_editor_test_table").should eq 42
@@ -2017,7 +2017,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       for_mysql { db_column.type.should eq "longtext" }
       for_postgresql { db_column.type.should eq "text" }
-      for_sqlite { db_column.type.should eq "text" }
+      for_sqlite { db_column.type.downcase.should eq "text" }
 
       connection.open do |db|
         db.scalar("SELECT foo FROM schema_editor_test_table").should eq "hello"
@@ -2354,7 +2354,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "table_id"
               column_type = rs.read(String)
-              column_type.should eq "integer"
+              column_type.downcase.should eq "integer"
             end
           end
 
@@ -2496,7 +2496,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "table_id"
               column_type = rs.read(String)
-              column_type.should eq "integer"
+              column_type.downcase.should eq "integer"
             end
           end
 

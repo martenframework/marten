@@ -3,6 +3,7 @@ require "./column/concerns/**"
 require "./column/base"
 require "./column/big_int"
 require "./column/bool"
+require "./column/date"
 require "./column/date_time"
 require "./column/float"
 require "./column/int"
@@ -35,6 +36,7 @@ module Marten
 
         register "big_int", BigInt
         register "bool", Bool
+        register "date", Date
         register "date_time", DateTime
         register "float", Float
         register "reference", Reference

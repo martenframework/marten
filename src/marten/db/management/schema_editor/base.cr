@@ -120,12 +120,6 @@ module Marten
           private delegate build_sql, to: @connection
           private delegate quote, to: @connection
 
-          private macro defined?(t)
-            {% if t.resolve? %}
-              {{ yield }}
-            {% end %}
-          end
-
           private def index_name(table_name, columns, suffix)
             index_name = "index_#{table_name}_on_#{columns.join("_")}#{suffix}"
             return index_name if index_name.size <= @connection.max_name_size

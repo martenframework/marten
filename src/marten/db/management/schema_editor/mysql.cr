@@ -43,6 +43,7 @@ module Marten
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Management::Column::BigInt"   => "bigint",
             "Marten::DB::Management::Column::Bool"     => "bool",
+            "Marten::DB::Management::Column::Date"     => "date",
             "Marten::DB::Management::Column::DateTime" => "datetime(6)",
             "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",

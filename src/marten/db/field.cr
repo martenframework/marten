@@ -1,6 +1,7 @@
 require "./field/base"
 require "./field/big_int"
 require "./field/bool"
+require "./field/date"
 require "./field/date_time"
 require "./field/float"
 require "./field/int"
@@ -61,6 +62,7 @@ module Marten
 
       register "big_int", BigInt
       register "bool", Bool
+      register "date", Date
       register "date_time", DateTime
       register "float", Float
       register "int", Int

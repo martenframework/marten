@@ -1,5 +1,6 @@
 require "./field/base"
 require "./field/bool"
+require "./field/date"
 require "./field/date_time"
 require "./field/float"
 require "./field/int"
@@ -68,6 +69,7 @@ module Marten
       end
 
       register "bool", Bool
+      register "date", Date
       register "date_time", DateTime
       register "float", Float
       register "int", Int

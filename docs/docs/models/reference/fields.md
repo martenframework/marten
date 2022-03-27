@@ -62,6 +62,18 @@ end
 
 A `bool` field allows to persist booleans.
 
+### `date`
+
+A `date` field allows to persist date values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `auto_now`
+
+The `auto_now` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is saved. This provides a convenient way to define `updated_at` fields. Defaults to `false`.
+
+#### `auto_now_add`
+
+The `auto_now_add` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
+
 ### `date_time`
 
 A `date_time` field allows to persist date-time values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:

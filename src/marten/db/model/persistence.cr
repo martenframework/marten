@@ -133,17 +133,15 @@ module Marten
         # If the model instance is new, a new record is created in the DB ; otherwise the existing record is updated.
         # This method will return `true` if the model instance is valid and was created / updated successfully.
         # Otherwise it will return `false` if the model instance validation failed.
-        def save(using : Nil | String | Symbol = nil) : Bool
-          if valid?
-            # TODO: this block should probably be executed if the record is not persisted or if changes have been made
-            # to the considered record (dirty changes mechanism).
-            connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
-            connection.transaction do
-              insert_or_update(connection)
-              true
-            end
-          else
-            false
+        def save(using : Nil | String | Symbol = nil, validate : Bool = true) : Bool
+          return false if validate && !valid?
+
+          # TODO: this block should probably be executed if the record is not persisted or if changes have been made
+          # to the considered record (dirty changes mechanism).
+          connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
+          connection.transaction do
+            insert_or_update(connection)
+            true
           end
         end
 
@@ -153,8 +151,8 @@ module Marten
         # This method will return `true` if the model instance is valid and was created / updated successfully.
         # Otherwise it will raise a `Marten::DB::Errors::InvalidRecord` exception if the model instance validation
         # failed.
-        def save!(using : Nil | String | Symbol = nil) : Bool
-          save(using: using) || (raise Errors::InvalidRecord.new("Record is invalid"))
+        def save!(using : Nil | String | Symbol = nil, validate : Bool = true) : Bool
+          save(using: using, validate: validate) || (raise Errors::InvalidRecord.new("Record is invalid"))
         end
 
         protected setter new_record

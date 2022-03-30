@@ -155,3 +155,16 @@ Global errors can be specified through the use of an alternative `#add` method t
 user.errors.add("User is invalid")                      # error type is "invalid"
 user.errors.add("User is invalid", type: :invalid_user) # error type is "invalid_user"
 ```
+
+## Skipping validations
+
+Model validations can be explicitly skipped when using the `#save` or `#save!` methods. To do so, the `validate: false` argument can be used:
+
+```crystal
+user = User.new
+user.save(validate: false)
+```
+
+:::caution
+It is generally not a good idea to skip validation that way. This technique should be used with caution!
+:::

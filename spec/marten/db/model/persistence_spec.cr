@@ -119,6 +119,12 @@ describe Marten::DB::Model::Persistence do
       object.persisted?.should be_true
     end
 
+    it "allows to save a new object by bypassing validations" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", last_name: "Doe", first_name: "")
+      object.save(validate: false).should be_true
+      object.persisted?.should be_true
+    end
+
     it "returns false if the new object is invalid" do
       object = TestUser.new(last_name: "Doe")
       object.save.should be_false
@@ -129,6 +135,12 @@ describe Marten::DB::Model::Persistence do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.username = "jd2"
       object.save.should be_true
+    end
+
+    it "allows to save an existing object by bypassing validations" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.first_name = ""
+      object.save(validate: false).should be_true
     end
 
     it "returns false if an existing object is invalid" do
@@ -211,6 +223,12 @@ describe Marten::DB::Model::Persistence do
       object.persisted?.should be_true
     end
 
+    it "allows to save a new object by bypassing validations" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", last_name: "Doe", first_name: "")
+      object.save!(validate: false).should be_true
+      object.persisted?.should be_true
+    end
+
     it "raises if the new object is invalid" do
       object = TestUser.new(last_name: "Doe")
       expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
@@ -221,6 +239,12 @@ describe Marten::DB::Model::Persistence do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.username = "jd2"
       object.save!.should be_true
+    end
+
+    it "allows to save an existing object by bypassing validations" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.first_name = ""
+      object.save!(validate: false).should be_true
     end
 
     it "raises if an existing object is invalid" do

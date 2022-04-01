@@ -93,10 +93,14 @@ module Marten
           "contains"    => "LIKE %s",
           "endswith"    => "LIKE %s",
           "exact"       => "= %s",
+          "gt"          => "> %s",
+          "gte"         => ">= %s",
           "icontains"   => "LIKE UPPER(%s)",
           "iendswith"   => "LIKE UPPER(%s)",
           "iexact"      => "LIKE UPPER(%s)",
           "istartswith" => "LIKE UPPER(%s)",
+          "lt"          => "< %s",
+          "lte"         => "<= %s",
           "startswith"  => "LIKE %s",
         }
       end

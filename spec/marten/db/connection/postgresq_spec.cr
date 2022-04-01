@@ -92,6 +92,16 @@ for_postgresql do
         conn.operator_for("exact").should eq "= %s"
       end
 
+      it "returns the expected operator for a gt predicate" do
+        conn = Marten::DB::Connection.default
+        conn.operator_for("gt").should eq "> %s"
+      end
+
+      it "returns the expected operator for a gte predicate" do
+        conn = Marten::DB::Connection.default
+        conn.operator_for("gte").should eq ">= %s"
+      end
+
       it "returns the expected operator for an icontains predicate" do
         conn = Marten::DB::Connection.default
         conn.operator_for("icontains").should eq "LIKE UPPER(%s)"
@@ -110,6 +120,16 @@ for_postgresql do
       it "returns the expected operator for an istartswith predicate" do
         conn = Marten::DB::Connection.default
         conn.operator_for("istartswith").should eq "LIKE UPPER(%s)"
+      end
+
+      it "returns the expected operator for a lt predicate" do
+        conn = Marten::DB::Connection.default
+        conn.operator_for("lt").should eq "< %s"
+      end
+
+      it "returns the expected operator for a lte predicate" do
+        conn = Marten::DB::Connection.default
+        conn.operator_for("lte").should eq "<= %s"
       end
 
       it "returns the expected operator for a startswith predicate" do

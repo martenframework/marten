@@ -88,10 +88,14 @@ module Marten
           "contains"    => "LIKE %s ESCAPE '\\'",
           "endswith"    => "LIKE %s ESCAPE '\\'",
           "exact"       => "= %s",
+          "gt"          => "> %s",
+          "gte"         => ">= %s",
           "icontains"   => "LIKE %s ESCAPE '\\'",
           "iendswith"   => "LIKE %s ESCAPE '\\'",
           "iexact"      => "LIKE %s ESCAPE '\\'",
           "istartswith" => "LIKE %s ESCAPE '\\'",
+          "lt"          => "< %s",
+          "lte"         => "<= %s",
           "startswith"  => "LIKE %s ESCAPE '\\'",
         }
 

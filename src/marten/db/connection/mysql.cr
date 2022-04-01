@@ -88,10 +88,14 @@ module Marten
           "contains"    => "LIKE BINARY %s",
           "endswith"    => "LIKE BINARY %s",
           "exact"       => "= %s",
+          "gt"          => "> %s",
+          "gte"         => ">= %s",
           "icontains"   => "LIKE %s",
           "iendswith"   => "LIKE %s",
           "iexact"      => "LIKE %s",
           "istartswith" => "LIKE %s",
+          "lt"          => "< %s",
+          "lte"         => "<= %s",
           "startswith"  => "LIKE BINARY %s",
         }
       end

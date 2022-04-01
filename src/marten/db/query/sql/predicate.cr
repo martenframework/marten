@@ -18,12 +18,16 @@ module Marten
           register Contains
           register EndsWith
           register Exact
+          register GreaterThan
+          register GreaterThanOrEqual
           register IContains
           register IEndsWith
           register IExact
           register In
           register IsNull
           register IStartsWith
+          register LessThan
+          register LessThanOrEqual
           register StartsWith
         end
       end

@@ -16,11 +16,21 @@ module Marten
         end
       end
 
+      # Returns the expected HTTP response for a rendered template content.
+      def get_response(content)
+        HTTP::Response.new(content)
+      end
+
       # Renders the configured template for a specific `context` object.
-      def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context)
+      def render_template(context : Hash | NamedTuple | Nil | Marten::Template::Context)
         template_context = Marten::Template::Context.from(context)
         template_context["view"] = self
-        HTTP::Response.new(Marten.templates.get_template(template_name).render(template_context))
+        Marten.templates.get_template(template_name).render(template_context)
+      end
+
+      # Renders the configured template for a specific `context` object and produces an HTTP response.
+      def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context)
+        get_response(render_template(context))
       end
 
       # Returns the template name that should be rendered by the view.

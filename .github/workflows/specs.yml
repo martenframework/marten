@@ -23,8 +23,8 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.3.2',
-          # 'nightly',
+          '1.4.0',
+          'nightly',
         ]
     container:
       image: crystallang/crystal:${{ matrix.crystal }}
@@ -70,8 +70,8 @@ jobs:
       matrix:
         db_version: ['10', '11', '12', 'latest']
         crystal: [
-          '1.3.2',
-          #'nightly',
+          '1.4.0',
+          'nightly',
         ]
     container:
       image: crystallang/crystal:${{ matrix.crystal }}
@@ -106,8 +106,8 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.3.2',
-          # 'nightly',
+          '1.4.0',
+          'nightly',
         ]
     container:
       image: crystallang/crystal:${{ matrix.crystal }}

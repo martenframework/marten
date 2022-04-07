@@ -286,7 +286,7 @@ module Marten
           def style(msg, fore = nil, mode = nil)
             output = msg.colorize.toggle(color)
             output.fore(fore) unless fore.nil?
-            output.mode(mode) unless mode.nil?
+            output.mode(Colorize::Mode.parse(mode.to_s)) unless mode.nil?
             output.to_s
           end
 

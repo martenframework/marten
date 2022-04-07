@@ -29,8 +29,8 @@ module Marten
         # Allows to configure the page size to use if records should be paginated.
         #
         # If the specified page size is `nil`, it means that records won't be paginated.
-        def page_size(page_size : Int | Nil)
-          @@page_size = page_size.try(&.to_i32)
+        def page_size(page_size : Int32 | Nil)
+          @@page_size = page_size
         end
       end
 

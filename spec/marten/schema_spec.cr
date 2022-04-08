@@ -1,6 +1,13 @@
 require "./spec_helper"
 
 describe Marten::Schema do
+  describe "::inherited" do
+    it "ensures that the schema inherits its parent fields" do
+      Marten::SchemaSpec::SubSchema.fields.size.should eq 4
+      Marten::SchemaSpec::SubSchema.fields.map(&.id).should eq(["foo", "bar", "number", "acknowledged"])
+    end
+  end
+
   describe "::get_field" do
     it "returns the field associated with an identifier string" do
       field = Marten::SchemaSpec::SimpleSchema.get_field("foo")
@@ -138,5 +145,10 @@ module Marten::SchemaSpec
   class SimpleSchema < Marten::Schema
     field :foo, :string
     field :bar, :string
+  end
+
+  class SubSchema < SimpleSchema
+    field :number, :int
+    field :acknowledged, :bool
   end
 end

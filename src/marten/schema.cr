@@ -20,6 +20,8 @@ module Marten
 
     macro inherited
       FIELDS_ = {} of Nil => Nil
+
+      _inherit_fields
     end
 
     # Allows to define a schema field.
@@ -131,6 +133,32 @@ module Marten
       end
 
       super
+    end
+
+    # :nodoc:
+    macro _inherit_fields
+      {% if @type.ancestors.first.has_constant?("FIELDS_") %}
+        {% for field_id, field_config in @type.ancestors.first.constant("FIELDS_") %}
+          {% FIELDS_[field_id] = field_config %}
+
+          {% field_klass = nil %}
+          {% field_ann = nil %}
+          {% for k in Marten::Schema::Field::Base.all_subclasses %}
+            {% ann = k.annotation(Marten::Schema::Field::Registration) %}
+            {% if ann && ann[:id] == field_config[:type] %}
+              {% field_klass = k %}
+              {% field_ann = ann %}
+            {% end %}
+          {% end %}
+
+          register_field(
+            {{ field_klass }}.new(
+              {{ field_id }},
+              {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% end %}
+            )
+          )
+        {% end %}
+      {% end %}
     end
   end
 end

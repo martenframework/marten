@@ -41,7 +41,11 @@ module.exports = {
       type: 'category',
       label: 'Views',
       link: {type: 'doc', id: 'views'},
-      items: ['views/introduction'],
+      items: [
+        'views/introduction',
+        'views/routing',
+        'views/generic-views',
+      ],
     },
     {
       type: 'category',

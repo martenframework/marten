@@ -271,6 +271,45 @@ describe Marten::DB::Model::Table do
     end
   end
 
+  describe "#set_field_values" do
+    it "allows to set the value of specific model instance fields from keyword arguments" do
+      tag = Tag.new(name: "crystal", is_active: false)
+      tag.set_field_values(name: "updated", is_active: true)
+      tag.name.should eq "updated"
+      tag.is_active.should be_true
+    end
+
+    it "allows to set the value of specific model instance fields from a hash" do
+      tag = Tag.new(name: "crystal", is_active: false)
+      tag.set_field_values({"name" => "updated", "is_active" => true})
+      tag.name.should eq "updated"
+      tag.is_active.should be_true
+    end
+
+    it "allows to set the value of specific model instance fields from a named tuple" do
+      tag = Tag.new(name: "crystal", is_active: false)
+      tag.set_field_values({name: "updated", is_active: true})
+      tag.name.should eq "updated"
+      tag.is_active.should be_true
+    end
+
+    it "raises if a field cannot be found" do
+      tag = Tag.new(name: "crystal")
+
+      expect_raises(Marten::DB::Errors::UnknownField) do
+        tag.set_field_values(name: "updated", unknown: "test")
+      end
+    end
+
+    it "raises if a value type is invalid for the considered field type" do
+      tag = Tag.new(name: "crystal")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        tag.set_field_values(name: 42, is_active: true)
+      end
+    end
+  end
+
   describe "#to_s" do
     it "returns the expected model instance representation" do
       tag = Tag.create!(name: "crystal", is_active: true)

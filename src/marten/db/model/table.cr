@@ -241,6 +241,21 @@ module Marten
           {% end %}
         end
 
+        # Allows to set the values of multiple fields.
+        #
+        # If one of the specified field names doesn't match any existing field, a `Marten::DB::Errors::UnknownField`
+        # exception will be raised.
+        def set_field_values(**values)
+          set_field_values(values)
+        end
+
+        # :ditto:
+        def set_field_values(values : Hash | NamedTuple)
+          sanitized_values = Hash(String, Field::Any | Model).new
+          values.each { |key, value| sanitized_values[key.to_s] = value }
+          assign_field_values(sanitized_values)
+        end
+
         def to_s(io)
           inspect(io)
         end

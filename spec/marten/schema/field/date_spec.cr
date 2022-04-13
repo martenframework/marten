@@ -78,6 +78,11 @@ describe Marten::Schema::Field::Date do
       field = Marten::Schema::Field::Date.new("test_field")
       field.serialize(nil).should be_nil
     end
+
+    it "returns the string version of other values" do
+      field = Marten::Schema::Field::Date.new("test_field")
+      field.serialize(42).should eq "42"
+    end
   end
 
   describe "#perform_validation" do

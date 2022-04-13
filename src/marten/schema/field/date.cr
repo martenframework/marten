@@ -21,7 +21,12 @@ module Marten
         end
 
         def serialize(value) : ::String?
-          value.try { |v| v.to_s("%F") }
+          case value
+          when ::Time
+            value.to_s("%F")
+          else
+            value.try(&.to_s)
+          end
         end
 
         private def fetch_date_format(index)

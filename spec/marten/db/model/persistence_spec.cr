@@ -159,7 +159,7 @@ describe Marten::DB::Model::Persistence do
         Marten::DB::Errors::UnmetSaveCondition,
         "Save is prohibited because related object 'updated_by' is not persisted"
       ) do
-        post.save!
+        post.save
       end
     end
 
@@ -293,6 +293,272 @@ describe Marten::DB::Model::Persistence do
     it "does not run before_update and after_update callbacks for new records" do
       obj = Marten::DB::Model::PersistenceSpec::Record.new
       obj.save!
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+    end
+  end
+
+  describe "#update" do
+    it "allows to save a new object" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update(username: "test1", email: "test1@example.com").should be_true
+
+      object.persisted?.should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to save a new object with attributes expressed as a hash" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update({"username" => "test1", "email" => "test1@example.com"}).should be_true
+
+      object.persisted?.should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to save a new object with attributes expressed as a named tuple" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update({username: "test1", email: "test1@example.com"}).should be_true
+
+      object.persisted?.should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "returns false if the new object is invalid" do
+      object = TestUser.new(last_name: "Doe")
+      object.update(username: nil).should be_false
+      object.persisted?.should be_false
+    end
+
+    it "allows to update an existing object" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update(username: "test1", email: "test1@example.com").should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to update an existing object with attributes expressed as a hash" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update({"username" => "test1", "email" => "test1@example.com"}).should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to update an existing object with attributes expressed as a named tuple" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update({username: "test1", email: "test1@example.com"}).should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "returns false if an existing object is invalid" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update(username: nil).should be_false
+      object.reload.username.should eq "jd"
+    end
+
+    it "raises if an optional related object is not persisted" do
+      existing_user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      new_user = TestUser.new
+
+      post = Post.new(author: existing_user, updated_by: new_user, title: "Test")
+
+      expect_raises(
+        Marten::DB::Errors::UnmetSaveCondition,
+        "Save is prohibited because related object 'updated_by' is not persisted"
+      ) do
+        post.update(title: "Updated")
+      end
+    end
+
+    it "runs before_create and after_create callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_create_track.should eq "unset"
+      obj.after_create_track.should eq "unset"
+
+      obj.update(name: "updated")
+
+      obj.before_create_track.should eq "before_create"
+      obj.after_create_track.should eq "after_create"
+    end
+
+    it "runs before_save and after_save callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_save_track.should eq "unset"
+      obj.after_save_track.should eq "unset"
+
+      obj.update(name: "updated")
+
+      obj.before_save_track.should eq "before_save"
+      obj.after_save_track.should eq "after_save"
+    end
+
+    it "runs before_update and after_update callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+
+      obj.update(name: "updated")
+
+      obj.before_update_track.should eq "before_update"
+      obj.after_update_track.should eq "after_update"
+    end
+
+    it "does not run before_update and after_update callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.update(name: "updated")
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+    end
+  end
+
+  describe "#update!" do
+    it "allows to save a new object" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update!(username: "test1", email: "test1@example.com").should be_true
+
+      object.persisted?.should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to save a new object with attributes expressed as a hash" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update!({"username" => "test1", "email" => "test1@example.com"}).should be_true
+
+      object.persisted?.should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to save a new object with attributes expressed as a named tuple" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update!({username: "test1", email: "test1@example.com"}).should be_true
+
+      object.persisted?.should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "raises if the new object is invalid" do
+      object = TestUser.new(last_name: "Doe")
+      expect_raises(Marten::DB::Errors::InvalidRecord) { object.update!(username: nil) }
+      object.persisted?.should be_false
+    end
+
+    it "allows to update an existing object" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update!(username: "test1", email: "test1@example.com").should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to update an existing object with attributes expressed as a hash" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update!({"username" => "test1", "email" => "test1@example.com"}).should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "allows to update an existing object with attributes expressed as a named tuple" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.update!({username: "test1", email: "test1@example.com"}).should be_true
+
+      object.reload
+      object.username.should eq "test1"
+      object.email.should eq "test1@example.com"
+    end
+
+    it "raises if an existing object is invalid" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      expect_raises(Marten::DB::Errors::InvalidRecord) { object.update!(username: nil) }
+      object.reload.username.should eq "jd"
+    end
+
+    it "raises if an optional related object is not persisted" do
+      existing_user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      new_user = TestUser.new
+
+      post = Post.new(author: existing_user, updated_by: new_user, title: "Test")
+
+      expect_raises(
+        Marten::DB::Errors::UnmetSaveCondition,
+        "Save is prohibited because related object 'updated_by' is not persisted"
+      ) do
+        post.update!(title: "Updated")
+      end
+    end
+
+    it "runs before_create and after_create callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_create_track.should eq "unset"
+      obj.after_create_track.should eq "unset"
+
+      obj.update!(name: "updated")
+
+      obj.before_create_track.should eq "before_create"
+      obj.after_create_track.should eq "after_create"
+    end
+
+    it "runs before_save and after_save callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.before_save_track.should eq "unset"
+      obj.after_save_track.should eq "unset"
+
+      obj.update!(name: "updated")
+
+      obj.before_save_track.should eq "before_save"
+      obj.after_save_track.should eq "after_save"
+    end
+
+    it "runs before_update and after_update callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.before_update_track.should eq "unset"
+      obj.after_update_track.should eq "unset"
+
+      obj.update!(name: "updated")
+
+      obj.before_update_track.should eq "before_update"
+      obj.after_update_track.should eq "after_update"
+    end
+
+    it "does not run before_update and after_update callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.update!(name: "updated")
 
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"

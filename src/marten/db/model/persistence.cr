@@ -155,6 +155,36 @@ module Marten
           save(using: using, validate: validate) || (raise Errors::InvalidRecord.new("Record is invalid"))
         end
 
+        # Updates the model instance.
+        #
+        # This method updates the passed field values and then saves the record. This method returns `true` if the model
+        # instance is valid and was created / updated successfully. Otherwise it returns `false` if the model instance
+        # validation fails.
+        def update(**values)
+          update(values)
+        end
+
+        # :ditto:
+        def update(values : Hash | NamedTuple)
+          set_field_values(values)
+          save
+        end
+
+        # Updates the model instance.
+        #
+        # This method updates the passed field values and then saves the record. This method returns `true` if the model
+        # instance is valid and was created / updated successfully. Otherwise it raises a
+        # `Marten::DB::Errors::InvalidRecord` exception if the model instance validation fails.
+        def update!(**values)
+          update!(values)
+        end
+
+        # :ditto:
+        def update!(values : Hash | NamedTuple)
+          set_field_values(values)
+          save!
+        end
+
         protected setter new_record
 
         private def insert_or_update(connection)

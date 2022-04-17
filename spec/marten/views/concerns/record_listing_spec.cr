@@ -270,7 +270,7 @@ module Marten::Views::RecordListingSpec
     include Marten::Views::RecordListing
 
     model TestUser
-    ordering "-created_at"
+    ordering "-username"
   end
 
   class TestViewWithoutConfiguration < Marten::View

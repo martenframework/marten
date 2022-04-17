@@ -28,7 +28,7 @@ module Marten
 
       # Returns the field value.
       def value
-        schema.data[id]?
+        schema.data[id]? || schema.initial[id]?
       end
     end
   end

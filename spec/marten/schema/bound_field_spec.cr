@@ -99,6 +99,17 @@ describe Marten::Schema::BoundField do
       bound_field.value.should eq "hello"
     end
 
+    it "fallbacks to the initial value if there is one" do
+      schema = Marten::Schema::BoundFieldSpec::TestSchema.new(
+        data: Marten::HTTP::Params::Data.new,
+        initial: Marten::Schema::DataHash{"foo" => "hello"}
+      )
+
+      bound_field = Marten::Schema::BoundField.new(schema, schema.class.get_field("foo"))
+
+      bound_field.value.should eq "hello"
+    end
+
     it "returns nil if there is no field value" do
       schema = Marten::Schema::BoundFieldSpec::TestSchema.new(
         Marten::HTTP::Params::Data{"foo" => ["hello"]}

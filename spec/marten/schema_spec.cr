@@ -117,6 +117,14 @@ describe Marten::Schema do
       schema.get_field_value(:bar).should be_nil
     end
 
+    it "returns the initial value associated with a given field if no value is found in the current data" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(
+        data: Marten::HTTP::Params::Data.new,
+        initial: Marten::Schema::DataHash{"foo" => "hello"}
+      )
+      schema.get_field_value("foo").should eq "hello"
+    end
+
     it "raises if the field cannot be found" do
       schema = Marten::SchemaSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
       expect_raises(Marten::Schema::Errors::UnknownField) { schema.get_field_value("unknown") }

@@ -9,7 +9,10 @@ module Marten
     include Core::Validation
 
     # :nodoc:
-    alias DataHash = HTTP::Params::Data | HTTP::Params::Query
+    alias DataHash = Hash(String, Field::Any | Nil | HTTP::UploadedFile)
+
+    # :nodoc:
+    alias AnyDataHash = DataHash | HTTP::Params::Data | HTTP::Params::Query
 
     @@fields : Hash(String, Field::Base) = {} of String => Field::Base
 
@@ -88,7 +91,7 @@ module Marten
       @@fields[field.id] = field
     end
 
-    def initialize(@data : DataHash)
+    def initialize(@data : AnyDataHash, @initial : AnyDataHash = DataHash.new)
     end
 
     # Returns the bound field associated with the passed field name or raises if the field is not present.
@@ -109,10 +112,11 @@ module Marten
     # match any existing field, a `Marten::Schema::Errors::UnknownField` exception is raised.
     def get_field_value(field_name : String | Symbol)
       field = self.class.get_field(field_name)
-      @data[field.id]?
+      @data[field.id]? || @initial[field.id]?
     end
 
     protected getter data
+    protected getter initial
 
     private def bound_fields
       @bound_fields ||= begin

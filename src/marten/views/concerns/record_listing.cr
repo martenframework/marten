@@ -12,6 +12,9 @@ module Marten
         # Returns the page size to use if records should be paginated.
         class_getter page_size : Int32 | Nil
 
+        # Returns the array of fields to use to order the records.
+        class_getter ordering : Array(String) | Nil
+
         extend Marten::Views::RecordListing::ClassMethods
       end
 
@@ -32,6 +35,24 @@ module Marten
         def page_size(page_size : Int32 | Nil)
           @@page_size = page_size
         end
+
+        # Allows to configure the list of fields to use to order the records.
+        def ordering(*fields : String | Symbol)
+          @@ordering = fields.map(&.to_s).to_a
+        end
+
+        # Allows to configure the list of fields to use to order the records.
+        def ordering(fields : Array(String | Symbol))
+          @@ordering = fields.map(&.to_s)
+        end
+      end
+
+      # Returns the model used to list the records.
+      def model : Model.class
+        self.class.model || raise Errors::ImproperlyConfigured.new(
+          "'#{self.class.name}' must define a model class via the '::model' class method method or by overriding the " \
+          "'#model' method"
+        )
       end
 
       # Returns a page resulting from the pagination of the queryset for the current page.
@@ -49,7 +70,11 @@ module Marten
 
       # Returns the queryset used to retrieve the record displayed by the view.
       def queryset
-        self.class.model.not_nil!.all
+        if ordering = self.class.ordering
+          model.all.order(ordering)
+        else
+          model.all
+        end
       end
     end
   end

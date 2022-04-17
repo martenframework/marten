@@ -225,6 +225,35 @@ describe Marten::Views::RecordListing do
 
       view.queryset.to_a.should eq [user_1, user_2]
     end
+
+    it "uses the configured ordering" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::RecordListingSpec::TestViewWithOrdering.new(request)
+
+      view.queryset.to_a.should eq [user_2, user_1]
+    end
+
+    it "raises as expected if the model is not configured" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::RecordListingSpec::TestViewWithoutConfiguration.new(request)
+
+      expect_raises(Marten::Views::Errors::ImproperlyConfigured) { view.queryset }
+    end
   end
 end
 
@@ -235,6 +264,13 @@ module Marten::Views::RecordListingSpec
     model TestUser
     page_number_param "p"
     page_size 2
+  end
+
+  class TestViewWithOrdering < Marten::View
+    include Marten::Views::RecordListing
+
+    model TestUser
+    ordering "-created_at"
   end
 
   class TestViewWithoutConfiguration < Marten::View

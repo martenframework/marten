@@ -40,9 +40,17 @@ module Marten
         end
       end
 
+      # Returns the model used to retrieve the record.
+      def model : Model.class
+        self.class.model || raise Errors::ImproperlyConfigured.new(
+          "'#{self.class.name}' must define a model class via the '::model' class method method or by overriding the " \
+          "'#model' method"
+        )
+      end
+
       # Returns the queryset used to retrieve the record displayed by the view.
       def queryset
-        self.class.model.not_nil!.all
+        model.all
       end
 
       # Returns the record that will be exposed by the view.

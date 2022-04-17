@@ -85,6 +85,20 @@ describe Marten::Views::RecordRetrieving do
       view.record.should eq user_1
     end
 
+    it "raises as expected if the model is not configured" do
+      params = Hash(String, Marten::Routing::Parameter::Types){"identifier" => 42}
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::RecordRetrievingSpec::TestViewWithoutConfiguration.new(request, params)
+
+      expect_raises(Marten::Views::Errors::ImproperlyConfigured) { view.record }
+    end
+
     it "raises the expected exceptions when the record does not exist" do
       TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")

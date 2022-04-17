@@ -106,9 +106,13 @@ module Marten
           end
 
           def order(*fields : String) : Nil
+            order(fields.to_a)
+          end
+
+          def order(fields : Array(String | Symbol)) : Nil
             order_clauses = [] of {String, Bool}
 
-            fields.each do |raw_field|
+            fields.map(&.to_s).each do |raw_field|
               reversed = raw_field.starts_with?('-')
               raw_field = raw_field[1..] if reversed
 

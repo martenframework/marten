@@ -508,8 +508,22 @@ module Marten
         #
         # In the above example, records would be ordered by descending publication date, and then by title (ascending).
         def order(*fields : String | Symbol)
+          order(fields.to_a)
+        end
+
+        # Allows to specify the ordering in which records should be returned when evaluating the query set.
+        #
+        # Multiple fields can be specified in order to define the final ordering. For example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.order(["-published_at", "title"])
+        # ```
+        #
+        # In the above example, records would be ordered by descending publication date, and then by title (ascending).
+        def order(fields : Array(String | Symbol))
           qs = clone
-          qs.query.order(*fields.map(&.to_s))
+          qs.query.order(fields.map(&.to_s))
           qs
         end
 

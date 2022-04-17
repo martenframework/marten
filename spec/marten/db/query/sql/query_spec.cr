@@ -615,6 +615,28 @@ describe Marten::DB::Query::SQL::Query do
       query.order("author__first_name")
       query.execute.should eq [post_2, post_3, post_1]
     end
+
+    it "can order from an array of strings" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Foo", last_name: "Bar")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Bob", last_name: "Ka")
+      user_4 = TestUser.create!(username: "u4", email: "u4@example.com", first_name: "John", last_name: "Arg")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.order(["first_name", "last_name"])
+      query.execute.should eq [user_3, user_2, user_4, user_1]
+    end
+
+    it "can order from an array of symbols" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Foo", last_name: "Bar")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Bob", last_name: "Ka")
+      user_4 = TestUser.create!(username: "u4", email: "u4@example.com", first_name: "John", last_name: "Arg")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.order([:first_name, :last_name])
+      query.execute.should eq [user_3, user_2, user_4, user_1]
+    end
   end
 
   describe "#ordered?" do

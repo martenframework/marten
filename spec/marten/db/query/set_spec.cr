@@ -1343,6 +1343,26 @@ describe Marten::DB::Query::Set do
 
       qset.order(:first_name, :last_name).to_a.should eq [user_3, user_2, user_1]
     end
+
+    it "allows to order from an array of strings" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.order(["first_name", "last_name"]).to_a.should eq [user_3, user_2, user_1]
+    end
+
+    it "allows to order from an array of symbols" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.order([:first_name, :last_name]).to_a.should eq [user_3, user_2, user_1]
+    end
   end
 
   describe "#paginator" do

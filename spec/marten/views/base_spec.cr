@@ -474,6 +474,38 @@ describe Marten::Views::Base do
     end
   end
 
+  describe "#redirect" do
+    it "returns an 302 Found HTTP response for a specific location by default" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::BaseSpec::Test1View.new(request)
+
+      response = view.redirect("https://example.com")
+      response.should be_a Marten::HTTP::Response::Found
+      response.headers.should eq(Marten::HTTP::Headers{"Location" => "https://example.com"})
+    end
+
+    it "returns an 301 Moved Permanently HTTP response for a specific location if permanent is set to true" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      view = Marten::Views::BaseSpec::Test1View.new(request)
+
+      response = view.redirect("https://example.com", permanent: true)
+      response.should be_a Marten::HTTP::Response::MovedPermanently
+      response.headers.should eq(Marten::HTTP::Headers{"Location" => "https://example.com"})
+    end
+  end
+
   describe "#response" do
     it "returns nil if the view was not dispatched yet" do
       request = Marten::HTTP::Request.new(

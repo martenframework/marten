@@ -139,6 +139,14 @@ module Marten
         after_callbacks_response || response!
       end
 
+      # Returns a redirect HTTP response for a specific `url`.
+      #
+      # By default, the HTTP response returned will be a "302 Found", unless the `permanent` argument is set to `true`
+      # (in which case the response will be a "301 Moved Permanently").
+      def redirect(url : String, permanent = false)
+        permanent ? HTTP::Response::MovedPermanently.new(url) : HTTP::Response::Found.new(url)
+      end
+
       # Returns an HTTP response generated from a content string, content type and status code.
       def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status = 200)
         HTTP::Response.new(content: content, content_type: content_type, status: status)

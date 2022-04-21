@@ -76,6 +76,34 @@ describe Marten::Schema::BoundField do
     end
   end
 
+  describe "#required?" do
+    it "returns true if the field is required" do
+      schema = Marten::Schema::BoundFieldSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"foo" => ["hello"]}
+      )
+
+      bound_field = Marten::Schema::BoundField.new(
+        schema,
+        Marten::Schema::Field::String.new("test_field", required: true)
+      )
+
+      bound_field.required?.should be_true
+    end
+
+    it "returns false if the field is not required" do
+      schema = Marten::Schema::BoundFieldSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"foo" => ["hello"]}
+      )
+
+      bound_field = Marten::Schema::BoundField.new(
+        schema,
+        Marten::Schema::Field::String.new("test_field", required: false)
+      )
+
+      bound_field.required?.should be_false
+    end
+  end
+
   describe "#schema" do
     it "returns the associated schema" do
       schema = Marten::Schema::BoundFieldSpec::TestSchema.new(

@@ -13,9 +13,6 @@ module Marten
       def initialize(@schema : Schema, @field : Field::Base)
       end
 
-      # Returns the field identifier.
-      delegate id, to: field
-
       # Returns `true` if the field is errored.
       def errored?
         !schema.errors[field.id].empty?
@@ -30,6 +27,12 @@ module Marten
       def value
         schema.data[id]? || schema.initial[id]?
       end
+
+      # Returns the field identifier.
+      delegate id, to: field
+
+      # Returns `true` if the field is required.
+      delegate required?, to: field
     end
   end
 end

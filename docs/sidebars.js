@@ -67,6 +67,13 @@ module.exports = {
       items: [
         'development/settings',
         'development/applications',
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'development/reference/settings',
+          ],
+        },
       ],
     },
   ],

@@ -45,6 +45,7 @@ module.exports = {
         'views/introduction',
         'views/routing',
         'views/generic-views',
+        'views/error-views',
       ],
     },
     {
@@ -63,7 +64,10 @@ module.exports = {
       type: 'category',
       label: 'Development',
       link: {type: 'doc', id: 'development'},
-      items: ['development/applications'],
+      items: [
+        'development/settings',
+        'development/applications',
+      ],
     },
   ],
 };

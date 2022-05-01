@@ -129,11 +129,13 @@ module Marten
               statements << "DELETE FROM #{table_name}"
             end
 
-            # Add a statement to reset table sequences.
-            statements << build_sql do |s|
-              s << "UPDATE #{quote("sqlite_sequence")}"
-              s << "SET #{quote("seq")} = 0"
-              s << "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
+            # Add a statement to reset table sequences if the sqlite_sequence table exists.
+            if sqlite_sequence?
+              statements << build_sql do |s|
+                s << "UPDATE #{quote("sqlite_sequence")}"
+                s << "SET #{quote("seq")} = 0"
+                s << "WHERE #{quote("name")} IN (#{table_names.join(", ")})"
+              end
             end
 
             statements
@@ -220,6 +222,22 @@ module Marten
 
           private def rename_table_statement(old_name : String, new_name : String) : String
             "ALTER TABLE #{quote(old_name)} RENAME TO #{quote(new_name)}"
+          end
+
+          private def sqlite_sequence?
+            result = @connection.open do |db|
+              db.scalar(
+                build_sql do |s|
+                  s << "SELECT EXISTS("
+                  s << "SELECT 1"
+                  s << "FROM #{quote("sqlite_master")}"
+                  s << "WHERE #{quote("name")} = #{quote("sqlite_sequence")}"
+                  s << ")"
+                end
+              )
+            end
+
+            ["1", "t", "true"].includes?(result.to_s)
           end
 
           private def with_remade_table(table)

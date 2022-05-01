@@ -17,8 +17,8 @@ describe Marten::DB::Management::Migrations::Runner do
 
     introspector = Marten::DB::Connection.default.introspector
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
-      schema_editor.delete_table("foo_tags") if introspector.table_names.includes?("foo_tags")
-      schema_editor.delete_table("bar_tags") if introspector.table_names.includes?("bar_tags")
+      schema_editor.delete_table("runner_spec_foo_tags") if introspector.table_names.includes?("runner_spec_foo_tags")
+      schema_editor.delete_table("runner_spec_bar_tags") if introspector.table_names.includes?("runner_spec_bar_tags")
     end
 
     # Reset local migration app configs to avoid them to be used elsewhere.
@@ -34,8 +34,8 @@ describe Marten::DB::Management::Migrations::Runner do
 
     introspector = Marten::DB::Connection.default.introspector
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
-      schema_editor.delete_table("foo_tags") if introspector.table_names.includes?("foo_tags")
-      schema_editor.delete_table("bar_tags") if introspector.table_names.includes?("bar_tags")
+      schema_editor.delete_table("runner_spec_foo_tags") if introspector.table_names.includes?("runner_spec_foo_tags")
+      schema_editor.delete_table("runner_spec_bar_tags") if introspector.table_names.includes?("runner_spec_bar_tags")
     end
   end
 
@@ -61,12 +61,12 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("foo_tags").should be_true
-      columns_details = introspector.columns_details("foo_tags")
+      introspector.table_names.includes?("runner_spec_foo_tags").should be_true
+      columns_details = introspector.columns_details("runner_spec_foo_tags")
       columns_details.map(&.name).sort!.should eq ["active", "id", "label"]
 
-      introspector.table_names.includes?("bar_tags").should be_true
-      columns_details = introspector.columns_details("bar_tags")
+      introspector.table_names.includes?("runner_spec_bar_tags").should be_true
+      columns_details = introspector.columns_details("runner_spec_bar_tags")
       columns_details.map(&.name).sort!.should eq ["active", "id", "label"]
     end
 
@@ -86,8 +86,8 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("bar_tags").should be_true
-      columns_details = introspector.columns_details("bar_tags")
+      introspector.table_names.includes?("runner_spec_bar_tags").should be_true
+      columns_details = introspector.columns_details("runner_spec_bar_tags")
       columns_details.map(&.name).sort!.should eq ["id", "label"]
     end
 
@@ -112,8 +112,8 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("foo_tags").should be_false
-      introspector.table_names.includes?("bar_tags").should be_false
+      introspector.table_names.includes?("runner_spec_foo_tags").should be_false
+      introspector.table_names.includes?("runner_spec_bar_tags").should be_false
     end
 
     it "is able to fake a specific migration forward" do
@@ -133,7 +133,7 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("bar_tags").should be_false
+      introspector.table_names.includes?("runner_spec_bar_tags").should be_false
     end
 
     it "marks replacement migrations as applied if the replaced migrations were applied during the runner execution" do
@@ -147,7 +147,7 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("foo_tags").should be_true
+      introspector.table_names.includes?("runner_spec_foo_tags").should be_true
     end
 
     it "marks replacement migrations as applied if the replaced migrations were applied before the runner execution" do
@@ -191,7 +191,7 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("bar_tags").should be_false
+      introspector.table_names.includes?("runner_spec_bar_tags").should be_false
     end
 
     it "is able to unapply the migrations of a specific app up to a specific version" do
@@ -212,8 +212,8 @@ describe Marten::DB::Management::Migrations::Runner do
 
       introspector = Marten::DB::Connection.default.introspector
 
-      introspector.table_names.includes?("bar_tags").should be_true
-      columns_details = introspector.columns_details("bar_tags")
+      introspector.table_names.includes?("runner_spec_bar_tags").should be_true
+      columns_details = introspector.columns_details("runner_spec_bar_tags")
       columns_details.map(&.name).sort!.should eq ["id", "label"]
     end
   end

@@ -1,6 +1,5 @@
 require "colorize"
 require "ecr"
-require "file_utils"
 require "option_parser"
 
 require "./cli/**"

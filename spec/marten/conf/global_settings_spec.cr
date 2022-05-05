@@ -241,6 +241,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#media_files" do
+    it "returns the media files configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.media_files.should be_a Marten::Conf::GlobalSettings::MediaFiles
+    end
+  end
+
   describe "#port" do
     it "returns 8000 by default" do
       global_settings = Marten::Conf::GlobalSettings.new

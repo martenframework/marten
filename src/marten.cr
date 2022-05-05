@@ -4,6 +4,7 @@ require "db"
 require "crypto/subtle"
 require "digest/md5"
 require "ecr/macros"
+require "file_utils"
 require "html"
 require "http"
 require "i18n"
@@ -38,6 +39,7 @@ module Marten
   Log = ::Log.for("marten")
 
   @@apps : Apps::Registry?
+  @@media_files_storage : Core::Storage::Base?
   @@env : Conf::Env?
   @@routes : Routing::Map?
   @@settings : Conf::GlobalSettings?
@@ -59,6 +61,10 @@ module Marten
     @@env ||= Conf::Env.new
   end
 
+  def self.media_files_storage
+    @@media_files_storage.not_nil!
+  end
+
   def self.routes
     @@routes ||= Routing::Map.new
   end
@@ -78,6 +84,7 @@ module Marten
     setup_settings
     setup_apps
     setup_assets
+    setup_media_files
     setup_templates
     setup_i18n
   end
@@ -105,6 +112,14 @@ module Marten
     assets.manifests = settings.assets.manifests
 
     assets.finders = finders
+  end
+
+  # :nodoc:
+  def self.setup_media_files : Nil
+    @@media_files_storage = (
+      settings.media_files.storage ||
+      Core::Storage::FileSystem.new(root: settings.media_files.root, base_url: settings.media_files.url)
+    )
   end
 
   # :nodoc:

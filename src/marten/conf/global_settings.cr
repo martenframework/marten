@@ -209,6 +209,11 @@ module Marten
         @log_backend = log_backend
       end
 
+      # Provides access to media files settings.
+      def media_files
+        @media_files ||= GlobalSettings::MediaFiles.new
+      end
+
       # Allows to define the list of middlewares used by the application.
       def middleware=(v)
         @middleware = Array(Marten::Middleware.class).new

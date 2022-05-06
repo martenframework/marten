@@ -39,6 +39,7 @@ module Marten
       register "trans", Translate
       register "t", Translate
       register "url", Url
+      register "verbatim", Verbatim
     end
   end
 end

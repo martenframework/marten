@@ -117,6 +117,22 @@ module Marten
         HTTP::Response.new(content: "", content_type: "", status: status)
       end
 
+      # Returns an HTTP response containing the passed raw JSON string.
+      #
+      # The response will use the `application/json` content type and the `200` status code (the latest can be set to
+      # something else through the use of the `status` argument).
+      def json(raw_json : String, status = 200)
+        HTTP::Response.new(content: raw_json, content_type: "application/json", status: status)
+      end
+
+      # Returns an HTTP response containing the passed object serialized as JSON.
+      #
+      # The response will use the `application/json` content type and the `200` status code (the latest can be set to
+      # something else through the use of the `status` argument).
+      def json(serializable, status = 200)
+        HTTP::Response.new(content: serializable.to_json, content_type: "application/json", status: status)
+      end
+
       # Handles an `OPTIONS` HTTP request and returns a `Marten::HTTP::Response` object.
       #
       # The default implementation will return an HTTP response that includes an `Allow` header populated from the

@@ -384,6 +384,85 @@ describe Marten::Views::Base do
     end
   end
 
+  describe "#json" do
+    context "with a raw JSON string" do
+      it "returns the expected HTTP response" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        view = Marten::Views::BaseSpec::Test1View.new(request)
+        response = view.json({foo: "bar"}.to_json)
+
+        response.content_type.should eq "application/json"
+        response.status.should eq 200
+        response.content.should eq({foo: "bar"}.to_json)
+      end
+
+      it "allows to customize the status code" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        view = Marten::Views::BaseSpec::Test1View.new(request)
+        response = view.json({foo: "bar"}.to_json, status: 404)
+
+        response.content_type.should eq "application/json"
+        response.status.should eq 404
+        response.content.should eq({foo: "bar"}.to_json)
+      end
+    end
+
+    context "a serializable object" do
+      it "returns the expected HTTP response" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        view = Marten::Views::BaseSpec::Test1View.new(request)
+
+        response_1 = view.json({"foo" => "bar"})
+        response_1.content_type.should eq "application/json"
+        response_1.status.should eq 200
+        response_1.content.should eq({"foo" => "bar"}.to_json)
+
+        response_2 = view.json({foo: "bar"})
+        response_2.content_type.should eq "application/json"
+        response_2.status.should eq 200
+        response_2.content.should eq({foo: "bar"}.to_json)
+      end
+
+      it "allows to customize the status code" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        view = Marten::Views::BaseSpec::Test1View.new(request)
+        response = view.json({foo: "bar"}, status: 404)
+
+        response.content_type.should eq "application/json"
+        response.status.should eq 404
+        response.content.should eq({foo: "bar"}.to_json)
+      end
+    end
+  end
+
   describe "#process_dispatch" do
     it "runs before_dispatch and after_dispatch callbacks as expected" do
       request = Marten::HTTP::Request.new(

@@ -141,6 +141,16 @@ Unless explicitly specified, `permanent` will automatically be set to `false`.
 head(404)
 ```
 
+#### `json`
+
+`json` allows to forge an HTTP response with the `application/json` content type. It can be used with a raw JSON string, or any serializable object:
+
+```crystal
+json({ foo: "bar" }, status: 200)
+```
+
+Unless specified, the `status` is set to `200`.
+
 ### Callbacks
 
 Callbacks let you define logic that is triggered before or after a view's dispatch flow. This allows you to easily intercept the incoming request and completely bypass the execution of the regular `#dispatch` method for example. Two callbacks are supported: `before_dispatch` and `after_dispatch`.

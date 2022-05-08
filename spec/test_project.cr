@@ -69,6 +69,7 @@ Marten.configure :test do |config|
   ]
 
   config.assets.root = "spec/assets"
+  config.media_files.root = "spec/media"
 end
 
 Marten.routes.draw do

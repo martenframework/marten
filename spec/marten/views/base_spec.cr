@@ -596,6 +596,127 @@ describe Marten::Views::Base do
     end
   end
 
+  describe "#render" do
+    it "returns an HTTP response containing the template rendered using a specific context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/test.html", context: {name: "John Doe"})
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "is able to render the template using a named tuple context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/test.html", context: {name: "John Doe"})
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "is able to render the template using a hash context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/test.html", context: {"name" => "John Doe"})
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "is able to render the template using a context object" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/test.html", context: Marten::Template::Context{"name" => "John Doe"})
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "includes the view in the context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/view.html")
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq HTML.escape(view.to_s)
+    end
+
+    it "allows to specify a specific status code" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/test.html", context: {name: "John Doe"}, status: 404)
+
+      response.status.should eq 404
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "allows to specify a specific content type" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      view = Marten::Views::BaseSpec::Test5View.new(request)
+      response = view.render("specs/views/base/test.html", context: {name: "John Doe"}, content_type: "text/plain")
+
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+  end
+
   describe "#respond" do
     it "returns an HTTP response with an associated content and content type" do
       request = Marten::HTTP::Request.new(

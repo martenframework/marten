@@ -4,17 +4,18 @@ module Marten
       module Development
         class ServeMediaFile < Base
           def get
-            media_file_fullpath = File.join(Marten.settings.media_files.root, params["path"].as(String))
-            return head 404 if Dir.exists?(media_file_fullpath)
+            filepath = params["path"].as(String)
+            return head 404 if !Marten.media_files_storage.exists?(filepath)
 
             content_type = begin
-              MIME.from_filename(media_file_fullpath)
+              MIME.from_filename(filepath)
             rescue KeyError
               "application/octet-stream"
             end
 
-            respond content: File.read(media_file_fullpath), content_type: content_type
-          rescue File::NotFoundError
+            file_io = Marten.media_files_storage.open(filepath)
+            respond content: file_io.gets_to_end, content_type: content_type
+          rescue IO::Error
             head 404
           end
         end

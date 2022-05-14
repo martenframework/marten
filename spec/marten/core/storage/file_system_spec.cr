@@ -4,7 +4,7 @@ describe Marten::Core::Storage::FileSystem do
   describe "#exists" do
     it "returns true if a file associated with the passed file path exists" do
       storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
-      storage.save("css/app.css", IO::Memory.new("html { background: white; }"))
+      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
       storage.exists?("css/app.css").should be_true
     end
 
@@ -17,7 +17,7 @@ describe Marten::Core::Storage::FileSystem do
   describe "#open" do
     it "returns an IO corresponding to the passed file path" do
       storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
-      storage.save("css/app.css", IO::Memory.new("html { background: white; }"))
+      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
       io = storage.open("css/app.css")
       io.should be_a File
       io.gets.should eq "html { background: white; }"
@@ -34,7 +34,7 @@ describe Marten::Core::Storage::FileSystem do
   describe "#save" do
     it "copy the content of the passed IO object to the destination path" do
       storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
-      storage.save("css/app.css", IO::Memory.new("html { background: white; }"))
+      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
       File.read("/tmp/css/app.css").should eq "html { background: white; }"
     end
   end

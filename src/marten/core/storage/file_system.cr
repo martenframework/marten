@@ -16,7 +16,11 @@ module Marten
           raise Errors::FileNotFound.new("File '#{filepath}' cannot be found")
         end
 
-        def save(filepath : String, content : IO) : Nil
+        def url(filepath : String) : String
+          File.join(base_url, URI.encode_path(filepath))
+        end
+
+        def write(filepath : String, content : IO) : Nil
           new_path = path(filepath)
 
           FileUtils.mkdir_p(Path[new_path].dirname)
@@ -24,10 +28,6 @@ module Marten
           File.open(new_path, "wb") do |new_file|
             IO.copy(content, new_file)
           end
-        end
-
-        def url(filepath : String) : String
-          File.join(base_url, URI.encode_path(filepath))
         end
 
         private getter root

@@ -11,11 +11,11 @@ module Marten
         # Raises `Marten::Core::Storage::Errors::FileNotFound` if the file does not exist.
         abstract def open(filepath : String) : IO
 
-        # Saves a file content into the storage.
-        abstract def save(filepath : String, content : IO) : Nil
-
         # Returns the URL associated with the passed file name or file path.
         abstract def url(filepath : String) : String
+
+        # Write a file's content into the storage.
+        abstract def write(filepath : String, content : IO) : Nil
       end
     end
   end

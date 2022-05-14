@@ -47,7 +47,7 @@ module Marten
           private def copy_asset_file(relative_path, absolute_path)
             File.open(absolute_path) do |io|
               print("  › Copying #{style(relative_path, mode: :dim)}...", ending: "")
-              Marten.assets.storage.save(relative_path, io)
+              Marten.assets.storage.write(relative_path, io)
               print(style(" DONE", fore: :light_green, mode: :bold))
             end
           end

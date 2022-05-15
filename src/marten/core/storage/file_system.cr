@@ -16,6 +16,10 @@ module Marten
           raise Errors::FileNotFound.new("File '#{filepath}' cannot be found")
         end
 
+        def size(filepath : String) : Int64
+          File.size(path(filepath))
+        end
+
         def url(filepath : String) : String
           File.join(base_url, URI.encode_path(filepath))
         end

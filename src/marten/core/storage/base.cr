@@ -11,6 +11,9 @@ module Marten
         # Raises `Marten::Core::Storage::Errors::FileNotFound` if the file does not exist.
         abstract def open(filepath : String) : IO
 
+        # Returns the size of a file at a given `filepath`.
+        abstract def size(filepath : String) : Int64
+
         # Returns the URL associated with the passed file name or file path.
         abstract def url(filepath : String) : String
 

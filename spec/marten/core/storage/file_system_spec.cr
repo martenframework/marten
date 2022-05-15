@@ -53,6 +53,14 @@ describe Marten::Core::Storage::FileSystem do
     end
   end
 
+  describe "#size" do
+    it "returns the size of the file associated with the passed file path" do
+      storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
+      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
+      storage.size("css/app.css").should eq File.size("/tmp/css/app.css")
+    end
+  end
+
   describe "#url" do
     it "returns a URL constructed from the base URL" do
       storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "/assets/")

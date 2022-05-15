@@ -32,10 +32,24 @@ describe Marten::Core::Storage::FileSystem do
   end
 
   describe "#save" do
-    it "copy the content of the passed IO object to the destination path" do
+    it "copy the content of the passed IO object to the destination path if it does not already exist" do
+      destination_path = "css/app_#{Time.local.to_unix}.css"
       storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
-      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
-      File.read("/tmp/css/app.css").should eq "html { background: white; }"
+      path = storage.save(destination_path, IO::Memory.new("html { background: white; }"))
+      path.should eq destination_path
+      File.read(File.join("/tmp", path)).should eq "html { background: white; }"
+    end
+
+    it "copy the content of the passed IO object to a modified destination path if it already exists" do
+      destination_path = "css/app.css"
+
+      storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
+      storage.save(destination_path, IO::Memory.new("html { background: white; }"))
+      path = storage.save(destination_path, IO::Memory.new("html { background: white; }"))
+
+      path.should_not eq destination_path
+      path.starts_with?("css/app").should be_true
+      File.read(File.join("/tmp", path)).should eq "html { background: white; }"
     end
   end
 
@@ -48,6 +62,14 @@ describe Marten::Core::Storage::FileSystem do
     it "only escape the filepath" do
       storage = Marten::Core::Storage::FileSystem.new(root: "assets", base_url: "http://localhost:8080/assets/")
       storage.url("css/app:test.css").should eq "http://localhost:8080/assets/css/app%3Atest.css"
+    end
+  end
+
+  describe "#write" do
+    it "copy the content of the passed IO object to the destination path" do
+      storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
+      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
+      File.read("/tmp/css/app.css").should eq "html { background: white; }"
     end
   end
 end

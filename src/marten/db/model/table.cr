@@ -210,7 +210,7 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           when {{ field_var.name.stringify }}
-            @{{ field_var.id }}
+            {{ field_var.id }}
           {% end %}
           else
             raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
@@ -268,7 +268,7 @@ module Marten
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           {% unless ann[:field_kwargs] && ann[:field_kwargs][:primary_key] %}
           io << ", "
-          io << {{ field_var.name.stringify }} + ": #{@{{ field_var.id }}.inspect}"
+          io << {{ field_var.name.stringify }} + ": #{{{ field_var.id }}.inspect}"
           {% end %}
           {% end %}
           io << ">"
@@ -373,7 +373,7 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column!] = field.to_db(@{{ field_var.id }}) if field.db_column?
+            values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
           {% end %}
           values
         end
@@ -429,9 +429,9 @@ module Marten
           @@db_indexes = [] of Marten::DB::Index
           @@db_table = nil
           @@db_unique_constraints = [] of Marten::DB::Constraint::Unique
-          @@fields = {} of String => Marten::DB::Field::Base
-          @@fields_per_column = {} of String => Marten::DB::Field::Base
-          @@relation_fields_per_relation_name = {} of String => Marten::DB::Field::Base
+          @@fields = {} of ::String => Marten::DB::Field::Base
+          @@fields_per_column = {} of ::String => Marten::DB::Field::Base
+          @@relation_fields_per_relation_name = {} of ::String => Marten::DB::Field::Base
           @@reverse_relations = [] of Marten::DB::ReverseRelation
         end
 

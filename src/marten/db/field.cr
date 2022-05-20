@@ -3,6 +3,7 @@ require "./field/big_int"
 require "./field/bool"
 require "./field/date"
 require "./field/date_time"
+require "./field/file"
 require "./field/float"
 require "./field/int"
 require "./field/string"
@@ -64,6 +65,7 @@ module Marten
       register "bool", Bool
       register "date", Date
       register "date_time", DateTime
+      register "file", File
       register "float", Float
       register "int", Int
       register "many_to_many", ManyToMany

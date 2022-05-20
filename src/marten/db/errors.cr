@@ -24,6 +24,9 @@ module Marten
       # block, the transaction will be rollbacked and the transaction block will return `false`.
       class Rollback < Exception; end
 
+      # Represents an error raised when a suspicious file operation is identified.
+      class SuspiciousFileOperation < Exception; end
+
       # Represents an error raised when a field value cannot be processed because it doesn't have the expected type.
       # This can happen when initializing model objects using unexpected values and types.
       class UnexpectedFieldValue < Exception; end

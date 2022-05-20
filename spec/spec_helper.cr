@@ -19,6 +19,9 @@ require "../src/marten/spec"
 require "./ext/**"
 require "./test_project"
 
+# Empty media directory after specs execution.
+Spec.after_suite { Dir["spec/media/*"].each { |d| FileUtils.rm_rf(d) } }
+
 def for_mysql(&block)
   for_db_backends(:mysql) do
     yield

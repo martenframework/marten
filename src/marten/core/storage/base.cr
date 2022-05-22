@@ -3,6 +3,9 @@ module Marten
     module Storage
       # Abstract base class representing a file storage.
       abstract class Base
+        # Deletes the file associated with the passed `filepath`.
+        abstract def delete(filepath : String) : Nil
+
         # Returns true if the given `filepath` exists.
         abstract def exists?(filepath : String) : Bool
 

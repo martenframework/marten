@@ -6,6 +6,12 @@ module Marten
         def initialize(@root : String, @base_url : String)
         end
 
+        def delete(filepath : String) : Nil
+          File.delete(path(filepath))
+        rescue File::NotFoundError
+          raise Errors::FileNotFound.new("File '#{filepath}' cannot be found")
+        end
+
         def exists?(filepath : String) : Bool
           File.exists?(path(filepath))
         end

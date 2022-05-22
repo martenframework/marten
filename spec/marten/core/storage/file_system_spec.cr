@@ -1,6 +1,24 @@
 require "./spec_helper"
 
 describe Marten::Core::Storage::FileSystem do
+  describe "#delete" do
+    it "deletes the file associated with the passed file path" do
+      storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
+      storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
+
+      storage.delete("css/app.css")
+
+      storage.exists?("css/app.css").should be_false
+    end
+
+    it "raises if the file does not exist" do
+      storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
+      expect_raises(Marten::Core::Storage::Errors::FileNotFound) do
+        storage.delete("css/unknown.css")
+      end
+    end
+  end
+
   describe "#exists" do
     it "returns true if a file associated with the passed file path exists" do
       storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")

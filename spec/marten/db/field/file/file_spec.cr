@@ -33,6 +33,47 @@ describe Marten::DB::Field::File::File do
     end
   end
 
+  describe "#delete" do
+    it "closes the associated file and deletes the file in the underlying storage" do
+      Marten.media_files_storage.write("css/app.css", IO::Memory.new("html { background: white; }"))
+      raw_file = File.new(File.join(__DIR__, "file_spec/fixtures/helloworld.txt"))
+
+      field = Marten::DB::Field::File.new("my_field")
+      file = Marten::DB::Field::File::File.new(field, "css/app.css")
+      file.file = raw_file
+
+      file.delete
+
+      file.file.should be_nil
+      file.name.should be_nil
+      file.committed?.should be_false
+
+      Marten.media_files_storage.exists?("css/app.css").should be_false
+    end
+
+    it "saves the associated record if instructed to" do
+      record = Marten::DB::Field::File::FileSpec::Attachment.create!
+
+      record.file.save("path/to/file.txt", IO::Memory.new("Hello World!"), save: true)
+      record.reload
+      file_name = record.file.name.not_nil!
+
+      record.file.delete(save: true)
+      record.reload
+
+      record.file.attached?.should be_false
+      Marten.media_files_storage.exists?(file_name).should be_false
+    end
+
+    it "raises if no file is currently attached to the field file" do
+      field = Marten::DB::Field::File.new("my_field")
+      file = Marten::DB::Field::File::File.new(field)
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        file.delete
+      end
+    end
+  end
+
   describe "#file" do
     it "returns the associated file object" do
       raw_file = File.new(File.join(__DIR__, "file_spec/fixtures/helloworld.txt"))

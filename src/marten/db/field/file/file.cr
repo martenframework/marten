@@ -23,6 +23,9 @@ module Marten
           # :nodoc:
           setter committed
 
+          # Allows to associate a new file to the field.
+          setter file
+
           # :nodoc:
           setter record
 
@@ -39,14 +42,24 @@ module Marten
             @committed
           end
 
-          # Allows to associate a new file to the field.
-          def file=(file : ::File | HTTP::UploadedFile)
-            @file = file
+          # Deletes the associated filfe from the storage.
+          #
+          # A `Marten::DB::Errors::UnexpectedFieldValue` error is raised if no file is associated with this object.
+          # Optionally, a `save` boolean can be set to force the associated record to be saved along the way.
+          def delete(save = false) : Nil
+            with_ensured_file do
+              @field.storage.delete(name!)
+              self.file = nil
+              self.name = nil
+              self.committed = false
+
+              record!.save if save
+            end
           end
 
           # Returns a `IO` object allowing to interact with the file's content.
           #
-          # A `Marten::DB::Errors::UnexpectedFieldValue` error is rasied if no file is associated with this object.
+          # A `Marten::DB::Errors::UnexpectedFieldValue` error is raised if no file is associated with this object.
           def open : IO
             with_ensured_file do
               if !committed?
@@ -75,7 +88,7 @@ module Marten
 
           # Returns the `size` of the file.
           #
-          # A `Marten::DB::Errors::UnexpectedFieldValue` error is rasied if no file is associated with this object.
+          # A `Marten::DB::Errors::UnexpectedFieldValue` error is raised if no file is associated with this object.
           def size : Int64
             with_ensured_file do
               if !committed?
@@ -88,7 +101,7 @@ module Marten
 
           # Returns the URL of the file.
           #
-          # A `Marten::DB::Errors::UnexpectedFieldValue` error is rasied if no file is associated with this object.
+          # A `Marten::DB::Errors::UnexpectedFieldValue` error is raised if no file is associated with this object.
           def url : ::String
             with_ensured_file do
               @field.storage.url(name.not_nil!)

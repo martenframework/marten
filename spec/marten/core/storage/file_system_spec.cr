@@ -69,6 +69,18 @@ describe Marten::Core::Storage::FileSystem do
       path.starts_with?("css/app").should be_true
       File.read(File.join("/tmp", path)).should eq "html { background: white; }"
     end
+
+    it "does not retain leading ./ characters in the generated path" do
+      destination_path = "./app.css"
+
+      storage = Marten::Core::Storage::FileSystem.new(root: File.join("/tmp/"), base_url: "/assets/")
+      storage.save(destination_path, IO::Memory.new("html { background: white; }"))
+      path = storage.save(destination_path, IO::Memory.new("html { background: white; }"))
+
+      path.should_not eq destination_path
+      path.starts_with?("app").should be_true
+      File.read(File.join("/tmp", path)).should eq "html { background: white; }"
+    end
   end
 
   describe "#size" do

@@ -40,7 +40,8 @@ module Marten
           extension = path.extension
 
           while exists?(filepath)
-            filepath = File.join(path.parent.to_s, gen_unique_filepath(stem, extension))
+            filepath = gen_unique_filepath(stem, extension)
+            filepath = File.join(path.parent.to_s, filepath) if path.parent.to_s != "."
           end
 
           filepath

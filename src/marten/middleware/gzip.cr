@@ -10,7 +10,7 @@ module Marten
         response = get_response.call
 
         # Don't compress short responses as this is not worth it.
-        return response if response.content.size < SHORT_RESPONSE_SIZE_THRESHOLD
+        return response if response.content.bytesize < SHORT_RESPONSE_SIZE_THRESHOLD
 
         # Don't compress responses that contain an explicit Content-Encoding header.
         return response if response.headers[:CONTENT_ENCODING]?
@@ -22,10 +22,10 @@ module Marten
         return response unless request.headers.fetch(:ACCEPT_ENCODING, "").matches?(GZIP_ACCEPT_ENCODING_RE)
 
         compressed_content = compress(response.content)
-        return response if compressed_content.size >= response.content.size
+        return response if compressed_content.bytesize >= response.content.bytesize
 
         response.content = compressed_content
-        response.headers["Content-Length"] = compressed_content.size
+        response.headers["Content-Length"] = compressed_content.bytesize
 
         # Ensures that any etag is weak to comply with RFC 7232.
         etag = response.headers[:"ETag"]?

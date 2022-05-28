@@ -1,5 +1,11 @@
 module Marten
   abstract class Middleware
+    # Activates the right I18n locale based on the incoming requests.
+    #
+    # This middleware will activate the right locale based on the Accept-Language header. Only explicitly-configured
+    # locales can be activated by this middleware (that is, locales that are specified in the
+    # `Marten.settings.i18n.available_locales` and `Marten.settings.i18n.default_locale` settings). If the incoming
+    # locale can't be found in the project configuration, the default locale will be used instead.
     class I18n < Middleware
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         locale = get_locale_from(request)

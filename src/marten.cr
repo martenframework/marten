@@ -1,6 +1,7 @@
 # Marten - The pragmatic web framework.
 
 require "db"
+require "compress/gzip"
 require "crypto/subtle"
 require "digest/md5"
 require "ecr/macros"

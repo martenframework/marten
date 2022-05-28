@@ -198,7 +198,7 @@ describe Marten::Middleware::GZip do
 
       response.headers[:CONTENT_ENCODING].should eq "gzip"
       response.content.should_not eq uncompressed_content
-      response.headers[:CONTENT_LENGTH].should eq response.content.size.to_s
+      response.headers[:CONTENT_LENGTH].should eq response.content.bytesize.to_s
     end
   end
 end

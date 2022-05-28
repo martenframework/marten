@@ -22,6 +22,9 @@ module Marten
       # Returns the status code of the HTTP response.
       getter status
 
+      # Allows to overridde the response's content.
+      setter content
+
       def initialize(
         @content : String = "",
         @content_type : String = DEFAULT_CONTENT_TYPE,

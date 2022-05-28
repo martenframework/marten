@@ -41,6 +41,14 @@ describe Marten::HTTP::Response do
     end
   end
 
+  describe "#content=" do
+    it "allows to set the response content" do
+      response = Marten::HTTP::Response.new
+      response.content = "Hello"
+      response.content.should eq "Hello"
+    end
+  end
+
   describe "#content_type" do
     it "returns the response content type" do
       response = Marten::HTTP::Response.new(content_type: "text/plain")

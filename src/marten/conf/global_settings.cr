@@ -4,6 +4,7 @@ module Marten
     class GlobalSettings
       @@registered_settings_namespaces = [] of String
 
+      @log_backend : ::Log::Backend
       @request_max_parameters : Nil | Int32
       @target_env : String?
       @view400 : Views::Base.class

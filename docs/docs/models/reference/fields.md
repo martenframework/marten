@@ -86,6 +86,51 @@ The `auto_now` argument allows to ensure that the corresponding field value is a
 
 The `auto_now_add` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
 
+### `file`
+
+A `file` field allows to persist the reference to an uploaded file.
+
+:::info
+`file` fields can't be configured as primary keys.
+:::
+
+#### `storage`
+
+This optional argument can be used to configure the storage that will be used to persist the actual files. It defaults to the media files storage (configured via the `media_files.storage` setting), but can be overridden on a per-field basis if needed:
+
+```crystal
+my_storage = Marten::Core::Storage::FileSystem.new(root: "files", base_url: "/files/")
+
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :file, :file, storage: my_storage
+end
+```
+
+Please refer to [Managing files](../../files/managing-files) for more details on how to manage uploaded files and the associated storages.
+
+#### `upload_to`
+
+This optional argument can be used to configure where the uploaded files are persisted in the storage. It defaults to an empty string and can be set to either a string or a proc.
+
+If set to a string, it allows to define in which directory of the underlyign storage files will be persisted:
+
+```crystal
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :file, :file, upload_to: "foo/bar"
+end
+```
+
+If set to a proc, it allows to customize the logic allowing to generate the resulting path _and_ filename:
+
+```crystal
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :file, :file, upload_to: ->(filename : String) { File.join("files/uploads", filename) }
+end
+```
+
 ### `float`
 
 A `float` field allows to persist floating point numbers (`Float64` objects).

@@ -63,6 +63,17 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Files',
+      link: {type: 'doc', id: 'files'},
+      items: ['files/introduction'],
+      items: [
+        'files/uploading-files',
+        'files/managing-files',
+        'files/asset-handling',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Development',
       link: {type: 'doc', id: 'development'},
       items: [

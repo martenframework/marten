@@ -70,7 +70,7 @@ config.middleware = [
 ]
 ```
 
-Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../views/middlewares) in order to learn more about middlewares.
+Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../views-and-http/middlewares) in order to learn more about middlewares.
 
 ### `port`
 
@@ -132,25 +132,25 @@ A boolean indicating if the `X-Forwarded-Proto header` is used to determine whet
 
 Default: `Views::Defaults::BadRequest`
 
-The view class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error views](../../views/error-views) in order to learn more about error views.
+The view class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
 
 ### `view403`
 
 Default: `Views::Defaults::PermissionDenied`
 
-The view class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error views](../../views/error-views) in order to learn more about error views.
+The view class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
 
 ### `view404`
 
 Default: `Views::Defaults::PageNotFound`
 
-The view class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error views](../../views/error-views) in order to learn more about error views.
+The view class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
 
 ### `view500`
 
 Default: `Views::Defaults::ServerError`
 
-The view class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error views](../../views/error-views) in order to learn more about error views.
+The view class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
 
 ## Assets settings
 

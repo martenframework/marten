@@ -46,6 +46,7 @@ module.exports = {
         'views/routing',
         'views/generic-views',
         'views/error-views',
+        'views/middlewares',
       ],
     },
     {

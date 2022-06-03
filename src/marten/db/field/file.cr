@@ -3,6 +3,9 @@ module Marten
     module Field
       # Represents a file field.
       class File < Base
+        # :nodoc:
+        alias AdditionalType = ::File | HTTP::UploadedFile
+
         getter default
 
         # Returns the max size of the string corresponding to the file path to be stored in the database.
@@ -129,7 +132,8 @@ module Marten
               @[Marten::DB::Model::Table::FieldInstanceVariable(
                 field_klass: {{ @type }},
                 field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
-                field_type: {{ field_ann[:exposed_type] }}
+                field_type: {{ field_ann[:exposed_type] }},
+                additional_type: ::File | Marten::HTTP::UploadedFile
               )]
 
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?
@@ -156,7 +160,7 @@ module Marten
                 {{ field_id }}!
               end
 
-              def {{ field_id }}=(file : HTTP::UploadedFile)
+              def {{ field_id }}=(file : Marten::HTTP::UploadedFile)
                 @{{ field_id }} = Marten::DB::Field::File::File.new(
                   field: self.class.get_field({{ field_id.stringify }}).as(Marten::DB::Field::File),
                   name: file.filename

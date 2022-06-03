@@ -40,10 +40,14 @@ module Marten
         {% end %}
 
         {% exposed_type = method.return_type %}
+        {% additional_type = nil %}
 
         {% for method in klass.methods %}
           {% if method.name == "from_db_result_set" %}
             {% exposed_type = method.return_type %}
+          {% end %}
+          {% if klass.has_constant?(:AdditionalType) %}
+            {% additional_type = klass.constant(:AdditionalType) %}
           {% end %}
         {% end %}
         {% unless exposed_type %}
@@ -52,11 +56,18 @@ module Marten
               {% if !exposed_type && method.name == "from_db_result_set" %}
                 {% exposed_type = method.return_type %}
               {% end %}
+              {% if !additional_type && parent_klass.has_constant?(:AdditionalType) %}
+                {% additional_type = parent_klass.constant(:AdditionalType) %}
+              {% end %}
             {% end %}
           {% end %}
         {% end %}
 
-        @[Marten::DB::Field::Registration(id: {{ id }}, exposed_type: {{ exposed_type }})]
+        @[Marten::DB::Field::Registration(
+          id: {{ id }},
+          exposed_type: {{ exposed_type }},
+          additional_type: {{ additional_type }}
+        )]
         class ::{{klass.id}}; end
         add_field_to_registry({{ id }}, {{ klass }})
       end
@@ -85,6 +96,9 @@ module Marten
           {% ann = k.annotation(Marten::DB::Field::Registration) %}
           {% if ann %}
             {% field_types << ann[:exposed_type] %}
+            {% if ann[:additional_type] %}
+              {% field_types << ann[:additional_type] %}
+            {% end %}
           {% end %}
         {% end %}
 

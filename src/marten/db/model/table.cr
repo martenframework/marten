@@ -222,23 +222,10 @@ module Marten
         #
         # If the passed `field_name` doesn't match any existing field, a `Marten::DB::Errors::UnknownField` exception
         # will be raised.
-        def set_field_value(field_name : String | Symbol, value : Field::Any)
-          {% begin %}
-          case field_name.to_s
-          {% for field_var in @type.instance_vars
-                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-          when {{ field_var.name.stringify }}
-            if !value.is_a?({{ field_var.type }})
-              raise Errors::UnexpectedFieldValue.new(
-                "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
-              )
-            end
-            self.{{ field_var.id }} = value
-          {% end %}
-          else
-            raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
-          end
-          {% end %}
+        def set_field_value(field_name : String | Symbol, value : Field::Any | Model)
+          sanitized_values = Hash(String, Field::Any | Model).new
+          sanitized_values[field_name.to_s] = value
+          assign_field_values(sanitized_values)
         end
 
         # Allows to set the values of multiple fields.
@@ -342,9 +329,12 @@ module Marten
         private def assign_field_values(values : Hash(String, Field::Any | Model))
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
             if values.has_key?({{ field_var.name.stringify }})
               value = values[{{ field_var.name.stringify }}]
-              if !value.is_a?({{ field_var.type }})
+              if !value.is_a?(
+                {{ field_var.type }}{% if ann[:additional_type] %} | {{ ann[:additional_type] }}{% end %}
+              )
                 raise Errors::UnexpectedFieldValue.new(
                   "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
                 )
@@ -353,7 +343,6 @@ module Marten
               values.delete({{field_var.name.stringify}})
             end
 
-            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
             {% if ann && ann[:relation_name] %}
               if values.has_key?({{ ann[:relation_name].stringify }})
                 value = values[{{ ann[:relation_name].stringify }}]

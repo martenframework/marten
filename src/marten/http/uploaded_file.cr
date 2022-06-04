@@ -1,8 +1,10 @@
 module Marten
   module HTTP
+    # Represents an uploaded file.
     class UploadedFile
-      @io : IO
+      @io : ::File
 
+      # Returns the `File` object associated with the corresponding temporary file.
       getter io
 
       def initialize(@part : ::HTTP::FormData::Part)
@@ -16,7 +18,7 @@ module Marten
       delegate filename, to: @part
 
       # Returns the uploaded file size.
-      delegate size, to: @part
+      delegate size, to: @io
     end
   end
 end

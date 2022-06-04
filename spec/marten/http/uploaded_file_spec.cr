@@ -5,11 +5,11 @@ describe Marten::HTTP::UploadedFile do
     it "allows to initialize an uploaded file from a form data part" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
-          IO::Memory.new
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"}},
+          IO::Memory.new("This is a test")
         )
       )
-      uploaded_file.size.should eq 123
+      uploaded_file.size.should eq 14
     end
   end
 
@@ -17,7 +17,7 @@ describe Marten::HTTP::UploadedFile do
     it "returns the filename" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"}},
           IO::Memory.new
         )
       )
@@ -26,14 +26,14 @@ describe Marten::HTTP::UploadedFile do
   end
 
   describe "#size" do
-    it "returns the file size specified in the content disposition" do
+    it "returns the expected file size" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
-          IO::Memory.new
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"}},
+          IO::Memory.new("This is a test")
         )
       )
-      uploaded_file.size.should eq 123
+      uploaded_file.size.should eq 14
     end
   end
 
@@ -41,11 +41,11 @@ describe Marten::HTTP::UploadedFile do
     it "returns the IO object allowing to manipulate the file content" do
       uploaded_file = Marten::HTTP::UploadedFile.new(
         HTTP::FormData::Part.new(
-          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"; size=123}},
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"}},
           IO::Memory.new("This is a test")
         )
       )
-      uploaded_file.io.should be_a IO
+      uploaded_file.io.should be_a File
       uploaded_file.io.gets_to_end.should eq "This is a test"
     end
   end

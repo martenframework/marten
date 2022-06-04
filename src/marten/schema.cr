@@ -17,7 +17,7 @@ module Marten
     @@fields : Hash(String, Field::Base) = {} of String => Field::Base
 
     @bound_fields : Hash(String, BoundField) | Nil = nil
-    @validated_data = {} of String => Field::Any
+    @validated_data = {} of String => Field::Any | Nil | HTTP::UploadedFile
 
     getter validated_data
 

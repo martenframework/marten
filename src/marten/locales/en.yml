@@ -45,6 +45,10 @@ en:
             - "%m/%d/%Y %H:%M:%S"
             - "%m/%d/%Y %H:%M:%S.%f"
             - "%m/%d/%Y %H:%M"
+        file:
+          errors:
+            empty: "Empty files are not allowed."
+            file_name_too_long: "The maximum allowed file name length is %{max_name_size}."
         float:
           errors:
             invalid: "Enter a valid number."

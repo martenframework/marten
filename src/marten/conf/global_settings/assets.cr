@@ -24,7 +24,7 @@ module Marten
         # Returns the absolute path where collected assets will be persisted.
         getter root
 
-        # Returns the ID of the storage used to collect and persist assets.
+        # Returns the storage used to collect and persist assets.
         getter storage
 
         # Returns the base URL to use when exposing asset URLs.

@@ -154,6 +154,61 @@ The view class that should generate responses for Internal Error responses (HTTP
 
 ## Assets settings
 
+Assets settings allow to configure how Marten should interact with [assets](../files/asset-handling). These settings are all available under the `assets` namespace:
+
+```crystal
+config.assets.root = "assets"
+config.assets.url = "/assets/"
+```
+
+### `app_dirs`
+
+Default: `true`
+
+A boolean indicating whether assets should be looked for inside installed application folders. When this setting is set to `true`, this means that assets provided by installed applications will be collected by the `collectassets` command (please refer to [Asset handling](../files/asset-handling) for more details regarding how to manage assets in your project).
+
+### `dirs`
+
+Default: `[] of String`
+
+An array of directories where assets should be looked for. The order of these directories is important as it defines the order in which assets are searched for.
+
+### `manifests`
+
+Default: `[] of String`
+
+An array of paths to manifest JSON files to use to resolve assets URLs. Manifest files will be used to return the right fingerprinted asset path for a generic path, which can be usefull if your asset bundling strategy support this.
+
+### `root`
+
+Default: `"assets"`
+
+A string containing the absolute path where collected assets will be persisted (when running the `collectassets` command). By default assets will be persisted in a folder that is relative to the Marten project's directory. Obviously, this folder should be empty before running the `collectassets` command in order to not overwrite existing files: assets should be defined as part of your applications' `assets` folders instead.
+
+:::info
+This setting is only used if `assets.storage` is `nil`.
+:::
+
+### `storage`
+
+Default: `nil`
+
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files in order to persist them into a given location.
+
+By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+
+A specific storage can be set instead to ensure that collected assets are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `assets.root` and `assets.url` setting values are basically ignored and are overridden by the use of the specified storage.
+
+### `url`
+
+Default: `"/assets/"`
+
+The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
+
+:::info
+This setting is only used if `assets.storage` is `nil`.
+:::
+
 ## CSRF settings
 
 ## Database settings

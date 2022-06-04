@@ -79,6 +79,14 @@ module.exports = {
       items: [
         'development/settings',
         'development/applications',
+        'development/management-commands',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'development/how-to/create-custom-commands',
+          ],
+        },
         {
           type: 'category',
           label: 'Reference',

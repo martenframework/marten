@@ -211,6 +211,74 @@ This setting is only used if `assets.storage` is `nil`.
 
 ## CSRF settings
 
+CSRF settings allow to configure how Cross-Site Request Forgeries (CSRF) attacks protection measures are implemented within the considered Marten project. Please refer to [Cross-Site Request Forgery protection](../../security/csrf) for more details about this topic.
+
+The following settings are all available under the `csrf` namespace:
+
+```crystal
+config.csrf.protection_enabled = true
+config.csrf.cookie_name = "csrf-token"
+```
+
+### `cookie_domain`
+
+Default: `nil`
+
+An optional domain to use when setting the CSRF cookie. This can be used to share the CSRF cookie across multiple subdomains for example. For example, setting this option to `.example.com` will make it possible send a POST request from a form on one subdomain (eg. `foo.example.com`) to another subdomain (eg. `bar.example.com `).
+
+### `cookie_http_only`
+
+Default: `false`
+
+A boolean indicating whether client-side scripts should be prevented from accessing the CSRF token cookie. If this option is set to `true`, Javascript scripts won't be able to access the CSRF cookie.
+
+### `cookie_max_age`
+
+Default: `31_556_952` (approximatively one year)
+
+The max age (in seconds) of the CSRF cookie.
+
+### `cookie_name`
+
+Default: `"csrftoken"`
+
+The name of the cookie to use for the CSRF token. This cookie name should be different than any other cookies created by your application.
+
+### `cookie_same_site`
+
+Default: `"Lax"`
+
+The value of the [SameSite flag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) to use for the CSRF cookie. Accepted values are `"Lax"`, `"Strict"`, or `"None"`.
+
+### `cookie_secure`
+
+Default: `false`
+
+A boolean indicating whether to use a secure cookie for the CSRF cookie. Setting this to `true` will force browsers to send the cookie with an encrypted request over the HTTPS protocol only.
+
+### `protection_enabled`
+
+Default: `true`
+
+A boolean indicating if the CSRF protection is enabled globally. When set to `true`, views will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-view basis. See [Cross-Site Request Forgery protection](../../security/csrf) for more details.
+
+### `trusted_origins`
+
+Default: `[] of String`
+
+An array of trusted origins.
+
+These origins will be trusted for CSRF-protected requests (such as POST requests) and they will be used to check either the `Origin` or the `Referer` header depending on the request scheme. This is done to ensure that a specific subdomain such as `sub1.example.com` cannot issue a POST request to `sub2.example.com`. In order to enable CSRF-protected requests over different origins, it's possible to add trusted origins to this array. For example `https://sub1.example.com` can be configured as a trusted domain that way, but it's possible to allow CSRF-protected requests for all the subdomains of a specific domain by using `https://*.example.com`.
+
+For example:
+
+```crystal
+config.csrf.trusted_origins = [
+  "https://*.example.com",
+  "https://other.example.org",
+]
+```
+
 ## Database settings
 
 ## I18n settings

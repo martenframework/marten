@@ -65,7 +65,6 @@ module.exports = {
       type: 'category',
       label: 'Files',
       link: {type: 'doc', id: 'files'},
-      items: ['files/introduction'],
       items: [
         'files/uploading-files',
         'files/managing-files',
@@ -94,6 +93,14 @@ module.exports = {
             'development/reference/settings',
           ],
         },
+      ],
+    },
+    {
+      type: 'category',
+      label: 'Security',
+      link: {type: 'doc', id: 'security'},
+      items: [
+        'security/csrf',
       ],
     },
   ],

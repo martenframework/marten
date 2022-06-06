@@ -112,7 +112,7 @@ module Marten
         ).not_nil!
       rescue NilAssertionError
         raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a success route the '::schema' class method method or by " \
+          "'#{self.class.name}' must define a success route via the '::schema' class method method or by " \
           "overriding the '#schema_class' method"
         )
       end

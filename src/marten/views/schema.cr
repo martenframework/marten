@@ -95,8 +95,8 @@ module Marten
       # Returns the schema class that should be used by the view.
       def schema_class
         self.class.schema || raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a schema class name via the '::success_route_name' class method method " \
-          "or via the '::success_url' class method"
+          "'#{self.class.name}' must define a schema class name via the '#schema' class method method, " \
+          "or by overridding the '#schema_class' method"
         )
       end
 
@@ -112,8 +112,8 @@ module Marten
         ).not_nil!
       rescue NilAssertionError
         raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a success route via the '::schema' class method method or by " \
-          "overriding the '#schema_class' method"
+          "'#{self.class.name}' must define a success route via the '#success_route_name' or '#success_url' class " \
+          "method, or by overridding the '#success_url' method"
         )
       end
     end

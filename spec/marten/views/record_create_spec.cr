@@ -102,6 +102,58 @@ describe Marten::Views::RecordCreate do
       Marten::Views::RecordCreateSpec::Tag.filter(name: "newtag").exists?.should be_true
     end
   end
+
+  describe "#record" do
+    it "returns nil by default" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "foo=123&bar=456"
+        )
+      )
+      view = Marten::Views::RecordCreateSpec::TestView.new(request)
+
+      view.record.should be_nil
+    end
+
+    it "returns nil if the schema is invalid" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "bad=bad"
+        )
+      )
+
+      view = Marten::Views::RecordCreateSpec::TestView.new(request)
+      view.dispatch
+
+      view.record.should be_nil
+    end
+
+    it "returns the created record if the schema is valid" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "name=newtag"
+        )
+      )
+      view = Marten::Views::RecordCreateSpec::TestView.new(request)
+
+      view.schema.valid?
+      view.dispatch
+
+      Marten::Views::RecordCreateSpec::Tag.filter(name: "newtag").exists?.should be_true
+
+      tag = Marten::Views::RecordCreateSpec::Tag.filter(name: "newtag").first
+      view.record.should eq tag
+    end
+  end
 end
 
 module Marten::Views::RecordCreateSpec

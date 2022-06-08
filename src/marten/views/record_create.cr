@@ -33,8 +33,15 @@ module Marten
     # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
     # to redirect to.
     class RecordCreate < Views::Schema
+      @record : DB::Model? = nil
+
       # Returns the configured model class.
       class_getter model : DB::Model.class | Nil
+
+      # Returns the created record upon a valid schema processing, returns `nil` otherwise.
+      getter record
+
+      setter record
 
       # Allows to configure the model class that should be used to create the new record.
       def self.model(model : DB::Model.class | Nil)
@@ -45,8 +52,8 @@ module Marten
       #
       # By default, this will create the new record and return a 302 redirect targetting the configured success URL.
       def process_valid_schema
-        record = model.new(schema.validated_data)
-        record.save!
+        self.record = model.new(schema.validated_data)
+        self.record.try(&.save!)
 
         super
       end

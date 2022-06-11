@@ -6,10 +6,15 @@
 
 /* You can override the default Infima variables here. */
 
+@use './components/markdown';
+@use './components/navbar';
+@use './components/pagination';
+@use './components/sidebar';
+@use './components/toc';
+
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
 
 :root {
-
   --ifm-color-primary: #eb6864;
   --ifm-color-primary-dark: rgb(33, 175, 144);
   --ifm-color-primary-darker: rgb(31, 165, 136);
@@ -18,10 +23,25 @@
   --ifm-color-primary-lighter: rgb(102, 212, 189);
   --ifm-color-primary-lightest: rgb(146, 224, 208);
   --ifm-code-font-size: 90%;
-  --ifm-code-background: #eee;
   --ifm-code-padding-horizontal: 4px;
   --ifm-font-family-base: 'Inter';
   --ifm-font-color-base: #4a4a4a;
+  --ifm-navbar-link-color: #fafafa;
+}
+
+html[data-theme='light'] {
+  --ifm-background-color: white;
+  --ifm-code-background: #eee;
+  --ifm-font-color-base: rgb(34, 45, 58);
+  --ifm-heading-color: rgb(3, 6, 11);
+  --ifm-menu-color: rgb(3, 6, 11);
+  --ifm-navbar-shadow: 0 1px 0 0 #eee;
+  --ifm-toc-border-color: #eee;
+}
+
+html[data-theme='dark'] {
+  --ifm-background-color: #04060b;
+  --ifm-font-color-base: rgb(215, 221, 226);
 }
 
 .docusaurus-highlight-code-line {
@@ -29,43 +49,6 @@
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
-}
-
-.navbar__logo img {
-  margin-top: -1px;
-}
-.navbar__title {
-  font-family: Comfortaa;
-}
-
-aside img {
-  margin-top: -1px;
-}
-aside img + b {
-  font-family: Comfortaa;
-}
-
-code {
-  border: 1px solid var(--ifm-code-background);
-}
-
-.theme-doc-sidebar-item-link-level-1 > a {
-  font-family: 'Inter';
-  font-size: 1rem;
-}
-.theme-doc-sidebar-item-category-level-1 > a {
-  font-family: 'Inter';
-  font-size: 1rem;
-}
-.theme-doc-sidebar-item-link-level-2 > a {
-  font-family: 'Inter';
-  font-weight: 400;
-  font-size: 0.875rem;
-}
-.theme-doc-sidebar-item-category-level-2 {
-  font-family: 'Inter';
-  font-weight: 400;
-  font-size: 0.875rem;
 }
 
 .card {

@@ -1,0 +1,63 @@
+html[data-theme='light'] {
+  --sidebar-background-color: #fafafa;
+}
+
+html[data-theme='dark'] {
+  --sidebar-background-color: rgb(19, 23, 28);
+}
+
+aside {
+  z-index: 10000;
+  background-color: var(--sidebar-background-color);
+
+  img {
+    margin-top: -1px;
+  }
+
+  img + b {
+    font-family: Comfortaa;
+
+    &:after {
+      font-size: 0.8rem;
+      color: gray;
+      content: " DOCS";
+    }
+  }
+
+  nav.menu {
+    padding: 1rem;
+  }
+
+  .theme-doc-sidebar-item-link-level-1 {
+    margin-bottom: 0.5rem;
+
+    a {
+      font-family: 'Inter';
+      font-size: 1rem;
+    }
+  }
+
+  .theme-doc-sidebar-item-category-level-1 {
+    margin-bottom: 0.5rem;
+
+    a {
+      font-family: 'Inter';
+      font-size: 1rem;
+    }
+  }
+
+  .theme-doc-sidebar-item-link-level-2 > a {
+    font-family: 'Inter';
+    font-weight: 400;
+    font-size: 0.875rem;
+  }
+
+  .theme-doc-sidebar-item-category-level-2 {
+    font-family: 'Inter';
+    font-weight: 400;
+
+    a {
+      font-size: 0.875rem !important;
+    }
+  }
+}

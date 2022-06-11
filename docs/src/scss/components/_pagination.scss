@@ -1,0 +1,39 @@
+#__docusaurus {
+  .pagination-nav {
+    &__link {
+      border: none;
+    }
+
+    &__label {
+      --icon-padding: 0.25rem;
+    }
+
+    &__sublabel {
+      margin-block-end: 1rem;
+    }
+
+    > a.pagination-nav__link--prev {
+      padding-left: 0;
+
+      .pagination-nav__label {
+        &::before {
+          padding-inline-end: var(--icon-padding);
+          transform: translateX(calc(var(--icon-padding) * -1));
+          content: '←';
+        }
+      }
+    }
+
+    > a.pagination-nav__link--next {
+      padding-right: 0;
+
+      .pagination-nav__label {
+        &::after {
+          padding-inline-start: var(--icon-padding);
+          transform: translateX(calc(-100% + var(--icon-padding)));
+          content: '→';
+        }
+      }
+    }
+  }
+}

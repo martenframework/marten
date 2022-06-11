@@ -1,0 +1,19 @@
+#__docusaurus {
+  [class^='tableOfContents_'] {
+    max-height: initial;
+    padding-block-end: 1.25rem;
+    line-height: 1.4;
+
+    code {
+      padding: 0;
+      border: none !important;
+      background: transparent;
+    }
+  }
+
+  [class^='tocCollapsible_'] {
+    @media (max-width: 996px) {
+      display: none;
+    }
+  }
+}

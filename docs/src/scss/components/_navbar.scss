@@ -1,0 +1,27 @@
+nav.navbar {
+  background: linear-gradient(-45deg, #904e95 0, #eb6864);
+  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+
+  button.clean-btn {
+    &:hover, &:focus {
+      background: var(--ifm-color-primary);
+    }
+
+    svg {
+      color: var(--ifm-navbar-link-color);
+    }
+  }
+
+  .navbar__logo img {
+    margin-top: -1px;
+  }
+  .navbar__title {
+    font-family: Comfortaa;
+
+    &:after {
+      font-size: 0.8rem;
+      color: gray;
+      content: " DOCS";
+    }
+  }
+}

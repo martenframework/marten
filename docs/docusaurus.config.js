@@ -14,17 +14,20 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   projectName: 'marten',
   noIndex: true,
 
+  plugins: ['docusaurus-plugin-sass'],
+
   presets: [
     [
       '@docusaurus/preset-classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          breadcrumbs: false,
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/',
         },
         theme: {
-          customCss: require.resolve('./src/css/custom.css'),
+          customCss: require.resolve('./src/scss/custom.scss'),
         },
       }),
     ],
@@ -51,18 +54,11 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             position: 'right',
           },
         ],
-        hideOnScroll: false,
-      },
-      footer: {
-        style: 'dark',
-        copyright: `Copyright © ${new Date().getFullYear()} Marten Framework. Built with Docusaurus.`,
+        hideOnScroll: true,
       },
       prism: {
         theme: require('prism-react-renderer/themes/okaidia'),
         additionalLanguages: ['ruby', 'crystal'],
-      },
-      colorMode: {
-        disableSwitch: true,
       },
     }),
 });

@@ -281,6 +281,76 @@ config.csrf.trusted_origins = [
 
 ## Database settings
 
+These settings allow to configure the databases used by the considered Marten project. At least one default database must be configured if your project makes use of [models](../../models-and-databases/introduction), and additional databases can optionally be configured as well.
+
+```crystal
+# Default database
+config.database do |db|
+  db.backend = :sqlite
+  db.name = "default_db.db"
+end
+
+# Additional database
+config.database :other do |db|
+  db.backend = :sqlite
+  db.name = "other_db.db"
+db
+```
+
+Configuring other database backends such as MySQL or PostgreSQL usually involve specifying more connection parameters (eg. user, password, etc). For example:
+
+```crystal
+config.database do |db|
+  db.backend = :postgresql
+  db.host = "localhost"
+  db.name = "my_db"
+  db.user = "my_user"
+  db.password = "my_passport"
+end
+```
+
+The following options are all available when configuring a database configuration object, which is available by opening a block with the `#database` method (like in the above examples).
+
+### `backend`
+
+Default: `nil`
+
+The database backend to use for connecting to the considered database. Marten supports three backends presently:
+
+* `:mysql`
+* `:postgresql`
+* `:sqlite`
+
+### `host`
+
+Default: `nil`
+
+A string containing the host used to connect to the database. No value means that the host will be localhost.
+
+### `name`
+
+Default: `nil`
+
+The name of the database to connect to. If you use the `sqlite` backend, this can be a string or a `Path` object containing the path (absolute or relative) to the considered database path.
+
+### `password`
+
+Default: `nil`
+
+A string containing the password to use to connect to the configured database.
+
+### `port`
+
+Default: `nil`
+
+The port to use to connect to the configured database. No value means that the default port will be used.
+
+### `user`
+
+Default: `nil`
+
+A string containing the name of the user that should be used to connect to the configured database.
+
 ## I18n settings
 
 ## Media files settings

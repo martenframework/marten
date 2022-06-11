@@ -244,6 +244,21 @@ describe Marten::HTTP::Request do
       request.data.fetch_all("file2").not_nil!.[1].should be_a Marten::HTTP::UploadedFile
     end
 
+    it "returns an object containing the params extracted from application/json inputs" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/json"},
+          body: %{{"foo": "bar", "test": "xyz"}}
+        )
+      )
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 2
+      request.data.fetch_all("foo").should eq ["bar"]
+      request.data.fetch_all("test").should eq ["xyz"]
+    end
+
     it "returns an object without parsed params if the content type is not supported" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

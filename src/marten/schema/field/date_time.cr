@@ -13,6 +13,8 @@ module Marten
                         value
                       when ::String
                         parse_date_time(value) || raise_unexpected_field_value(value)
+                      when JSON::Any
+                        deserialize(value.raw)
                       else
                         raise_unexpected_field_value(value)
                       end

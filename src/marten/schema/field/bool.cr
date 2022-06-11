@@ -4,7 +4,7 @@ module Marten
       # Represents a boolean schema field.
       class Bool < Base
         def deserialize(value) : ::Bool
-          [true, "true", 1, "1", "yes", "on"].includes?(value)
+          [true, "true", 1, "1", "yes", "on"].includes?(value.is_a?(JSON::Any) ? value.raw : value)
         end
 
         def serialize(value) : ::String?

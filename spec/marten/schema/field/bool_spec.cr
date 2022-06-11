@@ -32,10 +32,26 @@ describe Marten::Schema::Field::Bool do
       field.deserialize("on").should be_true
     end
 
-    it "returns true in all other instances" do
+    it "returns true if the value is a truthy JSON value" do
+      field = Marten::Schema::Field::Bool.new("test_field")
+      field.deserialize(JSON.parse("true")).should be_true
+      field.deserialize(JSON.parse(%{"true"})).should be_true
+      field.deserialize(JSON.parse(%{1})).should be_true
+      field.deserialize(JSON.parse(%{"1"})).should be_true
+    end
+
+    it "returns false in all other instances" do
       field = Marten::Schema::Field::Bool.new("test_field")
       field.deserialize("").should be_false
       field.deserialize("false").should be_false
+    end
+
+    it "returns false if the value is a falsy JSON value" do
+      field = Marten::Schema::Field::Bool.new("test_field")
+      field.deserialize(JSON.parse("false")).should be_false
+      field.deserialize(JSON.parse(%{"false"})).should be_false
+      field.deserialize(JSON.parse(%{0})).should be_false
+      field.deserialize(JSON.parse(%{"0"})).should be_false
     end
   end
 

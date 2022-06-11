@@ -23,8 +23,12 @@ module Marten
           case value
           when Nil
             value
+          when ::Int
+            value.to_i64
           when ::String
             Int64.new(value)
+          when JSON::Any
+            deserialize(value.raw)
           else
             raise_unexpected_field_value(value)
           end

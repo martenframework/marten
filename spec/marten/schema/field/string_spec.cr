@@ -17,6 +17,12 @@ describe Marten::Schema::Field::String do
       field = Marten::Schema::Field::String.new("test_field", strip: false)
       field.deserialize("  hello  ").should eq "  hello  "
     end
+
+    it "returns the string representation of the passed JSON value" do
+      field = Marten::Schema::Field::String.new("test_field")
+      field.deserialize(JSON.parse("42")).should eq "42"
+      field.deserialize(JSON.parse(%{"foo bar"})).should eq "foo bar"
+    end
   end
 
   describe "#max_size" do

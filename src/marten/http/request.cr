@@ -153,8 +153,9 @@ module Marten
         method == "TRACE"
       end
 
-      private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
+      private CONTENT_TYPE_APPLICATION_JSON = "application/json"
       private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"
+      private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
       private HOST_VALIDATION_RE            = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
 
       private def allowed_host?(domain)
@@ -252,6 +253,13 @@ module Marten
               params[part.name].as(Params::Data::Values) << UploadedFile.new(part)
             else
               params[part.name].as(Params::Data::Values) << part.body.gets_to_end
+            end
+          end
+        elsif content_type?(CONTENT_TYPE_APPLICATION_JSON)
+          if !(json_params = JSON.parse(body).as_h?).nil?
+            json_params.each do |key, value|
+              params[key] = [] of Params::Data::Value unless params.has_key?(key)
+              params[key].as(Params::Data::Values) << value
             end
           end
         end

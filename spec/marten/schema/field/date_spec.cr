@@ -55,6 +55,31 @@ describe Marten::Schema::Field::Date do
       end
     end
 
+    it "returns a time object in the proper time zone for valid JSON objects" do
+      supported_formats = [
+        "%Y-%m-%d",
+        "%m/%d/%Y",
+        "%b %d %Y",
+        "%b %d, %Y",
+        "%d %b %Y",
+        "%d %b, %Y",
+        "%B %d %Y",
+        "%B %d, %Y",
+        "%d %B %Y",
+        "%d %B, %Y",
+      ]
+
+      supported_formats.each do |format|
+        time = Time.local(Marten.settings.time_zone)
+
+        field = Marten::Schema::Field::Date.new("test_field")
+        field.deserialize(JSON.parse(%{"#{time.to_s(format)}"})).should eq(
+          Time.parse(time.to_s(format), format, Marten.settings.time_zone)
+        )
+        field.deserialize(JSON.parse(%{"#{time.to_s(format)}"})).not_nil!.location.should eq Marten.settings.time_zone
+      end
+    end
+
     it "raises if the passed value has an unexpected type" do
       field = Marten::Schema::Field::Date.new("test_field")
       expect_raises(Marten::Schema::Errors::UnexpectedFieldValue) { field.deserialize(true) }

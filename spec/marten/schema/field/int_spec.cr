@@ -18,6 +18,16 @@ describe Marten::Schema::Field::Int do
       field.deserialize("1223112").should eq 1_223_112
     end
 
+    it "returns the integer value corresponding to the passed JSON string" do
+      field = Marten::Schema::Field::Int.new("test_field")
+      field.deserialize(JSON.parse(%{"1223112"})).should eq 1_223_112
+    end
+
+    it "returns the integer value corresponding to the passed JSON integer" do
+      field = Marten::Schema::Field::Int.new("test_field")
+      field.deserialize(JSON.parse("1223112")).should eq 1_223_112
+    end
+
     it "raises if the passed value has an unexpected type" do
       field = Marten::Schema::Field::Int.new("test_field")
       expect_raises(Marten::Schema::Errors::UnexpectedFieldValue) { field.deserialize(true) }

@@ -9,6 +9,13 @@ describe Marten::Schema::Field::UUID do
       )
     end
 
+    it "returns the UUID corresponding to the passed JSON string value" do
+      field = Marten::Schema::Field::UUID.new("test_field")
+      field.deserialize(JSON.parse(%{"d764c9a6-439b-11eb-b378-0242ac130002"})).should eq(
+        UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")
+      )
+    end
+
     it "returns nil if the passed value is an empty value" do
       field = Marten::Schema::Field::UUID.new("test_field")
       field.deserialize(nil).should be_nil

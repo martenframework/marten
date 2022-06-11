@@ -18,6 +18,21 @@ describe Marten::Schema::Field::Float do
       field.deserialize("12231.12").should eq 12_231.12
     end
 
+    it "returns the float value corresponding to the passed JSON string" do
+      field = Marten::Schema::Field::Float.new("test_field")
+      field.deserialize(JSON.parse(%{"12231.12"})).should eq 12_231.12
+    end
+
+    it "returns the float value corresponding to the passed JSON int" do
+      field = Marten::Schema::Field::Float.new("test_field")
+      field.deserialize(JSON.parse("12231")).should eq 12_231
+    end
+
+    it "returns the float value corresponding to the passed JSON float" do
+      field = Marten::Schema::Field::Float.new("test_field")
+      field.deserialize(JSON.parse("12231.12")).should eq 12_231.12
+    end
+
     it "raises if the passed value has an unexpected type" do
       field = Marten::Schema::Field::Float.new("test_field")
       expect_raises(Marten::Schema::Errors::UnexpectedFieldValue) { field.deserialize(true) }

@@ -11,6 +11,8 @@ module Marten
             value
           when ::String
             value.empty? ? nil : ::UUID.new(value)
+          when JSON::Any
+            deserialize(value.raw)
           else
             raise_unexpected_field_value(value)
           end

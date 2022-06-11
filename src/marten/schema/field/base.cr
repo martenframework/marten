@@ -50,7 +50,7 @@ module Marten
         private EMPTY_VALUES = [nil, ""]
 
         private def empty_value?(value) : ::Bool
-          EMPTY_VALUES.includes?(value)
+          EMPTY_VALUES.includes?(value.is_a?(JSON::Any) ? value.raw : value)
         end
 
         private def invalid_error_message(_schema)

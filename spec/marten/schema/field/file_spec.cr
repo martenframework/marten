@@ -35,6 +35,11 @@ describe Marten::Schema::Field::File do
       field.deserialize("").should be_nil
     end
 
+    it "raises if the passed value is a JSON object" do
+      field = Marten::Schema::Field::File.new("test_field")
+      expect_raises(Marten::Schema::Errors::UnexpectedFieldValue) { field.deserialize(JSON.parse(%{"foo"})) }
+    end
+
     it "raises if the passed value is a non-empty string" do
       field = Marten::Schema::Field::File.new("test_field")
       expect_raises(Marten::Schema::Errors::UnexpectedFieldValue) { field.deserialize("foo") }

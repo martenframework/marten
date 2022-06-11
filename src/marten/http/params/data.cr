@@ -8,13 +8,13 @@ module Marten
         include Core
 
         # :nodoc:
-        alias Value = String | UploadedFile
+        alias Value = JSON::Any | String | UploadedFile
 
         # :nodoc:
         alias Values = Array(Value)
 
         # :nodoc:
-        alias RawHash = Hash(String, Array(String) | Array(UploadedFile) | Values)
+        alias RawHash = Hash(String, Array(String) | Array(JSON::Any) | Array(UploadedFile) | Values)
 
         def initialize
           @params = RawHash.new

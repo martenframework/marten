@@ -67,3 +67,7 @@ code {
   font-weight: 400;
   font-size: 0.875rem;
 }
+
+.card {
+  margin-bottom: 1rem;
+}

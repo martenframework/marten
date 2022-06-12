@@ -103,5 +103,13 @@ module.exports = {
         'security/csrf',
       ],
     },
+    {
+      type: 'category',
+      label: 'Internationalization',
+      link: {type: 'doc', id: 'i18n'},
+      items: [
+        'i18n/introduction',
+      ],
+    },
   ],
 };

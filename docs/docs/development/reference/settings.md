@@ -353,6 +353,34 @@ A string containing the name of the user that should be used to connect to the c
 
 ## I18n settings
 
+I18n settings allow to configure internationalization-related settings. Please refer to [Internationalization](../../i18n) for more details about how to leverage translations and localized contents in your projects.
+
+:::info
+Marten makes use of [crystal-i18n](https://crystal-i18n.github.io/) in order to handle translations and locales. Further [configuration options](https://crystal-i18n.github.io/configuration.html) are also provided by this shard and can be leveraged by any Marten projects if necessary.
+:::
+
+The following settings are all available under the `i18n` namespace:
+
+```crystal
+config.i18n.default_locale = :fr
+```
+
+### `available_locales`
+
+Default: `nil`
+
+Allows to define the locales that can be activated in order to perform translation lookups and localizations. For example:
+
+```crystal
+config.i18n.available_locales = [:en, :fr]
+```
+
+### `default_locale`
+
+Default: `"en"`
+
+The default locale used by the Marten project.
+
 ## Media files settings
 
 ## Sessions settings

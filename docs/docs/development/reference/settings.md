@@ -383,6 +383,43 @@ The default locale used by the Marten project.
 
 ## Media files settings
 
+Media files settings allow to configure how Marten should interact with [media files](../files/managing-files). These settings are all available under the `media_files` namespace:
+
+```crystal
+config.media_files.root = "files"
+config.media_files.url = "/files/"
+```
+
+### `root`
+
+Default: `"media"`
+
+A string containing the absolute path where uploaded files will be persisted. By default uploaded files will be persisted in a folder that is relative to the Marten project's directory.
+
+:::info
+This setting is only used if `media_files.storage` is `nil`.
+:::
+
+### `storage`
+
+Default: `nil`
+
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when uploading files in order to persist them into a given location.
+
+By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+
+A specific storage can be set instead to ensure that uploaded files are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `media_files.root` and `media_files.url` setting values are basically ignored and are overridden by the use of the specified storage.
+
+### `url`
+
+Default: `"/media/"`
+
+The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
+
+:::info
+This setting is only used if `media_files.storage` is `nil`.
+:::
+
 ## Sessions settings
 
 ## Templates settings

@@ -1,6 +1,7 @@
 require "./concerns/callbacks"
 require "./concerns/cookies"
 require "./concerns/request_forgery_protection"
+require "./concerns/session"
 
 module Marten
   module Views
@@ -12,6 +13,7 @@ module Marten
       include Callbacks
       include Cookies
       include RequestForgeryProtection
+      include Session
 
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 

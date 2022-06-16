@@ -46,7 +46,7 @@ module Marten
 
           # Returns `true` if the session store is empty.
           def empty? : Bool
-            session_hash.empty?
+            session_key.nil? && session_hash.empty?
           end
 
           # Returns `true` if the session store was modified.

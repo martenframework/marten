@@ -82,21 +82,21 @@ describe Marten::Middleware::Session do
     end
 
     it "patches the Vary header when removing the session cookie because the store is empty" do
-      encryptor = Marten::Core::Encryptor.new
-      session_key = encryptor.encrypt(Hash(String, String).new.to_json)
-
       raw_request = ::HTTP::Request.new(
         method: "GET",
         resource: "/test/xyz",
         headers: HTTP::Headers{"Host" => "example.com"},
       )
-      raw_request.cookies[Marten.settings.sessions.cookie_name] = session_key
+      raw_request.cookies[Marten.settings.sessions.cookie_name] = "test"
       request = Marten::HTTP::Request.new(raw_request)
 
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        ->{
+          request.session.flush
+          Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
+        }
       )
 
       response.cookies.has_key?(Marten.settings.sessions.cookie_name).should be_false

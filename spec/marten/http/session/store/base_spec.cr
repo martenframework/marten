@@ -110,6 +110,11 @@ describe Marten::HTTP::Session::Store::Base do
       store["test"] = "test"
       store.empty?.should be_false
     end
+
+    it "returns false if the store is empty but a session key is set" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.empty?.should be_false
+    end
   end
 
   describe "#modified?" do

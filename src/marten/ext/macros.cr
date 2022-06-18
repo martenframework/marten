@@ -1,4 +1,4 @@
-macro defined?(t)
+macro __marten_defined?(t)
   {% if t.resolve? %}
     {{ yield }}
   {% end %}

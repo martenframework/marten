@@ -1,5 +1,5 @@
-defined?(::SQLite3::ResultSet) do
-  class SQLite3::ResultSet < DB::ResultSet
+class SQLite3::ResultSet
+  __marten_defined?(::SQLite3::ResultSet) do
     def read(t : Time?.class) : Time?
       read(String?).try do |v|
         if v.includes? "."

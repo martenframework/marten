@@ -28,7 +28,7 @@ module Marten
           end
 
           def quoted_default_value_for_built_in_column(value : ::DB::Any) : String
-            defined?(::PG) do
+            __marten_defined?(::PG) do
               value = case value
                       when Bytes
                         "X'#{value.hexstring}'"

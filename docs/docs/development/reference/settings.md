@@ -422,4 +422,56 @@ This setting is only used if `media_files.storage` is `nil`.
 
 ## Sessions settings
 
+Sessions settings allow to configure how Marten should handle [sessions](../../views-and-http/introduction#using-sessions). These settings are all available under the `sessions` namespace:
+
+```crystal
+config.sessions.cookie_name = "_sessions"
+config.sessions.store = :cookie
+```
+
+### `cookie_domain`
+
+Default: `nil`
+
+An optional domain to use when setting the session cookie. This can be used to share the session cookie across multiple subdomains.
+
+### `cookie_http_only`
+
+Default: `false`
+
+A boolean indicating whether client-side scripts should be prevented from accessing the session cookie. If this option is set to `true`, Javascript scripts won't be able to access the session cookie.
+
+### `cookie_max_age`
+
+Default: `1_209_600` (two weeks)
+
+The max age (in seconds) of the session cookie.
+
+
+### `cookie_name`
+
+Default: `"sessionid"`
+
+The name of the cookie to use for the session token. This cookie name should be different than any other cookies created by your application.
+
+### `cookie_same_site`
+
+Default: `"Lax"`
+
+The value of the [SameSite flag](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) to use for the session cookie. Accepted values are `"Lax"`, `"Strict"`, or `"None"`.
+
+### `cookie_secure`
+
+Default: `false`
+
+A boolean indicating whether to use a secure cookie for the session cookie. Setting this to `true` will force browsers to send the cookie with an encrypted request over the HTTPS protocol only.
+
+### `store`
+
+Default: `"cookie"`
+
+A string containing the identifier of the store used to handle sessions.
+
+By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../views-and-http/sessions) for more details about this capability.
+
 ## Templates settings

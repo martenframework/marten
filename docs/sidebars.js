@@ -47,6 +47,7 @@ module.exports = {
         'views-and-http/generic-views',
         'views-and-http/error-views',
         'views-and-http/middlewares',
+        'views-and-http/sessions',
       ],
     },
     {

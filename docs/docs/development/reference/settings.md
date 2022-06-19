@@ -173,6 +173,15 @@ Default: `[] of String`
 
 An array of directories where assets should be looked for. The order of these directories is important as it defines the order in which assets are searched for.
 
+It should be noted that path objects or symbols can also be used to configure this setting:
+
+```crystal
+config.assets.dirs = [
+  Path["src/path1/assets"],
+  :"src/path2/assets",
+]
+```
+
 ### `manifests`
 
 Default: `[] of String`
@@ -475,3 +484,37 @@ A string containing the identifier of the store used to handle sessions.
 By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../views-and-http/sessions) for more details about this capability.
 
 ## Templates settings
+
+Templates settings allow to configure how Marten discovers and renders [templates](../../templates). These settings are all available under the `templates` namespace:
+
+```crystal
+config.templates.app_dirs = false
+config.templates.cached = false
+```
+
+### `app_dirs`
+
+Default: `true`
+
+A boolean indicating whether templates should be looked for inside installed application folders (local `templates` directories). When this setting is set to `true`, this means that templates provided by installed applications can be loaded and rendered by the templates engine. Otherwise, it would not be possible to load and render these application templates.
+
+### `cached`
+
+Default: `false`
+
+A boolean indicating whether templates should be kept in a memory cache upon being loaded and parsed. This setting should likely be set to `false` in development environments (where changes to templates are frequent) and set to `true` in production environments (in order to avoid loading and parsing the same templates multiple times).
+
+### `dirs`
+
+Default: `[] of String`
+
+An array of directories where templates should be looked for. The order of these directories is important as it defines the order in which templates are searched for when requesting a template for a given path (eg. `foo/bar/template.html`).
+
+It should be noted that path objects or symbols can also be used to configure this setting:
+
+```crystal
+config.templates.dirs = [
+  Path["src/path1/templates"],
+  :"src/path2/templates",
+]
+```

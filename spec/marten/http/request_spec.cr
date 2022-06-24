@@ -297,6 +297,52 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#flash" do
+    it "returns the flash store if it was set previously" do
+      flash_store = Marten::HTTP::FlashStore.new
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.flash = flash_store
+
+      request.flash.should eq flash_store
+    end
+
+    it "raises a NilAssertionError if the flash store was not set previously" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      expect_raises(NilAssertionError) { request.flash }
+    end
+  end
+
+  describe "#flash=" do
+    it "allows to set the flash store associated with the request" do
+      flash_store = Marten::HTTP::FlashStore.new
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.flash = flash_store
+
+      request.flash.should eq flash_store
+    end
+  end
+
   describe "#full_path" do
     it "returns the request full path when query params are present" do
       request = Marten::HTTP::Request.new(

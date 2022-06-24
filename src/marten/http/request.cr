@@ -6,9 +6,10 @@ module Marten
     # metadata of the incoming request.
     class Request
       @accepted_media_types : Array(MIME::MediaType)?
+      @flash : FlashStore?
       @host_and_port : NamedTuple(host: String, port: String)?
       @scheme : String?
-      @session : Session::Store::Base? = nil
+      @session : Session::Store::Base?
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
@@ -48,6 +49,19 @@ module Marten
       # Returns `true` if the request is a DELETE.
       def delete?
         method == "DELETE"
+      end
+
+      # Returns the flash store for the considered request.
+      #
+      # If no flash store was previously set (for example if the flash middleware is not used), a `NilAssertionError`
+      # exception will be raised.
+      def flash
+        @flash.not_nil!
+      end
+
+      # Allows to set the flash store for the request.
+      def flash=(flash_store : FlashStore)
+        @flash = flash_store
       end
 
       # Returns the path including the GET parameters if applicable.

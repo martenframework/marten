@@ -79,10 +79,5 @@ html[data-theme='dark'] {
   > header + p {
     color: var(--markdown-text-intro-c);
     font-size: 1.25rem;
-
-    + p {
-      color: var(--markdown-text-intro-c);
-      font-size: 1.25rem;
-    }
   }
 }

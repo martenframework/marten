@@ -92,6 +92,7 @@ module.exports = {
           label: 'Reference',
           items: [
             'development/reference/settings',
+            'development/reference/management-commands',
           ],
         },
       ],

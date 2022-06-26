@@ -1,5 +1,6 @@
 require "./concerns/callbacks"
 require "./concerns/cookies"
+require "./concerns/flash"
 require "./concerns/request_forgery_protection"
 require "./concerns/session"
 
@@ -12,6 +13,7 @@ module Marten
     class Base
       include Callbacks
       include Cookies
+      include Flash
       include RequestForgeryProtection
       include Session
 

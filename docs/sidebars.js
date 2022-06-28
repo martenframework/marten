@@ -32,7 +32,8 @@ module.exports = {
           label: 'Reference',
           items: [
             'models-and-databases/reference/fields',
-            'models-and-databases/reference/query_set',
+            'models-and-databases/reference/query-set',
+            'models-and-databases/reference/migration-operations',
           ],
         },
       ],

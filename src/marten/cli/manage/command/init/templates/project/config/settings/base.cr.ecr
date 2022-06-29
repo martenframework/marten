@@ -6,6 +6,7 @@ Marten.configure do |config|
 
   config.middleware = [
     Marten::Middleware::Session,
+    Marten::Middleware::Flash,
     Marten::Middleware::GZip,
   ]
 

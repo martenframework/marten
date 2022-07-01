@@ -22,7 +22,7 @@ The above view returns a `200 OK` response containing a short text, regardless o
 
 Views are initialized from a [`Marten::HTTP::Request`](pathname:///api/Marten/Http/Request.html) object and an optional set of routing parameters. Their inner logic is executed when calling the `#dispatch` method, which _must_ return a [`Marten::HTTP::Response`](pathname:///api/Marten/Http/Response.html) object.
 
-When the `#dispatch` method is explicitly overridden, it is responsible for applying different logics in order to handle the various incoming HTTP request methods. For example, a view might display an HTML page containing a form when handling a `GET` request while handling possible form data when handling a `POST` request:
+When the `#dispatch` method is explicitly overridden, it is responsible for applying different logics in order to handle the various incoming HTTP request methods. For example, a view might display an HTML page containing a form when handling a `GET` request, and it might process possible form data when handling a `POST` request:
 
 ```crystal
 class FormView < Marten::View
@@ -65,11 +65,12 @@ The `request` object gives access to a set of useful information and attributes 
 | `#body` | Returns the raw body of the request as a string. |
 | `#cookies` | Returns a hash-like object (instance of [`Marten::HTTP::Cookies`](pathname:///api/Marten/Http/Cookies.html)) containing the cookies associated with the request. |
 | `#data` | Returns a hash-like object (instance of [`Marten::HTTP::Params::Data`](pathname:///api/Marten/Http/Params/Data.html)) containing the request data. |
+| `#flash` | Returns a hash-like object (instance of [`Marten::HTTP::FlashStore`](pathname:///api/Marten/Http/FlashStore.html)) containing the flash messages available to the current request. |
 | `#headers` | Returns a hash-like object (instance of [`Marten::HTTP::Headers`](pathname:///api/Marten/Http/Headers.html)) containg the headers embedded in the request. |
 | `#host` | Returns the host associated with the considered request. |
 | `#method` | Returns the considered HTTP request method (`GET`, `POST`, `PUT`, etc). |
 | `#query_params` | Returns a hash-like object (instance of [`Marten::HTTP::Params::Query`](pathname:///api/Marten/Http/Params/Query.html)) containing the HTTP GET parameters embedded in the request. |
-| `#session` | Returns a hash-like object (instance of [`Marten::HTTP::Session`](pathname:///api/Marten/Http/Session.html)) corresponding to the session store for the current request. |
+| `#session` | Returns a hash-like object (instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/Marten/Http/Session/Store/Base.html)) corresponding to the session store for the current request. |
 
 The `response` object corresponds to the HTTP response that is returned to the client. Response objects can be created by initializing the [`Marten::HTTP::Response`](pathname:///api/Marten/Http/Response.html) class directly (or one of its subclasses) or by using [response helper methods](#response-helper-methods). Once initialized, these objects can be mutated to further configure what is sent back to the browser. The most common methods that you can use in this regard are listed below:
 
@@ -223,6 +224,79 @@ end
 
 Please refer to [Routing](./routing) for more information regarding routes configuration.
 
+## Using cookies
+
+Views are able to interact with a cookies store, that you can use to store small amounts of data on the client. This data will be persisted across requests, and will be made accessible with every incoming request.
+
+The cookies store is an instance of [`Marten::HTTP::Cookies`](pathname:///api/Marten/Http/Cookies.html) and provides a hash-like interface allowing to retrieve and store data. Views can access it through the use of the `#cookies` method. Here is a very simple example of how to interact with cookies:
+
+```crystal
+class MyView < Marten::View
+  def get
+    cookies[:foo] = "bar"
+    respond "Hello World!"
+  end
+end
+```
+
+It should be noted that the cookies store gives access to two sub stores: an encrypted one and a signed one.
+
+`cookies.encrypted` allows to define cookies that will be signed and encrypted. Whenever a cookie is requested from this store, the raw value of the cookie will be decrypted. This is useful to create cookies whose values can't be read nor tampered by users:
+
+```crystal
+cookies.encrypted[:secret_message] = "Hello!"
+```
+
+`cookies.signed` allows to define cookies that will be signed but not encrypted. This means that whenever a cookie is requested from this store, the signed representation of the corresponding value will be verified. This is useful to create cookies that can't be tampered by users, but it should be noted that the actual data can still be read by the client.
+
+```crystal
+cookies.signed[:signed_message] = "Hello!"
+```
+
 ## Using sessions
 
-## Using cookies
+Views can interact with a session store, which you can use to store small amounts of data that will be persisted between requests. How much data you can persist is this store depends on the session backend being used. The default backend persists session data using an encrypted cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages.
+
+The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/Marten/Http/Session/Store/Base.html) and provides a hash-like interface. Views can access it through the use of the `#session` method. For example:
+
+```crystal
+class MyView < Marten::View
+  def get
+    session[:foo] = "bar"
+    respond "Hello World!"
+  end
+end
+```
+
+Please refer to [Sessions](./sessions) for more information regarding configuring sessions and the available backends.
+
+## Using the flash store
+
+The flash store provides a way to pass basic string messages from one view to the next one. Any string value that is set in this store will be available to the next view processing the next request, and then it will be cleared out. Such mechanism provides a convenient way of creating one-time notification messages (such as alerts or notices).
+
+The flash store is an instance [`Marten::HTTP::FlashStore`](pathname:///api/Marten/Http/FlashStore.html) and provides a hash-like interface. Views can access it through the use of the `#flash` method. For example:
+
+```crystal
+class MyView < Marten::View
+  def post
+    flash[:notice] = "Article successfully created!"
+    redirect("/success")
+  end
+end
+```
+
+In the above example, the view creates a flash message before returning a redirect response to another URL. It is up to the view processing this URL to decide what to do with the flash message; this can involve rendering it as part of a base template for example.
+
+Note that it is possible to explicitly keep the current flash messages so that they remain all accessible to the next view processing the next request. This can be done by using the `flash.keep` method, which can take an optional argument in order to keep the message associated with a specific key only.
+
+```crystal
+flash.keep       # keeps all the flash messages for the next request
+flash.keep(:foo) # keeps the message associated with the "foo" key only
+```
+
+The reverse operation is also possible: you can decide to discard all the current flash messages so that none of them will remain accessible to the next view processing the next request. This can be done by using the `flash.discard` method, which can take an optional argument in order to discard the message associated with a specific key only.
+
+```crystal
+flash.discard       # discards all the flash messages
+flash.discard(:foo) # discards the message associated with the "foo" key only
+```

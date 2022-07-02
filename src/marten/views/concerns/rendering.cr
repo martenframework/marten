@@ -23,7 +23,7 @@ module Marten
 
       # Renders the configured template for a specific `context` object.
       def render_template(context : Hash | NamedTuple | Nil | Marten::Template::Context)
-        template_context = Marten::Template::Context.from(context)
+        template_context = Marten::Template::Context.from(context, request)
         template_context["view"] = self
         Marten.templates.get_template(template_name).render(template_context)
       end

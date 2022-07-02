@@ -19,6 +19,13 @@ module Marten
         end
       end
 
+      # Initializes a context from a hash (or a named tuple) and an HTTP request.
+      def self.from(values : Context | Hash | NamedTuple | Nil, request : HTTP::Request)
+        context = from(values)
+        context["request"] = request
+        context
+      end
+
       # Allows to initialize an empty context.
       def initialize
         @blocks = BlockStack.new

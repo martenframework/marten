@@ -177,7 +177,7 @@ module Marten
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
         status = 200
       )
-        template_context = Marten::Template::Context.from(context)
+        template_context = Marten::Template::Context.from(context, request)
         template_context["view"] = self
         HTTP::Response.new(
           content: Marten.templates.get_template(template_name).render(template_context),

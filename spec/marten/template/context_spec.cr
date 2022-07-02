@@ -24,6 +24,81 @@ describe Marten::Template::Context do
       ctx2 = Marten::Template::Context.from(ctx1)
       ctx2.should be ctx1
     end
+
+    context "with a request" do
+      it "automatically injects the passed request into the initialized context" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        ctx = Marten::Template::Context.from({"foo" => "bar"}, request)
+
+        ctx["request"].should eq request
+      end
+
+      it "can be used to initialize a context from a given hash" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        ctx = Marten::Template::Context.from({"foo" => "bar"}, request)
+
+        ctx.empty?.should be_false
+        ctx["foo"].should eq "bar"
+      end
+
+      it "can be used to initialize a context from a given named tuple" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        ctx = Marten::Template::Context.from({foo: "bar"}, request)
+
+        ctx.empty?.should be_false
+        ctx["foo"].should eq "bar"
+      end
+
+      it "can be used to initialize a context from a nil value" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        ctx = Marten::Template::Context.from(nil, request)
+
+        ctx.empty?.should be_false
+      end
+
+      it "returns any existing context object it receives as argument" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+
+        ctx1 = Marten::Template::Context.from({"foo" => "bar"}, request)
+        ctx2 = Marten::Template::Context.from(ctx1, request)
+
+        ctx2.should be ctx1
+      end
+    end
   end
 
   describe "::new" do

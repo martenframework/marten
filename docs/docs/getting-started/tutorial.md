@@ -69,7 +69,7 @@ shards install
 ```
 
 :::info
-Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example apps can provide [models](../models) or [views](../views). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects. The use of apps is activated by simply adding app classes to the `installed_apps` setting.
+Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example apps can provide [models](../models-and-databases) or [views](../views-and-http). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects. The use of apps is activated by simply adding app classes to the `installed_apps` setting.
 
 By default, when creating a new project through the use of the `init` command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
 

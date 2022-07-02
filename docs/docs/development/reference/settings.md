@@ -154,7 +154,7 @@ The view class that should generate responses for Internal Error responses (HTTP
 
 ## Assets settings
 
-Assets settings allow to configure how Marten should interact with [assets](../files/asset-handling). These settings are all available under the `assets` namespace:
+Assets settings allow to configure how Marten should interact with [assets](../../files/asset-handling). These settings are all available under the `assets` namespace:
 
 ```crystal
 config.assets.root = "assets"
@@ -165,7 +165,7 @@ config.assets.url = "/assets/"
 
 Default: `true`
 
-A boolean indicating whether assets should be looked for inside installed application folders. When this setting is set to `true`, this means that assets provided by installed applications will be collected by the `collectassets` command (please refer to [Asset handling](../files/asset-handling) for more details regarding how to manage assets in your project).
+A boolean indicating whether assets should be looked for inside installed application folders. When this setting is set to `true`, this means that assets provided by installed applications will be collected by the `collectassets` command (please refer to [Asset handling](../../files/asset-handling) for more details regarding how to manage assets in your project).
 
 ### `dirs`
 
@@ -392,7 +392,7 @@ The default locale used by the Marten project.
 
 ## Media files settings
 
-Media files settings allow to configure how Marten should interact with [media files](../files/managing-files). These settings are all available under the `media_files` namespace:
+Media files settings allow to configure how Marten should interact with [media files](../../files/managing-files). These settings are all available under the `media_files` namespace:
 
 ```crystal
 config.media_files.root = "files"

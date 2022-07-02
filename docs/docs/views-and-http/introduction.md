@@ -4,7 +4,7 @@ description: Learn how to define views and respond to HTTP requests.
 sidebar_label: Introduction
 ---
 
-Views are classes whose responsibility is to process web requests and to return responses. They implement the necessary logic allowing to return this response, which can involve processing form data through the use of [schemas](../schemas) for example, retrieving [model records](../models) from the database, etc. They can return responses corresponding to HTML pages, JSON objects, redirects, ...
+Views are classes whose responsibility is to process web requests and to return responses. They implement the necessary logic allowing to return this response, which can involve processing form data through the use of [schemas](../schemas) for example, retrieving [model records](../models-and-databases) from the database, etc. They can return responses corresponding to HTML pages, JSON objects, redirects, ...
 
 ## Writing views
 

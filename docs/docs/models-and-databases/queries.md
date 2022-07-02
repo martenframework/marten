@@ -6,7 +6,7 @@ sidebar_label: Queries
 
 Once [models are properly defined](./introduction), it is possible to leverage the querying API in order to interact with model records. This API lets you build what is commonly referred to as "query sets": that is, representations of records collections that can be read, filtered, updated, or deleted.
 
-This documents covers the main features of the [query set API](./reference/query_set). Most of the examples used to illustrate these features will refer to the following models:
+This documents covers the main features of the [query set API](./reference/query-set). Most of the examples used to illustrate these features will refer to the following models:
 
 ```crystal
 class City < Marten::Model
@@ -198,7 +198,7 @@ Article.all.filter(author_id: 42)
 ```
 :::
 
-Marten support numerous predicate types, which are all documented in the [field predicates reference](./reference/query_set#field-predicates). The ones that you'll encounter most frequently are outlined below:
+Marten support numerous predicate types, which are all documented in the [field predicates reference](./reference/query-set#field-predicates). The ones that you'll encounter most frequently are outlined below:
 
 #### `exact`
 

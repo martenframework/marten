@@ -28,7 +28,7 @@ module Marten
           Management::Introspector::SQLite.new(self)
         end
 
-        def left_operand_for(id : String, _predicate) : String
+        def left_operand_for(id : String, predicate) : String
           id
         end
 

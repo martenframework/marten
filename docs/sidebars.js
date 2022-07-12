@@ -49,6 +49,13 @@ module.exports = {
         'views-and-http/error-views',
         'views-and-http/middlewares',
         'views-and-http/sessions',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'views-and-http/how-to/create-custom-route-parameters',
+          ],
+        },
       ],
     },
     {

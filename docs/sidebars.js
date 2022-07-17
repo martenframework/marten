@@ -56,6 +56,13 @@ module.exports = {
             'views-and-http/how-to/create-custom-route-parameters',
           ],
         },
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'views-and-http/reference/generic-views',
+          ],
+        },
       ],
     },
     {

@@ -2,6 +2,24 @@ nav.navbar {
   background: linear-gradient(-45deg, #904e95 0, #eb6864);
   box-shadow: 0 0 5px rgba(0,0,0,0.2);
 
+  &.navbar-sidebar--show {
+    @media (max-width: 997px) {
+      button.clean-btn {
+        svg {
+          color: gray;
+        }
+      }
+
+      .navbar__title {
+        color: var(--ifm-color-primary);
+
+        &:after {
+          color: gray;
+        }
+      }
+    }
+  }
+
   button.clean-btn {
     &:hover, &:focus {
       background: var(--ifm-color-primary);
@@ -22,6 +40,12 @@ nav.navbar {
       font-size: 0.8rem;
       color: gray;
       content: " DOCS";
+    }
+
+    @media (max-width: 997px) {
+      &:after {
+        color: white;
+      }
     }
   }
 }

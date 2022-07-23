@@ -54,7 +54,12 @@ module Marten
 
         @[Marten::Schema::Field::Registration(id: {{ id }}, exposed_type: {{ exposed_type }})]
         class ::{{klass.id}}; end
-        add_field_to_registry({{ id }}, {{ klass }})
+        Marten::Schema::Field.add_field_to_registry({{ id }}, {{ klass }})
+      end
+
+      # :nodoc:
+      def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
+        @@registry[id.to_s] = field_klass
       end
 
       macro finished
@@ -77,10 +82,6 @@ module Marten
       register "int", Int
       register "string", String
       register "uuid", UUID
-
-      protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
-        @@registry[id.to_s] = field_klass
-      end
     end
   end
 end

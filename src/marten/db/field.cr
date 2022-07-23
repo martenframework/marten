@@ -69,24 +69,11 @@ module Marten
           additional_type: {{ additional_type }}
         )]
         class ::{{klass.id}}; end
-        add_field_to_registry({{ id }}, {{ klass }})
+        Marten::DB::Field.add_field_to_registry({{ id }}, {{ klass }})
       end
 
-      register "big_int", BigInt
-      register "bool", Bool
-      register "date", Date
-      register "date_time", DateTime
-      register "file", File
-      register "float", Float
-      register "int", Int
-      register "many_to_many", ManyToMany
-      register "many_to_one", ManyToOne
-      register "one_to_one", OneToOne
-      register "string", String
-      register "text", Text
-      register "uuid", UUID
-
-      protected def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
+      # :nodoc:
+      def self.add_field_to_registry(id : ::String | Symbol, field_klass : Base.class)
         @@registry[id.to_s] = field_klass
       end
 
@@ -104,6 +91,20 @@ module Marten
 
         alias Any = Symbol | {% for t, i in field_types %}{{ t }}{% if i + 1 < field_types.size %} | {% end %}{% end %}
       end
+
+      register "big_int", BigInt
+      register "bool", Bool
+      register "date", Date
+      register "date_time", DateTime
+      register "file", File
+      register "float", Float
+      register "int", Int
+      register "many_to_many", ManyToMany
+      register "many_to_one", ManyToOne
+      register "one_to_one", OneToOne
+      register "string", String
+      register "text", Text
+      register "uuid", UUID
     end
   end
 end

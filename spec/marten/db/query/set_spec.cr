@@ -363,6 +363,17 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.count.should eq 3
     end
 
+    it "returns the expected number of record for an unfiltered query set that was already fetched" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.all
+      qset.each { }
+
+      qset.count.should eq 3
+    end
+
     it "returns the expected number of record for a filtered query set" do
       Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
@@ -371,6 +382,24 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c).count.should eq 2
       Marten::DB::Query::Set(Tag).new.filter(name__startswith: "r").count.should eq 1
       Marten::DB::Query::Set(Tag).new.filter(name__startswith: "x").count.should eq 0
+    end
+
+    it "returns the expected number of record for a filtered query set that was already fetched" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      qset_1 = Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c).all
+      qset_1.each { }
+      qset_1.count.should eq 2
+
+      qset_2 = Marten::DB::Query::Set(Tag).new.filter(name__startswith: "r").all
+      qset_2.each { }
+      qset_2.count.should eq 1
+
+      qset_3 = Marten::DB::Query::Set(Tag).new.filter(name__startswith: "x").all
+      qset_3.each { }
+      qset_3.count.should eq 0
     end
   end
 

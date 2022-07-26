@@ -94,7 +94,7 @@ module Marten
 
         # Returns the number of records that are targeted by the current query set.
         def count
-          @query.count
+          @result_cache.nil? ? @query.count : @result_cache.not_nil!.size
         end
 
         # Creates a model instance and saves it to the database if it is valid.

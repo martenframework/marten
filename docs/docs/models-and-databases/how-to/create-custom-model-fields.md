@@ -86,7 +86,7 @@ Creating new model fields from scratch involves subclassing the [`Marten::DB::Fi
 
 ### Mandatory methods
 
-#### `#default`
+#### `default`
 
 The `#default` method is responsible for returning the field's default value, if any. Not all fields support default values; if this does not apply to your field use case, you can simply "no-op" this method:
 
@@ -102,7 +102,7 @@ On the other hand, if your field can be initialized with a `default` argument (a
 getter default
 ```
 
-#### `#from_db`
+#### `from_db`
 
 The `#from_db` method is responsible for converting the passed raw DB value to the right field value. Indeed, the value that is read from the database will usually need to be converted to another format. For example a `uuid` field might need to convert a `String` value to a proper `UUID` object:
 
@@ -125,7 +125,7 @@ It should be noted that you will usually want to handle the case of `nil` values
 
 If the value can't be processed properly by your field class, then it may be necessary to raise an exception. To do that you can leverage the `#raise_unexpected_field_value` method, which will raise a `Marten::DB::Errors::UnexpectedFieldValue` exception.
 
-#### `#from_db_result_set`
+#### `from_db_result_set`
 
 The `#from_db_result_set` method is responsible for extracting the field value from a DB result set and returning the right object corresponding to this value. This method will usually be called when retrieving your field's value from the database (when using the Marten ORM). The method takes a standard `DB::ResultSet` object as argument and it is expected that you use `#read` to retrieve the intended column value. See the [Crystal reference documentation](https://crystal-lang.org/reference/1.5/database/index.html#reading-query-results) for more details around these objects and methods.
 
@@ -139,7 +139,7 @@ end
 
 The `#from_db_result_set` method is supposed to return the read value into the right "representation", that is the final object representing the field value that users will interact with when manipulating model records (for example a `UUID` object created from a string). As such, you will usually want to call [`#from_db`](#fromdb) once you get the value from the database result set in order to return the final value.
 
-#### `#to_column`
+#### `to_column`
 
 Most model fields will contribute a corresponding column at the database level ; these columns are read by Marten in order to generate migrations from model definitions. The column returned by the `#to_column` method should be an instance of a subclass of [`Marten::DB::Management::Column::Base`](pathname:///api/Marten/DB/Management/Column/Base.html).
 
@@ -161,7 +161,7 @@ end
 
 If for some reasons your custom field does not contribute any columns at the database model, it is possible to simply "no-op" the `#to_column` method by returning `nil` instead.
 
-#### `#to_db`
+#### `to_db`
 
 The `#to_db` method converts a field value from the "Crystal" representation to the database representation. As such, this method performs the reverse operation of the [`#from_db`](#fromdb) method.
 
@@ -184,7 +184,7 @@ Again, if the value can't be processed properly by the field class, it may be ne
 
 ### Other useful methods
 
-#### `#initialize`
+#### `initialize`
 
 The default `#initialize` method that is provided by the [`Marten::DB::Field::Base`](pathname:///api/Marten/DB/Field/Base.html) is fairly simply and looks like this:
 
@@ -203,7 +203,7 @@ end
 
 Depending on your field requirements, you might want to overridde this method completely in order to support additional parameters (such as default values, max sizes, validation-related options, etc).
 
-#### `#validate`
+#### `validate`
 
 The `#validate` method does nothing by default and can be overridden on a per-field class basis in order to implement custom validation logic. This method takes the model record being validated and the field value as arguments, which allows you to easily run validation checks and to add [validation errors](../validations) to the model record.
 

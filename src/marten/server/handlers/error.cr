@@ -21,6 +21,9 @@ module Marten
         rescue Marten::HTTP::Errors::SuspiciousOperation
           view = Marten.settings.view400.new(context.marten.request)
           convert_view_response(context, view.dispatch.as(HTTP::Response))
+        rescue Marten::HTTP::Errors::PermissionDenied
+          view = Marten.settings.view403.new(context.marten.request)
+          convert_view_response(context, view.dispatch.as(HTTP::Response))
         rescue e : Exception
           Log.error { "Internal Server Error: #{context.request.path}\n#{e.inspect_with_backtrace}" }
 

@@ -82,6 +82,7 @@ module Marten
           app_template "shared/.gitkeep", "templates/.gitkeep"
           app_template "shared/.gitkeep", "views/.gitkeep"
 
+          project_template "shared/.gitkeep", "config/initializers/.gitkeep"
           project_template "project/config/settings/base.cr.ecr", "config/settings/base.cr"
           project_template "project/config/settings/development.cr.ecr", "config/settings/development.cr"
           project_template "project/config/settings/production.cr.ecr", "config/settings/production.cr"

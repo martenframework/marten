@@ -61,6 +61,7 @@ module.exports = {
           label: 'Reference',
           items: [
             'views-and-http/reference/generic-views',
+            'views-and-http/reference/middlewares',
           ],
         },
       ],

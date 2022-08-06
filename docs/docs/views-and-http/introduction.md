@@ -255,7 +255,7 @@ cookies.signed[:signed_message] = "Hello!"
 
 ## Using sessions
 
-Views can interact with a session store, which you can use to store small amounts of data that will be persisted between requests. How much data you can persist is this store depends on the session backend being used. The default backend persists session data using an encrypted cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages.
+Views can interact with a session store, which you can use to store small amounts of data that will be persisted between requests. How much data you can persist in this store depends on the session backend being used. The default backend persists session data using an encrypted cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages.
 
 The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/Marten/Http/Session/Store/Base.html) and provides a hash-like interface. Views can access it through the use of the `#session` method. For example:
 

@@ -1,5 +1,6 @@
 module Marten
   module Server
+    # Marten's specific request/response context.
     class Context
       getter request
       getter response

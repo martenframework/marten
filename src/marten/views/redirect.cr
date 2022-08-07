@@ -2,7 +2,7 @@ module Marten
   module Views
     # View allowing to conveniently return redirect responses.
     class Redirect < Base
-      # Indices the whether query strings should be copied into the redirect URL or not.
+      # Indicates whether query strings should be copied into the redirect URL or not.
       #
       # Defaults to `false`.
       class_getter forward_query_string : Bool = false

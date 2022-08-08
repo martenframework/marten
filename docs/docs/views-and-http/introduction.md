@@ -104,7 +104,7 @@ end
 
 Technically, it is possible to forge HTTP responses by instantiating the [`Marten::HTTP::Response`](pathname:///api/Marten/Http/Response.html) class directly (or one of its subclasses such as [`Marten::HTTP::Response::Found`](pathname:///api/Marten/Http/Response/Found.html) for example). That being said, Marten provides a set of helper methods that can be used to conveniently forge responses for various use cases:
 
-#### `#respond`
+#### `respond`
 
 You already saw `#respond` in action in the [first example](#writing-views). Basically, `#respond` allows to forge an HTTP response by specifying a content, a content type, and a status code:
 

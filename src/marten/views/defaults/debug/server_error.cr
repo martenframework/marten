@@ -15,7 +15,7 @@ module Marten
             if request.accepts?("text/html")
               render_server_error_page
             else
-              HTTP::Response::InternalServerError.new(content: "Internal Server Error", content_type: "text/html")
+              HTTP::Response::InternalServerError.new(content: "Internal Server Error", content_type: "text/plain")
             end
           end
 
@@ -54,7 +54,7 @@ module Marten
           private BACKTRACE_FRAME_RE = /\s(?<file>[^\s\:]+):(?<line_number>\d+)/
 
           private def render_server_error_page
-            HTTP::Response.new(ECR.render("#{__DIR__}/templates/server_error.html.ecr"))
+            HTTP::Response::InternalServerError.new(ECR.render("#{__DIR__}/templates/server_error.html.ecr"))
           end
         end
       end

@@ -21,7 +21,7 @@ module Marten
           end
 
           private def render_not_found_page
-            HTTP::Response.new(ECR.render("#{__DIR__}/templates/page_not_found.html.ecr"))
+            HTTP::Response::NotFound.new(ECR.render("#{__DIR__}/templates/page_not_found.html.ecr"))
           end
 
           private def render_welcome_page

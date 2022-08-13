@@ -4,6 +4,36 @@ require "./record_update_spec/**"
 describe Marten::Views::RecordUpdate do
   with_installed_apps Marten::Views::RecordUpdateSpec::App
 
+  describe "::record_context_name" do
+    it "returns the configured context name for the record" do
+      Marten::Views::RecordUpdateSpec::TestView.record_context_name.should eq "tag"
+    end
+
+    it "returns `record` by default" do
+      Marten::Views::RecordUpdateSpec::TestViewWithoutConfiguration.record_context_name.should eq "record"
+    end
+  end
+
+  describe "#context" do
+    it "returns the expected hash" do
+      tag = Marten::Views::RecordUpdateSpec::Tag.create(name: "oldtag")
+
+      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => tag.id!}
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "name=updatedtag"
+        )
+      )
+      view = Marten::Views::RecordUpdateSpec::TestView.new(request, params)
+
+      view.context["schema"].should be_a Marten::Views::RecordUpdateSpec::TagSchema
+      view.context["tag"].should eq tag
+    end
+  end
+
   describe "#post" do
     it "updates an existing record and returns the expected redirect response if the schema is valid" do
       tag = Marten::Views::RecordUpdateSpec::Tag.create(name: "oldtag")
@@ -105,5 +135,9 @@ module Marten::Views::RecordUpdateSpec
     schema TagSchema
     success_route_name "dummy"
     template_name "specs/views/schema/test.html"
+    record_context_name "tag"
+  end
+
+  class TestViewWithoutConfiguration < Marten::Views::RecordUpdate
   end
 end

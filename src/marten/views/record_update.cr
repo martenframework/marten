@@ -36,6 +36,18 @@ module Marten
     class RecordUpdate < Views::Schema
       include RecordRetrieving
 
+      # Returns the name to use to include the model record into the template context (defaults to `record`).
+      class_getter record_context_name : String = "record"
+
+      # Allows to configure the name to use to include the model record into the template context.
+      def self.record_context_name(name : String | Symbol)
+        @@record_context_name = name.to_s
+      end
+
+      def context
+        super.not_nil!.merge({self.class.record_context_name => record})
+      end
+
       # Returns a hash of initial data, computed from the considered record, to prepare the schema.
       def initial_data
         initial_data = HTTP::Params::Data.new

@@ -96,6 +96,7 @@ module.exports = {
         'development/settings',
         'development/applications',
         'development/management-commands',
+        'development/testing',
         {
           type: 'category',
           label: "How-To's",

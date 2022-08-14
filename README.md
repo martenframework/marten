@@ -12,7 +12,14 @@ reinventing the wheel.
 
 ## Documentation
 
-Online browsable documentation is available at https://martenframework.com.
+Online browsable documentation is available at [https://martenframework.com/docs](https://martenframework.com/docs).
+
+## Getting started
+
+Are you new to the Marten web framework? The following resources will help you get started:
+
+* The [installation guide](https://martenframework.com/docs/getting-started/installation) will help you install Crystal and the Marten CLI
+* The [tutorial](https://martenframework.com/docs/getting-started/tutorial) will help you discover the main features of the framework by creating a simple web application
 
 ## Authors
 

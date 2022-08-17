@@ -153,38 +153,38 @@ describe Marten::Views::Defaults::Debug::ServerError do
     end
 
     it "returns the expected template snippet lines if the error is a template syntax error" do
-      Marten.settings.debug = true
+      with_overridden_setting(:debug, true) do
+        source = <<-TEMPLATE
+        HEADER
+        Hello World, {% %}!
+        FOOTER
+        TEMPLATE
 
-      source = <<-TEMPLATE
-      HEADER
-      Hello World, {% %}!
-      FOOTER
-      TEMPLATE
+        parser = Marten::Template::Parser.new(source)
 
-      parser = Marten::Template::Parser.new(source)
+        error = expect_raises(
+          Marten::Template::Errors::InvalidSyntax,
+          "Empty tag detected on line 2"
+        ) do
+          parser.parse
+        end
 
-      error = expect_raises(
-        Marten::Template::Errors::InvalidSyntax,
-        "Empty tag detected on line 2"
-      ) do
-        parser.parse
-      end
-
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/foo/bar",
-          headers: HTTP::Headers{"Host" => "example.com", "Accept" => "text/html"}
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "/foo/bar",
+            headers: HTTP::Headers{"Host" => "example.com", "Accept" => "text/html"}
+          )
         )
-      )
 
-      view = Marten::Views::Defaults::Debug::ServerError.new(request)
-      view.bind_error(error)
+        view = Marten::Views::Defaults::Debug::ServerError.new(request)
+        view.bind_error(error)
 
-      view.template_snippet_lines.not_nil!.should_not be_empty
-      view.template_snippet_lines.not_nil![0].should eq({"HEADER", 1, false})
-      view.template_snippet_lines.not_nil![1].should eq({"Hello World, {% %}!", 2, true})
-      view.template_snippet_lines.not_nil![2].should eq({"FOOTER", 3, false})
+        view.template_snippet_lines.not_nil!.should_not be_empty
+        view.template_snippet_lines.not_nil![0].should eq({"HEADER", 1, false})
+        view.template_snippet_lines.not_nil![1].should eq({"Hello World, {% %}!", 2, true})
+        view.template_snippet_lines.not_nil![2].should eq({"FOOTER", 3, false})
+      end
     end
   end
 end

@@ -97,26 +97,26 @@ describe Marten::Template::Parser do
     end
 
     it "properly decorates invalid syntax errors when in debug mode" do
-      Marten.settings.debug = true
+      with_overridden_setting(:debug, true) do
+        source = <<-TEMPLATE
+        Hello World, {% %}!
+        TEMPLATE
 
-      source = <<-TEMPLATE
-      Hello World, {% %}!
-      TEMPLATE
+        parser = Marten::Template::Parser.new(source)
 
-      parser = Marten::Template::Parser.new(source)
+        error = expect_raises(
+          Marten::Template::Errors::InvalidSyntax,
+          "Empty tag detected on line 1"
+        ) do
+          parser.parse
+        end
 
-      error = expect_raises(
-        Marten::Template::Errors::InvalidSyntax,
-        "Empty tag detected on line 1"
-      ) do
-        parser.parse
+        error.source.should eq source
+        error.token.not_nil!.type.should eq Marten::Template::Parser::TokenType::TAG
       end
-
-      error.source.should eq source
-      error.token.not_nil!.type.should eq Marten::Template::Parser::TokenType::TAG
     end
 
-    it "does not decorate invalid syntax errors when in debug mode" do
+    it "does not decorate invalid syntax errors when not in debug mode" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
         Hello World, {% %}!

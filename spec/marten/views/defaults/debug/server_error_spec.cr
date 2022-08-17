@@ -57,7 +57,7 @@ describe Marten::Views::Defaults::Debug::ServerError do
   end
 
   describe "#error" do
-    it "raiss a nil assertion error if no error was bound to the server error view" do
+    it "raises a nil assertion error if no error was bound to the server error view" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -65,8 +65,6 @@ describe Marten::Views::Defaults::Debug::ServerError do
           headers: HTTP::Headers{"Host" => "example.com", "Accept" => "text/html"}
         )
       )
-
-      error = Exception.new("Something bad happened!")
 
       view = Marten::Views::Defaults::Debug::ServerError.new(request)
 

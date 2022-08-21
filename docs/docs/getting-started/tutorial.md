@@ -321,7 +321,7 @@ Let's define the expected template for our home view by creating a `src/template
 
 As you can see, Marten's templating system relies on variables that are surrounded by **`{{`** and **`}}`**. Each variable can involve lookups in order to access specific object attributes. In the above example `{{ article.title }}` means that the `title` attribute of the `article` variable should be outputted.
 
-Method-calling is done by using statements (also called "template tags") delimited by **`{*`** and **`*}`**. Such statements can involve for loops, if conditions, etc. In the above example we are using a for loop to iterate over the `Article` records in the `articles` query set that is "passed" to the template context in our `HomeView` view.
+Method-calling is done by using statements (also called "template tags") delimited by **`{%`** and **`%}`**. Such statements can involve for loops, if conditions, etc. In the above example we are using a for loop to iterate over the `Article` records in the `articles` query set that is "passed" to the template context in our `HomeView` view.
 
 If you go back to the home page ([http://localhost:8000](http://localhost:8000)), you should be able to see a list of article titles corresponding to all the `Article` records you created previously.
 

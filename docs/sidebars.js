@@ -70,7 +70,25 @@ module.exports = {
       type: 'category',
       label: 'Templates',
       link: {type: 'doc', id: 'templates'},
-      items: ['templates/introduction'],
+      items: [
+        'templates/introduction',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'templates/how-to/create-custom-filters',
+            'templates/how-to/create-custom-tags',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'templates/reference/filters',
+            'templates/reference/tags',
+          ],
+        },
+      ],
     },
     {
       type: 'category',

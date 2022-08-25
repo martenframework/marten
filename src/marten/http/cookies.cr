@@ -34,14 +34,33 @@ module Marten
       end
 
       # Deletes a specific cookie and return its value, or `nil` if the cookie does not exist.
-      def delete(name : String | Symbol) : String?
+      #
+      # Appart from the name of the cookie to delete, this method allows to define some additional cookie properties:
+      #
+      #   * the cookie `path`
+      #   * the associated `domain` (useful in order to define cross-domain cookies)
+      #   * the `same_site` policy (accepted values are `"lax"` or `"strict"`)
+      #
+      # The `path`, `domain`, and `same_site` values should always be the same that were used to create the cookie.
+      # Otherwise the cookie might not be deleted properly.
+      def delete(
+        name : String | Symbol,
+        path : String = "/",
+        domain : String? = nil,
+        same_site : Nil | String | Symbol = nil
+      ) : String?
         if raw_cookie = cookies.delete(name.to_s)
           deleted_cookie_value = raw_cookie.value
 
-          # Removing a cookie involves assigning it a past expiry.
-          raw_cookie.expires = 1.year.ago
-          raw_cookie.value = ""
-          set_cookies << raw_cookie
+          # Removing a cookie involves setting a cookie with the same name and a past expiry.
+          set_cookies << ::HTTP::Cookie.new(
+            name: name.to_s,
+            value: "",
+            expires: 1.year.ago,
+            path: path,
+            domain: domain,
+            samesite: same_site.nil? ? nil : ::HTTP::Cookie::SameSite.parse(same_site.to_s)
+          )
 
           deleted_cookie_value
         end

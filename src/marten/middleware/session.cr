@@ -25,7 +25,11 @@ module Marten
         session_modified = request.session.modified?
 
         if request.cookies.has_key?(Marten.settings.sessions.cookie_name) && request.session.empty?
-          request.cookies.delete(Marten.settings.sessions.cookie_name)
+          request.cookies.delete(
+            Marten.settings.sessions.cookie_name,
+            domain: Marten.settings.sessions.cookie_domain,
+            same_site: Marten.settings.sessions.cookie_same_site
+          )
           response.headers.patch_vary("Cookie")
           return
         end

@@ -37,6 +37,16 @@ module Marten
             @accessed
           end
 
+          # Regenerates the session key while keeping all the existing data.
+          def cycle_key : Nil
+            data = session_hash.dup
+
+            flush
+            create
+
+            @session_hash = data
+          end
+
           # Allows to delete a session value for a specific `key`.
           def delete(key : String | Symbol)
             deleted_value = session_hash.delete(key.to_s)

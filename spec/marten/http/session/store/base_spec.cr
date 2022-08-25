@@ -80,6 +80,31 @@ describe Marten::HTTP::Session::Store::Base do
     end
   end
 
+  describe "#cycle_key" do
+    it "cycles the key of a store whose data was already accessed" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store[:foo]?.should eq "bar"
+      store.accessed?.should be_true
+
+      store.cycle_key
+
+      store[:foo]?.should eq "bar"
+      store.session_key.should_not eq "sessionkey"
+    end
+
+    it "cycles the key of a store whose data was not already accessed" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.accessed?.should be_false
+
+      store.cycle_key
+
+      store[:foo]?.should eq "bar"
+      store.session_key.should_not eq "sessionkey"
+    end
+  end
+
   describe "#delete" do
     it "deletes a key value associated with a given key string" do
       store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")

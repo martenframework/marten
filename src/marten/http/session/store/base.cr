@@ -59,10 +59,30 @@ module Marten
             session_key.nil? && session_hash.empty?
           end
 
+          # Returns the value associated with the passed `key`, or the passed `default` if the key is not found.
+          def fetch(key : String | Symbol, default = nil)
+            fetch(key) { default }
+          end
+
+          # Returns the value associated with the passed `key`, or calls a block with the key when not found.
+          def fetch(key : String | Symbol)
+            self[key.to_s]? || yield key
+          end
+
+          # Returns `true` if the provided `key` exists.
+          def has_key?(key : String | Symbol) # ameba:disable Style/PredicateName
+            session_hash.has_key?(key.to_s)
+          end
+
           # Returns `true` if the session store was modified.
           def modified? : Bool
             @modified
           end
+
+          delegate each, to: session_hash
+
+          # Returns the number of keys in the session hash.
+          delegate size, to: session_hash
 
           # Creates a new session store.
           #

@@ -123,6 +123,16 @@ describe Marten::HTTP::Session::Store::Base do
     end
   end
 
+  describe "#each" do
+    it "allows to iterate over the keys and values" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.each do |key, value|
+        key.should eq "foo"
+        value.should eq "bar"
+      end
+    end
+  end
+
   describe "#empty?" do
     it "returns true if the store is empty" do
       store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
@@ -139,6 +149,60 @@ describe Marten::HTTP::Session::Store::Base do
     it "returns false if the store is empty but a session key is set" do
       store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
       store.empty?.should be_false
+    end
+  end
+
+  describe "#fetch" do
+    it "allows to retrieve a specific value using its key" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.fetch("foo") { "fallback" }.should eq "bar"
+    end
+
+    it "allows to retrieve a specific value using its key expressed as a symbol" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.fetch(:foo) { "fallback" }.should eq "bar"
+    end
+
+    it "allows to retrieve a specific value using its key and a default" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.fetch("foo", "fallback").should eq "bar"
+    end
+
+    it "allows to retrieve a specific value using its key expressed as a symbol and a default" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.fetch(:foo, "fallback").should eq "bar"
+    end
+
+    it "yields the key when not found" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.fetch("unknown") { |n| n }.should eq "unknown"
+    end
+
+    it "returns the default value if the key is not found" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.fetch("unknown", "fallback").should eq "fallback"
+    end
+  end
+
+  describe "#has_key?" do
+    it "returns true if a value is present for a key string" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.has_key?("foo").should be_true
+    end
+
+    it "returns true if a value is present for a key symbol" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.has_key?("foo").should be_true
+    end
+
+    it "returns false if a value is not present for a key string" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.has_key?("unknown").should be_false
+    end
+
+    it "returns false if a value is not present for a key symbol" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.has_key?("unknown").should be_false
     end
   end
 
@@ -159,6 +223,19 @@ describe Marten::HTTP::Session::Store::Base do
     it "returns the session key" do
       store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
       store.session_key.should eq "sessionkey"
+    end
+  end
+
+  describe "#size" do
+    it "returns the size of the sessions hash" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+      store.size.should eq 1
+
+      store["new"] = "other"
+      store.size.should eq 2
+
+      store.flush
+      store.size.should eq 0
     end
   end
 end

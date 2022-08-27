@@ -26,7 +26,7 @@ Creating a project is the first thing to do in order to start working on a Marte
 This can be achieved from the command line, where you can run the following command to create your first Marten project:
 
 ```bash
-marten init project myblog
+marten new project myblog
 ```
 
 The above command will create a `myblog` directory inside your current directory. This new folder should have the following content:
@@ -75,7 +75,7 @@ shards install
 :::info
 Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example apps can provide [models](../models-and-databases) or [views](../views-and-http). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, views, or templates to other projects. The use of apps is activated by simply adding app classes to the [`installed_apps`](../development/reference/settings#installed_apps) setting.
 
-By default, when creating a new project through the use of the `init` command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, migrations, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
+By default, when creating a new project through the use of the [`new`](../development/reference/management-commands#new) command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, migrations, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
 
 As projects grow in size and scope, it is generally encouraged to start thinking in terms of apps and how to split models, views, or features accross multiple apps depending on their intended responsibilities. Please refer to [Applications](../development/applications) to learn more about applications and how to structure your projects using them.
 :::

@@ -1,12 +1,12 @@
-require "./init/**"
+require "./new/**"
 
 module Marten
   module CLI
     class Manage
       module Command
-        class Init < Base
+        class New < Base
           # :nodoc:
-          TEMPLATE_DIR = "#{__DIR__}/init/templates"
+          TEMPLATE_DIR = "#{__DIR__}/new/templates"
 
           help "Initialize a new Marten project or application structure."
 

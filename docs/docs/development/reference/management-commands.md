@@ -7,11 +7,11 @@ description: Management commands reference.
 
 ## `genmigrations`
 
-## `init`
-
 ## `listmigrations`
 
 ## `migrate`
+
+## `new`
 
 ## `resetmigrations`
 

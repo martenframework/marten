@@ -2,7 +2,7 @@ module Marten
   module CLI
     class Manage
       module Command
-        class Init < Base
+        class New < Base
           abstract class Template
             @full_path : Path
 

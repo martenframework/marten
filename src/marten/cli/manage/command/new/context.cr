@@ -2,7 +2,7 @@ module Marten
   module CLI
     class Manage
       module Command
-        class Init < Base
+        class New < Base
           class Context
             property dir : String
             property name : String

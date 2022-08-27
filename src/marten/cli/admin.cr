@@ -5,7 +5,7 @@ module Marten
     # The admin CLI is a wrapper around the management CLI: when used inside a Marten project, it allows to conveniently
     # compile the management CLI in order to issue commands in order to interact with the database and the installed
     # applications. When used outside of a Marten project, the admin CLI provides a simple way to initialize a new app
-    # or project through the use of the `init` sub-command.
+    # or project through the use of the `new` sub-command.
     class Admin
       def initialize(@options : Array(String), @stdout : IO = STDOUT, @stderr : IO = STDERR)
       end
@@ -65,8 +65,8 @@ module Marten
 
       private def handle_inside_of_project_invocation
         case options.first?
-        when "init"
-          Manage::Command::Init.new(options: options[1..], stdout: stdout, stderr: stderr).handle
+        when "new"
+          Manage::Command::New.new(options: options[1..], stdout: stdout, stderr: stderr).handle
         when "serve"
           Manage::Command::Serve.new(options: options[1..], stdout: stdout, stderr: stderr).handle
         else
@@ -82,14 +82,14 @@ module Marten
           exit
         end
 
-        if !command || command == "--help" || command == "-h" || command != "init"
-          show_init_command_usage
+        if !command || command == "--help" || command == "-h" || command != "new"
+          show_new_command_usage
           exit
         end
 
         options.shift
 
-        Manage::Command::Init.new(options: options, stdout: stdout, stderr: stderr).handle
+        Manage::Command::New.new(options: options, stdout: stdout, stderr: stderr).handle
       end
 
       private def inside_project?
@@ -100,8 +100,8 @@ module Marten
         ENV.fetch("MARTEN_MANAGE_FILE", "./manage.cr")
       end
 
-      private def show_init_command_usage
-        Manage::Command::Init.new(options: ["--help"], stdout: stdout, stderr: stderr).handle
+      private def show_new_command_usage
+        Manage::Command::New.new(options: ["--help"], stdout: stdout, stderr: stderr).handle
       end
 
       private def show_version

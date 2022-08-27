@@ -67,6 +67,20 @@ describe Marten::HTTP::Cookies do
     end
   end
 
+  describe "#[]=" do
+    it "sets the passed cookie value with a key string" do
+      cookies = Marten::HTTP::Cookies.new(HTTP::Cookies{"test" => "value"})
+      cookies["foo"] = "bar"
+      cookies["foo"].should eq "bar"
+    end
+
+    it "sets the passed cookie value with a key symbol" do
+      cookies = Marten::HTTP::Cookies.new(HTTP::Cookies{"test" => "value"})
+      cookies[:foo] = "bar"
+      cookies[:foo].should eq "bar"
+    end
+  end
+
   describe "#delete" do
     it "deletes a cookie from a cookie name string and returns the associated value" do
       cookies = Marten::HTTP::Cookies.new(HTTP::Cookies{"test" => "value"})

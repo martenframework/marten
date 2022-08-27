@@ -33,6 +33,13 @@ module Marten
         cookies[name.to_s]?.try(&.value)
       end
 
+      # Allows to set a new cookie associated with the specified `name`.
+      #
+      # The string representation of the passed `value` object will be used as the cookie value.
+      def []=(name, value)
+        set(name, value)
+      end
+
       # Deletes a specific cookie and return its value, or `nil` if the cookie does not exist.
       #
       # Appart from the name of the cookie to delete, this method allows to define some additional cookie properties:

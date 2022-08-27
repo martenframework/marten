@@ -158,6 +158,20 @@ We also use [`block`](./reference/tags#block) tags to redefine the content of th
 You can use many levels of template inheritance if needed. Indeed, a `child.html` template can very well extend a `base_dashboard.html` template, which itself extends a `base.html` template for example.
 :::
 
+It should be noted that it is also possible to get the content of a block from a parent template by using the `super` template tag. This can be useful in situations where blocks in a child template need to extend (add content) to a parent's block content instead of overwriting it.
+
+For example, with the following snippet the output of the `title` block would be "My super website - Example page":
+
+```html
+{% extend "base.html" %}
+
+{% block title %}{% super %} - Example page{% endblock %}
+
+{% block content %}Custom page content{% endblock %}
+```
+
+It's important to remember that the `super` template tag can only be used within `block` tags.
+
 ## Template loading
 
 Templates can be loaded from specific locations within your codebase and from application folders. This is controlled by two main settings:

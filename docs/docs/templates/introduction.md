@@ -290,3 +290,37 @@ end
 ```
 
 Note that **all** "attribute-like" public methods will be made available to the template runtime when using the [`Marten::Template::Object::Auto`](pathname:///api/Marten/Template/Object/Auto.html) module. This may be a good enough behavior, but if you want to have more control over what can be accessed in templates or not, you will likely end up using [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) and the [`#template_attributes`](pathname:///api/Marten/Template/Object.html#template_attributes(*names)-macro) macro instead.
+
+## Auto-escaping
+
+The output of template variables is automatically escaped by Marten in order to prevent Cross Site Scripting (XSS) vulnerabilities.
+
+For example, let's consider the following snippet:
+
+```html
+Hello, {{ name }}!
+```
+
+If this template is rendered with `<script>alert('popup')</script>` as the content of the `name` variable, then the output will be:
+
+```html
+Hello, &lt;script&gt;alert(&#39;popup&#39;)&lt;/script&gt;!
+```
+
+It should be noted that this behaviour can be disabled _explicitly_. Indeed, sometimes it is expected that some template variables will contain a trusted HTML content that you intend to embed into the template's HTML.
+
+To do this, it possible to make use of the [`safe`](./reference/filters#safe) template filter. This filter "marks" the output of a variable as safe, which ensures that its content is not escaped before being inserted in the final output of a rendered template.
+
+For example:
+
+```html
+Hello, {{ name }}!
+Hello, {{ name|safe }}!
+```
+
+When rendered with `<b>John</b>` as the content of the `name` variable, the above template will output:
+
+```html
+Hello, &lt;b&gt;John&lt;/b&gt;!
+Hello, <b>John</b>!
+```

@@ -6,15 +6,16 @@ module Marten
     module Tag
       # The `asset` template tag.
       #
-      # The `asset` template tag allows generate the URL of a given asset. It must be take at one argument (the filepath
-      # of the asset).For example the following line is a valid usage of the `asset` tag:
+      # The `asset` template tag allows to generate the URL of a given asset. It must be take one argument (the filepath
+      # of the asset).
+      #
+      # For example the following line is a valid usage of the `asset` tag:
       #
       # ```
       # {% asset "app/app.css" %}
       # ```
       #
-      # The asset name can be resolved as template variables too. Optionally, resolved asset URLs can be assigned to a
-      # specific variable using the `as` keyword:
+      # Optionally, resolved asset URLs can be assigned to a specific variable using the `as` keyword:
       #
       # ```
       # {% asset "app/app.css" as my_var %}

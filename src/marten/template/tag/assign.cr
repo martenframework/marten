@@ -6,7 +6,7 @@ module Marten
     module Tag
       # The `assign` template tag.
       #
-      # The `assign` template tag allows to define new variable that will be stored in the template's context:
+      # The `assign` template tag allows to define new variables that will be stored in the template's context:
       #
       # ```
       # {% assign my_var = "Hello World!" %}

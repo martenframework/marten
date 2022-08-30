@@ -5,7 +5,7 @@ module Marten
       #
       # The `super` template tag allows to render the content of a block from a parent template (in a situation where
       # both the `extend` and `block` tags are used). This can be useful in situations where blocks in a child template
-      # need to extend (add data) to a parent's block content instead of overwriting it.
+      # need to extend (add content) to a parent's block content instead of overwriting it.
       class Super < Base
         def initialize(parser : Parser, source : String)
         end

@@ -6,7 +6,7 @@ module Marten
       # The `local_time` template tag.
       #
       # The `local_time` template tag allows to output the string representation of the local time. It must be take one
-      # one argument (the pattern used to output the time). For example the following lines are valid usages of the
+      # argument (the pattern used to output the time). For example the following lines are valid usages of the
       # `local_time` tag:
       #
       # ```
@@ -14,8 +14,7 @@ module Marten
       # {% local_time "%Y-%m-%d %H:%M:%S %:z" %}
       # ```
       #
-      # The local time pattern can be resolved as a template variable. Optionally, the output of this tag can be
-      # assigned to a specific variable using the `as` keyword:
+      # Optionally, the output of this tag can be assigned to a specific variable using the `as` keyword:
       #
       # ```
       # {% local_time "%Y" as current_year %}

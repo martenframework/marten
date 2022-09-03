@@ -1,9 +1,13 @@
 module Marten
   module Template
     class Engine
+      @context_producers = [] of ContextProducer
       @loaders = [] of Loader::Base
 
+      getter context_producers
       getter loaders
+
+      setter context_producers
       setter loaders
 
       # Returns the first compiled template matching the given template name.

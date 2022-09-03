@@ -63,6 +63,39 @@ describe Marten::Conf::GlobalSettings::Templates do
     end
   end
 
+  describe "#context_producers" do
+    it "returns an empty array by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.context_producers.should eq [] of Marten::Template::ContextProducer.class
+    end
+
+    it "returns the array configured context producers" do
+      context_producers = [
+        Marten::Template::ContextProducer::Debug,
+        Marten::Template::ContextProducer::I18n,
+      ]
+
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.context_producers = context_producers
+
+      templates_conf.context_producers.should eq context_producers
+    end
+  end
+
+  describe "#context_producers=" do
+    it "allows to configure the array of configured context producers" do
+      context_producers = [
+        Marten::Template::ContextProducer::Debug,
+        Marten::Template::ContextProducer::I18n,
+      ]
+
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.context_producers = context_producers
+
+      templates_conf.context_producers.should eq context_producers
+    end
+  end
+
   describe "#dirs" do
     it "returns an empty array of strings by default" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new

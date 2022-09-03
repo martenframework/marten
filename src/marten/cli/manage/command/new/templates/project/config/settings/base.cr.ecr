@@ -14,4 +14,11 @@ Marten.configure do |config|
     db.backend = :sqlite
     db.name = Path["<%= @context.name %>.db"].expand
   end
+
+  config.templates.context_producers = [
+    Marten::Template::ContextProducer::Request,
+    Marten::Template::ContextProducer::Flash,
+    Marten::Template::ContextProducer::Debug,
+    Marten::Template::ContextProducer::I18n,
+  ]
 end

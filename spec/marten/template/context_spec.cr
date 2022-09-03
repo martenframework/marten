@@ -1,6 +1,10 @@
 require "./spec_helper"
 
 describe Marten::Template::Context do
+  after_each do
+    Marten.setup_templates
+  end
+
   describe "::from" do
     it "can be used to initialize a context from a given hash" do
       ctx = Marten::Template::Context.from({"foo" => "bar"})
@@ -25,21 +29,22 @@ describe Marten::Template::Context do
       ctx2.should be ctx1
     end
 
-    context "with a request" do
-      it "automatically injects the passed request into the initialized context" do
-        request = Marten::HTTP::Request.new(
-          ::HTTP::Request.new(
-            method: "GET",
-            resource: "",
-            headers: HTTP::Headers{"Host" => "example.com"}
-          )
-        )
+    it "applies the configured context producers as expected" do
+      with_overridden_setting(
+        "templates.context_producers",
+        [Marten::Template::ContextSpec::StaticContextProducer, Marten::Template::ContextSpec::RequestContextProducer]
+      ) do
+        Marten.setup_templates
 
-        ctx = Marten::Template::Context.from({"foo" => "bar"}, request)
+        ctx = Marten::Template::Context.from({"foo" => "bar"})
 
-        ctx["request"].should eq request
+        ctx["foo"].should eq "bar"
+        ctx["static_context_producer"].should eq "applied"
+        expect_raises(KeyError) { ctx["request"] }
       end
+    end
 
+    context "with a request" do
       it "can be used to initialize a context from a given hash" do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
@@ -81,7 +86,7 @@ describe Marten::Template::Context do
 
         ctx = Marten::Template::Context.from(nil, request)
 
-        ctx.empty?.should be_false
+        ctx.empty?.should be_true
       end
 
       it "returns any existing context object it receives as argument" do
@@ -97,6 +102,29 @@ describe Marten::Template::Context do
         ctx2 = Marten::Template::Context.from(ctx1, request)
 
         ctx2.should be ctx1
+      end
+
+      it "applies the configured context producers as expected" do
+        with_overridden_setting(
+          "templates.context_producers",
+          [Marten::Template::ContextSpec::StaticContextProducer, Marten::Template::ContextSpec::RequestContextProducer]
+        ) do
+          Marten.setup_templates
+
+          request = Marten::HTTP::Request.new(
+            ::HTTP::Request.new(
+              method: "GET",
+              resource: "",
+              headers: HTTP::Headers{"Host" => "example.com"}
+            )
+          )
+
+          ctx = Marten::Template::Context.from({"foo" => "bar"}, request)
+
+          ctx["foo"].should eq "bar"
+          ctx["static_context_producer"].should eq "applied"
+          ctx["request"].should eq request
+        end
       end
     end
   end
@@ -280,6 +308,22 @@ describe Marten::Template::Context do
 
       ctx["foo"].should eq "bar"
       ctx["test"]?.should be_nil
+    end
+  end
+end
+
+module Marten::Template::ContextSpec
+  class StaticContextProducer < Marten::Template::ContextProducer
+    def produce(request : HTTP::Request? = nil)
+      {"static_context_producer" => "applied"}
+    end
+  end
+
+  class RequestContextProducer < Marten::Template::ContextProducer
+    def produce(request : HTTP::Request? = nil)
+      return if request.nil?
+
+      {"request" => request}
     end
   end
 end

@@ -1,6 +1,39 @@
 require "./spec_helper"
 
 describe Marten::Template::Engine do
+  describe "#context_producers" do
+    it "returns an empty array by default" do
+      engine = Marten::Template::Engine.new
+      engine.context_producers.should be_empty
+    end
+
+    it "returns the configured context producers" do
+      context_producers = [
+        Marten::Template::ContextProducer::Debug.new,
+        Marten::Template::ContextProducer::I18n.new,
+      ]
+
+      engine = Marten::Template::Engine.new
+      engine.context_producers = context_producers
+
+      engine.context_producers.should eq context_producers
+    end
+  end
+
+  describe "#context_producers=" do
+    it "allows to set context producers" do
+      context_producers = [
+        Marten::Template::ContextProducer::Debug.new,
+        Marten::Template::ContextProducer::I18n.new,
+      ]
+
+      engine = Marten::Template::Engine.new
+      engine.context_producers = context_producers
+
+      engine.context_producers.should eq context_producers
+    end
+  end
+
   describe "#get_template" do
     it "returns compiled templates from the underlying loaders" do
       engine = Marten::Template::Engine.new

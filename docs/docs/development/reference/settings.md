@@ -504,6 +504,12 @@ Default: `false`
 
 A boolean indicating whether templates should be kept in a memory cache upon being loaded and parsed. This setting should likely be set to `false` in development environments (where changes to templates are frequent) and set to `true` in production environments (in order to avoid loading and parsing the same templates multiple times).
 
+### `context_producers`
+
+Default: `[] of Marten::Template::ContextProducer.class`
+
+An array of context producer classes. Context producers are helpers that ensure that common variables are automatically inserted in the template context whenever a template is rendered. See [Using context producers](../../templates/introduction#using-context-producers) to learn more about this capability.
+
 ### `dirs`
 
 Default: `[] of String`

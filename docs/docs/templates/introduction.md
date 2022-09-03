@@ -291,6 +291,27 @@ end
 
 Note that **all** "attribute-like" public methods will be made available to the template runtime when using the [`Marten::Template::Object::Auto`](pathname:///api/Marten/Template/Object/Auto.html) module. This may be a good enough behavior, but if you want to have more control over what can be accessed in templates or not, you will likely end up using [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) and the [`#template_attributes`](pathname:///api/Marten/Template/Object.html#template_attributes(*names)-macro) macro instead.
 
+## Using context producers
+
+Context producers are helpers that ensure that common variables are automatically inserted in the template context whenever a template is rendered. They are applied every time a new template context is generated.
+
+For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a view and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
+
+Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings#context_producers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
+
+```crystal
+config.templates.context_producers = [
+  Marten::Template::ContextProducer::Request,
+  Marten::Template::ContextProducer::Flash,
+  Marten::Template::ContextProducer::Debug,
+  Marten::Template::ContextProducer::I18n,
+]
+```
+
+Each context producers in this array will be applied in order when a new template context is created and will contribute "common" context values to it. This means that the order of these is important since context producers can technically overwrite the values that were added by previous context producers.
+
+Please head over to the [context producers reference](./reference/context-producers) to see a list of all the available context producers. Implementing custom context producers is also a possibility that is documented in [Create custom context producers](./how-to/create-custom-context-producers).
+
 ## Auto-escaping
 
 The output of template variables is automatically escaped by Marten in order to prevent Cross Site Scripting (XSS) vulnerabilities.

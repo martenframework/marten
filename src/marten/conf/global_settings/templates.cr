@@ -5,6 +5,7 @@ module Marten
       class Templates
         @app_dirs : Bool = true
         @cached : Bool = false
+        @context_producers = [] of Template::ContextProducer.class
         @dirs : Array(String) = [] of String
 
         # Returns a boolean indicating whether templates should be looked for inside installed applications.
@@ -12,6 +13,9 @@ module Marten
 
         # Returns a boolean indicating whether templates should be kept in a memory cache upon being loaded and parsed.
         getter cached
+
+        # Returns an array of context producers that will be used to populate the context for each template.
+        getter context_producers
 
         # Returns an array of directories where templates should be looked for.
         #
@@ -27,6 +31,12 @@ module Marten
         # setting this configuration option to `true`, compiled templates will be kept in memory and further renderings
         # of the same templates will result in previous compiled templates to be reused.
         setter cached
+
+        # Allows to set the context producers that will be used to populate the context for each template.
+        def context_producers=(v)
+          @context_producers = Array(Template::ContextProducer.class).new
+          @context_producers.concat(v)
+        end
 
         # Allows to set the directories where templates should be looked for.
         def dirs=(dirs : Array(Path | String | Symbol))

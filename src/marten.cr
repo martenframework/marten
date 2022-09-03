@@ -141,6 +141,10 @@ module Marten
                         else
                           loaders
                         end
+
+    context_producers = [] of Marten::Template::ContextProducer
+    context_producers += settings.templates.context_producers.map(&.new)
+    templates.context_producers = context_producers
   end
 
   # :nodoc:

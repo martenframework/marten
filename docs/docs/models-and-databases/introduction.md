@@ -8,7 +8,7 @@ Models define what data can be persisted and manipulated by a Marten application
 
 ## Basic model definition
 
-Marten models must be defined as subclasses of the `Marten::Model` base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
+Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
 
 For example, the following code snippet defines a simple `Article` model:
 

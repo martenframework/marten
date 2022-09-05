@@ -96,7 +96,24 @@ module.exports = {
       type: 'category',
       label: 'Schemas',
       link: {type: 'doc', id: 'schemas'},
-      items: ['schemas/introduction'],
+      items: [
+        'schemas/introduction',
+        'schemas/validations',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'schemas/how-to/create-custom-schema-fields',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'schemas/reference/fields',
+          ],
+        },
+      ],
     },
     {
       type: 'category',

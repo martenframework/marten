@@ -56,8 +56,6 @@ class MyModel < Marten::Model
 end
 ```
 
-#### 
-
 ### `bool`
 
 A `bool` field allows to persist booleans.

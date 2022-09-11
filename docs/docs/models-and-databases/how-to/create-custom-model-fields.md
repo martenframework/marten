@@ -28,7 +28,7 @@ To do so, you will have to call the [`Marten::DB::Field#register`](pathname:///a
 Marten::DB::Field.register(:foo, FooField)
 ```
 
-The identifier you pass to `#register` can be a symbol or a string. This is the identifier that is then made available to model field classes in order to define their fields:
+The identifier you pass to `#register` can be a symbol or a string. This is the identifier that is then made available to model classes in order to define their fields:
 
 ```crystal
 class MyModel < Marten::DB::Model

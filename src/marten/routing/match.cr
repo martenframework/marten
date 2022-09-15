@@ -1,6 +1,7 @@
 module Marten
   module Routing
-    class Match
+    # A route match, corresponding to a specific view plus the extracted route parameters.
+    struct Match
       getter view
       getter kwargs
 

@@ -53,6 +53,18 @@ For example:
 
 If `value` is `<p>Hello</p>`, then the output will be `<p>Hello</p>` as well.
 
+## `size`
+
+The `size` filter allows to return the size of a string or an enumerable object.
+
+For example:
+
+```html
+{{ value|size }}
+```
+
+If `value` is `hello`, then the output will be 5.
+
 ## `upcase`
 
 The `upcase` filter allows to convert a string so that each of its characters is uppercase.

@@ -28,6 +28,7 @@ module Marten
       register "default", Default
       register "downcase", DownCase
       register "safe", Safe
+      register "size", Size
       register "upcase", UpCase
     end
   end

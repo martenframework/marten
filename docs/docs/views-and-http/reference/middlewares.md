@@ -42,3 +42,13 @@ Enables the use of [sessions](../sessions).
 When this middleware is used, each request will have a session store initialized according to the [sessions configuration](../../development/reference/settings#sessions-settings). This session store is a hash-like object that allows to fetch or set values that are associated with specific keys.
 
 The session store is initialized from a session key that is stored as a regular cookie. If the session store ends up being empty after a request's handling, the associated cookie is deleted. Otherwise the cookie is refreshed if the session store is modified as part of the considered request. Each session cookie is set to expire according to a configured cookie max age (the default cookie max age is 2 weeks).
+
+## X-Frame-Options middleware
+
+**Class:** [`Marten::Middleware::XFrameOptions`](pathname:///api/Marten/Middleware/XFrameOptions.html)
+
+Sets the X-Frame-Options header in the response if it wasn't already set.
+
+When this middleware is used, a X-Frame-Options header will be inserted into the HTTP response. The default value for this header (which configurable via the [`x_frame_options`](../../development/reference/settings#xframeoptions) setting) is "DENY", which means that the response cannot be displayed in a frame. This allows to prevent click-jacking attacks, by ensuring that the web app cannot be embedded into other sites.
+
+On the other hand, if the `x_frame_options` is set to "SAMEORIGIN" the page can be displayed in a frame if the site including is the same as the one serving the page.

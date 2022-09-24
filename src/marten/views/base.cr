@@ -3,6 +3,7 @@ require "./concerns/cookies"
 require "./concerns/flash"
 require "./concerns/request_forgery_protection"
 require "./concerns/session"
+require "./concerns/x_frame_options"
 
 module Marten
   module Views
@@ -16,6 +17,7 @@ module Marten
       include Flash
       include RequestForgeryProtection
       include Session
+      include XFrameOptions
 
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 

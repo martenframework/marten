@@ -152,6 +152,12 @@ Default: `Views::Defaults::ServerError`
 
 The view class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
 
+### `x_frame_options`
+
+Default: `"DENY"`
+
+The value to use for the X-Frame-Options header when the associated middleware is used. The value of this setting will be used by the [`Marten::Middleware::XFrameOptions`](../../views-and-http/reference/middlewares#x-frame-options-middleware) middleware when inserting the X-Frame-Options header in HTTP responses.
+
 ## Assets settings
 
 Assets settings allow to configure how Marten should interact with [assets](../../files/asset-handling). These settings are all available under the `assets` namespace:

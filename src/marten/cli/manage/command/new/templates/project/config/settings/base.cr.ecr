@@ -8,6 +8,7 @@ Marten.configure do |config|
     Marten::Middleware::Session,
     Marten::Middleware::Flash,
     Marten::Middleware::GZip,
+    Marten::Middleware::XFrameOptions,
   ]
 
   config.database do |db|

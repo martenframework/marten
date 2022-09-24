@@ -539,6 +539,33 @@ describe Marten::Conf::GlobalSettings do
       settings.target_env.should be_nil
     end
   end
+
+  describe "#x_frame_options" do
+    it "#returns DENY by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.x_frame_options.should eq "DENY"
+    end
+
+    it "returns the configured X-Frame-Options header value if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.x_frame_options = "SAMEORIGIN"
+      global_settings.x_frame_options.should eq "SAMEORIGIN"
+    end
+  end
+
+  describe "#x_frame_options=" do
+    it "allows to configure the X-Frame-Options header value with a string" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.x_frame_options = "SAMEORIGIN"
+      global_settings.x_frame_options.should eq "SAMEORIGIN"
+    end
+
+    it "allows to configure the X-Frame-Options header value with a symbol" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.x_frame_options = :SAMEORIGIN
+      global_settings.x_frame_options.should eq "SAMEORIGIN"
+    end
+  end
 end
 
 module Marten::Conf::GlobalSettingsSpec

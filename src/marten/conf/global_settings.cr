@@ -72,6 +72,12 @@ module Marten
       # Returns the configured view class that should generate responses for Internal Error responses (HTTP 500).
       getter view500
 
+      # Returns the value to use for the X-Frame-Options header when the associated middleware is used.
+      #
+      # The value of this setting will be used by the `Marten::Middleware::XFrameOptions` middleware when inserting the
+      # X-Frame-Options header in HTTP responses.
+      getter x_frame_options
+
       # Allows to set the explicit list of allowed hosts for the application.
       #
       # The application has to be explictely configured to serve a list of allowed hosts. This is to mitigate HTTP Host
@@ -173,6 +179,7 @@ module Marten
         @view403 = Views::Defaults::PermissionDenied
         @view404 = Views::Defaults::PageNotFound
         @view500 = Views::Defaults::ServerError
+        @x_frame_options = "DENY"
       end
 
       # Provides access to assets settings.
@@ -238,6 +245,14 @@ module Marten
         yield self
       ensure
         @target_env = current_target_env
+      end
+
+      # Allows to set the value to use for the X-Frame-Options header when the associated middleware is used.
+      #
+      # This value will  be used by the `Marten::Middleware::XFrameOptions` middleware when inserting the
+      # X-Frame-Options header in HTTP responses.
+      def x_frame_options=(x_frame_options : String | Symbol)
+        @x_frame_options = x_frame_options.to_s
       end
 
       protected def setup

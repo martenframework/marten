@@ -33,9 +33,15 @@ module Marten
           exit
         end
 
-        if command == "--help" || command == "-h"
+        if command == "--help" || command == "-h" || (command == "help" && options.size == 1)
           show_top_level_usage
           exit
+        end
+
+        if command == "help"
+          command = options[1]
+          options.shift
+          options << "--help"
         end
 
         if command == "--version" || command == "-v"

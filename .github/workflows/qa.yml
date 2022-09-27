@@ -7,7 +7,7 @@ on:
     branches: "*"
 
 jobs:
-  qa:
+  crystal:
     runs-on: ubuntu-latest
     container:
       image: crystallang/crystal:1.5.1
@@ -17,3 +17,15 @@ jobs:
         run: shards install --ignore-crystal-version
       - name: QA checks
         run: make qa
+  docs:
+    runs-on: ubuntu-latest
+    container:
+      image: crystallang/crystal:1.5.1
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install doc dependencies
+        run: cd docs && npm install
+      - name: Build doc
+        run: |
+          crystal docs --output=docs/static/api
+          cd docs && npm run build

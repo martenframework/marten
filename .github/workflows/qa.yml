@@ -23,6 +23,10 @@ jobs:
       image: crystallang/crystal:1.5.1
     steps:
       - uses: actions/checkout@v1
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.x
       - name: Install doc dependencies
         run: cd docs && npm install
       - name: Build doc

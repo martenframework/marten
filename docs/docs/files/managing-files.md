@@ -149,7 +149,7 @@ By default, [`file`](../models-and-databases/reference/fields#file) model fields
 
 ### Interacting with the media file storage
 
-You won't usually need to interact directly with the file storage, but it's worth mentioning that storage objects share the same API. Indeed, the class of these storage objects must inherit from the [`Marten::Core::Storage::Base`](api/Marten/Core/Storage/Base.html) abstract class and implement a set of mandatory methods which provide the following functionalities:
+You won't usually need to interact directly with the file storage, but it's worth mentioning that storage objects share the same API. Indeed, the class of these storage objects must inherit from the [`Marten::Core::Storage::Base`](pathname:///api/Marten/Core/Storage/Base.html) abstract class and implement a set of mandatory methods which provide the following functionalities:
 
 * saving files ([`#save`](pathname:///api/Marten/Core/Storage/Base.html#save(filepath%3AString%2Ccontent%3AIO)%3AString-instance-method))
 * deleting files ([`#delete`](pathname:///api/Marten/Core/Storage/Base.html#delete(filepath%3AString)%3ANil-instance-method))

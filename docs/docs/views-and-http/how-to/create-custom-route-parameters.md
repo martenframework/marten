@@ -7,7 +7,7 @@ Although Marten has built-in support for [common route parameters](../routing#sp
 
 ## Defining a route parameter
 
-In order to implement custom parameters, you need to subclass the [`Marten::Routing::Parameter::Base`](api/Marten/Routing/Parameter/Base.html) abstract class. Each parameter class is responsible for:
+In order to implement custom parameters, you need to subclass the [`Marten::Routing::Parameter::Base`](pathname:///api/Marten/Routing/Parameter/Base.html) abstract class. Each parameter class is responsible for:
 
 * defining a [regex](https://crystal-lang.org/reference/master/syntax_and_semantics/literals/regex.html) allowing to match the parameters in raw paths (which can be done through the use of the [`#regex`](pathname:///api/Marten/Routing/Parameter/Base.html#regex(regex)-macro) macro)
 * defining _how_ the route parameter value should be deserialized (which can be done by implementing a [`#loads`](pathname:///api/Marten/Routing/Parameter/Base.html#loads(value%3A%3A%3AString)-instance-method) method)

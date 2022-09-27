@@ -207,7 +207,7 @@ template.render({ foo: "bar" })
 Most objects that are provided by Marten (such as Model records, query sets, schemas, etc) can automatically be used as part of templates. If your project involves other custom classes, and if you would like to interact with such objects in your your templates, then you will need to explicitly ensure that they include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module.
 
 :::note Why?
-Crystal being a statically typed language, the Marten engine needs to know which types of objects it is dealing with in advance in order to know (i) what can go into template contexts and (ii) how to "resolve" object attributes when templates are rendered. It is not possible to simply expect any `Object` object, hence why we need to make use of a shared [`Marten::Template::Object`](api/Marten/Template/Object.html) module to account for all the classes whose objects should be usable as part of template contexts.
+Crystal being a statically typed language, the Marten engine needs to know which types of objects it is dealing with in advance in order to know (i) what can go into template contexts and (ii) how to "resolve" object attributes when templates are rendered. It is not possible to simply expect any `Object` object, hence why we need to make use of a shared [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module to account for all the classes whose objects should be usable as part of template contexts.
 :::
 
 Let's take the example of a `Point` class that provides access to an x-coordinate and a y-coordinate:
@@ -297,7 +297,7 @@ Context producers are helpers that ensure that common variables are automaticall
 
 For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a view and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
 
-Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings#context_producers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
+Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings#contextproducers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
 
 ```crystal
 config.templates.context_producers = [

@@ -128,7 +128,7 @@ The [`#template_name`](pathname:///api/Marten/Views/Rendering/ClassMethods.html#
 
 View allowing to conveniently return redirect responses.
 
-This view can be used to generate a redirect response (temporary or permanent) to another location. To configure such location, you can either leverage the [`#route_name`](pathname:///api/Marten/Views/Redirect.html#route_name(route_name%3AString%3F)-class-method) class method (which expects a valid [route name](../routing#reverse-url-resolutions)) or the [`#url`](pathname:///api/Marten/Views/Redirect.html#url(url%3AString%3F)-class-method) class method. If you need to implement a custom redirection URL logic, you can also override the [`#redirect_url`](api/Marten/Views/Redirect.html#redirect_url-instance-method) method.
+This view can be used to generate a redirect response (temporary or permanent) to another location. To configure such location, you can either leverage the [`#route_name`](pathname:///api/Marten/Views/Redirect.html#route_name(route_name%3AString%3F)-class-method) class method (which expects a valid [route name](../routing#reverse-url-resolutions)) or the [`#url`](pathname:///api/Marten/Views/Redirect.html#url(url%3AString%3F)-class-method) class method. If you need to implement a custom redirection URL logic, you can also override the [`#redirect_url`](pathname:///api/Marten/Views/Redirect.html#redirect_url-instance-method) method.
 
 ```crystal
 class TestRedirectView < Marten::Views::Redirect
@@ -136,9 +136,9 @@ class TestRedirectView < Marten::Views::Redirect
 end
 ```
 
-By default, the redirect returned by such view is a temporary one. In order to generate a permanent redirect response instead, it is possible to leverage the [`#permanent`](api/Marten/Views/Redirect.html#permanent(permanent%3ABool)-class-method) class method.
+By default, the redirect returned by such view is a temporary one. In order to generate a permanent redirect response instead, it is possible to leverage the [`#permanent`](pathname:///api/Marten/Views/Redirect.html#permanent(permanent%3ABool)-class-method) class method.
 
-It should also be noted that by default, incoming query string parameters **are not** forwarded to the redirection URL. If you wish to ensure that these parameters are forwarded, you can make use of the [`forward_query_string`](api/Marten/Views/Redirect.html#forward_query_string(forward_query_string%3ABool)-class-method) class method.
+It should also be noted that by default, incoming query string parameters **are not** forwarded to the redirection URL. If you wish to ensure that these parameters are forwarded, you can make use of the [`forward_query_string`](pathname:///api/Marten/Views/Redirect.html#forward_query_string(forward_query_string%3ABool)-class-method) class method.
 
 ## Processing a schema
 

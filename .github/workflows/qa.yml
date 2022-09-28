@@ -27,6 +27,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
+      - name: Install shards
+        run: shards install --ignore-crystal-version
       - name: Install doc dependencies
         run: cd docs && npm install
       - name: Build doc

@@ -45,34 +45,81 @@ module Marten
   @@routes : Routing::Map?
   @@settings : Conf::GlobalSettings?
 
+  # Returns the apps registry.
+  #
+  # This method returns an instance of `Marten::Apps::Registry`, giving access to the details of the installed
+  # applications.
   def self.apps
     @@apps ||= Apps::Registry.new
   end
 
+  # Returns the assets engine.
+  #
+  # This method returns an instance of `Marten::Asset::Engine`, which allows to find assets and to generate their URLs.
   def self.assets
     @@assets.not_nil!
   end
 
+  # Allows to configure a Marten project.
+  #
+  # This method allows to define the setting values of a Marten project. When called without argument, it allows to
+  # define shared setting values (ie. shared across all environments):
+  #
+  # ```
+  # Marten.configure do |config|
+  #   config.installed_apps = [
+  #     FooApp,
+  #     BarApp,
+  #   ]
+  # end
+  # ```
+  #
+  # This method can also be called with a specific argument in order to ensure that the underlying settings are defined
+  # for a specific environment only:
+  #
+  # ```
+  # Marten.configure :development do |config|
+  #   config.secret_key = "INSECURE"
+  # end
+  # ```
   def self.configure(env : Nil | String | Symbol = nil)
     return unless env.nil? || self.env == env.to_s
     settings.with_target_env(env.try(&.to_s)) { |settings_with_target_env| yield settings_with_target_env }
   end
 
+  # Returns the current Marten environment.
+  #
+  # This method returns a `Marten::Conf::Env` object, which allows to interact with the current environment. For
+  # example:
+  #
+  # ```
+  # Marten.env              # => <Marten::Conf::Env:0x1052b8060 @id="development">
+  # Marten.env.id           # => "development"
+  # Marten.env.development? # =>true
+  # ```
   def self.env
     @@env ||= Conf::Env.new
   end
 
+  # Returns the media files storage.
+  #
+  # This method returns an instance of a `Marten::Core::Storage::Base` subclass. This object allows to perform file
+  # operations like saving files, deleting files, generating URLs...
   def self.media_files_storage
     @@media_files_storage.not_nil!
   end
 
+  # Returns the main routes map.
+  #
+  # This method returns the main routes map, initialized according to the routes configuration and allowing to perform
+  # reverse URL resolutions.
   def self.routes
     @@routes ||= Routing::Map.new
   end
 
   # Returns the settings of the application.
   #
-  # This method returns the main `Marten::Conf::GlobalSettings` object containing the settings configured for the
+  # This method returns the main `Marten::Conf::GlobalSettings` object, which contains the settings configured for the
   # current environment.
   def self.settings
     @@settings ||= Conf::GlobalSettings.new
@@ -161,6 +208,7 @@ module Marten
     I18n.init
   end
 
+  # Starts the Marten server.
   def self.start
     setup
 
@@ -177,6 +225,9 @@ module Marten
     Marten::Server.start
   end
 
+  # Returns the Marten templates engine.
+  #
+  # This method returns an instance of `Marten::Template::Engine`, which allows to find templates and to render them.
   def self.templates
     @@templates.not_nil!
   end

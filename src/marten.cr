@@ -95,7 +95,7 @@ module Marten
   # ```
   # Marten.env              # => <Marten::Conf::Env:0x1052b8060 @id="development">
   # Marten.env.id           # => "development"
-  # Marten.env.development? # =>true
+  # Marten.env.development? # => true
   # ```
   def self.env
     @@env ||= Conf::Env.new

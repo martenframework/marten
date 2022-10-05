@@ -16,8 +16,6 @@ In order to define settings, it is necessary to access the global Marten configu
 
 ```crystal
 Marten.configure do |config|
-  config.secret_key = "INSECURE!"
-
   config.installed_apps = [
     FooApp,
     BarApp,

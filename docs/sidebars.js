@@ -1,5 +1,5 @@
 module.exports = {
-  tutorialSidebar: [
+  sidebar: [
     'prologue',
     {
       type: 'category',
@@ -165,6 +165,24 @@ module.exports = {
       link: {type: 'doc', id: 'i18n'},
       items: [
         'i18n/introduction',
+      ],
+    },
+    {
+      type: 'category',
+      label: 'The Marten project',
+      link: {type: 'doc', id: 'the-marten-project'},
+      items: [
+        'the-marten-project/contributing',
+        {
+          type: 'category',
+          label: 'Release notes',
+          link: {type: 'doc', id: 'the-marten-project/release-notes'},
+          collapsible: false,
+          className: 'release-notes',
+          items: [
+            'the-marten-project/release-notes/0.1',
+          ],
+        },
       ],
     },
   ],

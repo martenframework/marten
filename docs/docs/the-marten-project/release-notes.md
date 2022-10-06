@@ -1,6 +1,7 @@
 ---
 title: Release notes
 description: Find all the release notes of the Marten web framework.
+pagination_next: null
 ---
 
 Here are listed the release notes for each version of the Marten web framework.

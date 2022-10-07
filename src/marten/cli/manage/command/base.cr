@@ -161,7 +161,7 @@ module Marten
           # ```
           # class MyCommand < Marten::CLI::Command
           #   def setup
-          #     on_option("option", "o", "The name of the option") do
+          #     on_option("o", "option", "The name of the option") do
           #       @option_var = true
           #     end
           #   end
@@ -187,7 +187,7 @@ module Marten
           # ```
           # class MyCommand < Marten::CLI::Command
           #   def setup
-          #     on_option(:option, :arg, "The name of the option") do |arg|
+          #     on_option_with_arg(:option, :arg, "The name of the option") do |arg|
           #       @arg = arg
           #     end
           #   end
@@ -213,7 +213,7 @@ module Marten
           # ```
           # class MyCommand < Marten::CLI::Command
           #   def setup
-          #     on_option("option", "o", "arg", "The name of the option") do |arg|
+          #     on_option_with_arg("o", "option", "arg", "The name of the option") do |arg|
           #       @arg = arg
           #     end
           #   end

@@ -91,7 +91,7 @@ These files and folders are described below:
 | app.cr | Definition of the application configuration abstraction; this is also where application files requirements should be defined. |
 | cli.cr | Requirements of CLI-related files, such as migrations for example. |
 
-The most important file of an application is the `app.cr` one. This file usually includes all the app requirements and defines the application configuration class itself, which must be a subclass of the [`Marten::App`](pathmame:///api/Marten/App.html) abstract class. This class allows mainly to define the "label" identifier of the application (through the use of the [`#label`](pathname:///api/Marten/Apps/Config.html#label(label%3AString|Symbol)-class-method) class method): this identifier must be unique across all the installed applications of a project and is used to generate things like model table names or migration classes.
+The most important file of an application is the `app.cr` one. This file usually includes all the app requirements and defines the application configuration class itself, which must be a subclass of the [`Marten::App`](pathname:///api/Marten/App.html) abstract class. This class allows mainly to define the "label" identifier of the application (through the use of the [`#label`](pathname:///api/Marten/Apps/Config.html#label(label%3AString|Symbol)-class-method) class method): this identifier must be unique across all the installed applications of a project and is used to generate things like model table names or migration classes.
 
 Here is an example `app.cr` file content for an hypothetic "blog" app:
 

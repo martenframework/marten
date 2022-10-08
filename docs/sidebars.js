@@ -156,7 +156,9 @@ module.exports = {
       label: 'Security',
       link: {type: 'doc', id: 'security'},
       items: [
+        'security/introduction',
         'security/csrf',
+        'security/clickjacking',
       ],
     },
     {

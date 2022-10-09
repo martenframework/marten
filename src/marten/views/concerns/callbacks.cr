@@ -56,7 +56,7 @@ module Marten
         # :nodoc:
         DISPATCH_CALLBACKS = {
           before: [] of String,
-          after: [] of String,
+          after:  [] of String,
         }
       end
 

@@ -116,11 +116,11 @@ module Marten
         macro _begin_model_callbacks_setup
           # :nodoc:
           MODEL_CALLBACKS = {
-            initialize: { after: [] of String },
-            create: { before: [] of String, after: [] of String },
-            update: { before: [] of String, after: [] of String },
-            save: { before: [] of String, after: [] of String },
-            delete: { before: [] of String, after: [] of String },
+            initialize: {after: [] of String},
+            create:     {before: [] of String, after: [] of String},
+            update:     {before: [] of String, after: [] of String},
+            save:       {before: [] of String, after: [] of String},
+            delete:     {before: [] of String, after: [] of String},
           }
         end
 

@@ -70,7 +70,7 @@ module Marten
           # :nodoc:
           VALIDATION_CALLBACKS = {
             before: [] of String,
-            after: [] of String,
+            after:  [] of String,
           }
         end
 

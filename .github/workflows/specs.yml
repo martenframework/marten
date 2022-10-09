@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.5.1',
+          '1.6.0',
           'nightly',
         ]
     container:
@@ -70,7 +70,7 @@ jobs:
       matrix:
         db_version: ['10', '11', '12', 'latest']
         crystal: [
-          '1.5.1',
+          '1.6.0',
           'nightly',
         ]
     container:
@@ -106,7 +106,7 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.5.1',
+          '1.6.0',
           'nightly',
         ]
     container:

@@ -147,7 +147,7 @@ class HelloWorldCommand < Marten::CLI::Command
 end
 ```
 
-As you can see, the [`#style`](pathname:///api/Marten/CLI/Manage/Command/Base.html#style(msg%2Cfore%3Dnil%2Cmode%3Dnil)-instance-method) method can be used to apply `fore` and `mode` styles to a specific text values. The values you can use for the `fore` and `mode` arguments are the same as the ones that you can use with the [`Colorize`](https://crystal-lang.org/api/1.5.1/Colorize.html) module (which comes with the standard library).
+As you can see, the [`#style`](pathname:///api/Marten/CLI/Manage/Command/Base.html#style(msg%2Cfore%3Dnil%2Cmode%3Dnil)-instance-method) method can be used to apply `fore` and `mode` styles to a specific text values. The values you can use for the `fore` and `mode` arguments are the same as the ones that you can use with the [`Colorize`](https://crystal-lang.org/api/Colorize.html) module (which comes with the standard library).
 
 ## Handling error cases
 

@@ -48,15 +48,16 @@ module Marten
           s << " --error-trace" if options.includes?("--error-trace")
         end
 
-        stdout.print("⧖ Compiling...")
+        # stdout.print("⧖ Compiling...")
 
         tmp_stdout = IO::Memory.new
         tmp_stderr = IO::Memory.new
 
-        build_status = Process.run(command, shell: true, input: STDIN, output: tmp_stdout, error: tmp_stderr)
+        build_status = Spinner.start("Compiling...", stdout) do
+          Process.run(command, shell: true, input: STDIN, output: tmp_stdout, error: tmp_stderr)
+        end
 
-        # Deletes the "Compiling..." message from the line and prints the result of the manage binary compilation.
-        stdout.print("\33[2K\r")
+        # Prints the result of the manage binary compilation.
         stdout.print(tmp_stdout.to_s)
         stderr.print(tmp_stderr.to_s)
 

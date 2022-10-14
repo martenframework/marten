@@ -2,8 +2,8 @@ module Marten
   module HTTP
     # Represents a flash messages store.
     #
-    # This store provides a way to pass basic string messages from one view to another. Any string value that is set in
-    # this store will be available to the next view processing the next request, and then it will be cleared out.
+    # This store provides a way to pass basic string messages from one handler to another. Any string value that is set
+    # in this store will be available to the next handler processing the next request, and then it will be cleared out.
     class FlashStore
       include Enumerable({String, String})
 

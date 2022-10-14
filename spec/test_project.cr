@@ -74,7 +74,7 @@ Marten.configure :test do |config|
 end
 
 Marten.routes.draw do
-  path "/dummy", DummyView, name: "dummy"
-  path "/dummy/<id:int>", DummyView, name: "dummy_with_id"
-  path "/dummy/<id:int>/and/<scope:slug>", DummyView, name: "dummy_with_id_and_scope"
+  path "/dummy", DummyHandler, name: "dummy"
+  path "/dummy/<id:int>", DummyHandler, name: "dummy_with_id"
+  path "/dummy/<id:int>/and/<scope:slug>", DummyHandler, name: "dummy_with_id_and_scope"
 end

@@ -80,7 +80,7 @@ module Marten
           app_template "shared/.gitkeep", "models/.gitkeep"
           app_template "shared/.gitkeep", "schemas/.gitkeep"
           app_template "shared/.gitkeep", "templates/.gitkeep"
-          app_template "shared/.gitkeep", "views/.gitkeep"
+          app_template "shared/.gitkeep", "handlers/.gitkeep"
 
           project_template "shared/.gitkeep", "config/initializers/.gitkeep"
           project_template "project/config/settings/base.cr.ecr", "config/settings/base.cr"
@@ -96,7 +96,7 @@ module Marten
           project_template "shared/.gitkeep", "src/models/.gitkeep"
           project_template "shared/.gitkeep", "src/schemas/.gitkeep"
           project_template "shared/.gitkeep", "src/templates/.gitkeep"
-          project_template "shared/.gitkeep", "src/views/.gitkeep"
+          project_template "shared/.gitkeep", "src/handlers/.gitkeep"
           project_template "project/manage.cr.ecr", "manage.cr"
           project_template "project/shard.yml.ecr", "shard.yml"
 

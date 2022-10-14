@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::Server::Handlers::Routing do
   describe "#call" do
-    it "executes the resolved view and sets the obtained response on the context for a route with no parameters" do
+    it "executes the resolved handler and sets the obtained response on the context for a route with no parameters" do
       handler = Marten::Server::Handlers::Routing.new
 
       context = HTTP::Server::Context.new(
@@ -19,7 +19,7 @@ describe Marten::Server::Handlers::Routing do
       context.marten.response.not_nil!.content.should eq "It works!"
     end
 
-    it "executes the resolved view and sets the obtained response on the context for a route with parameters" do
+    it "executes the resolved handler and sets the obtained response on the context for a route with parameters" do
       handler = Marten::Server::Handlers::Routing.new
 
       context = HTTP::Server::Context.new(

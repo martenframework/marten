@@ -121,7 +121,7 @@ I18n.with_locale(:fr) do
 end
 ```
 
-Finally it should be noted that Marten provides an [I18n middleware](../views-and-http/reference/middlewares#i18n-middleware) that activates the right locale based on the Accept-Language header. Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../development/reference/settings#available_locales) and [`i18n.default_locale`](../development/reference/settings#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead. By leveraging this middleware, you can be sure that the right locale is automatically enabled for your users, and so you don't need to take care of it.
+Finally it should be noted that Marten provides an [I18n middleware](../handlers-and-http/reference/middlewares#i18n-middleware) that activates the right locale based on the Accept-Language header. Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../development/reference/settings#available_locales) and [`i18n.default_locale`](../development/reference/settings#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead. By leveraging this middleware, you can be sure that the right locale is automatically enabled for your users, and so you don't need to take care of it.
 
 ## Locales and apps
 

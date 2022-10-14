@@ -15,13 +15,13 @@ describe Marten::Template::Tag::Url do
   end
 
   describe "#render" do
-    it "is able to returns the right URL for a view without arguments" do
+    it "is able to returns the right URL for a handler without arguments" do
       parser = Marten::Template::Parser.new("")
       tag = Marten::Template::Tag::Url.new(parser, %{url "dummy"})
       tag.render(Marten::Template::Context.new).should eq Marten.routes.reverse(:dummy)
     end
 
-    it "is able to returns the right URL for a view with arguments" do
+    it "is able to returns the right URL for a handler with arguments" do
       parser = Marten::Template::Parser.new("")
 
       tag_1 = Marten::Template::Tag::Url.new(parser, %{url "dummy_with_id" id: 42})

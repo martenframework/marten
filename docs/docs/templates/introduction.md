@@ -191,7 +191,7 @@ This will return a compiled [`Template`](pathname:///api/Marten/Template/Templat
 
 ## Rendering a template
 
-You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [views](../views-and-http), which means that you will likely end up using the [`#render`](../views-and-http/introduction#render) shortcut, or [generic views](../views-and-http/generic-views) that automatically render templates for you.
+You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction#render) shortcut, or [generic handlers](../handlers-and-http/generic-handlers) that automatically render templates for you.
 
 That being said, it is also possible to render any [`Template`](pathname:///api/Marten/Template/Template.html) object that you loaded by leveraging the [`#render`](pathname:///api/Marten/Template/Template.html#render(context%3AHash|NamedTuple)%3AString-instance-method) method. This method can be used either with a Marten context object, a hash, or a named tuple:
 
@@ -295,7 +295,7 @@ Note that **all** "attribute-like" public methods will be made available to the 
 
 Context producers are helpers that ensure that common variables are automatically inserted in the template context whenever a template is rendered. They are applied every time a new template context is generated.
 
-For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a view and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
+For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a handler and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
 
 Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings#contextproducers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
 

@@ -4,15 +4,15 @@ description: Learn how to leverage applications to structure your projects.
 sidebar_label: Applications
 ---
 
-Marten projects can be organized into logical and reusable components called "applications". These applications can contribute specific behaviors and abstractions to a project, including [models](../models-and-databases), [views](../views-and-http), and [templates](../templates). They can be packaged and reused across various projects as well.
+Marten projects can be organized into logical and reusable components called "applications". These applications can contribute specific behaviors and abstractions to a project, including [models](../models-and-databases), [handlers](../handlers-and-http), and [templates](../templates). They can be packaged and reused across various projects as well.
 
 ## Overview
 
-A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases), [views](../views-and-http), [templates](../templates), [schemas](../schemas/), etc.
+A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases), [handlers](../handlers-and-http), [templates](../templates), [schemas](../schemas/), etc.
 
-Marten projects always use one or many applications. Indeed, each Marten project comes with a default [main application](#the-main-application) that corresponds to the standard `src` folder: models, migrations, or other classes defined in this folder are associated with the main application by default (unless they are part of another _explicitly defined_ application). As projects grow in size and scope, it is generally encouraged to start thinking in terms of applications and how to split models, views, or features accross multiple apps depending on their intended responsibilities.
+Marten projects always use one or many applications. Indeed, each Marten project comes with a default [main application](#the-main-application) that corresponds to the standard `src` folder: models, migrations, or other classes defined in this folder are associated with the main application by default (unless they are part of another _explicitly defined_ application). As projects grow in size and scope, it is generally encouraged to start thinking in terms of applications and how to split models, handlers, or features accross multiple apps depending on their intended responsibilities.
 
-Another benefit of applications is that they can be packaged and reused across multiple projects. This allows third-party libraries and shards to easily contribute models, migrations, views, or templates to other projects.
+Another benefit of applications is that they can be packaged and reused across multiple projects. This allows third-party libraries and shards to easily contribute models, migrations, handlers, or templates to other projects.
 
 ## Using applications
 
@@ -70,11 +70,11 @@ Running such command will usually create the following directory structure:
 
 ```
 src/blog
+├── handlers
 ├── migrations
 ├── models
 ├── schemas
 ├── templates
-├── views
 ├── app.cr
 └── cli.cr
 ```
@@ -83,11 +83,11 @@ These files and folders are described below:
 
 | Path | Description |
 | ----------- | ----------- |
+| handlers/ | Empty directory where the request handlers of the application will be defined. |
 | migrations/ | Empty directory that will store the migrations that will be generated for the models of the application. |
 | models/ | Empty directory where the models of the application will be defined. |
 | schemas/ | Empty directory where the schemas of the application will be defined. |
 | templates/ | Empty directory where the templates of the application will be defined. |
-| views/ | Empty directory where the views of the application will be defined. |
 | app.cr | Definition of the application configuration abstraction; this is also where application files requirements should be defined. |
 | cli.cr | Requirements of CLI-related files, such as migrations for example. |
 
@@ -96,9 +96,9 @@ The most important file of an application is the `app.cr` one. This file usually
 Here is an example `app.cr` file content for an hypothetic "blog" app:
 
 ```crystal
+require "./handlers/**"
 require "./models/**"
 require "./schemas/**"
-require "./views/**"
 
 module Blog
   class App < Marten::App

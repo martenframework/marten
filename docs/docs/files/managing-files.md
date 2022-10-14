@@ -207,14 +207,14 @@ When doing this, all the file operations will be done using the configured stora
 
 ## Serving uploaded files during development
 
-Marten provides a view that you can use to serve media files in development environments only. This view ([`Marten::Views::Defaults::Development::ServeMediaFile`](pathname:///api/Marten/Views/Defaults/Development/ServeMediaFile.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
+Marten provides a handler that you can use to serve media files in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeMediaFile`](pathname:///api/Marten/Handlers/Defaults/Development/ServeMediaFile.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
 
 ```crystal
 Marten.routes.draw do
   # Other routes...
 
   if Marten.env.development?
-    path "#{Marten.settings.media_files.url}<path:path>", Marten::Views::Defaults::Development::ServeMediaFile, name: "media_file"
+    path "#{Marten.settings.media_files.url}<path:path>", Marten::Handlers::Defaults::Development::ServeMediaFile, name: "media_file"
   end
 end
 ```
@@ -222,5 +222,5 @@ end
 As you can see, this route will automatically use the URL that is configured as part of the [`url`](../development/reference/settings#url-1) media files setting. For example, this means that a `foo/bar.txt` media file would be served by the `/media/foo/bar.txt` route in development if the [`url`](../development/reference/settings#url-1) setting is set to `/media/`.
 
 :::warning
-It is very important to understand that this view should **only** be used in development environments. Indeed, the [`Marten::Views::Defaults::Development::ServeMediaFile`](pathname:///api/Marten/Views/Defaults/Development/ServeMediaFile.html) view is not suited for production environments as it is not really efficient nor secure. A better way to serve uploaded files is to leverage a web server or a cloud bucket for example (depending on the configured media files storage).
+It is very important to understand that this handler should **only** be used in development environments. Indeed, the [`Marten::Handlers::Defaults::Development::ServeMediaFile`](pathname:///api/Marten/Handlers/Defaults/Development/ServeMediaFile.html) handler is not suited for production environments as it is not really efficient nor secure. A better way to serve uploaded files is to leverage a web server or a cloud bucket for example (depending on the configured media files storage).
 :::

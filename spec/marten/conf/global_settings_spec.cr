@@ -436,87 +436,87 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
-  describe "#view400" do
-    it "#returns Marten::Views::Defaults::BadRequest by default" do
+  describe "#handler400" do
+    it "#returns Marten::Handlers::Defaults::BadRequest by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view400.should eq Marten::Views::Defaults::BadRequest
+      global_settings.handler400.should eq Marten::Handlers::Defaults::BadRequest
     end
 
-    it "returns the configured view class if explictely set" do
+    it "returns the configured handler class if explictely set" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view400 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view400.should eq Marten::Conf::GlobalSettingsSpec::TestView
-    end
-  end
-
-  describe "#view400=" do
-    it "allows to configure the view class used for bad request responses" do
-      global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view400 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view400.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler400 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler400.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
-  describe "#view403" do
-    it "#returns Marten::Views::Defaults::PermissionDenied by default" do
+  describe "#handler400=" do
+    it "allows to configure the handler class used for bad request responses" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view403.should eq Marten::Views::Defaults::PermissionDenied
-    end
-
-    it "returns the configured view class if explictely set" do
-      global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view403 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view403.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler400 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler400.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
-  describe "#view403=" do
-    it "allows to configure the view class used for permission denied responses" do
+  describe "#handler403" do
+    it "#returns Marten::Handlers::Defaults::PermissionDenied by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view403 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view403.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler403.should eq Marten::Handlers::Defaults::PermissionDenied
+    end
+
+    it "returns the configured handler class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.handler403 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler403.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
-  describe "#view404" do
-    it "#returns Marten::Views::Defaults::PageNotFound by default" do
+  describe "#handler403=" do
+    it "allows to configure the handler class used for permission denied responses" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view404.should eq Marten::Views::Defaults::PageNotFound
-    end
-
-    it "returns the configured view class if explictely set" do
-      global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view404 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view404.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler403 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler403.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
-  describe "#view404=" do
-    it "allows to configure the view class used for not found responses" do
+  describe "#handler404" do
+    it "#returns Marten::Handlers::Defaults::PageNotFound by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view404 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view404.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler404.should eq Marten::Handlers::Defaults::PageNotFound
+    end
+
+    it "returns the configured handler class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.handler404 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler404.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
-  describe "#view500" do
-    it "#returns Marten::Views::Defaults::ServerError by default" do
+  describe "#handler404=" do
+    it "allows to configure the handler class used for not found responses" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view500.should eq Marten::Views::Defaults::ServerError
-    end
-
-    it "returns the configured view class if explictely set" do
-      global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view500 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view500.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler404 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler404.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
-  describe "#view500=" do
-    it "allows to configure the view class used for server error responses" do
+  describe "#handler500" do
+    it "#returns Marten::Handlers::Defaults::ServerError by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.view500 = Marten::Conf::GlobalSettingsSpec::TestView
-      global_settings.view500.should eq Marten::Conf::GlobalSettingsSpec::TestView
+      global_settings.handler500.should eq Marten::Handlers::Defaults::ServerError
+    end
+
+    it "returns the configured handler class if explictely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.handler500 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler500.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
+    end
+  end
+
+  describe "#handler500=" do
+    it "allows to configure the handler class used for server error responses" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.handler500 = Marten::Conf::GlobalSettingsSpec::TestHandler
+      global_settings.handler500.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
     end
   end
 
@@ -577,7 +577,7 @@ module Marten::Conf::GlobalSettingsSpec
     label :test
   end
 
-  class TestView < Marten::Views::Base
+  class TestHandler < Marten::Handlers::Base
     def get
       Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
     end

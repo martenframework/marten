@@ -4,33 +4,33 @@ describe Marten::Routing::Rule::Map do
   describe "#resolve" do
     it "is able to resolve a path that does not contain any parameter" do
       map = Marten::Routing::Map.new
-      map.path("/xyz", Marten::Views::Base, name: "xyz")
+      map.path("/xyz", Marten::Handlers::Base, name: "xyz")
 
       rule = Marten::Routing::Rule::Map.new("/home", map, name: "inc")
 
       match = rule.resolve("/home/xyz")
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
-      match.view.should eq Marten::Views::Base
+      match.handler.should eq Marten::Handlers::Base
       match.kwargs.should be_empty
     end
 
     it "is able to resolve a path that contains parameters" do
       map = Marten::Routing::Map.new
-      map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       rule = Marten::Routing::Rule::Map.new("/home/xyz/<sid:slug>", map, name: "inc")
 
       match = rule.resolve("/home/xyz/my-slug/count/42/display")
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
-      match.view.should eq Marten::Views::Base
+      match.handler.should eq Marten::Handlers::Base
       match.kwargs.should eq({"sid" => "my-slug", "number" => 42})
     end
 
     it "returns nil if the path does not match the considered rule" do
       map = Marten::Routing::Map.new
-      map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       rule = Marten::Routing::Rule::Map.new("/home/xyz/<sid:slug>", map, name: "inc")
 
@@ -39,7 +39,7 @@ describe Marten::Routing::Rule::Map do
 
     it "returns nil if the path does not match the considered rule at the including path level" do
       map = Marten::Routing::Map.new
-      map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       rule = Marten::Routing::Rule::Map.new("/home/xyz/<sid:slug>", map, name: "inc")
 
@@ -48,7 +48,7 @@ describe Marten::Routing::Rule::Map do
 
     it "returns nil if the path does not match the considered rule at the included path level" do
       map = Marten::Routing::Map.new
-      map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       rule = Marten::Routing::Rule::Map.new("/home/xyz/<sid:slug>", map, name: "inc")
 
@@ -59,8 +59,8 @@ describe Marten::Routing::Rule::Map do
   describe "#reversers" do
     it "returns an array containing a reversers built from the enclosing rule and the sub paths" do
       map = Marten::Routing::Map.new
-      map.path("/count/<number:int>/display", Marten::Views::Base, name: "count")
-      map.path("/xyz", Marten::Views::Base, name: "xyz")
+      map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "count")
+      map.path("/xyz", Marten::Handlers::Base, name: "xyz")
 
       rule = Marten::Routing::Rule::MapSpec::TestMapRule.new("/home/xyz/<sid:slug>", map, name: "inc")
 

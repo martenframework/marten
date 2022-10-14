@@ -24,7 +24,7 @@ describe Marten::Server::Handlers::Error do
       output_io.rewind.gets.should eq "It works"
     end
 
-    it "calls the page not found view in case of a Marten::HTTP::Errors::NotFound error" do
+    it "calls the page not found handler in case of a Marten::HTTP::Errors::NotFound error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|
@@ -46,7 +46,7 @@ describe Marten::Server::Handlers::Error do
       output_io.rewind.gets.not_nil!.includes?("The requested resource was not found")
     end
 
-    it "calls the page not found view in case of a Marten::Routing::Errors::NoResolveMatch error" do
+    it "calls the page not found handler in case of a Marten::Routing::Errors::NoResolveMatch error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|
@@ -68,7 +68,7 @@ describe Marten::Server::Handlers::Error do
       output_io.rewind.gets.not_nil!.includes?("The requested resource was not found")
     end
 
-    it "calls the bad request view in case of a Marten::HTTP::Errors::SuspiciousOperation error" do
+    it "calls the bad request handler in case of a Marten::HTTP::Errors::SuspiciousOperation error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|
@@ -90,7 +90,7 @@ describe Marten::Server::Handlers::Error do
       output_io.rewind.gets.not_nil!.includes?("Bad Request")
     end
 
-    it "calls the permission denied view in case of a Marten::HTTP::Errors::PermissionDenied error" do
+    it "calls the permission denied handler in case of a Marten::HTTP::Errors::PermissionDenied error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|
@@ -112,7 +112,7 @@ describe Marten::Server::Handlers::Error do
       output_io.rewind.gets.not_nil!.includes?("403 Forbidden")
     end
 
-    it "calls the server error view in case of any other error" do
+    it "calls the server error handler in case of any other error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|

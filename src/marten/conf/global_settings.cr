@@ -7,10 +7,10 @@ module Marten
       @log_backend : ::Log::Backend
       @request_max_parameters : Nil | Int32
       @target_env : String?
-      @view400 : Views::Base.class
-      @view403 : Views::Base.class
-      @view404 : Views::Base.class
-      @view500 : Views::Base.class
+      @handler400 : Handlers::Base.class
+      @handler403 : Handlers::Base.class
+      @handler404 : Handlers::Base.class
+      @handler500 : Handlers::Base.class
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -60,17 +60,17 @@ module Marten
       # Returns a boolean indicating if the X-Forwarded-Proto header is used to determine whether a request is secure.
       getter use_x_forwarded_proto
 
-      # Returns the configured view class that should generate responses for Bad Request responses (HTTP 400).
-      getter view400
+      # Returns the configured handler class that should generate responses for Bad Request responses (HTTP 400).
+      getter handler400
 
-      # Returns the configured view class that should generate responses for Permission Denied responses (HTTP 403).
-      getter view403
+      # Returns the configured handler class that should generate responses for Permission Denied responses (HTTP 403).
+      getter handler403
 
-      # Returns the configured view class that should generate responses for Not Found responses (HTTP 404).
-      getter view404
+      # Returns the configured handler class that should generate responses for Not Found responses (HTTP 404).
+      getter handler404
 
-      # Returns the configured view class that should generate responses for Internal Error responses (HTTP 500).
-      getter view500
+      # Returns the configured handler class that should generate responses for Internal Error responses (HTTP 500).
+      getter handler500
 
       # Returns the value to use for the X-Frame-Options header when the associated middleware is used.
       #
@@ -122,17 +122,17 @@ module Marten
       # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
       setter use_x_forwarded_proto
 
-      # Allows to set the view class that should generate responses for Bad Request responses (HTTP 400).
-      setter view400
+      # Allows to set the handler class that should generate responses for Bad Request responses (HTTP 400).
+      setter handler400
 
-      # Allows to set the view class that should generate responses for Permission Denied responses (HTTP 403).
-      setter view403
+      # Allows to set the handler class that should generate responses for Permission Denied responses (HTTP 403).
+      setter handler403
 
-      # Allows to set the view class that should generate responses for Not Found responses (HTTP 404).
-      setter view404
+      # Allows to set the handler class that should generate responses for Not Found responses (HTTP 404).
+      setter handler404
 
-      # Allows to set the view class that should generate responses for Internal Error responses (HTTP 500).
-      setter view500
+      # Allows to set the handler class that should generate responses for Internal Error responses (HTTP 500).
+      setter handler500
 
       # :nodoc:
       def self.register_settings_namespace(ns : String)
@@ -175,10 +175,10 @@ module Marten
         @use_x_forwarded_host = false
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
-        @view400 = Views::Defaults::BadRequest
-        @view403 = Views::Defaults::PermissionDenied
-        @view404 = Views::Defaults::PageNotFound
-        @view500 = Views::Defaults::ServerError
+        @handler400 = Handlers::Defaults::BadRequest
+        @handler403 = Handlers::Defaults::PermissionDenied
+        @handler404 = Handlers::Defaults::PageNotFound
+        @handler500 = Handlers::Defaults::ServerError
         @x_frame_options = "DENY"
       end
 

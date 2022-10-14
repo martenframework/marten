@@ -3,31 +3,31 @@ require "./spec_helper"
 describe Marten::Routing::Rule::Path do
   describe "#resolve" do
     it "is able to resolve a path that does not contain any parameter" do
-      rule = Marten::Routing::Rule::Path.new("/home/xyz", Marten::Views::Base, name: "home_xyz")
+      rule = Marten::Routing::Rule::Path.new("/home/xyz", Marten::Handlers::Base, name: "home_xyz")
       match = rule.resolve("/home/xyz")
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
-      match.view.should eq Marten::Views::Base
+      match.handler.should eq Marten::Handlers::Base
       match.kwargs.should be_empty
     end
 
     it "is able to resolve a path that contains parameters" do
       rule = Marten::Routing::Rule::Path.new(
         "/home/xyz/<sid:slug>/count/<number:int>/display",
-        Marten::Views::Base,
+        Marten::Handlers::Base,
         name: "home_xyz"
       )
       match = rule.resolve("/home/xyz/my-slug/count/42/display")
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
-      match.view.should eq Marten::Views::Base
+      match.handler.should eq Marten::Handlers::Base
       match.kwargs.should eq({"sid" => "my-slug", "number" => 42})
     end
 
     it "returns nil if the path does not match the considered rule" do
       rule = Marten::Routing::Rule::Path.new(
         "/home/xyz/<sid:slug>/count/<number:int>/display",
-        Marten::Views::Base,
+        Marten::Handlers::Base,
         name: "home_xyz"
       )
       rule.resolve("/home").should be_nil
@@ -38,7 +38,7 @@ describe Marten::Routing::Rule::Path do
     it "returns an array containing a single reverser for the considered path" do
       rule = Marten::Routing::Rule::PathSpec::TestPathRule.new(
         "/home/xyz/<sid:slug>/display",
-        Marten::Views::Base,
+        Marten::Handlers::Base,
         name: "home_xyz"
       )
 

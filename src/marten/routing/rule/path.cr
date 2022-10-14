@@ -9,9 +9,9 @@ module Marten
 
         getter name
         getter path
-        getter view
+        getter handler
 
-        def initialize(@path : String, @view : Marten::Views::Base.class, @name : String)
+        def initialize(@path : String, @handler : Marten::Handlers::Base.class, @name : String)
           @regex, @path_for_interpolation, @parameters = path_to_regex(@path)
         end
 
@@ -25,7 +25,7 @@ module Marten
             kwargs[name] = param_handler.loads(value.to_s)
           end
 
-          Match.new(@view, kwargs)
+          Match.new(@handler, kwargs)
         end
 
         protected def reversers : Array(Reverser)

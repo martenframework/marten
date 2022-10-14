@@ -6,12 +6,12 @@ module Marten
       # The `url` template tag.
       #
       # The `url` template tag allows to perform URL lookups. It must be take at least one argument (the name of the
-      # targeted view) followed by optional keyword arguments. For example the following lines are valid usages of the
-      # `url` tag:
+      # targeted handler) followed by optional keyword arguments. For example the following lines are valid usages of
+      # the `url` tag:
       #
       # ```
-      # {% url "my_view" %}
-      # {% url "my_other_view" arg1: var1, arg2: var2 %}
+      # {% url "my_handler" %}
+      # {% url "my_other_handler" arg1: var1, arg2: var2 %}
       # ```
       #
       # URL names and parameter values can be resolved as template variables too, but they can also be defined as
@@ -20,7 +20,7 @@ module Marten
       # Optionally, resolved URLs can be assigned to a specific variable using the `as` keyword:
       #
       # ```
-      # {% url "my_other_view" arg1: var1, arg2: var2 as my_var %}
+      # {% url "my_other_handler" arg1: var1, arg2: var2 as my_var %}
       # ```
       class Url < Base
         include CanExtractKwargs

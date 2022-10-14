@@ -13,8 +13,8 @@ module Marten
     #
     # This method must be implemented by subclasses: it takes a `request` argument (the current HTTP request) and a
     # `get_response` proc that allows to get the final response. This proc might actually call the next middleware in
-    # the chain of configured middlewares, or the final matched view. That way, the current middleware have the ability
-    # to intercept any incoming request and the associated response, and to modify them if applicable.
+    # the chain of configured middlewares, or the final matched handler. That way, the current middleware have the
+    # ability to intercept any incoming request and the associated response, and to modify them if applicable.
     abstract def call(
       request : Marten::HTTP::Request,
       get_response : Proc(Marten::HTTP::Response)

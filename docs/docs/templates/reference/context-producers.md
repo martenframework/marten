@@ -15,7 +15,7 @@ The Debug context producer contributes a `debug` variable to the context: the as
 
 **Class:** [`Marten::Template::ContextProducer::Flash`](pathname:///api/Marten/Template/ContextProducer/Flash.html)
 
-The Flash context producer contributes a `flash` variable to the context: this variable corresponds to the [flash store](../../views-and-http/introduction#using-the-flash-store) that is associated with the current HTTP request. If the template context is not initialized with an HTTP request object, then no variables are inserted.
+The Flash context producer contributes a `flash` variable to the context: this variable corresponds to the [flash store](../../handlers-and-http/introduction#using-the-flash-store) that is associated with the current HTTP request. If the template context is not initialized with an HTTP request object, then no variables are inserted.
 
 ## I18n context producer
 

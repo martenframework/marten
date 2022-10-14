@@ -5,29 +5,29 @@ describe Marten::Routing::Match do
     it "raises if the inserted rule doesn't have a valid name" do
       map = Marten::Routing::Map.new
       expect_raises(Marten::Routing::Errors::InvalidRuleName) do
-        map.path("/", Marten::Views::Base, name: ":$in~")
+        map.path("/", Marten::Handlers::Base, name: ":$in~")
       end
     end
 
     it "raises if the inserted rule is an empty string" do
       map = Marten::Routing::Map.new
       expect_raises(Marten::Routing::Errors::InvalidRuleName) do
-        map.path("/", Marten::Views::Base, name: "")
+        map.path("/", Marten::Handlers::Base, name: "")
       end
     end
 
     it "raises if the inserted rule name is already taken" do
       map = Marten::Routing::Map.new
-      map.path("/", Marten::Views::Base, name: "home")
+      map.path("/", Marten::Handlers::Base, name: "home")
       expect_raises(Marten::Routing::Errors::InvalidRuleName) do
-        map.path("/bis", Marten::Views::Base, name: "home")
+        map.path("/bis", Marten::Handlers::Base, name: "home")
       end
     end
 
     it "raises if the inserted rule is a path that contains duplicated parameter names" do
       map = Marten::Routing::Map.new
       expect_raises(Marten::Routing::Errors::InvalidRulePath) do
-        map.path("/path/xyz/<id:int>/test<id:slug>/bad", Marten::Views::Base, name: "home")
+        map.path("/path/xyz/<id:int>/test<id:slug>/bad", Marten::Handlers::Base, name: "home")
       end
     end
 
@@ -35,7 +35,7 @@ describe Marten::Routing::Match do
       map = Marten::Routing::Map.new
       expect_raises(Marten::Routing::Errors::InvalidRulePath) do
         sub_map = Marten::Routing::Map.draw do
-          path("/bad/<id:int>/foobar", Marten::Views::Base, name: "home")
+          path("/bad/<id:int>/foobar", Marten::Handlers::Base, name: "home")
         end
         map.path("/path/xyz/<id:int>", sub_map, name: "included")
       end
@@ -45,7 +45,7 @@ describe Marten::Routing::Match do
   describe "#resolve" do
     it "is able to resolve a path that does not contain any parameter" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/xyz", Marten::Views::Base, name: "xyz")
+      sub_map.path("/xyz", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home", sub_map, name: "inc")
@@ -53,13 +53,13 @@ describe Marten::Routing::Match do
       match = map.resolve("/home/xyz")
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
-      match.view.should eq Marten::Views::Base
+      match.handler.should eq Marten::Handlers::Base
       match.kwargs.should be_empty
     end
 
     it "is able to resolve a path that contains parameters" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      sub_map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
@@ -67,13 +67,13 @@ describe Marten::Routing::Match do
       match = map.resolve("/home/xyz/my-slug/count/42/display")
       match.should be_a Marten::Routing::Match
       match = match.as(Marten::Routing::Match)
-      match.view.should eq Marten::Views::Base
+      match.handler.should eq Marten::Handlers::Base
       match.kwargs.should eq({"sid" => "my-slug", "number" => 42})
     end
 
     it "raises if the path does not match any registered route rule" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      sub_map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
@@ -87,28 +87,28 @@ describe Marten::Routing::Match do
   describe "#reverse(name, **kwargs)" do
     it "returns the interpolated path for a top-level given route name without parameters" do
       map = Marten::Routing::Map.new
-      map.path("/home/test", Marten::Views::Base, name: "home")
+      map.path("/home/test", Marten::Handlers::Base, name: "home")
 
       map.reverse("home").should eq "/home/test"
     end
 
     it "can be used with a route name symbol" do
       map = Marten::Routing::Map.new
-      map.path("/home/test", Marten::Views::Base, name: "home")
+      map.path("/home/test", Marten::Handlers::Base, name: "home")
 
       map.reverse(:home).should eq "/home/test"
     end
 
     it "returns the interpolated path for a top-level given route name with parameters" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       map.reverse("home", sid: "hello-world", number: 42).should eq "/home/hello-world/test/42"
     end
 
     it "returns the interpolated path for a sub given route name without parameters" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/xyz", Marten::Views::Base, name: "xyz")
+      sub_map.path("/xyz", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home", sub_map, name: "inc")
@@ -118,7 +118,7 @@ describe Marten::Routing::Match do
 
     it "returns the interpolated path for a given sub route name with parameters" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      sub_map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
@@ -128,7 +128,7 @@ describe Marten::Routing::Match do
 
     it "raises an error if the route name does not match any registered name" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
         map.reverse("name:inc", sid: "hello-world", number: 42)
@@ -137,7 +137,7 @@ describe Marten::Routing::Match do
 
     it "raises an error if the matched route name does not receive all the expected paramter" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
         map.reverse("home", sid: "hello-world")
@@ -148,28 +148,28 @@ describe Marten::Routing::Match do
   describe "#reverse(name, params)" do
     it "returns the interpolated path for a top-level given route name without parameters" do
       map = Marten::Routing::Map.new
-      map.path("/home/test", Marten::Views::Base, name: "home")
+      map.path("/home/test", Marten::Handlers::Base, name: "home")
 
       map.reverse("home", {} of String => String).should eq "/home/test"
     end
 
     it "returns the interpolated path for a top-level given route name with parameters" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       map.reverse("home", {"sid" => "hello-world", "number" => 42}).should eq "/home/hello-world/test/42"
     end
 
     it "can be used with a route name symbol" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       map.reverse(:home, {"sid" => "hello-world", "number" => 42}).should eq "/home/hello-world/test/42"
     end
 
     it "returns the interpolated path for a sub given route name without parameters" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/xyz", Marten::Views::Base, name: "xyz")
+      sub_map.path("/xyz", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home", sub_map, name: "inc")
@@ -179,7 +179,7 @@ describe Marten::Routing::Match do
 
     it "returns the interpolated path for a given sub route name with parameters" do
       sub_map = Marten::Routing::Map.new
-      sub_map.path("/count/<number:int>/display", Marten::Views::Base, name: "xyz")
+      sub_map.path("/count/<number:int>/display", Marten::Handlers::Base, name: "xyz")
 
       map = Marten::Routing::Map.new
       map.path("/home/xyz/<sid:slug>", sub_map, name: "inc")
@@ -191,7 +191,7 @@ describe Marten::Routing::Match do
 
     it "raises an error if the route name does not match any registered name" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
         map.reverse("name:inc", {"sid" => "hello-world", "number" => 42})
@@ -200,7 +200,7 @@ describe Marten::Routing::Match do
 
     it "raises an error if the matched route name does not receive all the expected paramter" do
       map = Marten::Routing::Map.new
-      map.path("/home/<sid:slug>/test/<number:int>", Marten::Views::Base, name: "home")
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
         map.reverse("home", {"sid" => "hello-world"})

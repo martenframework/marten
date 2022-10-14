@@ -20,10 +20,10 @@ module Marten
 
       # Inserts a new path into the routes map.
       #
-      # The target associated with the considered path must be either a view (subclass of `Marten::Views::Base`) or
-      # another `Marten::Routing::Map` instance (in case of nested routes maps). Each <path, target> pair must be given
-      # a name that will be used to uniquely identify the route.
-      def path(path : String, target : Marten::Views::Base.class | Map, name : String | Symbol) : Nil
+      # The target associated with the considered path must be either a handler (subclass of `Marten::Handlers::Base`)
+      # or another `Marten::Routing::Map` instance (in case of nested routes maps). Each <path, target> pair must be
+      # given a name that will be used to uniquely identify the route.
+      def path(path : String, target : Marten::Handlers::Base.class | Map, name : String | Symbol) : Nil
         unless RULE_NAME_RE.match(name)
           raise Errors::InvalidRuleName.new(
             "A rule name can only contain letters, numbers, dashes or underscores"
@@ -34,7 +34,7 @@ module Marten
           raise Errors::InvalidRuleName.new("A '#{name}' route already exists")
         end
 
-        if target.is_a?(Marten::Views::Base.class)
+        if target.is_a?(Marten::Handlers::Base.class)
           rule = Rule::Path.new(path, target, name.to_s)
         else # Nested routes map
           rule = Rule::Map.new(path, target, name.to_s)
@@ -58,7 +58,7 @@ module Marten
 
       # Resolves a path - identify a route matching a specific path.
       #
-      # The route resolution process tries to identify which view corresponds to the considered path and returns a
+      # The route resolution process tries to identify which handler corresponds to the considered path and returns a
       # `Marten::Routing::Match` object if a match is found. If no match is found a
       # `Marten::Routing::Errors::NoResolveMatch` exception is raised.
       def resolve(path : String) : Match

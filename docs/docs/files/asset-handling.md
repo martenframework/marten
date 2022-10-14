@@ -86,14 +86,14 @@ Marten.assets.url("app/app.css") # => "/assets/app/app.css"
 
 ## Serving assets in development
 
-Marten provides a view that you can use to serve assets in development environments only. This view ([`Marten::Views::Defaults::Development::ServeAsset`](pathname:///api/Marten/Views/Defaults/Development/ServeAsset.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
+Marten provides a handler that you can use to serve assets in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/Marten/Handlers/Defaults/Development/ServeAsset.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
 
 ```crystal
 Marten.routes.draw do
   # Other routes...
 
   if Marten.env.development?
-    path "#{Marten.settings.assets.url}<path:path>", Marten::Views::Defaults::Development::ServeAsset, name: "asset"
+    path "#{Marten.settings.assets.url}<path:path>", Marten::Handlers::Defaults::Development::ServeAsset, name: "asset"
   end
 end
 ```
@@ -101,7 +101,7 @@ end
 As you can see, this route will automatically use the URL that is configured as part of the [`url`](../development/reference/settings#url) asset setting. For example, this means that an `app/app.css` asset would be served by the `/assets/app/app.css` route in development if the [`url`](../development/reference/settings#url) setting is set to `/assets/`.
 
 :::warning
-It is very important to understand that this view should **only** be used in development environments. Indeed, the [`Marten::Views::Defaults::Development::ServeAsset`](pathname:///api/Marten/Views/Defaults/Development/ServeAsset.html) view does not require assets to have been collected beforehand through the use of the [`collectassets`](../development/reference/management-commands#collectassets) management command. This means that it will try to find assets in your applications' `assets` directories and in the directories configured in the [`dirs`](../development/reference/settings#dirs) setting. This mechanism is helpful in development, but it is not suitable for production environments since it is inneficient and (probably) insecure.
+It is very important to understand that this handler should **only** be used in development environments. Indeed, the [`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/Marten/Handlers/Defaults/Development/ServeAsset.html) handler does not require assets to have been collected beforehand through the use of the [`collectassets`](../development/reference/management-commands#collectassets) management command. This means that it will try to find assets in your applications' `assets` directories and in the directories configured in the [`dirs`](../development/reference/settings#dirs) setting. This mechanism is helpful in development, but it is not suitable for production environments since it is inneficient and (probably) insecure.
 :::
 
 ## Serving assets in production

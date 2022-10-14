@@ -1,11 +1,11 @@
-require "./concerns/view_response_converter"
+require "./concerns/handler_response_converter"
 
 module Marten
   module Server
     module Handlers
       class Middleware
         include ::HTTP::Handler
-        include ViewResponseConverter
+        include HandlerResponseConverter
 
         @middleware_chain : Array(Marten::Middleware)?
 
@@ -22,7 +22,7 @@ module Marten
                      end
 
           # At this point the final HTTP response has to be written to the server response.
-          convert_view_response(context, response)
+          convert_handler_response(context, response)
 
           context
         end

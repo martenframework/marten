@@ -10,7 +10,7 @@ This document describres the main security features that are provided by the Mar
 
 Cross-Site Request Forgery (CSRF) attacks generally involve a malicious website trying to perform actions on a web application on behalf of an already authenticated user.
 
-Marten comes with a built-in [CSRF protection mechanism](./csrf) that is automatically enabled for your [views](../views-and-http). The use of this CSRF protection mechanism is controlled by a set of [dedicated settings](../development/reference/settings#csrf-settings).
+Marten comes with a built-in [CSRF protection mechanism](./csrf) that is automatically enabled for your [handlers](../handlers-and-http). The use of this CSRF protection mechanism is controlled by a set of [dedicated settings](../development/reference/settings#csrf-settings).
 
 :::caution
 You should be careful when tweaking those settings and avoid disabling this protection unless this is absolutely necessary.
@@ -24,7 +24,7 @@ You can learn about the CSRF protection provided by Marten and the associated to
 
 Clickjacking attacks involve a malicious website embedding another unprotected website in a frame. This can lead to users performing unintended actions on the targeted website.
 
-Marten comes with a built-in [clickjacking protection mechanism](./clickjacking), that involves using a dedicated middleware (the [X-Frame-Options middleware](../views-and-http/reference/middlewares#x-frame-options-middleware)). This middleware is always automatically enabled for projects that are generated via the [`new`](../development/reference/management-commands#new) management command and, as its name implies, it involves setting the X-Frame-Options header in order to prevent the considered Marten website from being inserted into a frame.
+Marten comes with a built-in [clickjacking protection mechanism](./clickjacking), that involves using a dedicated middleware (the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware)). This middleware is always automatically enabled for projects that are generated via the [`new`](../development/reference/management-commands#new) management command and, as its name implies, it involves setting the X-Frame-Options header in order to prevent the considered Marten website from being inserted into a frame.
 
 You can learn about the clickjacking protection provided by Marten and the associated tools in the [dedicated documentation](./clickjacking).
 

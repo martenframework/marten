@@ -1,6 +1,6 @@
 ---
 title: Introduction to schemas
-description: Learn how to define schemas and use them in views.
+description: Learn how to define schemas and use them in handlers.
 sidebar_label: Introduction
 ---
 
@@ -32,12 +32,12 @@ In the above example, `title`, `content`, and `published_at` are fields of the `
 
 Schemas can theoretically be used to process to any kind of data, including a request's data. This makes them ideal when it comes to processing form inputs data or JSON payloads for example.
 
-When used as part of [views](../views-and-http/introduction), and especially when processing HTML forms, schemas will usually be initialized and used to render a form when `GET` requests are submitted to the considered view. Processing the actual form data will usually be done in the same view when `POST` requests are submitted.
+When used as part of [handlers](../handlers-and-http/introduction), and especially when processing HTML forms, schemas will usually be initialized and used to render a form when `GET` requests are submitted to the considered handler. Processing the actual form data will usually be done in the same handler when `POST` requests are submitted.
 
-For example the view in the following snippets displays a schema when a `GET` request is processed, and it validates the incoming data using the schema when the request is a `POST`:
+For example the handler in the following snippets displays a schema when a `GET` request is processed, and it validates the incoming data using the schema when the request is a `POST`:
 
 ```crystal
-class ArticleCreateView < Marten::View
+class ArticleCreateHandler < Marten::Handler
   @schema : ArticleSchema?
 
   def get
@@ -63,7 +63,7 @@ end
 
 Let's break it down a bit more:
 
-* when the incoming request is a `GET`, the view will simply render the `article_create.html` template, and initialize the schema (instance of `ArticleSchema`) with any data currently present in the request object (which is returned by the `#request` method). This schema object is made available to the template context
+* when the incoming request is a `GET`, the handler will simply render the `article_create.html` template, and initialize the schema (instance of `ArticleSchema`) with any data currently present in the request object (which is returned by the `#request` method). This schema object is made available to the template context
 * when the incoming request is a `POST`, it will initialize the schema and try to see if it is valid considering the incoming data (using the `#valid?` method). If it's valid, then a new `Article` record will be created using the schema's validated data (`#validated_data`), and the user will be redirect to a home page. Otherwise, the `article_create.html` template will be rendered again with the invalid schema in the associated context
 
 It should be noted that templates can easily interact with schema objects in order to introspect them and render a corresponding HTML form. In the above example, the schema could be used as follows to render an equivalent form in the `article_create.html` template:
@@ -97,15 +97,15 @@ It should be noted that templates can easily interact with schema objects in ord
 ```
 
 :::tip
-Some [generic views](../views-and-http/generic-views) allow to conveniently process schemas in views. This is the case for the [`Marten::Views::Schema`](../views-and-http/reference/generic-views#processing-a-schema), the [`Marten::Views::RecordCreate`](../views-and-http/reference/generic-views#creating-a-record), and the [`Marten::Views::RecordUpdate`](../views-and-http/reference/generic-views#updating-a-record) generic views for example.
+Some [generic handlers](../handlers-and-http/generic-handlers) allow to conveniently process schemas in handlers. This is the case for the [`Marten::Handlers::Schema`](../handlers-and-http/reference/generic-handlers#processing-a-schema), the [`Marten::Handlers::RecordCreate`](../handlers-and-http/reference/generic-handlers#creating-a-record), and the [`Marten::Handlers::RecordUpdate`](../handlers-and-http/reference/generic-handlers#updating-a-record) generic handlers for example.
 :::
 
 Note that schemas can be used for other things than processing form data. For example they can also be used to process JSON payloads as part of API endpoints:
 
 ```crystal
-class API::ArticleCreateView < Marten::View
+class API::ArticleCreateHandler < Marten::Handler
   def post
-    schema = ArticleCreateView.new(request.data)
+    schema = ArticleCreateHandler.new(request.data)
     
     if schema.valid?
       article = Article.new(schema.validated_data)

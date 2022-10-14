@@ -35,9 +35,9 @@ The `block` template tag allow to define that some specific portions of a templa
 
 ## `csrf_token`
 
-The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used for templates that are rendered as part of a view (for example by leveraging [`#render`](../../views-and-http/introduction#render) or one of the [generic views](../../views-and-http/generic-views) involving rendered templates).
+The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used for templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers) involving rendered templates).
 
-This can be used to insert the CSRF token into a hidden form input so that it gets sent to the view processing the form data for example. Indeed, views will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`):
+This can be used to insert the CSRF token into a hidden form input so that it gets sent to the handler processing the form data for example. Indeed, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`):
 
 ```html
 <form method="post" action="" enctype="multipart/form-data">
@@ -187,13 +187,13 @@ Alias for [`translate`](#translate).
 
 ## `url`
 
-The `url` template tag allows to perform [URL lookups](../../views-and-http/routing#reverse-url-resolutions). It must be take at least one argument (the name of the targeted view) followed by optional keyword arguments (if the route require parameters).
+The `url` template tag allows to perform [URL lookups](../../handlers-and-http/routing#reverse-url-resolutions). It must be take at least one argument (the name of the targeted handler) followed by optional keyword arguments (if the route require parameters).
 
 For example the following lines are valid usages of the `url` tag:
 
 ```html
-{% url "my_view" %}
-{% url "my_other_view" arg1: var1, arg2: var2 %}
+{% url "my_handler" %}
+{% url "my_other_handler" arg1: var1, arg2: var2 %}
 ```
 
 URL names and parameter values can be resolved as template variables too, but they can also be defined as literal values if necessary.
@@ -201,7 +201,7 @@ URL names and parameter values can be resolved as template variables too, but th
 Optionally, resolved URLs can be assigned to a specific variable using the `as` keyword:
 
 ```html
-{% url "my_other_view" arg1: var1, arg2: var2 as my_var %}
+{% url "my_other_handler" arg1: var1, arg2: var2 as my_var %}
 ```
 
 ## `verbatim`

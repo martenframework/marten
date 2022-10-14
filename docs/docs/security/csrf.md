@@ -14,7 +14,7 @@ Cross-Site Request Forgery (CSRF) attacks generally involve a malicious website 
 The CSRF protection ignores safe HTTP requests. As such, you should ensure that those are side effect free.
 :::
 
-The CSRF protection provided by Marten is based on the verification of a token that must be provided for each unsafe HTTP request. This token is stored in the client: Marten sends a token cookie with every HTTP response when the token value is requested in views ([`#get_csrf_token`](pathname:///api/Marten/Views/RequestForgeryProtection.html#get_csrf_token-instance-method) method) or templates (eg. through the use of the [`csrf_token`](../templates/reference/tags#csrf_token) tag). It should be noted that the actual value of the token cookie changes every time an HTTP response is returned to the client: this is because the actual secret token is scrambled using a mask that changes for every request where the CSRF token is requested and used.
+The CSRF protection provided by Marten is based on the verification of a token that must be provided for each unsafe HTTP request. This token is stored in the client: Marten sends a token cookie with every HTTP response when the token value is requested in handlers ([`#get_csrf_token`](pathname:///api/Marten/Handlers/RequestForgeryProtection.html#get_csrf_token-instance-method) method) or templates (eg. through the use of the [`csrf_token`](../templates/reference/tags#csrf_token) tag). It should be noted that the actual value of the token cookie changes every time an HTTP response is returned to the client: this is because the actual secret token is scrambled using a mask that changes for every request where the CSRF token is requested and used.
 
 The token value must be specified when submitting unsafe HTTP requests: this can be done either in the data itself (by specifying a `csrftoken` input) or by using a specific header (X-CSRF-Token). When receiving this value, Marten compares it to the token cookie value: if the tokens are not valid, or if there is a mismatch, then this means that the request is malicious and that it must be rejected (which will result in a 403 error).
 
@@ -23,14 +23,14 @@ Finally, it should be noted that a few additional checks can be performed in add
 * in order to protect against cross-subdomain attacks, the HTTP request host will be verified in order to ensure that it is either part of the allowed hosts ([`allowed_hosts`](../development/reference/settings#allowed_hosts) setting) or that the value of the Origin header matches the configured trusted origins ([`csrf.trusted_origins`](../development/reference/settings#trusted_origins) setting)
 * the Referer header will also be checked for HTTPS request (if the Origin header is not set) in order to prevent subdomains to perform unsafe HTTP requests on the protected web applications (unless those subdomains are explicitly allowed as part of the [`csrf.trusted_origins`](../development/reference/settings#trusted_origins) setting)
 
-The Cross-Site Request Forgery protection provided by Marten is performed at the view level automatically. This protection is implemented in the [`Marten::Views::RequestForgeryProtection`](pathname:///api/Marten/Views/RequestForgeryProtection.html) module.
+The Cross-Site Request Forgery protection provided by Marten is performed at the handler level automatically. This protection is implemented in the [`Marten::Handlers::RequestForgeryProtection`](pathname:///api/Marten/Handlers/RequestForgeryProtection.html) module.
 
 ## Basic usage
 
-You should first ensure that the CSRF protection is enabled, which is the case by default when projects are generated through the use of the [`new`](../development/reference/management-commands#new) management command. That being said, if the CSRF protection is globally disabled (when the [`csrf.protection_enabled`](../development/reference/settings#protection_enabled) setting is set to `false`) you need to ensure that your view enables it _locally_. For example:
+You should first ensure that the CSRF protection is enabled, which is the case by default when projects are generated through the use of the [`new`](../development/reference/management-commands#new) management command. That being said, if the CSRF protection is globally disabled (when the [`csrf.protection_enabled`](../development/reference/settings#protection_enabled) setting is set to `false`) you need to ensure that your handler enables it _locally_. For example:
 
 ```crystal
-class MyView < Marten::View
+class MyHandler < Marten::Handler
   protect_from_forgery true
 
   # [...]
@@ -97,18 +97,18 @@ Once you have the CSRF token value, all you need to do is to ensure that a X-CSR
 
 The CSRF protection is enabled by default and can be configured through the use of a [dedicated set of settings](../development/reference/settings#csrf-settings). These settings can be used to enable or disable the protection globally, tweak some of the parameters of the CSRF token cookie, change the trusted origins, etc.
 
-## Enabling or disable the protection on a per-view basis
+## Enabling or disable the protection on a per-handler basis
 
-Regardless of the value of the [`csrf.protection_enabled`](../development/reference/settings#protection_enabled) setting, it is possible to enable or disable the CSRF protection on a per-view basis. This can be achieved through the use of the [`#protect_from_forgery`](pathname:///api/Marten/Views/RequestForgeryProtection/ClassMethods.html#protect_from_forgery(protect%3ABool)%3ANil-instance-method) class method, which takes a single boolean as argument:
+Regardless of the value of the [`csrf.protection_enabled`](../development/reference/settings#protection_enabled) setting, it is possible to enable or disable the CSRF protection on a per-handler basis. This can be achieved through the use of the [`#protect_from_forgery`](pathname:///api/Marten/Handlers/RequestForgeryProtection/ClassMethods.html#protect_from_forgery(protect%3ABool)%3ANil-instance-method) class method, which takes a single boolean as argument:
 
 ```crystal
-class ProtectedView < Marten::View
+class ProtectedHandler < Marten::Handler
   protect_from_forgery true
 
   # [...]
 end
 
-class UnprotectedView < Marten::View
+class UnprotectedHandler < Marten::Handler
   protect_from_forgery false
 
   # [...]

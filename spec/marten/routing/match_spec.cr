@@ -1,20 +1,20 @@
 require "./spec_helper"
 
 describe Marten::Routing::Match do
-  describe "::view" do
-    it "returns the associated view class" do
+  describe "#handler" do
+    it "returns the associated handler class" do
       match = Marten::Routing::Match.new(
-        Marten::Routing::MatchSpec::TestView,
+        Marten::Routing::MatchSpec::TestHandler,
         {"id" => 123} of String => Marten::Routing::Parameter::Types
       )
-      match.view.should eq Marten::Routing::MatchSpec::TestView
+      match.handler.should eq Marten::Routing::MatchSpec::TestHandler
     end
   end
 
-  describe "::kwargs" do
-    it "returns the associated view parameters" do
+  describe "#kwargs" do
+    it "returns the associated handler parameters" do
       match = Marten::Routing::Match.new(
-        Marten::Routing::MatchSpec::TestView,
+        Marten::Routing::MatchSpec::TestHandler,
         {"id" => 123} of String => Marten::Routing::Parameter::Types
       )
       match.kwargs.should eq({"id" => 123})
@@ -23,6 +23,6 @@ describe Marten::Routing::Match do
 end
 
 module Marten::Routing::MatchSpec
-  class TestView < Marten::Views::Base
+  class TestHandler < Marten::Handlers::Base
   end
 end

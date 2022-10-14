@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::Template::Tag::CsrfToken do
   describe "#render" do
-    it "returns the CSRF token if the view is in the context" do
+    it "returns the CSRF token if the handler is in the context" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -11,13 +11,13 @@ describe Marten::Template::Tag::CsrfToken do
         )
       )
 
-      view = Marten::Template::Tag::CsrfTokenSpec::TestView.new(request)
-      view.process_dispatch
+      handler = Marten::Template::Tag::CsrfTokenSpec::TestHandler.new(request)
+      handler.process_dispatch
 
       parser = Marten::Template::Parser.new("")
 
       context = Marten::Template::Context.new
-      context["view"] = view
+      context["handler"] = handler
 
       tag = Marten::Template::Tag::CsrfToken.new(parser, "csrf_token")
       rendered = tag.render(context)
@@ -25,7 +25,7 @@ describe Marten::Template::Tag::CsrfToken do
       rendered.should_not be_empty
     end
 
-    it "returns an empty string if no view is in the context" do
+    it "returns an empty string if no handler is in the context" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -34,8 +34,8 @@ describe Marten::Template::Tag::CsrfToken do
         )
       )
 
-      view = Marten::Template::Tag::CsrfTokenSpec::TestView.new(request)
-      view.process_dispatch
+      handler = Marten::Template::Tag::CsrfTokenSpec::TestHandler.new(request)
+      handler.process_dispatch
 
       parser = Marten::Template::Parser.new("")
 
@@ -43,7 +43,7 @@ describe Marten::Template::Tag::CsrfToken do
       tag.render(Marten::Template::Context.new).should be_empty
     end
 
-    it "returns if the view context key is not an actual view" do
+    it "returns if the handler context key is not an actual handler" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -52,13 +52,13 @@ describe Marten::Template::Tag::CsrfToken do
         )
       )
 
-      view = Marten::Template::Tag::CsrfTokenSpec::TestView.new(request)
-      view.process_dispatch
+      handler = Marten::Template::Tag::CsrfTokenSpec::TestHandler.new(request)
+      handler.process_dispatch
 
       parser = Marten::Template::Parser.new("")
 
       context = Marten::Template::Context.new
-      context["view"] = 42
+      context["handler"] = 42
 
       tag = Marten::Template::Tag::CsrfToken.new(parser, "csrf_token")
       tag.render(context).should be_empty
@@ -67,7 +67,7 @@ describe Marten::Template::Tag::CsrfToken do
 end
 
 module Marten::Template::Tag::CsrfTokenSpec
-  class TestView < Marten::View
+  class TestHandler < Marten::Handler
     def get
       respond "OK"
     end

@@ -70,7 +70,7 @@ config.middleware = [
 ]
 ```
 
-Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../views-and-http/middlewares) in order to learn more about middlewares.
+Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares) in order to learn more about middlewares.
 
 ### `port`
 
@@ -128,35 +128,35 @@ Default: `false`
 
 A boolean indicating if the `X-Forwarded-Proto header` is used to determine whether a request is secure. This setting can be enabled if the Marten application is served behind a proxy that sets this header. For example if such proxy sets this header to `https`, Marten will assume that the request is secure at the application level **only** if `use_x_forwarded_proto` is set to `true`.
 
-### `view400`
+### `handler400`
 
-Default: `Views::Defaults::BadRequest`
+Default: `Marten::Handlers::Defaults::BadRequest`
 
-The view class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
+The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
 
-### `view403`
+### `handler403`
 
-Default: `Views::Defaults::PermissionDenied`
+Default: `Marten::Handlers::Defaults::PermissionDenied`
 
-The view class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
+The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
 
-### `view404`
+### `handler404`
 
-Default: `Views::Defaults::PageNotFound`
+Default: `Marten::Handlers::Defaults::PageNotFound`
 
-The view class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
+The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
 
-### `view500`
+### `handler500`
 
-Default: `Views::Defaults::ServerError`
+Default: `Marten::Handlers::Defaults::ServerError`
 
-The view class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error views](../../views-and-http/error-views) in order to learn more about error views.
+The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
 
 ### `x_frame_options`
 
 Default: `"DENY"`
 
-The value to use for the X-Frame-Options header when the associated middleware is used. The value of this setting will be used by the [`Marten::Middleware::XFrameOptions`](../../views-and-http/reference/middlewares#x-frame-options-middleware) middleware when inserting the X-Frame-Options header in HTTP responses.
+The value to use for the X-Frame-Options header when the associated middleware is used. The value of this setting will be used by the [`Marten::Middleware::XFrameOptions`](../../handlers-and-http/reference/middlewares#x-frame-options-middleware) middleware when inserting the X-Frame-Options header in HTTP responses.
 
 ## Assets settings
 
@@ -275,7 +275,7 @@ A boolean indicating whether to use a secure cookie for the CSRF cookie. Setting
 
 Default: `true`
 
-A boolean indicating if the CSRF protection is enabled globally. When set to `true`, views will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-view basis. See [Cross-Site Request Forgery protection](../../security/csrf) for more details.
+A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf) for more details.
 
 ### `trusted_origins`
 
@@ -437,7 +437,7 @@ This setting is only used if `media_files.storage` is `nil`.
 
 ## Sessions settings
 
-Sessions settings allow to configure how Marten should handle [sessions](../../views-and-http/introduction#using-sessions). These settings are all available under the `sessions` namespace:
+Sessions settings allow to configure how Marten should handle [sessions](../../handlers-and-http/introduction#using-sessions). These settings are all available under the `sessions` namespace:
 
 ```crystal
 config.sessions.cookie_name = "_sessions"
@@ -487,7 +487,7 @@ Default: `"cookie"`
 
 A string containing the identifier of the store used to handle sessions.
 
-By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../views-and-http/sessions) for more details about this capability.
+By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions) for more details about this capability.
 
 ## Templates settings
 

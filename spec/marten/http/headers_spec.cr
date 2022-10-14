@@ -195,6 +195,11 @@ describe Marten::HTTP::Headers do
       headers.fetch(:X_FOO_BAR, "notset").should eq "notset"
       headers.fetch(:x_foo_bar, "notset").should eq "notset"
     end
+
+    it "calls the specified block if the passed name is not found" do
+      headers = Marten::HTTP::Headers.new(HTTP::Headers{"Content-Type" => "application/json"})
+      headers.fetch("X-Foo-Bar") { |k| "notset: #{k}" }.should eq "notset: X-Foo-Bar"
+    end
   end
 
   describe "#patch_vary" do

@@ -47,6 +47,11 @@ module Marten
         headers.fetch(name.to_s, default)
       end
 
+      # Returns the value of the specified header name or calls the block with the name when not found.
+      def fetch(name : String | Symbol, default = nil)
+        self[name]? || yield name
+      end
+
       # Allows to add header names to the Vary header.
       def patch_vary(*headers : String) : Nil
         vary_headers = [] of String

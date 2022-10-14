@@ -171,6 +171,21 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Deployment',
+      link: {type: 'doc', id: 'deployment'},
+      items: [
+        'deployment/introduction',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'deployment/how-to/deploy-to-a-linux-server',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'The Marten project',
       link: {type: 'doc', id: 'the-marten-project'},
       items: [

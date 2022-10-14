@@ -45,7 +45,7 @@ for_mysql do
 
       it "returns 2**64 if the passed value is nil" do
         conn = Marten::DB::Connection.default
-        conn.limit_value(nil).should eq 18_446_744_073_709_551_615
+        conn.limit_value(nil).should eq 18_446_744_073_709_551_615_u64
       end
     end
 

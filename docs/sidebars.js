@@ -175,13 +175,6 @@ module.exports = {
       link: {type: 'doc', id: 'deployment'},
       items: [
         'deployment/introduction',
-        {
-          type: 'category',
-          label: "How-To's",
-          items: [
-            'deployment/how-to/deploy-to-a-linux-server',
-          ],
-        },
       ],
     },
     {

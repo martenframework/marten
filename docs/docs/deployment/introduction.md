@@ -84,6 +84,15 @@ It's important to note that the Marten server is intended to be used behind a re
 
 Depending on your use cases, a reverse proxy will also allow you to easily serve other contents such as [assets](../files/asset-handling) or [uploaded files](../files/managing-files), and to use SSL/TLS.
 
+:::tip
+It is possible to run multiple processes of the same server behind a reverse proxy such as Nginx. Indeed, each compiled server can accept optional parameters in order to override the host and / or port being used. These parameter are respectively `--bind` (or `-b`) and `--port` (or `-p`). For example:
+
+```bash
+bin/server -b 127.0.0.1
+bin/server -p 8080
+```
+:::
+
 ## Additional tips
 
 This section lists a few additional things to consider when deploying Marten projects.

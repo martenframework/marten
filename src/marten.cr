@@ -12,6 +12,7 @@ require "i18n"
 require "log"
 require "mime/media_type"
 require "openssl/hmac"
+require "option_parser"
 require "uuid"
 
 require "./marten/app"
@@ -209,7 +210,11 @@ module Marten
   end
 
   # Starts the Marten server.
-  def self.start
+  def self.start(host : String? = nil, port : Int32? = nil, args : Array(String) = ARGV)
+    parse_start_args(args)
+    override_server_host(host) if host
+    override_server_port(port) if port
+
     setup
 
     Marten::Server.setup
@@ -234,5 +239,28 @@ module Marten
 
   protected def self.dir_location
     __DIR__
+  end
+
+  private def self.override_server_host(host : String)
+    Marten.settings.host = host
+  end
+
+  private def self.override_server_port(port : Int32)
+    Marten.settings.port = port.to_i
+  end
+
+  private def self.parse_start_args(args : Array(String))
+    OptionParser.parse(args) do |opts|
+      opts.on("-b HOST", "--bind HOST", "Custom host to bind") do |host|
+        override_server_host(host.strip)
+      end
+      opts.on("-p PORT", "--port PORT", "Custom port to listen for connections") do |port|
+        override_server_port(port.to_i)
+      end
+      opts.on("-h", "--help", "Shows this help") do
+        puts opts
+        exit 0
+      end
+    end
   end
 end

@@ -3,6 +3,14 @@ init:
 
 	shards install
 
+	@printf "\n\n${YELLOW}---------------- Initialization ---${RESET} ${GREEN}Node.js dependencies${RESET}\n\n"
+
+	cd docs && npm i
+
+	@printf "${YELLOW}---------------- Initialization ---${RESET} ${GREEN}Environment settings${RESET}\n\n"
+
+	rsync --ignore-existing .spec.env.json.example .spec.env.json
+
 	@printf "\n\n${YELLOW}---------------- Done.${RESET}\n\n"
 
 

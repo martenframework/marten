@@ -46,12 +46,8 @@ On macOS or Linux, Marten can be installed using [Homebrew](https://brew.sh/) (a
 
 ```bash
 brew tap martenframework/marten git@github.com:martenframework/homebrew-marten.git
-HOMEBREW_GITHUB_API_TOKEN=<PERSONAL_ACCESS_TOKEN> brew install marten
+brew install marten
 ```
-
-:::note
-Marten is presently under development and can only be accessed via a private Github repository. This is why a personal access token is needed in order to install the Marten CLI by using Homebrew. In order to create such token, you can navigate to the [Personal Access Token](https://github.com/settings/tokens) configuration page. Please ensure that the `repo` and `read:org` scopes are granted for this token, otherwise the above installation flow will not complete as expected.
-:::
 
 Once the installation is complete, you should be able to use the `marten` command:
 

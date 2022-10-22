@@ -45,7 +45,7 @@ The next step is to install the Marten CLI. This tool will let you easily genera
 On macOS or Linux, Marten can be installed using [Homebrew](https://brew.sh/) (also known as Linuxbrew) by running the following commands:
 
 ```bash
-brew tap martenframework/marten git@github.com:martenframework/homebrew-marten.git
+brew tap martenframework/marten
 brew install marten
 ```
 

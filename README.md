@@ -26,6 +26,10 @@ Are you new to the Marten web framework? The following resources will help you g
 Morgan Aubert ([@ellmetha](https://github.com/ellmetha)) and 
 [contributors](https://github.com/martenframework/marten/contributors).
 
+## Acknowledgements
+
+The Marten web framework initially draws its inspiration from [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). You can browse the [Acknowledgements](https://martenframework.com/docs/the-marten-project/acknowledgements) section of the documentation to learn more about the various inspirations and contributions that helped shape Marten.
+
 ## License
 
 MIT. See ``LICENSE`` for more details.

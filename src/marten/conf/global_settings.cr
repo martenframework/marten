@@ -233,6 +233,11 @@ module Marten
         @sessions ||= GlobalSettings::Sessions.new
       end
 
+      # Provides access to strict transport security settings.
+      def strict_transport_security
+        @strict_transport_security ||= GlobalSettings::StrictTransportSecurity.new
+      end
+
       # Provides access to templates settings.
       def templates
         @templates ||= GlobalSettings::Templates.new

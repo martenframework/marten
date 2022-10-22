@@ -489,6 +489,41 @@ A string containing the identifier of the store used to handle sessions.
 
 By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions) for more details about this capability.
 
+## Strict transport security policy settings
+
+Strict transport security policy settings allow to configure how Marten should set the HTTP Strict-Transport-Security response header when the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares#strict-transport-security-middleware) middleware is used:
+
+```crystal
+config.strict_transport_security.max_age = 3_600
+config.strict_transport_security.include_sub_domains = true
+```
+
+### `include_sub_domains`
+
+Default: `false`
+
+Defines whether the `includeSubDomains` directive should be inserted into the HTTP Strict-Transport-Security response header. When this directive is set, this means that the policy will also apply to all the site's subdomains.
+
+:::caution
+You should be careful when enabling this option as this will prevent browsers from connecting to your site's subdomains using HTTP for the duration defined by the [`max_age`](#max_age) setting.
+:::
+
+### `max_age`
+
+Default: `nil`
+
+Defines the duration in seconds that browsers should remember that the web app must be accessed using HTTPS only. A `nil` value means that the HTTP Strict-Transport-Security response header is not inserted in responses (which is equivalent to not using the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares#strict-transport-security-middleware) middleware).
+
+:::caution
+You should be careful when defining a value for this setting because this will prevent browsers from connecting to your site using HTTP for the duration you specified.
+:::
+
+### `preload`
+
+Default: `false`
+
+Defines whether the `preload` directive should be inserted into the HTTP Strict-Transport-Security response header. Setting this to `true` means that you allow your site to be submitted to the [HSTS browser preload list](https://hstspreload.org/) by browsers.
+
 ## Templates settings
 
 Templates settings allow to configure how Marten discovers and renders [templates](../../templates). These settings are all available under the `templates` namespace:

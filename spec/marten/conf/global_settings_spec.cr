@@ -345,6 +345,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#strict_transport_security" do
+    it "returns the strict transport security configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.strict_transport_security.should be_a Marten::Conf::GlobalSettings::StrictTransportSecurity
+    end
+  end
+
   describe "#templates" do
     it "returns the templates configuration" do
       global_settings = Marten::Conf::GlobalSettings.new

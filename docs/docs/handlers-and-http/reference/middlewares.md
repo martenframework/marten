@@ -43,6 +43,22 @@ When this middleware is used, each request will have a session store initialized
 
 The session store is initialized from a session key that is stored as a regular cookie. If the session store ends up being empty after a request's handling, the associated cookie is deleted. Otherwise the cookie is refreshed if the session store is modified as part of the considered request. Each session cookie is set to expire according to a configured cookie max age (the default cookie max age is 2 weeks).
 
+## Strict-Transport-Security middleware
+
+**Class:** [`Marten::Middleware::StrictTransportSecurity`](pathname:///api/Marten/Middleware/StrictTransportSecurity.html)
+
+Sets the Strict-Transport-Security header in the response if it wasn't already set.
+
+This middleware automatically sets the HTTP Strict-Transport-Security (HSTS) response header for all responses unless it was already specified in the response headers. This allows to let browsers know that the considered website should only be accessed using HTTPS, which results in future HTTP requests to be automatically converted to HTTPS (up until the configured strict transport policy max age is reached).
+
+Browsers ensure that this policy is applied for a specific duration because a `max-age` directive is embedded into the header value. This max age duration is expressed in seconds and can be configured using the [`strict_security_policy.max_age`](../../development/reference/settings#max_age) setting.
+
+:::caution
+When enabling this middleware, you should probably start with small values for the [`strict_security_policy.max_age`](../../development/reference/settings#max_age) setting (for example `3600` - one hour). Indeed, when browsers are aware of the Strict-Transport-Security header they will refuse to connect to your website using HTTP until the expiry time corresponding to the configured max age is reached.
+
+This is why the value of the [`strict_security_policy.max_age`](../../development/reference/settings#max_age) setting is `nil` by default: this prevents the middleware from inserting the Strict-Transport-Security response header until you actually specify a max age.
+:::
+
 ## X-Frame-Options middleware
 
 **Class:** [`Marten::Middleware::XFrameOptions`](pathname:///api/Marten/Middleware/XFrameOptions.html)

@@ -183,6 +183,7 @@ module.exports = {
       link: {type: 'doc', id: 'the-marten-project'},
       items: [
         'the-marten-project/contributing',
+        'the-marten-project/acknowledgements',
         {
           type: 'category',
           label: 'Release notes',

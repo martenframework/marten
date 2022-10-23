@@ -12,7 +12,6 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   favicon: 'img/favicon.ico',
   organizationName: 'martenframework',
   projectName: 'marten',
-  noIndex: true,
 
   plugins: ['docusaurus-plugin-sass'],
 

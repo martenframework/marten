@@ -107,7 +107,7 @@ Marten's documentation is written using Markdown. It is powered by [Docusaurus](
 In order to run the documentation liveserver locally, you can change into `docs` and make use of the following command:
 
 ```bash
-yarn run start
+npm run start
 ```
 
 This will start the Docusaurus server at [http://localhost:3000/docs/](http://localhost:3000/docs/) and you will be able to easily see and test the changes you are making to the documentation source files.

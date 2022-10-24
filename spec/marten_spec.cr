@@ -7,6 +7,7 @@ describe Marten do
     end
   end
 
+  %{
   describe "#start" do
     it "starts the server using the configured host and port" do
       MartenSpec.run_server.includes?(
@@ -26,6 +27,7 @@ describe Marten do
       ).should be_true
     end
   end
+  }
 end
 
 module MartenSpec

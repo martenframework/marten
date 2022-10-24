@@ -2,7 +2,10 @@
 
 ![logo](docs/static/img/hero.svg)
 
-[![CI](https://github.com/martenframework/marten/workflows/Specs/badge.svg)](https://github.com/martenframework/marten/actions) [![CI](https://github.com/martenframework/marten/workflows/QA/badge.svg)](https://github.com/martenframework/marten/actions)
+[![Version](https://img.shields.io/github/v/tag/martenframework/marten)](https://github.com/martenframework/marten/tags)
+[![License](https://img.shields.io/github/license/martenframework/marten)](https://github.com/martenframework/marten/blob/main/LICENSE)
+[![CI](https://github.com/martenframework/marten/workflows/Specs/badge.svg)](https://github.com/martenframework/marten/actions)
+[![CI](https://github.com/martenframework/marten/workflows/QA/badge.svg)](https://github.com/martenframework/marten/actions)
 
 ---
 

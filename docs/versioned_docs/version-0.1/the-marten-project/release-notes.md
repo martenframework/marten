@@ -9,3 +9,4 @@ Here are listed the release notes for each version of the Marten web framework.
 ## Marten 0.1
 
 * [Marten 0.1 release notes](./release-notes/0.1)
+* [Marten 0.1.1 release notes](./release-notes/0.1.1)

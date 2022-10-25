@@ -398,7 +398,7 @@ There is something missing though: the home page does not link to the "detail" p
 // highlight-next-line
     {{ article.title }}
 // highlight-next-line
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">Handler</a>
+    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
 // highlight-next-line
   </li>
 {% endfor %}
@@ -520,7 +520,7 @@ Obviously, we still need to a link somewhere in our application to be able to ea
 {% for article in articles %}
   <li>
     {{ article.title }}
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">Handler</a>
+    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
   </li>
 {% endfor %}
 </ul>
@@ -629,7 +629,7 @@ We can also add a link somewhere in the home page of the application to be able 
 {% for article in articles %}
   <li>
     {{ article.title }}
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">Handler</a>
+    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
     // highlight-next-line
     &dash; <a href="{% url 'article_update' pk: article.id %}">Update</a>
   </li>
@@ -709,7 +709,7 @@ We can also add a link somewhere in the home page of the application to be able 
 {% for article in articles %}
   <li>
     {{ article.title }}
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">Handler</a>
+    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
     &dash; <a href="{% url 'article_update' pk: article.id %}">Update</a>
     // highlight-next-line
     &dash; <a href="{% url 'article_delete' pk: article.id %}">Delete</a>

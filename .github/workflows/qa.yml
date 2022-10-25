@@ -1,6 +1,8 @@
 name: QA
 
 on:
+  push:
+    branches: "*"
   pull_request:
     branches: "*"
 

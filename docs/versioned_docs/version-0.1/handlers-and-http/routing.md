@@ -26,6 +26,10 @@ As you can see, routes are defined by calling a `#path` method that requires thr
 * the second argment is the handler class associated with the specified route
 * the last argument is the route name, which is an identifier that can later be used in your codebase to generate the full URL for a specific route, and optionally inject parameters in it (see [Reverse URL resolutions](#reverse-url-resolutions))
 
+:::tip
+It is possible to map multiple routes to the same handler class if necessary. This can be useful if you need to provide route aliases for some handlers for example.
+:::
+
 These routes are evaluated and constructed at runtime, which means that you can define conditional routes if you need to. For example a "debug" handler (only available in a development environment) could be added to the above routes map with the following addition:
 
 ```crystal

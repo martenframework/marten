@@ -23,10 +23,15 @@ module Marten
           @params.has_key?(name.to_s)
         end
 
-        # Returns the last value for the specified parameter name or fallback to the provided default value ( which is
+        # Returns the last value for the specified parameter name or fallback to the provided default value (which is
         # `nil` by default).
         def fetch(name : String | Symbol, default = nil)
           self[name]? || default
+        end
+
+        # Returns the last value for the specified parameter name or calls the block with the name when not found.
+        def fetch(name : String | Symbol)
+          self[name]? || yield name
         end
 
         # Returns all the values for a specified parameter name.

@@ -146,6 +146,13 @@ describe Marten::HTTP::Params::Query do
       params.fetch("dummy", "notfound").should eq "notfound"
     end
 
+    it "can call a passed block with the parameter name if it is unknown" do
+      params = Marten::HTTP::Params::Query.new(
+        Marten::HTTP::Params::Query::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
+      )
+      params.fetch("dummy") { |n| "Not found: #{n}" }.should eq "Not found: dummy"
+    end
+
     it "can return a specific fallback value if the parameter name corresponds to an empty array" do
       params = Marten::HTTP::Params::Query.new(
         Marten::HTTP::Params::Query::RawHash{"foo" => ["bar"], "xyz" => [] of String}

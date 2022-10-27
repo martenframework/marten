@@ -48,7 +48,7 @@ module Marten
       end
 
       # Returns the value of the specified header name or calls the block with the name when not found.
-      def fetch(name : String | Symbol, default = nil)
+      def fetch(name : String | Symbol)
         self[name]? || yield name
       end
 

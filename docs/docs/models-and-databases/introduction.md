@@ -310,6 +310,36 @@ article.save!
 
 Please head over to the [Model validations](./validations) guide in order to learn more about model validations.
 
+## Inheritance
+
+Model classes can inherit from each other. This allows you to easily reuse the field definitions and table attributes of a parent model within a child model.
+
+Presently, the Marten web framework only allows [abstract model inheritance](#inheriting-from-abstract-models) (which is useful in order to reuse shared model fields and patterns over multiple child models without having a database table created for the parent model). Support for multi-table inheritance is planned for future releases.
+
+:::caution
+You can technically inherit from concrete model classes, but this will result in the same behavior as the [abstract model technique](#inheriting-from-abstract-models). As mentioned previously, this behavior is likely to change in future Marten versions and you should probably not rely on it.
+:::
+
+### Inheriting from abstract models
+
+You can define abstract model classes by leveraging [Crystal's abstract type mechanism](https://crystal-lang.org/reference/syntax_and_semantics/virtual_and_abstract_types.html). Doing so allows to easily reuse model field definitions, table properties, and custom logics within child models. In this situation, the parent's model does not contribute any table to the considered database.
+
+For example:
+
+```crystal
+abstract class Person < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :name, :string, max_size: 255
+  field :email, :string, max_size: 255
+end
+
+class Student < Person
+  field :grade, :string, max_size: 15
+end
+```
+
+The `Student` model will have four model fields in total (`id`, `name`, `email`, and `grade`). Moreover all the methods of the parent model fields will be available on the child model. It should be noted that in this case the `Person` model cannot be used like a regular model: for example, trying to query records will return an error since no table is actually associated with the abstract model. Since it is an [abstract type](https://crystal-lang.org/reference/syntax_and_semantics/virtual_and_abstract_types.html), the `Student` class can't be instantiated either.
+
 ## Callbacks
 
 It is possible to define callbacks in your model in order to bind methods and logics to specific events in the life-cycle of your model records. For example, it is possible to define callbacks that run before a record gets created, or before it is destroyed.

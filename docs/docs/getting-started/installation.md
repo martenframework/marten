@@ -62,7 +62,7 @@ Marten can be installed from the sources by running the following commands:
 ```bash
 git clone https://github.com/martenframework/marten
 cd marten
-make
+shards install
 crystal build src/marten_cli.cr -o bin/marten
 mv bin/marten /usr/local/bin
 ```

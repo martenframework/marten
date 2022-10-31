@@ -3,7 +3,7 @@ title: Tutorial
 description: Learn how to use Marten by creating a simple web application.
 ---
 
-This guide will walk you though the creation of a simple weblog application, which will help you learn the basics of the Marten web framework. It is designed for beginners who want to get started by creating a Marten web project, so no prior experience with the framework is required.
+This guide will walk you through the creation of a simple weblog application, which will help you learn the basics of the Marten web framework. It is designed for beginners who want to get started by creating a Marten web project, so no prior experience with the framework is required.
 
 ## Requirements
 
@@ -17,7 +17,7 @@ This should output the version of your Marten installation.
 
 ## What is Marten?
 
-Marten is a web application framework written in the Crystal programming language. It is designed to make developping web applications easy and fun; and it does so by making some assumptions regarding what are the common needs developpers may encounter when building web applications.
+Marten is a web application framework written in the Crystal programming language. It is designed to make developing web applications easy and fun; and it does so by making some assumptions regarding the common needs that developers may encounter when building web applications.
 
 ## Creating a project
 
@@ -60,10 +60,10 @@ These files and folders are described below:
 
 | Path | Description |
 | ----------- | ----------- |
-| config/ | Contains the configuration of the project. This includes environment-specific Marten configuration settings, initializers, and the routes of the web application. |
-| spec/ | Contains the project specs, allowing to test your application. | 
+| config/ | Contains the configuration of the project. This includes environment-specific Marten configuration settings, initializers, and web application routes. |
+| spec/ | Contains the project specs, allowing you to test your application. | 
 | src/ | Contains the source code of the application. By default this folder will include a `project.cr` file (where all dependencies - including Marten itself - are required), a `server.cr` file (which starts the Marten web server), a `cli.cr` file (where migrations and CLI-related abstractions are required), and empty `handlers`, `migrations`, `models`, `schemas`, and `templates` folders. |
-| manage.cr | This file defines a CLI that lets you interact with your Marten project in order to perform various actions (eg. running database migrations, collecting assets, etc). |
+| manage.cr | This file defines a CLI that lets you interact with your Marten project in order to perform various actions (e.g. running database migrations, collecting assets, etc). |
 | shard.yml | The standard [shard.yml](https://crystal-lang.org/reference/the_shards_command/index.html) file, that lists the dependencies that are required to build your application. |
 
 Now that the project structure is created, you can change into the `myblog` directory (if you haven't already) in order to install the project dependencies by running the following command:
@@ -73,11 +73,11 @@ shards install
 ```
 
 :::info
-Marten projects are organized around the concept of "apps". A Marten app is set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example apps can provide [models](../models-and-databases) or [handlers](../handlers-and-http). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, handlers, or templates to other projects. The use of apps is activated by simply adding app classes to the [`installed_apps`](../development/reference/settings#installed_apps) setting.
+Marten projects are organized around the concept of "apps". A Marten app is a set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example, apps can provide [models](../models-and-databases) or [handlers](../handlers-and-http). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, handlers, or templates to other projects. The use of apps is activated by simply adding app classes to the [`installed_apps`](../development/reference/settings#installed_apps) setting.
 
 By default, when creating a new project through the use of the [`new`](../development/reference/management-commands#new) command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, migrations, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
 
-As projects grow in size and scope, it is generally encouraged to start thinking in terms of apps and how to split models, handlers, or features accross multiple apps depending on their intended responsibilities. Please refer to [Applications](../development/applications) to learn more about applications and how to structure your projects using them.
+As projects grow in size and scope, it is generally encouraged to start thinking in terms of apps and how to split models, handlers, or features across multiple apps depending on their intended responsibilities. Please refer to [Applications](../development/applications) to learn more about applications and how to structure your projects using them.
 :::
 
 ## Running the development server
@@ -88,7 +88,7 @@ Now that you have a fully functional web project, you can start a development se
 marten serve
 ```
 
-This will start a Marten development server. To verify that it's working as expected, you can open a browser and navigate to [http://localhost:8000](http://localhost:8000). When doing so, you should be greated by the Marten "welcome" page:
+This will start a Marten development server. To verify that it's working as expected, you can open a browser and navigate to [http://localhost:8000](http://localhost:8000). When doing so, you should be greeted by the Marten "welcome" page:
 
 ![Marten welcome page](/img/getting-started/tutorial/marten_welcome_page.png)
 
@@ -104,11 +104,11 @@ end
 ```
 :::
 
-Once started, the development server will watch your project source files and will automatically recompile them when they are updated; it will also take care of restarting your project server. As such you don't have to manually restart the server when making changes to your application source files.
+Once started, the development server will watch your project source files and will automatically recompile them when they are updated; it will also take care of restarting your project server. As such, you don't have to manually restart the server when making changes to your application source files.
 
 ## Writing a first handler
 
-Let's start by creating a first handler for your project. To do so, create a `src/handlers/home_handler.cr` file with the following content:
+Let's start by creating the first handler for your project. To do so, create a `src/handlers/home_handler.cr` file with the following content:
 
 ```crystal title="src/handlers/home_handler.cr"
 class HomeHandler < Marten::Handler
@@ -118,7 +118,7 @@ class HomeHandler < Marten::Handler
 end
 ```
 
-Handlers are classes that process a web request in order to produce a web response. This response can be a rendered HTML content or a redirection for example.
+Handlers are classes that process a web request in order to produce a web response. This response can be rendered HTML content or a redirection for example.
 
 In the above example, the `HomeHandler` handler explicitly processes a `GET` HTTP request and returns a very simple `200 OK` response containing a short text. But in order to access this handler via a browser, it is necessary to map it to a URL route. To do so, you can edit the `config/routes.cr` file as follows:
 
@@ -140,7 +140,7 @@ The `config/routes.cr` file was automatically created earlier when you initializ
 The `#path` method accepts three arguments:
 
 * the first argument is the route pattern, which is a string like `/foo/bar`. When Marten needs to resolve a route, it starts at the beginning of the routes array and compares each of the configured routes until it finds a matching one
-* the second argment is the handler class associated with the specified route. When a request URL is matched to a specific route, Marten executes the handler that is associated with it
+* the second argument is the handler class associated with the specified route. When a request URL is matched to a specific route, Marten executes the handler that is associated with it
 * the last argument is the route name. This is an identifier that can later be used in your codebase to generate the full URL for a specific route, and optionally inject parameters in it
 
 Now if you go to [http://localhost:8000](http://localhost:8000), you will get the `Hello World!` response that is generated by the handler you just wrote.
@@ -226,14 +226,14 @@ config.database do |db|
 end
 ```
 
-An SQLite database is a good choice in order to try Marten and experiment with it (since SQLite is already pre-installed on most systems). That being said, if you need to use another database backend (for example, PostgreSQL or MySQL), fee free to have a look at the [databases configuration reference](../development/reference/settings#database-settings).
+An SQLite database is a good choice in order to try Marten and experiment with it (since SQLite is already pre-installed on most systems). That being said, if you need to use another database backend (for example, PostgreSQL or MySQL), feel free to have a look at the [databases configuration reference](../development/reference/settings#database-settings).
 :::
 
 ## Interacting with model records
 
 Now that our `Article` model table has been created at the database level, let's try to make use of the Marten ORM to create and query article records.
 
-To do so, we can laungh the [Crystal playground](https://crystal-lang.org/reference/master/using_the_compiler/index.html#crystal-play) as follows:
+To do so, we can launch the [Crystal playground](https://crystal-lang.org/reference/master/using_the_compiler/index.html#crystal-play) as follows:
 
 ```shell
 crystal play
@@ -246,7 +246,7 @@ require "./src/project"
 Marten.setup
 ```
 
-These lines basically require your project dependencies and ensure that Marten is properly set up. You should keep those in the editor when playing with the following examples. Each of the following snippets is assumed to be copy/pasted below the previous one. The output of these examples is highlighted next to the `# =>` comment line.
+These lines basically require your project dependencies and ensure that Marten is properly set up. You should keep those in the editor when playing with the following examples. Each of the following snippets is assumed to be copied/pasted below the previous one. The output of these examples is highlighted next to the `# =>` comment line.
 
 Let's start by initializing a new `Article` object:
 
@@ -255,7 +255,7 @@ article = Article.new(title: "My article", content: "This is my article.")
 # => #<Article:0x102c4dbe0 id: nil, title: "My article", content: "This is my article.">
 ```
 
-As you can see, by using `#new` we are initializing a new `Article` object by specifying its field values (`title` and `content`). It should be noted that so far, the object is only _initialized_ and is not saved to the database yet (this is why `id` is set to `nil` in the above snippet). In order to persist the new object at the database level, you can make use of the `#save` method:
+As you can see, by using `#new`, we are initializing a new `Article` object by specifying its field values (`title` and `content`). It should be noted that so far, the object is only _initialized_ and is not saved to the database yet (this is why `id` is set to `nil` in the above snippet). In order to persist the new object at the database level, you can make use of the `#save` method:
 
 ```crystal
 article.save
@@ -852,4 +852,4 @@ As part of this tutorial, we covered the main features of the Marten web framewo
 
 Now that you've experimented with these core concepts of the framework, you should not hesitate to update the application we just created in order to experiment further and add new features to it.
 
-The Marten documentation also contains plenty of additional guides allowing you to keep exploring and learn more about other areas of the framework. These may be useful depending on the specific needs of your application: [Testing](../development/testing), [Applications](../development/applications), [Security](../security/), [Internationalization](../i18n), etc.
+The Marten documentation also contains plenty of additional guides allowing you to keep exploring and learning more about other areas of the framework. These may be useful depending on the specific needs of your application: [Testing](../development/testing), [Applications](../development/applications), [Security](../security/), [Internationalization](../i18n), etc.

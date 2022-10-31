@@ -8,7 +8,7 @@ This guide will help you get started in order to install Marten and its dependen
 
 ## Install Crystal
 
-Marten is a Crystal web framework; as such Crystal must be installed on your system. There are many ways to install Crystal, but we'll only highlight what we think are the most common ones here for the sake of simplicity: using Homebrew (macOS or Linux) or using the APT package manager (Ubuntu, Debian). Please refer to the official [Crystal installation guide](https://crystal-lang.org/install/) if these methods don't work for you.
+Marten is a Crystal web framework; as such Crystal must be installed on your system. There are many ways to install Crystal, but we'll only highlight what we think are the most common ones here for the sake of simplicity: using Homebrew (macOS or Linux) or the APT package manager (Ubuntu, Debian). Please refer to the official [Crystal installation guide](https://crystal-lang.org/install/) if these methods don't work for you.
 
 ### Using Homebrew
 
@@ -20,7 +20,7 @@ brew install crystal
 
 ### Using APT
 
-On Ubuntu, Debian or any other Linux distribution using the APT package manager, Crystal can be installed by runnnig the following command:
+On Ubuntu, Debian or any other Linux distribution using the APT package manager, Crystal can be installed by running the following command:
 
 ```bash
 curl -fsSL https://crystal-lang.org/install.sh | sudo bash

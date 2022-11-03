@@ -4,7 +4,7 @@ description: Learn how you can start contributing to the Marten project.
 sidebar_label: Contributing
 ---
 
-Marten is a big projects that will keep evolving over time. If you want to, there are many ways to get involved!
+Marten is a big project that will keep evolving over time. If you want to, there are many ways to get involved!
 
 ## First things first...
 
@@ -16,11 +16,11 @@ You should use the [project's issue tracker](https://github.com/martenframework/
 
 ### About bug reports
 
-If you've found a bug related to the Marten web framework **that is not a security issue**, then you should (i) search the [existing issues](https://github.com/martenframework/marten/issues) to verify that it hasn't been reportd yet and (ii) [create a new issue](https://github.com/martenframework/marten/issues/new) if that's not the case. Don't forget to include as many details as possible in your tickets: an explanatory description of the issue at hand and how to reproduce it, snippets and / or tracebacks if this is appropriate, etc.
+If you've found a bug related to the Marten web framework **that is not a security issue**, then you should (i) search the [existing issues](https://github.com/martenframework/marten/issues) to verify that it hasn't been reported yet and (ii) [create a new issue](https://github.com/martenframework/marten/issues/new) if that's not the case. Don't forget to include as many details as possible in your tickets: an explanatory description of the issue at hand and how to reproduce it, snippets and/or tracebacks if this is appropriate, etc.
 
 ### About security issues
 
-If you've found a security issue please **do not open a GitHub issue**. Instead, send an email at `security@martenframework.com`. We'll then investigate together to resolve the problem so we can make an announcement about a solution along with the vulnerability.
+If you've found a security issue please **do not open a GitHub issue**. Instead, send an email to `security@martenframework.com`. We'll then investigate together to resolve the problem so we can make an announcement about a solution along with the vulnerability.
 
 ## Contributing code
 
@@ -44,11 +44,11 @@ Once this is done you should change into the `marten` repository and install the
 make
 ```
 
-This will install a bunch of Crystal shards and some Node.js dependencies (which are required in order to work on the [Docusaurus](https://docusaurus.io/)-powered documentation).
+This will install a bunch of Crystal shards and some Node.js dependencies (which are required to work on the [Docusaurus](https://docusaurus.io/)-powered documentation).
 
 ### Coding style
 
-Overall, Marten tries to comply to Crystal's [style guide](https://crystal-lang.org/reference/conventions/coding_style.html) and you should ensure that your changes comply to it as well if you are contributing code to the project.
+Overall, Marten tries to comply with Crystal's [style guide](https://crystal-lang.org/reference/conventions/coding_style.html) and you should ensure that your changes comply with it as well if you are contributing code to the project.
 
 In addition to that, Marten's codebase is checked using [ameba](https://github.com/crystal-ameba/ameba) and via the standard [`crystal tool format`](https://crystal-lang.org/reference/man/crystal/index.html#crystal-tool-format) command. Every pull request opened on [Marten's GitHub repository](https://github.com/martenframework/marten) will be checked using these tools automatically. If needed, you can verify that these checks are passing locally by running the following commands:
 
@@ -58,7 +58,7 @@ make lint          # Run ameba checks only
 make format_checks # Run Crystal formatting checks only
 ```
 
-Additionally you can also applies Crystal's default formatting to the codebase by running:
+Additionally, you can also apply Crystal's default formatting to the codebase by running:
 
 ```bash
 make format
@@ -104,7 +104,7 @@ MARTEN_SPEC_DB_CONNECTION=postgresql make tests # Will run specs using the Postg
 
 Marten's documentation is written using Markdown. It is powered by [Docusaurus](https://docusaurus.io/) and lives under the `docs` folder.
 
-In order to run the documentation liveserver locally, you can change into `docs` and make use of the following command:
+To run the documentation live server locally, you can change into `docs` and make use of the following command:
 
 ```bash
 npm run start

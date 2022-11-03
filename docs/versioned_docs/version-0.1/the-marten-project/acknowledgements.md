@@ -7,7 +7,7 @@ This section lists and acknowledges the various projects that inspired the Marte
 
 ## Inspirations
 
-The Marten web framework implements a set of ideas and APIs that are inspired by the awesome work that was put in two particular frameworks: [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). It can be easy to take for granted what these frameworks provide, and we should not forget to give credit where credit is due.
+The Marten web framework implements a set of ideas and APIs that are inspired by the awesome work that was put into two particular frameworks: [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). It can be easy to take for granted what these frameworks provide, and we should not forget to give credit where credit is due.
 
 ### Django
 

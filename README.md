@@ -19,15 +19,15 @@ reinventing the wheel.
 
 **🎯 Simple** 
 
-Marten's syntax is inherited from the slickness and simplicity of the Crystal programming language. On top of that, the framework tries to be KISS and DRY compliant as much as possible in order to reduce time-to-market.
+Marten's syntax is inherited from the slickness and simplicity of the Crystal programming language. On top of that, the framework tries to be KISS and DRY compliant as much as possible to reduce time-to-market.
 
 **⚡ Fast**
 
-Marten gives you the ability to build full-featured web applications by leveraging the bare metal performances of the Crystal programming language. It also makes a moderate use of macros and tries to optimize for decent compile times.
+Marten gives you the ability to build full-featured web applications by leveraging the bare metal performances of the Crystal programming language. It also makes moderate use of macros and tries to optimize for decent compile times.
 
 **🧳 Full-featured**
 
-Marten adheres to the "batteries included" philosopy. Out of the box, it provides the tools and features that are commonly required by web applications: ORM, migrations, translations, templating engine, sessions, etc.
+Marten adheres to the "batteries included" philosophy. Out of the box, it provides the tools and features that are commonly required by web applications: ORM, migrations, translations, templating engines, sessions, etc.
 
 **🔧 Extensible**
 
@@ -35,7 +35,7 @@ Marten gives you the ability to contribute extra functionalities to the framewor
 
 **💠 App-oriented**
 
-Marten allows to separate projects into a set of logical "apps". These apps can also be extracted in order to contribute features and behaviours to other Marten projects. The goal here is to allow the creation of a powerful apps ecosystem over time.
+Marten allows separating projects into a set of logical "apps". These apps can also be extracted to contribute features and behaviors to other Marten projects. The goal here is to allow the creation of a powerful apps ecosystem over time.
 
 **🛡️ Secure**
 
@@ -43,7 +43,7 @@ Marten comes with security mechanisms out of the box. Things like cross-site req
 
 ### Batteries included
 
-The tools you need are built in the framework. Database ORM, translations, migrations, templates, sessions, and many more can be leveraged right away.
+The tools you need are built into the framework. Database ORM, translations, migrations, templates, sessions, and many more can be leveraged right away.
 
 **Design your models easily**
 
@@ -70,7 +70,7 @@ class ArticleListHandler < Marten::Handler
 end
 ```
 
-**Render user-facing contents with templates**
+**Render user-facing content with templates**
 
 Templates provide a convenient way to define your presentation logic and to write contents (such as HTML) that are rendered dynamically. This rendering can involve model records or any other variables you define.
 
@@ -101,7 +101,7 @@ Are you new to the Marten web framework? The following resources will help you g
 Morgan Aubert ([@ellmetha](https://github.com/ellmetha)) and 
 [contributors](https://github.com/martenframework/marten/contributors).
 
-## Acknowledgements
+## Acknowledgments
 
 The Marten web framework initially draws its inspiration from [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). You can browse the [Acknowledgements](https://martenframework.com/docs/the-marten-project/acknowledgements) section of the documentation to learn more about the various inspirations and contributions that helped shape Marten.
 

@@ -185,6 +185,44 @@ class User < Marten::Model
 end
 ```
 
+## Multifields indexes and unique constraints
+
+Single model fields can be indexed or associated with a unique constraint _individually_ by leveraging the [`index`](./reference/fields#index) and [`unique`](./reference/fields#unique) field options. That being said, it is sometimes necessary to configure multifields indexes or unique constraints.
+
+### Multifields indexes
+
+Multifields indexes can be configured in a model by leveraging the [`#db_index`](pathname:///api/Marten/DB/Model/Table/ClassMethods.html#db_index(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
+
+For example:
+
+```crystal
+class Person < Marten::Model
+  field :id, :int, primary_key: true, auto: true
+  field :first_name, :string, max_size: 50
+  field :last_name, :string, max_size: 50
+
+  db_index :person_full_name_index, field_names: [:first_name, :last_name]
+end
+```
+
+### Multifields unique constraints
+
+Multifields unique constraints can be configured in a model by leveraging the [`#db_unique_constraint`](pathname:///api/Marten/DB/Model/Table/ClassMethods.html#db_unique_constraint(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
+
+For example:
+
+```crystal
+class Booking < Marten::Model
+  field :id, :int, primary_key: true, auto: true
+  field :room, :string, max_size: 50
+  field :date, :date, max_size: 50
+
+  db_unique_constraint :booking_room_date_constraint, field_names: [:room, :date]
+end
+```
+
+The above constraint ensures that each room can only be booked for each date.
+
 ## CRUD operations
 
 CRUD stands for **C**reate, **R**ead, **U**pdate, and **D**elete. Marten provides a set of methods and tools allowing applications to read and manipulate data stored in model tables.

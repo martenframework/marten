@@ -8,7 +8,7 @@ This section describes what's involved when it comes to deploying a Marten web a
 
 ## Overview
 
-Each deployment pipeline is unique and will vary from one project to another. That being said, a few things and requirements will be commonly encountered when it comes to deploying a Marten projects:
+Each deployment pipeline is unique and will vary from one project to another. That being said, a few things and requirements will be commonly encountered when it comes to deploying a Marten project:
 
 1. installing your project's dependencies
 2. compiling your project's server and [management CLI](../development/management-commands)
@@ -20,11 +20,11 @@ Where, when, and how these steps are performed will vary from one project to ano
 
 ### Installing dependencies
 
-One of the first things you need to do when deploying a Marten project is to ensure that the dependencies of the projects are available. In this light, you can leverage the `shards install` command in order to install your project's Crystal dependencies (assuming that Crystal is installed on your destination machine). Obviously your project may require the installation of other types of dependencies (such as Node.js dependencies for example), which you have to take care as well.
+One of the first things you need to do when deploying a Marten project is to ensure that the dependencies of the projects are available. In this light, you can leverage the `shards install` command to install your project's Crystal dependencies (assuming that Crystal is installed on your destination machine). Obviously, your project may require the installation of other types of dependencies (such as Node.js dependencies for example), which you have to take care of as well.
 
 ### Compiling your project
 
-Your project server and [management CLI](../development/management-commands) need to be compiled in order to run your project's server and to execute additional deployment-related management commands (eg. in order to [collect assets](#collecting-assets) or [apply migrations](#applying-migrations)).
+Your project server and [management CLI](../development/management-commands) need to be compiled to run your project's server and to execute additional deployment-related management commands (eg. to [collect assets](#collecting-assets) or [apply migrations](#applying-migrations)).
 
 When it comes to your project server, you will usually need to compile the `src/server.cr` file (which is automatically created when generating new projects via the [`new`](../development/reference/management-commands#new) management command). This can be achieved with the following command:
 
@@ -62,7 +62,7 @@ The assets handling documentation also provides a few [guidelines](../files/asse
 
 ### Applying migrations
 
-You projects will likely make use of models, which means that you will need to ensure that those are properly created at your configured database level by running the associated migrations.
+Your projects will likely make use of models, which means that you will need to ensure that those are properly created at your configured database level by running the associated migrations.
 
 To do so, you can use the compiled `manage` binary and run the [`migrate`](../development/reference/management-commands#migrate) management command:
 
@@ -85,7 +85,7 @@ It's important to note that the Marten server is intended to be used behind a re
 Depending on your use cases, a reverse proxy will also allow you to easily serve other contents such as [assets](../files/asset-handling) or [uploaded files](../files/managing-files), and to use SSL/TLS.
 
 :::tip
-It is possible to run multiple processes of the same server behind a reverse proxy such as Nginx. Indeed, each compiled server can accept optional parameters in order to override the host and / or port being used. These parameters are respectively `--bind` (or `-b`) and `--port` (or `-p`). For example:
+It is possible to run multiple processes of the same server behind a reverse proxy such as Nginx. Indeed, each compiled server can accept optional parameters to override the host and/or port being used. These parameters are respectively `--bind` (or `-b`) and `--port` (or `-p`). For example:
 
 ```bash
 bin/server -b 127.0.0.1

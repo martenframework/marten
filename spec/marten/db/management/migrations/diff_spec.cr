@@ -48,6 +48,54 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.unique_constraints[0].column_names.should eq ["foo", "bar"]
     end
 
+    it "is able to detect the addition of a new table with indexes" do
+      from_project_state = Marten::DB::Management::ProjectState.new
+
+      new_table_state = Marten::DB::Management::TableState.new(
+        app_label: "app",
+        name: "new_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [
+          Marten::DB::Management::Index.new("test_index", ["foo", "bar"]),
+        ]
+      )
+      to_project_state = Marten::DB::Management::ProjectState.new(tables: [new_table_state])
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+
+      changes["app"][0].name.ends_with?("create_new_table_table").should be_true
+
+      changes["app"][0].operations.size.should eq 1
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation.name.should eq "new_table"
+
+      operation.columns.size.should eq 3
+      operation.columns[0].should be_a Marten::DB::Management::Column::BigInt
+      operation.columns[0].name.should eq "id"
+      operation.columns[0].as(Marten::DB::Management::Column::BigInt).primary_key?.should be_true
+      operation.columns[0].as(Marten::DB::Management::Column::BigInt).auto?.should be_true
+      operation.columns[1].should be_a Marten::DB::Management::Column::BigInt
+      operation.columns[1].name.should eq "foo"
+      operation.columns[2].should be_a Marten::DB::Management::Column::BigInt
+      operation.columns[2].name.should eq "bar"
+
+      operation.unique_constraints.size.should eq 0
+
+      operation.indexes.size.should eq 1
+      operation.indexes[0].name.should eq "test_index"
+      operation.indexes[0].column_names.should eq ["foo", "bar"]
+    end
+
     it "is able to detect the addition of new columns to existing tables" do
       from_project_state = Marten::DB::Management::ProjectState.new(
         tables: [

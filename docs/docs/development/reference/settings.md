@@ -14,9 +14,9 @@ Default: `[] of String`
 
 An explicit array of allowed hosts for the application.
 
-The application has to be explictely configured to serve a list of allowed hosts. This is to mitigate HTTP Host header attacks. The strings in this array can correspond to regular domain names or subdomains (eg. `example.com` or `www.example.com`); when this is the case the Host header of the incoming request will be checked to ensure that it exactly matches one of the configured allowed hosts.
+The application has to be explicitly configured to serve a list of allowed hosts. This is to mitigate HTTP Host header attacks. The strings in this array can correspond to regular domain names or subdomains (eg. `example.com` or `www.example.com`); when this is the case the Host header of the incoming request will be checked to ensure that it exactly matches one of the configured allowed hosts.
 
-It is also possible to match all the subdomains of a specific domain by specifying prepending a `.` at the beginning of host string. For example `.example.com` will matches `example.com`, `www.example.com`, `sub.example.com`, or any other subdomains. Finally the special `*` string can be used to match any Host value, but this wildcard value should be used with caution as you wouldn't be protected against Host header attacks.
+It is also possible to match all the subdomains of a specific domain by prepending a `.` at the beginning of the host string. For example `.example.com` will matches `example.com`, `www.example.com`, `sub.example.com`, or any other subdomains. Finally, the special `*` string can be used to match any Host value, but this wildcard value should be used with caution as you wouldn't be protected against Host header attacks.
 
 It should be noted that this setting is automatically set to the following array when a project is running in [debug mode](#debug) (unless it is explicitly set):
 
@@ -30,7 +30,7 @@ Default: `false`
 
 A boolean allowing to enable or disable debug mode.
 
-When running in debug mode, Marten will automatically provide detailed information about raised exceptions (including tracebacks) and the incoming HTTP requests. As such this mode is mostly useful for development environments.
+When running in debug mode, Marten will automatically provide detailed information about raised exceptions (including tracebacks) and incoming HTTP requests. As such this mode is mostly useful for development environments.
 
 ### `host`
 
@@ -42,7 +42,7 @@ The host the HTTP server running the application will be listening on.
 
 Default: `[] of Marten::Apps::Config.class`
 
-An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) in order to learn more about applications.
+An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) to learn more about applications.
 
 ### `log_backend`
 
@@ -70,7 +70,7 @@ config.middleware = [
 ]
 ```
 
-Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares) in order to learn more about middlewares.
+Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares) to learn more about middlewares.
 
 ### `port`
 
@@ -108,7 +108,7 @@ The `secret_key` setting value **must** be kept secret. You should never commit 
 
 Default: `Time::Location.load("UTC")`
 
-The default time zone used by the application when it comes to store date times in the database and to display them. Any [`Time::Location`](https://crystal-lang.org/api/Time/Location.html) object can be used.
+The default time zone used by the application when it comes to storing date times in the database and displaying them. Any [`Time::Location`](https://crystal-lang.org/api/Time/Location.html) object can be used.
 
 ### `use_x_forwarded_host`
 
@@ -126,31 +126,31 @@ A boolean indicating if the `X-Forwarded-Port` header is used to determine the p
 
 Default: `false`
 
-A boolean indicating if the `X-Forwarded-Proto header` is used to determine whether a request is secure. This setting can be enabled if the Marten application is served behind a proxy that sets this header. For example if such proxy sets this header to `https`, Marten will assume that the request is secure at the application level **only** if `use_x_forwarded_proto` is set to `true`.
+A boolean indicating if the `X-Forwarded-Proto header` is used to determine whether a request is secure. This setting can be enabled if the Marten application is served behind a proxy that sets this header. For example, if such proxy sets this header to `https`, Marten will assume that the request is secure at the application level **only** if `use_x_forwarded_proto` is set to `true`.
 
 ### `handler400`
 
 Default: `Marten::Handlers::Defaults::BadRequest`
 
-The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
+The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
 
 ### `handler403`
 
 Default: `Marten::Handlers::Defaults::PermissionDenied`
 
-The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
+The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
 
 ### `handler404`
 
 Default: `Marten::Handlers::Defaults::PageNotFound`
 
-The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
+The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
 
 ### `handler500`
 
 Default: `Marten::Handlers::Defaults::ServerError`
 
-The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers) in order to learn more about error handlers.
+The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
 
 ### `x_frame_options`
 
@@ -160,7 +160,7 @@ The value to use for the X-Frame-Options header when the associated middleware i
 
 ## Assets settings
 
-Assets settings allow to configure how Marten should interact with [assets](../../files/asset-handling). These settings are all available under the `assets` namespace:
+Assets settings allow configuring how Marten should interact with [assets](../../files/asset-handling). These settings are all available under the `assets` namespace:
 
 ```crystal
 config.assets.root = "assets"
@@ -192,13 +192,13 @@ config.assets.dirs = [
 
 Default: `[] of String`
 
-An array of paths to manifest JSON files to use to resolve assets URLs. Manifest files will be used to return the right fingerprinted asset path for a generic path, which can be usefull if your asset bundling strategy support this.
+An array of paths to manifest JSON files to use to resolve assets URLs. Manifest files will be used to return the right fingerprinted asset path for a generic path, which can be useful if your asset bundling strategy support this.
 
 ### `root`
 
 Default: `"assets"`
 
-A string containing the absolute path where collected assets will be persisted (when running the `collectassets` command). By default assets will be persisted in a folder that is relative to the Marten project's directory. Obviously, this folder should be empty before running the `collectassets` command in order to not overwrite existing files: assets should be defined as part of your applications' `assets` folders instead.
+A string containing the absolute path where collected assets will be persisted (when running the `collectassets` command). By default, assets will be persisted in a folder that is relative to the Marten project's directory. Obviously, this folder should be empty before running the `collectassets` command in order to not overwrite existing files: assets should be defined as part of your applications' `assets` folders instead.
 
 :::info
 This setting is only used if `assets.storage` is `nil`.
@@ -208,7 +208,7 @@ This setting is only used if `assets.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files in order to persist them into a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
 
 By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
@@ -226,7 +226,7 @@ This setting is only used if `assets.storage` is `nil`.
 
 ## CSRF settings
 
-CSRF settings allow to configure how Cross-Site Request Forgeries (CSRF) attacks protection measures are implemented within the considered Marten project. Please refer to [Cross-Site Request Forgery protection](../../security/csrf) for more details about this topic.
+CSRF settings allow configuring how Cross-Site Request Forgeries (CSRF) attack protection measures are implemented within the considered Marten project. Please refer to [Cross-Site Request Forgery protection](../../security/csrf) for more details about this topic.
 
 The following settings are all available under the `csrf` namespace:
 
@@ -239,7 +239,7 @@ config.csrf.cookie_name = "csrf-token"
 
 Default: `nil`
 
-An optional domain to use when setting the CSRF cookie. This can be used to share the CSRF cookie across multiple subdomains for example. For example, setting this option to `.example.com` will make it possible send a POST request from a form on one subdomain (eg. `foo.example.com`) to another subdomain (eg. `bar.example.com `).
+An optional domain to use when setting the CSRF cookie. This can be used to share the CSRF cookie across multiple subdomains for example. For example, setting this option to `.example.com` will make it possible to send a POST request from a form on one subdomain (eg. `foo.example.com`) to another subdomain (eg. `bar.example.com `).
 
 ### `cookie_http_only`
 
@@ -249,7 +249,7 @@ A boolean indicating whether client-side scripts should be prevented from access
 
 ### `cookie_max_age`
 
-Default: `31_556_952` (approximatively one year)
+Default: `31_556_952` (approximately one year)
 
 The max age (in seconds) of the CSRF cookie.
 
@@ -275,7 +275,7 @@ A boolean indicating whether to use a secure cookie for the CSRF cookie. Setting
 
 Default: `true`
 
-A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf) for more details.
+A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf) for more details.
 
 ### `trusted_origins`
 
@@ -283,7 +283,7 @@ Default: `[] of String`
 
 An array of trusted origins.
 
-These origins will be trusted for CSRF-protected requests (such as POST requests) and they will be used to check either the `Origin` or the `Referer` header depending on the request scheme. This is done to ensure that a specific subdomain such as `sub1.example.com` cannot issue a POST request to `sub2.example.com`. In order to enable CSRF-protected requests over different origins, it's possible to add trusted origins to this array. For example `https://sub1.example.com` can be configured as a trusted domain that way, but it's possible to allow CSRF-protected requests for all the subdomains of a specific domain by using `https://*.example.com`.
+These origins will be trusted for CSRF-protected requests (such as POST requests) and they will be used to check either the `Origin` or the `Referer` header depending on the request scheme. This is done to ensure that a specific subdomain such as `sub1.example.com` cannot issue a POST request to `sub2.example.com`. To enable CSRF-protected requests over different origins, it's possible to add trusted origins to this array. For example `https://sub1.example.com` can be configured as a trusted domain that way, but it's possible to allow CSRF-protected requests for all the subdomains of a specific domain by using `https://*.example.com`.
 
 For example:
 
@@ -296,7 +296,7 @@ config.csrf.trusted_origins = [
 
 ## Database settings
 
-These settings allow to configure the databases used by the considered Marten project. At least one default database must be configured if your project makes use of [models](../../models-and-databases/introduction), and additional databases can optionally be configured as well.
+These settings allow configuring the databases used by the considered Marten project. At least one default database must be configured if your project makes use of [models](../../models-and-databases/introduction), and additional databases can optionally be configured as well.
 
 ```crystal
 # Default database
@@ -312,7 +312,7 @@ config.database :other do |db|
 db
 ```
 
-Configuring other database backends such as MySQL or PostgreSQL usually involve specifying more connection parameters (eg. user, password, etc). For example:
+Configuring other database backends such as MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). For example:
 
 ```crystal
 config.database do |db|
@@ -368,10 +368,10 @@ A string containing the name of the user that should be used to connect to the c
 
 ## I18n settings
 
-I18n settings allow to configure internationalization-related settings. Please refer to [Internationalization](../../i18n) for more details about how to leverage translations and localized contents in your projects.
+I18n settings allow configuring internationalization-related settings. Please refer to [Internationalization](../../i18n) for more details about how to leverage translations and localized content in your projects.
 
 :::info
-Marten makes use of [crystal-i18n](https://crystal-i18n.github.io/) in order to handle translations and locales. Further [configuration options](https://crystal-i18n.github.io/configuration.html) are also provided by this shard and can be leveraged by any Marten projects if necessary.
+Marten makes use of [crystal-i18n](https://crystal-i18n.github.io/) to handle translations and locales. Further [configuration options](https://crystal-i18n.github.io/configuration.html) are also provided by this shard and can be leveraged by any Marten projects if necessary.
 :::
 
 The following settings are all available under the `i18n` namespace:
@@ -384,7 +384,7 @@ config.i18n.default_locale = :fr
 
 Default: `nil`
 
-Allows to define the locales that can be activated in order to perform translation lookups and localizations. For example:
+Allows defining the locales that can be activated to perform translation lookups and localizations. For example:
 
 ```crystal
 config.i18n.available_locales = [:en, :fr]
@@ -398,7 +398,7 @@ The default locale used by the Marten project.
 
 ## Media files settings
 
-Media files settings allow to configure how Marten should interact with [media files](../../files/managing-files). These settings are all available under the `media_files` namespace:
+Media files settings allow configuring how Marten should interact with [media files](../../files/managing-files). These settings are all available under the `media_files` namespace:
 
 ```crystal
 config.media_files.root = "files"
@@ -419,9 +419,9 @@ This setting is only used if `media_files.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when uploading files in order to persist them into a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
 
-By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that uploaded files are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `media_files.root` and `media_files.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -437,7 +437,7 @@ This setting is only used if `media_files.storage` is `nil`.
 
 ## Sessions settings
 
-Sessions settings allow to configure how Marten should handle [sessions](../../handlers-and-http/introduction#using-sessions). These settings are all available under the `sessions` namespace:
+Sessions settings allow configuring how Marten should handle [sessions](../../handlers-and-http/introduction#using-sessions). These settings are all available under the `sessions` namespace:
 
 ```crystal
 config.sessions.cookie_name = "_sessions"
@@ -487,7 +487,7 @@ Default: `"cookie"`
 
 A string containing the identifier of the store used to handle sessions.
 
-By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions) for more details about this capability.
+By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions) for more details about this capability.
 
 ## Strict transport security policy settings
 
@@ -526,7 +526,7 @@ Defines whether the `preload` directive should be inserted into the HTTP Strict-
 
 ## Templates settings
 
-Templates settings allow to configure how Marten discovers and renders [templates](../../templates). These settings are all available under the `templates` namespace:
+Templates settings allow configuring how Marten discovers and renders [templates](../../templates). These settings are all available under the `templates` namespace:
 
 ```crystal
 config.templates.app_dirs = false
@@ -543,7 +543,7 @@ A boolean indicating whether templates should be looked for inside installed app
 
 Default: `false`
 
-A boolean indicating whether templates should be kept in a memory cache upon being loaded and parsed. This setting should likely be set to `false` in development environments (where changes to templates are frequent) and set to `true` in production environments (in order to avoid loading and parsing the same templates multiple times).
+A boolean indicating whether templates should be kept in a memory cache upon being loaded and parsed. This setting should likely be set to `false` in development environments (where changes to templates are frequent) and set to `true` in production environments (to avoid loading and parsing the same templates multiple times).
 
 ### `context_producers`
 

@@ -10,15 +10,15 @@ Marten projects can be organized into logical and reusable components called "ap
 
 A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases), [handlers](../handlers-and-http), [templates](../templates), [schemas](../schemas/), etc.
 
-Marten projects always use one or many applications. Indeed, each Marten project comes with a default [main application](#the-main-application) that corresponds to the standard `src` folder: models, migrations, or other classes defined in this folder are associated with the main application by default (unless they are part of another _explicitly defined_ application). As projects grow in size and scope, it is generally encouraged to start thinking in terms of applications and how to split models, handlers, or features accross multiple apps depending on their intended responsibilities.
+Marten projects always use one or many applications. Indeed, each Marten project comes with a default [main application](#the-main-application) that corresponds to the standard `src` folder: models, migrations, or other classes defined in this folder are associated with the main application by default (unless they are part of another _explicitly defined_ application). As projects grow in size and scope, it is generally encouraged to start thinking in terms of applications and how to split models, handlers, or features across multiple apps depending on their intended responsibilities.
 
 Another benefit of applications is that they can be packaged and reused across multiple projects. This allows third-party libraries and shards to easily contribute models, migrations, handlers, or templates to other projects.
 
 ## Using applications
 
-The use of application must be manually enabled within projects: this is done through the use of the [`installed_apps`](./reference/settings#installedapps) setting.
+The use of applications must be manually enabled within projects: this is done through the use of the [`installed_apps`](./reference/settings#installedapps) setting.
 
-This setting corresponds to an array of installed app classes. Indeed, each Marten application must define a subclass of [`Marten::App`](pathname:///api/Marten/App.html) in order to specify a few things such as the application label (see [Creating applications](#creating-applications) for more information about this). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project.
+This setting corresponds to an array of installed app classes. Indeed, each Marten application must define a subclass of [`Marten::App`](pathname:///api/Marten/App.html) to specify a few things such as the application label (see [Creating applications](#creating-applications) for more information about this). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project.
 
 For example:
 
@@ -46,17 +46,17 @@ The "main" application is a default application that is always implicitly used b
 The main application is associated with the `main` label. This means that models of the main application that do not define an explicit table name will have table names starting with `main_`.
 :::
 
-It should be noted that it is possible to create _explicitly defined_ applications whose structures live under the `src` folder as well: the abstractions (eg. models, migrations, etc) of these applications will be associated with them and _not_ with the main application. This is because abstractions are always associated with the closest application in the files and folders structure.
+It should be noted that it is possible to create _explicitly defined_ applications whose structures live under the `src` folder as well: the abstractions (eg. models, migrations, etc) of these applications will be associated with them and _not_ with the main application. This is because abstractions are always associated with the closest application in the files/folders structure.
 
-In the end, the main application provides a convenient way for starting projects and prototyping without requiring to spec out how projects will be organized in terms of applications upfront. That being said, as projects grow in size and scope, it is really encouraged to start thinking in terms of applications and how to split abstractions and features accross multiple apps depending on their intended responsibilities.
+In the end, the main application provides a convenient way for starting projects and prototyping without requiring to spec out how projects will be organized in terms of applications upfront. That being said, as projects grow in size and scope, it is really encouraged to start thinking in terms of applications and how to split abstractions and features across multiple apps depending on their intended responsibilities.
 
 ### Order of installed applications
 
 You should note that the order in which installed applications are defined in the [`installed_apps`](./reference/settings#installedapps) setting can actually matter.
 
-For example, a "foo" app might define a `test.html` template, and a similar template with the exact same name might be defined by a "bar" app. If the "foo" app appears before the "bar" app in the array of installed app, then requesting and rendering the `test.html` template will actually involve the "foo" app's template only. This is because template loaders associated with app directories iterate over applications in the order in which they are defined in the installed apps array.
+For example, a "foo" app might define a `test.html` template, and a similar template with the exact same name might be defined by a "bar" app. If the "foo" app appears before the "bar" app in the array of installed apps, then requesting and rendering the `test.html` template will actually involve the "foo" app's template only. This is because template loaders associated with app directories iterate over applications in the order in which they are defined in the installed apps array.
 
-This is why it is always important to _namespace_ abstractions, assets, templates, and locales when creating applications. Failing to do so exposes apps to conflicts with other applications' code. As such, in the previous example the "foo" app should've defined a `foo/test.html` template while the "bar" app should've defined a `bar/test.html` template to avoid possible conflicts.
+This is why it is always important to _namespace_ abstractions, assets, templates, and locales when creating applications. Failing to do so exposes apps to conflicts with other applications' code. As such, in the previous example, the "foo" app should've defined a `foo/test.html` template while the "bar" app should've defined a `bar/test.html` template to avoid possible conflicts.
 
 ## Creating applications
 
@@ -66,7 +66,7 @@ Creating applications can be done very easily through the use of the [`new`](./r
 marten new app blog src/blog
 ```
 
-Running such command will usually create the following directory structure:
+Running such a command will usually create the following directory structure:
 
 ```
 src/blog
@@ -93,7 +93,7 @@ These files and folders are described below:
 
 The most important file of an application is the `app.cr` one. This file usually includes all the app requirements and defines the application configuration class itself, which must be a subclass of the [`Marten::App`](pathname:///api/Marten/App.html) abstract class. This class allows mainly to define the "label" identifier of the application (through the use of the [`#label`](pathname:///api/Marten/Apps/Config.html#label(label%3AString|Symbol)-class-method) class method): this identifier must be unique across all the installed applications of a project and is used to generate things like model table names or migration classes.
 
-Here is an example `app.cr` file content for an hypothetic "blog" app:
+Here is an example `app.cr` file content for a hypothetic "blog" app:
 
 ```crystal
 require "./handlers/**"

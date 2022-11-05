@@ -21,7 +21,7 @@ class MyCommand < Marten::CLI::Command
 end
 ```
 
-As you can see in the previous example, the [`#help`](pathname:///api/Marten/CLI/Manage/Command/Base.html#help(help%3AString)-class-method) class method allows to set a "help text" that will be displayed when the help information of the command is requested.
+As you can see in the previous example, the [`#help`](pathname:///api/Marten/CLI/Manage/Command/Base.html#help(help%3AString)-class-method) class method allows setting a "help text" that will be displayed when the help information of the command is requested.
 
 If the above command was part of an installed application, it could be executed by using the Marten CLI as follows:
 
@@ -38,7 +38,7 @@ Marten management commands can accept options and arguments. These differ and ma
 
 By default options and arguments are always optional. That being said, they can be made mandatory in the command execution logic if needed.
 
-Both options and arguments must be specified in the optional [`#setup`](pathname:///api/Marten/CLI/Manage/Command/Base.html#setup-instance-method) method: this method will be called in order to prepare the definition of the command, including its arguments and options.
+Both options and arguments must be specified in the optional [`#setup`](pathname:///api/Marten/CLI/Manage/Command/Base.html#setup-instance-method) method: this method will be called to prepare the definition of the command, including its arguments and options.
 
 For example:
 
@@ -60,7 +60,7 @@ class MyCommand < Marten::CLI::Command
 end
 ```
 
-In the above example, the [`#on_argument`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_argument(name%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method is used to define an `arg1` argument. This method requires an argument name, an associated help text, and a proc where the value of the argument will be forwarded at execution time (which allows you to assign it to an instance variable or process it if you wish to). Similarly, the [`#on_option`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_option(flag%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method is used to define an `example` option; and in this case the name of the option and its associated help text must be specified, and a proc can be defined to identify that the option was specified at execution time (which can be used to set a related boolean instance variable variable for example).
+In the above example, the [`#on_argument`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_argument(name%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method is used to define an `arg1` argument. This method requires an argument name, an associated help text, and a proc where the value of the argument will be forwarded at execution time (which allows you to assign it to an instance variable or process it if you wish to). Similarly, the [`#on_option`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_option(flag%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method is used to define an `example` option.  In this case, the name of the option and its associated help text must be specified, and a proc can be defined to identify that the option was specified at execution time (which can be used to set a related boolean instance variable for example).
 
 The above command would produce the following help information:
 
@@ -81,7 +81,7 @@ Options:
 
 ### Configuring options
 
-As mentioned previously, it is possibly to make use of the [`#on_option`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_option(flag%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method in order to configure a specific command option (eg. `--option`). It expects a flag name, a description, and it yields a block to let the command properly assign the option value to the command object at execution time:
+As mentioned previously, it is possible to make use of the [`#on_option`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_option(flag%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method to configure a specific command option (eg. `--option`). It expects a flag name and a description, and it yields a block to let the command properly assign the option value to the command object at execution time:
 
 ```crystal
 on_option("example", "An example option") { @example = true }
@@ -97,7 +97,7 @@ on_option("e", "example", "An example option") { @example = true }
 
 ### Configuring options that accept arguments
 
-It is possible to make use of the [`#on_option_with_arg`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_option_with_arg(flag%3AString|Symbol%2Carg%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method in order to configure a specific command option with an associated argument. This method will configure a command option (eg. `--option`) and an associated argument. It expects a flag name, an argument name, a description, and it yields a block to let the command properly assign the option argument to the command object at execution time:
+It is possible to make use of the [`#on_option_with_arg`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_option_with_arg(flag%3AString|Symbol%2Carg%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method to configure a specific command option with an associated argument. This method will configure a command option (eg. `--option`) and an associated argument. It expects a flag name, an argument name, and a description. It yields a block to let the command properly assign the option to the command object at execution time:
 
 ```crystal
 on_option_with_arg(:option, :arg, "The name of the option") { @arg = arg }
@@ -111,7 +111,7 @@ on_option_with_arg("o", "option", "arg", "The name of the option") { |arg| @arg 
 
 ### Configuring arguments
 
-As mentioned previously, it is possibly to make use of the [`#on_argument`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_argument(name%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method in order to configure a specific command argument. This method expects an argument name, a description, and it yields a block to let the command properly assign the argument value to the command object at execution time:
+As mentioned previously, it is possible to make use of the [`#on_argument`](pathname:///api/Marten/CLI/Manage/Command/Base.html#on_argument(name%3AString|Symbol%2Cdescription%3AString%2C%26block%3AString->)-instance-method) instance method in order to configure a specific command argument. This method expects an argument name and a description, and it yields a block to let the command properly assign the argument value to the command object at execution time:
 
 ```crystal
 on_argument(:arg, "The name of the argument") { |value| @arg_var = value }
@@ -147,11 +147,11 @@ class HelloWorldCommand < Marten::CLI::Command
 end
 ```
 
-As you can see, the [`#style`](pathname:///api/Marten/CLI/Manage/Command/Base.html#style(msg%2Cfore%3Dnil%2Cmode%3Dnil)-instance-method) method can be used to apply `fore` and `mode` styles to a specific text values. The values you can use for the `fore` and `mode` arguments are the same as the ones that you can use with the [`Colorize`](https://crystal-lang.org/api/Colorize.html) module (which comes with the standard library).
+As you can see, the [`#style`](pathname:///api/Marten/CLI/Manage/Command/Base.html#style(msg%2Cfore%3Dnil%2Cmode%3Dnil)-instance-method) method can be used to apply `fore` and `mode` styles to a specific text value. The values you can use for the `fore` and `mode` arguments are the same as the ones that you can use with the [`Colorize`](https://crystal-lang.org/api/Colorize.html) module (which comes with the standard library).
 
 ## Handling error cases
 
-You will likely want to handle error situations when writing management commands, for example in order to return error messages if a specified argument is not provided or if it is invalid. To do so you can make use of the [`#print_error`](pathname:///api/Marten/CLI/Manage/Command/Base.html#print_error(msg)-instance-method) helper method, which will print the passed string to the error file descriptor:
+You will likely want to handle error situations when writing management commands. For example, to return error messages if a specified argument is not provided or if it is invalid. To do so you can make use of the [`#print_error`](pathname:///api/Marten/CLI/Manage/Command/Base.html#print_error(msg)-instance-method) helper method, which will print the passed string to the error file descriptor:
 
 ```crystal
 class HelloWorldCommand < Marten::CLI::Command

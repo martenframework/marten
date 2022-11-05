@@ -10,9 +10,9 @@ This page provides a reference for all the available management commands and the
 
 **Usage:** `marten collectassets [options]`
 
-Collects all the assets and copy them in a unique storage.
+Collects all the assets and copies them into a unique storage.
 
-Please refer to [Asset handling](../../files/asset-handling) to lear more about when and how assets are "collected".
+Please refer to [Asset handling](../../files/asset-handling) to learn more about when and how assets are "collected".
 
 ### Options
 
@@ -55,11 +55,11 @@ marten genmigrations foo --empty # Generates an empty migration for the "foo" ap
 
 Lists all the available database migrations.
 
-This command will introspect your project and your installed applications in order to list the available migrations, and indicate whether they have already been applied or not. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
+This command will introspect your project and your installed applications to list the available migrations, and indicate whether they have already been applied or not. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
 
 ### Options
 
-* `--db=ALIAS` - Allows to specify the alias of the database on which migrations will be applied or unapplied (default to  `default`)
+* `--db=ALIAS` - Allows specifying the alias of the database on which migrations will be applied or unapplied (default to  `default`)
 
 ### Arguments
 
@@ -78,12 +78,12 @@ marten listmigrations foo # Lists all the migrations of the "foo" app
 
 Runs database migrations.
 
-The `migrate` command allows to apply (or unapply) migrations to your databases. By default, when executed without arguments, it will execute all the non-applied migrations for your installed applications. That being said, it is possible to ensure that only the migrations of a specific application are applied by specifying an additional `app_label` argument. In order to unapply certain migrations (or to apply some of them up to a certain version only), it is possible to specify another `migration` argument corresponding to the version of a targetted migration. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
+The `migrate` command allows you to apply (or unapply) migrations to your databases. By default, when executed without arguments, it will execute all the non-applied migrations for your installed applications. That being said, it is possible to ensure that only the migrations of a specific application are applied by specifying an additional `app_label` argument. To unapply certain migrations (or to apply some of them up to a certain version only), it is possible to specify another `migration` argument corresponding to the version of a targetted migration. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
 
 ### Options
 
-* `--fake` - Allows to mark migrations as applied or unapplied without actually running them
-* `--db=ALIAS` - Allows to specify the alias of the database on which migrations will be applied or unapplied (default to `default`)
+* `--fake` - Allows marking migrations as applied or unapplied without actually running them
+* `--db=ALIAS` - Allows specifying the alias of the database on which migrations will be applied or unapplied (default to `default`)
 
 ### Arguments
 

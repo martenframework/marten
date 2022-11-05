@@ -8,11 +8,11 @@ Marten projects can be configured through the use of settings files. This sectio
 
 ## Overview
 
-Settings will be usually defined under a `config/settings` folder at the root of your project structure. There are no strict requirements regarding _where_ settings are defined nor how they are organized, but as a general rule of thumb it is recommended to organize settings on a per-environment basis (shared settings, development settings, production settings, etc).
+Settings will be usually defined under a `config/settings` folder at the root of your project structure. There are no strict requirements regarding _where_ settings are defined nor how they are organized, but as a general rule of thumb, it is recommended to organize settings on a per-environment basis (shared settings, development settings, production settings, etc).
 
 In such configuration, you will usually define shared settings (settings that are shared across all your environments) in a dedicated settings file (eg. `config/settings/base.cr`) and other environment-specific settings in other files (eg. `config/settings/development.cr`).
 
-In order to define settings, it is necessary to access the global Marten configuration object through the use of the [`Marten#configure`](pathname:///api/Marten.html#configure(env%3ANil|String|Symbol%3Dnil%2C%26)-class-method) method. This method returns a [`Marten::Conf::GlobalSettings`](pathname:///api/Marten/Conf/GlobalSettings.html) object that you can use to define setting values. For example:
+To define settings, it is necessary to access the global Marten configuration object through the use of the [`Marten#configure`](pathname:///api/Marten.html#configure(env%3ANil|String|Symbol%3Dnil%2C%26)-class-method) method. This method returns a [`Marten::Conf::GlobalSettings`](pathname:///api/Marten/Conf/GlobalSettings.html) object that you can use to define setting values. For example:
 
 ```crystal
 Marten.configure do |config|
@@ -37,7 +37,7 @@ Marten.configure do |config|
 end
 ```
 
-It should be noted that the [`Marten#configure`](pathname:///api/Marten.html#configure(env%3ANil|String|Symbol%3Dnil%2C%26)-class-method) method can be called with an additional argument in order to ensure that the underlying settings are defined for a specific environment only:
+It should be noted that the [`Marten#configure`](pathname:///api/Marten.html#configure(env%3ANil|String|Symbol%3Dnil%2C%26)-class-method) method can be called with an additional argument to ensure that the underlying settings are defined for a specific environment only:
 
 ```crystal
 Marten.configure :development do |config|

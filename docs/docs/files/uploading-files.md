@@ -60,11 +60,11 @@ class UploadFileHandler < Marten::Handlers::Schema
 end
 ```
 
-The presence / absence of the file (and - optionally - some of its attributes) will be validated according to the schema definition when `POST` requests are processed by the handler.
+The presence/absence of the file (and - optionally - some of its attributes) will be validated according to the schema definition when `POST` requests are processed by the handler.
 
 ## Persisting uploaded files in model records
 
-Models can define [`file`](../models-and-databases/reference/fields#file) fields and persist "references" of uploaded files in their rows. This allows to "retain" specific uploaded files and to associate their references with specific model records.
+Models can define [`file`](../models-and-databases/reference/fields#file) fields and persist "references" of uploaded files in their rows. This allows "retaining" specific uploaded files and associating their references with specific model records.
 
 For example, we could modify the handler in the previous section so that it persists and associate the uploaded file to a new `Attachment` record as follows:
 

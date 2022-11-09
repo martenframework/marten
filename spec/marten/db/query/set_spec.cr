@@ -1413,6 +1413,90 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#raw" do
+    it "returns the expected records for non-parameterized queries" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.raw("select * from app_tag order by id;").to_a.should eq [tag_1, tag_2, tag_3]
+      qset.raw("select * from app_tag where name = 'crystal';").to_a.should eq [tag_2]
+    end
+
+    it "returns the expected records for queries involving positional parameters" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.raw("select * from app_tag where name = ?;", ["crystal"]).to_a.should eq [tag_2]
+      qset.raw("select * from app_tag where name = ? or name = ? order by id;", ["ruby", "coding"]).to_a.should eq(
+        [tag_1, tag_3]
+      )
+    end
+
+    it "returns the expected records for queries involving splat positional parameters" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.raw("select * from app_tag where name = ?;", "crystal").to_a.should eq [tag_2]
+      qset.raw("select * from app_tag where name = ? or name = ? order by id;", "ruby", "coding").to_a.should eq(
+        [tag_1, tag_3]
+      )
+    end
+
+    it "returns the expected records for queries involving named parameters expressed as a named tuple" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.raw("select * from app_tag where name = :name;", {name: "crystal"}).to_a.should eq [tag_2]
+      qset.raw(
+        "select * from app_tag where name = :name1 or name = :name2 order by id;",
+        {name1: "ruby", name2: "coding"}
+      ).to_a.should eq(
+        [tag_1, tag_3]
+      )
+    end
+
+    it "returns the expected records for queries involving named parameters expressed as a hash" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.raw("select * from app_tag where name = :name;", {"name" => "crystal"}).to_a.should eq [tag_2]
+      qset.raw(
+        "select * from app_tag where name = :name1 or name = :name2 order by id;",
+        {"name1" => "ruby", "name2" => "coding"}
+      ).to_a.should eq([tag_1, tag_3])
+    end
+
+    it "returns the expected records for queries involving double splat named parameters" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.raw("select * from app_tag where name = :name;", name: "crystal").to_a.should eq [tag_2]
+      qset.raw(
+        "select * from app_tag where name = :name1 or name = :name2 order by id;",
+        name1: "ruby",
+        name2: "coding"
+      ).to_a.should eq([tag_1, tag_3])
+    end
+  end
+
   describe "#reverse" do
     it "reverses the current order of the considered queryset" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

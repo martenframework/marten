@@ -20,6 +20,7 @@ module.exports = {
         'models-and-databases/validations',
         'models-and-databases/callbacks',
         'models-and-databases/migrations',
+        'models-and-databases/raw-sql',
         {
           type: 'category',
           label: "How-To's",

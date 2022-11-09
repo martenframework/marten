@@ -321,6 +321,78 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::raw" do
+    it "returns the expected records for non-parameterized queries" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Tag.raw("select * from app_tag order by id;").to_a.should eq [tag_1, tag_2, tag_3]
+      Tag.raw("select * from app_tag where name = 'crystal';").to_a.should eq [tag_2]
+    end
+
+    it "returns the expected records for queries involving positional parameters" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Tag.raw("select * from app_tag where name = ?;", ["crystal"]).to_a.should eq [tag_2]
+      Tag.raw("select * from app_tag where name = ? or name = ? order by id;", ["ruby", "coding"]).to_a.should eq(
+        [tag_1, tag_3]
+      )
+    end
+
+    it "returns the expected records for queries involving splat positional parameters" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Tag.raw("select * from app_tag where name = ?;", "crystal").to_a.should eq [tag_2]
+      Tag.raw("select * from app_tag where name = ? or name = ? order by id;", "ruby", "coding").to_a.should eq(
+        [tag_1, tag_3]
+      )
+    end
+
+    it "returns the expected records for queries involving named parameters expressed as a named tuple" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Tag.raw("select * from app_tag where name = :name;", {name: "crystal"}).to_a.should eq [tag_2]
+      Tag.raw(
+        "select * from app_tag where name = :name1 or name = :name2 order by id;",
+        {name1: "ruby", name2: "coding"}
+      ).to_a.should eq(
+        [tag_1, tag_3]
+      )
+    end
+
+    it "returns the expected records for queries involving named parameters expressed as a hash" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Tag.raw("select * from app_tag where name = :name;", {"name" => "crystal"}).to_a.should eq [tag_2]
+      Tag.raw(
+        "select * from app_tag where name = :name1 or name = :name2 order by id;",
+        {"name1" => "ruby", "name2" => "coding"}
+      ).to_a.should eq([tag_1, tag_3])
+    end
+
+    it "returns the expected records for queries involving double splat named parameters" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      Tag.raw("select * from app_tag where name = :name;", name: "crystal").to_a.should eq [tag_2]
+      Tag.raw(
+        "select * from app_tag where name = :name1 or name = :name2 order by id;",
+        name1: "ruby",
+        name2: "coding"
+      ).to_a.should eq([tag_1, tag_3])
+    end
+  end
+
   describe "::using" do
     before_each do
       TestUser.using(:other).create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

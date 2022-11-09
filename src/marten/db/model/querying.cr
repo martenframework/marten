@@ -232,6 +232,76 @@ module Marten
             last.not_nil!
           end
 
+          # Returns a raw query set for the passed SQL query and optional positional parameters.
+          #
+          # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records
+          # matched by the passed SQL query. For example:
+          #
+          # ```
+          # Article.raw("SELECT * FROM articles")
+          # ```
+          #
+          # Additional positional parameters can also be specified if the query needs to be parameterized. For example:
+          #
+          # ```
+          # Article.raw("SELECT * FROM articles WHERE title = ? and created_at > ?", "Hello World!", "2022-10-30")
+          # ```
+          def raw(query : String, *args)
+            default_queryset.raw(query, args.to_a)
+          end
+
+          # Returns a raw query set for the passed SQL query and optional named parameters.
+          #
+          # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records
+          # matched by the passed SQL query. For example:
+          #
+          # ```
+          # Article.raw("SELECT * FROM articles")
+          # ```
+          #
+          # Additional named parameters can also be specified if the query needs to be parameterized. For example:
+          #
+          # ```
+          # Article.raw(
+          #   "SELECT * FROM articles WHERE title = :title and created_at > :created_at",
+          #   title: "Hello World!",
+          #   created_at: "2022-10-30"
+          # )
+          # ```
+          def raw(query : String, **kwargs)
+            default_queryset.raw(query, kwargs.to_h)
+          end
+
+          # Returns a raw query set for the passed SQL query and positional parameters.
+          #
+          # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records
+          # matched by the passed SQL query and associated positional parameters. For example:
+          #
+          # ```
+          # Article.raw("SELECT * FROM articles WHERE title = ? and created_at > ?", ["Hello World!", "2022-10-30"])
+          # ```
+          def raw(query : String, params : Array)
+            default_queryset.raw(query, params)
+          end
+
+          # Returns a raw query set for the passed SQL query and named parameters.
+          #
+          # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records
+          # matched by the passed SQL query and associated named parameters. For example:
+          #
+          # ```
+          # Article.raw(
+          #   "SELECT * FROM articles WHERE title = :title and created_at > :created_at",
+          #   {
+          #     title:      "Hello World!",
+          #     created_at: "2022-10-30",
+          #   }
+          # )
+          # ```
+          def raw(query : String, params : Hash | NamedTuple)
+            default_queryset.raw(query, params)
+          end
+
           # Returns a queryset that will be evaluated using the specified database.
           #
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the

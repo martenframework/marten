@@ -186,6 +186,44 @@ query_set.order("-published_at", "title")
 
 In the above example, records would be ordered by descending publication date (because of the `-` prefix), and then by title (ascending).
 
+### `raw`
+
+Returns a raw query set for the passed SQL query and optional parameters.
+
+This method returns a [`Marten::DB::Query::RawSet`](pathname:///api/Marten/DB/Query/RawSet.html) object, which allows to iterate over the model records matched by the passed SQL query. For example:
+
+```crystal
+Article.all.raw("SELECT * FROM articles")
+```
+
+Additional parameters can also be specified if the query needs to be parameterized. Those can be specified as positional or named arguments. For example:
+
+```crystal
+# Using splat positional parameters:
+Article.all.raw("SELECT * FROM articles WHERE title = ? and created_at > ?", "Hello World!", "2022-10-30")
+
+# Using an array of positional parameters:
+Article.all.raw("SELECT * FROM articles WHERE title = ? and created_at > ?", ["Hello World!", "2022-10-30"])
+
+# Using double splat named parameters:
+Article.all.raw(
+  "SELECT * FROM articles WHERE title = :title and created_at > :created_at",
+  title: "Hello World!",
+  created_at: "2022-10-30"
+)
+
+# Using a hash of named parameters:
+Article.all.raw(
+  "SELECT * FROM articles WHERE title = :title and created_at > :created_at",
+  {
+    title:      "Hello World!",
+    created_at: "2022-10-30",
+  }
+)
+```
+
+Please refer to [Raw SQL](../raw-sql) to learn more about performing raw SQL queries.
+
 ### `reverse`
 
 Allows to reverse the order of the current query set.

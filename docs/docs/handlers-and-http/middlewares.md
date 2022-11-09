@@ -5,7 +5,7 @@ sidebar_label: Middlewares
 ---
 
 
-Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. These hooks take an HTTP request as their input and they output an HTTP response; in the process they can implement whatever logic they deem necessary to perform actions based on the incoming request and / or the associated response.
+Middlewares are used to "hook" into Marten's request/response lifecycle. They can be used to alter or implement logic based on incoming HTTP requests and the resulting HTTP responses. These hooks take an HTTP request as their input and they output an HTTP response; in the process, they can implement whatever logic they deem necessary to perform actions based on the incoming request and/or the associated response.
 
 ## How middlewares work
 
@@ -29,7 +29,7 @@ The `get_response` proc will either call the next middleware in the chain of mid
 
 ## Activating middlewares
 
-In order to be used, middleware classes need to be specified in the [`middleware`](../development/reference/settings#middleware) setting. This setting is an array of middleware classes that defines the "chain" of middlewares that will be "hooked" into Marten's request / response lifecycle.
+In order to be used, middleware classes need to be specified in the [`middleware`](../development/reference/settings#middleware) setting. This setting is an array of middleware classes that defines the "chain" of middlewares that will be "hooked" into Marten's request/response lifecycle.
 
 For example:
 

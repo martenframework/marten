@@ -15,15 +15,15 @@ Marten provides generic handlers allowing to perform the following actions:
 * process a [schema](../schemas)
 * list, display, create, update, or delete [model records](../models-and-databases)
 
-A few of these generic handlers are described below (and all of them are listed in the [dedicated reference](./reference/generic-handlers)). Each of these handler classes must be subclassed on a per project basis to define the required "attributes", and optionally to override methods to customize things like objects exposed in template contexts. By doing so you are essentially defining handlers that inherit these common patterns, without having to reimplement them.
+A few of these generic handlers are described below (and all of them are listed in the [dedicated reference](./reference/generic-handlers)). Each of these handler classes must be subclassed on a per-project basis to define the required "attributes", and optionally to override methods to customize things like objects exposed in template contexts. By doing so you are essentially defining handlers that inherit these common patterns, without having to reimplement them.
 
-Finally it should be noted that using generic handlers is totally optional. They provide a good starting point in order to implement frequently encountered use cases, but you can decide to design your own set of generic handlers to accommodate for your project needs if the built-in ones don't match your requirements.
+Finally, it should be noted that using generic handlers is totally optional. They provide a good starting point to implement frequently encountered use cases, but you can decide to design your own set of generic handlers to accommodate for your project needs if the built-in ones don't match your requirements.
 
 ## A few examples
 
 ### Performing a redirect
 
-Having a handler that performs a redirect can be easily achieved by subclassing the [`Marten::Handlers::Redirect`](pathname:///api/Marten/Handlers/Redirect.html) generic handler. For example you could easily define a handler that redirects to an `articles:list` route with the following snippet:
+Having a handler that performs a redirect can be easily achieved by subclassing the [`Marten::Handlers::Redirect`](pathname:///api/Marten/Handlers/Redirect.html) generic handler. For example, you could easily define a handler that redirects to a `articles:list` route with the following snippet:
 
 ```crystal
 class ArticlesRedirectHandler < Marten::Handlers::Redirect
@@ -42,7 +42,7 @@ class TestRedirectHandler < Marten::Handlers::Redirect
 end
 ```
 
-Finally you can even implement your own logic in order to compute the redirection URL by overridding the `#redirect_url` method:
+Finally, you can even implement your own logic in order to compute the redirection URL by overriding the `#redirect_url` method:
 
 ```crystal
 class ArticleRedirectHandler < Marten::Handlers::Redirect
@@ -61,7 +61,7 @@ end
 
 One of the most frequent things you will want to do when writing handlers is to return HTML responses containing rendered [templates](../templates). To do so, you can obviously define a regular handler and make use of the [`#render`](./introduction#render) helper. But, you may also want to leverage the [`Marten::Handlers::Template`](pathname:///api/Marten/Handlers/Template.html) generic handler.
 
-This generic handlers will return a 200 OK HTTP response containing a rendered HTML template. To make use of it, you can simply define a subclass of it and ensure that you call the `#template_name` class method in order to define the template that will be rendered:
+This generic handler will return a 200 OK HTTP response containing a rendered HTML template. To make use of it, you can simply define a subclass of it and ensure that you call the `#template_name` class method in order to define the template that will be rendered:
 
 ```crystal
 class HomeHandler < Marten::Handlers::Template
@@ -94,9 +94,9 @@ class ArticleDetailHandler < Marten::Handlers::RecordDetail
 end
 ```
 
-By assuming that the route path associated with this handler is something like `/articles/<pk:int>`, this handler will automatically retrieve the right `Article` record by using the primary key provided in the `pk` route parameter. If the record does not exist, a `Marten::HTTP::Errors::NotFound` exceptions will be raised (which will lead to the default "not found" error page to be displayed to the user), and otherwise the configured template will be rendered (with the `Article` record exposed in the context under the `record` key).
+By assuming that the route path associated with this handler is something like `/articles/<pk:int>`, this handler will automatically retrieve the right `Article` record by using the primary key provided in the `pk` route parameter. If the record does not exist, a `Marten::HTTP::Errors::NotFound` exception will be raised (which will lead to the default "not found" error page being displayed to the user), and otherwise the configured template will be rendered (with the `Article` record exposed in the context under the `record` key).
 
-For example, the template associated with this handler could be something like:
+For example, the template associated with this handler could be something like this:
 
 ```html
 <ul>
@@ -136,6 +136,6 @@ class MyFormHandler < Marten::Handlers::Schema
 end
 ```
 
-By default, such handler will render the configured template when the incoming request is a GET or for POST requests if the data cannot be validated using the specified schema (in that case, the template is expected to use the invalid schema to display a form with the right errored inputs). The specified template can have access to the configured schema through the use of the `schema` object in the template context.
+By default, such a handler will render the configured template when the incoming request is a GET or for POST requests if the data cannot be validated using the specified schema (in that case, the template is expected to use the invalid schema to display a form with the right errored inputs). The specified template can have access to the configured schema through the use of the `schema` object in the template context.
 
 If the schema is valid, a temporary redirect is issued by using the URL corresponding to the `#success_route_name` value (although it should be noted that the way to generate this success URL can be overridden by defining a `#success_url` method). By default, the handler does nothing when the processed schema is valid (except redirecting to the success URL). That's why it can be helpful to override the `#process_valid_schema` method to implement any logic that should be triggered after a successful schema validation.

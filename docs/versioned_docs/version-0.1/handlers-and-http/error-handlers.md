@@ -15,7 +15,7 @@ Marten provides default error handlers for the following situations:
 * when **a suspicious operation is detected**, it will return a default Bad Request (400) response
 * when **an action is forbidden**, it will return a default Forbidden (403) response
 
-Note that you don't need to manually deal or interact with these default error handlers: they are automatically used by the Marten server when the above error conditions are met.
+Note that you don't need to manually interact with these default error handlers: they are automatically used by the Marten server when the above error conditions are met.
 
 ### Page Not Found (404)
 
@@ -46,7 +46,7 @@ A Forbidden (403) response is automatically returned by the [`Marten::Handlers::
 
 ## Customizing error handlers
 
-Each of the error handlers mentioned above can be easily customized: by default they provide a "raw" server response with a standard message, and it might make sense on a project-basis to customize how they show up to your users. As such, each handler is associated with a dedicated template name that will be rendered if your project defines it. Each of these handlers can also be replaced by a custom one by using the appropriate settings.
+Each of the error handlers mentioned above can be easily customized: by default they provide a "raw" server response with a standard message, and it might make sense on a project basis to customize how they show up to your users. As such, each handler is associated with a dedicated template name that will be rendered if your project defines it. Each of these handlers can also be replaced by a custom one by using the appropriate settings.
 
 These customization options are listed below:
 

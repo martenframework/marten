@@ -88,7 +88,11 @@ module Marten
         # If this method is called in an existing transaction, the connection associated with this transaction will be
         # used instead.
         def open(&block)
-          yield current_transaction.nil? ? db : current_transaction.not_nil!.connection
+          if (trx = current_transaction).nil?
+            using_connection { |conn| yield conn }
+          else
+            yield trx.connection
+          end
         end
 
         # Escapes special characters from a pattern aimed at being used in the context of a LIKE statement.
@@ -148,15 +152,25 @@ module Marten
         end
 
         private def new_transaction
-          db.transaction do |tx|
-            transactions[Fiber.current.object_id] ||= tx
-            yield
+          using_connection do |conn|
+            conn.transaction do |tx|
+              transactions[Fiber.current.object_id] ||= tx
+              yield
+            end
           end
           true
         rescue Marten::DB::Errors::Rollback
           false
         ensure
           transactions.delete(Fiber.current.object_id)
+        end
+
+        private def using_connection
+          db.retry do
+            db.using_connection do |conn|
+              yield conn
+            end
+          end
         end
       end
     end

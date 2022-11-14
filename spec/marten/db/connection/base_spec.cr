@@ -1,6 +1,35 @@
 require "./spec_helper"
 
 describe Marten::DB::Connection::Base do
+  describe "::new" do
+    it "initializes the DB as expected" do
+      Marten.settings.databases.each do |config|
+        conn = Marten::DB::Connection.get(config.id)
+
+        expected_db_uri = URI.new(
+          scheme: conn.scheme,
+          user: config.user,
+          password: config.password,
+          host: config.host,
+          port: config.port,
+          path: (config.name || "").gsub(":memory:", ""),
+          query: URI::Params.build do |params|
+            params.add("checkout_timeout", config.checkout_timeout.to_s)
+            params.add("initial_pool_size", config.initial_pool_size.to_s)
+            params.add("max_idle_pool_size", config.max_idle_pool_size.to_s)
+            params.add("max_pool_size", config.max_pool_size.to_s)
+            params.add("retry_attempts", config.retry_attempts.to_s)
+            params.add("retry_delay", config.retry_delay.to_s)
+          end
+        ).to_s
+
+        conn.open do |db_conn|
+          db_conn.context.uri.to_s.should eq expected_db_uri
+        end
+      end
+    end
+  end
+
   describe "#alias" do
     it "returns the alias associated with the connection database" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")

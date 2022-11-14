@@ -122,23 +122,26 @@ module Marten
         end
 
         protected def build_url
-          parts = [] of String?
+          URI.new(
+            scheme: scheme,
+            user: @config.user,
+            password: @config.password,
+            host: @config.host,
+            port: @config.port,
+            path: @config.name || "",
+            query: build_url_params
+          ).to_s
+        end
 
-          parts << "#{scheme}://"
-
-          unless @config.user.nil?
-            parts << "#{@config.user}:#{@config.password}@"
+        protected def build_url_params
+          URI::Params.build do |params|
+            params.add("checkout_timeout", @config.checkout_timeout.to_s)
+            params.add("initial_pool_size", @config.initial_pool_size.to_s)
+            params.add("max_idle_pool_size", @config.max_idle_pool_size.to_s)
+            params.add("max_pool_size", @config.max_pool_size.to_s)
+            params.add("retry_attempts", @config.retry_attempts.to_s)
+            params.add("retry_delay", @config.retry_delay.to_s)
           end
-
-          if !@config.host.nil? && !@config.port.nil?
-            parts << "#{@config.host}:#{@config.port}/"
-          elsif !@config.host.nil?
-            parts << "#{@config.host}/"
-          end
-
-          parts << @config.name
-
-          parts.compact!.join("")
         end
 
         protected def db

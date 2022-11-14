@@ -4,49 +4,114 @@ module Marten
       # Defines the configuration of a specific database connection.
       class Database
         @backend : String?
+        @checkout_timeout : Float64 = 5.0
         @host : String?
+        @initial_pool_size : Int32 = 1
+        @max_idle_pool_size : Int32 = 1
+        @max_pool_size : Int32 = 0 # unlimited
         @name : String?
         @name_set_with_env : String?
         @password : String?
         @port : Int32?
+        @retry_attempts : Int32 = 1
+        @retry_delay : Float64 = 1.0
         @target_env : String?
         @user : String?
 
+        # Returns the identifier of the database.
         getter id
+
+        # Returns the connection backend of the database.
         getter backend
+
+        # Returns the number of seconds to wait for a connection to become available when the max pool size is reached.
+        getter checkout_timeout
+
+        # Returns the database host.
         getter host
+
+        # Returns the initial number of connections created for the database connections pool.
+        getter initial_pool_size
+
+        # Returns the maximum number of idle connections for the database connections pool.
+        #
+        # When released, a connection will be closed only if there are already `max_idle_pool_size` idle connections.
+        getter max_idle_pool_size
+
+        # Returns the maximum number of connections that will be held by the database connections pool.
+        #
+        # When set to `0`, this means that there is no limit to the number of connections.
+        getter max_pool_size
+
+        # Returns the database name.
         getter name
+
+        # Returns the database password.
         getter password
+
+        # Returns the database port.
         getter port
+
+        # Returns the maximum number of attempts to retry re-establishing a lost connection.
+        getter retry_attempts
+
+        # Returns the delay to wait between each retry at re-establishing a lost connection.
+        getter retry_delay
+
+        # Returns the database user name.
         getter user
 
         # :nodoc:
         getter name_set_with_env
 
+        # Allows to set the seconds to wait for a connection to become available when the max pool size is reached.
+        setter checkout_timeout
+
+        # Allows to set the initial number of connections created for the database connections pool.
+        setter initial_pool_size
+
+        # Allows to set the maximum number of idle connections for the database connections pool.
+        setter max_idle_pool_size
+
+        # Allows to set the maximum number of connections that will be held by the database connections pool.
+        setter max_pool_size
+
+        # Allows to set the maximum number of attempts to retry re-establishing a lost connection.
+        setter retry_attempts
+
+        # Allows to set the delay to wait between each retry at re-establishing a lost connection.
+        setter retry_delay
+
         def initialize(@id : String)
         end
 
+        # Allows to set the connection backend of the database.
         def backend=(val : String | Symbol)
           @backend = val.to_s
         end
 
+        # Allows to set the database host.
         def host=(val : String | Symbol)
           @host = val.to_s
         end
 
+        # Allows to set the database name.
         def name=(val : Path | String | Symbol)
           @name = val.to_s
           @name_set_with_env = @target_env
         end
 
+        # Allows to set the database password.
         def password=(val : String | Symbol)
           @password = val.to_s
         end
 
+        # Allows to set the database port.
         def port=(val : Int)
           @port = val.to_i32
         end
 
+        # Allows to set the database user name.
         def user=(val : String | Symbol)
           @user = val.to_s
         end

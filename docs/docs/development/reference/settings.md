@@ -336,11 +336,35 @@ The database backend to use for connecting to the considered database. Marten su
 * `:postgresql`
 * `:sqlite`
 
+### `checkout_timeout`
+
+Default: `5.0`
+
+The number of seconds to wait for a connection to become available when the max pool size is reached.
+
 ### `host`
 
 Default: `nil`
 
 A string containing the host used to connect to the database. No value means that the host will be localhost.
+
+### `initial_pool_size`
+
+Default: `1`
+
+The initial number of connections created for the database connections pool.
+
+### `max_idle_pool_size`
+
+Default: `1`
+
+The maximum number of idle connections for the database connections pool. Concretely, this means that when released, a connection will be closed only if there are already `max_idle_pool_size` idle connections.
+
+### `max_pool_size`
+
+Default: `0`
+
+The maximum number of connections that will be held by the database connections pool. When set to `0`, this means that there is no limit to the number of connections.
 
 ### `name`
 
@@ -359,6 +383,18 @@ A string containing the password to use to connect to the configured database.
 Default: `nil`
 
 The port to use to connect to the configured database. No value means that the default port will be used.
+
+### `retry_attempts`
+
+Default: `1`
+
+The maximum number of attempts to retry re-establishing a lost connection.
+
+### `retry_delay`
+
+Default: `1.0`
+
+The delay to wait between each retry at re-establishing a lost connection.
 
 ### `user`
 

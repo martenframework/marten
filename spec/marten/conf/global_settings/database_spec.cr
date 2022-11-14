@@ -44,6 +44,27 @@ describe Marten::Conf::GlobalSettings::Database do
     end
   end
 
+  describe "#checkout_timeout" do
+    it "returns the expected default value if not configured" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.checkout_timeout.should eq 5.0
+    end
+
+    it "returns the configured value" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.checkout_timeout = 7.5
+      db_config.checkout_timeout.should eq 7.5
+    end
+  end
+
+  describe "#checkout_timeout=" do
+    it "allows to set the checkout timeout" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.checkout_timeout = 7.5
+      db_config.checkout_timeout.should eq 7.5
+    end
+  end
+
   describe "#host=" do
     it "allows to set the host from a symbol" do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
@@ -68,6 +89,69 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
       db_config.host = "localhost"
       db_config.host.should eq "localhost"
+    end
+  end
+
+  describe "#initial_pool_size" do
+    it "returns the expected default value if not configured" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.initial_pool_size.should eq 1
+    end
+
+    it "returns the configured value" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.initial_pool_size = 2
+      db_config.initial_pool_size.should eq 2
+    end
+  end
+
+  describe "#initial_pool_size=" do
+    it "allows to set the initial pool size" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.initial_pool_size = 2
+      db_config.initial_pool_size.should eq 2
+    end
+  end
+
+  describe "#max_idle_pool_size" do
+    it "returns the expected default value if not configured" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.max_idle_pool_size.should eq 1
+    end
+
+    it "returns the configured value" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.max_idle_pool_size = 2
+      db_config.max_idle_pool_size.should eq 2
+    end
+  end
+
+  describe "#max_idle_pool_size=" do
+    it "allows to set the max idle pool size" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.max_idle_pool_size = 2
+      db_config.max_idle_pool_size.should eq 2
+    end
+  end
+
+  describe "#max_pool_size" do
+    it "returns the expected default value if not configured" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.max_pool_size.should eq 0
+    end
+
+    it "returns the configured value" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.max_pool_size = 100
+      db_config.max_pool_size.should eq 100
+    end
+  end
+
+  describe "#max_pool_size=" do
+    it "allows to set the max pool size" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.max_pool_size = 100
+      db_config.max_pool_size.should eq 100
     end
   end
 
@@ -143,6 +227,48 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
       db_config.port = 1234
       db_config.port.should eq 1234
+    end
+  end
+
+  describe "#retry_attempts" do
+    it "returns the expected default value if not configured" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.retry_attempts.should eq 1
+    end
+
+    it "returns the configured value" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.retry_attempts = 2
+      db_config.retry_attempts.should eq 2
+    end
+  end
+
+  describe "#retry_attempts=" do
+    it "allows to set the retry attempts number" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.retry_attempts = 2
+      db_config.retry_attempts.should eq 2
+    end
+  end
+
+  describe "#retry_delay" do
+    it "returns the expected default value if not configured" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.retry_delay.should eq 1.0
+    end
+
+    it "returns the configured value" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.retry_delay = 2.5
+      db_config.retry_delay.should eq 2.5
+    end
+  end
+
+  describe "#retry_delay=" do
+    it "allows to set the retry delay" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.retry_delay = 2.5
+      db_config.retry_delay.should eq 2.5
     end
   end
 

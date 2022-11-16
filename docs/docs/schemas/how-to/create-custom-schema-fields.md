@@ -37,7 +37,7 @@ class MySchema < Marten::Schema
 end
 ```
 
-The call to `#register` can be made from anywhere in your codebase, but obviously you will want to ensure that it is done before requiring your schema classes: indeed, Marten will make the compilation of your project fail if it can't find the field type you are trying to use as part of a schema definition.
+The call to `#register` can be made from anywhere in your codebase, but obviously, you will want to ensure that it is done before requiring your schema classes: indeed, Marten will make the compilation of your project fail if it can't find the field type you are trying to use as part of a schema definition.
 
 ## Subclassing existing schema fields
 
@@ -81,7 +81,7 @@ Creating new schema fields from scratch involves subclassing the [`Marten::Schem
 
 #### `deserialize`
 
-The `#deserialize` method is responsible for deserializing a schema field value. Indeed, the raw value of a schema field usually comes from a request's data and needs to be converted to another format. For example a `uuid` field might need to convert a `String` value to a proper `UUID` object:
+The `#deserialize` method is responsible for deserializing a schema field value. Indeed, the raw value of a schema field usually comes from a request's data and needs to be converted to another format. For example, a `uuid` field might need to convert a `String` value to a proper `UUID` object:
 
 ```crystal
 def deserialize(value) : ::UUID?
@@ -108,7 +108,7 @@ If the value can't be processed properly by your field class, then it may be nec
 
 #### `serialize`
 
-The `#serialize` method is responsible for serializing a field value, which is essentialy the reverse of the [`#deserialize`](#deserialize) method. As such, this method must convert a field value from the "Crystal" representation to the "raw" schema representation.
+The `#serialize` method is responsible for serializing a field value, which is essentially the reverse of the [`#deserialize`](#deserialize) method. As such, this method must convert a field value from the "Crystal" representation to the "raw" schema representation.
 
 For example, this method could return the string representation of a `UUID` object:
 
@@ -134,7 +134,7 @@ def initialize(
 end
 ```
 
-Depending on your field requirements, you might want to overridde this method completely in order to support additional parameters (such as default validation-related options for example).
+Depending on your field requirements, you might want to override this method completely in order to support additional parameters (such as default validation-related options for example).
 
 #### `validate`
 

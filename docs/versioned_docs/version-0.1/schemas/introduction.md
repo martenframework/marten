@@ -4,7 +4,7 @@ description: Learn how to define schemas and use them in handlers.
 sidebar_label: Introduction
 ---
 
-Schemas are classes that define how input data should be serialized / deserialized, and validated. Schemas are usually used when processing web requests containing form data or pre-defined payloads.
+Schemas are classes that define how input data should be serialized/deserialized, and validated. Schemas are usually used when processing web requests containing form data or pre-defined payloads.
 
 ## Basic schema definition and usage
 
@@ -30,11 +30,11 @@ In the above example, `title`, `content`, and `published_at` are fields of the `
 
 ### Using schemas
 
-Schemas can theoretically be used to process to any kind of data, including a request's data. This makes them ideal when it comes to processing form inputs data or JSON payloads for example.
+Schemas can theoretically be used to process any kind of data, including a request's data. This makes them ideal when it comes to processing form inputs data or JSON payloads for example.
 
 When used as part of [handlers](../handlers-and-http/introduction), and especially when processing HTML forms, schemas will usually be initialized and used to render a form when `GET` requests are submitted to the considered handler. Processing the actual form data will usually be done in the same handler when `POST` requests are submitted.
 
-For example the handler in the following snippets displays a schema when a `GET` request is processed, and it validates the incoming data using the schema when the request is a `POST`:
+For example, the handler in the following snippets displays a schema when a `GET` request is processed, and it validates the incoming data using the schema when the request is a `POST`:
 
 ```crystal
 class ArticleCreateHandler < Marten::Handler
@@ -100,7 +100,7 @@ It should be noted that templates can easily interact with schema objects in ord
 Some [generic handlers](../handlers-and-http/generic-handlers) allow to conveniently process schemas in handlers. This is the case for the [`Marten::Handlers::Schema`](../handlers-and-http/reference/generic-handlers#processing-a-schema), the [`Marten::Handlers::RecordCreate`](../handlers-and-http/reference/generic-handlers#creating-a-record), and the [`Marten::Handlers::RecordUpdate`](../handlers-and-http/reference/generic-handlers#updating-a-record) generic handlers for example.
 :::
 
-Note that schemas can be used for other things than processing form data. For example they can also be used to process JSON payloads as part of API endpoints:
+Note that schemas can be used for other things than processing form data. For example, they can also be used to process JSON payloads as part of API endpoints:
 
 ```crystal
 class API::ArticleCreateHandler < Marten::Handler
@@ -141,9 +141,9 @@ end
 
 ### Field ID and field type
 
-Pretty much like model fiels, every field in a schema class must contain two mandatory positional arguments: a field identifier and a field type.
+Pretty much like model fields, every field in a schema class must contain two mandatory positional arguments: a field identifier and a field type.
 
-The field identifier is used by Marten in order to determine the name of the corresponding key in any data set objects that should be validated by the schema.
+The field identifier is used by Marten to determine the name of the corresponding key in any data set objects that should be validated by the schema.
 
 The field type determines a few other things:
 
@@ -151,7 +151,7 @@ The field type determines a few other things:
 * how the field is serialized and deserialized
 * how field values are actually validated
 
-Marten provides numerous build-in schema field types that cover common web development needs. The complete list of supported fields is covered in the [schema fields reference](./reference/fields).
+Marten provides numerous built-in schema field types that cover common web development needs. The complete list of supported fields is covered in the [schema fields reference](./reference/fields).
 
 :::note
 It is possible to write custom schema fields and to use them in your schema definitions. See [How to create custom schema fields](./how-to/create-custom-schema-fields) for more details regarding this capability.
@@ -197,7 +197,7 @@ Please head over to the [Schema validations](./validations) guide in order to le
 
 ## Callbacks
 
-It is possible to define callbacks in your schema in order to bind methods and logics to specific events in the life-cycle of your schema objects. Presently, schemas support callbacks related to validation only: `before_validation` and `after_validation`
+It is possible to define callbacks in your schema in order to bind methods and logics to specific events in the life cycle of your schema objects. Presently, schemas support callbacks related to validation only: `before_validation` and `after_validation`
 
 `before_validation` callbacks are called before running validation rules for a given schema while `after_validation` callbacks are executed after. They can be used to alter the validated data once the validation is done for example.
 

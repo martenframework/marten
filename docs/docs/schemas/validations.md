@@ -4,7 +4,7 @@ description: Learn how to validate data with schemas.
 sidebar_label: Validations
 ---
 
-The main goal of schemas is to validate data and request parameters. As such, schemas provide a convenient mechanism allowing to definition validation rules. These rules can be inherited from the fields in your schema depending on the options you used and the type of your fields. They can also be explicitly specified in your schema class, which is useful if you need to implement custom validation logics.
+The main goal of schemas is to validate data and request parameters. As such, schemas provide a convenient mechanism allowing to define validation rules. These rules can be inherited from the fields in your schema depending on the options you used and the type of your fields. They can also be explicitly specified in your schema class, which is useful if you need to implement custom validation logics.
 
 
 ## Overview
@@ -21,7 +21,7 @@ end
 
 In the above snippet, a `UserSchema` schema is defined and it is specified that the `name` field must be present (`required: true`) and that the associated value cannot exceed 128 characters.
 
-Given these characteristics, it is possible to initialize `UserSchema` instances and to validate data through the use of the `#valid?` method:
+Given these characteristics, it is possible to initialize `UserSchema` instances and validate data through the use of the `#valid?` method:
 
 ```crystal
 schema_1 = UserSchema.new(Marten::Schema::DataHash.new)
@@ -50,14 +50,14 @@ schema.invalid?   # => true
 
 As mentioned previously, fields can contribute validation rules to your schemas. These validation rules can be inherited:
 
-* from the field type itself: some field will validate that values are of a specific type (for example a `uuid` field will not validate values that don't correspond to valid UUIDs)
+* from the field type itself: some fields will validate that values are of a specific type (for example a `uuid` field will not validate values that don't correspond to valid UUIDs)
 * from the field options you define (for example fields using `required: true` will result in errors if the field is missing from the validated data)
 
-Please refer to the [fields reference](./reference/fields) in order to learn more about the supported field types and their associated options.
+Please refer to the [fields reference](./reference/fields) to learn more about the supported field types and their associated options.
 
 ## Custom validation rules
 
-Custom validation rules can be defined through the use of the `#validate` macro. This macro lets you configure the name of a validation method that should be called when a schema instance is validated. Inside this method you can implement any validation logic that you might require and add errors to the schema instance if the data is invalid.
+Custom validation rules can be defined through the use of the `#validate` macro. This macro lets you configure the name of a validation method that should be called when a schema instance is validated. Inside this method, you can implement any validation logic that you might require and add errors to the schema instance if the data is invalid.
 
 For example:
 
@@ -79,7 +79,7 @@ class SignUpSchema < Marten::Schema
 end
 ```
 
-In the above snippet, a custom validation method ensures that the `password1` and `password2` fields have the exact same value. If that's not the case, then a specific error (that is not associated with any fields) is added to the schema instance (which makes it invalid). It's interesting to note the use of the `#validated_data` method here: this method returns  a hash of all the values that were previously sanitized and validated. You can make use of it when defining custom validation rules: indeed, these rules always run _after_ all the fields have been individually validated first.
+In the above snippet, a custom validation method ensures that the `password1` and `password2` fields have the exact same value. If that's not the case, then a specific error (that is not associated with any fields) is added to the schema instance (which makes it invalid). It's interesting to note the use of the `#validated_data` method here: this method returns a hash of all the values that were previously sanitized and validated. You can make use of it when defining custom validation rules: indeed, these rules always run _after_ all the fields have been individually validated first.
 
 :::important
 You can define multiple validation rules in your schema classes. When doing so, don't forget that these custom validation rules are called in the order they are defined.

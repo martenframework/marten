@@ -52,7 +52,7 @@ author = Author.new(first_name: "John", last_name: "Doe") # not persisted yet!
 author.save                                               # the author is now persisted to the database!
 ```
 
-Finally it should be noted that both `#create` and `#new` support an optional block that will receive the initialized model record. This allows to initialize attributes or to call additional methods on the record being initialized:
+Finally, it should be noted that both `#create` and `#new` support an optional block that will receive the initialized model record. This allows to initialize attributes or to call additional methods on the record being initialized:
 
 ```crystal
 Author.create do |author|
@@ -62,7 +62,7 @@ end
 ```
 
 :::caution
-Model records will be validated before being saved to the database. If this validation fails, both the `#create` and `#save` method will silently fail: `#create` will return the invalid model instance while `#save` will return `false`. The `#create` and `#save` methods also have bang counterparts (`#create!` and `#save!`) that will explicitly raise a validation error (`Marten::DB::Errors::InvalidRecord`) in case of an invalid record.
+Model records will be validated before being saved to the database. If this validation fails, both the `#create` and `#save` methods will silently fail: `#create` will return the invalid model instance while `#save` will return `false`. The `#create` and `#save` methods also have bang counterparts (`#create!` and `#save!`) that will explicitly raise a validation error (`Marten::DB::Errors::InvalidRecord`) in case of an invalid record.
 
 Please refer to [Validations](./validations) in order to learn more about model validations.
 :::
@@ -71,7 +71,7 @@ Please refer to [Validations](./validations) in order to learn more about model 
 
 In order to interact with a collection of model records, it is necessary to construct a "query set". A query set represents a collection of model records in the database. It can have filters, be paginated, etc. Unless a specific "write" operation is performed on such query sets, they will usually be mapped to a standard `SELECT` statement where filters are converted to `WHERE` clauses.
 
-Query set can be forged from a specific model by using methods such `#all`, `#filter`, or `#exclude` (those are described below). One of the key characterics of query sets is that they are **lazily evaluated**: defining a query set will usually not involve any database operation. Additionally, most methods provided by query sets also return new query set objects. Query sets are only translated to SQL queries hitting the underlying database when records need to be extracted or manipulated by the considered codebase.
+Query sets can be forged from a specific model by using methods such `#all`, `#filter`, or `#exclude` (those are described below). One of the key characteristics of query sets is that they are **lazily evaluated**: defining a query set will usually not involve any database operation. Additionally, most methods provided by query sets also return new query set objects. Query sets are only translated to SQL queries hitting the underlying database when records need to be extracted or manipulated by the considered codebase.
 
 For example, filters can be chained on a query set without it being evaluated. The query set is only evaluated when the actual records need to be displayed or when it becomes necessary to interact with them:
 
@@ -81,9 +81,9 @@ qset = qset.filter(author__first_name: "John")  # the query set is not evaluated
 puts qset                                       # the query set is evaluated
 ```
 
-In the above example the two filters are simply chained without these resulting in database hits. The query set is only evaluated when the actual records need to be printed.
+In the above example, the two filters are simply chained without these resulting in database hits. The query set is only evaluated when the actual records need to be printed.
 
-Query set are **iterable**: they provide the ability to iterate over the resulting records (which will also force the query set to be evaluated when this happens):
+Query sets are **iterable**: they provide the ability to iterate over the resulting records (which will also force the query set to be evaluated when this happens):
 
 ```crystal
 qset = Article.filter(title__startswith: "Top") # the query set is not evaluated
@@ -98,7 +98,7 @@ Retrieving all the records of a specific model can be achieved through the use o
 Author.all
 ```
 
-"All records" does not necessarilly mean all the records in the considered table. For example `#all` can be chained to an existing query set that was filtered (which is usually unnecessary since this does not alter the resulting records):
+"All records" does not necessarily mean all the records in the considered table. For example, `#all` can be chained to an existing query set that was filtered (which is usually unnecessary since this does not alter the resulting records):
 
 ```crystal
 Author.filter(first_name: "John").all
@@ -215,7 +215,7 @@ Author.filter(first_name__exact: "John")
 
 This field predicate can be used for case insensitive matches.
 
-For example the following filter would return `Article` records whose titles are `Test`, `TEST` or `test`:
+For example, the following filter would return `Article` records whose titles are `Test`, `TEST` or `test`:
 
 ```crystal
 Article.filter(title__iexact: "test")
@@ -249,7 +249,7 @@ For example, the following snippet will return all the `Article` records whose t
 Article.filter { q(title__startswith: "Top") | q(title__startswith: "10") }
 ```
 
-Using this approach, it is possible to produce complex conditions by combining `q()` expressions with the `&`, `|`, and `-` operators. Parantheses can also be used to group statements:
+Using this approach, it is possible to produce complex conditions by combining `q()` expressions with the `&`, `|`, and `-` operators. Parentheses can also be used to group statements:
 
 ```crystal
 Article.filter { 
@@ -269,7 +269,7 @@ Article.filter {
 
 The double underscores notation described previously (`__`) can also be used to filter based on related model fields. For example, in the considered models definitions, we have an `Article` model which defines a relation (`many_to_one` field) to the `Author` model through the `author` field. The `Author` model itself also defines a relation to a `City` record through the `hometown` field.
 
-Given this data model, we could easily retrieve `Article` records whose author first name is "John" with the following query set:
+Given this data model, we could easily retrieve `Article` records whose author's first name is "John" with the following query set:
 
 ```crystal
 Article.filter(author__first_name: "John")
@@ -281,7 +281,7 @@ We could even retrieve all the `Article` records whose author are located in "Mo
 Article.filter(author__hometown__name: "Montreal")
 ```
 
-And obviously the above querysets could also be used along with more specific field predicate types. For example:
+And obviously, the above query sets could also be used along with more specific field predicate types. For example:
 
 ```crystal
 Author.filter(author__hometown__name__startswith: "New")
@@ -289,7 +289,7 @@ Author.filter(author__hometown__name__startswith: "New")
 
 When doing “deep filtering” like this, related model tables are automatically "joined" at the SQL level (inner joins or left outer joins depending on the nullability of the filtered fields). So the filtered relations are also already "selected" as part of the query, and fully initialized at the Crystal level.
 
-It is also possible to explicitly define that a specific queryset must "join" a set of relations. This can result in nice performance improvements since this can help reduce the number of SQL queries performed for a given codebase. This is achieved through the use of the `#join` method:
+It is also possible to explicitly define that a specific query set must "join" a set of relations. This can result in nice performance improvements since this can help reduce the number of SQL queries performed for a given codebase. This is achieved through the use of the `#join` method:
 
 ```crystal
 author_1 = Author.filter(first_name: "John")
@@ -327,7 +327,7 @@ When calling the `#update` method like in the previous example, the update is do
 
 ## Deleting records
 
-Single model records that has been retrieved from the database can be deleted by using the `#delete` method:
+Single model records that have been retrieved from the database can be deleted by using the `#delete` method:
 
 ```crystal
 article = Article.get(id: 42)
@@ -340,4 +340,4 @@ Marten also provide the ability to delete the records that are targetted by a sp
 Article.filter(title: "My article").delete
 ```
 
-By default, related objects that are associated with the deleted records will also deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference](./reference/fields#on_delete) for more details). The method always returns the number of deleted records.
+By default, related objects that are associated with the deleted records will also be deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference](./reference/fields#on_delete) for more details). The method always returns the number of deleted records.

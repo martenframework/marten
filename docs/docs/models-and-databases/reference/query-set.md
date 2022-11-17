@@ -73,7 +73,7 @@ qset_2[2..6]? # returns a "sliced" query set
 
 ### `all`
 
-Allows to retrieve all the records of a specific model. `#all` can be used as a class method from any model class, or it can be used as an instance method from any query set object. In this last case, calling `#all` returns a copy of the current query set.
+Allows retrieving all the records of a specific model. `#all` can be used as a class method from any model class, or it can be used as an instance method from any query set object. In this last case, calling `#all` returns a copy of the current query set.
 
 For example:
 
@@ -175,7 +175,7 @@ query_set.none.exists? # => false
 
 ### `order`
 
-Allows to specify the ordering in which records should be returned when evaluating the query set.
+Allows specifying the ordering in which records should be returned when evaluating the query set.
 
 Multiple fields can be specified in order to define the final ordering. For example:
 
@@ -226,7 +226,7 @@ Please refer to [Raw SQL](../raw-sql) to learn more about performing raw SQL que
 
 ### `reverse`
 
-Allows to reverse the order of the current query set.
+Allows reversing the order of the current query set.
 
 For example, this would return all the `Article` records ordered by descending title:
 
@@ -237,7 +237,7 @@ query_set.reverse
 
 ### `using`
 
-Allows to define which database alias should be used when evaluating the query set.
+Allows defining which database alias should be used when evaluating the query set.
 
 For example:
 
@@ -318,7 +318,7 @@ Article.filter(title__startswith: "Top").delete # deletes all the articles whose
 
 ### `each`
 
-Allows to iterate over the records that are targeted by the current query set.
+Allows iterating over the records that are targeted by the current query set.
 
 This method can be used to define a block that iterates over the records that are targeted by a query set:
 
@@ -455,7 +455,7 @@ Below are listed all the available [field predicates](../queries#field-predicate
 
 ### `contains`
 
-Allows to filter records based on field values that contain a specific substring. Note that this is a **case-sensitive** predicate.
+Allows filtering records based on field values that contain a specific substring. Note that this is a **case-sensitive** predicate.
 
 ```crystal
 Article.all.filter(title__contains: "tech")
@@ -463,7 +463,7 @@ Article.all.filter(title__contains: "tech")
 
 ### `endswith`
 
-Allows to filter records based on field values that end with a specific substring. Note that this is a **case-sensitive** predicate.
+Allows filtering records based on field values that end with a specific substring. Note that this is a **case-sensitive** predicate.
 
 ```crystal
 Article.all.filter(title__endswith: "travel")
@@ -471,7 +471,7 @@ Article.all.filter(title__endswith: "travel")
 
 ### `exact`
 
-Allows to filter records based on a specific field value (exact match). Note that providing a `nil` value will result in a `IS NULL` check at the SQL level.
+Allows filtering records based on a specific field value (exact match). Note that providing a `nil` value will result in a `IS NULL` check at the SQL level.
 
 This is the default predicate; as such it is not necessary to specify it when filtering records. The following two query sets are equivalent:
 
@@ -482,7 +482,7 @@ Article.all.filter(published__exact: true)
 
 ### `gte`
 
-Allows to filter record based on field values that are greater than or equal to a specified value.
+Allows filtering records based on field values that are greater than or equal to a specified value.
 
 ```crystal
 Article.all.filter(rating__gte: 10)
@@ -490,7 +490,7 @@ Article.all.filter(rating__gte: 10)
 
 ### `gt`
 
-Allows to filter record based on field values that are greater than a specified value.
+Allows filtering records based on field values that are greater than a specified value.
 
 ```crystal
 Article.all.filter(rating__gt: 10)
@@ -498,7 +498,7 @@ Article.all.filter(rating__gt: 10)
 
 ### `icontains`
 
-Allows to filter records based on field values that contain a specific substring, in a case-insensitive way.
+Allows filtering records based on field values that contain a specific substring, in a case-insensitive way.
 
 ```crystal
 Article.all.filter(title__icontains: "tech")
@@ -506,7 +506,7 @@ Article.all.filter(title__icontains: "tech")
 
 ### `iendswith`
 
-Allows to filter records based on field values that end with a specific substring, in a case-insensitive way.
+Allows filtering records based on field values that end with a specific substring, in a case-insensitive way.
 
 ```crystal
 Article.all.filter(title__iendswith: "travel")
@@ -514,7 +514,7 @@ Article.all.filter(title__iendswith: "travel")
 
 ### `iexact`
 
-Allows to filter records based on a specific field value (exact match), in a case-insensitive way.
+Allows filtering records based on a specific field value (exact match), in a case-insensitive way.
 
 ```crystal
 Article.all.filter(title__iexact: "Top blog posts")
@@ -522,7 +522,7 @@ Article.all.filter(title__iexact: "Top blog posts")
 
 ### `istartswith`
 
-Allows to filter records based on field values that start with a specific substring, in a case-insensitive way.
+Allows filtering records based on field values that start with a specific substring, in a case-insensitive way.
 
 ```crystal
 Article.all.filter(title__istartswith: "top")
@@ -530,7 +530,7 @@ Article.all.filter(title__istartswith: "top")
 
 ### `in`
 
-Allows to filter records based on field values that are contained in a specific array of values.
+Allows filtering records based on field values that are contained in a specific array of values.
 
 ```crystal
 Tag.all.filter(slug__in=["foo", "bar", "xyz"])
@@ -538,7 +538,7 @@ Tag.all.filter(slug__in=["foo", "bar", "xyz"])
 
 ### `isnull`
 
-Allows to filter records based on field values that should be null or not null.
+Allows filtering records based on field values that should be null or not null.
 
 ```crystal
 Article.all.filter(subtitle__isnull: true)
@@ -547,7 +547,7 @@ Article.all.filter(subtitle__isnull: false)
 
 ### `lte`
 
-Allows to filter record based on field values that are less than or equal to a specified value.
+Allows filtering records based on field values that are less than or equal to a specified value.
 
 ```crystal
 Article.all.filter(rating__lte: 10)
@@ -555,7 +555,7 @@ Article.all.filter(rating__lte: 10)
 
 ### `lt`
 
-Allows to filter record based on field values that are less than a specified value.
+Allows filtering records based on field values that are less than a specified value.
 
 ```crystal
 Article.all.filter(rating__lt: 10)
@@ -563,7 +563,7 @@ Article.all.filter(rating__lt: 10)
 
 ### `startswith`
 
-Allows to filter records based on field values that start with a specific substring. Note that this is a **case-sensitive** predicate.
+Allows filtering records based on field values that start with a specific substring. Note that this is a **case-sensitive** predicate.
 
 ```crystal
 Article.all.filter(title__startswith: "Top")

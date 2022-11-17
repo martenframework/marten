@@ -4,7 +4,7 @@ description: Learn how to define models and interact with model records.
 sidebar_label: Introduction
 ---
 
-Models define what data can be persisted and manipulated by a Marten application. They explicitly specify fields and rules that map to database tables and columns. As such they correspond to the layer of the framework that is responsible for representing business data and logic.
+Models define what data can be persisted and manipulated by a Marten application. They explicitly specify fields and rules that map to database tables and columns. As such, they correspond to the layer of the framework that is responsible for representing business data and logic.
 
 ## Basic model definition
 
@@ -32,9 +32,9 @@ CREATE TABLE myapp_articles (
 
 ## Models and installed apps
 
-A model's application needs to be explicitly added to the list of installed applications for the considered project. Indeed, Marten requires projects to explicitly declare the applications they are using in the `installed_apps` configuration option. Model tables and migrations will only be created / applied for model classes that are provided by _installed apps_.
+A model's application needs to be explicitly added to the list of installed applications for the considered project. Indeed, Marten requires projects to explicitly declare the applications they are using in the `installed_apps` configuration option. Model tables and migrations will only be created/applied for model classes that are provided by _installed apps_.
 
-For example if the above `Article` model was associated with a `MyApp` application class, it would be possible to ensure that it is used by ensuring that the `installed_app` configuration option is as follows:
+For example, if the above `Article` model was associated with a `MyApp` application class, it would be possible to ensure that it is used by ensuring that the `installed_app` configuration option is as follows:
 
 ```crystal
 Marten.configure do |config|
@@ -78,33 +78,33 @@ The field type determines a few other things:
 * the getter and setter methods that are generated for the field in the model class
 * how field values are actually validated
 
-Marten provides numerous build-in field types that cover common web development needs. The complete list of supported fields is covered in the [model fields reference](./reference/fields).
+Marten provides numerous built-in field types that cover common web development needs. The complete list of supported fields is covered in the [model fields reference](./reference/fields).
 
 :::note
-It is possible to write custom model fields and to use them in your model definitions. See [How to create custom model fields](./how-to/create-custom-model-fields) for more details.
+It is possible to write custom model fields and use them in your model definitions. See [How to create custom model fields](./how-to/create-custom-model-fields) for more details.
 :::
 
 ### Common field options
 
-In addition to their identifiers and types, fields can take keyword arguments that allow to further configure their behaviours and how they map to database columns. Most of the time those additional keyword arguments are optional, but they can be mandatory depending on the considered field type.
+In addition to their identifiers and types, fields can take keyword arguments that allow to further configure their behaviors and how they map to database columns. Most of the time those additional keyword arguments are optional, but they can be mandatory depending on the considered field type.
 
 Some of these optional field arguments are shared across all the available fields. Below is a list of the ones you'll encounter most frequently.
 
 #### `null`
 
-The `null` argument allows to define whether a field is allowed to store `NULL` values in the database. The default value for this argument is `false`.
+The `null` argument allows defining whether a field is allowed to store `NULL` values in the database. The default value for this argument is `false`.
 
 #### `blank`
 
-The `blank` argument allows to define whether a field is allowed to receive blank values from a validation perspective. The fields with `blank: false` that receive blank values will make their associated model record validation fail. The default value for this argument is `false`.
+The `blank` argument allows defining whether a field is allowed to receive blank values from a validation perspective. The fields with `blank: false` that receive blank values will make their associated model record validation fail. The default value for this argument is `false`.
 
 #### `default`
 
-The `default` argument allows to define a default value for a given field. The default value for this argument is `nil`.
+The `default` argument allows defining a default value for a given field. The default value for this argument is `nil`.
 
 #### `unique`
 
-The `unique` argument allows to define that values for a specific field must be unique throughout the associated table. The default value for this argument is `false`.
+The `unique` argument allows defining that values for a specific field must be unique throughout the associated table. The default value for this argument is `false`.
 
 ### Mandatory primary key
 
@@ -116,7 +116,7 @@ class MyModel < Marten::Model
 end
 ```
 
-It should be noted that the primary key can correspond to any other field type. For example your primary key could correspond to an `uuid` field:
+It should be noted that the primary key can correspond to any other field type. For example, your primary key could correspond to an `uuid` field:
 
 ```crystal
 class MyModel < Marten::Model
@@ -138,7 +138,7 @@ Marten provides special fields allowing to define the three most common types of
 
 Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields#many_to_many) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
-For example, an `Article` model could have a many-to-many field towards a `Tag` model. In such case, an `Article` record could have many associated `Tag` records, and every `Tag` records could be associated to many `Article` records as well:
+For example, an `Article` model could have a many-to-many field towards a `Tag` model. In such case, an `Article` record could have many associated `Tag` records, and every `Tag` record could be associated to many `Article` records as well:
 
 ```crystal
 class Tag < Marten::Model
@@ -251,7 +251,7 @@ article.title = "My article"
 article.content = "Learn how to build web apps with Marten!"
 ```
 
-A model instance that was initialized like in the previous example will not be persisted to the database automatically. In this situation it is possible to ensure that the corresponding record is created in the database by using the `#save` method (`article.save`).
+A model instance that was initialized like in the previous example will not be persisted to the database automatically. In this situation, it is possible to ensure that the corresponding record is created in the database by using the `#save` method (`article.save`).
 
 Finally it should be noted that both `#create` and `#new` support an optional block that will receive the initialized model record. This allows to initialize attributes or to call additional methods on the record being initialized:
 
@@ -376,11 +376,11 @@ class Student < Person
 end
 ```
 
-The `Student` model will have four model fields in total (`id`, `name`, `email`, and `grade`). Moreover all the methods of the parent model fields will be available on the child model. It should be noted that in this case the `Person` model cannot be used like a regular model: for example, trying to query records will return an error since no table is actually associated with the abstract model. Since it is an [abstract type](https://crystal-lang.org/reference/syntax_and_semantics/virtual_and_abstract_types.html), the `Student` class can't be instantiated either.
+The `Student` model will have four model fields in total (`id`, `name`, `email`, and `grade`). Moreover, all the methods of the parent model fields will be available on the child model. It should be noted that in this case the `Person` model cannot be used like a regular model: for example, trying to query records will return an error since no table is actually associated with the abstract model. Since it is an [abstract type](https://crystal-lang.org/reference/syntax_and_semantics/virtual_and_abstract_types.html), the `Student` class can't be instantiated either.
 
 ## Callbacks
 
-It is possible to define callbacks in your model in order to bind methods and logics to specific events in the life-cycle of your model records. For example, it is possible to define callbacks that run before a record gets created, or before it is destroyed.
+It is possible to define callbacks in your model in order to bind methods and logics to specific events in the life cycle of your model records. For example, it is possible to define callbacks that run before a record gets created, or before it is destroyed.
 
 Please head over to the [Model callbacks](./callbacks) guide in order to learn more about model callbacks.
 

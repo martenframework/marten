@@ -7,7 +7,7 @@ This page provides a reference for all the available migration operations that c
 
 ## `add_column`
 
-The `add_column` operation allows to add a column to an existing table. It must be called with a table name as first argument, followed by a column definition (column name and attributes).
+The `add_column` operation allows adding a column to an existing table. It must be called with a table name as first argument, followed by a column definition (column name and attributes).
 
 For example:
 
@@ -18,7 +18,7 @@ add_column :test_table, :new_id, :reference, to_table: :target_table, to_column:
 
 ## `add_index`
 
-The `add_index` operation allows to add an index to an existing table. It must be called with a table name as first argument, followed by an index definition (index name and indexed column names).
+The `add_index` operation allows adding an index to an existing table. It must be called with a table name as first argument, followed by an index definition (index name and indexed column names).
 
 For example:
 
@@ -28,7 +28,7 @@ add_index :test_table, :test_index, [:foo, :bar]
 
 ## `add_unique_constraint`
 
-The `add_unique_constraint` operation allows to add a unique constraint to an existing table. It must be called with a table name as first argument, followed by a unique constraint definition (constraint name and targetted column names).
+The `add_unique_constraint` operation allows adding a unique constraint to an existing table. It must be called with a table name as first argument, followed by a unique constraint definition (constraint name and targetted column names).
 
 For example:
 
@@ -38,7 +38,7 @@ add_unique_constraint :test_table, :test_constraint, [:foo, :bar]
 
 ## `change_column`
 
-The `change_column` operation allows to alter an existing column definition. It must be called with a table name as first argument, followed by a column definition (column name and attributes).
+The `change_column` operation allows altering an existing column definition. It must be called with a table name as first argument, followed by a column definition (column name and attributes).
 
 For example:
 
@@ -48,7 +48,7 @@ change_column :test_table, :test_column, :string, max_size: 155, null: true
 
 ## `create_table`
 
-The `create_table` operation allows to create a new table, which includes the underlying column definitions, indexes, and unique constraints. It must be called with a table name as first argument and requires a block where columns, indexes, and unique constraints are defined.
+The `create_table` operation allows creating a new table, which includes the underlying column definitions, indexes, and unique constraints. It must be called with a table name as first argument and requires a block where columns, indexes, and unique constraints are defined.
 
 For example:
 
@@ -65,7 +65,7 @@ end
 
 ## `delete_table`
 
-The `delete_table` operation allows to delete an existing table. It must be called with a table name as first argument.
+The `delete_table` operation allows deleting an existing table. It must be called with a table name as first argument.
 
 For example:
 
@@ -75,7 +75,7 @@ delete_table :test_table
 
 ## `execute`
 
-The `execute` operation allows to execute custom SQL statements as part of a migration. It must be called with a forward statement as first positional argument, and it can also take a second positional argument in order to specify the statement to execute when unapplying the migration.
+The `execute` operation allows executing custom SQL statements as part of a migration. It must be called with a forward statement as first positional argument, and it can also take a second positional argument in order to specify the statement to execute when unapplying the migration.
 
 For example:
 
@@ -96,7 +96,7 @@ execute(
 
 ## `remove_column`
 
-The `remove_column` operation allows to remove an existing column from a table. It must be called with a table name as first argument, followed by a column name.
+The `remove_column` operation allows removing an existing column from a table. It must be called with a table name as first argument, followed by a column name.
 
 For example:
 
@@ -106,7 +106,7 @@ remove_column :test_table, :test_column
 
 ## `remove_index`
 
-The `remove_index` operation allows to remove an existing index from a table. It must be called with a table name as first argument, followed by an index name.
+The `remove_index` operation allows removing an existing index from a table. It must be called with a table name as first argument, followed by an index name.
 
 For example:
 
@@ -116,7 +116,7 @@ remove_index :test_table, :test_index
 
 ## `remove_unique_constraint`
 
-The `remove_unique_constraint` operation allows to remove an existing unique constraint from a table. It must be called with a table name as first argument, followed by a unique constraint name.
+The `remove_unique_constraint` operation allows removing an existing unique constraint from a table. It must be called with a table name as first argument, followed by a unique constraint name.
 
 For example:
 
@@ -126,7 +126,7 @@ remove_unique_constraint :test_table, :test_constraint
 
 ## `rename_column`
 
-The `rename_column` operation allows to rename an existing column in a table. It must be called with a table name as first argument, followed by the old column name, and the new one.
+The `rename_column` operation allows renaming an existing column in a table. It must be called with a table name as first argument, followed by the old column name, and the new one.
 
 For example:
 
@@ -136,7 +136,7 @@ rename_column :test_table, :old_column, :new_column
 
 ## `rename_table`
 
-The `rename_table` operation allows to rename an existing table. It must be called with the existing table name as first argument, followed by the new table name.
+The `rename_table` operation allows renaming an existing table. It must be called with the existing table name as first argument, followed by the new table name.
 
 For example:
 

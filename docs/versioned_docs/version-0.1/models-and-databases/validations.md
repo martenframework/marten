@@ -52,7 +52,7 @@ user.save!
 # => Unhandled exception: Record is invalid (Marten::DB::Errors::InvalidRecord)
 ```
 
-When validating model records, the validations rules that are inherited by fields will be executed first and the any custom validation rule defined in the model will be applied.
+When validating model records, the validation rules that are inherited by fields will be executed first and then any custom validation rule defined in the model will be applied.
 
 ### Running model validations
 
@@ -66,16 +66,16 @@ user.invalid?   # => true
 
 ## Field validation rules
 
-As mentioned previously, field can contribute validation rules to your models. These validation rules can be inherited:
+As mentioned previously, fields can contribute validation rules to your models. These validation rules can be inherited:
 
-* from the field type itself: some field will validate that values are of a specific type (for example a `uuid` field will not validate values that don't correspond to valid UUIDs)
+* from the field type itself: some fields will validate that values are of a specific type (for example a `uuid` field will not validate values that don't correspond to valid UUIDs)
 * from the field options you define (for example fields using `blank: true` won't accept empty values)
 
 Please refer to the [fields reference](./reference/fields) in order to learn more about the supported field types and their associated options.
 
 ## Custom validation rules
 
-Custom validate rules can be defined through the use of the `#validate` macro. This macro lets you configure the name of a validation method that should be called when a model instance is validated. Inside this method you can implement any validation logic that you might require and add errors to your model instances if you they are identified as invalid.
+Custom validate rules can be defined through the use of the `#validate` macro. This macro lets you configure the name of a validation method that should be called when a model instance is validated. Inside this method, you can implement any validation logic that you might require and add errors to your model instances if they are identified as invalid.
 
 For example:
 
@@ -96,9 +96,9 @@ In the above snippet, a custom validation method ensures that the `name` of a `U
 
 ## Validation errors
 
-Methods like `#valid?` or `#invalid?` only let you know whether a model instance is valid or invalid. But you'll likely want to know exactly what are the actual errors or how do add new ones.
+Methods like `#valid?` or `#invalid?` only let you know whether a model instance is valid or invalid. But you'll likely want to know exactly what are the actual errors or how to add new ones.
 
-As such, every model instances has an associated error set, which is an instance of [`Marten::Core::Validation::ErrorSet`](pathname:///api/Marten/Core/Validation/ErrorSet.html).
+As such, every model instance has an associated error set, which is an instance of [`Marten::Core::Validation::ErrorSet`](pathname:///api/Marten/Core/Validation/ErrorSet.html).
 
 ### Inspecting errors
 

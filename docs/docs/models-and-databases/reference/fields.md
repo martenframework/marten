@@ -41,13 +41,13 @@ The `unique` argument allows to define that values for a specific field must be 
 
 ### `big_int`
 
-A `big_int` field allows to persist 64-bit integers. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `big_int` field allows persisting 64-bit integers. In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `auto`
 
 The `auto` argument auto-increment for the considered database column. Defaults to `false`.
 
-This argument will be used mainly when defining integer IDs that autmatically increment:
+This argument will be used mainly when defining integer IDs that automatically increment:
 
 ```crystal
 class MyModel < Marten::Model
@@ -58,35 +58,35 @@ end
 
 ### `bool`
 
-A `bool` field allows to persist booleans.
+A `bool` field allows persisting booleans.
 
 ### `date`
 
-A `date` field allows to persist date values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `date` field allows persisting date values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `auto_now`
 
-The `auto_now` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is saved. This provides a convenient way to define `updated_at` fields. Defaults to `false`.
+The `auto_now` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is saved. This provides a convenient way to define `updated_at` fields. Defaults to `false`.
 
 #### `auto_now_add`
 
-The `auto_now_add` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
+The `auto_now_add` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
 
 ### `date_time`
 
-A `date_time` field allows to persist date-time values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `date_time` field allows persisting date-time values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `auto_now`
 
-The `auto_now` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is saved. This provides a convenient way to define `updated_at` fields. Defaults to `false`.
+The `auto_now` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is saved. This provides a convenient way to define `updated_at` fields. Defaults to `false`.
 
 #### `auto_now_add`
 
-The `auto_now_add` argument allows to ensure that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
+The `auto_now_add` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
 
 ### `file`
 
-A `file` field allows to persist the reference to an uploaded file.
+A `file` field allows persisting the reference to an uploaded file.
 
 :::info
 `file` fields can't be configured as primary keys.
@@ -111,7 +111,7 @@ Please refer to [Managing files](../../files/managing-files) for more details on
 
 This optional argument can be used to configure where the uploaded files are persisted in the storage. It defaults to an empty string and can be set to either a string or a proc.
 
-If set to a string, it allows to define in which directory of the underlyign storage files will be persisted:
+If set to a string, it allows to define in which directory of the underlying storage files will be persisted:
 
 ```crystal
 class Attachment < Marten::Model
@@ -131,17 +131,17 @@ end
 
 ### `float`
 
-A `float` field allows to persist floating point numbers (`Float64` objects).
+A `float` field allows persisting floating point numbers (`Float64` objects).
 
 ### `int`
 
-An `int` field allows to persist 32-bit integers. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+An `int` field allows persisting 32-bit integers. In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `auto`
 
 The `auto` argument auto-increment for the considered database column. Defaults to `false`.
 
-This argument will be used mainly when defining integer IDs that autmatically increment:
+This argument will be used mainly when defining integer IDs that automatically increment:
 
 ```crystal
 class MyModel < Marten::Model
@@ -168,7 +168,7 @@ The `max_size` argument allows to specify the maximum size of the persisted stri
 
 ### `uuid`
 
-A `uuid` field allows to persist Universally Unique IDentifiers (`UUID` objects).
+A `uuid` field allows persisting Universally Unique IDentifiers (`UUID` objects).
 
 ## Relationship field types
 
@@ -197,7 +197,7 @@ The `to` argument **is required** and allows to specify the model class that is 
 
 #### `related`
 
-The `related` argument allows to define the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Tag` records expose their related `Article` records:
+The `related` argument allows defining the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Tag` records expose their related `Article` records:
 
 ```crystal
 class Tag < Marten::Model
@@ -216,7 +216,7 @@ The default value is `nil`, which means that no reverse relation is defined on t
 
 ### `many_to_one`
 
-A `many_to_one` field allows to define a many-to-one relationship. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
+A `many_to_one` field allows defining a many-to-one relationship. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
 For example, an `Article` model could have a many-to-one field towards an `Author` model. In such case, an `Article` record would only have one associated `Author` record, but every `Author` record could be associated to many `Article` records:
 
@@ -239,7 +239,7 @@ The `to` argument **is required** and allows to specify the model class that is 
 
 #### `related`
 
-The `related` argument allows to define the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Author` records expose their related `Article` records:
+The `related` argument allows defining the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Author` records expose their related `Article` records:
 
 ```crystal
 class Author < Marten::Model
@@ -267,7 +267,7 @@ The `on_delete` argument allows to specify the deletion strategy to adopt when a
 
 ### `one_to_one`
 
-A `one_to_one` field allows to define a one-to-one relationship. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
+A `one_to_one` field allows defining a one-to-one relationship. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
 For example, a `User` model could have a one-to-one field towards a `Profile` model. In such case, the `User` model could only have one associated `Profile` record, and the reverse would be true as well (a `Profile` record could only have one associated `User` record). In fact, a one-to-one field is really similar to a many-to-one field, but with an additional unicity constraint:
 
@@ -290,7 +290,7 @@ The `to` argument **is required** and allows to specify the model class that is 
 
 #### `related`
 
-The `related` argument allows to define the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define a `user` backward relation in order to let `Profile` records expose their related `User` record:
+The `related` argument allows defining the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define a `user` backward relation in order to let `Profile` records expose their related `User` record:
 
 ```crystal
 class Profile < Marten::Model

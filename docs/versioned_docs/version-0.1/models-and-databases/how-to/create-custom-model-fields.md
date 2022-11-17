@@ -11,9 +11,9 @@ Model fields have the following responsibilities:
 
 * they define the type and properties of the underlying column at the database level
 * they define the necessary Crystal bindings at the model class level: this means that they can contribute custom methods or instance variables to the models making use of them (eg. getters, setters, etc)
-* they define how field values are validated and / or sanitized
+* they define how field values are validated and/or sanitized
 
-Creating a custom model field does not necessarilly mean that all of these responsibilities need to be taken care of as part of the custom field implementation. It really depends on whether you want to:
+Creating a custom model field does not necessarily mean that all of these responsibilities need to be taken care of as part of the custom field implementation. It really depends on whether you want to:
 
 * leverage an existing built-in model field (eg. integer, string, etc)
 * or create a new model field from scratch.
@@ -38,7 +38,7 @@ class MyModel < Marten::DB::Model
 end
 ```
 
-The call to `#register` can be made from anywhere in your codebase, but obviously you will want to ensure that it is done before requiring your model classes: indeed, Marten will make the compilation of your project fail if it can't find the field type you are trying to use as part of a model definition.
+The call to `#register` can be made from anywhere in your codebase, but obviously, you will want to ensure that it is done before requiring your model classes: indeed, Marten will make the compilation of your project fail if it can't find the field type you are trying to use as part of a model definition.
 
 ## Subclassing existing model fields
 
@@ -96,7 +96,7 @@ def default
 end
 ```
 
-On the other hand, if your field can be initialized with a `default` argument (and if it defines a `@default` instance variable), another possiblity is to define a `#default` getter:
+On the other hand, if your field can be initialized with a `default` argument (and if it defines a `@default` instance variable), another possibility is to define a `#default` getter:
 
 ```crystal
 getter default
@@ -104,7 +104,7 @@ getter default
 
 #### `from_db`
 
-The `#from_db` method is responsible for converting the passed raw DB value to the right field value. Indeed, the value that is read from the database will usually need to be converted to another format. For example a `uuid` field might need to convert a `String` value to a proper `UUID` object:
+The `#from_db` method is responsible for converting the passed raw DB value to the right field value. Indeed, the value that is read from the database will usually need to be converted to another format. For example, a `uuid` field might need to convert a `String` value to a proper `UUID` object:
 
 ```crystal
 def from_db(value) : ::UUID?
@@ -121,7 +121,7 @@ def from_db(value) : ::UUID?
 end
 ```
 
-It should be noted that you will usually want to handle the case of `nil` values as part of this methods since fields can be configured as nullable via the [`null: true`](../reference/fields#null) option. 
+It should be noted that you will usually want to handle the case of `nil` values as part of this method since fields can be configured as nullable via the [`null: true`](../reference/fields#null) option. 
 
 If the value can't be processed properly by your field class, then it may be necessary to raise an exception. To do that you can leverage the `#raise_unexpected_field_value` method, which will raise a `Marten::DB::Errors::UnexpectedFieldValue` exception.
 
@@ -141,7 +141,7 @@ The `#from_db_result_set` method is supposed to return the read value into the r
 
 #### `to_column`
 
-Most model fields will contribute a corresponding column at the database level ; these columns are read by Marten in order to generate migrations from model definitions. The column returned by the `#to_column` method should be an instance of a subclass of [`Marten::DB::Management::Column::Base`](pathname:///api/Marten/DB/Management/Column/Base.html).
+Most model fields will contribute a corresponding column at the database level; these columns are read by Marten in order to generate migrations from model definitions. The column returned by the `#to_column` method should be an instance of a subclass of [`Marten::DB::Management::Column::Base`](pathname:///api/Marten/DB/Management/Column/Base.html).
 
 For example, an "email" field could return a string column as part of its `#to_column` method:
 
@@ -159,7 +159,7 @@ def to_column : Marten::DB::Management::Column::Base?
 end
 ```
 
-If for some reasons your custom field does not contribute any columns at the database model, it is possible to simply "no-op" the `#to_column` method by returning `nil` instead.
+If for some reason your custom field does not contribute any columns to the database model, it is possible to simply "no-op" the `#to_column` method by returning `nil` instead.
 
 #### `to_db`
 
@@ -201,7 +201,7 @@ def initialize(
 end
 ```
 
-Depending on your field requirements, you might want to overridde this method completely in order to support additional parameters (such as default values, max sizes, validation-related options, etc).
+Depending on your field requirements, you might want to override this method completely in order to support additional parameters (such as default values, max sizes, validation-related options, etc).
 
 #### `validate`
 

@@ -4,7 +4,7 @@ description: Learn about the main security features provided by the Marten frame
 sidebar_label: Introduction
 ---
 
-This document describres the main security features that are provided by the Marten web framework.
+This document describees the main security features that are provided by the Marten web framework.
 
 ## Cross-Site Request Forgery protection
 
@@ -30,7 +30,7 @@ You can learn about the clickjacking protection provided by Marten and the assoc
 
 ## Cross Site Scripting protection
 
-Cross Site Scripting (XSS) attacks involve a malicious user injecting client side scripts into the browser of another user. This usually happens when rendering database-stored HTML data or when generating HTML contents and displaying it in a browser: if these HTML contents are not properly sanitized, then this can allow an attacker's JavaScript to be executed in the browser.
+Cross Site Scripting (XSS) attacks involve a malicious user injecting client-side scripts into the browser of another user. This usually happens when rendering database-stored HTML data or when generating HTML contents and displaying it in a browser: if these HTML contents are not properly sanitized, then this can allow an attacker's JavaScript to be executed in the browser.
 
 To prevent this, Marten [templates](../templates) automatically escape HTML contents in variable outputs, unless those are marked as "safe". You can learn more about this capability in [Auto-Escaping](../templates/introduction#auto-escaping).
 
@@ -40,10 +40,10 @@ It should be noted that this auto-escaping mechanism can be disabled using a spe
 
 HTTP Host Header attacks happen when websites that handle the value of the Host header (eg. in order to generate fully qualified URLs) trust this header value implicitly and don't verify it.
 
-Marten implements a protection against this type of attacks by validating the Host header against a set of explicitly allowed hosts that must be specified in the [`allowed_hosts`](../development/reference/settings#allowed_hosts) setting. The X-Forwarded-Host header can also be used to determine the host if the use of this header is enabled ([`use_x_forwarded_host`](../development/reference/settings#use_x_forwarded_host) setting).
+Marten implements a protection mechanism against this type of attack by validating the Host header against a set of explicitly allowed hosts that must be specified in the [`allowed_hosts`](../development/reference/settings#allowed_hosts) setting. The X-Forwarded-Host header can also be used to determine the host if the use of this header is enabled ([`use_x_forwarded_host`](../development/reference/settings#use_x_forwarded_host) setting).
 
 ## SQL injection protection
 
-SQL injection attacks happen when a malicious user is able to execute arbitrary SQL queries on a database, which usually occurs when submitting input data to a web application. This can lead to database records being leaked and / or altered.
+SQL injection attacks happen when a malicious user is able to execute arbitrary SQL queries on a database, which usually occurs when submitting input data to a web application. This can lead to database records being leaked and/or altered.
 
 The [query sets](../models-and-databases/queries) API provided by Marten generates SQL code by using query parameterization. This means that the actual code of a query is defined separately from its parameters, which ensures that any user-provided parameter is escaped by the considered database driver before the query is executed.

@@ -77,18 +77,23 @@ module Marten
         # fields if applicable (`on_delete` option on many to one or one to one fields). It returns the number of rows
         # that were deleted as part of the record deletion.
         def delete(using : Nil | String | Symbol = nil)
-          run_before_delete_callbacks
+          deleted_count = 0
 
-          deletion = Deletion::Runner.new(
-            using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
-          )
+          connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
+          connection.transaction do
+            run_before_delete_callbacks
 
-          deletion.add(self)
-          deleted_count = deletion.execute
+            deletion = Deletion::Runner.new(
+              using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
+            )
 
-          @deleted = true
+            deletion.add(self)
+            deleted_count = deletion.execute
 
-          run_after_delete_callbacks
+            @deleted = true
+
+            run_after_delete_callbacks
+          end
 
           deleted_count
         end

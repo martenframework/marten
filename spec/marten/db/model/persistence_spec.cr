@@ -591,6 +591,16 @@ describe Marten::DB::Model::Persistence do
       obj.before_delete_track.should eq "before_delete"
       obj.after_delete_track.should eq "after_delete"
     end
+
+    it "runs before_delete and after_delete in a transaction" do
+      obj = Marten::DB::Model::PersistenceSpec::UndeletableRecord.create!
+
+      expect_raises(Exception, "Deletion prevented!") do
+        obj.delete
+      end
+
+      Marten::DB::Model::PersistenceSpec::UndeletableRecord.filter(id: obj.id).exists?.should be_true
+    end
   end
 
   describe "#deleted?" do

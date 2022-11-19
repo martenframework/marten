@@ -20,6 +20,7 @@ module.exports = {
         'models-and-databases/validations',
         'models-and-databases/callbacks',
         'models-and-databases/migrations',
+        'models-and-databases/transactions',
         'models-and-databases/raw-sql',
         {
           type: 'category',

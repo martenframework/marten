@@ -26,6 +26,7 @@
         "models-and-databases/validations",
         "models-and-databases/callbacks",
         "models-and-databases/migrations",
+        "models-and-databases/transactions",
         {
           "type": "category",
           "label": "How-To's",

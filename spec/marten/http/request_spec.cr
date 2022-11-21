@@ -326,6 +326,35 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#flash?" do
+    it "returns true if the flash store was set previously" do
+      flash_store = Marten::HTTP::FlashStore.new
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.flash = flash_store
+
+      request.flash?.should be_true
+    end
+
+    it "returns false if the flash store was not set previously" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      request.flash?.should be_false
+    end
+  end
+
   describe "#flash=" do
     it "allows to set the flash store associated with the request" do
       flash_store = Marten::HTTP::FlashStore.new
@@ -950,6 +979,35 @@ describe Marten::HTTP::Request do
       )
 
       expect_raises(Marten::HTTP::Errors::UnmetRequestCondition, "Session store not available") { request.session }
+    end
+  end
+
+  describe "#session?" do
+    it "returns true if the session store was set previously" do
+      session_store = Marten::HTTP::Session::Store::Cookie.new(nil)
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.session = session_store
+
+      request.session?.should be_true
+    end
+
+    it "returns false if the session store was not set previously" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      request.session?.should be_false
     end
   end
 

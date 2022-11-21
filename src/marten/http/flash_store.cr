@@ -84,7 +84,7 @@ module Marten
       end
 
       # Returns `true` if a message associated with the passed `key` exists.
-      def has_key?(key : String | Symbol) # ameba:disable Style/PredicateName
+      def has_key?(key : String | Symbol)
         @flashes.has_key?(key.to_s)
       end
 

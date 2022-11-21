@@ -70,7 +70,7 @@ module Marten
           end
 
           # Returns `true` if the provided `key` exists.
-          def has_key?(key : String | Symbol) # ameba:disable Style/PredicateName
+          def has_key?(key : String | Symbol)
             session_hash.has_key?(key.to_s)
           end
 

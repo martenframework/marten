@@ -93,7 +93,7 @@ Style/NegatedConditionsInUnless:
   Enabled: false
 
 Style/PredicateName:
-  Enabled: true
+  Enabled: false
 
 Style/RedundantBegin:
   Enabled: true

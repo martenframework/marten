@@ -37,7 +37,7 @@ module Marten
       end
 
       # Returns `true` if the header with the provided name exists.
-      def has_key?(name : String | Symbol) # ameba:disable Style/PredicateName
+      def has_key?(name : String | Symbol)
         headers.has_key?(name.to_s)
       end
 

@@ -30,6 +30,10 @@ module Marten
       # This excepion is raised when too many parameters (such as GET or POST parameters) are received for a specific
       # request. This is to to prevent large requests that could be used in the context of DOS attacks.
       class TooManyParametersReceived < SuspiciousOperation; end
+
+      # Represents an error raised when a condition is not met on a particular request, eg. because a middleware was not
+      # applied as expected.
+      class UnmetRequestCondition < Exception; end
     end
   end
 end

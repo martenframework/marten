@@ -57,6 +57,13 @@ module Marten
       # exception will be raised.
       def flash
         @flash.not_nil!
+      rescue NilAssertionError
+        raise Errors::UnmetRequestCondition.new("Flash store not available")
+      end
+
+      # Returns `true` if the flash store was properly set for the considered request.
+      def flash?
+        !@flash.nil?
       end
 
       # Allows to set the flash store for the request.
@@ -155,6 +162,13 @@ module Marten
       # exception will be raised.
       def session
         @session.not_nil!
+      rescue NilAssertionError
+        raise Errors::UnmetRequestCondition.new("Session store not available")
+      end
+
+      # Returns `true` if the session store was properly set for the considered request.
+      def session?
+        !@session.nil?
       end
 
       # Allows to set the session store for the request.

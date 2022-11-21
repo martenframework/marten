@@ -63,6 +63,7 @@ These files and folders are described below:
 | config/ | Contains the configuration of the project. This includes environment-specific Marten configuration settings, initializers, and web application routes. |
 | spec/ | Contains the project specs, allowing you to test your application. | 
 | src/ | Contains the source code of the application. By default this folder will include a `project.cr` file (where all dependencies - including Marten itself - are required), a `server.cr` file (which starts the Marten web server), a `cli.cr` file (where migrations and CLI-related abstractions are required), and empty `handlers`, `migrations`, `models`, `schemas`, and `templates` folders. |
+| .gitignore | Regular `.gitignore` file which tells git the files and directories that should be ignored. |
 | manage.cr | This file defines a CLI that lets you interact with your Marten project in order to perform various actions (e.g. running database migrations, collecting assets, etc). |
 | shard.yml | The standard [shard.yml](https://crystal-lang.org/reference/the_shards_command/index.html) file, that lists the dependencies that are required to build your application. |
 

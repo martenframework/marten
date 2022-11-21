@@ -19,7 +19,7 @@ module Marten
         end
 
         # Returns `true` if the parameter with the provided name exists.
-        def has_key?(name : String | Symbol) # ameba:disable Style/PredicateName
+        def has_key?(name : String | Symbol)
           @params.has_key?(name.to_s)
         end
 

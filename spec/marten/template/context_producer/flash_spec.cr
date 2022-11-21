@@ -21,9 +21,25 @@ describe Marten::Template::ContextProducer::Flash do
       context_producer.produce(request).should eq({"flash" => flash_store})
     end
 
-    it "returns the nil when a request is not present" do
+    it "returns nil when a request is not present" do
       context_producer = Marten::Template::ContextProducer::Flash.new
       context_producer.produce.should be_nil
+    end
+
+    it "returns nil when a request does not have a flash store set" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          body: "foo=bar",
+          headers: HTTP::Headers{
+            "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp",
+          }
+        )
+      )
+
+      context_producer = Marten::Template::ContextProducer::Flash.new
+      context_producer.produce(request).should be_nil
     end
   end
 end

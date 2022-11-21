@@ -313,7 +313,7 @@ describe Marten::HTTP::Request do
       request.flash.should eq flash_store
     end
 
-    it "raises a NilAssertionError if the flash store was not set previously" do
+    it "raises the expected exception if the flash store was not set previously" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -322,7 +322,7 @@ describe Marten::HTTP::Request do
         )
       )
 
-      expect_raises(NilAssertionError) { request.flash }
+      expect_raises(Marten::HTTP::Errors::UnmetRequestCondition, "Flash store not available") { request.flash }
     end
   end
 
@@ -940,7 +940,7 @@ describe Marten::HTTP::Request do
       request.session.should eq session_store
     end
 
-    it "raises a NilAssertionError if the session store was not set previously" do
+    it "raises the expected exception if the session store was not set previously" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -949,7 +949,7 @@ describe Marten::HTTP::Request do
         )
       )
 
-      expect_raises(NilAssertionError) { request.session }
+      expect_raises(Marten::HTTP::Errors::UnmetRequestCondition, "Session store not available") { request.session }
     end
   end
 

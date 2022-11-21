@@ -97,6 +97,7 @@ module Marten
           project_template "shared/.gitkeep", "src/schemas/.gitkeep"
           project_template "shared/.gitkeep", "src/templates/.gitkeep"
           project_template "shared/.gitkeep", "src/handlers/.gitkeep"
+          project_template "project/.gitignore", ".gitignore"
           project_template "project/manage.cr.ecr", "manage.cr"
           project_template "project/shard.yml.ecr", "shard.yml"
 

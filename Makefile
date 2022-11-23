@@ -61,7 +61,7 @@ lint:
 t: tests
 ## Run all the test suites.
 tests:
-	crystal spec
+	crystal spec --error-trace
 
 
 # MAKEFILE HELPERS

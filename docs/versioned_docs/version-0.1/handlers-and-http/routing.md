@@ -126,7 +126,7 @@ In order to reverse a URL from within a handler class, you can simply leverage t
 ```crystal
 class MyHandler < Marten::Handler
   def post
-    redirect(reverse("home))
+    redirect(reverse("home"))
   end
 end
 ```

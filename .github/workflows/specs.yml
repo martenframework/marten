@@ -45,11 +45,6 @@ jobs:
         PGPASSWORD: mysql
     - name: Install shards
       run: shards install --ignore-crystal-version
-    - name: Cache Crystal
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/crystal
-        key: ${{ runner.os }}-crystal
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
@@ -94,11 +89,6 @@ jobs:
         PGPASSWORD: postgres
     - name: Install shards
       run: shards install --ignore-crystal-version
-    - name: Cache Crystal
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/crystal
-        key: ${{ runner.os }}-crystal
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
@@ -127,11 +117,6 @@ jobs:
         apt-get -yqq install libsqlite3-dev
     - name: Install shards
       run: shards install --ignore-crystal-version
-    - name: Cache Crystal
-      uses: actions/cache@v1
-      with:
-        path: ~/.cache/crystal
-        key: ${{ runner.os }}-crystal
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests

@@ -4,7 +4,7 @@ module Marten
     #
     # A safe string is simply an object wrapping a string ; it indicates that the underlying string is "safe" and that
     # it should not be automatically escaped at rendering time.
-    class SafeString
+    struct SafeString
       forward_missing_to @string
 
       def initialize(@string : String)

@@ -52,7 +52,7 @@ module Marten
                     Token.new(TokenType::VARIABLE, raw_token[2...-2].strip, line_number)
                   elsif !is_text && !verbatim && raw_token.starts_with?(TAG_START)
                     block_content = block_content.not_nil!
-                    verbatim = "end#{block_content}" if ["verbatim", "verbatim "].includes?(block_content[..9])
+                    verbatim = "end#{block_content}" if {"verbatim", "verbatim "}.includes?(block_content[..9])
                     Token.new(TokenType::TAG, block_content, line_number)
                   elsif !is_text && !verbatim && raw_token.starts_with?(COMMENT_START)
                     Token.new(TokenType::COMMENT, "", line_number)

@@ -2,7 +2,7 @@ module Marten
   module Template
     class Parser
       # Represents a token extracted during a lexical analysis.
-      class Token
+      struct Token
         getter type
         getter content
         getter line_number

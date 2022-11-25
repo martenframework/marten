@@ -12,7 +12,7 @@ This documents covers the available callbacks and introduces you to the associat
 
 As stated above, callbacks are methods that will be called when specific events occur for a specific model instance. They need to be registered explicitly as part your model definitions. There are [many types of of callbacks](#available-callbacks), and it is possible to register "before" or "after" callbacks for most of these types.
 
-For example:
+Registering a callback is as simple as calling the right callback macro (eg. `#before_validation`) with a symbol of the name of the method to call when the callback is executed. For example:
 
 ```crystal
 class User < Marten::Model
@@ -72,3 +72,43 @@ The use of the `#save` / `#save!` and the `#create` / `#create!` methods will tr
 `before_delete` callbacks are called before a record gets deleted while `after_delete` callbacks are called after.
 
 The use of the `#delete` method will trigger these callbacks.
+
+### `after_commit`
+
+`after_commit` callbacks are called after a record is created, updated, or deleted, but only after the corresponding SQL transaction has been committed to the database (which isn't the case for other `after_*` callbacks - See [Transactions](./transactions) for more details). For example:
+
+```crystal
+after_commit :do_something
+```
+
+As mentioned previously, by default such callbacks will run in the context of record creations, updates, and deletions. That being said it is also possible to associate these callbacks with one or more specific actions only by using the `on` argument. For example:
+
+```crystal
+after_commit :do_something, on: :create # Will run after creations only
+after_commit :do_something, on: :update # Will run after updates only
+after_commit :do_something, on: :update # Will run after saves (creations or updates) only
+after_commit :do_something, on: :delete # Will run after deletions only
+after_commit :do_something_else, on: [:create, :delete] # Will run after creations and deletions only
+```
+
+The actions supported by the `on` argument are `create`, `update`, `save`, and `delete`.
+
+### `after_rollback`
+
+`after_rollback` callbacks are called after a transaction is rolled back when a record is created, updated, or deleted. For example:
+
+```crystal
+after_rollback :do_something
+```
+
+As mentioned previously, by default such callbacks will run in the context of record creations, updates, and deletions. That being said it is also possible to associate these callbacks with one or more specific actions only by using the `on` argument. For example:
+
+```crystal
+after_rollback :do_something, on: :create # Will run after rolled back creations only
+after_rollback :do_something, on: :update # Will run after rolled back updates only
+after_rollback :do_something, on: :update # Will run after rolled back saves (creations or updates) only
+after_rollback :do_something, on: :delete # Will run after rolled back deletions only
+after_rollback :do_something_else, on: [:create, :delete] # Will run after rolled back creations and deletions only
+```
+
+The actions supported by the `on` argument are `create`, `update`, `save`, and `delete`.

@@ -12,6 +12,16 @@ module Marten::DB::Model::PersistenceSpec
     field :before_save_track, :string, max_size: 255, default: "unset"
     field :after_save_track, :string, max_size: 255, default: "unset"
 
+    field :after_create_commit_track, :string, max_size: 255, default: "unset"
+    field :after_update_commit_track, :string, max_size: 255, default: "unset"
+    field :after_save_commit_track, :string, max_size: 255, default: "unset"
+    field :after_delete_commit_track, :string, max_size: 255, default: "unset"
+
+    field :after_create_rollback_track, :string, max_size: 255, default: "unset"
+    field :after_update_rollback_track, :string, max_size: 255, default: "unset"
+    field :after_save_rollback_track, :string, max_size: 255, default: "unset"
+    field :after_delete_rollback_track, :string, max_size: 255, default: "unset"
+
     before_create :set_before_create_track
     after_create :set_after_create_track
 
@@ -23,6 +33,16 @@ module Marten::DB::Model::PersistenceSpec
 
     before_delete :set_before_delete_track
     after_delete :set_after_delete_track
+
+    after_create_commit :set_after_create_commit_track
+    after_update_commit :set_after_update_commit_track
+    after_save_commit :set_after_save_commit_track
+    after_delete_commit :set_after_delete_commit_track
+
+    after_create_rollback :set_after_create_rollback_track
+    after_update_rollback :set_after_update_rollback_track
+    after_save_rollback :set_after_save_rollback_track
+    after_delete_rollback :set_after_delete_rollback_track
 
     property before_delete_track : String? = nil
     property after_delete_track : String? = nil
@@ -57,6 +77,38 @@ module Marten::DB::Model::PersistenceSpec
 
     private def set_after_delete_track
       self.after_delete_track = "after_delete"
+    end
+
+    private def set_after_create_commit_track
+      self.after_create_commit_track = "after_create_commit"
+    end
+
+    private def set_after_update_commit_track
+      self.after_update_commit_track = "after_update_commit"
+    end
+
+    private def set_after_save_commit_track
+      self.after_save_commit_track = "after_save_commit"
+    end
+
+    private def set_after_delete_commit_track
+      self.after_delete_commit_track = "after_delete_commit"
+    end
+
+    private def set_after_create_rollback_track
+      self.after_create_rollback_track = "after_create_rollback"
+    end
+
+    private def set_after_update_rollback_track
+      self.after_update_rollback_track = "after_update_rollback"
+    end
+
+    private def set_after_save_rollback_track
+      self.after_save_rollback_track = "after_save_rollback"
+    end
+
+    private def set_after_delete_rollback_track
+      self.after_delete_rollback_track = "after_delete_rollback"
     end
   end
 end

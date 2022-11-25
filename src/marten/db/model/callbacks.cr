@@ -112,15 +112,179 @@ module Marten
           %}
         end
 
+        # Allows to define callbacks that are called after a DB commit when a record is created, updated, or deleted.
+        #
+        # By default, the callback method will be called after record creations, updates, and deletions. It is also
+        # possible to restrict the callback to certain actions by using the `on` argument as follows:
+        #
+        # ```
+        # after_commit :do_something, on: :create # Will run only after creations
+        # after_commit :do_something, on: :update # Will run only after updates
+        # after_commit :do_something, on: :update # Will run only after saves (creations or updates)
+        # after_commit :do_something, on: :delete # Will run only after deletions
+        # ```
+        #
+        # The actions supported for the `on` argument are `create`, `update`, `save`, and `delete`. Note that it is also
+        # possible to define that an after commit callback must run for multiple actions by using an array of actions:
+        #
+        # ```
+        # after_commit :do_something, on: [:update, :delete]
+        # ```
+        macro after_commit(*names, **kwargs)
+          {% on_kwarg = kwargs[:on] %}
+          {% if on_kwarg.is_a?(NilLiteral) %}
+            {% targetted_actions = [:create, :update, :delete] %}
+          {% elsif on_kwarg.is_a?(ArrayLiteral) %}
+            {% targetted_actions = on_kwarg.map { |action| action.id.symbolize } %}
+          {% else %}
+            {% targetted_actions = [on_kwarg.id.symbolize] %}
+          {% end %}
+
+          {% if !targetted_actions.all? { |action| [:create, :update, :save, :delete].includes?(action) } %}
+            raise "Invalid actions for after_commit callback: #{on_kwarg}"
+          {% end %}
+
+          {%
+            targetted_actions.each do |action|
+              names.reduce(MODEL_CALLBACKS[action][:commit]) do |array, name|
+                array << name.id.stringify
+                array
+              end
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB rollback when a record is created, updated, or deleted.
+        #
+        # By default, the callback method will be called in the context of record creations, updates, and deletions. It
+        # is also possible to restrict the callback to certain actions by using the `on` argument as follows:
+        #
+        # ```
+        # after_rollback :do_something, on: :create # Will run only after creations
+        # after_rollback :do_something, on: :update # Will run only after updates
+        # after_rollback :do_something, on: :update # Will run only after saves (creations or updates)
+        # after_rollback :do_something, on: :delete # Will run only after deletions
+        # ```
+        #
+        # The actions supported for the `on` argument are `create`, `update`, `save`, and `delete`. Note that it is also
+        # possible to define that an after rollback callback must run for multiple actions by using an array of actions:
+        #
+        # ```
+        # after_rollback :do_something, on: [:update, :delete]
+        # ```
+        macro after_rollback(*names, **kwargs)
+          {% on_kwarg = kwargs[:on] %}
+          {% if on_kwarg.is_a?(NilLiteral) %}
+            {% targetted_actions = [:create, :update, :delete] %}
+          {% elsif on_kwarg.is_a?(ArrayLiteral) %}
+            {% targetted_actions = on_kwarg.map { |action| action.id.symbolize } %}
+          {% else %}
+            {% targetted_actions = [on_kwarg.id.symbolize] %}
+          {% end %}
+
+          {% if !targetted_actions.all? { |action| [:create, :update, :save, :delete].includes?(action) } %}
+            raise "Invalid actions for after_rollback callback: #{on_kwarg}"
+          {% end %}
+
+          {%
+            targetted_actions.each do |action|
+              names.reduce(MODEL_CALLBACKS[action][:rollback]) do |array, name|
+                array << name.id.stringify
+                array
+              end
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB commit when a record is created.
+        macro after_create_commit(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:create][:commit]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB rollback when a record is created.
+        macro after_create_rollback(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:create][:rollback]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB commit when a record is updated.
+        macro after_update_commit(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:update][:commit]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB rollback when a record is updated.
+        macro after_update_rollback(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:update][:rollback]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB commit when a record is created or updated.
+        macro after_save_commit(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:save][:commit]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB rollback when a record is created or updated.
+        macro after_save_rollback(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:save][:rollback]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB commit when a record is deleted.
+        macro after_delete_commit(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:delete][:commit]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
+        # Allows to define callbacks that are called after a DB rollback when a record is deleted.
+        macro after_delete_rollback(*names)
+          {%
+            names.reduce(MODEL_CALLBACKS[:delete][:rollback]) do |array, name|
+              array << name.id.stringify
+              array
+            end
+          %}
+        end
+
         # :nodoc:
         macro _begin_model_callbacks_setup
           # :nodoc:
           MODEL_CALLBACKS = {
             initialize: {after: [] of String},
-            create:     {before: [] of String, after: [] of String},
-            update:     {before: [] of String, after: [] of String},
-            save:       {before: [] of String, after: [] of String},
-            delete:     {before: [] of String, after: [] of String},
+            create:     {before: [] of String, after: [] of String, commit: [] of String, rollback: [] of String},
+            update:     {before: [] of String, after: [] of String, commit: [] of String, rollback: [] of String},
+            save:       {before: [] of String, after: [] of String, commit: [] of String, rollback: [] of String},
+            delete:     {before: [] of String, after: [] of String, commit: [] of String, rollback: [] of String},
           }
         end
 
@@ -142,6 +306,26 @@ module Marten
                     super
 
                     {{ MODEL_CALLBACKS[callback_id][callback_type].join('\n').id }}
+                  end
+                {% end %}
+              {% end %}
+            {% end %}
+
+            {% for callback_type in [:commit, :rollback] %}
+              {% for callback_id in %i(create update save delete) %}
+                {% if !MODEL_CALLBACKS[callback_id][callback_type].empty? %}
+                  protected def has_after_{{ callback_id.id }}_{{ callback_type.id }}_callbacks?
+                    true
+                  end
+
+                  protected def run_after_{{ callback_id.id }}_{{ callback_type.id }}_callbacks : Nil
+                    super
+
+                    {{ MODEL_CALLBACKS[callback_id][callback_type].join('\n').id }}
+                  end
+                {% else %}
+                  protected def has_after_{{ callback_id.id }}_{{ callback_type.id }}_callbacks?
+                    false
                   end
                 {% end %}
               {% end %}
@@ -174,6 +358,62 @@ module Marten
         end
 
         protected def run_after_delete_callbacks
+        end
+
+        protected def run_after_create_commit_callbacks
+        end
+
+        protected def run_after_update_commit_callbacks
+        end
+
+        protected def run_after_save_commit_callbacks
+        end
+
+        protected def run_after_delete_commit_callbacks
+        end
+
+        protected def run_after_create_rollback_callbacks
+        end
+
+        protected def run_after_update_rollback_callbacks
+        end
+
+        protected def run_after_save_rollback_callbacks
+        end
+
+        protected def run_after_delete_rollback_callbacks
+        end
+
+        protected def has_after_create_commit_callbacks?
+          false
+        end
+
+        protected def has_after_update_commit_callbacks?
+          false
+        end
+
+        protected def has_after_save_commit_callbacks?
+          false
+        end
+
+        protected def has_after_delete_commit_callbacks?
+          false
+        end
+
+        protected def has_after_create_rollback_callbacks?
+          false
+        end
+
+        protected def has_after_update_rollback_callbacks?
+          false
+        end
+
+        protected def has_after_save_rollback_callbacks?
+          false
+        end
+
+        protected def has_after_delete_rollback_callbacks?
+          false
         end
       end
     end

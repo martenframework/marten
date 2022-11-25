@@ -67,6 +67,70 @@ describe Marten::DB::Model::Persistence do
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"
     end
+
+    it "runs after_create_commit callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create
+      obj.after_create_commit_track.should eq "after_create_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_create_rollback callbacks as expected in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "after_create_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
   end
 
   describe "::create!" do
@@ -109,6 +173,70 @@ describe Marten::DB::Model::Persistence do
       obj = Marten::DB::Model::PersistenceSpec::Record.create!
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"
+    end
+
+    it "runs after_create_commit callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_create_commit_track.should eq "after_create_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_create_rollback callbacks as expected in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "after_create_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback" do
+      obj = nil
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj = Marten::DB::Model::PersistenceSpec::Record.create!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
     end
   end
 
@@ -214,6 +342,155 @@ describe Marten::DB::Model::Persistence do
       obj.pk.should be_a(UUID)
       TagWithUUID.get!(pk: obj.pk).should eq obj
     end
+
+    it "runs after_create_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save
+      obj.after_create_commit_track.should eq "after_create_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.name = "updated"
+
+      obj.after_update_commit_track.should eq "unset"
+
+      obj.save
+
+      obj.after_update_commit_track.should eq "after_update_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.name = "updated"
+
+      obj.after_save_commit_track = "unset"
+      obj.save
+
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.name = "updated"
+      obj.save
+
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_create_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "after_create_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "after_update_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_create_commit_track = "unset"
+      obj.after_save_commit_track = "unset"
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
   end
 
   describe "#save!" do
@@ -296,6 +573,155 @@ describe Marten::DB::Model::Persistence do
 
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"
+    end
+
+    it "runs after_create_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save!
+      obj.after_create_commit_track.should eq "after_create_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save!
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.save!
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.name = "updated"
+
+      obj.after_update_commit_track.should eq "unset"
+
+      obj.save!
+
+      obj.after_update_commit_track.should eq "after_update_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.name = "updated"
+
+      obj.after_save_commit_track = "unset"
+      obj.save!
+
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.name = "updated"
+      obj.save!
+
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_create_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "after_create_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "after_update_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_create_commit_track = "unset"
+      obj.after_save_commit_track = "unset"
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.name = "updated"
+        obj.save!
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
     end
   end
 
@@ -430,6 +856,148 @@ describe Marten::DB::Model::Persistence do
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"
     end
+
+    it "runs after_create_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.update(name: "updated")
+      obj.after_create_commit_track.should eq "after_create_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.update(name: "updated")
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.update(name: "updated")
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.after_update_commit_track.should eq "unset"
+
+      obj.update(name: "updated")
+
+      obj.after_update_commit_track.should eq "after_update_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.after_save_commit_track = "unset"
+      obj.update(name: "updated")
+
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.update(name: "updated")
+
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_create_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "after_create_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "after_update_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_create_commit_track = "unset"
+      obj.after_save_commit_track = "unset"
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
   end
 
   describe "#update!" do
@@ -563,6 +1131,148 @@ describe Marten::DB::Model::Persistence do
       obj.before_update_track.should eq "unset"
       obj.after_update_track.should eq "unset"
     end
+
+    it "runs after_create_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.update!(name: "updated")
+      obj.after_create_commit_track.should eq "after_create_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.update!(name: "updated")
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+      obj.update!(name: "updated")
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.after_update_commit_track.should eq "unset"
+
+      obj.update!(name: "updated")
+
+      obj.after_update_commit_track.should eq "after_update_commit"
+    end
+
+    it "runs after_save_commit callbacks as expected for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      obj.after_save_commit_track = "unset"
+      obj.update!(name: "updated")
+
+      obj.after_save_commit_track.should eq "after_save_commit"
+    end
+
+    it "does not run other after_commit callbacks for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.update!(name: "updated")
+
+      obj.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_create_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "after_create_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for new records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
+
+    it "runs after_update_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_update_rollback_track.should eq "after_update_rollback"
+    end
+
+    it "runs after_save_rollback callbacks as expected in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_save_rollback_track.should eq "after_save_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_delete_rollback_track.should eq "unset"
+    end
+
+    it "does not run other after_commit callbacks in case of a rollback for existing records" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.after_create_commit_track = "unset"
+      obj.after_save_commit_track = "unset"
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.update!(name: "updated")
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_commit_track.should eq "unset"
+      obj.not_nil!.after_update_commit_track.should eq "unset"
+      obj.not_nil!.after_save_commit_track.should eq "unset"
+      obj.not_nil!.after_delete_commit_track.should eq "unset"
+    end
   end
 
   describe "#delete" do
@@ -600,6 +1310,50 @@ describe Marten::DB::Model::Persistence do
       end
 
       Marten::DB::Model::PersistenceSpec::UndeletableRecord.filter(id: obj.id).exists?.should be_true
+    end
+
+    it "runs after_delete_commit callbacks as expected" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+      obj.delete
+      obj.after_delete_commit_track.should eq "after_delete_commit"
+    end
+
+    it "does not run other after_commit callbacks" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.new
+
+      obj.after_create_commit_track.should eq "unset"
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_save_commit_track.should eq "unset"
+
+      obj.delete
+
+      obj.after_create_commit_track.should eq "unset"
+      obj.after_update_commit_track.should eq "unset"
+      obj.after_save_commit_track.should eq "unset"
+    end
+
+    it "runs after_delete_rollback callbacks as expected in case of a rollback" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.delete
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_delete_rollback_track.should eq "after_delete_rollback"
+    end
+
+    it "does not run other after_rollback callbacks in case of a rollback" do
+      obj = Marten::DB::Model::PersistenceSpec::Record.create!
+
+      Marten::DB::Model::PersistenceSpec::Record.transaction do
+        obj.delete
+        raise Marten::DB::Errors::Rollback.new("Rollback!")
+      end
+
+      obj.not_nil!.after_create_rollback_track.should eq "unset"
+      obj.not_nil!.after_update_rollback_track.should eq "unset"
+      obj.not_nil!.after_save_rollback_track.should eq "unset"
     end
   end
 

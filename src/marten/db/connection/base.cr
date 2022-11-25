@@ -8,7 +8,7 @@ module Marten
       abstract class Base
         @db : ::DB::Database?
         @url : String
-        @transactions = {} of UInt64 => ::DB::Transaction
+        @transactions = {} of UInt64 => Transaction
 
         def initialize(@config : Conf::GlobalSettings::Database)
           @url = build_url
@@ -83,6 +83,20 @@ module Marten
           clauses.compact!.join " "
         end
 
+        # Registers a proc to be called when the current transaction is committed to the databse.
+        #
+        # This method has no effect if it is called outside of a transaction block.
+        def observe_transaction_commit(block : -> Nil)
+          current_transaction.try { |t| t.observe_commit(block) }
+        end
+
+        # Registers a proc to be called when the current transaction is rolled back.
+        #
+        # This method has no effect if it is called outside of a transaction block.
+        def observe_transaction_rollback(block : -> Nil)
+          current_transaction.try { |t| t.observe_rollback(block) }
+        end
+
         # Provides a database entrypoint to the block.
         #
         # If this method is called in an existing transaction, the connection associated with this transaction will be
@@ -93,6 +107,11 @@ module Marten
           else
             yield trx.connection
           end
+        end
+
+        # Allows to quote a specific name (such as a table name or column ID) for the database at hand.
+        def quote(name : String | Symbol) : String
+          "#{quote_char}#{name}#{quote_char}"
         end
 
         # Escapes special characters from a pattern aimed at being used in the context of a LIKE statement.
@@ -106,11 +125,6 @@ module Marten
         # transaction will be used in case of nested calls to this method.
         def transaction
           current_transaction ? yield : new_transaction { yield }
-        end
-
-        # Allows to quote a specific name (such as a table name or column ID) for the database at hand.
-        def quote(name : String | Symbol) : String
-          "#{quote_char}#{name}#{quote_char}"
         end
 
         # Returns true if the current database was explicitly configured for the test environment.
@@ -154,17 +168,30 @@ module Marten
           transactions[Fiber.current.object_id]?
         end
 
+        private def mark_current_transaction_as_rolled_back
+          current_transaction.try { |t| t.rolled_back = true }
+        end
+
         private def new_transaction
           using_connection do |conn|
             conn.transaction do |tx|
-              transactions[Fiber.current.object_id] ||= tx
+              transactions[Fiber.current.object_id] ||= Transaction.new(tx)
               yield
             end
           end
           true
         rescue Marten::DB::Errors::Rollback
+          mark_current_transaction_as_rolled_back
           false
+        rescue error
+          mark_current_transaction_as_rolled_back
+          raise error
         ensure
+          release_current_transaction
+        end
+
+        private def release_current_transaction
+          current_transaction.try { |t| t.notify_observers }
           transactions.delete(Fiber.current.object_id)
         end
 

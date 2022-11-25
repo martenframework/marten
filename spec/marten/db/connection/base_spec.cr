@@ -99,6 +99,76 @@ describe Marten::DB::Connection::Base do
     end
   end
 
+  describe "#observe_transaction_commit" do
+    it "returns nil if there is no current transaction and does not configure any observer" do
+      conn = Marten::DB::Connection.default
+
+      commit_notified = false
+
+      conn.observe_transaction_commit(->{ commit_notified = true; nil }).should be_nil
+
+      conn.transaction do
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+      end
+
+      TestUser.all.size.should eq 2
+      commit_notified.should be_false
+    end
+
+    it "allows to set a commit observer when called from within a transaction" do
+      conn = Marten::DB::Connection.default
+
+      commit_notified = false
+
+      conn.transaction do
+        conn.observe_transaction_commit(->{ commit_notified = true; nil })
+
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+      end
+
+      TestUser.all.size.should eq 2
+      commit_notified.should be_true
+    end
+  end
+
+  describe "#observe_transaction_rollback" do
+    it "returns nil if there is no current transaction and does not configure any observer" do
+      conn = Marten::DB::Connection.default
+
+      rollback_notified = false
+
+      conn.observe_transaction_rollback(->{ rollback_notified = true; nil }).should be_nil
+
+      conn.transaction do
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+      end
+
+      TestUser.all.size.should eq 2
+      rollback_notified.should be_false
+    end
+
+    it "allows to set a rollback observer when called from within a transaction" do
+      conn = Marten::DB::Connection.default
+
+      rollback_notified = false
+
+      conn.transaction do
+        conn.observe_transaction_rollback(->{ rollback_notified = true; nil })
+
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+
+        raise Marten::DB::Errors::Rollback.new("Roll back!")
+      end
+
+      TestUser.all.size.should eq 0
+      rollback_notified.should be_true
+    end
+  end
+
   describe "#open" do
     it "allows to open a DB connection" do
       conn = Marten::DB::Connection.default
@@ -147,6 +217,96 @@ describe Marten::DB::Connection::Base do
       end
 
       TestUser.all.size.should eq 0
+    end
+
+    it "rolls back silently when a Marten::DB::Errors::Rollback exception is raised" do
+      conn = Marten::DB::Connection.default
+
+      TestUser.connection.should eq conn
+
+      conn.transaction do
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        raise Marten::DB::Errors::Rollback.new("Roll back!")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+      end
+
+      TestUser.all.size.should eq 0
+    end
+
+    it "notifies commit observers when the transaction is committed" do
+      conn = Marten::DB::Connection.default
+
+      TestUser.connection.should eq conn
+
+      commit_notified = false
+
+      conn.transaction do
+        conn.observe_transaction_commit(->{ commit_notified = true; nil })
+
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+      end
+
+      TestUser.all.size.should eq 2
+      commit_notified.should be_true
+    end
+
+    it "does not notify rollback observers when the transaction is committed" do
+      conn = Marten::DB::Connection.default
+
+      TestUser.connection.should eq conn
+
+      rollback_notified = false
+
+      conn.transaction do
+        conn.observe_transaction_rollback(->{ rollback_notified = true; nil })
+
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+      end
+
+      TestUser.all.size.should eq 2
+      rollback_notified.should be_false
+    end
+
+    it "notifies rollback observers when the transaction is rolled back" do
+      conn = Marten::DB::Connection.default
+
+      TestUser.connection.should eq conn
+
+      rollback_notified = false
+
+      conn.transaction do
+        conn.observe_transaction_rollback(->{ rollback_notified = true; nil })
+
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+
+        raise Marten::DB::Errors::Rollback.new("Roll back!")
+      end
+
+      TestUser.all.size.should eq 0
+      rollback_notified.should be_true
+    end
+
+    it "does not notify commit observers when the transaction is rolled back" do
+      conn = Marten::DB::Connection.default
+
+      TestUser.connection.should eq conn
+
+      commit_notified = false
+
+      conn.transaction do
+        conn.observe_transaction_commit(->{ commit_notified = true; nil })
+
+        TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
+
+        raise Marten::DB::Errors::Rollback.new("Roll back!")
+      end
+
+      TestUser.all.size.should eq 0
+      commit_notified.should be_false
     end
   end
 

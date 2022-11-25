@@ -83,6 +83,14 @@ module Marten
           connection.transaction do
             run_before_delete_callbacks
 
+            if has_after_delete_commit_callbacks?
+              connection.observe_transaction_commit(->run_after_delete_commit_callbacks)
+            end
+
+            if has_after_delete_rollback_callbacks?
+              connection.observe_transaction_rollback(->run_after_delete_rollback_callbacks)
+            end
+
             deletion = Deletion::Runner.new(
               using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
             )
@@ -206,6 +214,14 @@ module Marten
 
           run_before_save_callbacks
 
+          if has_after_save_commit_callbacks?
+            connection.observe_transaction_commit(->run_after_save_commit_callbacks)
+          end
+
+          if has_after_save_rollback_callbacks?
+            connection.observe_transaction_rollback(->run_after_save_rollback_callbacks)
+          end
+
           if persisted?
             update(connection)
           else
@@ -217,6 +233,14 @@ module Marten
 
         private def insert(connection)
           run_before_create_callbacks
+
+          if has_after_create_commit_callbacks?
+            connection.observe_transaction_commit(->run_after_create_commit_callbacks)
+          end
+
+          if has_after_create_rollback_callbacks?
+            connection.observe_transaction_rollback(->run_after_create_rollback_callbacks)
+          end
 
           self.class.fields.each do |field|
             next if field.primary_key?
@@ -243,6 +267,14 @@ module Marten
 
         private def update(connection)
           run_before_update_callbacks
+
+          if has_after_update_commit_callbacks?
+            connection.observe_transaction_commit(->run_after_update_commit_callbacks)
+          end
+
+          if has_after_update_rollback_callbacks?
+            connection.observe_transaction_rollback(->run_after_update_rollback_callbacks)
+          end
 
           self.class.fields.each do |field|
             next if field.primary_key?

@@ -5,9 +5,9 @@ description: Template tags reference.
 
 ## `asset`
 
-The `asset` template tag allows to generate the URL of a given [asset](../../files/asset-handling). It must be take at least one argument (the filepath of the asset).
+The `asset` template tag allows to generate the URL of a given [asset](../../files/asset-handling). It must take at least one argument (the filepath of the asset).
 
-For example the following line is a valid usage of the `asset` tag and will output the path or URL of the `app/app.css` asset:
+For example, the following line is a valid usage of the `asset` tag and will output the path or URL of the `app/app.css` asset:
 
 ```html
 {% asset "app/app.css" %}
@@ -31,7 +31,7 @@ For example:
 
 ## `block`
 
-The `block` template tag allow to define that some specific portions of a template can be overriden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
+The `block` template tag allows to define that some specific portions of a template can be overridden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
 
 ## `csrf_token`
 
@@ -51,11 +51,11 @@ See [Cross-Site Request Forgery protection](../../security/csrf) to learn more a
 
 ## `extend`
 
-The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overriden or extended by the child template. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
+The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overridden or extended by the child template. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
 
 ## `for`
 
-The `for` template tag allows to loop over the items of iterable objects. It supports unpacking multiple items when applicable (eg. when iterating over hashes) and also handles fallbacks through the use of the `else` inner block. It should be noted that the `for` template tag require a closing `endfor` tag.
+The `for` template tag allows to loop over the items of iterable objects. It supports unpacking multiple items when applicable (eg. when iterating over hashes) and also handles fallbacks through the use of the `else` inner block. It should be noted that the `for` template tag requires a closing `endfor` tag.
 
 For example:
 
@@ -119,9 +119,9 @@ Templates that are included using the `include` template are parsed and rendered
 
 ## `local_time`
 
-The `local_time` template tag allows to output the string representation of the local time. It must be take one argument (the [format](https://crystal-lang.org/api/Time/Format.html) used to output the time).
+The `local_time` template tag allows to output the string representation of the local time. It must take one argument (the [format](https://crystal-lang.org/api/Time/Format.html) used to output the time).
 
-For example the following lines are valid usages of the `local_time` tag:
+For example, the following lines are valid usages of the `local_time` tag:
 
 ```html
 {% local_time "%Y" %}
@@ -136,7 +136,7 @@ Optionally, the output of this tag can be assigned to a specific variable using 
 
 ## `spaceless`
 
-The `spaceless` template tag allows to remove whitespaces, tabs, and new lines between HTML tags. Whitespaces inside tags are left untouched. It should be noted that the `spaceless` template tag require a closing `endspaceless` tag.
+The `spaceless` template tag allows to remove whitespaces, tabs, and new lines between HTML tags. Whitespaces inside tags are left untouched. It should be noted that the `spaceless` template tag requires a closing `endspaceless` tag.
 
 For example:
 
@@ -187,9 +187,9 @@ Alias for [`translate`](#translate).
 
 ## `url`
 
-The `url` template tag allows to perform [URL lookups](../../handlers-and-http/routing#reverse-url-resolutions). It must be take at least one argument (the name of the targeted handler) followed by optional keyword arguments (if the route require parameters).
+The `url` template tag allows to perform [URL lookups](../../handlers-and-http/routing#reverse-url-resolutions). It must take at least one argument (the name of the targeted handler) followed by optional keyword arguments (if the route requires parameters).
 
-For example the following lines are valid usages of the `url` tag:
+For example, the following lines are valid usages of the `url` tag:
 
 ```html
 {% url "my_handler" %}

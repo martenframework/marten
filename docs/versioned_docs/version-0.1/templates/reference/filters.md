@@ -55,7 +55,7 @@ If `value` is `<p>Hello</p>`, then the output will be `<p>Hello</p>` as well.
 
 ## `size`
 
-The `size` filter allows to return the size of a string or an enumerable object.
+The `size` filter allows returning the size of a string or an enumerable object.
 
 For example:
 

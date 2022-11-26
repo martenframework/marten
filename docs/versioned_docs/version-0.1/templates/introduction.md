@@ -8,9 +8,9 @@ Templates provide a convenient way for defining the presentation logic of a web 
 
 ## Syntax
 
-A template is a textual document or a string that makes use of the Marten template language, and which can be used to generate _any_ text-based format (HTML, XML, etc). In order to insert dynamic content, templates usually make use of a few constructs such as **variables**, which are replaced by the corresponding values when the template is evaluated, and **tags**, which can be used to implement the logic of the template.
+A template is a textual document or a string that makes use of the Marten template language, and that can be used to generate _any_ text-based format (HTML, XML, etc). In order to insert dynamic content, templates usually make use of a few constructs such as **variables**, which are replaced by the corresponding values when the template is evaluated, and **tags**, which can be used to implement the logic of the template.
 
-For example, the following template displays the properties of an `article` variable and loops over the associated comments in order display them as a list:
+For example, the following template displays the properties of an `article` variable and loops over the associated comments in order to display them as a list:
 
 ```html
 <h1>{{ article.title }}</h1>
@@ -40,7 +40,7 @@ Hello, {{ name }}!
 
 If the context used to render the above template is `{"name" => "John Doe"}`, then the output would be "Hello, John Doe!".
 
-Each variable can involve additional lookups in order to access specific object attributes, if such object have ones. These lookups are expressed by relying on a dot notation (`foo.bar`). For example, the following snippet would output the `title` attribute of the `article` variable:
+Each variable can involve additional lookups in order to access specific object attributes (if such objects have ones). These lookups are expressed by relying on a dot notation (`foo.bar`). For example, the following snippet would output the `title` attribute of the `article` variable:
 
 ```html
 <h1>{{ article.title }}</h1>
@@ -48,7 +48,7 @@ Each variable can involve additional lookups in order to access specific object 
 
 ### Filters
 
-Filters can be applied on [variables](#variables) or [tag](#tags) arguments in order to transform their values. They are applied to these variables or arguments through the use of a pipe (**`|`**) followed by the name of the filter.
+Filters can be applied to [variables](#variables) or [tag](#tags) arguments in order to transform their values. They are applied to these variables or arguments through the use of a pipe (**`|`**) followed by the name of the filter.
 
 For example, the following snippet will apply the [`capitalize`](./reference/filters#capitalize) filter to the output of the `name` variable, which will capitalize the value of this variable:
 
@@ -86,7 +86,7 @@ As mentioned above, some tags allow to perform control flows and require a "clos
 {% endfor %}
 ```
 
-Some tags also require arguments. For example, the [`url`](./reference/tags#url) template tag requires at least the name of route for which the URL resolution should be performed:
+Some tags also require arguments. For example, the [`url`](./reference/tags#url) template tag requires at least the name of the route for which the URL resolution should be performed:
 
 ```html
 {% url "my_route" %}
@@ -124,10 +124,10 @@ For example, a "base" template could look like this:
 </html>
 ```
 
-Here the base template defines two blocks by using the [`block`](./reference/tags#block) template tag. Using this tag essentially makes it possible for any child templates to "overridde" the content of these blocks.
+Here the base template defines two blocks by using the [`block`](./reference/tags#block) template tag. Using this tag essentially makes it possible for any child templates to "override" the content of these blocks.
 
 :::tip
-Note that it is possible to specify the name of the block being closed in the `endblock` tag to improve readibility. For example:
+Note that it is possible to specify the name of the block being closed in the `endblock` tag to improve readability. For example:
 
 ```html
 {% block title %}
@@ -176,7 +176,7 @@ It's important to remember that the `super` template tag can only be used withi
 
 Templates can be loaded from specific locations within your codebase and from application folders. This is controlled by two main settings:
 
-* [`templates.app_dirs`](../development/reference/settings#app_dirs-1) is a boolean that indicates whether or not it should be possible to load templates that are provided by [installed applications](../development/reference/settings#installed_apps). Indeed, applications can defines a `templates` folder at their root, and these templates will be discoverable by Marten if this setting is set to `true`
+* [`templates.app_dirs`](../development/reference/settings#app_dirs-1) is a boolean that indicates whether or not it should be possible to load templates that are provided by [installed applications](../development/reference/settings#installed_apps). Indeed, applications can define a `templates` folder at their root, and these templates will be discoverable by Marten if this setting is set to `true`
 * [`templates.dirs`](../development/reference/settings#dirs1) is an array of additional directories where templates should be looked for
 
 Application templates are always enabled by default (`templates.app_dirs = true`) for new Marten projects.
@@ -191,7 +191,7 @@ This will return a compiled [`Template`](pathname:///api/Marten/Template/Templat
 
 ## Rendering a template
 
-You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction#render) shortcut, or [generic handlers](../handlers-and-http/generic-handlers) that automatically render templates for you.
+You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction#render) shortcut or [generic handlers](../handlers-and-http/generic-handlers) that automatically render templates for you.
 
 That being said, it is also possible to render any [`Template`](pathname:///api/Marten/Template/Template.html) object that you loaded by leveraging the [`#render`](pathname:///api/Marten/Template/Template.html#render(context%3AHash|NamedTuple)%3AString-instance-method) method. This method can be used either with a Marten context object, a hash, or a named tuple:
 
@@ -204,7 +204,7 @@ template.render({ foo: "bar" })
 
 ## Using custom objects in contexts
 
-Most objects that are provided by Marten (such as Model records, query sets, schemas, etc) can automatically be used as part of templates. If your project involves other custom classes, and if you would like to interact with such objects in your your templates, then you will need to explicitly ensure that they include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module.
+Most objects that are provided by Marten (such as Model records, query sets, schemas, etc) can automatically be used as part of templates. If your project involves other custom classes, and if you would like to interact with such objects in your templates, then you will need to explicitly ensure that they include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module.
 
 :::note Why?
 Crystal being a statically typed language, the Marten engine needs to know which types of objects it is dealing with in advance in order to know (i) what can go into template contexts and (ii) how to "resolve" object attributes when templates are rendered. It is not possible to simply expect any `Object` object, hence why we need to make use of a shared [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module to account for all the classes whose objects should be usable as part of template contexts.
@@ -228,13 +228,13 @@ By default, `Point` objects cannot be used as part of templates. Let's say we wa
 My point is: {{ point.x }}, {{ point.y }}
 ```
 
-If you try to render such template while passing a `Point` object into the template context, you will encounter a `Marten::Template::Errors::UnsupportedValue` exception stating:
+If you try to render such a template while passing a `Point` object into the template context, you will encounter a `Marten::Template::Errors::UnsupportedValue` exception stating:
 
 ```
 Unable to initialize template values from Point objects
 ```
 
-To remediate this, you will have to include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module into the `Point` class and define a `#resolve_template_attribute` method as follows:
+To remediate this, you will have to include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module in the `Point` class and define a `#resolve_template_attribute` method as follows:
 
 ```crystal
 class Point
@@ -308,13 +308,13 @@ config.templates.context_producers = [
 ]
 ```
 
-Each context producers in this array will be applied in order when a new template context is created and will contribute "common" context values to it. This means that the order of these is important since context producers can technically overwrite the values that were added by previous context producers.
+Each context producer in this array will be applied in order when a new template context is created and will contribute "common" context values to it. This means that the order of these is important since context producers can technically overwrite the values that were added by previous context producers.
 
 Please head over to the [context producers reference](./reference/context-producers) to see a list of all the available context producers. Implementing custom context producers is also a possibility that is documented in [Create custom context producers](./how-to/create-custom-context-producers).
 
 ## Auto-escaping
 
-The output of template variables is automatically escaped by Marten in order to prevent Cross Site Scripting (XSS) vulnerabilities.
+The output of template variables is automatically escaped by Marten in order to prevent Cross-Site Scripting (XSS) vulnerabilities.
 
 For example, let's consider the following snippet:
 
@@ -328,9 +328,9 @@ If this template is rendered with `<script>alert('popup')</script>` as the conte
 Hello, &lt;script&gt;alert(&#39;popup&#39;)&lt;/script&gt;!
 ```
 
-It should be noted that this behaviour can be disabled _explicitly_. Indeed, sometimes it is expected that some template variables will contain a trusted HTML content that you intend to embed into the template's HTML.
+It should be noted that this behavior can be disabled _explicitly_. Indeed, sometimes it is expected that some template variables will contain trusted HTML content that you intend to embed into the template's HTML.
 
-To do this, it possible to make use of the [`safe`](./reference/filters#safe) template filter. This filter "marks" the output of a variable as safe, which ensures that its content is not escaped before being inserted in the final output of a rendered template.
+To do this, it is possible to make use of the [`safe`](./reference/filters#safe) template filter. This filter "marks" the output of a variable as safe, which ensures that its content is not escaped before being inserted in the final output of a rendered template.
 
 For example:
 

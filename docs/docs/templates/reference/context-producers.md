@@ -21,7 +21,7 @@ The Flash context producer contributes a `flash` variable to the context: this v
 
 **Class:** [`Marten::Template::ContextProducer::I18n`](pathname:///api/Marten/Template/ContextProducer/I18n.html)
 
-The I18n context producers contributes I18n-related variables to the context:
+The I18n context producer contributes I18n-related variables to the context:
 
 * `locale`: the current locale
 * `available_locales`: an array of all the available locales that can be activated for the project
@@ -30,5 +30,5 @@ The I18n context producers contributes I18n-related variables to the context:
 
 **Class:** [`Marten::Template::ContextProducer::Request`](pathname:///api/Marten/Template/ContextProducer/Request.html)
 
-The Request context producers contributes a `request` variable to the context: this variable corresponds to the current HTTP request object. If the template context is not initialized with an HTTP request object, then no variables are inserted.
+The Request context producer contributes a `request` variable to the context: this variable corresponds to the current HTTP request object. If the template context is not initialized with an HTTP request object, then no variables are inserted.
 

@@ -4,7 +4,7 @@ sidebar_label: Create custom filters
 description: How to create custom template filters.
 ---
 
-Marten has built-in support for a number of common [template filters](../reference/filters), but the framework also allows you to write your own template filters that you can leverage as part of your project's templates.
+Marten has built-in support for common [template filters](../reference/filters), but the framework also allows you to write your own template filters that you can leverage as part of your project's templates.
 
 ## Defining a template filter
 
@@ -41,7 +41,7 @@ You should feel free to raise [`Marten::Template::Errors::InvalidSyntax`](pathna
 
 ### `Marten::Template::Value` objects
 
-As highlighted previously, template filters mainly interact with [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) objects: they take such objects as parameters (for the incoming value the filter should be applied to and fpr the optional filter parameter), and they must return such objects as well.
+As highlighted previously, template filters mainly interact with [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) objects: they take such objects as parameters (for the incoming value the filter should be applied to and for the optional filter parameter), and they must return such objects as well.
 
 [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) objects can be created from any supported object by using the `#from` method as follows:
 
@@ -60,12 +60,12 @@ value.raw  # => "hello"
 
 ### Filters and HTML auto-escaping
 
-When writing filters that are intended to operate on strings, it is important to remember that [HTML is automatically escaped](../introduction#auto-escaping) in templates. As such, some strings values might be flagged as "safe" and some other as "unsafe":
+When writing filters that are intended to operate on strings, it is important to remember that [HTML is automatically escaped](../introduction#auto-escaping) in templates. As such, some string values might be flagged as "safe" and some others as "unsafe":
 
 * regular `String` values are always assumed to be "unsafe" and will be automatically escaped by Marten's template engine
 * safe strings are wrapped in `Marten::Template::SafeString` objects
 
-This means that if your filter needs to have a different behaviour based on the fact that a string is safe or not, then you will have to verify what is the type of the underlying value (by relying on the `#raw` method as explained in the previous section). It is the filter's responsibility to ensure that an incoming "safe string" is returned as a "safe string" as well or simply converted to a regular string that will be auto-escaped.
+This means that if your filter needs to have a different behavior based on the fact that a string is safe or not, then you will have to verify what is the type of the underlying value (by relying on the `#raw` method as explained in the previous section). It is the filter's responsibility to ensure that an incoming "safe string" is returned as a "safe string" as well or simply converted to a regular string that will be auto-escaped.
 
 Creating safe strings is simply a matter of initializing `Marten::Template::SafeString` from a regular string:
 
@@ -79,7 +79,7 @@ end
 
 ## Registering template filters
 
-In order to be able to use custom template filters, you must register them to Marten's global template filters registry.
+To be able to use custom template filters, you must register them to Marten's global template filters registry.
 
 To do so, you will have to call the [`Marten::Template::Filter#register`](pathname:///api/Marten/Template/Filter.html#register(filter_name%3AString|Symbol%2Cfilter_klass%3ABase.class)-class-method) method with the name of the filter you wish to use in templates, and the filter class.
 

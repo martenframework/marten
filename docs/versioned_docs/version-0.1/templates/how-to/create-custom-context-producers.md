@@ -4,7 +4,7 @@ sidebar_label: Create context producers
 description: How to create custom context producers.
 ---
 
-Marten has built-in support for a number of common [context producers](../reference/context-producers), but the framework also allows you to write your own context producers that you can leverage as part of your project's templates. This allows you to easily reuse common context values over multiple templates.
+Marten has built-in support for common [context producers](../reference/context-producers), but the framework also allows you to write your own context producers that you can leverage as part of your project's templates. This allows you to easily reuse common context values over multiple templates.
 
 ## Defining a context producer
 

@@ -4,7 +4,7 @@ sidebar_label: Create custom tags
 description: How to create custom template tags.
 ---
 
-Marten has built-in support for a number of common [template tags](../reference/tags), but the framework also allows you to write your own template tags that you can leverage as part of your project's templates.
+Marten has built-in support for common [template tags](../reference/tags), but the framework also allows you to write your own template tags that you can leverage as part of your project's templates.
 
 ## Defining a template tag
 
@@ -13,7 +13,7 @@ Template tags are subclasses of the [`Marten::Template::Tag::Base`](pathname:///
 * the `#initialize` method is used to initialize a template tag object and it is called at **parsing time**: this means that it is the responsibility of this method to ensure that the content of the template tag is valid from a parsing standpoint
 * the `#render` method is called at **rendering time** to apply the tag's logic: this means that the method is only called for valid template tag statements that were parsed without errors
 
-Since tags are created and processed when the template is parsed, they can theoritically be used to implement any kind of behavior. That being said, there are a few patterns that are frequently used when writing tags that you might want to consider to help you get started:
+Since tags are created and processed when the template is parsed, they can theoretically be used to implement any kind of behavior. That being said, there are a few patterns that are frequently used when writing tags that you might want to consider to help you get started:
 
 * **simple tags:** tags outputting a value that can (optionally) be assigned to a new variable
 * **inclusion tags:** tags including and rendering other templates
@@ -23,7 +23,7 @@ Since tags are created and processed when the template is parsed, they can theor
 
 Simple tags usually output a value while allowing this value to be assigned to a new variable (that will be added to the template context). They can eventually take arguments in order to return the right result at rendering time.
 
-Let's take the example of a `local_time` template tag that outputs the string representation of the local time and that takes one mandatory argument (the [format](https://crystal-lang.org/api/Time/Format.html) used to output the time). Such template tag could be implemented as follows:
+Let's take the example of a `local_time` template tag that outputs the string representation of the local time and that takes one mandatory argument (the [format](https://crystal-lang.org/api/Time/Format.html) used to output the time). Such a template tag could be implemented as follows:
 
 ```crystal
 class LocalTimeTag < Marten::Template::Tag::Base
@@ -73,11 +73,11 @@ As you can see template tags are initialized from a parser (instance of [Marten:
 * initialize a filter expression (instance of [Marten::Template::FilterExpression](pathname:///api/Marten/Template/FilterExpression.html)) from the format argument: this is necessary because the argument can be a string literal or variable with filters applied to it
 * verify if the output of the template tag is assigned to a variable by looking for an `as` statement: if that's the case the name of the variable is persisted in a dedicated instance variable
 
-The `#render` method is called at rendering time: it takes the current context object as argument and must return a string. In the above example, this method "resolves" the time format expression that was identified at initialization time from the context (which is necessary if it was a variable) and generates the right time representation. If the tag wasn't specified with an `as` variable, then this value is simply returned, otherwise it is persisted in the context and an empty string is returned.
+The `#render` method is called at rendering time: it takes the current context object as argument and must return a string. In the above example, this method "resolves" the time format expression that was identified at initialization time from the context (which is necessary if it was a variable) and generates the right time representation. If the tag wasn't specified with an `as` variable, then this value is simply returned, otherwise, it is persisted in the context and an empty string is returned.
 
 ### Inclusion tags
 
-Inclusion tags are similar to simple tags: they can take arguments (mandatory or not), assign their outputs to variables, but the difference is that they render a template in order to produce the final output.
+Inclusion tags are similar to simple tags: they can take arguments (mandatory or not), and assign their outputs to variables, but the difference is that they render a template in order to produce the final output.
 
 Let's take the example of a `list` template tag that outputs the elements of an array in a regular `ul` HTML tag. The template being rendered by such template tag could look like this:
 
@@ -147,7 +147,7 @@ As you can see, the implementation of this tag looks quite similar to the one hi
 
 Closable tags involve a closing statement, like this is the case for the `{% block %}...{% endblock %}` template tag for example. Usually, such tags will "capture" all the nodes between the opening tag and the closing tag, render them at rendering time, and do something with the output of this rendering.
 
-To illustrate this, let's take the example of a `spaceless` tag that will remove whitespaces, tabs and new lines between HTML tags. Such template tag could be implemented as follows:
+To illustrate this, let's take the example of a `spaceless` tag that will remove whitespaces, tabs and new lines between HTML tags. Such a template tag could be implemented as follows:
 
 ```crystal
 class SpacelessTag < Marten::Template::Base
@@ -164,7 +164,7 @@ class SpacelessTag < Marten::Template::Base
 end
 ```
 
-In this example, the `#initialize` method explicitly calls the parser's [`#parse`](pathname:///api/Marten/Template/Parser.html#parse(up_to%3AArray(String)%3F%3Dnil)%3ANodeSet-instance-method) in order to parse the following "nodes" up to the expecting closing tag (`endspaceless` in this case). If the specified closing tag is not encountered, the parser will automatically raise a syntax error. The obtained nodes are returned as a "node set" (instance of [`Marten::Template::NodeSet`](pathname:///api/Marten/Template/NodeSet.html)): this is a special object returned by the template parser that maps to multiple parsed nodes (those can be tags, variables, or plain text values) that can be rendered through a [`#render`](pathname:///api/Marten/Template/NodeSet.html#render(context%3AContext)-instance-method) method at rendering time.
+In this example, the `#initialize` method explicitly calls the parser's [`#parse`](pathname:///api/Marten/Template/Parser.html#parse(up_to%3AArray(String)%3F%3Dnil)%3ANodeSet-instance-method) in order to parse the following "nodes" up to the expected closing tag (`endspaceless` in this case). If the specified closing tag is not encountered, the parser will automatically raise a syntax error. The obtained nodes are returned as a "node set" (instance of [`Marten::Template::NodeSet`](pathname:///api/Marten/Template/NodeSet.html)): this is a special object returned by the template parser that maps to multiple parsed nodes (those can be tags, variables, or plain text values) that can be rendered through a [`#render`](pathname:///api/Marten/Template/NodeSet.html#render(context%3AContext)-instance-method) method at rendering time.
 
 The `#render` method of the above tag is relatively simple: it simply "renders" the node set corresponding to the template nodes that were extracted between the `{% spaceless %}...{% endspaceless %}` tags and then removes any whitespaces between the HTML tags in the output.
 

@@ -6,7 +6,7 @@
 [![License](https://img.shields.io/github/license/martenframework/marten)](https://github.com/martenframework/marten/blob/main/LICENSE)
 [![CI](https://github.com/martenframework/marten/workflows/Specs/badge.svg)](https://github.com/martenframework/marten/actions)
 [![CI](https://github.com/martenframework/marten/workflows/QA/badge.svg)](https://github.com/martenframework/marten/actions)
-[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://discord.gg/499Vwt6kTc)
+[![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://martenframework.com/chat)
 
 ---
 

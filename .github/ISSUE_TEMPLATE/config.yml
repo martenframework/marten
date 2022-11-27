@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Request a feature
+    url: https://github.com/martenframework/marten/discussions/new?category=ideas
+    about: Request a feature or submit new ideas in the discussion forum.
+  - name: Ask for help
+    url: https://github.com/martenframework/marten/discussions/new?category=q-a
+    about: Ask for help in the discussion forum.
+  - name: Chat
+    url: https://martenframework.com/chat
+    about: Chat with the community on Discord.

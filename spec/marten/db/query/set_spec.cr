@@ -1201,7 +1201,7 @@ describe Marten::DB::Query::Set do
       Post.create!(author: user_1, title: "Post 1")
       Post.create!(author: user_2, title: "Post 2")
 
-      qset = Marten::DB::Query::Set(Post).new
+      qset = Marten::DB::Query::Set(Post).new.order(:id)
 
       qset.join("author")
 
@@ -1216,7 +1216,7 @@ describe Marten::DB::Query::Set do
       Post.create!(author: user_1, title: "Post 1")
       Post.create!(author: user_2, title: "Post 2")
 
-      qset = Marten::DB::Query::Set(Post).new
+      qset = Marten::DB::Query::Set(Post).new.order(:id)
 
       qset.join(:author)
 
@@ -1231,7 +1231,7 @@ describe Marten::DB::Query::Set do
       Post.create!(author: user_1, title: "Post 1")
       Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
 
-      qset = Marten::DB::Query::Set(Post).new
+      qset = Marten::DB::Query::Set(Post).new.order(:id)
 
       qset.join(:author, :updated_by)
 
@@ -1249,7 +1249,7 @@ describe Marten::DB::Query::Set do
       post_1 = Post.create!(author: user_1, title: "Post 1")
       post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
 
-      qset = Marten::DB::Query::Set(Post).new
+      qset = Marten::DB::Query::Set(Post).new.order(:id)
 
       qset.join
 

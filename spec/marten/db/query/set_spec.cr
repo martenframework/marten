@@ -1242,24 +1242,12 @@ describe Marten::DB::Query::Set do
       qset[1].__set_spec_updated_by.should eq user_1
     end
 
-    it "returns the expected queryset if no relation names are passed as arguments" do
-      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
-      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+    it "raises as expected when called without arguments" do
+      qset = Marten::DB::Query::Set(Post).new
 
-      post_1 = Post.create!(author: user_1, title: "Post 1")
-      post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
-
-      qset = Marten::DB::Query::Set(Post).new.order(:id)
-
-      qset.join
-
-      qset[0].should eq post_1
-      qset[0].__set_spec_author.should be_nil
-      qset[0].__set_spec_updated_by.should be_nil
-
-      qset[1].should eq post_2
-      qset[1].__set_spec_author.should be_nil
-      qset[1].__set_spec_updated_by.should be_nil
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Relations must be specified when joining") do
+        qset.join
+      end
     end
   end
 

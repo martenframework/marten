@@ -441,6 +441,11 @@ module Marten
           io << "]>"
         end
 
+        # :nodoc:
+        def join
+          raise Errors::UnmetQuerySetCondition.new("Relations must be specified when joining")
+        end
+
         # Returns a queryset whose specified `relations` are "followed" and joined to each result.
         #
         # When using `#join`, the specified foreign-key relationships will be followed and each record returned by the

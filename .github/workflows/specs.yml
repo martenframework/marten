@@ -10,7 +10,7 @@ on:
 
 jobs:
   mysql:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       mysql:
         image: mysql:5.7
@@ -52,7 +52,7 @@ jobs:
       env:
         MARTEN_SPEC_DB_CONNECTION: mysql
   postgresql:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     services:
       postgres:
         image: postgres:${{ matrix.db_version }}
@@ -96,7 +96,7 @@ jobs:
       env:
         MARTEN_SPEC_DB_CONNECTION: postgresql
   sqlite:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false

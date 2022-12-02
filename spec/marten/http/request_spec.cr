@@ -18,22 +18,18 @@ describe Marten::HTTP::Request do
   describe "::new" do
     it "allows to initialize a request by specifying a standard HTTP::Request object" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
       )
       request.nil?.should be_false
     end
 
     it "overrides the request's body IO in order to use a memory IO" do
       request = Marten::HTTP::RequestSpec::TestRequest.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
       )
 
       request.wrapped_request.body.should be_a IO::Memory
@@ -43,14 +39,12 @@ describe Marten::HTTP::Request do
   describe "#accepts?" do
     it "returns true if the passed media type is supported by the request" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz",
-          body: "foo=bar",
-          headers: HTTP::Headers{
-            "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp",
-          }
-        )
+        method: "GET",
+        resource: "/test/xyz",
+        body: "foo=bar",
+        headers: HTTP::Headers{
+          "Accept" => "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp",
+        }
       )
 
       request.accepts?("text/html").should be_true

@@ -1,5 +1,7 @@
 require "spec"
 
+require "./spec/ext/**"
+
 module Marten
   module Spec
     def self.flush_databases

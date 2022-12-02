@@ -45,6 +45,18 @@ html[data-theme='dark'] {
   --ifm-font-color-base: rgb(215, 221, 226);
 }
 
+body {
+  --aa-primary-color-rgb: 235, 104, 100 !important;
+  --aa-input-border-color-rgb: 119, 119, 119 !important;
+}
+
+body.dark, body[data-theme='dark'] {
+  --aa-primary-color-rgb: 235, 104, 100 !important;
+  --aa-text-color-rgb: 215, 221, 226 !important;
+  --aa-muted-color-rgb: 215, 221, 226 !important;
+  --aa-background-color-rgb: 19, 23, 28 !important;
+}
+
 .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.1);
   display: block;

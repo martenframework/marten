@@ -13,7 +13,10 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   organizationName: 'martenframework',
   projectName: 'marten',
 
-  plugins: ['docusaurus-plugin-sass'],
+  plugins: [
+    'docusaurus-plugin-sass',
+    require.resolve('@cmfcmf/docusaurus-search-local'),
+  ],
 
   presets: [
     [

@@ -36,6 +36,12 @@ Marten also has built-in support for PostgreSQL and MySQL. Please refer to the a
 * [MySQL Installation Guide](https://dev.mysql.com/doc/refman/8.0/en/installing.html)
 * [SQLite Installation Guide](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm)
 
+Each database requires the use of a dedicated shard (package of Crystal code). You don't have to install any of these right now if you are just starting with the framework or if you are planning to follow the [tutorial](./tutorial), but you may have to add one of the following entries to your project's `shard.yml` file later:
+
+* [crystal-pg](https://github.com/will/crystal-pg) (needed when using PostgreSQL databases)
+* [crystal-mysql](https://github.com/crystal-lang/crystal-mysql) (needed when using MySQL databases)
+* [crystal-sqlite3](https://github.com/crystal-lang/crystal-sqlite3) (needed when using SQLite3 databases)
+
 ## Install Marten
 
 The next step is to install the Marten CLI. This tool will let you easily generate new Marten projects or applications.

@@ -201,6 +201,11 @@ module Marten
         @databases << db_config if not_yet_defined
       end
 
+      # Provides access to emailing settings.
+      def emailing
+        @emailing ||= GlobalSettings::Emailing.new
+      end
+
       # Provides access to internationalization settings.
       def i18n
         @i18n ||= GlobalSettings::I18n.new

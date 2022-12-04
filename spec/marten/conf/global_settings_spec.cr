@@ -150,6 +150,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#emailing" do
+    it "returns the emailing configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.emailing.should be_a Marten::Conf::GlobalSettings::Emailing
+    end
+  end
+
   describe "#host" do
     it "returns 127.0.0.1 by default" do
       global_settings = Marten::Conf::GlobalSettings.new

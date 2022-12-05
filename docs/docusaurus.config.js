@@ -38,6 +38,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      image: 'img/logo_primary_zoomed_alt_white.png',
       navbar: {
         title: 'Marten',
         logo: {

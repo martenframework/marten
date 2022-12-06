@@ -164,4 +164,26 @@ describe Marten::DB::Field::OneToOne do
       end
     end
   end
+
+  describe "::contribute_to_model" do
+    it "properly generates a getter? method for the related ID on the model class" do
+      obj_1 = TestUserProfile.new(
+        user: TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      )
+      obj_1.user_id?.should be_true
+
+      obj_2 = TestUserProfile.new
+      obj_2.user_id?.should be_false
+    end
+
+    it "properly generates a getter? method for the relation on the model class" do
+      obj_1 = TestUserProfile.new(
+        user: TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      )
+      obj_1.user?.should be_true
+
+      obj_2 = TestUserProfile.new
+      obj_2.user?.should be_false
+    end
+  end
 end

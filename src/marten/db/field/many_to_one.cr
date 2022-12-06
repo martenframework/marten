@@ -138,6 +138,10 @@ module Marten
                 @{{ field_id }}.not_nil!
               end
 
+              def {{ field_id }}?
+                !@{{ field_id }}.nil?
+              end
+
               def {{ field_id }}=(related_id : {{ field_ann[:exposed_type] }}?)
                 @{{ field_id }} = related_id
                 @{{ relation_attribute_name }} = nil
@@ -151,6 +155,10 @@ module Marten
 
               def {{ relation_attribute_name }}! : {{ related_model_klass }}
                 {{ relation_attribute_name }}.not_nil!
+              end
+
+              def {{ relation_attribute_name }}?
+                !{{ relation_attribute_name }}.nil?
               end
 
               def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)

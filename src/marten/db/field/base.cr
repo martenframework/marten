@@ -160,6 +160,10 @@ module Marten
                 @{{ field_id }}.not_nil!
               end
 
+              def {{ field_id }}?
+                !@{{ field_id }}.nil?
+              end
+
               def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
             {% end %}
           end

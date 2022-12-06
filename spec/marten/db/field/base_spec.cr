@@ -152,6 +152,14 @@ describe Marten::DB::Field::Base do
       expect_raises(NilAssertionError) { obj_2.name! }
     end
 
+    it "properly generates a getter? method for the field on the model class" do
+      obj_1 = Tag.create!(name: "crystal", is_active: true)
+      obj_1.name?.should be_true
+
+      obj_2 = Tag.new
+      obj_2.name?.should be_false
+    end
+
     it "properly generates a setter method for the field on the model class" do
       obj = Tag.create!(name: "crystal", is_active: true)
 

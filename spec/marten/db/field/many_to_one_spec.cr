@@ -164,4 +164,26 @@ describe Marten::DB::Field::ManyToOne do
       end
     end
   end
+
+  describe "::contribute_to_model" do
+    it "properly generates a getter? method for the related ID on the model class" do
+      obj_1 = Post.new(
+        author: TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      )
+      obj_1.author_id?.should be_true
+
+      obj_2 = Post.new
+      obj_2.author_id?.should be_false
+    end
+
+    it "properly generates a getter? method for the relation on the model class" do
+      obj_1 = Post.new(
+        author: TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      )
+      obj_1.author?.should be_true
+
+      obj_2 = Post.new
+      obj_2.author?.should be_false
+    end
+  end
 end

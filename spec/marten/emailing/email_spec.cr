@@ -212,9 +212,9 @@ describe Marten::Emailing::Email do
       email.headers.should be_empty
     end
 
-    it "automatically includes the Reply-To header if a reply-to address was configured for the email" do
-      email = Marten::Emailing::EmailSpec::EmailWithOverriddenReplyTo.new("test@example.com")
-      email.headers.should eq({"Reply-To" => "test@example.com"})
+    it "returns custom headers" do
+      email = Marten::Emailing::EmailSpec::EmailWithOverriddenHeaders.new
+      email.headers.should eq({"foo" => "bar"})
     end
   end
 
@@ -376,6 +376,12 @@ module Marten::Emailing::EmailSpec
     to @to
 
     def initialize(@to)
+    end
+  end
+
+  class EmailWithOverriddenHeaders < Marten::Emailing::Email
+    def headers
+      {"foo" => "bar"}
     end
   end
 end

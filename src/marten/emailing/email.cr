@@ -67,10 +67,6 @@ module Marten
 
       # Returns the headers to set on the email.
       def headers : Hash(String, String)
-        if !reply_to.nil?
-          @headers["Reply-To"] = reply_to.to_s
-        end
-
         @headers
       end
 

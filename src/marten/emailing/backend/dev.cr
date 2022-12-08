@@ -28,6 +28,10 @@ module Marten
             parts << "BCC: #{bcc.join(", ")}"
           end
 
+          if !(reply_to = email.reply_to).nil?
+            parts << "Reply-To: #{reply_to}"
+          end
+
           parts << "Subject: #{email.subject}"
           parts << "Headers: #{email.headers}" unless email.headers.empty?
 

@@ -92,6 +92,25 @@ describe Marten::Emailing::Backend::Dev do
       )
     end
 
+    it "outputs an email with a Reply-To address as expected if this capability is activated" do
+      stdout = IO::Memory.new
+
+      email = Marten::Emailing::Backend::DevSpec::TestEmailWithReplyTo.new
+      backend = Marten::Emailing::Backend::Dev.new(print_emails: true, stdout: stdout)
+
+      backend.deliver(email)
+
+      stdout.rewind
+      stdout.gets_to_end.should eq(
+        <<-OUTPUT
+        From: webmaster@localhost
+        To: test@example.com
+        Reply-To: reply-to@example.com
+        Subject: Hello World!
+        OUTPUT
+      )
+    end
+
     it "outputs an email with headers as expected if this capability is activated" do
       stdout = IO::Memory.new
 
@@ -139,6 +158,13 @@ module Marten::Emailing::Backend::DevSpec
     to "test@example.com"
 
     bcc ["bcc1@example.com", "bcc2@example.com"]
+  end
+
+  class TestEmailWithReplyTo < Marten::Email
+    subject "Hello World!"
+    to "test@example.com"
+
+    reply_to "reply-to@example.com"
   end
 
   class TestEmailWithHeaders < Marten::Email

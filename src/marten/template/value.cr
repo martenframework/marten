@@ -79,6 +79,11 @@ module Marten
             return object[key.to_s]
           rescue KeyError
           end
+        elsif object.is_a?(Indexable) && !object.is_a?(Marten::Template::Object) && key.responds_to?(:to_i)
+          begin
+            return object[key.to_i]
+          rescue ArgumentError | IndexError
+          end
         elsif object.responds_to?(:resolve_template_attribute)
           return object.resolve_template_attribute(key.to_s)
         end

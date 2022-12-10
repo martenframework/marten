@@ -8,7 +8,7 @@ This section covers the basics regarding how to test a Marten project and the va
 
 ## The basics
 
-You should test your Marten projects to ensure that it adheres to the specifications it was built for. Like any Crystal project, Marten lets you write "specs" (see the [official documentation related to testing in Crystal](https://crystal-lang.org/reference/guides/testing.html) to learn more about those).
+You should test your Marten project to ensure that it adheres to the specifications it was built for. Like any Crystal project, Marten lets you write "specs" (see the [official documentation related to testing in Crystal](https://crystal-lang.org/reference/guides/testing.html) to learn more about those).
 
 By default, when creating a project through the use of the [`new`](./reference/management-commands#new) management command, Marten will automatically create a `spec/` folder at the root of your project structure. This folder contains a unique `spec_helper.cr` file allowing you to initialize the test environment for your Marten project.
 
@@ -25,6 +25,10 @@ require "../src/project"
 ```
 
 As you can see, the `spec_helper.cr` file forces the Marten environment variable to be set to `test` and requires the spec library as well as Marten and your actual project. This file should be required by all your spec files.
+
+:::info
+It's very important to require `marten/spec` in your top-level spec helper as this will ensure that the mandatory spec callbacks are configured for your spec suite (eg. in order to ensure that your database is properly set up before each spec is executed).
+:::
 
 When it comes to running your tests, you can simply make use of the standard [`crystal spec`](https://crystal-lang.org/reference/man/crystal/index.html#crystal-spec) command.
 

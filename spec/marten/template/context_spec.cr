@@ -309,6 +309,36 @@ describe Marten::Template::Context do
       ctx["foo"].should eq "bar"
       ctx["test"]?.should be_nil
     end
+
+    it "returns the underlying block value" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+
+      result = ctx.stack do |depth_1_ctx|
+        depth_1_ctx["foo"].should eq "bar"
+
+        depth_1_ctx["depth_1_foo"] = "depth_1_bar"
+        depth_1_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+        ctx.stack do |depth_2_ctx|
+          depth_2_ctx["foo"].should eq "bar"
+          depth_2_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+          depth_2_ctx["depth_2_foo"] = "depth_2_bar"
+          depth_2_ctx["depth_2_foo"].should eq "depth_2_bar"
+        end
+
+        depth_1_ctx["foo"].should eq "bar"
+        depth_1_ctx["depth_1_foo"].should eq "depth_1_bar"
+
+        42
+      end
+
+      ctx["foo"].should eq "bar"
+      ctx["depth_1_foo"]?.should be_nil
+      ctx["depth_2_foo"]?.should be_nil
+
+      result.should eq 42
+    end
   end
 end
 

@@ -141,7 +141,7 @@ describe Marten::Template::Tag::For do
     it "exposes whether a specific iteration is the first one or not" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% if loop.first %}1{% else %}0{% endif %};
+        {% if loop.first? %}1{% else %}0{% endif %};
         {% endfor %}
         TEMPLATE
       )
@@ -153,7 +153,7 @@ describe Marten::Template::Tag::For do
     it "exposes whether a specific iteration is the last one or not" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% if loop.last %}1{% else %}0{% endif %};
+        {% if loop.last? %}1{% else %}0{% endif %};
         {% endfor %}
         TEMPLATE
       )

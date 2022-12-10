@@ -1,4 +1,5 @@
 require "./concerns/*"
+require "./for/*"
 
 module Marten
   module Template
@@ -48,8 +49,7 @@ module Marten
         end
 
         def render(context : Context) : String
-          rendered_iterations = [] of String
-          parent_loop = context["loop"]?
+          parent_loop = context[LOOP_VARIABLE]?
 
           context.stack do |loop_context|
             items = @iterable_expression.resolve(loop_context)
@@ -58,47 +58,41 @@ module Marten
               return @else_nodes.nil? ? "" : @else_nodes.not_nil!.render(loop_context)
             end
 
-            loop_hash = {} of String => Bool | Int32 | Nil | Value
-            loop_hash["parent"] = parent_loop
+            loop = Loop.new(items_size: items.size, parent: parent_loop)
+            loop_context[LOOP_VARIABLE] = loop
 
-            items_size = items.size
-            items.each_with_index do |item, index|
-              # Prepare loop related attributes.
-              loop_hash["index0"] = index
-              loop_hash["index"] = index + 1
-              loop_hash["revindex0"] = items_size - index - 1
-              loop_hash["revindex"] = items_size - index
-              loop_hash["first"] = (index == 0)
-              loop_hash["last"] = (index == items_size - 1)
+            String.build do |io|
+              items.each_with_index do |item, index|
+                # Prepare loop related attributes.
+                loop.index = index
 
-              loop_context["loop"] = loop_hash
-
-              if @loop_vars.size == 1
-                # No unoacking needed.
-                loop_context[@loop_vars.first] = item
-              else
-                if item.raw.is_a?(Iterable)
-                  item_arr = item.to_a
-                  @loop_vars.each_with_index do |var, var_index|
-                    if var_index + 1 > item_arr.size
-                      raise Errors::UnsupportedType.new("Missing objects to unpack")
-                    end
-
-                    loop_context[var] = item_arr[var_index]
-                  end
+                if @loop_vars.size == 1
+                  # No unpacking needed.
+                  loop_context[@loop_vars.first] = item
                 else
-                  raise Errors::UnsupportedType.new(
-                    "Unable to unpack #{item.raw.class} objects into multiple variables"
-                  )
-                end
-              end
+                  if item.raw.is_a?(Iterable)
+                    item_arr = item.to_a
+                    @loop_vars.each_with_index do |var, var_index|
+                      if var_index + 1 > item_arr.size
+                        raise Errors::UnsupportedType.new("Missing objects to unpack")
+                      end
 
-              rendered_iterations << @loop_nodes.render(loop_context)
+                      loop_context[var] = item_arr[var_index]
+                    end
+                  else
+                    raise Errors::UnsupportedType.new(
+                      "Unable to unpack #{item.raw.class} objects into multiple variables"
+                    )
+                  end
+                end
+
+                io << @loop_nodes.render(loop_context)
+              end
             end
           end
-
-          rendered_iterations.join
         end
+
+        private LOOP_VARIABLE = "loop"
       end
     end
   end

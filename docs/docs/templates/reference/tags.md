@@ -55,7 +55,7 @@ The `extend` template tag allows to define that a template inherits from a speci
 
 ## `for`
 
-The `for` template tag allows to loop over the items of iterable objects. It supports unpacking multiple items when applicable (eg. when iterating over hashes) and also handles fallbacks through the use of the `else` inner block. It should be noted that the `for` template tag requires a closing `endfor` tag.
+The `for` template tag allows to loop over the items of iterable objects and it also handles fallbacks through the use of the `else` inner block. It should be noted that the `for` template tag requires a closing `endfor` tag.
 
 For example:
 
@@ -66,6 +66,26 @@ For example:
   No items!
 {% endfor %}
 ```
+
+It should be noted that `for` loops support unpacking multiple items when applicable (eg. when iterating over hashes or enumerables containing arrays or tuples):
+
+```html
+{% for label, url in navigation_items %}
+  <a href="{{ url }}">{{ label }}</a>
+{% endfor %}
+```
+
+Finally, loops give access to a special `loop` variable _inside_ the loop in order to expose information about the iteration process:
+
+| Variable | Description |
+| -------- | ----------- |
+| `loop.index` | The index of the current iteration (1-indexed) |
+| `loop.index0` | The index of the current iteration (0-indexed) |
+| `loop.revindex` | The index of the current iteration counting from the end of the loop (1-indexed) |
+| `loop.revindex0` | The index of the current iteration counting from the end of the loop (0-indexed) |
+| `loop.first?` | A boolean indicating if this is the first iteration of the loop |
+| `loop.last?` | A boolean indicating if this is the last iteration of the loop |
+| `loop.parent` | The parent's `loop` variable (only for nested for loops) |
 
 ## `if`
 

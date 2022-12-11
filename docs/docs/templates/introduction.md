@@ -46,6 +46,12 @@ Each variable can involve additional lookups in order to access specific object 
 <h1>{{ article.title }}</h1>
 ```
 
+This notation can be used to call object methods but also to perform key lookups for hashes or named tuples. It can also be used to perform index lookups for indexable objects (such as arrays or tuples):
+
+```
+{{ my_array.0 }}
+```
+
 ### Filters
 
 Filters can be applied to [variables](#variables) or [tag](#tags) arguments in order to transform their values. They are applied to these variables or arguments through the use of a pipe (**`|`**) followed by the name of the filter.

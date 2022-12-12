@@ -2,7 +2,7 @@ module Marten
   module Emailing
     module Backend
       # A development emailing backend that outputs details of delivered emails.
-      class Dev < Base
+      class Development < Base
         getter delivered_emails
         getter? print_emails
 

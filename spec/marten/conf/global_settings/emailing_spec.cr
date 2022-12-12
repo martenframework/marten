@@ -5,8 +5,8 @@ describe Marten::Conf::GlobalSettings::Emailing do
     it "returns the dev backend with emails printed disabled by default" do
       emailing_conf = Marten::Conf::GlobalSettings::Emailing.new
 
-      emailing_conf.backend.should be_a Marten::Emailing::Backend::Dev
-      emailing_conf.backend.as(Marten::Emailing::Backend::Dev).print_emails?.should be_false
+      emailing_conf.backend.should be_a Marten::Emailing::Backend::Development
+      emailing_conf.backend.as(Marten::Emailing::Backend::Development).print_emails?.should be_false
     end
 
     it "returns the custom backend configured" do

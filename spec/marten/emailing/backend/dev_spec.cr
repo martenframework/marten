@@ -1,10 +1,10 @@
 require "./spec_helper"
 
-describe Marten::Emailing::Backend::Dev do
+describe Marten::Emailing::Backend::Development do
   describe "#deliver" do
     it "collects the delivered email by default" do
       email = Marten::Emailing::Backend::DevSpec::TestEmail.new
-      backend = Marten::Emailing::Backend::Dev.new
+      backend = Marten::Emailing::Backend::Development.new
 
       backend.deliver(email)
 
@@ -13,7 +13,7 @@ describe Marten::Emailing::Backend::Dev do
 
     it "does not collect the delivered email if this capability is deactivated" do
       email = Marten::Emailing::Backend::DevSpec::TestEmail.new
-      backend = Marten::Emailing::Backend::Dev.new(collect_emails: false)
+      backend = Marten::Emailing::Backend::Development.new(collect_emails: false)
 
       backend.deliver(email)
 
@@ -24,7 +24,7 @@ describe Marten::Emailing::Backend::Dev do
       stdout = IO::Memory.new
 
       email = Marten::Emailing::Backend::DevSpec::TestEmail.new
-      backend = Marten::Emailing::Backend::Dev.new(stdout: stdout)
+      backend = Marten::Emailing::Backend::Development.new(stdout: stdout)
 
       backend.deliver(email)
 
@@ -36,7 +36,7 @@ describe Marten::Emailing::Backend::Dev do
       stdout = IO::Memory.new
 
       email = Marten::Emailing::Backend::DevSpec::TestEmail.new
-      backend = Marten::Emailing::Backend::Dev.new(print_emails: true, stdout: stdout)
+      backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
 
@@ -58,7 +58,7 @@ describe Marten::Emailing::Backend::Dev do
       stdout = IO::Memory.new
 
       email = Marten::Emailing::Backend::DevSpec::TestEmailWithCc.new
-      backend = Marten::Emailing::Backend::Dev.new(print_emails: true, stdout: stdout)
+      backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
 
@@ -77,7 +77,7 @@ describe Marten::Emailing::Backend::Dev do
       stdout = IO::Memory.new
 
       email = Marten::Emailing::Backend::DevSpec::TestEmailWithBcc.new
-      backend = Marten::Emailing::Backend::Dev.new(print_emails: true, stdout: stdout)
+      backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
 
@@ -96,7 +96,7 @@ describe Marten::Emailing::Backend::Dev do
       stdout = IO::Memory.new
 
       email = Marten::Emailing::Backend::DevSpec::TestEmailWithReplyTo.new
-      backend = Marten::Emailing::Backend::Dev.new(print_emails: true, stdout: stdout)
+      backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
 
@@ -115,7 +115,7 @@ describe Marten::Emailing::Backend::Dev do
       stdout = IO::Memory.new
 
       email = Marten::Emailing::Backend::DevSpec::TestEmailWithHeaders.new
-      backend = Marten::Emailing::Backend::Dev.new(print_emails: true, stdout: stdout)
+      backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
 

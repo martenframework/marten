@@ -5,9 +5,9 @@ require "./spec/ext/**"
 module Marten
   module Spec
     def self.clear_collected_emails
-      return unless Marten.settings.emailing.backend.is_a?(Marten::Emailing::Backend::Dev)
+      return unless Marten.settings.emailing.backend.is_a?(Marten::Emailing::Backend::Development)
 
-      Marten.settings.emailing.backend.as(Marten::Emailing::Backend::Dev).delivered_emails.clear
+      Marten.settings.emailing.backend.as(Marten::Emailing::Backend::Development).delivered_emails.clear
     end
 
     def self.flush_databases

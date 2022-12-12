@@ -3,7 +3,7 @@ module Marten
     class GlobalSettings
       # Allows to configure emailing-related settings.
       class Emailing
-        @backend : Marten::Emailing::Backend::Base = Marten::Emailing::Backend::Dev.new
+        @backend : Marten::Emailing::Backend::Base = Marten::Emailing::Backend::Development.new
         @from_address = Marten::Emailing::Address.new("webmaster@localhost")
 
         # Returns the backend used to deliver emails.

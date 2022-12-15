@@ -48,6 +48,9 @@ en:
             - "%m/%d/%Y %H:%M:%S"
             - "%m/%d/%Y %H:%M:%S.%f"
             - "%m/%d/%Y %H:%M"
+        email:
+          errors:
+            invalid: "Enter a valid email address."
         file:
           errors:
             empty: "Empty files are not allowed."

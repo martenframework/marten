@@ -27,6 +27,22 @@ A `date_time` field allows validating date time values. Fields using this type a
 
 A `date` field allows validating date values. Fields using this type are converted to `Time` objects in Crystal.
 
+### `email`
+
+An `email` field allows validating email address values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_size`
+
+The `max_size` argument allows defining the maximum size allowed for the email address string. The default value for this argument is `254` (in accordance with RFCs 3696 and 5321).
+
+#### `min_size`
+
+The `min_size` argument allows defining the minimum size allowed for the email address string. The default value for this argument is `nil`, which means that the minimum size is not validated by default.
+
+#### `strip`
+
+The `strip` argument allows defining whether the string value should be stripped of leading and trailing whitespaces. The default is `true`.
+
 ### `file`
 
 A `file` field allows validating uploaded files. In addition to the [common field options](#common-field-options), such fields support the following arguments:

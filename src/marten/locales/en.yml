@@ -6,6 +6,9 @@ en:
           errors:
             blank: "This field cannot be blank."
             nil: "This field cannot be null."
+        email:
+          errors:
+            invalid: "Enter a valid email address."
         string:
           errors:
             too_long: "The maximum allowed length is %{max_size}"

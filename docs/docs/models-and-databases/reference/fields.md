@@ -84,6 +84,14 @@ The `auto_now` argument allows ensuring that the corresponding field value is au
 
 The `auto_now_add` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
 
+### `email`
+
+An `email` field allows to persist _valid_ email addresses. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_size`
+
+The `max_size` argument is optional and defaults to 254 characters (in accordance with RFCs 3696 and 5321). It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validate field values.
+
 ### `file`
 
 A `file` field allows persisting the reference to an uploaded file.

@@ -120,7 +120,7 @@ Emailing backends define _how_ emails are actually sent when [`#deliver`](pathna
 Which backend is used by when sending emails is something that is controlled by the [`emailing.backend`](../development/reference/settings#backend-1) setting. All the available emailing backends are listed in the [emailing backend reference](./reference/backends).
 
 :::tip
-If necessary, it is also possible to override which emailing backend is used on a per-email basis by leveraging the [`#backend`](pathname///api/Marten/Emailing/Email.html#backend(backend%3ABackend%3A%3ABase)%3ANil-class-method) class method. For example:
+If necessary, it is also possible to override which emailing backend is used on a per-email basis by leveraging the [`#backend`](pathname:///api/Marten/Emailing/Email.html#backend(backend%3ABackend%3A%3ABase)%3ANil-class-method) class method. For example:
 
 ```crystal
 class WelcomeEmail < Marten::Email

@@ -402,6 +402,33 @@ Default: `nil`
 
 A string containing the name of the user that should be used to connect to the configured database.
 
+## Emailing settings
+
+Emailing settings allow configuring emailing-related settings. Please refer to [Emailing](../../emailing) for more details about how to define and send emails in your projects.
+
+The following settings are all available under the `emailing` namespace:
+
+```crystal
+config.emailing.from_address = "no-reply@example.com"
+config.emailing.backend = Marten::Emailing::Backend::Development.new(print_emails: true)
+```
+
+### `backend`
+
+Default: `Marten::Emailing::Backend::Development.new`
+
+The backend to use when it comes to send emails. Emailing backends define _how_ emails are actually sent.
+
+By default, a development backend (instance of [`Marten::Emailing::Backend::Dev`](pathname:///api/Marten/Emailing/Backend/Development.html)) is used: this backend "collects" all the emails that are "delivered" by default (which can be used in specs in order to test sent emails), but it can also be configured to print email details to the standard output if necessary (see the [emailing backend reference](../../emailing/reference/backends) for more details about this capability).
+
+Additional emailing backend shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your specific email sending requirements. These backends are listed in the [emailing backend reference](../../emailing/reference/backends#other-backends).
+
+### `from_address`
+
+Default: `"webmaster@localhost"`
+
+The default from address used in emails. Email definitions that don't specify a "from" address explicitly will use this email address automatically for the sender email. It should be noted that this from email address can be defined as a string or as a [`Marten::Emailing::Address`](pathname:///api/Marten/Emailing/Address.html) object (which allows to specify the name AND the address of the sender email).
+
 ## I18n settings
 
 I18n settings allow configuring internationalization-related settings. Please refer to [Internationalization](../../i18n) for more details about how to leverage translations and localized content in your projects.

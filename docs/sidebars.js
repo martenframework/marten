@@ -173,6 +173,21 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Emailing',
+      link: {type: 'doc', id: 'emailing'},
+      items: [
+        'emailing/introduction',
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'emailing/reference/backends',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Deployment',
       link: {type: 'doc', id: 'deployment'},
       items: [

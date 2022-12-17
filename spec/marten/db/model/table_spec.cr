@@ -241,6 +241,53 @@ describe Marten::DB::Model::Table do
     end
   end
 
+  describe "#pk" do
+    it "returns the primary key field value" do
+      tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")
+
+      tag.pk.should_not be_nil
+      tag.pk.should eq tag.id
+    end
+
+    it "returns the raw field value for a relationship field" do
+      tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")
+      wrapping_tag = Marten::DB::Model::TableSpec::WrappingTag.create!(tag: tag, details: "Test")
+
+      wrapping_tag.pk.should_not be_nil
+      wrapping_tag.pk.should eq tag.pk
+    end
+
+    it "returns nil if the primary key field has no value" do
+      tag = Marten::DB::Model::TableSpec::Tag.new
+
+      tag.pk.should be_nil
+    end
+  end
+
+  describe "#pk!" do
+    it "returns the primary key field value" do
+      tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")
+
+      tag.pk!.should_not be_nil
+      tag.pk!.should eq tag.id
+    end
+
+    it "raises a NilAssertionError if the primary key field has no value" do
+      tag = Marten::DB::Model::TableSpec::Tag.new
+
+      expect_raises(NilAssertionError) { tag.pk! }
+    end
+  end
+
+  describe "#pk=" do
+    it "allows to set the primary key field value" do
+      tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")
+
+      tag.pk = 42
+      tag.pk.should eq 42
+    end
+  end
+
   describe "#set_field_value" do
     it "allows to set the value of a specific model instance field" do
       tag = Tag.new(name: "crystal")

@@ -218,6 +218,30 @@ module Marten
           {% end %}
         end
 
+        # Returns the primary key value.
+        def pk
+          {% begin %}
+          {%
+            pkey = @type.instance_vars.find do |ivar|
+              ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
+              ann && ann[:field_kwargs] && ann[:field_kwargs][:primary_key]
+            end
+          %}
+
+          {% if pkey %}self.{{ pkey.id }}{% end %}
+          {% end %}
+        end
+
+        # Returns the primary key value or raise `NilAssertionError`.
+        def pk!
+          pk.not_nil!
+        end
+
+        # Allows to set the primary key value.
+        def pk=(val)
+          set_field_value(self.class.pk_field.id, val)
+        end
+
         # Allows to set the value of a specific field.
         #
         # If the passed `field_name` doesn't match any existing field, a `Marten::DB::Errors::UnknownField` exception
@@ -385,8 +409,10 @@ module Marten
 
         # :nodoc:
         macro _inherit_table_attributes
-          {% if @type.ancestors.first.has_constant?("FIELDS_") %}
-            {% for field_id, field_config in @type.ancestors.first.constant("FIELDS_") %}
+          {% ancestor_model = @type.ancestors.first %}
+
+          {% if ancestor_model.has_constant?("FIELDS_") %}
+            {% for field_id, field_config in ancestor_model.constant("FIELDS_") %}
               {% FIELDS_[field_id] = field_config %}
 
               {% field_klass = nil %}
@@ -408,8 +434,8 @@ module Marten
               )
             {% end %}
 
-            @@db_indexes = {{ @type.ancestors.first.name }}.db_indexes.clone
-            @@db_unique_constraints = {{ @type.ancestors.first.name }}.db_unique_constraints.clone
+            @@db_indexes = {{ ancestor_model.name }}.db_indexes.clone
+            @@db_unique_constraints = {{ ancestor_model.name }}.db_unique_constraints.clone
           {% end %}
         end
 
@@ -435,18 +461,6 @@ module Marten
           {% if pkeys.size > 1 %}
             {{ raise "Many primary keys found for model '#{@type}' ; only one is allowed" }}
           {% end %}
-
-          def pk
-            {{ pkeys[0].id }}
-          end
-
-          def pk!
-            {{ pkeys[0].id }}.not_nil!
-          end
-
-          def pk=(val)
-            self.{{ pkeys[0].id }} = val
-          end
         end
 
         # :nodoc:

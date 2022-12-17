@@ -49,6 +49,17 @@ nav.navbar {
     }
   }
 
+  .navbar__item.navbar__link {
+    svg {
+      display: none;
+    }
+  }
+  .menu__link {
+    svg {
+      display: none;
+    }
+  }
+
   .dsla-search-wrapper {
     button {
       padding: 0 20px 0 8px;

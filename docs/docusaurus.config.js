@@ -62,9 +62,10 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             position: 'right',
           },
           {
-            href: '/..',
+            href: 'https://martenframework.com',
             label: 'Website',
             position: 'right',
+            target: '',
           },
         ],
         hideOnScroll: true,

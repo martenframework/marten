@@ -179,6 +179,13 @@ module.exports = {
         'emailing/introduction',
         {
           type: 'category',
+          label: "How-To's",
+          items: [
+            'emailing/how-to/create-custom-emailing-backends',
+          ],
+        },
+        {
+          type: 'category',
           label: 'Reference',
           items: [
             'emailing/reference/backends',

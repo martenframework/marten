@@ -24,6 +24,7 @@ Additional emailing backend shards are also maintained under the umbrella of the
 
 * [`marten-smtp-emailing`](https://github.com/martenframework/marten-smtp-emailing) provides an SMTP emailing backend
 * [`marten-sendgrid-emailing`](https://github.com/martenframework/marten-sendgrid-emailing) provides a [Sendgrid](https://sendgrid.com/) emailing backend
+* [`marten-mailgun-emailing`](https://github.com/martenframework/marten-mailgun-emailing) provides a [Mailgun](https://www.mailgun.com/) emailing backend
 
 :::info
 Feel free to contribute to this page and add links to your shards if you've created emailing backends that are not listed here!

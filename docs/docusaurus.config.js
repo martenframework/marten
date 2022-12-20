@@ -15,7 +15,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
   plugins: [
     'docusaurus-plugin-sass',
-    require.resolve('@cmfcmf/docusaurus-search-local'),
+    // require.resolve('@cmfcmf/docusaurus-search-local'),
   ],
 
   presets: [
@@ -73,6 +73,12 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
       prism: {
         theme: require('prism-react-renderer/themes/okaidia'),
         additionalLanguages: ['ruby', 'crystal'],
+      },
+      algolia: {
+        appId: 'EQ32BI3T7E',
+        apiKey: '784eef906f1329000df262eef9c2960d',
+        indexName: 'martenframework',
+        contextualSearch: true,
       },
     }),
 });

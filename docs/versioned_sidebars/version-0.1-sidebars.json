@@ -27,6 +27,7 @@
         "models-and-databases/callbacks",
         "models-and-databases/migrations",
         "models-and-databases/transactions",
+        "models-and-databases/multiple-databases",
         {
           "type": "category",
           "label": "How-To's",

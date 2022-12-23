@@ -22,6 +22,7 @@ module.exports = {
         'models-and-databases/migrations',
         'models-and-databases/transactions',
         'models-and-databases/raw-sql',
+        'models-and-databases/multiple-databases',
         {
           type: 'category',
           label: "How-To's",

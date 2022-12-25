@@ -117,7 +117,7 @@ module Marten
         end
 
         # :nodoc:
-        macro contribute_to_model(model_klass, field_id, field_ann, kwargs, inherited)
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           # Registers the field to the model class.
 
           class ::{{ model_klass }}
@@ -128,7 +128,7 @@ module Marten
               )
             )
 
-            {% if !inherited %}
+            {% if !model_klass.resolve.abstract? %}
               @[Marten::DB::Model::Table::FieldInstanceVariable(
                 field_klass: {{ @type }},
                 field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},

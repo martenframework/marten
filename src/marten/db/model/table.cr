@@ -195,8 +195,7 @@ module Marten
             {{ @type }},
             {{ sanitized_id }},
             {{ field_ann }},
-            {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %},
-            false
+            {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
           )
         end
 
@@ -429,8 +428,7 @@ module Marten
                 {{ @type }},
                 {{ field_id.id }},
                 {{ field_ann }},
-                {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %},
-                true
+                {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %}
               )
             {% end %}
 

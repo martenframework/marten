@@ -94,7 +94,7 @@ module Marten
         end
 
         # :nodoc:
-        macro contribute_to_model(model_klass, field_id, field_ann, kwargs, inherited)
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           {% relation_attribute_name = field_id %}
           {% field_id = (field_id.stringify + "_id").id %}
           {% related_model_klass = kwargs[:to] %}
@@ -112,7 +112,7 @@ module Marten
               )
             )
 
-            {% if !inherited %}
+            {% if !model_klass.resolve.abstract? %}
               # Getter and setter methods for the raw related object ID and the plain related object need to be created.
 
               {% if related_model_klass.stringify == "self" %}

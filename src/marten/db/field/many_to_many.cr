@@ -67,7 +67,7 @@ module Marten
         end
 
         # :nodoc:
-        macro contribute_to_model(model_klass, field_id, field_ann, kwargs, inherited)
+        macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
           {% if !model_klass.resolve.abstract? %}
             # Automatically creates a "through" model to manage the many-to-many relationship between the considered
             # model and the related model.

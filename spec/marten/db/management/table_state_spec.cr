@@ -154,6 +154,48 @@ describe Marten::DB::Management::TableState do
       table_state.columns.includes?(new_column).should be_true
     end
 
+    it "changes the column if it is at the beginning of the array of columns" do
+      old_column = Marten::DB::Management::Column::Int.new("foo")
+      new_column = Marten::DB::Management::Column::String.new("foo", max_size: 100)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          old_column,
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::Int.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      table_state.change_column(new_column)
+
+      table_state.columns.includes?(old_column).should be_false
+      table_state.columns.includes?(new_column).should be_true
+    end
+
+    it "changes the column if it is at the end of the array of columns" do
+      old_column = Marten::DB::Management::Column::Int.new("foo")
+      new_column = Marten::DB::Management::Column::String.new("foo", max_size: 100)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "my_table",
+        [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+          Marten::DB::Management::Column::Int.new("bar"),
+          old_column,
+        ] of Marten::DB::Management::Column::Base,
+        [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      table_state.change_column(new_column)
+
+      table_state.columns.includes?(old_column).should be_false
+      table_state.columns.includes?(new_column).should be_true
+    end
+
     it "raises NilAssertionError if the column is not found" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
       expect_raises(NilAssertionError) do

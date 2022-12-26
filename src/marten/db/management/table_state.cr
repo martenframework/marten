@@ -48,7 +48,7 @@ module Marten
         end
 
         def change_column(column : Column::Base) : Nil
-          index = columns.bsearch_index { |c, _i| c.name == column.name }
+          index = columns.index { |c| c.name == column.name }
           columns[index.not_nil!] = column
         end
 

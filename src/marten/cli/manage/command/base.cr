@@ -127,7 +127,6 @@ module Marten
           # ```
           def on_argument(name : String | Symbol, description : String, &block : String ->)
             name = name.to_s
-            # TODO: validate name format
             append_argument(name, description)
             @argument_handlers << ArgumentHandler.new(name, block)
           end

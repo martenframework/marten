@@ -201,7 +201,7 @@ module Marten
         protected setter new_record
 
         private def insert_or_update(connection)
-          # Prevent saving if an unsaved related object is assigned to the current model instance. This situation could
+          # Prevents saving if an unsaved related object is assigned to the current model instance. This situation could
           # lead to data loss since the current model instance could be saved but not the related object.
           self.class.fields.each do |field|
             next if !field.relation?
@@ -210,6 +210,13 @@ module Marten
             raise Errors::UnmetSaveCondition.new(
               "Save is prohibited because related object '#{field.relation_name}' is not persisted"
             )
+          end
+
+          # Notifies each field so that they have the chance to apply changes to the model instance before the actual
+          # save operation.
+          self.class.fields.each do |field|
+            next if field.primary_key?
+            field.prepare_save(self, new_record: new_record?)
           end
 
           run_before_save_callbacks
@@ -242,11 +249,6 @@ module Marten
             connection.observe_transaction_rollback(->run_after_create_rollback_callbacks)
           end
 
-          self.class.fields.each do |field|
-            next if field.primary_key?
-            field.prepare_save(self, new_record: true)
-          end
-
           values = field_db_values
 
           pk_field = self.class.pk_field
@@ -274,11 +276,6 @@ module Marten
 
           if has_after_update_rollback_callbacks?
             connection.observe_transaction_rollback(->run_after_update_rollback_callbacks)
-          end
-
-          self.class.fields.each do |field|
-            next if field.primary_key?
-            field.prepare_save(self, new_record: false)
           end
 
           values = field_db_values

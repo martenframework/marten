@@ -199,6 +199,16 @@ module Marten
           )
         end
 
+        # Allows to automatically configure creation and update timestamp fields.
+        #
+        # This macro will contribute two model fields to the models it is applied to: one `created_at` field containing
+        # the creation time of the record, and one `updated_at` field containing the update time of the record (which is
+        # also refreshed every time the model is updated).
+        macro with_timestamp_fields
+          field :created_at, :date_time, auto_now_add: true
+          field :updated_at, :date_time, auto_now: true
+        end
+
         # Allows to read the value of a specific field.
         #
         # This methods returns the value of the field corresponding to `field_name`. If the passed `field_name` doesn't

@@ -6,9 +6,19 @@ describe Marten::DB::Model::Table do
 
   describe "::inherited" do
     it "ensures that the model inherits its parent fields" do
-      Marten::DB::Model::TableSpec::Article.fields.size.should eq 7
+      Marten::DB::Model::TableSpec::Article.fields.size.should eq 9
       Marten::DB::Model::TableSpec::Article.fields.map(&.id).should eq(
-        ["id", "author_id", "moderator_id", "title", "content", "tags", "additional_content"]
+        [
+          "created_at",
+          "updated_at",
+          "id",
+          "author_id",
+          "moderator_id",
+          "title",
+          "content",
+          "tags",
+          "additional_content",
+        ]
       )
     end
 
@@ -218,6 +228,20 @@ describe Marten::DB::Model::Table do
       expect_raises(Marten::DB::Errors::UnknownField) do
         Tag.get_field(:unknown)
       end
+    end
+  end
+
+  describe "::with_timestamp_fields" do
+    it "adds the expected fields to the model" do
+      created_at_field = Marten::DB::Model::TableSpec::BaseArticle.get_field("created_at")
+      created_at_field.should be_a Marten::DB::Field::DateTime
+      created_at_field.as(Marten::DB::Field::DateTime).auto_now_add?.should be_true
+      created_at_field.as(Marten::DB::Field::DateTime).auto_now?.should be_false
+
+      updated_at_field = Marten::DB::Model::TableSpec::BaseArticle.get_field("updated_at")
+      updated_at_field.should be_a Marten::DB::Field::DateTime
+      updated_at_field.as(Marten::DB::Field::DateTime).auto_now?.should be_true
+      updated_at_field.as(Marten::DB::Field::DateTime).auto_now_add?.should be_false
     end
   end
 

@@ -185,6 +185,36 @@ class User < Marten::Model
 end
 ```
 
+### Timestamps
+
+Marten lets you easily add automatic `created_at` / `updated_at` [`date_time`](./reference/fields#date_time) fields to your models by leveraging the [`#with_timestamp_fields`](pathname:///api/Marten/DB/Model/Table.html#with_timestamp_fields-macro) macro:
+
+```crystal
+class Article < Marten::Model
+  // highlight-next-line
+  with_timestamp_fields
+
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 255
+end
+```
+
+The `created_at` field is populated with the current time when new records are created while the `updated_at` field is refreshed with the current time whenever records are updated.
+
+Note that using [`#with_timestamp_fields`](pathname:///api/Marten/DB/Model/Table.html#with_timestamp_fields-macro) is technically equivalent as defining two `created_at` and `updated_at` [`date_time`](./reference/fields#date_time) fields as follows:
+
+```crystal
+class Article < Marten::Model
+  // highlight-next-line
+  field :created_at, :date_time, auto_now_add: true
+  // highlight-next-line
+  field :updated_at, :date_time, auto_now: true
+
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 255
+end
+```
+
 ## Multifields indexes and unique constraints
 
 Single model fields can be indexed or associated with a unique constraint _individually_ by leveraging the [`index`](./reference/fields#index) and [`unique`](./reference/fields#unique) field options. That being said, it is sometimes necessary to configure multifields indexes or unique constraints.

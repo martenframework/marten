@@ -1,5 +1,7 @@
 module Marten::DB::Model::TableSpec
   abstract class BaseArticle < Marten::Model
+    with_timestamp_fields
+
     field :id, :big_int, primary_key: true, auto: true
     field :author, :many_to_one, to: Marten::DB::Model::TableSpec::Author, related: :articles, on_delete: :cascade
     field(

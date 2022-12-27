@@ -24,7 +24,9 @@ If you've found a security issue please **do not open a GitHub issue**. Instead,
 
 ## Contributing code
 
-The preferred way to contribute to the Marten framework is to submit pull requests to the project's [GitHub repository](https://github.com/martenframework/marten). Below are provided some general tips regarding contributing code: development environments, running tests, etc.
+The preferred way to contribute to the Marten framework is to submit pull requests to the project's [GitHub repository](https://github.com/martenframework/marten). If you don't know where to start and would like to start contributing code to the Marten framework, you can have a look at the [Good first issues](https://github.com/martenframework/marten/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22).
+
+Below are provided some general tips regarding contributing code: development environments, running tests, etc.
 
 ### Development environment
 

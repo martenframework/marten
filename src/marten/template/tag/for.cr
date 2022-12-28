@@ -39,11 +39,11 @@ module Marten
 
           @iterable_expression = FilterExpression.new(parts.last)
 
-          @loop_nodes = parser.parse(up_to: %w(else endfor))
+          @loop_nodes = parser.parse(up_to: {"else", "endfor"})
           token = parser.shift_token
 
           if token.content == "else"
-            @else_nodes = parser.parse(up_to: %w(endfor))
+            @else_nodes = parser.parse(up_to: {"endfor"})
             parser.shift_token
           end
         end

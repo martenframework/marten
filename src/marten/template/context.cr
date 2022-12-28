@@ -2,7 +2,7 @@ module Marten
   module Template
     # A template context.
     class Context
-      @values : Array(Hash(String, Value)) = [Hash(String, Value).new]
+      @values : Deque(Hash(String, Value)) = Deque{Hash(String, Value).new}
 
       # Returns the blocks stack associated with the context.
       getter blocks
@@ -49,13 +49,13 @@ module Marten
 
       # Allows to initialize a new context from the specified values.
       def initialize(values : Hash(String, Value))
-        @values = [values]
+        @values << values
         @blocks = BlockStack.new
       end
 
       # Returns a specific context value for a given key.
       def [](key : String) : Value
-        @values.reverse.each do |values|
+        @values.reverse_each do |values|
           return values[key] if values.has_key?(key)
         end
 

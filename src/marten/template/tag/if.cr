@@ -22,7 +22,7 @@ module Marten
 
           # First step: if condition.
           condition = Condition.new(parts).parse
-          inner_nodes = parser.parse(up_to: %w(elsif else endif))
+          inner_nodes = parser.parse(up_to: {"elsif", "else", "endif"})
           @conditions_and_nodes << {condition, inner_nodes}
 
           # Next step: optional elsif conditions.
@@ -30,14 +30,14 @@ module Marten
           while token.content.starts_with?("elsif")
             parts = split_smartly(token.content)[1..]
             condition = Condition.new(parts).parse
-            inner_nodes = parser.parse(up_to: %w(elsif else endif))
+            inner_nodes = parser.parse(up_to: {"elsif", "else", "endif"})
             @conditions_and_nodes << {condition, inner_nodes}
             token = parser.shift_token
           end
 
           # Final step: optional else condition.
           if token.content.starts_with?("else")
-            inner_nodes = parser.parse(up_to: %w(endif))
+            inner_nodes = parser.parse(up_to: {"endif"})
             @conditions_and_nodes << {nil, inner_nodes}
             token = parser.shift_token
           end

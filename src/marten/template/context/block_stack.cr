@@ -4,13 +4,13 @@ module Marten
       # Represents a stack of blocks used for a given context.
       class BlockStack
         def initialize
-          @blocks = {} of String => Array(Tag::Block)
+          @blocks = {} of String => Deque(Tag::Block)
         end
 
         # Adds an array of block tags to the stack.
         def add(blocks : Array(Tag::Block)) : Nil
           blocks.each do |block|
-            @blocks[block.name] ||= [] of Tag::Block
+            @blocks[block.name] ||= Deque(Tag::Block).new
             @blocks[block.name].unshift(block)
           end
         end
@@ -29,7 +29,7 @@ module Marten
 
         # Pushes a block tag to the stack.
         def push(block : Tag::Block) : Nil
-          @blocks[block.name] ||= [] of Tag::Block
+          @blocks[block.name] ||= Deque(Tag::Block).new
           @blocks[block.name].push(block)
         end
       end

@@ -31,26 +31,26 @@ module Marten
           parser.encountered_block_names << parts.last
 
           # Retrieves the inner nodes up to the endblock tag.
-          @nodes = parser.parse(up_to: %w(endblock))
+          @nodes = parser.parse(up_to: {"endblock"})
           parser.shift_token
         end
 
         def render(context : Context) : String
-          result = ""
+          String.build do |io|
+            context.stack do |block_context|
+              current_block = context.blocks.pop(name)
+              block = current_block || self
 
-          context.stack do |block_context|
-            current_block = context.blocks.pop(name)
-            block = current_block || self
+              block_context[BLOCK_VARIABLE] = {name: block.name}
 
-            block_context["block"] = {"name" => block.name}
+              io << block.nodes.render(block_context)
 
-            result = block.nodes.render(block_context)
-
-            context.blocks.push(current_block) if !current_block.nil?
+              context.blocks.push(current_block) if !current_block.nil?
+            end
           end
-
-          result
         end
+
+        private BLOCK_VARIABLE = "block"
       end
     end
   end

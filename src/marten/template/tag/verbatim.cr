@@ -15,7 +15,7 @@ module Marten
         @inner_nodes : NodeSet
 
         def initialize(parser : Parser, source : String)
-          @inner_nodes = parser.parse(up_to: %w(endverbatim))
+          @inner_nodes = parser.parse(up_to: {"endverbatim"})
           parser.shift_token
         end
 

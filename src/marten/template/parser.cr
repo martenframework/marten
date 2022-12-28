@@ -19,7 +19,7 @@ module Marten
       end
 
       # Generates a set of nodes from the lexical tokens.
-      def parse(up_to : Array(String)? = nil) : NodeSet
+      def parse(up_to : Array(String) | Nil | Tuple = nil) : NodeSet
         nodes = NodeSet.new
 
         while !@tokens.empty?

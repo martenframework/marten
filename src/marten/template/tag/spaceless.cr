@@ -9,7 +9,7 @@ module Marten
         @inner_nodes : NodeSet
 
         def initialize(parser : Parser, source : String)
-          @inner_nodes = parser.parse(up_to: %w(endspaceless))
+          @inner_nodes = parser.parse(up_to: {"endspaceless"})
           parser.shift_token
         end
 

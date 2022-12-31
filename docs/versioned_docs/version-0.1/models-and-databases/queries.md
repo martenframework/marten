@@ -307,6 +307,31 @@ The double underscores notations can also be used in the context of joins. For e
 Article.join(:author__hometown).get(id: 42)
 ```
 
+### Pagination
+
+Marten provides a pagination mechanism that you can leverage in order to easily iterate over records that are split across several pages of data. This works as follows: each query set object lets you generate a "paginator" (instance of [`Marten::DB::Query::Paginator`](pathname:///api/Marten/DB/Query/Paginator.html)) from a given page size (the number of records you would like on each page). You can then use this paginator in order to request specific pages, which gives you access to the corresponding records and to some additional pagination metadata.
+
+For example:
+
+```crystal
+query_set = Article.filter(published: true)
+
+paginator = query_set.paginator(10)
+paginator.page_size   # => 10
+paginator.pages_count # => 6
+
+# Retrieve the first page and iterate over the underlying records
+page = paginator.page(1)
+page.each { |article| puts article }
+page.number               # 1
+page.previous_page?       # => false
+page.previous_page_number # => nil
+page.next_page?           # => true
+page.next_page_number     # => 2
+```
+
+As you can see, paginator objects let you request specific pages by providing a page number (1-indexed!) to the [`#page`](pathname:///api/Marten/DB/Query/Paginator.html#page(number%3AInt)-instance-method) method. Such pages are instances of [`Marten::DB::Query::Page`](pathname:///api/Marten/DB/Query/Page.html) and give you the ability to easily iterate over the corresponding records. They also give you the ability to retrieve some pagination-related information (eg. about the previous and next pages by leveraging the [`#previous_page?`](pathname:///api/Marten/DB/Query/Page.html#previous_page%3F-instance-method), [`#previous_page_number`](pathname:///api/Marten/DB/Query/Page.html#previous_page_number-instance-method), [`#next_page?`](pathname:///api/Marten/DB/Query/Page.html#next_page%3F-instance-method), and [`#next_page_number`](pathname:///api/Marten/DB/Query/Page.html#next_page_number-instance-method) methods).
+
 ## Updating records
 
 Once a model record has been retrieved from the database, it is possible to update it by modifying its attributes and calling the `#save` method (already mentioned previously):

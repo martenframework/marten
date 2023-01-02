@@ -321,6 +321,92 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::pluck" do
+    context "with double splat arguments" do
+      it "allows extracting a specific field value whose name is expressed as a symbol" do
+        TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.pluck(:username).should eq [["jd1"], ["jd2"], ["jd3"]]
+      end
+
+      it "allows extracting a specific field value whose name is expressed as a string" do
+        TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.pluck("username").should eq [["jd1"], ["jd2"], ["jd3"]]
+      end
+
+      it "allows extracting multiple specific fields values" do
+        TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.pluck(:first_name, :last_name).should eq [["John", "Doe"], ["John", "Doe"], ["Bob", "Doe"]]
+      end
+
+      it "allows extracting specific fields by following associations" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        Post.create!(author: user_1, title: "Post 1", published: true)
+        Post.create!(author: user_1, title: "Post 2", published: true)
+        Post.create!(author: user_2, title: "Post 3", published: true)
+        Post.create!(author: user_1, title: "Post 4", published: false)
+        Post.create!(author: user_3, title: "Post 5", published: false)
+
+        Post.pluck(:title, :author__first_name).to_set.should eq(
+          [["Post 1", "John"], ["Post 2", "John"], ["Post 3", "John"], ["Post 4", "John"], ["Post 5", "Bob"]].to_set
+        )
+      end
+    end
+
+    context "with array of field names" do
+      it "allows extracting a specific field value whose name is expressed as a symbol" do
+        TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.pluck([:username]).should eq [["jd1"], ["jd2"], ["jd3"]]
+      end
+
+      it "allows extracting a specific field value whose name is expressed as a string" do
+        TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.pluck(["username"]).should eq [["jd1"], ["jd2"], ["jd3"]]
+      end
+
+      it "allows extracting multiple specific fields values" do
+        TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        TestUser.pluck([:first_name, :last_name]).should eq [["John", "Doe"], ["John", "Doe"], ["Bob", "Doe"]]
+      end
+
+      it "allows extracting specific fields by following associations" do
+        user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+        Post.create!(author: user_1, title: "Post 1", published: true)
+        Post.create!(author: user_1, title: "Post 2", published: true)
+        Post.create!(author: user_2, title: "Post 3", published: true)
+        Post.create!(author: user_1, title: "Post 4", published: false)
+        Post.create!(author: user_3, title: "Post 5", published: false)
+
+        Post.pluck([:title, :author__first_name]).to_set.should eq(
+          [["Post 1", "John"], ["Post 2", "John"], ["Post 3", "John"], ["Post 4", "John"], ["Post 5", "Bob"]].to_set
+        )
+      end
+    end
+  end
+
   describe "::raw" do
     it "returns the expected records for non-parameterized queries" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

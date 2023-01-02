@@ -136,6 +136,11 @@ module Marten
             !@order_clauses.empty?
           end
 
+          def pluck(fields : Array(String)) : Array(Array(Field::Any))
+            plucked_columns = solve_plucked_columns(fields)
+            execute_pluck_query(*build_pluck_query(plucked_columns), plucked_columns)
+          end
+
           def raw_delete
             sql, parameters = build_delete_query
             connection.open do |db|
@@ -312,6 +317,25 @@ module Marten
             {sql, parameters}
           end
 
+          private def build_pluck_query(plucked_columns)
+            where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
+
+            sql = build_sql do |s|
+              s << "SELECT"
+              s << connection.distinct_clause_for(distinct_columns) if distinct
+              s << plucked_columns.map(&.last).join(", ")
+              s << "FROM #{table_name}"
+              s << @joins.join(" ") { |j| j.to_sql }
+              s << where
+              s << order_by
+              s << "LIMIT #{limit}" unless limit.nil?
+              s << "OFFSET #{@offset}" unless @offset.nil?
+            end
+
+            {sql, parameters}
+          end
+
           private def build_query
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
@@ -427,6 +451,22 @@ module Marten
             parent_join
           end
 
+          private def execute_pluck_query(query, parameters, plucked_columns)
+            results = [] of Array(Field::Any)
+
+            connection.open do |db|
+              db.query query, args: parameters do |result_set|
+                result_set.each do
+                  results << plucked_columns.each_with_object(Array(Field::Any).new) do |(field, _c), plucked_values|
+                    plucked_values << field.from_db_result_set(result_set)
+                  end
+                end
+              end
+            end
+
+            results
+          end
+
           private def execute_query(query, parameters)
             results = [] of Model
 
@@ -532,6 +572,24 @@ module Marten
             end
 
             predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
+          end
+
+          private def solve_plucked_columns(fields)
+            fields.each_with_object([] of Tuple(Field::Base, String)) do |raw_field, plucked_columns|
+              field_path = verify_field(raw_field)
+              relation_field_path = field_path.select { |field, _r| field.relation? }
+
+              if relation_field_path.empty? || field_path.size == 1
+                field = field_path.first[0]
+                column = "#{Model.db_table}.#{field.db_column!}"
+              else
+                join = ensure_join_for_field_path(relation_field_path)
+                field = field_path.last[0]
+                column = join.not_nil!.column_name(field.db_column!)
+              end
+
+              plucked_columns << {field, column}
+            end
           end
 
           private def table_name

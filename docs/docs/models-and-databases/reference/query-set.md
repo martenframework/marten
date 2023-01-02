@@ -432,6 +432,19 @@ paginator = query_set.paginator(10)
 paginator.page(1) # Returns the first page of records
 ```
 
+### `pluck`
+
+Returns specific column values without loading entire record objects.
+
+This method allows to easily select specific column values from the current query set. This allows retrieving specific column values without actually loading entire records. The method returns an array containing one array with the actual column values for each record targeted by the query set.
+
+For example:
+
+```crystal
+Post.all.pluck("title", "published")
+# => [["First article", true], ["Upcoming article", false]]
+```
+
 ### `size`
 
 Alias for [`#count`](#count): returns the number of records that are targetted by the query set.

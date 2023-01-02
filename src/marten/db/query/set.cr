@@ -545,6 +545,34 @@ module Marten
           Paginator(M).new(self, page_size.to_i32)
         end
 
+        # Returns specific column values without loading entire record objects.
+        #
+        # This method allows to easily select specific column values from the current query set. This allows retrieving
+        # specific column values without actually loading entire records. The method returns an array containing one
+        # array with the actual column values for each record targeted by the query set. For example:
+        #
+        # ```
+        # Post.all.pluck("title", "published")
+        # # => [["First article", true], ["Upcoming article", false]]
+        # ```
+        def pluck(*fields : String | Symbol) : Array(Array(Field::Any))
+          pluck(fields.to_a)
+        end
+
+        # Returns specific column values without loading entire record objects.
+        #
+        # This method allows to easily select specific column values from the current query set. This allows retrieving
+        # specific column values without actually loading entire records. The method returns an array containing one
+        # array with the actual column values for each record targeted by the query set. For example:
+        #
+        # ```
+        # Post.all.pluck(["title", "published"])
+        # # => [["First article", true], ["Upcoming article", false]]
+        # ```
+        def pluck(fields : Array(String | Symbol)) : Array(Array(Field::Any))
+          clone.query.pluck(fields.map(&.to_s))
+        end
+
         # Returns a raw query set for the passed SQL query and optional positional parameters.
         #
         # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records

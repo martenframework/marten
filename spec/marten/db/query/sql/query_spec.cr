@@ -707,6 +707,53 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#pluck" do
+    it "allows extracting a single field values" do
+      TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.pluck(["username"]).should eq [["jd1"], ["jd2"], ["jd3"]]
+    end
+
+    it "is consistent with the current filters" do
+      TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(first_name: "John"))
+      query.pluck(["username"]).should eq [["jd1"], ["jd2"]]
+    end
+
+    it "allows extracting multiple fields values" do
+      TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.pluck(["first_name", "last_name"]).should eq [["John", "Doe"], ["John", "Doe"], ["Bob", "Doe"]]
+    end
+
+    it "allows extracting field values by following joins" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1", published: true)
+      Post.create!(author: user_1, title: "Post 2", published: true)
+      Post.create!(author: user_2, title: "Post 3", published: true)
+      Post.create!(author: user_1, title: "Post 4", published: false)
+      Post.create!(author: user_3, title: "Post 5", published: false)
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.pluck(["title", "author__first_name"]).to_set.should eq(
+        [["Post 1", "John"], ["Post 2", "John"], ["Post 3", "John"], ["Post 4", "John"], ["Post 5", "Bob"]].to_set
+      )
+    end
+  end
+
   describe "#setup_distinct_clause" do
     it "allows to configure a global distinct clause for the query" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

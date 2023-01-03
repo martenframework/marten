@@ -86,7 +86,7 @@ module Marten
 
           # :nodoc:
           def contribute_to_project(project : ProjectState) : Nil
-            target_table = project.tables.values.find { |t| t.name == to_table }.not_nil!
+            target_table = project.tables.values.find! { |t| t.name == to_table }
             @target_column = target_table.get_column(to_column).clone
             @target_column.not_nil!.primary_key = false
 

@@ -25,7 +25,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo"))
 
       introspector = Marten::DB::Connection.default.introspector
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       for_mysql { db_column.type.should eq "int" }
       for_postgresql { db_column.type.should eq "integer" }
@@ -73,7 +73,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: true))
 
       introspector = Marten::DB::Connection.default.introspector
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_true
     end
@@ -94,7 +94,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: false))
 
       introspector = Marten::DB::Connection.default.introspector
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_false
     end
@@ -1680,7 +1680,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.change_column(project_state, table_state, old_column, new_column)
 
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_true
     end
@@ -1712,7 +1712,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.change_column(project_state, table_state, old_column, new_column)
 
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_true
     end
@@ -1740,7 +1740,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.change_column(project_state, table_state, old_column, new_column)
 
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_false
     end
@@ -1772,7 +1772,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
       schema_editor.change_column(project_state, table_state, old_column, new_column)
 
-      db_column = introspector.columns_details(table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_false
       db_column.default.should eq "42"

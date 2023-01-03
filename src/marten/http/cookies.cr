@@ -73,7 +73,7 @@ module Marten
         end
       end
 
-      def each
+      def each(&)
         cookies.each do |cookie|
           yield({cookie.name, cookie.value})
         end
@@ -99,7 +99,7 @@ module Marten
       end
 
       # Returns the value associated with the passed cookie name, or calls a block with the name when not found.
-      def fetch(name : String | Symbol)
+      def fetch(name : String | Symbol, &)
         self[name]? || yield name
       end
 

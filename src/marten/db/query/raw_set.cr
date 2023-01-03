@@ -79,7 +79,7 @@ module Marten
         #   # Do something
         # end
         # ```
-        def each
+        def each(&)
           fetch if @result_cache.nil?
           @result_cache.not_nil!.each do |r|
             yield r

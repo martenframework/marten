@@ -64,7 +64,7 @@ module Marten
           # ```
           # Post.exclude { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
           # ```
-          def exclude(&block)
+          def exclude(&)
             expr = Query::Expression::Filter.new
             query : Query::Node = with expr yield
             default_queryset.exclude(query)
@@ -94,7 +94,7 @@ module Marten
           # ```
           # Post.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
           # ```
-          def filter(&block)
+          def filter(&)
             expr = Query::Expression::Filter.new
             query : Query::Node = with expr yield
             default_queryset.filter(query)
@@ -146,7 +146,7 @@ module Marten
           #
           # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
           # exception if multiple records match the specified set of filters.
-          def get(&block)
+          def get(&)
             expr = Query::Expression::Filter.new
             query : Query::Node = with expr yield
             default_queryset.get(query)
@@ -186,7 +186,7 @@ module Marten
           #
           # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
           # exception if multiple records match the specified set of filters.
-          def get!(&block)
+          def get!(&)
             expr = Query::Expression::Filter.new
             query : Query::Node = with expr yield
             default_queryset.get!(query)

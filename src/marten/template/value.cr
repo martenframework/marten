@@ -58,7 +58,7 @@ module Marten
         end
       end
 
-      def each
+      def each(&)
         yield_each_from_raw { |r| yield Value.from(r) }
       end
 
@@ -91,7 +91,7 @@ module Marten
         raise Errors::UnknownVariable.new
       end
 
-      private def yield_each_from_raw
+      private def yield_each_from_raw(&)
         case object = raw
         when Enumerable(Value), Iterable(Value)
           object.each { |v| yield v.as(Value).raw }

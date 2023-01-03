@@ -29,7 +29,7 @@ module Marten
           #   post.complex_attribute = compute_complex_attribute
           # end
           # ```
-          def create(**kwargs, &block)
+          def create(**kwargs, &)
             object = new(**kwargs)
             yield object
             object.save
@@ -57,7 +57,7 @@ module Marten
           # Post.create!(title: "My blog post") do |post|
           #   post.complex_attribute = compute_complex_attribute
           # end
-          def create!(**kwargs, &block)
+          def create!(**kwargs, &)
             object = new(**kwargs)
             yield object
             object.save!

@@ -135,7 +135,7 @@ module Marten
           {% if on_kwarg.is_a?(NilLiteral) %}
             {% targetted_actions = [:create, :update, :delete] %}
           {% elsif on_kwarg.is_a?(ArrayLiteral) %}
-            {% targetted_actions = on_kwarg.map { |action| action.id.symbolize } %}
+            {% targetted_actions = on_kwarg.map(&.id.symbolize) %}
           {% else %}
             {% targetted_actions = [on_kwarg.id.symbolize] %}
           {% end %}
@@ -177,7 +177,7 @@ module Marten
           {% if on_kwarg.is_a?(NilLiteral) %}
             {% targetted_actions = [:create, :update, :delete] %}
           {% elsif on_kwarg.is_a?(ArrayLiteral) %}
-            {% targetted_actions = on_kwarg.map { |action| action.id.symbolize } %}
+            {% targetted_actions = on_kwarg.map(&.id.symbolize) %}
           {% else %}
             {% targetted_actions = [on_kwarg.id.symbolize] %}
           {% end %}

@@ -1,117 +1,17 @@
-Globs:
-  - spec/**/*.cr
-  - src/**/*.cr
-
-Layout/LineLength:
-  Enabled: true
-  MaxLength: 120
-
-Layout/TrailingBlankLines:
-  Enabled: true
-
-Layout/TrailingWhitespace:
-  Enabled: true
-
-Lint/ComparisonToBoolean:
-  Enabled: false
-
-Lint/DebuggerStatement:
-  Enabled: true
-
-Lint/EmptyEnsure:
-  Enabled: true
-
-Lint/EmptyExpression:
-  Enabled: true
-
-Lint/HashDuplicatedKey:
-  Enabled: true
-
-Lint/LiteralInCondition:
-  Enabled: true
-
-Lint/LiteralInInterpolation:
-  Enabled: true
-
-Lint/PercentArrays:
-  Enabled: true
-  StringArrayUnwantedSymbols: ',"'
-  SymbolArrayUnwantedSymbols: ',:'
-
-Lint/RandZero:
-  Enabled: true
-
-Lint/RedundantWithIndex:
-  Enabled: true
-
-Lint/RedundantWithObject:
-  Enabled: true
-
-Lint/ShadowedArgument:
-  Enabled: true
-
-Lint/ShadowedException:
-  Enabled: true
-
-Lint/ShadowingOuterLocalVar:
-  Enabled: true
-
-Lint/UnreachableCode:
-  Enabled: true
-
-Lint/UnusedArgument:
-  Enabled: true
-
-Lint/UselessConditionInWhen:
-  Enabled: true
-
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Performance/AnyAfterFilter:
-  Enabled: true
-
-Performance/AnyInsteadOfEmpty:
+Lint/NotNil:
   Enabled: false
-
-Performance/FirstLastAfterFilter:
-  Enabled: true
-
-Performance/SizeAfterFilter:
-  Enabled: true
-
-Style/ConstantNames:
-  Enabled: true
-
-Style/LargeNumbers:
-  Enabled: true
-
-Style/MethodNames:
-  Enabled: true
 
 Style/NegatedConditionsInUnless:
   Enabled: false
 
-Style/PredicateName:
-  Enabled: false
-
-Style/RedundantBegin:
+Performance/AnyInsteadOfEmpty:
   Enabled: true
+  Excluded:
+    - src/marten/db/management/migrations/reader.cr
 
-Style/RedundantReturn:
+Layout/LineLength:
   Enabled: true
-
-Style/VerboseBlock:
-  Enabled: false
-
-Style/TypeNames:
-  Enabled: true
-
-Style/UnlessElse:
-  Enabled: true
-
-Style/VariableNames:
-  Enabled: true
-
-Style/WhileTrue:
-  Enabled: true
+  MaxLength: 120

@@ -211,7 +211,7 @@ module Marten
         operations << operation
       end
 
-      private def with_faked_operations_registration
+      private def with_faked_operations_registration(&)
         previous_faked_operations_registration = faked_operations_registration?
         @faked_operations_registration = true
         yield

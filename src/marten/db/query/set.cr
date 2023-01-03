@@ -125,7 +125,7 @@ module Marten
         #   post.complex_attribute = compute_complex_attribute
         # end
         # ```
-        def create(**kwargs, &block)
+        def create(**kwargs, &)
           object = M.new(**kwargs)
           yield object
           object.save(using: @query.using)
@@ -160,7 +160,7 @@ module Marten
         #   post.complex_attribute = compute_complex_attribute
         # end
         # ```
-        def create!(**kwargs, &block)
+        def create!(**kwargs, &)
           object = M.new(**kwargs)
           yield object
           object.save!(using: @query.using)
@@ -239,7 +239,7 @@ module Marten
         #   # Do something
         # end
         # ```
-        def each
+        def each(&)
           fetch if @result_cache.nil?
           @result_cache.not_nil!.each do |r|
             yield r
@@ -272,7 +272,7 @@ module Marten
         # query_set = Post.all
         # query_set.exclude { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
         # ```
-        def exclude(&block)
+        def exclude(&)
           expr = Expression::Filter.new
           query : Node = with expr yield
           exclude(query)
@@ -314,7 +314,7 @@ module Marten
         # query_set = Post.all
         # query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
         # ```
-        def filter(&block)
+        def filter(&)
           expr = Expression::Filter.new
           query : Node = with expr yield
           filter(query)
@@ -369,7 +369,7 @@ module Marten
         #
         # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
         # exception if multiple records match the specified set of filters.
-        def get(&block)
+        def get(&)
           expr = Expression::Filter.new
           query : Node = with expr yield
           get(query)
@@ -418,7 +418,7 @@ module Marten
         #
         # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
         # exception if multiple records match the specified set of filters.
-        def get!(&block)
+        def get!(&)
           expr = Expression::Filter.new
           query : Node = with expr yield
           get!(query)
@@ -436,7 +436,7 @@ module Marten
         def inspect(io)
           results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
           io << "<#{self.class.name} ["
-          io << "#{results[...INSPECT_RESULTS_LIMIT].join(", ") { |r| r.inspect }}"
+          io << "#{results[...INSPECT_RESULTS_LIMIT].join(", ", &.inspect)}"
           io << ", ...(remaining truncated)..." if results.size > INSPECT_RESULTS_LIMIT
           io << "]>"
         end

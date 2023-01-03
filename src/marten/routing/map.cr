@@ -3,7 +3,7 @@ module Marten
     class Map
       getter rules
 
-      def self.draw
+      def self.draw(&)
         map = new
         with map yield map
         map
@@ -14,7 +14,7 @@ module Marten
         @reversers = {} of String => Reverser
       end
 
-      def draw
+      def draw(&)
         with self yield self
       end
 

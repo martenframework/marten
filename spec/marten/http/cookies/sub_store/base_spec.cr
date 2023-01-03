@@ -64,7 +64,7 @@ end
 
 module Marten::HTTP::Cookies::SubStore::BaseSpec
   class TestStore < Marten::HTTP::Cookies::SubStore::Base
-    def fetch(name : String | Symbol)
+    def fetch(name : String | Symbol, &)
       store[name]
     rescue KeyError
       yield name

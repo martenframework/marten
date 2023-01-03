@@ -13,7 +13,7 @@ module Marten
       module CanSplitSmartly
         # Split a string expression and returns an array of strings.
         def split_smartly(expression : String) : Array(String)
-          expression.scan(SPLIT_RE).compact_map { |m| m.captures.first }
+          expression.scan(SPLIT_RE).compact_map(&.captures.first)
         end
 
         private SPLIT_RE = /

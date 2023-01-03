@@ -30,7 +30,7 @@ module Marten
         end
 
         # Returns the last value for the specified parameter name or calls the block with the name when not found.
-        def fetch(name : String | Symbol)
+        def fetch(name : String | Symbol, &)
           self[name]? || yield name
         end
 

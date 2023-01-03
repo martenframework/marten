@@ -78,7 +78,7 @@ module Marten
         end
 
         # Allows to conveniently build a SQL statement by yielding an array of nillable strings.
-        def build_sql
+        def build_sql(&)
           yield (clauses = [] of String?)
           clauses.compact!.join " "
         end
@@ -87,21 +87,21 @@ module Marten
         #
         # This method has no effect if it is called outside of a transaction block.
         def observe_transaction_commit(block : -> Nil)
-          current_transaction.try { |t| t.observe_commit(block) }
+          current_transaction.try(&.observe_commit(block))
         end
 
         # Registers a proc to be called when the current transaction is rolled back.
         #
         # This method has no effect if it is called outside of a transaction block.
         def observe_transaction_rollback(block : -> Nil)
-          current_transaction.try { |t| t.observe_rollback(block) }
+          current_transaction.try(&.observe_rollback(block))
         end
 
         # Provides a database entrypoint to the block.
         #
         # If this method is called in an existing transaction, the connection associated with this transaction will be
         # used instead.
-        def open(&block)
+        def open(&)
           if (trx = current_transaction).nil?
             using_connection { |conn| yield conn }
           else
@@ -123,7 +123,7 @@ module Marten
         #
         # Atomicity will be ensured for the database operations performed inside the block. Note that any existing
         # transaction will be used in case of nested calls to this method.
-        def transaction
+        def transaction(&)
           current_transaction ? yield : new_transaction { yield }
         end
 
@@ -169,10 +169,10 @@ module Marten
         end
 
         private def mark_current_transaction_as_rolled_back
-          current_transaction.try { |t| t.rolled_back = true }
+          current_transaction.try(&.rolled_back=(true))
         end
 
-        private def new_transaction
+        private def new_transaction(&)
           using_connection do |conn|
             conn.transaction do |tx|
               transactions[Fiber.current.object_id] ||= Transaction.new(tx)
@@ -191,11 +191,11 @@ module Marten
         end
 
         private def release_current_transaction
-          current_transaction.try { |t| t.notify_observers }
+          current_transaction.try(&.notify_observers)
           transactions.delete(Fiber.current.object_id)
         end
 
-        private def using_connection
+        private def using_connection(&)
           db.retry do
             db.using_connection do |conn|
               yield conn

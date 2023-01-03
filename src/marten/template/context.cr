@@ -85,7 +85,7 @@ module Marten
       end
 
       # Stack another context hash and yields itself.
-      def stack
+      def stack(&)
         @values << Hash(String, Value).new
         yield self
       ensure

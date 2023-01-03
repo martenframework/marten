@@ -22,25 +22,25 @@ require "./test_project"
 # Empty media directory after specs execution.
 Spec.after_suite { Dir["spec/media/*"].each { |d| FileUtils.rm_rf(d) } }
 
-def for_mysql(&block)
+def for_mysql(&)
   for_db_backends(:mysql) do
     yield
   end
 end
 
-def for_postgresql(&block)
+def for_postgresql(&)
   for_db_backends(:postgresql) do
     yield
   end
 end
 
-def for_sqlite(&block)
+def for_sqlite(&)
   for_db_backends(:sqlite) do
     yield
   end
 end
 
-def for_db_backends(*backends : String | Symbol, &block)
+def for_db_backends(*backends : String | Symbol, &)
   current_db_backend = ENV["MARTEN_SPEC_DB_CONNECTION"]? || "sqlite"
   if backends.map(&.to_s).includes?(current_db_backend)
     yield

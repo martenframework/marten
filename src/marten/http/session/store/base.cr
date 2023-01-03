@@ -65,7 +65,7 @@ module Marten
           end
 
           # Returns the value associated with the passed `key`, or calls a block with the key when not found.
-          def fetch(key : String | Symbol)
+          def fetch(key : String | Symbol, &)
             self[key.to_s]? || yield key
           end
 

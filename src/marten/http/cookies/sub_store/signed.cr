@@ -7,7 +7,7 @@ module Marten
           @signer : Core::Signer? = nil
 
           # Returns the value matching the passed signed cookie name, or calls a block with the name when not found.
-          def fetch(name : String | Symbol)
+          def fetch(name : String | Symbol, &)
             signer.unsign(store[name])
           rescue KeyError
             yield name

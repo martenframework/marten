@@ -2,7 +2,7 @@ module Marten
   module CLI
     # Represents a simple spinner that can be used while a task is being performed in a terminal.
     class Spinner
-      def self.start(*args, **kwargs)
+      def self.start(*args, **kwargs, &)
         spinner = new(*args, **kwargs).start
         yield
       ensure

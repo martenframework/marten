@@ -34,7 +34,7 @@ module Marten
 
         private def middleware_chain
           @middleware_chain ||= begin
-            chain = Marten.settings.middleware.map { |middleware_klass| middleware_klass.new }
+            chain = Marten.settings.middleware.map(&.new)
 
             chain.each_cons_pair do |middleware, next_middleware|
               middleware.next = next_middleware

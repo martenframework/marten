@@ -43,7 +43,7 @@ module Marten
         end
 
         result = unless candidates.empty?
-          candidates.sort_by { |app_config_klass| app_config_klass._marten_app_location.size }.reverse!.first
+          candidates.sort_by(&._marten_app_location.size).reverse!.first
         end
 
         if result.nil? || !@app_configs_store.has_key?(result.not_nil!.label)

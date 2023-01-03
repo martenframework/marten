@@ -140,7 +140,7 @@ module Marten
       end
 
       private def persist_new_csrf_token
-        return unless !csrf_token.nil? && csrf_token_update_required
+        return unless csrf_token && csrf_token_update_required
         response!.cookies.set(
           name: Marten.settings.csrf.cookie_name,
           value: csrf_token,

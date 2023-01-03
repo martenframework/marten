@@ -4,9 +4,6 @@ Metrics/CyclomaticComplexity:
 Lint/NotNil:
   Enabled: false
 
-Style/NegatedConditionsInUnless:
-  Enabled: false
-
 Performance/AnyInsteadOfEmpty:
   Enabled: true
   Excluded:

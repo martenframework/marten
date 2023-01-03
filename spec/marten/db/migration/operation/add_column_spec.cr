@@ -144,7 +144,7 @@ describe Marten::DB::Migration::Operation::AddColumn do
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
       introspector = Marten::DB::Connection.default.introspector
-      db_column = introspector.columns_details(to_table_state.name).find { |c| c.name == "foo" }.not_nil!
+      db_column = introspector.columns_details(to_table_state.name).find! { |c| c.name == "foo" }
 
       for_mysql { db_column.type.should eq "int" }
       for_postgresql { db_column.type.should eq "integer" }

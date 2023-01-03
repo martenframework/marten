@@ -229,7 +229,7 @@ module Marten
             execute(delete_table_statement(name))
 
             # Removes all deferred statements that still reference the deleted table.
-            @deferred_statements.reject! { |s| s.references_table?(name) }
+            @deferred_statements.reject!(&.references_table?(name))
           end
 
           def flush_tables(table_names : Array(String)) : Nil

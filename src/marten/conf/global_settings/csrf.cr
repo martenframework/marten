@@ -80,7 +80,7 @@ module Marten
         end
 
         protected def exactly_defined_trusted_origins
-          @exactly_defined_trusted_origins ||= trusted_origins.reject { |origin| origin.includes?('*') }
+          @exactly_defined_trusted_origins ||= trusted_origins.reject(&.includes?('*'))
         end
 
         protected def trusted_origins_hosts

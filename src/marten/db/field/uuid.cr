@@ -59,7 +59,7 @@ module Marten
           return if value.nil?
           return if value.as?(::UUID)
 
-          if (v = value.as?(::String))
+          if v = value.as?(::String)
             begin
               return if ::UUID.new(v)
             rescue ArgumentError

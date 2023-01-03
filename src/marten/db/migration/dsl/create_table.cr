@@ -6,7 +6,7 @@ module Marten
           def initialize(@name : String | Symbol)
           end
 
-          def build : self
+          def build(&) : self
             with self yield
             self
           end

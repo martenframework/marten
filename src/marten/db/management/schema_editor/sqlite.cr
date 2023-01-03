@@ -240,7 +240,7 @@ module Marten
             ["1", "t", "true"].includes?(result.to_s)
           end
 
-          private def with_remade_table(table)
+          private def with_remade_table(table, &)
             # Set up a mapping that will hold the link between columns from the original table to the columns of the
             # new table.
             column_names_mapping = {} of String => String

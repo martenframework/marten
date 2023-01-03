@@ -110,8 +110,8 @@ module Marten
         allowed_chars = CSRF_TOKEN_ALLOWED_CHARS
         mask = gen_new_token_secret
 
-        secret_indexes = secret.chars.map { |c| allowed_chars.index(c.to_s).not_nil! }
-        mask_indexes = mask.chars.map { |c| allowed_chars.index(c.to_s).not_nil! }
+        secret_indexes = secret.chars.map { |c| allowed_chars.index!(c.to_s) }
+        mask_indexes = mask.chars.map { |c| allowed_chars.index!(c.to_s) }
 
         pairs = secret_indexes.zip(mask_indexes)
         cipher = pairs.map { |x, y| allowed_chars[(x + y) % allowed_chars.size] }.join
@@ -140,7 +140,7 @@ module Marten
       end
 
       private def persist_new_csrf_token
-        return unless !csrf_token.nil? && csrf_token_update_required
+        return unless csrf_token && csrf_token_update_required
         response!.cookies.set(
           name: Marten.settings.csrf.cookie_name,
           value: csrf_token,
@@ -252,8 +252,8 @@ module Marten
 
         allowed_chars = CSRF_TOKEN_ALLOWED_CHARS
 
-        token_indexes = token.chars.map { |c| allowed_chars.index(c.to_s).not_nil! }
-        mask_indexes = mask.chars.map { |c| allowed_chars.index(c.to_s).not_nil! }
+        token_indexes = token.chars.map { |c| allowed_chars.index!(c.to_s) }
+        mask_indexes = mask.chars.map { |c| allowed_chars.index!(c.to_s) }
 
         pairs = token_indexes.zip(mask_indexes)
         pairs.map { |x, y| allowed_chars[x - y] }.join

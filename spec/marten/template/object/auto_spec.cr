@@ -41,7 +41,7 @@ module Marten::Template::Object::AutoSpec
       "hello"
     end
 
-    def with_block
+    def with_block(&)
       yield
     end
 

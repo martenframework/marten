@@ -30,7 +30,7 @@ module Marten
         run_after_initialize_callbacks
       end
 
-      def initialize(**kwargs, &block)
+      def initialize(**kwargs, &)
         initialize_field_values(kwargs)
         yield self
         run_after_initialize_callbacks
@@ -41,7 +41,7 @@ module Marten
         run_after_initialize_callbacks
       end
 
-      def initialize(kwargs : Hash | NamedTuple, &block)
+      def initialize(kwargs : Hash | NamedTuple, &)
         initialize_field_values(kwargs)
         yield self
         run_after_initialize_callbacks

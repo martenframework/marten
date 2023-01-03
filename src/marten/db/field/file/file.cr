@@ -63,7 +63,7 @@ module Marten
           def open : IO
             with_ensured_file do
               if !committed?
-                case (f = file)
+                case f = file
                 when ::File
                   f
                 when HTTP::UploadedFile
@@ -120,9 +120,8 @@ module Marten
             record.not_nil!
           end
 
-          private def with_ensured_file
+          private def with_ensured_file(&)
             raise Errors::UnexpectedFieldValue.new("No file available") if name.nil?
-
             yield
           end
         end

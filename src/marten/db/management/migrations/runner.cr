@@ -14,7 +14,7 @@ module Marten
             execute(app_config: app_config, migration_name: migration_name, fake: fake) { }
           end
 
-          def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false, &block)
+          def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false, &)
             targets = find_targets(app_config, migration_name)
 
             # Generates migration plans that define the order in which migrations have to be applied. The plan only
@@ -38,7 +38,7 @@ module Marten
             !generate_plan(targets).empty?
           end
 
-          private def execute_backward(plan, full_plan, fake)
+          private def execute_backward(plan, full_plan, fake, &)
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
 
             # Generates a hash of pre-migration states: each state in this hash corresponds to the state that would be
@@ -68,7 +68,7 @@ module Marten
             end
           end
 
-          private def execute_forward(plan, full_plan, fake)
+          private def execute_forward(plan, full_plan, fake, &)
             migration_ids_to_apply = plan.map { |m, _d| m.id }
             state = generate_current_project_state(full_plan)
 
@@ -164,7 +164,7 @@ module Marten
             end
           end
 
-          def mark_elligible_replacements_as_applied
+          def mark_elligible_replacements_as_applied(&)
             applied_migration_ids = get_applied_migration_ids
 
             @reader.replacements.each do |replacement_migration_id, replacement_migration|

@@ -211,9 +211,11 @@ describe Marten::DB::Management::TableState do
       table_state.get_column("test_number").name.should eq "test_number"
     end
 
-    it "raises NilAssertionError if the column is not found" do
+    it "raises Enumerable::NotFoundError if the column is not found" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
-      expect_raises(NilAssertionError) { table_state.get_column("unknown") }
+      expect_raises(Enumerable::NotFoundError) do
+        table_state.get_column("unknown")
+      end
     end
   end
 
@@ -235,9 +237,11 @@ describe Marten::DB::Management::TableState do
       table_state.get_index("test_index").should eq index
     end
 
-    it "raises NilAssertionError if the index is not found" do
+    it "raises Enumerable::NotFoundError if the index is not found" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
-      expect_raises(NilAssertionError) { table_state.get_index("unknown") }
+      expect_raises(Enumerable::NotFoundError) do
+        table_state.get_index("unknown")
+      end
     end
   end
 
@@ -259,9 +263,11 @@ describe Marten::DB::Management::TableState do
       table_state.get_unique_constraint("test_constraint").should eq unique_constraint
     end
 
-    it "raises NilAssertionError if the unique constraint is not found" do
+    it "raises Enumerable::NotFoundError if the unique constraint is not found" do
       table_state = Marten::DB::Management::TableState.from_model(TestUser)
-      expect_raises(NilAssertionError) { table_state.get_unique_constraint("unknown") }
+      expect_raises(Enumerable::NotFoundError) do
+        table_state.get_unique_constraint("unknown")
+      end
     end
   end
 
@@ -289,7 +295,9 @@ describe Marten::DB::Management::TableState do
 
       table_state.remove_column(column)
 
-      expect_raises(NilAssertionError) { table_state.get_column("test_number") }
+      expect_raises(Enumerable::NotFoundError) do
+        table_state.get_column("test_number")
+      end
     end
 
     it "removes the passed column name from the table state" do
@@ -298,7 +306,9 @@ describe Marten::DB::Management::TableState do
 
       table_state.remove_column("test_number")
 
-      expect_raises(NilAssertionError) { table_state.get_column("test_number") }
+      expect_raises(Enumerable::NotFoundError) do
+        table_state.get_column("test_number")
+      end
     end
   end
 

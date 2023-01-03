@@ -259,7 +259,7 @@ module Marten
               end
 
               s << "FROM #{table_name}"
-              s << @joins.join(" ") { |j| j.to_sql }
+              s << @joins.join(" ", &.to_sql)
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -287,7 +287,7 @@ module Marten
                 s << "  SELECT * FROM ("
                 s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
                 s << "    FROM #{table_name}"
-                s << @joins.join(" ") { |j| j.to_sql }
+                s << @joins.join(" ", &.to_sql)
                 s << where
                 s << "  ) subquery"
                 s << ")"
@@ -307,7 +307,7 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT EXISTS("
               s << "SELECT 1 FROM #{table_name}"
-              s << @joins.join(" ") { |j| j.to_sql }
+              s << @joins.join(" ", &.to_sql)
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -326,7 +326,7 @@ module Marten
               s << connection.distinct_clause_for(distinct_columns) if distinct
               s << plucked_columns.map(&.last).join(", ")
               s << "FROM #{table_name}"
-              s << @joins.join(" ") { |j| j.to_sql }
+              s << @joins.join(" ", &.to_sql)
               s << where
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
@@ -345,7 +345,7 @@ module Marten
               s << connection.distinct_clause_for(distinct_columns) if distinct
               s << columns
               s << "FROM #{table_name}"
-              s << @joins.join(" ") { |j| j.to_sql }
+              s << @joins.join(" ", &.to_sql)
               s << where
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
@@ -377,7 +377,7 @@ module Marten
                       s << "  SELECT * FROM ("
                       s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
                       s << "    FROM #{table_name}"
-                      s << @joins.join(" ") { |j| j.to_sql }
+                      s << @joins.join(" ", &.to_sql)
                       s << where
                       s << "  ) subquery"
                       s << ")"
@@ -523,7 +523,7 @@ module Marten
           end
 
           private def raise_invalid_field_error_with_valid_choices(raw_field, model, field_type = "field")
-            valid_choices = model.fields.join(", ") { |f| f.id }
+            valid_choices = model.fields.join(", ", &.id)
             raise Errors::InvalidField.new(
               "Unable to resolve '#{raw_field}' as a #{field_type}. Valid choices are: #{valid_choices}."
             )

@@ -27,14 +27,14 @@ module Marten
             each_joined_relation { |ri, _c| ri.advance }
           end
 
-          def each_local_column
+          def each_local_column(&)
             @model.fields.count(&.db_column?).times do
               yield @result_set, @result_set.column_names[@cursor]
               @cursor += 1
             end
           end
 
-          def each_joined_relation
+          def each_joined_relation(&)
             @joins.select(&.selected?).each do |join|
               relation_iterator = self.class.new(
                 join.to_model,

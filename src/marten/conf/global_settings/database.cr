@@ -128,7 +128,7 @@ module Marten
         end
 
         # :nodoc:
-        def with_target_env(target_env : String?)
+        def with_target_env(target_env : String?, &)
           current_target_env = @target_env
           @target_env = target_env
           yield self

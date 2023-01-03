@@ -7,7 +7,7 @@ module Marten
           @encryptor : Core::Encryptor? = nil
 
           # Returns the value matching the passed encrypted cookie name, or calls a block with the name when not found.
-          def fetch(name : String | Symbol)
+          def fetch(name : String | Symbol, &)
             encryptor.decrypt(store[name])
           rescue KeyError
             yield name

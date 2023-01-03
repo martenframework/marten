@@ -193,7 +193,7 @@ describe Marten::Handlers::Base do
       handler_1 = Marten::Handlers::Base.new(request)
       response_1 = handler_1.dispatch
       response_1.status.should eq 200
-      response_1.headers["Allow"].should eq Marten::Handlers::Base.http_method_names.join(", ") { |m| m.upcase }
+      response_1.headers["Allow"].should eq Marten::Handlers::Base.http_method_names.join(", ", &.upcase)
       response_1.headers["Content-Length"].should eq "0"
 
       handler_2 = Marten::Handlers::BaseSpec::Test1Handler.new(request)

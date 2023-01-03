@@ -343,7 +343,7 @@ module Marten::DB::Migration::DSLSpec
       operations << operation
     end
 
-    private def with_faked_operations_registration
+    private def with_faked_operations_registration(&)
       @faked_operations_registered = true
       yield
     end

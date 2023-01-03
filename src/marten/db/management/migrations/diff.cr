@@ -239,8 +239,8 @@ module Marten
               # Foreign key columns depend on the targeted table being created first.
               if column.is_a?(Column::Reference)
                 related_table = @to_state.tables.values
-                  .find { |t| t.name == column.as(Column::Reference).to_table }
-                  .not_nil!
+                  .find! { |t| t.name == column.as(Column::Reference).to_table }
+
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
 
@@ -290,8 +290,8 @@ module Marten
                 # Extract dependencies for all the foreign key columns associated with the considered table.
                 created_table.columns.select(Column::Reference).each do |fk_column|
                   related_table = @to_state.tables.values
-                    .find { |t| t.name == fk_column.as(Column::Reference).to_table }
-                    .not_nil!
+                    .find! { |t| t.name == fk_column.as(Column::Reference).to_table }
+
                   dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
                 end
 
@@ -328,8 +328,8 @@ module Marten
               # Foreign key columns depend on the targeted table being created first.
               if to_column.is_a?(Column::Reference)
                 related_table = @to_state.tables.values
-                  .find { |t| t.name == to_column.as(Column::Reference).to_table }
-                  .not_nil!
+                  .find! { |t| t.name == to_column.as(Column::Reference).to_table }
+
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end
 
@@ -350,8 +350,8 @@ module Marten
               # Extract dependencies for all the foreign key columns associated with the considered table.
               created_table.columns.select(Column::Reference).each do |fk_column|
                 related_table = @to_state.tables.values
-                  .find { |t| t.name == fk_column.as(Column::Reference).to_table }
-                  .not_nil!
+                  .find! { |t| t.name == fk_column.as(Column::Reference).to_table }
+
                 next if related_table == created_table
                 dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
               end

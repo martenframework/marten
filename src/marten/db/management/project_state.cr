@@ -23,7 +23,7 @@ module Marten
         def initialize(tables = [] of TableState)
           @tables = {} of String => TableState
           tables.each { |t| @tables[t.as(TableState).id] = t }
-          @tables.values.each { |t| t.contribute_to_project(self) }
+          @tables.values.each(&.contribute_to_project(self))
         end
 
         # Returns a clone of the current project state.

@@ -53,15 +53,15 @@ module Marten
         end
 
         def get_column(name : String) : Column::Base
-          @columns.find { |c| c.name == name }.not_nil!
+          @columns.find! { |c| c.name == name }
         end
 
         def get_index(name : String) : Management::Index
-          indexes.find { |i| i.name == name }.not_nil!
+          indexes.find! { |i| i.name == name }
         end
 
         def get_unique_constraint(name : String) : Management::Constraint::Unique
-          unique_constraints.find { |c| c.name == name }.not_nil!
+          unique_constraints.find! { |c| c.name == name }
         end
 
         def id : String
@@ -94,7 +94,7 @@ module Marten
 
         # :nodoc:
         def contribute_to_project(project : ProjectState) : Nil
-          columns.each { |c| c.contribute_to_project(project) }
+          columns.each(&.contribute_to_project(project))
         end
       end
     end

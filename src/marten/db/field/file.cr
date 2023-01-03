@@ -65,7 +65,7 @@ module Marten
           file = record.get_field_value(id).as?(Marten::DB::Field::File::File)
 
           if !file.nil? && !file.committed?
-            case (f = file.file)
+            case f = file.file
             when ::File
               file.save(file.name.not_nil!, f)
             when HTTP::UploadedFile

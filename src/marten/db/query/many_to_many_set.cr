@@ -31,7 +31,6 @@ module Marten
         def add(*objs : M)
           query.connection.transaction do
             # Identify which objects are already added to the many to many relationship and skip them.
-            # TODO: leverage the ability to only retrieve specific column values from the DB.
             existing_obj_ids = m2m_field.as(Field::ManyToMany).through._base_queryset.filter(
               Query::Node.new(
                 {
@@ -39,7 +38,7 @@ module Marten
                   "#{m2m_through_to_field.id}__in" => objs.map(&.pk!.as(Field::Any)).to_a,
                 }
               )
-            ).map { |o| o.get_field_value(m2m_through_to_field.id).as(Field::Any) }
+            ).pluck([m2m_through_to_field.id]).flatten
 
             # Add each object that was not already in the relationship.
             # TODO: bulk insert those objects instead of insert them one by one.

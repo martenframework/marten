@@ -545,6 +545,72 @@ module Marten
           Paginator(M).new(self, page_size.to_i32)
         end
 
+        # Returns specific column values for a single record without actually loading it.
+        #
+        # This method allows to easily select specific column values for a single record from the current query set.
+        # This allows retrieving specific column values without actually loading the entire record, and as such this is
+        # most useful for query sets that have been narrowed down to match a single record. The method returns an array
+        # containing the requested column values, or `nil` if no record was matched by the current query set. For
+        # example:
+        #
+        # ```
+        # Post.filter(pk: 1).pick("title", "published")
+        # # => ["First article", true]
+        # ```
+        def pick(*fields : String | Symbol) : Array(Field::Any)?
+          pick(fields.to_a)
+        end
+
+        # Returns specific column values for a single record without actually loading it.
+        #
+        # This method allows to easily select specific column values for a single record from the current query set.
+        # This allows retrieving specific column values without actually loading the entire record, and as such this is
+        # most useful for query sets that have been narrowed down to match a single record. The method returns an array
+        # containing the requested column values, or `nil` if no record was matched by the current query set. For
+        # example:
+        #
+        # ```
+        # Post.filter(pk: 1).pick(["title", "published"])
+        # # => ["First article", true]
+        # ```
+        def pick(fields : Array(String | Symbol)) : Array(Field::Any)?
+          qs = clone
+          qs.query.slice(0, 1)
+          qs.pluck(fields.map(&.to_s)).first?
+        end
+
+        # Returns specific column values for a single record without actually loading it.
+        #
+        # This method allows to easily select specific column values for a single record from the current query set.
+        # This allows retrieving specific column values without actually loading the entire record, and as such this is
+        # most useful for query sets that have been narrowed down to match a single record. The method returns an array
+        # containing the requested column values, or raises `NilAssertionError` if no record was matched by the current
+        # query set. For example:
+        #
+        # ```
+        # Post.filter(pk: 1).pick!("title", "published")
+        # # => ["First article", true]
+        # ```
+        def pick!(*fields : String | Symbol) : Array(Field::Any)
+          pick!(fields.to_a)
+        end
+
+        # Returns specific column values for a single record without actually loading it.
+        #
+        # This method allows to easily select specific column values for a single record from the current query set.
+        # This allows retrieving specific column values without actually loading the entire record, and as such this is
+        # most useful for query sets that have been narrowed down to match a single record. The method returns an array
+        # containing the requested column values, or raises `NilAssertionError` if no record was matched by the current
+        # query set. For example:
+        #
+        # ```
+        # Post.filter(pk: 1).pick!(["title", "published"])
+        # # => ["First article", true]
+        # ```
+        def pick!(fields : Array(String | Symbol)) : Array(Field::Any)
+          pick(fields).not_nil!
+        end
+
         # Returns specific column values without loading entire record objects.
         #
         # This method allows to easily select specific column values from the current query set. This allows retrieving

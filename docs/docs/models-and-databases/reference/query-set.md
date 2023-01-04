@@ -432,6 +432,32 @@ paginator = query_set.paginator(10)
 paginator.page(1) # Returns the first page of records
 ```
 
+### `pick`
+
+Returns specific column values for a single record without actually loading it.
+
+This method allows to easily select specific column values for a single record from the current query set. This allows retrieving specific column values without actually loading the entire record, and as such this is most useful for query sets that have been narrowed down to match a single record. The method returns an array containing the requested column values, or `nil` if no record was matched by the current query set.
+
+For example:
+
+```crystal
+Post.filter(pk: 1).pick("title", "published")
+# => ["First article", true]
+```
+
+### `pick!`
+
+Returns specific column values for a single record without actually loading it.
+
+This method allows to easily select specific column values for a single record from the current query set. This allows retrieving specific column values without actually loading the entire record, and as such this is most useful for query sets that have been narrowed down to match a single record. The method returns an array containing the requested column values, or raises `NilAssertionError` if no record was matched by the current query set.
+
+For example:
+
+```crystal
+Post.filter(pk: 1).pick!("title", "published")
+# => ["First article", true]
+```
+
 ### `pluck`
 
 Returns specific column values without loading entire record objects.

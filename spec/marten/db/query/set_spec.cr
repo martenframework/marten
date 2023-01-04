@@ -1395,6 +1395,138 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#pick" do
+    context "with double splat arguments" do
+      it "allows extracting a specific field value whose name is expressed as a symbol" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick(:username).should eq ["jd1"]
+      end
+
+      it "allows extracting a specific field value whose name is expressed as a string" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick("username").should eq ["jd1"]
+      end
+
+      it "allows extracting multiple specific fields values" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick(:first_name, :last_name).should eq ["John", "Doe"]
+      end
+
+      it "allows extracting specific fields by following associations" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        post = Post.create!(author: test_user, title: "Post 1", published: true)
+
+        Post.filter(pk: post.pk).pick(:title, :author__first_name).should eq ["Post 1", "John"]
+      end
+
+      it "returns nil if the queryset does not match any record" do
+        TestUser.filter(pk: -1).pick(:username).should be_nil
+      end
+    end
+
+    context "with array of field names" do
+      it "allows extracting a specific field value whose name is expressed as a symbol" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick([:username]).should eq ["jd1"]
+      end
+
+      it "allows extracting a specific field value whose name is expressed as a string" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick(["username"]).should eq ["jd1"]
+      end
+
+      it "allows extracting multiple specific fields values" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick([:first_name, :last_name]).should eq ["John", "Doe"]
+      end
+
+      it "allows extracting specific fields by following associations" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        post = Post.create!(author: test_user, title: "Post 1", published: true)
+
+        Post.filter(pk: post.pk).pick([:title, :author__first_name]).should eq ["Post 1", "John"]
+      end
+
+      it "returns nil if the queryset does not match any record" do
+        TestUser.filter(pk: -1).pick([:username]).should be_nil
+      end
+    end
+  end
+
+  describe "#pick!" do
+    context "with double splat arguments" do
+      it "allows extracting a specific field value whose name is expressed as a symbol" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick!(:username).should eq ["jd1"]
+      end
+
+      it "allows extracting a specific field value whose name is expressed as a string" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick!("username").should eq ["jd1"]
+      end
+
+      it "allows extracting multiple specific fields values" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick!(:first_name, :last_name).should eq ["John", "Doe"]
+      end
+
+      it "allows extracting specific fields by following associations" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        post = Post.create!(author: test_user, title: "Post 1", published: true)
+
+        Post.filter(pk: post.pk).pick!(:title, :author__first_name).should eq ["Post 1", "John"]
+      end
+
+      it "raises NilAssertionError if the queryset does not match any record" do
+        expect_raises(NilAssertionError) do
+          TestUser.filter(pk: -1).pick!(:username)
+        end
+      end
+    end
+
+    context "with array of field names" do
+      it "allows extracting a specific field value whose name is expressed as a symbol" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick!([:username]).should eq ["jd1"]
+      end
+
+      it "allows extracting a specific field value whose name is expressed as a string" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick!(["username"]).should eq ["jd1"]
+      end
+
+      it "allows extracting multiple specific fields values" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+        TestUser.filter(pk: test_user.pk).pick!([:first_name, :last_name]).should eq ["John", "Doe"]
+      end
+
+      it "allows extracting specific fields by following associations" do
+        test_user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        post = Post.create!(author: test_user, title: "Post 1", published: true)
+
+        Post.filter(pk: post.pk).pick!([:title, :author__first_name]).should eq ["Post 1", "John"]
+      end
+
+      it "raises NilAssertionError if the queryset does not match any record" do
+        expect_raises(NilAssertionError) do
+          TestUser.filter(pk: -1).pick!([:username])
+        end
+      end
+    end
+  end
+
   describe "#pluck" do
     context "with double splat arguments" do
       it "allows extracting a specific field value whose name is expressed as a symbol" do

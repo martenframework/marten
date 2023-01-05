@@ -41,6 +41,18 @@ For example:
 
 If `value` is "Hello", then the output will be "hello".
 
+## `linebreaks`
+
+The `linebreaks` filter allows to convert a string so that each of its characters is lowercase.
+
+For example:
+
+```html
+{{ value|linebreaks }}
+```
+
+If `value` is "Hello\nWorld", then the output will be "Hello<br />World".
+
 ## `safe`
 
 The `safe` filter allows to mark that a string is safe and that it should not be escaped before being inserted in the final output of a rendered template. Indeed, string values are always automatically HTML-escaped by default in templates.

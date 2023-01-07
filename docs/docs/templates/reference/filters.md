@@ -23,18 +23,7 @@ The `default` filter allows to fallback to a specific value if the left side of 
 
 For example:
 
-```html## `linebreaks`
-
-The `linebreaks` filter allows to convert a string so that each of its characters is lowercase.
-
-For example:
-
 ```html
-{{ value|linebreaks }}
-```
-
-If `value` is "Hello\nWorld", then the output will be "Hello<br />World".
-
 {{ value|default:"foobar" }}
 ```
 
@@ -54,7 +43,7 @@ If `value` is "Hello", then the output will be "hello".
 
 ## `linebreaks`
 
-The `linebreaks` filter allows to convert a string so that each of its characters is lowercase.
+The `linebreaks` filter allows to convert a string replacing all newlines with HTML line breaks (`<br />`).
 
 For example:
 
@@ -62,7 +51,7 @@ For example:
 {{ value|linebreaks }}
 ```
 
-If `value` is "Hello\nWorld", then the output will be `Hello<br />World`.
+If `value` is "Hello\nWorld", then the output will be "Hello`<br />`World".
 
 ## `safe`
 

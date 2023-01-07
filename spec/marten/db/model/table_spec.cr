@@ -4,6 +4,12 @@ require "./table_spec/app"
 describe Marten::DB::Model::Table do
   with_installed_apps Marten::DB::Model::TableSpec::App
 
+  describe "::finished" do
+    it "allows abstract models without pk field" do
+      Marten::DB::Model::TableSpec::AbstractModelWithoutPrimaryKey.fields.find(&.primary_key?).should be_nil
+    end
+  end
+
   describe "::inherited" do
     it "ensures that the model inherits its parent fields" do
       Marten::DB::Model::TableSpec::Article.fields.size.should eq 9

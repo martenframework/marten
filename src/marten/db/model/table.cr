@@ -465,7 +465,7 @@ module Marten
             {% if config[:kwargs] && config[:kwargs][:primary_key] %}{% pkeys << id %}{% end %}
           {% end %}
 
-          {% if pkeys.size == 0 %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}
+          {% if pkeys.size == 0 && !@type.abstract? %}{{ raise "No primary key found for model '#{@type}'" }}{% end %}
           {% if pkeys.size > 1 %}
             {{ raise "Many primary keys found for model '#{@type}' ; only one is allowed" }}
           {% end %}

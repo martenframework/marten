@@ -6,9 +6,10 @@ module Marten
       include Enumerable(self)
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) |
-                  Marten::DB::Model | Marten::DB::Query::Page::Any | Marten::DB::Query::Set::Any |
-                  Marten::Schema | Marten::Schema::BoundField | Marten::Schema::Field::Base | Marten::Template::Object |
-                  Nil | SafeString | String | Time | Handlers::Base
+                  Marten::DB::Field::Any | Marten::DB::Model | Marten::DB::Query::Page::Any |
+                  Marten::DB::Query::Set::Any | Marten::Schema | Marten::Schema::BoundField |
+                  Marten::Schema::Field::Base | Marten::Template::Object | Nil | SafeString | String | Time |
+                  Handlers::Base
 
       # Returns the raw value associated with the template value.
       getter raw

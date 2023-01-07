@@ -9,7 +9,14 @@ module Marten
         end
 
         def dumps(value) : Nil | ::String
-          value.as?(::UUID) ? value.to_s : nil
+          case value
+          when ::UUID
+            value.to_s
+          when ::String
+            ::UUID.parse?(value).try(&.to_s)
+          else
+            nil
+          end
         end
       end
     end

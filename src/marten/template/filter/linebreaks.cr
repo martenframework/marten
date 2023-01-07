@@ -3,8 +3,7 @@ module Marten
     module Filter
       # The `linebreaks` filter.
       #
-      # The `linebreaks` filter allows to modify a string so that the first letter is converted to uppercase and all the
-      # subsequent letters are converted to lowercase.
+      # The `linebreaks` filter allows to convert a string replacing all newlines with HTML line breaks (<br />).
       class LineBreaks < Base
         def apply(value : Value, arg : Value? = nil) : Value
           Value.from(value.to_s.gsub("\n", "<br />"))

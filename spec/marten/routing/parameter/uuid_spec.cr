@@ -41,5 +41,21 @@ describe Marten::Routing::Parameter::UUID do
       parameter = Marten::Routing::Parameter::UUID.new
       parameter.dumps(uuid).should eq "a288e10f-fffe-46d1-b71a-436e9190cdc3"
     end
+
+    it "dumps a UUID string" do
+      uuid = ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3")
+      parameter = Marten::Routing::Parameter::UUID.new
+      parameter.dumps(uuid.to_s).should eq "a288e10f-fffe-46d1-b71a-436e9190cdc3"
+    end
+
+    it "returns nil if the passed string does not correspond to a valid UUID" do
+      parameter = Marten::Routing::Parameter::UUID.new
+      parameter.dumps("bad").should be_nil
+    end
+
+    it "returns nil for other values" do
+      parameter = Marten::Routing::Parameter::UUID.new
+      parameter.dumps(42).should be_nil
+    end
   end
 end

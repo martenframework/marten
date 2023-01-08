@@ -51,7 +51,7 @@ For example:
 {{ value|linebreaks }}
 ```
 
-If `value` is `Hello\nWorld`, then the output will be `Hello`<br />`World`.
+If `value` is `Hello\nWorld`, then the output will be `Hello<br />World`.
 
 ## `safe`
 

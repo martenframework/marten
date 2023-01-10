@@ -26,6 +26,7 @@ jobs:
       matrix:
         crystal: [
           '1.6.2',
+          '1.7.0',
           'nightly',
         ]
     container:
@@ -68,6 +69,7 @@ jobs:
         db_version: ['11', '12', '13', '14', '15', 'latest']
         crystal: [
           '1.6.2',
+          '1.7.0',
           'nightly',
         ]
     container:
@@ -99,6 +101,7 @@ jobs:
       matrix:
         crystal: [
           '1.6.2',
+          '1.7.0',
           'nightly',
         ]
     container:

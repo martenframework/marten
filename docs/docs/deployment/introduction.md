@@ -18,6 +18,10 @@ Each deployment pipeline is unique and will vary from one project to another. Th
 
 Where, when, and how these steps are performed will vary from one project to another. Each of these steps is highlighted below along with some recommendations.
 
+It should also be noted that a few guides highlighting common deployment strategies can be leveraged if necessary:
+
+* [Deploying to an Ubuntu server](./how-to/deploy-to-an-ubuntu-server)
+
 ### Installing dependencies
 
 One of the first things you need to do when deploying a Marten project is to ensure that the dependencies of the projects are available. In this light, you can leverage the `shards install` command to install your project's Crystal dependencies (assuming that Crystal is installed on your destination machine). Obviously, your project may require the installation of other types of dependencies (such as Node.js dependencies for example), which you have to take care of as well.

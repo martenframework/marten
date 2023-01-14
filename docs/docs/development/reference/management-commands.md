@@ -150,6 +150,18 @@ Displays all the routes of the application.
 
 Starts a development server that is automatically recompiled when source files change.
 
+### Options
+
+* `-b HOST, --bind=HOST` - Allows specifying a custom host to bind
+* `-p PORT, --port=PORT` - Allows specifying a custom port to listen for connections
+
+### Examples
+
+```bash
+marten serve         # Starts a development server using the configured host and port
+marten serve -p 3000 # Starts a development server by overriding the port
+```
+
 ## `version`
 
 **Usage:** `marten version [options]`

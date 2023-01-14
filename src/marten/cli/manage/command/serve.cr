@@ -3,7 +3,30 @@ module Marten
     class Manage
       module Command
         class Serve < Base
+          @host : String?
+          @port : Int32?
+
           help "Start a development server that is automatically recompiled when source files change."
+
+          def setup
+            on_option_with_arg(
+              :b,
+              :bind,
+              arg: "host",
+              description: "Custom host to bind"
+            ) do |v|
+              @host = v
+            end
+
+            on_option_with_arg(
+              :p,
+              :port,
+              arg: "port",
+              description: "Custom port to listen for connections"
+            ) do |v|
+              @port = v.to_i
+            end
+          end
 
           def run
             loop do
@@ -22,6 +45,8 @@ module Marten
 
           private SERVER_BUILD_PATH = "tmp/manage"
 
+          private getter host
+          private getter port
           private getter server_build_success : Bool = false
           private getter server_process : Process? = nil
 
@@ -79,7 +104,18 @@ module Marten
           end
 
           private def start_server_process
-            self.server_process = Process.new(SERVER_BUILD_PATH, shell: false, output: stdout, error: stderr)
+            args = [
+              host ? "-b #{host}" : nil,
+              port ? "-p #{port}" : nil,
+            ].compact
+
+            self.server_process = Process.new(
+              SERVER_BUILD_PATH,
+              args: args,
+              shell: false,
+              output: stdout,
+              error: stderr
+            )
           end
 
           private def stop_server_process

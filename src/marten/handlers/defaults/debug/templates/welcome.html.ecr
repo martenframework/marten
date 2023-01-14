@@ -19,14 +19,15 @@
 
       .hero > .image-wrapper {
         padding: 1rem;
-        background-color: #eb6864;
+        background: linear-gradient(180deg, #904e95 0, #eb6864);
+        border-top: 4px solid #eb6864;
         text-align: center;
       }
 
       .hero > h1 {
         margin: 4rem 0;
         text-align: center;
-        color: #363636;
+        color: #525252;
       }
 
       .explanation {
@@ -36,25 +37,92 @@
         color: #4a4a4a;;
       }
 
-      .versions {
+      footer {
         margin: 0 auto;
-        margin-top: 2rem;
+        margin-top: 4rem;
+        padding: 2rem 0;
+        width: 75%;
+        border-top: 1px solid #efefef;
+      }
+
+      footer > .useful-links {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      footer > .useful-links > a {
+        margin: 0 1rem;
+        gap: 10px;
+        display: grid;
+        box-sizing: border-box;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      footer > .useful-links > a > .icon {
+        margin: 0 auto;
+        padding: 0.75rem;
+        border: 1px solid #d6d6d6;
+        border-radius: 100%;
+        display: block;
+      }
+
+      footer > .useful-links > a > .icon > svg {
+        display: block;
+        width: 1.5rem;
+        height: 1.5rem;
+        color: #525252;
+      }
+
+      footer > .useful-links > a > .content {
+        font-weight: 300;
+        line-height: 1.25;
+        color: #4a4a4a;
+        display: block;
+      }
+
+      footer > .useful-links > a > .content > .title {
+        display: block;
+        font-size: 1.25rem;
+        font-weight: 400;
+        line-height: 2rem;
+        color: #eb6864;
+      }
+
+      footer > .useful-links > a > .content > .subtitle {
+        display: block;
+      }
+
+      footer > .versions {
+        margin: 0 auto;
+        margin-top: 4rem;
         width: 50%;
         text-align: center;
         font-size: 12px;
       }
 
-      .versions > .version {
+      footer > .versions > .version {
         display: inline-block;
         white-space: nowrap;
       }
 
-      .versions strong {
+      footer > .versions strong {
         color: #eb6864;
       }
 
-      @media (max-width: 768px) {
+      @media (max-width: 1250px) {
+        footer {
+          width: 95%;
+        }
 
+        footer > .useful-links > a {
+          margin: 0 0.5rem;
+          gap: 10px;
+          display: grid;
+          box-sizing: border-box;
+          text-align: center;
+          text-decoration: none;
+        }
       }
 
       @media (max-width: 480px) {
@@ -65,13 +133,30 @@
         .hero > .image-wrapper > svg {
           width: 50%;
         }
+
+        footer > .useful-links {
+          display: grid;
+          grid-template-columns: 1fr;
+        }
+
+        footer > .useful-links > a {
+          margin-bottom: 2rem;
+        }
+
+        footer > .versions > p > .version {
+          display: block;
+        }
+
+        footer > .versions > p > .bull {
+          display: none;
+        }
       }
     </style>
   </head>
   <body>
     <header class="hero">
       <div class="image-wrapper">
-        <svg width="20%" version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 966.000000" preserveAspectRatio="xMidYMid meet">
+        <svg width="15%" version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900.000000 966.000000" preserveAspectRatio="xMidYMid meet">
           <defs>
             <style>.cls-1{fill:#fff;}.cls-2{fill:#333;}</style>
           </defs>
@@ -83,11 +168,44 @@
           </g>
         </svg>
       </div>
-      <h1>Welcome to Marten Framework!</h1>
+      <h1>Welcome to Marten!</h1>
     </header>
-    <p class="explanation">You are seeing this page because Marten is running in debug mode and you have not configured any routes.</p>
-    <div class="versions">
-      <p><span class="version">[<strong>Marten version:</strong> <%= Marten::VERSION %>]</span> <span class="version">[<strong>Crystal version:</strong> <%= Crystal::VERSION %>]</span></p>
-    </div>
+    <main>
+      <p class="explanation">You are seeing this page because Marten is running in debug mode and you have not configured any routes for the root of your application.</p>
+    </main>
+    <footer>
+      <div class="useful-links">
+        <a href="https://martenframework.com/docs" target="_blank">
+          <span class="icon">
+            <!-- Ionicons v5.5.2 | MIT License | github.com/ionic-team/ionicons --><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 160c16-63.16 76.43-95.41 208-96a15.94 15.94 0 0116 16v288a16 16 0 01-16 16c-128 0-177.45 25.81-208 64-30.37-38-80-64-208-64-9.88 0-16-8.05-16-17.93V80a15.94 15.94 0 0116-16c131.57.59 192 32.84 208 96zM256 160v288" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>
+          </span>
+          <span class="content">
+            <span class="title">Marten documentation</span>
+            <span class="subtitle">Guides, how-to's, and references</span>
+          </span>
+        </a>
+        <a href="https://martenframework.com/docs/getting-started/tutorial" target="_blank">
+          <span class="icon">
+            <!-- Ionicons v5.5.2 | MIT License | github.com/ionic-team/ionicons --><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M160 368L32 256l128-112M352 368l128-112-128-112"/></svg>
+          </span>
+          <span class="content">
+            <span class="title">Tutorial - Build a web blog</span>
+            <span class="subtitle">Get started with Marten</span>
+          </span>
+        </a>
+        <a href="https://martenframework.com/chat" target="_blank">
+          <span class="icon">
+            <!-- Ionicons v5.5.2 | MIT License | github.com/ionic-team/ionicons --><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M431 320.6c-1-3.6 1.2-8.6 3.3-12.2a33.68 33.68 0 012.1-3.1A162 162 0 00464 215c.3-92.2-77.5-167-173.7-167-83.9 0-153.9 57.1-170.3 132.9a160.7 160.7 0 00-3.7 34.2c0 92.3 74.8 169.1 171 169.1 15.3 0 35.9-4.6 47.2-7.7s22.5-7.2 25.4-8.3a26.44 26.44 0 019.3-1.7 26 26 0 0110.1 2l56.7 20.1a13.52 13.52 0 003.9 1 8 8 0 008-8 12.85 12.85 0 00-.5-2.7z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/><path d="M66.46 232a146.23 146.23 0 006.39 152.67c2.31 3.49 3.61 6.19 3.21 8s-11.93 61.87-11.93 61.87a8 8 0 002.71 7.68A8.17 8.17 0 0072 464a7.26 7.26 0 002.91-.6l56.21-22a15.7 15.7 0 0112 .2c18.94 7.38 39.88 12 60.83 12A159.21 159.21 0 00284 432.11" fill="none" stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32"/></svg>
+          </span>
+          <span class="content">
+            <span class="title">Chat with the community</span>
+            <span class="subtitle">Connect or ask for help in our chatroom</span>
+          </span>
+        </a>
+      </div>
+      <div class="versions">
+        <p><span class="version"><strong>Marten version:</strong> <%= Marten::VERSION %></span><span class="bull">&nbsp;&bull;&nbsp;</span><span class="version"><strong>Crystal version:</strong> <%= Crystal::VERSION %></span></p>
+      </div>
+    </footer>
   </body>
 </html>

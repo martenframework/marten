@@ -44,6 +44,19 @@ describe Marten::Schema::Field::Email do
 
       schema.errors.size.should eq 0
     end
+
+    it "does not add an invalid email error if the field value is empty" do
+      schema = Marten::Schema::Field::EmailSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"test_field" => [""]}
+      )
+
+      field = Marten::Schema::Field::Email.new("test_field")
+      field.perform_validation(schema)
+
+      schema.errors.size.should eq 1
+      schema.errors.first.field.should eq "test_field"
+      schema.errors.first.type.should eq "required"
+    end
   end
 end
 

@@ -53,5 +53,14 @@ describe Marten::DB::Field::Email do
 
       obj.errors.size.should eq 0
     end
+
+    it "does not add an invalid email error if the field value is empty" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::Email.new("email", null: false, blank: false)
+      field.validate(obj, "")
+
+      obj.errors.size.should eq 0
+    end
   end
 end

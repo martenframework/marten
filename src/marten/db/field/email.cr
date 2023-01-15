@@ -24,7 +24,7 @@ module Marten
           # Leverage string's built-in validations (max size).
           super
 
-          if !Emailing::Address.valid?(value)
+          if !value.empty? && !Emailing::Address.valid?(value)
             record.errors.add(id, I18n.t("marten.db.field.email.errors.invalid"))
           end
         end

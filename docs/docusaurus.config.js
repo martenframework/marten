@@ -52,7 +52,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
             dropdownActiveClassDisabled: true,
           },
           {
-            href: 'https://martenframework.com/docs/api/index.html',
+            href: 'https://martenframework.com/docs/api/0.1/index.html',
             label: 'API',
             position: 'right',
           },

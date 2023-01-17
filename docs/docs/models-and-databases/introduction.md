@@ -8,7 +8,7 @@ Models define what data can be persisted and manipulated by a Marten application
 
 ## Basic model definition
 
-Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
+Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/dev/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
 
 For example, the following code snippet defines a simple `Article` model:
 
@@ -187,7 +187,7 @@ end
 
 ### Timestamps
 
-Marten lets you easily add automatic `created_at` / `updated_at` [`date_time`](./reference/fields#date_time) fields to your models by leveraging the [`#with_timestamp_fields`](pathname:///api/Marten/DB/Model/Table.html#with_timestamp_fields-macro) macro:
+Marten lets you easily add automatic `created_at` / `updated_at` [`date_time`](./reference/fields#date_time) fields to your models by leveraging the [`#with_timestamp_fields`](pathname:///api/dev/Marten/DB/Model/Table.html#with_timestamp_fields-macro) macro:
 
 ```crystal
 class Article < Marten::Model
@@ -201,7 +201,7 @@ end
 
 The `created_at` field is populated with the current time when new records are created while the `updated_at` field is refreshed with the current time whenever records are updated.
 
-Note that using [`#with_timestamp_fields`](pathname:///api/Marten/DB/Model/Table.html#with_timestamp_fields-macro) is technically equivalent as defining two `created_at` and `updated_at` [`date_time`](./reference/fields#date_time) fields as follows:
+Note that using [`#with_timestamp_fields`](pathname:///api/dev/Marten/DB/Model/Table.html#with_timestamp_fields-macro) is technically equivalent as defining two `created_at` and `updated_at` [`date_time`](./reference/fields#date_time) fields as follows:
 
 ```crystal
 class Article < Marten::Model
@@ -221,7 +221,7 @@ Single model fields can be indexed or associated with a unique constraint _indiv
 
 ### Multifields indexes
 
-Multifields indexes can be configured in a model by leveraging the [`#db_index`](pathname:///api/Marten/DB/Model/Table/ClassMethods.html#db_index(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
+Multifields indexes can be configured in a model by leveraging the [`#db_index`](pathname:///api/dev/Marten/DB/Model/Table/ClassMethods.html#db_index(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
 
 For example:
 
@@ -237,7 +237,7 @@ end
 
 ### Multifields unique constraints
 
-Multifields unique constraints can be configured in a model by leveraging the [`#db_unique_constraint`](pathname:///api/Marten/DB/Model/Table/ClassMethods.html#db_unique_constraint(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
+Multifields unique constraints can be configured in a model by leveraging the [`#db_unique_constraint`](pathname:///api/dev/Marten/DB/Model/Table/ClassMethods.html#db_unique_constraint(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
 
 For example:
 

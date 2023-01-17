@@ -8,7 +8,7 @@ Marten has built-in support for common [template filters](../reference/filters),
 
 ## Defining a template filter
 
-Filters are subclasses of the [`Marten::Template::Filter::Base`](pathname:///api/Marten/Template/Filter/Base.html) abstract class. They must implement a single `#apply` method: this method takes the value the filter should be applied to (a [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) object wrapping _any_ of the object types supported by templates) and an optional argument that was specified to the filter.
+Filters are subclasses of the [`Marten::Template::Filter::Base`](pathname:///api/0.1/Marten/Template/Filter/Base.html) abstract class. They must implement a single `#apply` method: this method takes the value the filter should be applied to (a [`Marten::Template::Value`](pathname:///api/0.1/Marten/Template/Value.html) object wrapping _any_ of the object types supported by templates) and an optional argument that was specified to the filter.
 
 For example, in the expression `{{ var|test:42 }}`, the `test` filter would be called with the value of the `var` variable and the filter argument `42`.
 
@@ -22,7 +22,7 @@ class UnderscoreFilter < Marten::Template::Filter::Base
 end
 ```
 
-As you can see, the `#apply` method must return a [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) object.
+As you can see, the `#apply` method must return a [`Marten::Template::Value`](pathname:///api/0.1/Marten/Template/Value.html) object.
 
 Now let's try to write a `chomp` template filter that actually makes use of the specified argument. In this case, the argument will be used to define the suffix that should be removed from the end of the string representation of the incoming value:
 
@@ -36,14 +36,14 @@ end
 ```
 
 :::info
-You should feel free to raise [`Marten::Template::Errors::InvalidSyntax`](pathname:///api/Marten/Template/Errors/InvalidSyntax.html) from a filter's `#apply` method: this is especially relevant if the input has an unexpected type or if an argument is missing. That being said, it should be noted that any exception raised from a template filter won't be handled by the template engine and will result in a server error (unless explicitly handled by the application itself).
+You should feel free to raise [`Marten::Template::Errors::InvalidSyntax`](pathname:///api/0.1/Marten/Template/Errors/InvalidSyntax.html) from a filter's `#apply` method: this is especially relevant if the input has an unexpected type or if an argument is missing. That being said, it should be noted that any exception raised from a template filter won't be handled by the template engine and will result in a server error (unless explicitly handled by the application itself).
 :::
 
 ### `Marten::Template::Value` objects
 
-As highlighted previously, template filters mainly interact with [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) objects: they take such objects as parameters (for the incoming value the filter should be applied to and for the optional filter parameter), and they must return such objects as well.
+As highlighted previously, template filters mainly interact with [`Marten::Template::Value`](pathname:///api/0.1/Marten/Template/Value.html) objects: they take such objects as parameters (for the incoming value the filter should be applied to and for the optional filter parameter), and they must return such objects as well.
 
-[`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) objects can be created from any supported object by using the `#from` method as follows:
+[`Marten::Template::Value`](pathname:///api/0.1/Marten/Template/Value.html) objects can be created from any supported object by using the `#from` method as follows:
 
 ```crystal
 Marten::Template::Value.from("hello")
@@ -51,7 +51,7 @@ Marten::Template::Value.from(42)
 Marten::Template::Value.from(true)
 ```
 
-These objects are essentially "wrappers" around a real value that is manipulated as part of a template's runtime, and they provide a common interface allowing to interact with these during the template rendering. Your filter implementation can perform checks on the incoming [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) objects if necessary: eg. in order to verify that the underlying value is of the expected type. In this light, it is possible to make use of the `#raw` method to retrieve the real value that is wrapped by the [`Marten::Template::Value`](pathname:///api/Marten/Template/Value.html) object:
+These objects are essentially "wrappers" around a real value that is manipulated as part of a template's runtime, and they provide a common interface allowing to interact with these during the template rendering. Your filter implementation can perform checks on the incoming [`Marten::Template::Value`](pathname:///api/0.1/Marten/Template/Value.html) objects if necessary: eg. in order to verify that the underlying value is of the expected type. In this light, it is possible to make use of the `#raw` method to retrieve the real value that is wrapped by the [`Marten::Template::Value`](pathname:///api/0.1/Marten/Template/Value.html) object:
 
 ```crystal
 value = Marten::Template::Value.from("hello")
@@ -81,7 +81,7 @@ end
 
 To be able to use custom template filters, you must register them to Marten's global template filters registry.
 
-To do so, you will have to call the [`Marten::Template::Filter#register`](pathname:///api/Marten/Template/Filter.html#register(filter_name%3AString|Symbol%2Cfilter_klass%3ABase.class)-class-method) method with the name of the filter you wish to use in templates, and the filter class.
+To do so, you will have to call the [`Marten::Template::Filter#register`](pathname:///api/0.1/Marten/Template/Filter.html#register(filter_name%3AString|Symbol%2Cfilter_klass%3ABase.class)-class-method) method with the name of the filter you wish to use in templates, and the filter class.
 
 For example:
 

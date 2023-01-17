@@ -115,13 +115,13 @@ When Marten encounters a path that leads to another sub routes map, it chops off
 
 When working with web applications, a frequent need is to generate URLs in their final forms. To do so, you will want to avoid hard-coding URLs and instead leverage the ability to generate them from their associated names: this is what we call a reverse URL resolution.
 
-"Reversing" a URL is as simple as calling the [`Marten::Routing::Map#reverse`](pathname:///api/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method from the main routes map, which is accessible through the use of the [`Marten#routes`](pathname:///api/Marten.html#routes-class-method) method:
+"Reversing" a URL is as simple as calling the [`Marten::Routing::Map#reverse`](pathname:///api/dev/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method from the main routes map, which is accessible through the use of the [`Marten#routes`](pathname:///api/dev/Marten.html#routes-class-method) method:
 
 ```crystal
 Marten.routes.reverse("home") # will return "/"
 ```
 
-In order to reverse a URL from within a handler class, you can simply leverage the [`Marten::Handlers::Base#reverse`](pathname:///api/Marten/Handlers/Base.html#reverse(*args%2C**options)-instance-method) handler method:
+In order to reverse a URL from within a handler class, you can simply leverage the [`Marten::Handlers::Base#reverse`](pathname:///api/dev/Marten/Handlers/Base.html#reverse(*args%2C**options)-instance-method) handler method:
 
 ```crystal
 class MyHandler < Marten::Handler

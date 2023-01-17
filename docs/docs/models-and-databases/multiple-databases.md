@@ -11,7 +11,7 @@ Support for multi-database projects is still experimental and lacking features s
 
 ## Defining multiple databases
 
-Each Marten project leveraging a single database uses what is called a "default" database. This is the database whose configuration is defined when calling the [`#database`](pathname:///api/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2C%26)-instance-method) configuration method:
+Each Marten project leveraging a single database uses what is called a "default" database. This is the database whose configuration is defined when calling the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2C%26)-instance-method) configuration method:
 
 ```crystal
 config.database do |db|
@@ -22,7 +22,7 @@ end
 
 The "default" database is implied whenever you interact with the database (eg. by performing queries, creating records, etc), unless specified otherwise.
 
-The [`#database`](pathname:///api/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2C%26)-instance-method) configuration method can take an additional argument in order to define additional databases. For example:
+The [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2C%26)-instance-method) configuration method can take an additional argument in order to define additional databases. For example:
 
 ```crystal
 config.database :other_db do |db|

@@ -19,10 +19,10 @@ Note that you don't need to manually interact with these default error handlers:
 
 ### Page Not Found (404)
 
-A Page Not Found (404) response is automatically returned by the [`Marten::Handlers::Defaults::PageNotFound`](pathname:///api/Marten/Handlers/Defaults/PageNotFound.html) handler when:
+A Page Not Found (404) response is automatically returned by the [`Marten::Handlers::Defaults::PageNotFound`](pathname:///api/dev/Marten/Handlers/Defaults/PageNotFound.html) handler when:
 
 * a route cannot be found for an incoming request
-* the [`Marten::HTTP::Errors::NotFound`](pathname:///api/Marten/Http/Errors/NotFound.html) exception is raised
+* the [`Marten::HTTP::Errors::NotFound`](pathname:///api/dev/Marten/Http/Errors/NotFound.html) exception is raised
 
 :::info
 If your project is running in debug mode, Marten will automatically show a different page containing specific information about the original request instead of using the default Page Not Found handler.
@@ -30,7 +30,7 @@ If your project is running in debug mode, Marten will automatically show a diffe
 
 ### Internal Server Error (500)
 
-An Internal Server Error (500) response is automatically returned by the [`Marten::Handlers::Defaults::ServerError`](pathname:///api/Marten/Handlers/Defaults/ServerError.html) handler when an unhandled exception is intercepted by the Marten server.
+An Internal Server Error (500) response is automatically returned by the [`Marten::Handlers::Defaults::ServerError`](pathname:///api/dev/Marten/Handlers/Defaults/ServerError.html) handler when an unhandled exception is intercepted by the Marten server.
 
 :::info
 If your project is running in debug mode, Marten will automatically show a different page containing specific information about the error that occurred (traceback, request details, etc) instead of using the default Internal Server Error handler.
@@ -38,11 +38,11 @@ If your project is running in debug mode, Marten will automatically show a diffe
 
 ### Bad Request (400)
 
-A Bad Request (400) response is automatically returned by the [`Marten::Handlers::Defaults::BadRequest`](pathname:///api/Marten/Handlers/Defaults/BadRequest.html) handler when the [`Marten::HTTP::Errors::SuspiciousOperation`](pathname:///api/Marten/Http/Errors/SuspiciousOperation.html) exception is raised.
+A Bad Request (400) response is automatically returned by the [`Marten::Handlers::Defaults::BadRequest`](pathname:///api/dev/Marten/Handlers/Defaults/BadRequest.html) handler when the [`Marten::HTTP::Errors::SuspiciousOperation`](pathname:///api/dev/Marten/Http/Errors/SuspiciousOperation.html) exception is raised.
 
 ### Forbidden (403)
 
-A Forbidden (403) response is automatically returned by the [`Marten::Handlers::Defaults::PermissionDenied`](pathname:///api/Marten/Handlers/Defaults/PermissionDenied.html) handler when the [`Marten::HTTP::Errors::PermissionDenied`](pathname:///api/Marten/Http/Errors/PermissionDenied.html) exception is raised.
+A Forbidden (403) response is automatically returned by the [`Marten::Handlers::Defaults::PermissionDenied`](pathname:///api/dev/Marten/Handlers/Defaults/PermissionDenied.html) handler when the [`Marten::HTTP::Errors::PermissionDenied`](pathname:///api/dev/Marten/Http/Errors/PermissionDenied.html) exception is raised.
 
 ## Customizing error handlers
 

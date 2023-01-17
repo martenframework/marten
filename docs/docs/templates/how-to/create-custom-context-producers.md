@@ -8,7 +8,7 @@ Marten has built-in support for common [context producers](../reference/context-
 
 ## Defining a context producer
 
-Defining a context producer involves creating a subclass of the [`Marten::Template::ContextProducer`](pathname:///api/Marten/Template/ContextProducer.html) abstract class. This abstract class requires that subclasses implement a single [`#produce`](pathname:///api/Marten/Template/ContextProducer.html#produce(request%3AHTTP%3A%3ARequest%3F%3Dnil)-instance-method) method: this method takes an optional request object as argument and must return either:
+Defining a context producer involves creating a subclass of the [`Marten::Template::ContextProducer`](pathname:///api/dev/Marten/Template/ContextProducer.html) abstract class. This abstract class requires that subclasses implement a single [`#produce`](pathname:///api/dev/Marten/Template/ContextProducer.html#produce(request%3AHTTP%3A%3ARequest%3F%3Dnil)-instance-method) method: this method takes an optional request object as argument and must return either:
 
 * a hash or a named tuple containing the values to contribute to the template context
 * or `nil` if no values can be generated for the passed request

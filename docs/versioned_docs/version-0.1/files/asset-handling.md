@@ -23,7 +23,7 @@ The assets flow provided by Marten is **intentionally simple**. Indeed, Marten b
 
 Once assets have been "collected", it is possible to generate their URLs through the use of dedicated helpers:
 
-* by using the [assets engine](pathname:///api/Marten/Asset/Engine.html#url(filepath%3AString)%3AString-instance-method) in Crystal
+* by using the [assets engine](pathname:///api/0.1/Marten/Asset/Engine.html#url(filepath%3AString)%3AString-instance-method) in Crystal
 * by using the [`asset`](../templates/reference/tags#asset) tag in templates
 
 The way these asset URLs are generated depends on the configured [asset storage](../development/reference/settings#storage).
@@ -41,7 +41,7 @@ config.assets.url = "/assets/"
 
 ### Assets storage
 
-One of the most important asset settings is the [`storage`](../development/reference/settings#storage) one. Indeed, Marten uses a file storage mechanism to perform file operations related to assets (like uploading files, generating URLs, etc) by leveraging a standardized API. By default, assets use the [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that assets files are collected and placed to a specific folder in the local file system: this allows these files to then be served by a web server such as Nginx for example.
+One of the most important asset settings is the [`storage`](../development/reference/settings#storage) one. Indeed, Marten uses a file storage mechanism to perform file operations related to assets (like uploading files, generating URLs, etc) by leveraging a standardized API. By default, assets use the [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that assets files are collected and placed to a specific folder in the local file system: this allows these files to then be served by a web server such as Nginx for example.
 
 ### Assets root directory
 
@@ -49,7 +49,7 @@ This directory - which can be configured through the use of the [`root`](../deve
 
 ### Assets URL
 
-The asset URL is used when generating URLs for assets. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL. The default value is `/assets/`.
+The asset URL is used when generating URLs for assets. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL. The default value is `/assets/`.
 
 ### Asset directories
 
@@ -78,7 +78,7 @@ For example:
 
 In the above snippet, the `app/app.css` asset could be resolved to `/assets/app/app.css` (depending on the configuration of the project obviously).
 
-It is also possible to resolve asset URLs programmatically in Crystal. To do so, you can leverage the [`#url`](pathname:///api/Marten/Asset/Engine.html#url(filepath%3AString)%3AString-instance-method) method of the Marten assets engine:
+It is also possible to resolve asset URLs programmatically in Crystal. To do so, you can leverage the [`#url`](pathname:///api/0.1/Marten/Asset/Engine.html#url(filepath%3AString)%3AString-instance-method) method of the Marten assets engine:
 
 ```crystal
 Marten.assets.url("app/app.css") # => "/assets/app/app.css"
@@ -86,7 +86,7 @@ Marten.assets.url("app/app.css") # => "/assets/app/app.css"
 
 ## Serving assets in development
 
-Marten provides a handler that you can use to serve assets in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/Marten/Handlers/Defaults/Development/ServeAsset.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
+Marten provides a handler that you can use to serve assets in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/0.1/Marten/Handlers/Defaults/Development/ServeAsset.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
 
 ```crystal
 Marten.routes.draw do
@@ -101,7 +101,7 @@ end
 As you can see, this route will automatically use the URL that is configured as part of the [`url`](../development/reference/settings#url) asset setting. For example, this means that an `app/app.css` asset would be served by the `/assets/app/app.css` route in development if the [`url`](../development/reference/settings#url) setting is set to `/assets/`.
 
 :::warning
-It is very important to understand that this handler should **only** be used in development environments. Indeed, the [`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/Marten/Handlers/Defaults/Development/ServeAsset.html) handler does not require assets to have been collected beforehand through the use of the [`collectassets`](../development/reference/management-commands#collectassets) management command. This means that it will try to find assets in your applications' `assets` directories and in the directories configured in the [`dirs`](../development/reference/settings#dirs) setting. This mechanism is helpful in development, but it is not suitable for production environments since it is inneficient and (probably) insecure.
+It is very important to understand that this handler should **only** be used in development environments. Indeed, the [`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/0.1/Marten/Handlers/Defaults/Development/ServeAsset.html) handler does not require assets to have been collected beforehand through the use of the [`collectassets`](../development/reference/management-commands#collectassets) management command. This means that it will try to find assets in your applications' `assets` directories and in the directories configured in the [`dirs`](../development/reference/settings#dirs) setting. This mechanism is helpful in development, but it is not suitable for production environments since it is inneficient and (probably) insecure.
 :::
 
 ## Serving assets in production
@@ -118,7 +118,7 @@ It should be noted that there are many ways to serve assets in production. Again
 
 ### Serving assets from a web server
 
-As mentioned previously, Marten uses a file storage mechanism to perform file operations related to assets and to "collect" them. By default, assets use the [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that assets files are collected and placed into a specific folder in the local file system. This allows these assets to easily be served by a local web server if you have one properly configured.
+As mentioned previously, Marten uses a file storage mechanism to perform file operations related to assets and to "collect" them. By default, assets use the [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that assets files are collected and placed into a specific folder in the local file system. This allows these assets to easily be served by a local web server if you have one properly configured.
 
 For example, you could use a web server like [Apache](https://httpd.apache.org/) or [Nginx](https://nginx.org) to serve your collected assets. The way to configure these web servers will obviously vary from one solution to another, but you will likely need to define a location whose URL matches the [`url`](../development/reference/settings#url) setting value and that serves files from the folder where assets were collected (the [`root`](../development/reference/settings#root) folder).
 
@@ -157,4 +157,4 @@ To serve assets from a cloud storage (like Amazon's S3 or GCS) and (optionally) 
 Marten does not provide file storage implementations for the most frequently encountered cloud storage solutions presently. This is something that is planned for future releases though.
 :::
 
-Writing a custom file storage implementation will involve subclassing the [`Marten::Core::Storage::Base`](pathname:///api/Marten/Core/Storage/Base.html) abstract class and implementing a set of mandatory methods. The main difference compared to a "local file system" storage here is that you would need to make use of the API of the chosen cloud storage to perform low-level file operations (such as reading a file's content, verifying that a file exists, or generating a file URL).
+Writing a custom file storage implementation will involve subclassing the [`Marten::Core::Storage::Base`](pathname:///api/0.1/Marten/Core/Storage/Base.html) abstract class and implementing a set of mandatory methods. The main difference compared to a "local file system" storage here is that you would need to make use of the API of the chosen cloud storage to perform low-level file operations (such as reading a file's content, verifying that a file exists, or generating a file URL).

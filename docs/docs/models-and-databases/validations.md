@@ -98,7 +98,7 @@ In the above snippet, a custom validation method ensures that the `name` of a `U
 
 Methods like `#valid?` or `#invalid?` only let you know whether a model instance is valid or invalid. But you'll likely want to know exactly what are the actual errors or how to add new ones.
 
-As such, every model instance has an associated error set, which is an instance of [`Marten::Core::Validation::ErrorSet`](pathname:///api/Marten/Core/Validation/ErrorSet.html).
+As such, every model instance has an associated error set, which is an instance of [`Marten::Core::Validation::ErrorSet`](pathname:///api/dev/Marten/Core/Validation/ErrorSet.html).
 
 ### Inspecting errors
 

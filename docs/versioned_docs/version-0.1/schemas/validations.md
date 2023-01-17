@@ -89,7 +89,7 @@ You can define multiple validation rules in your schema classes. When doing so, 
 
 Methods like `#valid?` or `#invalid?` only let you know whether a schema instance is valid or invalid for a specific data set. But you'll likely want to know exactly what are the actual errors or how to add new ones.
 
-As such, every schema instance has an associated error set, which is an instance of [`Marten::Core::Validation::ErrorSet`](pathname:///api/Marten/Core/Validation/ErrorSet.html).
+As such, every schema instance has an associated error set, which is an instance of [`Marten::Core::Validation::ErrorSet`](pathname:///api/0.1/Marten/Core/Validation/ErrorSet.html).
 
 ### Inspecting errors
 

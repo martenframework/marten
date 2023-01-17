@@ -10,7 +10,7 @@ Schemas are classes that define how input data should be serialized/deserialized
 
 ### The schema class
 
-A schema class describes an _expected_ set of data. It describes the logical structure of this data, what are its expected characteristics, and what are the rules to use in order to identify whether it is valid or not. Schemas classes must inherit from the [`Marten::Schema`](pathname:///api/Marten/Schema.html) base class and they must define "fields" through the use of a `field` macro. These fields allow to define what data is expected by the schema, and how it is validated.
+A schema class describes an _expected_ set of data. It describes the logical structure of this data, what are its expected characteristics, and what are the rules to use in order to identify whether it is valid or not. Schemas classes must inherit from the [`Marten::Schema`](pathname:///api/0.1/Marten/Schema.html) base class and they must define "fields" through the use of a `field` macro. These fields allow to define what data is expected by the schema, and how it is validated.
 
 For example, the following snippet defines a simple `ArticleSchema` schema:
 

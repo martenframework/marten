@@ -7,7 +7,7 @@ Marten lets you easily create custom [emailing backends](../introduction#emailin
 
 ## Basic backend definition
 
-Defining an emailing backend is as simple as creating a class that inherits from the [`Marten::Emailing::Backend::Base`](pathname:///api/Marten/Emailing/Backend/Base.html) abstract class and that implements a unique `#deliver` method. This method takes a single `email` argument (instance of [`Marten::Emailing::Email`](pathname:///api/Marten/Emailing/Email.html)), corresponding to the email to deliver.
+Defining an emailing backend is as simple as creating a class that inherits from the [`Marten::Emailing::Backend::Base`](pathname:///api/dev/Marten/Emailing/Backend/Base.html) abstract class and that implements a unique `#deliver` method. This method takes a single `email` argument (instance of [`Marten::Emailing::Email`](pathname:///api/dev/Marten/Emailing/Email.html)), corresponding to the email to deliver.
 
 For example:
 

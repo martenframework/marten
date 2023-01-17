@@ -309,7 +309,7 @@ Article.join(:author__hometown).get(id: 42)
 
 ### Pagination
 
-Marten provides a pagination mechanism that you can leverage in order to easily iterate over records that are split across several pages of data. This works as follows: each query set object lets you generate a "paginator" (instance of [`Marten::DB::Query::Paginator`](pathname:///api/Marten/DB/Query/Paginator.html)) from a given page size (the number of records you would like on each page). You can then use this paginator in order to request specific pages, which gives you access to the corresponding records and to some additional pagination metadata.
+Marten provides a pagination mechanism that you can leverage in order to easily iterate over records that are split across several pages of data. This works as follows: each query set object lets you generate a "paginator" (instance of [`Marten::DB::Query::Paginator`](pathname:///api/0.1/Marten/DB/Query/Paginator.html)) from a given page size (the number of records you would like on each page). You can then use this paginator in order to request specific pages, which gives you access to the corresponding records and to some additional pagination metadata.
 
 For example:
 
@@ -330,7 +330,7 @@ page.next_page?           # => true
 page.next_page_number     # => 2
 ```
 
-As you can see, paginator objects let you request specific pages by providing a page number (1-indexed!) to the [`#page`](pathname:///api/Marten/DB/Query/Paginator.html#page(number%3AInt)-instance-method) method. Such pages are instances of [`Marten::DB::Query::Page`](pathname:///api/Marten/DB/Query/Page.html) and give you the ability to easily iterate over the corresponding records. They also give you the ability to retrieve some pagination-related information (eg. about the previous and next pages by leveraging the [`#previous_page?`](pathname:///api/Marten/DB/Query/Page.html#previous_page%3F-instance-method), [`#previous_page_number`](pathname:///api/Marten/DB/Query/Page.html#previous_page_number-instance-method), [`#next_page?`](pathname:///api/Marten/DB/Query/Page.html#next_page%3F-instance-method), and [`#next_page_number`](pathname:///api/Marten/DB/Query/Page.html#next_page_number-instance-method) methods).
+As you can see, paginator objects let you request specific pages by providing a page number (1-indexed!) to the [`#page`](pathname:///api/0.1/Marten/DB/Query/Paginator.html#page(number%3AInt)-instance-method) method. Such pages are instances of [`Marten::DB::Query::Page`](pathname:///api/0.1/Marten/DB/Query/Page.html) and give you the ability to easily iterate over the corresponding records. They also give you the ability to retrieve some pagination-related information (eg. about the previous and next pages by leveraging the [`#previous_page?`](pathname:///api/0.1/Marten/DB/Query/Page.html#previous_page%3F-instance-method), [`#previous_page_number`](pathname:///api/0.1/Marten/DB/Query/Page.html#previous_page_number-instance-method), [`#next_page?`](pathname:///api/0.1/Marten/DB/Query/Page.html#next_page%3F-instance-method), and [`#next_page_number`](pathname:///api/0.1/Marten/DB/Query/Page.html#next_page_number-instance-method) methods).
 
 ## Updating records
 

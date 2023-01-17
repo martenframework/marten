@@ -42,7 +42,7 @@ The host the HTTP server running the application will be listening on.
 
 Default: `[] of Marten::Apps::Config.class`
 
-An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) to learn more about applications.
+An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/dev/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) to learn more about applications.
 
 ### `log_backend`
 
@@ -208,9 +208,9 @@ This setting is only used if `assets.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
 
-By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that collected assets are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `assets.root` and `assets.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -218,7 +218,7 @@ A specific storage can be set instead to ensure that collected assets are persis
 
 Default: `"/assets/"`
 
-The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
+The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
 
 :::info
 This setting is only used if `assets.storage` is `nil`.
@@ -419,7 +419,7 @@ Default: `Marten::Emailing::Backend::Development.new`
 
 The backend to use when it comes to send emails. Emailing backends define _how_ emails are actually sent.
 
-By default, a development backend (instance of [`Marten::Emailing::Backend::Dev`](pathname:///api/Marten/Emailing/Backend/Development.html)) is used: this backend "collects" all the emails that are "delivered" by default (which can be used in specs in order to test sent emails), but it can also be configured to print email details to the standard output if necessary (see the [emailing backend reference](../../emailing/reference/backends) for more details about this capability).
+By default, a development backend (instance of [`Marten::Emailing::Backend::Dev`](pathname:///api/dev/Marten/Emailing/Backend/Development.html)) is used: this backend "collects" all the emails that are "delivered" by default (which can be used in specs in order to test sent emails), but it can also be configured to print email details to the standard output if necessary (see the [emailing backend reference](../../emailing/reference/backends) for more details about this capability).
 
 Additional emailing backend shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your specific email sending requirements. These backends are listed in the [emailing backend reference](../../emailing/reference/backends#other-backends).
 
@@ -427,7 +427,7 @@ Additional emailing backend shards are also maintained under the umbrella of the
 
 Default: `"webmaster@localhost"`
 
-The default from address used in emails. Email definitions that don't specify a "from" address explicitly will use this email address automatically for the sender email. It should be noted that this from email address can be defined as a string or as a [`Marten::Emailing::Address`](pathname:///api/Marten/Emailing/Address.html) object (which allows to specify the name AND the address of the sender email).
+The default from address used in emails. Email definitions that don't specify a "from" address explicitly will use this email address automatically for the sender email. It should be noted that this from email address can be defined as a string or as a [`Marten::Emailing::Address`](pathname:///api/dev/Marten/Emailing/Address.html) object (which allows to specify the name AND the address of the sender email).
 
 ## I18n settings
 
@@ -482,9 +482,9 @@ This setting is only used if `media_files.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
 
-By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that uploaded files are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `media_files.root` and `media_files.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -492,7 +492,7 @@ A specific storage can be set instead to ensure that uploaded files are persiste
 
 Default: `"/media/"`
 
-The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
+The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
 
 :::info
 This setting is only used if `media_files.storage` is `nil`.

@@ -21,4 +21,4 @@ The Marten documentation contains multiple pages and references that don't neces
 * **Reference pages** provide a curated technical reference of the framework APIs
 * **How-to guides** document how to solve common problems when working with the framework. Those can cover things like deployments, app development, etc
 
-Additionally, an automatically-generated [API reference](pathname:///api/index.html) is also available to dig into Marten's internals.
+Additionally, an automatically-generated [API reference](pathname:///api/dev/index.html) is also available to dig into Marten's internals.

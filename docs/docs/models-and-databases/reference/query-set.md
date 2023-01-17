@@ -190,7 +190,7 @@ In the above example, records would be ordered by descending publication date (b
 
 Returns a raw query set for the passed SQL query and optional parameters.
 
-This method returns a [`Marten::DB::Query::RawSet`](pathname:///api/Marten/DB/Query/RawSet.html) object, which allows to iterate over the model records matched by the passed SQL query. For example:
+This method returns a [`Marten::DB::Query::RawSet`](pathname:///api/dev/Marten/DB/Query/RawSet.html) object, which allows to iterate over the model records matched by the passed SQL query. For example:
 
 ```crystal
 Article.all.raw("SELECT * FROM articles")

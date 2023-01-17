@@ -187,19 +187,19 @@ Templates can be loaded from specific locations within your codebase and from ap
 
 Application templates are always enabled by default (`templates.app_dirs = true`) for new Marten projects.
 
-It is possible to programmatically load a template by name. To do so, you can use the [`#get_template`](pathname:///api/Marten/Template/Engine.html#get_template(template_name%3AString)%3ATemplate-instance-method) method that is provided by the Marten templates engine:
+It is possible to programmatically load a template by name. To do so, you can use the [`#get_template`](pathname:///api/dev/Marten/Template/Engine.html#get_template(template_name%3AString)%3ATemplate-instance-method) method that is provided by the Marten templates engine:
 
 ```crystal
 Marten.templates.get_template("foo/bar.html")
 ```
 
-This will return a compiled [`Template`](pathname:///api/Marten/Template/Template.html) object that you can then render by using a specific context.
+This will return a compiled [`Template`](pathname:///api/dev/Marten/Template/Template.html) object that you can then render by using a specific context.
 
 ## Rendering a template
 
 You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction#render) shortcut or [generic handlers](../handlers-and-http/generic-handlers) that automatically render templates for you.
 
-That being said, it is also possible to render any [`Template`](pathname:///api/Marten/Template/Template.html) object that you loaded by leveraging the [`#render`](pathname:///api/Marten/Template/Template.html#render(context%3AHash|NamedTuple)%3AString-instance-method) method. This method can be used either with a Marten context object, a hash, or a named tuple:
+That being said, it is also possible to render any [`Template`](pathname:///api/dev/Marten/Template/Template.html) object that you loaded by leveraging the [`#render`](pathname:///api/dev/Marten/Template/Template.html#render(context%3AHash|NamedTuple)%3AString-instance-method) method. This method can be used either with a Marten context object, a hash, or a named tuple:
 
 ```crystal
 template = Marten.templates.get_template("foo/bar.html")
@@ -210,10 +210,10 @@ template.render({ foo: "bar" })
 
 ## Using custom objects in contexts
 
-Most objects that are provided by Marten (such as Model records, query sets, schemas, etc) can automatically be used as part of templates. If your project involves other custom classes, and if you would like to interact with such objects in your templates, then you will need to explicitly ensure that they include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module.
+Most objects that are provided by Marten (such as Model records, query sets, schemas, etc) can automatically be used as part of templates. If your project involves other custom classes, and if you would like to interact with such objects in your templates, then you will need to explicitly ensure that they include the [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) module.
 
 :::note Why?
-Crystal being a statically typed language, the Marten engine needs to know which types of objects it is dealing with in advance in order to know (i) what can go into template contexts and (ii) how to "resolve" object attributes when templates are rendered. It is not possible to simply expect any `Object` object, hence why we need to make use of a shared [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module to account for all the classes whose objects should be usable as part of template contexts.
+Crystal being a statically typed language, the Marten engine needs to know which types of objects it is dealing with in advance in order to know (i) what can go into template contexts and (ii) how to "resolve" object attributes when templates are rendered. It is not possible to simply expect any `Object` object, hence why we need to make use of a shared [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) module to account for all the classes whose objects should be usable as part of template contexts.
 :::
 
 Let's take the example of a `Point` class that provides access to an x-coordinate and a y-coordinate:
@@ -240,7 +240,7 @@ If you try to render such a template while passing a `Point` object into the tem
 Unable to initialize template values from Point objects
 ```
 
-To remediate this, you will have to include the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module in the `Point` class and define a `#resolve_template_attribute` method as follows:
+To remediate this, you will have to include the [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) module in the `Point` class and define a `#resolve_template_attribute` method as follows:
 
 ```crystal
 class Point
@@ -263,9 +263,9 @@ class Point
 end
 ```
 
-Each class including the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) module must also implement a `#resolve_template_attribute` method in order to allow resolutions of object attributes when templates are rendered (for example `{{ point.x }}`). That being said, there are a few shortcuts that can be used in order to avoid writing such methods.
+Each class including the [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) module must also implement a `#resolve_template_attribute` method in order to allow resolutions of object attributes when templates are rendered (for example `{{ point.x }}`). That being said, there are a few shortcuts that can be used in order to avoid writing such methods.
 
-The first one is to use the [`#template_attributes`](pathname:///api/Marten/Template/Object.html#template_attributes(*names)-macro) macro in order to easily define the names of the methods that should be made available to the template runtime. For example, such macro could be used like this with our `Point` class:
+The first one is to use the [`#template_attributes`](pathname:///api/dev/Marten/Template/Object.html#template_attributes(*names)-macro) macro in order to easily define the names of the methods that should be made available to the template runtime. For example, such macro could be used like this with our `Point` class:
 
 ```crystal
 class Point
@@ -281,7 +281,7 @@ class Point
 end
 ```
 
-Another possibility is to include the [`Marten::Template::Object::Auto`](pathname:///api/Marten/Template/Object/Auto.html) module instead of the [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) one in your class. This module will automatically ensure that every "attribute-like" public method that is defined in the including class can also be accessed in templates when performing variable lookups.
+Another possibility is to include the [`Marten::Template::Object::Auto`](pathname:///api/dev/Marten/Template/Object/Auto.html) module instead of the [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) one in your class. This module will automatically ensure that every "attribute-like" public method that is defined in the including class can also be accessed in templates when performing variable lookups.
 
 ```crystal
 class Point
@@ -295,13 +295,13 @@ class Point
 end
 ```
 
-Note that **all** "attribute-like" public methods will be made available to the template runtime when using the [`Marten::Template::Object::Auto`](pathname:///api/Marten/Template/Object/Auto.html) module. This may be a good enough behavior, but if you want to have more control over what can be accessed in templates or not, you will likely end up using [`Marten::Template::Object`](pathname:///api/Marten/Template/Object.html) and the [`#template_attributes`](pathname:///api/Marten/Template/Object.html#template_attributes(*names)-macro) macro instead.
+Note that **all** "attribute-like" public methods will be made available to the template runtime when using the [`Marten::Template::Object::Auto`](pathname:///api/dev/Marten/Template/Object/Auto.html) module. This may be a good enough behavior, but if you want to have more control over what can be accessed in templates or not, you will likely end up using [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) and the [`#template_attributes`](pathname:///api/dev/Marten/Template/Object.html#template_attributes(*names)-macro) macro instead.
 
 ## Using context producers
 
 Context producers are helpers that ensure that common variables are automatically inserted in the template context whenever a template is rendered. They are applied every time a new template context is generated.
 
-For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a handler and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
+For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a handler and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/dev/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
 
 Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings#contextproducers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
 

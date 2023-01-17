@@ -8,9 +8,9 @@ Sessions can be used to store small amounts of data that will be persisted betwe
 
 ## Configuration
 
-In order to use sessions, you need to make sure that the [`Marten::Middleware::Session`](pathname:///api/Marten/Middleware/Session.html) middleware is part of your project's middleware chain, which can be configured in the [`middleware`](../development/reference/settings#middleware) setting. Note that the session middleware class is automatically added to this setting when initializing new projects.
+In order to use sessions, you need to make sure that the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware is part of your project's middleware chain, which can be configured in the [`middleware`](../development/reference/settings#middleware) setting. Note that the session middleware class is automatically added to this setting when initializing new projects.
 
-If your project does not require the use of sessions, you can simply ensure that the [`middleware`](../development/reference/settings#middleware) setting does not include the [`Marten::Middleware::Session`](pathname:///api/Marten/Middleware/Session.html) middleware class.
+If your project does not require the use of sessions, you can simply ensure that the [`middleware`](../development/reference/settings#middleware) setting does not include the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware class.
 
 How the session ID cookie is generated can also be tweaked by leveraging the following settings:
 
@@ -31,7 +31,7 @@ Other session stores can be installed as separate shards. For example, the [`mar
 
 ## Using sessions
 
-When the [`Marten::Middleware::Session`](pathname:///api/Marten/Middleware/Session.html), each HTTP request object will have a [`#session`](pathname:///api//Marten/HTTP/Request.html#session-instance-method) method returning the session store for the current request. The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/Marten/HTTP/Session/Store/Base.html) and provides a hash-like interface:
+When the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html), each HTTP request object will have a [`#session`](pathname:///api/dev//Marten/HTTP/Request.html#session-instance-method) method returning the session store for the current request. The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html) and provides a hash-like interface:
 
 ```crystal
 # Persisting values:

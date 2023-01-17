@@ -773,7 +773,7 @@ The handlers we implemented previously map to common web development use cases: 
 
 We could definitely leverage these generic handlers as part of our weblog application.
 
-In this light, let's start with the `HomeHandler` class we implemented earlier: this handler essentially retrieves all the `Article` records and makes this list available to the `home.html` template. This pattern is enabled by the [`Marten::Handlers::RecordList`](pathname:///api/Marten/Handlers/RecordList.html) generic handler. In order to use it, let's modify the `src/handlers/home_handler.cr` file as follows:
+In this light, let's start with the `HomeHandler` class we implemented earlier: this handler essentially retrieves all the `Article` records and makes this list available to the `home.html` template. This pattern is enabled by the [`Marten::Handlers::RecordList`](pathname:///api/dev/Marten/Handlers/RecordList.html) generic handler. In order to use it, let's modify the `src/handlers/home_handler.cr` file as follows:
 
 ```crystal title="src/handlers/home_handler.cr"
 class HomeHandler < Marten::Handlers::RecordList
@@ -785,7 +785,7 @@ end
 
 In the above snippet we use a few class methods in order to define how the handler should behave: `#model` allows to define the model class that should be used to retrieve the record, `#template_name` allows to define the name of the template to render, and `#list_context_name` allows to define the name of the record list variable in the template context.
 
-Let's continue with the `ArticleDetailHandler` class: this handler retrieves a specific `Article` record from a `pk` route parameter, and "renders" it using a specific template. This pattern is enabled by the [`Marten::Handlers::RecordDetail`](pathname:///api/Marten/Handlers/RecordDetail.html) generic handler. In order to use it, let's modify the `src/handlers/article_detail_handler.cr` file as follows:
+Let's continue with the `ArticleDetailHandler` class: this handler retrieves a specific `Article` record from a `pk` route parameter, and "renders" it using a specific template. This pattern is enabled by the [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) generic handler. In order to use it, let's modify the `src/handlers/article_detail_handler.cr` file as follows:
 
 ```crystal title="src/handlers/article_detail_handler.cr"
 class ArticleDetailHandler < Marten::Handlers::RecordDetail
@@ -797,7 +797,7 @@ end
 
 In order to configure how the handler should behave, we make use of a few class methods here as well: `#model` allows to define the model class of the record that should be retrieved, `#template_name` defines the template to render, and `#record_context_name` defines the name of the record variable in the template context.
 
-Now let's look at the `ArticleCreateHandler` class: this class displays a form when processing GET requests, and it validates a schema that is used to create a specific record when processing POST requests. This exact pattern is enabled by the [`Marten::Handlers::RecordCreate`](pathname:///api/Marten/Handlers/RecordCreate.html) generic handler. In order to use it, we can modify the `src/handlers/article_create_handler.cr` file as follows:
+Now let's look at the `ArticleCreateHandler` class: this class displays a form when processing GET requests, and it validates a schema that is used to create a specific record when processing POST requests. This exact pattern is enabled by the [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) generic handler. In order to use it, we can modify the `src/handlers/article_create_handler.cr` file as follows:
 
 ```crystal title="src/handlers/article_create_handler.cr"
 class ArticleCreateHandler < Marten::Handlers::RecordCreate
@@ -810,7 +810,7 @@ end
 
 Here, `#model` allows to define the model class to use to create the new record, `#schema` is the schema class that should be used to validated the incoming data, `#template_name` defines the name of the template to render, and `#success_route_name` is the name of the route to redirect to after a successful record creation.
 
-We can now look at the `ArticleUpdateHandler` class: this class retrieves a specific record and displays a form when processing GET requests, and it validates a schema whose data is used to update the record when processing POST requests. This pattern is enabled by the [`Marten::Handlers::RecordUpdate`](pathname:///api/Marten/Handlers/RecordUpdate.html) generic handler. Let's use it and let's modify the `src/handlers/article_update_handler.cr` file as follows:
+We can now look at the `ArticleUpdateHandler` class: this class retrieves a specific record and displays a form when processing GET requests, and it validates a schema whose data is used to update the record when processing POST requests. This pattern is enabled by the [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) generic handler. Let's use it and let's modify the `src/handlers/article_update_handler.cr` file as follows:
 
 ```crystal title="src/handlers/article_update_handler.cr"
 class ArticleUpdateHandler < Marten::Handlers::RecordUpdate
@@ -824,7 +824,7 @@ end
 
 Here, `#model` allows to define the model class to use to retrieve and update the record, `#schema` is the schema class that should be used to validated the incoming data, `#template_name` defines the name of the template to render, `#success_route_name` is the name of the route to redirect to after a successful record update, and `#record_context_name` is the name of the record variable in the template context.
 
-Finally, let's look at the `ArticleDeleteHandler` class: this handler renders a template when processing GET requests, and performs the deletion of the considered record when processing POST requests. This pattern is provided by the [`Marten::Handlers::RecordDelete`](pathname:///api/Marten/Handlers/RecordDelete.html) generic handler. In order to use it, let's modify the `src/handlers/article_delete_handler.cr` file as follows:
+Finally, let's look at the `ArticleDeleteHandler` class: this handler renders a template when processing GET requests, and performs the deletion of the considered record when processing POST requests. This pattern is provided by the [`Marten::Handlers::RecordDelete`](pathname:///api/dev/Marten/Handlers/RecordDelete.html) generic handler. In order to use it, let's modify the `src/handlers/article_delete_handler.cr` file as follows:
 
 ```crystal title="src/handlers/article_delete_handler.cr"
 class ArticleDeleteHandler < Marten::Handlers::RecordDelete

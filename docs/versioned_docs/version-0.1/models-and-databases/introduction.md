@@ -8,7 +8,7 @@ Models define what data can be persisted and manipulated by a Marten application
 
 ## Basic model definition
 
-Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
+Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/0.1/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
 
 For example, the following code snippet defines a simple `Article` model:
 
@@ -191,7 +191,7 @@ Single model fields can be indexed or associated with a unique constraint _indiv
 
 ### Multifields indexes
 
-Multifields indexes can be configured in a model by leveraging the [`#db_index`](pathname:///api/Marten/DB/Model/Table/ClassMethods.html#db_index(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
+Multifields indexes can be configured in a model by leveraging the [`#db_index`](pathname:///api/0.1/Marten/DB/Model/Table/ClassMethods.html#db_index(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
 
 For example:
 
@@ -207,7 +207,7 @@ end
 
 ### Multifields unique constraints
 
-Multifields unique constraints can be configured in a model by leveraging the [`#db_unique_constraint`](pathname:///api/Marten/DB/Model/Table/ClassMethods.html#db_unique_constraint(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
+Multifields unique constraints can be configured in a model by leveraging the [`#db_unique_constraint`](pathname:///api/0.1/Marten/DB/Model/Table/ClassMethods.html#db_unique_constraint(name%3AString|Symbol%2Cfield_names%3AArray(String)|Array(Symbol))%3ANil-instance-method) class method. This method requires an index name argument as well as an array of targeted field names.
 
 For example:
 

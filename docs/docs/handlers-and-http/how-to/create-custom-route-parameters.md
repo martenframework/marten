@@ -7,15 +7,15 @@ Although Marten has built-in support for [common route parameters](../routing#sp
 
 ## Defining a route parameter
 
-In order to implement custom parameters, you need to subclass the [`Marten::Routing::Parameter::Base`](pathname:///api/Marten/Routing/Parameter/Base.html) abstract class. Each parameter class is responsible for:
+In order to implement custom parameters, you need to subclass the [`Marten::Routing::Parameter::Base`](pathname:///api/dev/Marten/Routing/Parameter/Base.html) abstract class. Each parameter class is responsible for:
 
-* defining a [regex](https://crystal-lang.org/reference/master/syntax_and_semantics/literals/regex.html) allowing to match the parameters in raw paths (which can be done through the use of the [`#regex`](pathname:///api/Marten/Routing/Parameter/Base.html#regex(regex)-macro) macro)
-* defining _how_ the route parameter value should be deserialized (which can be done by implementing a [`#loads`](pathname:///api/Marten/Routing/Parameter/Base.html#loads(value%3A%3A%3AString)-instance-method) method)
-* defining _how_ the route parameter value should serialized (which can be done by implementing a [`#dumps`](pathname:///api/Marten/Routing/Parameter/Base.html#dumps(value)%3A%3A%3AString%3F-instance-method) method)
+* defining a [regex](https://crystal-lang.org/reference/master/syntax_and_semantics/literals/regex.html) allowing to match the parameters in raw paths (which can be done through the use of the [`#regex`](pathname:///api/dev/Marten/Routing/Parameter/Base.html#regex(regex)-macro) macro)
+* defining _how_ the route parameter value should be deserialized (which can be done by implementing a [`#loads`](pathname:///api/dev/Marten/Routing/Parameter/Base.html#loads(value%3A%3A%3AString)-instance-method) method)
+* defining _how_ the route parameter value should serialized (which can be done by implementing a [`#dumps`](pathname:///api/dev/Marten/Routing/Parameter/Base.html#dumps(value)%3A%3A%3AString%3F-instance-method) method)
 
-The [`#loads`](pathname:///api/Marten/Routing/Parameter/Base.html#loads(value%3A%3A%3AString)-instance-method) method takes the raw parameter (string) as argument and is expected to return the final Crystal object corresponding to the route parameter (this is the object that will be forwarded to the handler in the route parameters hash).
+The [`#loads`](pathname:///api/dev/Marten/Routing/Parameter/Base.html#loads(value%3A%3A%3AString)-instance-method) method takes the raw parameter (string) as argument and is expected to return the final Crystal object corresponding to the route parameter (this is the object that will be forwarded to the handler in the route parameters hash).
 
-The [`#dumps`](pathname:///api/Marten/Routing/Parameter/Base.html#dumps(value)%3A%3A%3AString%3F-instance-method) method takes the final route parameter object as argument and must return the corresponding string representation. Note that this method can either return a string or `nil`: `nil` means that the passed value couldn't be serialized properly, which will make any URL reverse resolution fail with a `Marten::Routing::Errors::NoReverseMatch` error.
+The [`#dumps`](pathname:///api/dev/Marten/Routing/Parameter/Base.html#dumps(value)%3A%3A%3AString%3F-instance-method) method takes the final route parameter object as argument and must return the corresponding string representation. Note that this method can either return a string or `nil`: `nil` means that the passed value couldn't be serialized properly, which will make any URL reverse resolution fail with a `Marten::Routing::Errors::NoReverseMatch` error.
 
 For example, a "year" (1000-2999) route parameter could be implemented as follows:
 
@@ -43,7 +43,7 @@ end
 
 In order to be able to use custom route parameters in your [route definitions](../routing#specifying-route-parameters), you must register them to Marten's global routing parameters registry.
 
-To do so, you will have to call the [`Marten::Routing::Parameter#register`](pathname:///api/Marten/Routing/Parameter.html#register(id%3A%3A%3AString|Symbol%2Cparameter_klass%3ABase.class)-class-method) method with the identifier of the parameter you wish to use in route path definitions, and the actual parameter class. For example:
+To do so, you will have to call the [`Marten::Routing::Parameter#register`](pathname:///api/dev/Marten/Routing/Parameter.html#register(id%3A%3A%3AString|Symbol%2Cparameter_klass%3ABase.class)-class-method) method with the identifier of the parameter you wish to use in route path definitions, and the actual parameter class. For example:
 
 ```crystal
 Marten::DB::Field.register(:year, YearParameter)

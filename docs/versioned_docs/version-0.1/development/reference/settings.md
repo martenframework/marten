@@ -42,7 +42,7 @@ The host the HTTP server running the application will be listening on.
 
 Default: `[] of Marten::Apps::Config.class`
 
-An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) to learn more about applications.
+An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/0.1/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) to learn more about applications.
 
 ### `log_backend`
 
@@ -208,9 +208,9 @@ This setting is only used if `assets.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/0.1/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
 
-By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that collected assets are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `assets.root` and `assets.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -218,7 +218,7 @@ A specific storage can be set instead to ensure that collected assets are persis
 
 Default: `"/assets/"`
 
-The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
+The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
 
 :::info
 This setting is only used if `assets.storage` is `nil`.
@@ -419,9 +419,9 @@ This setting is only used if `media_files.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/0.1/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
 
-By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that uploaded files are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `media_files.root` and `media_files.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -429,7 +429,7 @@ A specific storage can be set instead to ensure that uploaded files are persiste
 
 Default: `"/media/"`
 
-The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
+The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/0.1/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
 
 :::info
 This setting is only used if `media_files.storage` is `nil`.

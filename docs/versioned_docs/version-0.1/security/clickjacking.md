@@ -20,7 +20,7 @@ Marten's clickjacking protection involves using a dedicated middleware: the [X-F
 
 The [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware) simply sets the X-Frame-Options header in order to prevent the considered Marten website from being inserted into a frame. The value that is used for the X-Frame-Options header depends on the value of the [`x_frame_options`](../development/reference/settings#x_frame_options) setting (whose default value is `DENY`).
 
-It should be noted that you can decide to disable or enable the use of the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware) on a per-handler basis. To do so, you can simply make use of the [`#exempt_from_x_frame_options`](pathname:///api/Marten/Handlers/XFrameOptions/ClassMethods.html#exempt_from_x_frame_options(exempt%3ABool)%3ANil-instance-method) class method, which takes a single boolean as arguments:
+It should be noted that you can decide to disable or enable the use of the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware) on a per-handler basis. To do so, you can simply make use of the [`#exempt_from_x_frame_options`](pathname:///api/0.1/Marten/Handlers/XFrameOptions/ClassMethods.html#exempt_from_x_frame_options(exempt%3ABool)%3ANil-instance-method) class method, which takes a single boolean as arguments:
 
 ```crystal
 class ProtectedHandler < Marten::Handler

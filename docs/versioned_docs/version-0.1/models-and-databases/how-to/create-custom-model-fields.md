@@ -22,7 +22,7 @@ Creating a custom model field does not necessarily mean that all of these respon
 
 Regardless of the approach you take in order to define new model field classes ([subclassing built-in fields](#subclassing-existing-model-fields), or [creating new ones from scratch](#creating-new-model-fields-from-scratch)), these classes must be registered to the Marten's global fields registry in order to make them available for use when defining models.
 
-To do so, you will have to call the [`Marten::DB::Field#register`](pathname:///api/Marten/DB/Field.html#register(id%2Cfield_klass)-macro) method with the identifier of the field you wish to use, and the actual field class. For example:
+To do so, you will have to call the [`Marten::DB::Field#register`](pathname:///api/0.1/Marten/DB/Field.html#register(id%2Cfield_klass)-macro) method with the identifier of the field you wish to use, and the actual field class. For example:
 
 ```crystal
 Marten::DB::Field.register(:foo, FooField)
@@ -44,7 +44,7 @@ The call to `#register` can be made from anywhere in your codebase, but obviousl
 
 The easiest way to introduce a model field is probably to subclass one of the [built-in model fields](../reference/fields) provided by Marten. This can make a lot of sense if the "type" of the field you are trying to implement is already supported by Marten.
 
-For example, implementing a custom "email" field could be done by subclassing the existing [`Marten::DB::Field::String`](pathname:///api/Marten/DB/Field/String.html) class. Indeed, an "email" field is essentially a string with a pre-defined maximum size and some additional validation logic:
+For example, implementing a custom "email" field could be done by subclassing the existing [`Marten::DB::Field::String`](pathname:///api/0.1/Marten/DB/Field/String.html) class. Indeed, an "email" field is essentially a string with a pre-defined maximum size and some additional validation logic:
 
 ```crystal
 class EmailField < Marten::DB::Field::String
@@ -82,7 +82,7 @@ Everything that is described in the following section about [creating model fiel
 
 ## Creating new model fields from scratch
 
-Creating new model fields from scratch involves subclassing the [`Marten::DB::Field::Base`](pathname:///api/Marten/DB/Field/Base.html) abstract class. Because of this, the new field class is required to implement a set of mandatory methods. These mandatory methods, and some other ones that are optional (but interesting in terms of capabilities), are described in the following sections.
+Creating new model fields from scratch involves subclassing the [`Marten::DB::Field::Base`](pathname:///api/0.1/Marten/DB/Field/Base.html) abstract class. Because of this, the new field class is required to implement a set of mandatory methods. These mandatory methods, and some other ones that are optional (but interesting in terms of capabilities), are described in the following sections.
 
 ### Mandatory methods
 
@@ -141,7 +141,7 @@ The `#from_db_result_set` method is supposed to return the read value into the r
 
 #### `to_column`
 
-Most model fields will contribute a corresponding column at the database level; these columns are read by Marten in order to generate migrations from model definitions. The column returned by the `#to_column` method should be an instance of a subclass of [`Marten::DB::Management::Column::Base`](pathname:///api/Marten/DB/Management/Column/Base.html).
+Most model fields will contribute a corresponding column at the database level; these columns are read by Marten in order to generate migrations from model definitions. The column returned by the `#to_column` method should be an instance of a subclass of [`Marten::DB::Management::Column::Base`](pathname:///api/0.1/Marten/DB/Management/Column/Base.html).
 
 For example, an "email" field could return a string column as part of its `#to_column` method:
 
@@ -186,7 +186,7 @@ Again, if the value can't be processed properly by the field class, it may be ne
 
 #### `initialize`
 
-The default `#initialize` method that is provided by the [`Marten::DB::Field::Base`](pathname:///api/Marten/DB/Field/Base.html) is fairly simply and looks like this:
+The default `#initialize` method that is provided by the [`Marten::DB::Field::Base`](pathname:///api/0.1/Marten/DB/Field/Base.html) is fairly simply and looks like this:
 
 ```crystal
 def initialize(

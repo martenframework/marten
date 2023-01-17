@@ -21,7 +21,7 @@ When creating a custom schema field, there are usually two approaches that you c
 
 Regardless of the approach you take in order to define new schema field classes ([subclassing built-in fields](#subclassing-existing-schema-fields), or [creating new ones from scratch](#creating-new-schema-fields-from-scratch)), these classes must be registered to the Marten's global fields registry in order to make them available for use when defining schemas.
 
-To do so, you will have to call the [`Marten::Schema::Field#register`](pathname:///api/Marten/Schema/Field.html#register(id%2Cfield_klass)-macro) method with the identifier of the field you wish to use, and the actual field class. For example:
+To do so, you will have to call the [`Marten::Schema::Field#register`](pathname:///api/dev/Marten/Schema/Field.html#register(id%2Cfield_klass)-macro) method with the identifier of the field you wish to use, and the actual field class. For example:
 
 ```crystal
 Marten::Schema::Field.register(:foo, FooField)
@@ -43,7 +43,7 @@ The call to `#register` can be made from anywhere in your codebase, but obviousl
 
 This is probably the easiest way to create a custom field: if the field you want to create can be derived from one of the [built-in schema fields](../reference/fields) (usually those correspond to primitive types), then you can easily subclass the corresponding class and customize it so that it suits your needs.
 
-For example, implementing a custom "email" field could be done by subclassing the existing [`Marten::Schema::Field::String`](pathname:///api/Marten/Schema/Field/String.html) class. Indeed, an "email" field is essentially a string with a pre-defined maximum size and some additional validation logic:
+For example, implementing a custom "email" field could be done by subclassing the existing [`Marten::Schema::Field::String`](pathname:///api/dev/Marten/Schema/Field/String.html) class. Indeed, an "email" field is essentially a string with a pre-defined maximum size and some additional validation logic:
 
 ```crystal
 class EmailField < Marten::Schema::Field::String
@@ -75,7 +75,7 @@ Everything that is described in the following section about [creating schema fie
 
 ## Creating new schema fields from scratch
 
-Creating new schema fields from scratch involves subclassing the [`Marten::Schema::Field::Base`](pathname:///api/Marten/Schema/Field/Base.html) abstract class. Because of this, the new field class is required to implement a set of mandatory methods. These mandatory methods, and some other ones that are optional (but interesting in terms of capabilities), are described in the following sections.
+Creating new schema fields from scratch involves subclassing the [`Marten::Schema::Field::Base`](pathname:///api/dev/Marten/Schema/Field/Base.html) abstract class. Because of this, the new field class is required to implement a set of mandatory methods. These mandatory methods, and some other ones that are optional (but interesting in terms of capabilities), are described in the following sections.
 
 ### Mandatory methods
 
@@ -124,7 +124,7 @@ Again, if the value can't be processed properly by the field class, it may be ne
 
 #### `initialize`
 
-The default `#initialize` method that is provided by the [`Marten::Schema::Field::Base`](pathname:///api/Marten/Schema/Field/Base.html) is fairly simply and looks like this:
+The default `#initialize` method that is provided by the [`Marten::Schema::Field::Base`](pathname:///api/dev/Marten/Schema/Field/Base.html) is fairly simply and looks like this:
 
 ```crystal
 def initialize(

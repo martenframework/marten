@@ -8,7 +8,7 @@ Marten gives you the ability to interact with uploaded files. These files are ma
 
 ## Accessing uploaded files
 
-Uploaded files are made available in the [`#data`](pathname:///api/Marten/HTTP/Request.html#data%3AParams%3A%3AData-instance-method) hash-like object of any HTTP request object (instance of [`Marten::HTTP::Request`](pathname:///api/Marten/Http/Request.html)). These file objects are instances of the [`Marten::HTTP::UploadedFile`](pathname:///api/Marten/HTTP/UploadedFile.html) class.
+Uploaded files are made available in the [`#data`](pathname:///api/dev/Marten/HTTP/Request.html#data%3AParams%3A%3AData-instance-method) hash-like object of any HTTP request object (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/Http/Request.html)). These file objects are instances of the [`Marten::HTTP::UploadedFile`](pathname:///api/dev/Marten/HTTP/UploadedFile.html) class.
 
 For example, you could access and process a `file` file originating from an HTML form using a handler like this:
 
@@ -21,7 +21,7 @@ class ProcessUploadedFileHandler < Marten::Handler
 end
 ```
 
-[`Marten::HTTP::UploadedFile`](pathname:///api/Marten/HTTP/UploadedFile.html) objects give you access to the following key methods, which allow you to interact with the uploaded file and its content:
+[`Marten::HTTP::UploadedFile`](pathname:///api/dev/Marten/HTTP/UploadedFile.html) objects give you access to the following key methods, which allow you to interact with the uploaded file and its content:
 
 * `#filename` returns the name of the uploaded file
 * `#size` returns the size of the uploaded file
@@ -84,4 +84,4 @@ class UploadFileHandler < Marten::Handlers::Schema
 end
 ```
 
-Here, the `UploadFileHandler` inherits from the [`Marten::Handlers::Schema`](pathname:///api/Marten/Handlers/Schema.html) generic handler. It would also make sense to leverage the [`Marten::Handlers::RecordCreate`](pathname:///api/Marten/Handlers/RecordCreate.html) generic handler to process the schema and create the `Attachment` record at the same time.
+Here, the `UploadFileHandler` inherits from the [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html) generic handler. It would also make sense to leverage the [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) generic handler to process the schema and create the `Attachment` record at the same time.

@@ -9,7 +9,7 @@ Middlewares are used to "hook" into Marten's request/response lifecycle. They ca
 
 ## How middlewares work
 
-Middlewares are subclasses of the [`Marten::Middleware`](pathname:///api/Marten/Middleware.html) abstract class. They must implement a `#call` method that takes a request object (instance of [`Marten::HTTP::Request`](pathname:///api/Marten/HTTP/Request.html)) and a `get_response` proc (allowing to get the final response) as arguments, and that returns a [`Marten::HTTP::Response`](pathname:///api/Marten/HTTP/Response.html) object:
+Middlewares are subclasses of the [`Marten::Middleware`](pathname:///api/0.1/Marten/Middleware.html) abstract class. They must implement a `#call` method that takes a request object (instance of [`Marten::HTTP::Request`](pathname:///api/0.1/Marten/HTTP/Request.html)) and a `get_response` proc (allowing to get the final response) as arguments, and that returns a [`Marten::HTTP::Response`](pathname:///api/0.1/Marten/HTTP/Response.html) object:
 
 ```crystal
 class TestMiddleware < Marten::Middleware

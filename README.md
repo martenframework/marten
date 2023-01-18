@@ -104,7 +104,7 @@ Morgan Aubert ([@ellmetha](https://github.com/ellmetha)) and
 
 ## Acknowledgments
 
-The Marten web framework initially draws its inspiration from [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). You can browse the [Acknowledgments](https://martenframework.com/docs/the-marten-project/acknowledgements) section of the documentation to learn more about the various inspirations and contributions that helped shape Marten.
+The Marten web framework initially draws its inspiration from [Django](https://www.djangoproject.com/) and [Ruby on Rails](https://rubyonrails.org/). You can browse the [Acknowledgments](https://martenframework.com/docs/the-marten-project/acknowledgments) section of the documentation to learn more about the various inspirations and contributions that helped shape Marten.
 
 ## License
 

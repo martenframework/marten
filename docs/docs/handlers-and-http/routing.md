@@ -64,7 +64,7 @@ The following route parameter types are available:
 
 | Type | Description |
 | ----------- | ----------- |
-| `str` | Matches any non-empty string (excluding the forward slash character **`/`**). This is the default parameter type used for untyped parameters (eg. `<myparam>`). |
+| `str` or `string` | Matches any non-empty string (excluding the forward slash character **`/`**). This is the default parameter type used for untyped parameters (eg. `<myparam>`). |
 | `int` | Matches zero or any positive integer. These parameter values are always deserialized as `UInt64` objects. |
 | `path` | Matches any non-empty strings including forward slash characters (**`/`**). For example `foo/bar/xyz` could be matched by this parameter type. |
 | `slug` | Matches any string containing only ASCII letters, numbers, hyphen, and underscore characters. For example `my-first-project-01` could be matched by this parameter type. |

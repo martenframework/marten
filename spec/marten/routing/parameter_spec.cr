@@ -17,11 +17,12 @@ describe Marten::Routing::Parameter do
 
   describe "::registry" do
     it "returns the registered path parameter implementations" do
-      Marten::Routing::Parameter.registry.size.should eq 5
-      Marten::Routing::Parameter.registry["str"].should be_a Marten::Routing::Parameter::String
+      Marten::Routing::Parameter.registry.size.should eq 6
       Marten::Routing::Parameter.registry["int"].should be_a Marten::Routing::Parameter::Integer
       Marten::Routing::Parameter.registry["path"].should be_a Marten::Routing::Parameter::Path
       Marten::Routing::Parameter.registry["slug"].should be_a Marten::Routing::Parameter::Slug
+      Marten::Routing::Parameter.registry["str"].should be_a Marten::Routing::Parameter::String
+      Marten::Routing::Parameter.registry["string"].should be_a Marten::Routing::Parameter::String
       Marten::Routing::Parameter.registry["uuid"].should be_a Marten::Routing::Parameter::UUID
     end
   end

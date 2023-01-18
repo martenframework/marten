@@ -19,6 +19,7 @@ module Marten
       register "int", Integer
       register "path", Path
       register "slug", Slug
+      register "string", String
       register "uuid", UUID
     end
   end

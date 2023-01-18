@@ -12,7 +12,7 @@ This page provides a reference for all the available management commands and the
 
 Collects all the assets and copies them into a unique storage.
 
-Please refer to [Asset handling](../../files/asset-handling) to learn more about when and how assets are "collected".
+Please refer to [Asset handling](../../assets/introduction) to learn more about when and how assets are "collected".
 
 ### Options
 

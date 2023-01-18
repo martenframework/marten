@@ -28,7 +28,7 @@ Alternatively, you can also refer to [Crystal's official installation instructio
 Secondly, we should install a few additional packages that will be required later on:
 
 * `git` to clone the project's repository
-* `nginx` to serve the project's server behind a reverse proxy and also serve [assets](../../files/asset-handling) and [media files](../../files/managing-files)
+* `nginx` to serve the project's server behind a reverse proxy and also serve [assets](../../assets/introduction) and [media files](../../files/managing-files)
 * `postgresql` to handle our database needs
 
 This can be achieved by running the following command:
@@ -111,13 +111,13 @@ Depending on how you are handling assets as part of your projects you may have t
 
 ## Collect assets
 
-You will then want to collect your [assets](../../files/asset-handling) so that they are uploaded to their final destination. To do so you can leverage the management CLI binary you compiled previously and run the [`collectassets`](../../development/reference/management-commands#collectassets) command:
+You will then want to collect your [assets](../../assets/introduction) so that they are uploaded to their final destination. To do so you can leverage the management CLI binary you compiled previously and run the [`collectassets`](../../development/reference/management-commands#collectassets) command:
 
 ```bash
 bin/manage collectassets --no-input
 ```
 
-This management command will "collect" all the available assets from the applications' assets directories and from the directories configured in the [`dirs`](../../development/reference/settings#dirs) setting, and ensure that they are "uploaded" to their final destination based on the [assets storage](../../files/asset-handling#assets-storage) that is currently configured.
+This management command will "collect" all the available assets from the applications' assets directories and from the directories configured in the [`dirs`](../../development/reference/settings#dirs) setting, and ensure that they are "uploaded" to their final destination based on the [assets storage](../../assets/introduction#assets-storage) that is currently configured.
 
 ## Apply the project's migrations
 

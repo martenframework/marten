@@ -12,7 +12,7 @@ Each deployment pipeline is unique and will vary from one project to another. Th
 
 1. installing your project's dependencies
 2. compiling your project's server and [management CLI](../development/management-commands)
-3. collecting your project's [assets](../files/asset-handling)
+3. collecting your project's [assets](../assets/introduction)
 4. applying any pending migrations to your database
 5. starting the compiled server
 
@@ -61,7 +61,7 @@ bin/manage collectassets --no-input
 ```
 
 :::info
-The assets handling documentation also provides a few [guidelines](../files/asset-handling#serving-assets-in-production) on how to serve asset files in production that may be worth reading.
+The assets handling documentation also provides a few [guidelines](../assets/introduction#serving-assets-in-production) on how to serve asset files in production that may be worth reading.
 :::
 
 ### Applying migrations
@@ -86,7 +86,7 @@ bin/server
 
 It's important to note that the Marten server is intended to be used behind a reverse proxy such as [Nginx](https://www.nginx.com/) or [Apache](https://httpd.apache.org/): you will usually want to configure such reverse proxy so that it targets your configured Marten server host and port. In this light, you should ensure that your Marten server is not using the HTTP port 80 (instead it could use something like 8080 or 8000 for example).
 
-Depending on your use cases, a reverse proxy will also allow you to easily serve other contents such as [assets](../files/asset-handling) or [uploaded files](../files/managing-files), and to use SSL/TLS.
+Depending on your use cases, a reverse proxy will also allow you to easily serve other contents such as [assets](../assets/introduction) or [uploaded files](../files/managing-files), and to use SSL/TLS.
 
 :::tip
 It is possible to run multiple processes of the same server behind a reverse proxy such as Nginx. Indeed, each compiled server can accept optional parameters to override the host and/or port being used. These parameters are respectively `--bind` (or `-b`) and `--port` (or `-p`). For example:

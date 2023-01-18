@@ -5,7 +5,7 @@ description: Template tags reference.
 
 ## `asset`
 
-The `asset` template tag allows to generate the URL of a given [asset](../../files/asset-handling). It must take at least one argument (the filepath of the asset).
+The `asset` template tag allows to generate the URL of a given [asset](../../assets/introduction). It must take at least one argument (the filepath of the asset).
 
 For example, the following line is a valid usage of the `asset` tag and will output the path or URL of the `app/app.css` asset:
 

@@ -160,7 +160,7 @@ The value to use for the X-Frame-Options header when the associated middleware i
 
 ## Assets settings
 
-Assets settings allow configuring how Marten should interact with [assets](../../files/asset-handling). These settings are all available under the `assets` namespace:
+Assets settings allow configuring how Marten should interact with [assets](../../assets/introduction). These settings are all available under the `assets` namespace:
 
 ```crystal
 config.assets.root = "assets"
@@ -171,7 +171,7 @@ config.assets.url = "/assets/"
 
 Default: `true`
 
-A boolean indicating whether assets should be looked for inside installed application folders. When this setting is set to `true`, this means that assets provided by installed applications will be collected by the `collectassets` command (please refer to [Asset handling](../../files/asset-handling) for more details regarding how to manage assets in your project).
+A boolean indicating whether assets should be looked for inside installed application folders. When this setting is set to `true`, this means that assets provided by installed applications will be collected by the `collectassets` command (please refer to [Asset handling](../../assets/introduction) for more details regarding how to manage assets in your project).
 
 ### `dirs`
 

@@ -1,7 +1,7 @@
 ---
-title: Asset handling
+title: Assets handling
 description: Learn how to handle assets.
-sidebar_label: Asset handling
+sidebar_label: Introduction
 ---
 
 Web applications generally need to serve "static files" or "assets": static images, Javascript files, CSS files, etc. Marten provides a set of helpers in order to help you manage assets, refer to them, and upload them to specific storages.

@@ -120,12 +120,19 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Assets',
+      link: {type: 'doc', id: 'assets'},
+      items: [
+        'assets/introduction',
+      ],
+    },
+    {
+      type: 'category',
       label: 'Files',
       link: {type: 'doc', id: 'files'},
       items: [
         'files/uploading-files',
         'files/managing-files',
-        'files/asset-handling',
       ],
     },
     {

@@ -38,6 +38,25 @@ describe Marten::Handlers::Base do
       handler_3 = Marten::Handlers::Base.new(request, params_3)
       handler_3.params.should eq({"id" => ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3")})
     end
+
+    it "allows to initialize a handler instance from an HTTP request object and keyword arguments" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler_1 = Marten::Handlers::Base.new(request, id: 42)
+      handler_1.params.should eq({"id" => 42})
+
+      handler_2 = Marten::Handlers::Base.new(request, slug: "my-slug")
+      handler_2.params.should eq({"slug" => "my-slug"})
+
+      handler_3 = Marten::Handlers::Base.new(request, id: ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3"))
+      handler_3.params.should eq({"id" => ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3")})
+    end
   end
 
   describe "::http_method_names" do

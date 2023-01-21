@@ -48,8 +48,9 @@ module Marten
       def initialize(@request : HTTP::Request, @params : Hash(String, Routing::Parameter::Types))
       end
 
-      def initialize(@request : HTTP::Request)
+      def initialize(@request : HTTP::Request, **kwargs)
         @params = {} of String => Routing::Parameter::Types
+        initialize_params(kwargs)
       end
 
       # Triggers the execution of the handler in order to produce an HTTP response.
@@ -201,10 +202,6 @@ module Marten
       # Convenient helper method to resolve a route name.
       delegate reverse, to: Marten.routes
 
-      private def handle_http_method_not_allowed
-        HTTP::Response::MethodNotAllowed.new(self.class.http_method_names)
-      end
-
       private def call_http_method
         case request.method.downcase
         when "get"
@@ -226,6 +223,14 @@ module Marten
         else
           handle_http_method_not_allowed
         end
+      end
+
+      private def handle_http_method_not_allowed
+        HTTP::Response::MethodNotAllowed.new(self.class.http_method_names)
+      end
+
+      private def initialize_params(kwargs)
+        kwargs.each { |key, value| @params[key.to_s] = value }
       end
     end
   end

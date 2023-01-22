@@ -8,7 +8,7 @@ Marten gives you the ability to interact with uploaded files. These files are ma
 
 ## Accessing uploaded files
 
-Uploaded files are made available in the [`#data`](pathname:///api/dev/Marten/HTTP/Request.html#data%3AParams%3A%3AData-instance-method) hash-like object of any HTTP request object (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/Http/Request.html)). These file objects are instances of the [`Marten::HTTP::UploadedFile`](pathname:///api/dev/Marten/HTTP/UploadedFile.html) class.
+Uploaded files are made available in the [`#data`](pathname:///api/dev/Marten/HTTP/Request.html#data%3AParams%3A%3AData-instance-method) hash-like object of any HTTP request object (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html)). These file objects are instances of the [`Marten::HTTP::UploadedFile`](pathname:///api/dev/Marten/HTTP/UploadedFile.html) class.
 
 For example, you could access and process a `file` file originating from an HTML form using a handler like this:
 

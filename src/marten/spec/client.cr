@@ -16,7 +16,11 @@ module Marten
       @server_handler : ::HTTP::Handler?
       @session : HTTP::Session::Store::Base?
 
+      # Returns a `Marten::HTTP::Headers` object that can be leveraged to set headers that should bet for each request.
+      getter headers
+
       def initialize(@content_type : String? = nil, @disable_request_forgery_protection = true)
+        @headers = HTTP::Headers.new
       end
 
       # Returns a `Marten::HTTP::Cookies` object that can be leveraged to set cookies that should be used by the client.
@@ -277,6 +281,8 @@ module Marten
         request_content_type = content_type || default_content_type || DEFAULT_CONTENT_TYPE_PER_METHOD[method]?
         request_headers = Marten::HTTP::Headers{"Host" => "127.0.0.1"}
         request_headers["Content-Type"] = request_content_type if request_content_type
+
+        @headers.try(&.each { |k, v| request_headers[k.to_s] = v.first.to_s })
         headers.try(&.each { |k, v| request_headers[k.to_s] = v.to_s })
 
         request_full_path = if query_params.nil?

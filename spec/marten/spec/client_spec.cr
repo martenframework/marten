@@ -86,6 +86,16 @@ describe Marten::Spec::Client do
       headers["Content-Type"].should eq "application/javascript"
     end
 
+    it "uses client-level headers as expected" do
+      client = Marten::Spec::Client.new
+      client.headers["X-Foo"] = "BAR"
+
+      response = client.get(Marten.routes.reverse("headers_respond"))
+
+      headers = JSON.parse(response.content)
+      headers["X-Foo"].should eq "BAR"
+    end
+
     it "provides the ability to specify custom header values expressed as a hash" do
       client = Marten::Spec::Client.new
 
@@ -168,6 +178,14 @@ describe Marten::Spec::Client do
       response = client.head(Marten.routes.reverse("request_method_respond"))
 
       response.content.should eq "HEAD"
+    end
+  end
+
+  describe "#headers" do
+    it "returns a headers object" do
+      client = Marten::Spec::Client.new
+
+      client.headers.should be_a Marten::HTTP::Headers
     end
   end
 

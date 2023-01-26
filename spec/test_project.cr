@@ -64,6 +64,12 @@ Marten.configure :test do |config|
     end
   end
 
+  config.middleware = [
+    Marten::Middleware::Session,
+    Marten::Middleware::Flash,
+    Marten::Middleware::GZip,
+  ]
+
   config.templates.app_dirs = true
   config.templates.dirs = [
     "test_project/templates",
@@ -77,4 +83,14 @@ Marten.routes.draw do
   path "/dummy", DummyHandler, name: "dummy"
   path "/dummy/<id:int>", DummyHandler, name: "dummy_with_id"
   path "/dummy/<id:int>/and/<scope:slug>", DummyHandler, name: "dummy_with_id_and_scope"
+  path "/request-method-respond", RequestMethodRespondHandler, name: "request_method_respond"
+  path "/query-params-respond", QueryParamsRespondHandler, name: "query_params_respond"
+  path "/headers-respond", HeadersRespondHandler, name: "headers_respond"
+  path "/secure-request-require", SecureRequestRequireHandler, name: "secure_request_require"
+  path "/session-value-get", SessionValueGetHandler, name: "session_value_get"
+  path "/session-value-set", SessionValueSetHandler, name: "session_value_set"
+  path "/cookie-value-get", CookieValueGetHandler, name: "cookie_value_get"
+  path "/cookie-value-set", CookieValueSetHandler, name: "cookie_value_set"
+  path "/simple-schema", SimpleSchemaHandler, name: "simple_schema"
+  path "/simple-file-schema", SimpleFileSchemaHandler, name: "simple_file_schema"
 end

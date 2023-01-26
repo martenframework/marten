@@ -167,7 +167,7 @@ module Marten
         # Return early if the current HTTP method is "safe" by definition (ie. according to RFC7231 HTTP methods are
         # safe if their defined semantics are essentially read-only) or if CSRF protection is disable on a per-handler
         # basis.
-        return if !self.class.protect_from_forgery?
+        return if !self.class.protect_from_forgery? || request.disable_request_forgery_protection?
         return if CSRF_SAFE_HTTP_METHODS.includes?(request.method.downcase)
 
         if request.headers[:ORIGIN]?

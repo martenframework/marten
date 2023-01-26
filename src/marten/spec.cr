@@ -1,15 +1,42 @@
 require "spec"
 
-require "./spec/ext/**"
+require "./spec/**"
 
 module Marten
+  # Provides helpers and tools allowing to ease the process of writing specs for Marten projects.
   module Spec
-    def self.clear_collected_emails
+    @@client : Client?
+
+    # Clears the testing client.
+    #
+    # This method is automatically called after each spec.
+    def self.clear_client : Nil
+      @@client = nil
+    end
+
+    # Clears collected emails.
+    #
+    # This method is only relevant if the current emailing backend is an instance of
+    # `Marten::Emailing::Backend::Development` that was initialized with `collect_emails: true`.
+    #
+    # This method is automatically called after each spec.
+    def self.clear_collected_emails : Nil
       return unless Marten.settings.emailing.backend.is_a?(Marten::Emailing::Backend::Development)
 
       Marten.settings.emailing.backend.as(Marten::Emailing::Backend::Development).delivered_emails.clear
     end
 
+    # Returns an instance of the testing client.
+    #
+    # The testing client allows to issue requests to the server and obtain the associated responses. Note that this
+    # method is memoized on a per-spec basis.
+    def self.client : Client
+      @@client ||= Client.new
+    end
+
+    # Flushes all the databases.
+    #
+    # This method is automatically called after each spec.
     def self.flush_databases
       Marten::DB::Connection.registry.values.each do |conn|
         Marten::DB::Management::SchemaEditor.run_for(conn) do |schema_editor|
@@ -18,6 +45,9 @@ module Marten
       end
     end
 
+    # Setup all the databases by ensuring that model tables are up-to-date.
+    #
+    # This method is automatically called before each spec suite.
     def self.setup_databases
       Marten::DB::Connection.registry.values.each do |conn|
         if !conn.test_database?
@@ -36,3 +66,4 @@ Spec.before_suite &->Marten.setup
 Spec.before_suite &->Marten::Spec.setup_databases
 Spec.after_each &->Marten::Spec.flush_databases
 Spec.after_each &->Marten::Spec.clear_collected_emails
+Spec.after_each &->Marten::Spec.clear_client

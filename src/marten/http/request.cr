@@ -6,6 +6,7 @@ module Marten
     # metadata of the incoming request.
     class Request
       @accepted_media_types : Array(MIME::MediaType)?
+      @disable_request_forgery_protection = false
       @flash : FlashStore?
       @host_and_port : NamedTuple(host: String, port: String)?
       @scheme : String?
@@ -180,6 +181,11 @@ module Marten
       def trace?
         method == "TRACE"
       end
+
+      protected getter? disable_request_forgery_protection
+
+      protected setter disable_request_forgery_protection
+      protected setter scheme
 
       private CONTENT_TYPE_APPLICATION_JSON = "application/json"
       private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"

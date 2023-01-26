@@ -127,6 +127,23 @@ describe Marten::Handlers::RequestForgeryProtection do
       response.status.should eq 200
     end
 
+    it "allows unsafe requests if CSRF protection was disabled at the request level for test purposes" do
+      request = Marten::Handlers::RequestForgeryProtectionSpec::TestRequest.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.test_disable_request_forgery_protection = true
+
+      handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
+      response = handler.process_dispatch
+
+      response.content.should eq "OK_POST"
+      response.status.should eq 200
+    end
+
     it "regenerates the CSRF token if the persisted one is invalid and sets the corresponding cookie" do
       raw_request = ::HTTP::Request.new(method: "GET", resource: "/test/xyz")
       raw_request.cookies["csrftoken"] = "bad"
@@ -808,6 +825,12 @@ module Marten::Handlers::RequestForgeryProtectionSpec
   EXAMPLE_SECRET          = "hTJ5wBtIS8PDdtl87dKnxipaGiNjniE8"
   EXAMPLE_MASKED_SECRET_1 = "p8vDuGBeukHERfcivhmj27RzqR2Jm1pNyR6yS9WOcim9WApgsmYypf8BY1FUB_VL"
   EXAMPLE_MASKED_SECRET_2 = "dgTB07gL9s-alvSG7MFEp-RoFei_vG-ym1swmyBjRqPFqQ5E4RfTOi8qboXkKQEw"
+
+  class TestRequest < Marten::HTTP::Request
+    def test_disable_request_forgery_protection=(value)
+      self.disable_request_forgery_protection = value
+    end
+  end
 
   class TestHandler < Marten::Handler
     include Marten::Handlers::RequestForgeryProtection

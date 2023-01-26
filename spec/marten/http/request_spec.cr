@@ -291,6 +291,44 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#disable_request_forgery_protection=" do
+    it "allows to set a flag indicating to disable request forgery protection for test purposes" do
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "GET",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "127.0.0.1"}
+      )
+
+      request.test_disable_request_forgery_protection = true
+
+      request.test_disable_request_forgery_protection?.should be_true
+    end
+  end
+
+  describe "#disable_request_forgery_protection?" do
+    it "always returns false by default" do
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "GET",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "127.0.0.1"}
+      )
+
+      request.test_disable_request_forgery_protection?.should be_false
+    end
+
+    it "returns true if the corresponding flag was set to disable request forgery protection for test purposes" do
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "GET",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "127.0.0.1"}
+      )
+
+      request.test_disable_request_forgery_protection = true
+
+      request.test_disable_request_forgery_protection?.should be_true
+    end
+  end
+
   describe "#flash" do
     it "returns the flash store if it was set previously" do
       flash_store = Marten::HTTP::FlashStore.new
@@ -908,6 +946,21 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#scheme=" do
+    it "allows to set the request scheme for test purposes only" do
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "GET",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "127.0.0.1"}
+      )
+
+      request.test_scheme = "https"
+
+      request.scheme.should eq "https"
+      request.secure?.should be_true
+    end
+  end
+
   describe "#secure?" do
     around_each do |t|
       original_use_x_forwarded_proto = Marten.settings.use_x_forwarded_proto
@@ -1051,6 +1104,18 @@ module Marten::HTTP::RequestSpec
   class TestRequest < Marten::HTTP::Request
     def wrapped_request
       @request
+    end
+
+    def test_disable_request_forgery_protection=(value)
+      self.disable_request_forgery_protection = value
+    end
+
+    def test_disable_request_forgery_protection?
+      self.disable_request_forgery_protection?
+    end
+
+    def test_scheme=(scheme)
+      self.scheme = scheme
     end
   end
 end

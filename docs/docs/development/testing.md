@@ -92,3 +92,39 @@ Marten.configure :test do |config|
   end
 end
 ```
+
+## Testing tools
+
+Marten provides some tools that can become useful when writing specs. 
+
+### Collecting emails
+
+If your code is sending [emails](../emailing/introduction), you might want to test that these emails are sent as expected. To do that, you can leverage the [development emailing backend](../emailing/reference/backends#development-backend) to ensure that sent emails are collected as part of each spec execution.
+
+To do that, the emailing backend needs to be initialized with `collect_emails: true` when configuring the [`emailing.backend`](./reference/settings#backend-1) setting. For example:
+
+```crystal title=config/settings/test.cr
+Marten.configure :test do |config|
+  config.backend = Marten::Emailing::Backend::Development.new(collect_emails: true)
+end
+```
+
+Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`#delivered_emails`](api/dev/Marten/Emailing/Backend/Development.html#delivered_emails%3AArray(Marten%3A%3AEmailing%3A%3AEmail)-instance-method) method, which returns an array of [`Marten::Email`](pathname:///api/dev/Marten/Emailing/Email.html) instances. For example:
+
+```crystal
+describe MyObject do
+  describe "#do_something" do
+    it "sends an email as expected" do
+      obj = MyObject.new
+      obj.do_something
+
+      Marten.settings.emailing.backend.delivered_emails.size.should eq 1
+      Marten.settings.emailing.backend.delivered_emails[0].subject.should eq "Test subject"
+    end
+  end
+end
+```
+
+:::info
+Note that Marten also automatically ensures that the collected emails are automatically reset after each spec execution so that you don't have to take care of that directly.
+:::

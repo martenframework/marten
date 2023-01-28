@@ -95,7 +95,7 @@ end
 
 ## Testing tools
 
-Marten provides some tools that can become useful when writing specs. 
+Marten provides some tools that can become useful when writing specs.
 
 ### Collecting emails
 
@@ -109,7 +109,7 @@ Marten.configure :test do |config|
 end
 ```
 
-Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`#delivered_emails`](api/dev/Marten/Emailing/Backend/Development.html#delivered_emails%3AArray(Marten%3A%3AEmailing%3A%3AEmail)-instance-method) method, which returns an array of [`Marten::Email`](pathname:///api/dev/Marten/Emailing/Email.html) instances. For example:
+Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`#delivered_emails`](pathname:///api/dev/Marten/Emailing/Backend/Development.html#delivered_emails%3AArray(Marten%3A%3AEmailing%3A%3AEmail)-instance-method) method, which returns an array of [`Marten::Email`](pathname:///api/dev/Marten/Emailing/Email.html) instances. For example:
 
 ```crystal
 describe MyObject do

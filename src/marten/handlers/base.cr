@@ -19,6 +19,9 @@ module Marten
       include Session
       include XFrameOptions
 
+      # :nodoc:
+      alias ParamsHash = Hash(String, Routing::Parameter::Types)
+
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
@@ -45,12 +48,12 @@ module Marten
         @@http_method_names = method_names.to_a.map(&.to_s)
       end
 
-      def initialize(@request : HTTP::Request, @params : Hash(String, Routing::Parameter::Types))
+      def initialize(@request : HTTP::Request, @params : ParamsHash)
       end
 
       def initialize(@request : HTTP::Request, **kwargs)
-        @params = {} of String => Routing::Parameter::Types
-        initialize_params(kwargs)
+        @params = ParamsHash.new
+        kwargs.each { |key, value| @params[key.to_s] = value }
       end
 
       # Triggers the execution of the handler in order to produce an HTTP response.
@@ -227,10 +230,6 @@ module Marten
 
       private def handle_http_method_not_allowed
         HTTP::Response::MethodNotAllowed.new(self.class.http_method_names)
-      end
-
-      private def initialize_params(kwargs)
-        kwargs.each { |key, value| @params[key.to_s] = value }
       end
     end
   end

@@ -9,10 +9,10 @@ module Marten
     include Core::Validation
 
     # :nodoc:
-    alias DataHash = Hash(String, Field::Any | Nil | HTTP::UploadedFile)
+    alias DataHash = Hash(String, Field::Any | Nil | HTTP::UploadedFile | Routing::Parameter::Types)
 
     # :nodoc:
-    alias AnyDataHash = DataHash | HTTP::Params::Data | HTTP::Params::Query
+    alias AnyDataHash = DataHash | Handlers::Base::ParamsHash | HTTP::Params::Data | HTTP::Params::Query
 
     @@fields : Hash(String, Field::Base) = {} of String => Field::Base
 

@@ -1,6 +1,13 @@
 require "./spec_helper"
 
 describe Marten::Schema do
+  describe "#new" do
+    it "allows to initialize a schema from a handler's routing paramters" do
+      schema = Marten::SchemaSpec::SimpleSchema.new(Marten::Handlers::Base::ParamsHash{"id" => 42, "foo" => "bar"})
+      schema.should be_truthy
+    end
+  end
+
   describe "::inherited" do
     it "ensures that the schema inherits its parent fields" do
       Marten::SchemaSpec::SubSchema.fields.size.should eq 4

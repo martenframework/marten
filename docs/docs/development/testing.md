@@ -127,7 +127,7 @@ end
 ```
 
 :::tip
-In the above example we are simply specifying a "raw" path by hardcoding its value. In a real scenario, you will likely want to [resolve your handler URLs](../handlers-and-http/routing#reverse-url-resolutions) using the [`Marten::Routing::Map#reverse`](api/dev/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method of the main routes map (that way, you don't hardcode route paths in your specs). For example
+In the above example we are simply specifying a "raw" path by hardcoding its value. In a real scenario, you will likely want to [resolve your handler URLs](../handlers-and-http/routing#reverse-url-resolutions) using the [`Marten::Routing::Map#reverse`](pathname:///api/dev/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method of the main routes map (that way, you don't hardcode route paths in your specs). For example
 
 ```crystal
 url = Marten.routes.reverse("article_detail", pk: 42)

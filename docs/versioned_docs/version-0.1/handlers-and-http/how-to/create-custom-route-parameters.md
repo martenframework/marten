@@ -46,7 +46,7 @@ In order to be able to use custom route parameters in your [route definitions](.
 To do so, you will have to call the [`Marten::Routing::Parameter#register`](pathname:///api/0.1/Marten/Routing/Parameter.html#register(id%3A%3A%3AString|Symbol%2Cparameter_klass%3ABase.class)-class-method) method with the identifier of the parameter you wish to use in route path definitions, and the actual parameter class. For example:
 
 ```crystal
-Marten::DB::Field.register(:year, YearParameter)
+Marten::Routing::Parameter.register(:year, YearParameter)
 ```
 
 With the above registration, you could technically create the following route definition:

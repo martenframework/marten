@@ -128,11 +128,11 @@ describe Marten::CLI::Manage::Command::New do
       end
     end
 
-    it "creates a new project structure in a custom directory" do
+    it "creates a new project structure in a custom directory using the --dir option" do
       stdout = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::New.new(
-        options: ["project", "dummy_project", "sub/custom"],
+        options: ["project", "dummy_project", "--dir=sub/custom"],
         stdout: stdout
       )
 
@@ -163,11 +163,70 @@ describe Marten::CLI::Manage::Command::New do
       end
     end
 
-    it "creates a new app structure in a custom directory" do
+    it "creates a new project structure in a custom directory using the -d option" do
       stdout = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::New.new(
-        options: ["app", "dummy_app", "sub/custom"],
+        options: ["project", "dummy_project", "-d", "sub/custom"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      [
+        "config/initializers/.gitkeep",
+        "config/settings/base.cr",
+        "config/settings/development.cr",
+        "config/settings/production.cr",
+        "config/settings/test.cr",
+        "config/routes.cr",
+        "spec/spec_helper.cr",
+        "src/cli.cr",
+        "src/project.cr",
+        "src/server.cr",
+        "src/emails/.gitkeep",
+        "src/handlers/.gitkeep",
+        "src/migrations/.gitkeep",
+        "src/models/.gitkeep",
+        "src/schemas/.gitkeep",
+        "src/templates/.gitkeep",
+        ".gitignore",
+        "manage.cr",
+        "shard.yml",
+      ].each do |path|
+        File.exists?(File.join(".", "sub", "custom", path)).should be_true
+      end
+    end
+
+    it "creates a new app structure in a custom directory the --dir option" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["app", "dummy_app", "--dir=sub/custom"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      [
+        "app.cr",
+        "cli.cr",
+        "emails/.gitkeep",
+        "handlers/.gitkeep",
+        "migrations/.gitkeep",
+        "models/.gitkeep",
+        "schemas/.gitkeep",
+        "templates/.gitkeep",
+      ].each do |path|
+        File.exists?(File.join(".", "sub", "custom", path)).should be_true
+      end
+    end
+
+    it "creates a new app structure in a custom directory the -d option" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["app", "dummy_app", "-d", "sub/custom"],
         stdout: stdout
       )
 

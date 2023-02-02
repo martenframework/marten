@@ -23,7 +23,7 @@ module Marten
           def setup
             on_argument(:type, "Type of structure to initialize: 'project' or 'app'") { |v| @type = v }
             on_argument(:name, "Name of the project or app to initialize") { |v| @name = v }
-            on_argument(:dir, "Optional destination directory") { |v| @dir = v }
+            on_option_with_arg(:d, :dir, arg: "dir", description: "Optional destination directory") { |v| @dir = v }
           end
 
           def run
@@ -76,14 +76,14 @@ module Marten
 
           app_template "app/app.cr.ecr", "app.cr"
           app_template "app/cli.cr.ecr", "cli.cr"
-          app_template "shared/.gitkeep", "emails/.gitkeep"
-          app_template "shared/.gitkeep", "handlers/.gitkeep"
-          app_template "shared/.gitkeep", "migrations/.gitkeep"
-          app_template "shared/.gitkeep", "models/.gitkeep"
-          app_template "shared/.gitkeep", "schemas/.gitkeep"
-          app_template "shared/.gitkeep", "templates/.gitkeep"
+          app_template "shared/.gitkeep.ecr", "emails/.gitkeep"
+          app_template "shared/.gitkeep.ecr", "handlers/.gitkeep"
+          app_template "shared/.gitkeep.ecr", "migrations/.gitkeep"
+          app_template "shared/.gitkeep.ecr", "models/.gitkeep"
+          app_template "shared/.gitkeep.ecr", "schemas/.gitkeep"
+          app_template "shared/.gitkeep.ecr", "templates/.gitkeep"
 
-          project_template "shared/.gitkeep", "config/initializers/.gitkeep"
+          project_template "shared/.gitkeep.ecr", "config/initializers/.gitkeep"
           project_template "project/config/settings/base.cr.ecr", "config/settings/base.cr"
           project_template "project/config/settings/development.cr.ecr", "config/settings/development.cr"
           project_template "project/config/settings/production.cr.ecr", "config/settings/production.cr"
@@ -93,13 +93,13 @@ module Marten
           project_template "project/src/cli.cr.ecr", "src/cli.cr"
           project_template "project/src/project.cr.ecr", "src/project.cr"
           project_template "project/src/server.cr.ecr", "src/server.cr"
-          project_template "shared/.gitkeep", "src/emails/.gitkeep"
-          project_template "shared/.gitkeep", "src/handlers/.gitkeep"
-          project_template "shared/.gitkeep", "src/migrations/.gitkeep"
-          project_template "shared/.gitkeep", "src/models/.gitkeep"
-          project_template "shared/.gitkeep", "src/schemas/.gitkeep"
-          project_template "shared/.gitkeep", "src/templates/.gitkeep"
-          project_template "project/.gitignore", ".gitignore"
+          project_template "shared/.gitkeep.ecr", "src/emails/.gitkeep"
+          project_template "shared/.gitkeep.ecr", "src/handlers/.gitkeep"
+          project_template "shared/.gitkeep.ecr", "src/migrations/.gitkeep"
+          project_template "shared/.gitkeep.ecr", "src/models/.gitkeep"
+          project_template "shared/.gitkeep.ecr", "src/schemas/.gitkeep"
+          project_template "shared/.gitkeep.ecr", "src/templates/.gitkeep"
+          project_template "project/.gitignore.ecr", ".gitignore"
           project_template "project/manage.cr.ecr", "manage.cr"
           project_template "project/shard.yml.ecr", "shard.yml"
 

@@ -63,7 +63,7 @@ This is why it is always important to _namespace_ abstractions, assets, template
 Creating applications can be done very easily through the use of the [`new`](./reference/management-commands#new) management command. For example:
 
 ```bash
-marten new app blog src/blog
+marten new app blog --dir=src/blog
 ```
 
 Running such a command will usually create the following directory structure:

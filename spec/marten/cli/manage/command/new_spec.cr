@@ -69,6 +69,21 @@ describe Marten::CLI::Manage::Command::New do
       stderr.rewind.gets_to_end.includes?("You must specify a project or application name").should be_true
     end
 
+    it "prints an error when trying to use --with-auth for an app structure" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["app", "dummy_project", "--with-auth"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      stderr.rewind.gets_to_end.includes?("--with-auth can only be used when creating new projects").should be_true
+    end
+
     it "creates a new project structure" do
       stdout = IO::Memory.new
 
@@ -79,28 +94,23 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      [
-        "config/initializers/.gitkeep",
-        "config/settings/base.cr",
-        "config/settings/development.cr",
-        "config/settings/production.cr",
-        "config/settings/test.cr",
-        "config/routes.cr",
-        "spec/spec_helper.cr",
-        "src/cli.cr",
-        "src/project.cr",
-        "src/server.cr",
-        "src/emails/.gitkeep",
-        "src/handlers/.gitkeep",
-        "src/migrations/.gitkeep",
-        "src/models/.gitkeep",
-        "src/schemas/.gitkeep",
-        "src/templates/.gitkeep",
-        ".gitignore",
-        "manage.cr",
-        "shard.yml",
-      ].each do |path|
-        File.exists?(File.join(".", "dummy_project", path)).should be_true
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
+    it "creates a new project structure with authentication" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--with-auth"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
       end
     end
 
@@ -114,17 +124,8 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      [
-        "app.cr",
-        "cli.cr",
-        "emails/.gitkeep",
-        "handlers/.gitkeep",
-        "migrations/.gitkeep",
-        "models/.gitkeep",
-        "schemas/.gitkeep",
-        "templates/.gitkeep",
-      ].each do |path|
-        File.exists?(File.join(".", "dummy_app", path)).should be_true
+      Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_app", path)).should be_true, "File #{path} does not exist"
       end
     end
 
@@ -138,28 +139,8 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      [
-        "config/initializers/.gitkeep",
-        "config/settings/base.cr",
-        "config/settings/development.cr",
-        "config/settings/production.cr",
-        "config/settings/test.cr",
-        "config/routes.cr",
-        "spec/spec_helper.cr",
-        "src/cli.cr",
-        "src/project.cr",
-        "src/server.cr",
-        "src/emails/.gitkeep",
-        "src/handlers/.gitkeep",
-        "src/migrations/.gitkeep",
-        "src/models/.gitkeep",
-        "src/schemas/.gitkeep",
-        "src/templates/.gitkeep",
-        ".gitignore",
-        "manage.cr",
-        "shard.yml",
-      ].each do |path|
-        File.exists?(File.join(".", "sub", "custom", path)).should be_true
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES.each do |path|
+        File.exists?(File.join(".", "sub", "custom", path)).should be_true, "File #{path} does not exist"
       end
     end
 
@@ -173,28 +154,8 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      [
-        "config/initializers/.gitkeep",
-        "config/settings/base.cr",
-        "config/settings/development.cr",
-        "config/settings/production.cr",
-        "config/settings/test.cr",
-        "config/routes.cr",
-        "spec/spec_helper.cr",
-        "src/cli.cr",
-        "src/project.cr",
-        "src/server.cr",
-        "src/emails/.gitkeep",
-        "src/handlers/.gitkeep",
-        "src/migrations/.gitkeep",
-        "src/models/.gitkeep",
-        "src/schemas/.gitkeep",
-        "src/templates/.gitkeep",
-        ".gitignore",
-        "manage.cr",
-        "shard.yml",
-      ].each do |path|
-        File.exists?(File.join(".", "sub", "custom", path)).should be_true
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES.each do |path|
+        File.exists?(File.join(".", "sub", "custom", path)).should be_true, "File #{path} does not exist"
       end
     end
 
@@ -208,17 +169,8 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      [
-        "app.cr",
-        "cli.cr",
-        "emails/.gitkeep",
-        "handlers/.gitkeep",
-        "migrations/.gitkeep",
-        "models/.gitkeep",
-        "schemas/.gitkeep",
-        "templates/.gitkeep",
-      ].each do |path|
-        File.exists?(File.join(".", "sub", "custom", path)).should be_true
+      Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
+        File.exists?(File.join(".", "sub", "custom", path)).should be_true, "File #{path} does not exist"
       end
     end
 
@@ -232,17 +184,8 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      [
-        "app.cr",
-        "cli.cr",
-        "emails/.gitkeep",
-        "handlers/.gitkeep",
-        "migrations/.gitkeep",
-        "models/.gitkeep",
-        "schemas/.gitkeep",
-        "templates/.gitkeep",
-      ].each do |path|
-        File.exists?(File.join(".", "sub", "custom", path)).should be_true
+      Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
+        File.exists?(File.join(".", "sub", "custom", path)).should be_true, "File #{path} does not exist"
       end
     end
   end
@@ -250,4 +193,103 @@ end
 
 module Marten::CLI::Manage::Command::NewSpec
   PATH = "spec/marten/cli/manage/command/new_spec"
+
+  APP_FILES = [
+    "app.cr",
+    "cli.cr",
+    "emails/.gitkeep",
+    "handlers/.gitkeep",
+    "migrations/.gitkeep",
+    "models/.gitkeep",
+    "schemas/.gitkeep",
+    "templates/.gitkeep",
+  ]
+
+  PROJECT_FILES = [
+    "config/initializers/.gitkeep",
+    "config/settings/base.cr",
+    "config/settings/development.cr",
+    "config/settings/production.cr",
+    "config/settings/test.cr",
+    "config/routes.cr",
+    "spec/spec_helper.cr",
+    "src/cli.cr",
+    "src/project.cr",
+    "src/server.cr",
+    "src/assets/css/app.css",
+    "src/emails/.gitkeep",
+    "src/handlers/.gitkeep",
+    "src/migrations/.gitkeep",
+    "src/models/.gitkeep",
+    "src/schemas/.gitkeep",
+    "src/templates/base.html",
+    ".gitignore",
+    "manage.cr",
+    "shard.yml",
+  ]
+
+  PROJECT_WITH_AUTH_FILES = [
+    "config/initializers/.gitkeep",
+    "config/settings/base.cr",
+    "config/settings/development.cr",
+    "config/settings/production.cr",
+    "config/settings/test.cr",
+    "config/routes.cr",
+    "spec/auth/emails/password_reset_email_spec.cr",
+    "spec/auth/emails/spec_helper.cr",
+    "spec/auth/handlers/concerns/require_anonymous_user_spec.cr",
+    "spec/auth/handlers/concerns/require_signed_in_user_spec.cr",
+    "spec/auth/handlers/concerns/spec_helper.cr",
+    "spec/auth/handlers/password_reset_confirm_handler_spec.cr",
+    "spec/auth/handlers/password_reset_initiate_handler_spec.cr",
+    "spec/auth/handlers/profile_handler_spec.cr",
+    "spec/auth/handlers/sign_in_handler_spec.cr",
+    "spec/auth/handlers/sign_out_handler_spec.cr",
+    "spec/auth/handlers/sign_up_handler_spec.cr",
+    "spec/auth/handlers/spec_helper.cr",
+    "spec/auth/spec_helper.cr",
+    "spec/auth/schemas/password_reset_confirm_schema_spec.cr",
+    "spec/auth/schemas/password_reset_initiate_schema_spec.cr",
+    "spec/auth/schemas/sign_in_schema_spec.cr",
+    "spec/auth/schemas/sign_up_schema_spec.cr",
+    "spec/auth/schemas/spec_helper.cr",
+    "spec/spec_helper.cr",
+    "src/auth/emails/password_reset_email.cr",
+    "src/auth/handlers/concerns/require_anonymous_user.cr",
+    "src/auth/handlers/concerns/require_signed_in_user.cr",
+    "src/auth/handlers/password_reset_confirm_handler.cr",
+    "src/auth/handlers/password_reset_initiate_handler.cr",
+    "src/auth/handlers/profile_handler.cr",
+    "src/auth/handlers/sign_in_handler.cr",
+    "src/auth/handlers/sign_out_handler.cr",
+    "src/auth/handlers/sign_up_handler.cr",
+    "src/auth/migrations/0001_create_auth_user_table.cr",
+    "src/auth/models/user.cr",
+    "src/auth/schemas/password_reset_confirm_schema.cr",
+    "src/auth/schemas/password_reset_initiate_schema.cr",
+    "src/auth/schemas/sign_in_schema.cr",
+    "src/auth/schemas/sign_up_schema.cr",
+    "src/auth/templates/auth/emails/password_reset.html",
+    "src/auth/templates/auth/password_reset_confirm.html",
+    "src/auth/templates/auth/password_reset_initiate.html",
+    "src/auth/templates/auth/profile.html",
+    "src/auth/templates/auth/sign_in.html",
+    "src/auth/templates/auth/sign_up.html",
+    "src/auth/app.cr",
+    "src/auth/cli.cr",
+    "src/auth/routes.cr",
+    "src/cli.cr",
+    "src/project.cr",
+    "src/server.cr",
+    "src/assets/css/app.css",
+    "src/emails/.gitkeep",
+    "src/handlers/.gitkeep",
+    "src/migrations/.gitkeep",
+    "src/models/.gitkeep",
+    "src/schemas/.gitkeep",
+    "src/templates/base.html",
+    ".gitignore",
+    "manage.cr",
+    "shard.yml",
+  ]
 end

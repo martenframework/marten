@@ -4,5 +4,10 @@ version: 0.1.0
 dependencies:
   marten:
     github: martenframework/marten
+<%- if @context.targets_auth? -%>
+  marten_auth:
+    github: martenframework/marten-auth
+    branch: main
+<%- end -%>
   sqlite3:
     github: crystal-lang/crystal-sqlite3

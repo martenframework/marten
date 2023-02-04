@@ -7,4 +7,7 @@ require "marten/cli"
 # Third party CLI requirements.
 
 # Project CLI requirements.
+<%- if @context.targets_auth? -%>
+require "./auth/cli"
+<%- end -%>
 require "./migrations/**"

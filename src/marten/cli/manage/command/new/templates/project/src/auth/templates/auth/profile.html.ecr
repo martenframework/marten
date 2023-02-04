@@ -1,0 +1,6 @@
+{% extend "base.html" %}
+
+{% block content %}
+<h1>Profile</h1>
+<p><strong>Email:</strong> {{ request.user.email }}&nbsp;&bull;&nbsp;<a href="{% url 'auth:sign_out' %}">Sign out</a></p>
+{% endblock content %}

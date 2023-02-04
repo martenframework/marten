@@ -1,0 +1,20 @@
+{% extend "base.html" %}
+
+{% block content %}
+<h1>Sign in</h1>
+<form method="post" action="" enctype="multipart/form-data" novalidate>
+  <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+  {% for error in schema.errors.global %}<div class="global-error">{{ error.message }}</div>{% endfor %}
+
+  <label for="{{ schema.email.id }}">Email address</label>
+  <input type="text" id="{{ schema.email.id }}" name="{{ schema.email.id }}" value="{{ schema.email.value }}" autocomplete="off" required>
+  {% for error in schema.email.errors %}<p class="input-error">{{ error.message }}</p>{% endfor %}
+
+  <label for="{{ schema.password.id }}">Password</label>
+  <input type="password" id="{{ schema.password.id }}" name="{{ schema.password.id }}" value="{{ schema.password.value }}" autocomplete="off" required>
+  {% for error in schema.password.errors %}<p class="input-error">{{ error.message }}</p>{% endfor %}
+
+  <button>Sign in</button>
+</form>
+<p><a href="{% url 'auth:sign_up' %}">Sign up</a>&nbsp;&bull;&nbsp;<a href="{% url 'auth:password_reset_initiate' %}">Forgot password?</a></p>
+{% endblock content %}

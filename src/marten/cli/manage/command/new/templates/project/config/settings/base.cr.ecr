@@ -2,11 +2,20 @@ Marten.configure do |config|
   # IMPORTANT: please ensure the secret key value is kept secret!
   config.secret_key = "__insecure_<%= Random::Secure.random_bytes(32).hexstring %>__"
 
+  <%- if @context.targets_auth? -%>
+  config.installed_apps = [
+    Auth::App,
+  ]
+  <%- else -%>
   # config.installed_apps = []
+  <%- end -%>
 
   config.middleware = [
     Marten::Middleware::Session,
     Marten::Middleware::Flash,
+    <%- if @context.targets_auth? -%>
+    MartenAuth::Middleware,
+    <%- end -%>
     Marten::Middleware::GZip,
     Marten::Middleware::XFrameOptions,
   ]
@@ -22,4 +31,8 @@ Marten.configure do |config|
     Marten::Template::ContextProducer::Debug,
     Marten::Template::ContextProducer::I18n,
   ]
+
+  <%- if @context.targets_auth? -%>
+  config.auth.user_model = Auth::User
+  <%- end -%>
 end

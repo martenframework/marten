@@ -13,6 +13,7 @@ module Marten
             end
 
             abstract def path
+            abstract def target
 
             def render
               Dir.mkdir_p(@full_path.dirname)

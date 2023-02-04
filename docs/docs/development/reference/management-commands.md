@@ -111,6 +111,7 @@ The command allows you to fully define the name of your project or application, 
 ### Options
 
 * `-d DIR, --dir=DIR` - An optional destination directory
+* `--with-auth` - Adds an authentication application to newly created projects
 
 ### Arguments
 

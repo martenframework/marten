@@ -44,6 +44,7 @@ myblog/
 ├── spec
 │   └── spec_helper.cr
 ├── src
+│   ├── assets
 │   ├── handlers
 │   ├── migrations
 │   ├── models
@@ -62,7 +63,7 @@ These files and folders are described below:
 | ----------- | ----------- |
 | config/ | Contains the configuration of the project. This includes environment-specific Marten configuration settings, initializers, and web application routes. |
 | spec/ | Contains the project specs, allowing you to test your application. | 
-| src/ | Contains the source code of the application. By default this folder will include a `project.cr` file (where all dependencies - including Marten itself - are required), a `server.cr` file (which starts the Marten web server), a `cli.cr` file (where migrations and CLI-related abstractions are required), and empty `handlers`, `migrations`, `models`, `schemas`, and `templates` folders. |
+| src/ | Contains the source code of the application. By default this folder will include a `project.cr` file (where all dependencies - including Marten itself - are required), a `server.cr` file (which starts the Marten web server), a `cli.cr` file (where migrations and CLI-related abstractions are required), and `assets`, `handlers`, `migrations`, `models`, `schemas`, and `templates` folders. |
 | .gitignore | Regular `.gitignore` file which tells git the files and directories that should be ignored. |
 | manage.cr | This file defines a CLI that lets you interact with your Marten project in order to perform various actions (e.g. running database migrations, collecting assets, etc). |
 | shard.yml | The standard [shard.yml](https://crystal-lang.org/reference/the_shards_command/index.html) file, that lists the dependencies that are required to build your application. |
@@ -315,24 +316,34 @@ Templates provide a convenient way for defining the presentation logic of a web 
 Let's define the expected template for our home handler by creating a `src/templates/home.html` file with the following content:
 
 ```html title="src/templates/home.html"
-<h1>My blog</h1>
-<h2>Articles:</h2>
-<ul>
-{% for article in articles %}
-  <li>{{ article.title }}</li>
-{% endfor %}
-</ul>
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>My blog</h1>
+  <h2>Articles:</h2>
+  <ul>
+  {% for article in articles %}
+    <li>{{ article.title }}</li>
+  {% endfor %}
+  </ul>
+{% endblock %}
 ```
 
 As you can see, Marten's templating system relies on variables that are surrounded by **`{{`** and **`}}`**. Each variable can involve lookups in order to access specific object attributes. In the above example `{{ article.title }}` means that the `title` attribute of the `article` variable should be outputted.
 
 Method-calling is done by using statements (also called "template tags") delimited by **`{%`** and **`%}`**. Such statements can involve for loops, if conditions, etc. In the above example we are using a for loop to iterate over the `Article` records in the `articles` query set that is "passed" to the template context in our `HomeHandler` handler.
 
-If you go back to the home page ([http://localhost:8000](http://localhost:8000)), you should be able to see a list of article titles corresponding to all the `Article` records you created previously.
-
 :::info
 Please refer to [Templates](../templates/introduction) to learn more about Marten's templating system.
 :::
+
+:::info
+What about the `extend` and `block` tags in the previous snippet? These tags allow to "extend" a "base" template that usually contains the layout of an application (`base.html` in the above snippet) and to explicitly define the contents of the "blocks" that are expected by this base template. New marten projects are created with a simple `base.html` template that defines a very basic HTML document, whose body is filled with the content of a `content` block. This is why templates in this tutorial extend a `base.html` and override the content of the `content` block.
+
+You can learn more about these capabilities in [Template inheritance](../templates/introduction#template-inheritance).
+:::
+
+If you go back to the home page ([http://localhost:8000](http://localhost:8000)), you should be able to see a list of article titles corresponding to all the `Article` records you created previously.
 
 We have now pieced together the main components of the Marten web framework (Models, Handlers, Templates). When accessing the home page of our application, the following steps are taken care of by the framework:
 
@@ -385,8 +396,12 @@ As you can see above, the new route we mapped to the `ArticleDetailHandler` hand
 Obviously, we also need to define the `article_detail.html` template. To do so, let's create a `src/templates/article_detail.html` with the following content:
 
 ```html title="src/templates/article_detail.html"
-<h1>{{ article.title }}</h1>
-<p>{{ article.content }}</p>
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>{{ article.title }}</h1>
+  <p>{{ article.content }}</p>
+{% endblock %}
 ```
 
 Now if you try to access [http://localhost:8000/article/1](http://localhost:8000/article/1), you will be able to see the content of the `Article` record with ID 1.
@@ -394,20 +409,24 @@ Now if you try to access [http://localhost:8000/article/1](http://localhost:8000
 There is something missing though: the home page does not link to the "detail" page of each article. To remediate this, we can modify the `src/templates/home.html` template file as follows:
 
 ```html title="src/templates/home.html"
-<h1>My blog</h1>
-<h2>Articles:</h2>
-<ul>
-{% for article in articles %}
-// highlight-next-line
-  <li>
-// highlight-next-line
-    {{ article.title }}
-// highlight-next-line
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
-// highlight-next-line
-  </li>
-{% endfor %}
-</ul>
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>My blog</h1>
+  <h2>Articles:</h2>
+  <ul>
+  {% for article in articles %}
+  // highlight-next-line
+    <li>
+  // highlight-next-line
+      {{ article.title }}
+  // highlight-next-line
+      &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
+  // highlight-next-line
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}
 ```
 
 The `url` tag used in the above snippet allows to perform a reverse URL resolution. This allows to generate the final URL associated with a specific route name (the `article_detail` route name we defined earlier in this case). This reverse resolution can involve parameters if the considered route require ones.
@@ -468,26 +487,24 @@ In the above snippet, we make use of `#redirect` in order to indicate that we wa
 We can now create the `article_create.html` template file with the following content:
 
 ```html title="src/templates/article_create.html"
-<h1>Create a new article</h1>
-<form method="post" action="" novalidate>
-  <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+{% extend "base.html" %}
 
-  <fieldset>
+{% block content %}
+  <h1>Create a new article</h1>
+  <form method="post" action="" novalidate>
+    <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+
     <div><label>Title</label></div>
     <input type="text" name="{{ schema.title.id }}" value="{{ schema.title.value }}"/>
-    {% for error in schema.title.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
+    {% for error in schema.title.errors %}<p class="input-error"><small>{{ error.message }}</small></p>{% endfor %}
 
-  <fieldset>
     <div><label>Content</label></div>
     <textarea name="{{ schema.content.id }}" value="{{ schema.content.value }}">{{ schema.content.value }}</textarea>
-    {% for error in schema.content.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
+    {% for error in schema.content.errors %}<p class="input-error"><small>{{ error.message }}</small></p>{% endfor %}
 
-  <fieldset>
-    <button>Submit</button>
-  </fieldset>
-</form>
+    <div><button>Submit</button></div>
+  </form>
+{% endblock %}
 ```
 
 As you can see, the above snippet defines a form that includes two fields: one for the `title` schema field and the other one for the `content` schema field. Each schema field can be errored depending on the result of a validation, and this is why specific field errors are (optionally) displayed as well.
@@ -517,19 +534,22 @@ Now if you open your browser at [http://localhost:8000/article/create](http://lo
 Obviously, we still need to a link somewhere in our application to be able to easily access the article creation form. In this light, we can modify the `home.html` template file as follows:
 
 ```html title="src/templates/home.html"
-<h1>My blog</h1>
-// highlight-next-line
-<a href="{% url 'article_create' %}">Create new article</a>
-<h2>Articles:</h2>
-<ul>
-{% for article in articles %}
-  <li>
-    {{ article.title }}
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
-  </li>
-{% endfor %}
-</ul>
+{% extend "base.html" %}
 
+{% block content %}
+  <h1>My blog</h1>
+  // highlight-next-line
+  <a href="{% url 'article_create' %}">Create new article</a>
+  <h2>Articles:</h2>
+  <ul>
+  {% for article in articles %}
+    <li>
+      {{ article.title }}
+      &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}
 ```
 
 :::info
@@ -581,26 +601,24 @@ Here the `#get` and `#post` method implementations look similar to what was int
 We can now create the `article_update.html` template file with the following content:
 
 ```html title="src/templates/article_update.html"
-<h1>Update article "{{ article.title }}"</h1>
-<form method="post" action="" novalidate>
-  <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+{% extend "base.html" %}
 
-  <fieldset>
+{% block content %}
+  <h1>Update article "{{ article.title }}"</h1>
+  <form method="post" action="" novalidate>
+    <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+
     <div><label>Title</label></div>
     <input type="text" name="{{ schema.title.id }}" value="{{ schema.title.value }}"/>
-    {% for error in schema.title.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
+    {% for error in schema.title.errors %}<p class="input-error"><small>{{ error.message }}</small></p>{% endfor %}
 
-  <fieldset>
     <div><label>Content</label></div>
     <textarea name="{{ schema.content.id }}" value="{{ schema.content.value }}">{{ schema.content.value }}</textarea>
-    {% for error in schema.content.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
+    {% for error in schema.content.errors %}<p class="input-error"><small>{{ error.message }}</small></p>{% endfor %}
 
-  <fieldset>
-    <button>Submit</button>
-  </fieldset>
-</form>
+    <div><button>Submit</button></div>
+  </form>
+{% endblock %}
 ```
 
 As you can see, this looks very similar to what we did previously with the `article_create.html` template file.
@@ -627,19 +645,23 @@ Now if you open your browser at [http://localhost:8000/article/1/update](http://
 We can also add a link somewhere in the home page of the application to be able to easily access the update form for existing articles. In this light, we can modify the `home.html` template file as follows:
 
 ```html title="src/templates/home.html"
-<h1>My blog</h1>
-<a href="{% url 'article_create' %}">Create new article</a>
-<h2>Articles:</h2>
-<ul>
-{% for article in articles %}
-  <li>
-    {{ article.title }}
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
-    // highlight-next-line
-    &dash; <a href="{% url 'article_update' pk: article.id %}">Update</a>
-  </li>
-{% endfor %}
-</ul>
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>My blog</h1>
+  <a href="{% url 'article_create' %}">Create new article</a>
+  <h2>Articles:</h2>
+  <ul>
+  {% for article in articles %}
+    <li>
+      {{ article.title }}
+      &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
+      // highlight-next-line
+      &dash; <a href="{% url 'article_update' pk: article.id %}">Update</a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}
 ```
 
 ## Deleting an article
@@ -674,12 +696,16 @@ In the above snippet, the `#get` method simply fetches the `Article` record by u
 Let's now create the `article_delete.html` template file with the following content:
 
 ```html title="src/templates/article_delete.html"
-<h1>Delete article "{{ article.title }}"</h1>
-<p>Are you sure?</p>
-<form method="post" action="">
-  <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
-  <button>Yes, delete</button>
-</form>
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>Delete article "{{ article.title }}"</h1>
+  <p>Are you sure?</p>
+  <form method="post" action="">
+    <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+    <button>Yes, delete</button>
+  </form>
+{% endblock %}
 ```
 
 This template simply asks the user for confirmation and displays a confirmation button embedded in a form to issue the POST request that will actually delete the record.
@@ -707,20 +733,24 @@ Now if you open your browser at [http://localhost:8000/article/1/delete](http://
 We can also add a link somewhere in the home page of the application to be able to easily access the delete confirmation page for existing articles. In this light, we can modify the `home.html` template file as follows:
 
 ```html title="src/templates/home.html"
-<h1>My blog</h1>
-<a href="{% url 'article_create' %}">Create new article</a>
-<h2>Articles:</h2>
-<ul>
-{% for article in articles %}
-  <li>
-    {{ article.title }}
-    &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
-    &dash; <a href="{% url 'article_update' pk: article.id %}">Update</a>
-    // highlight-next-line
-    &dash; <a href="{% url 'article_delete' pk: article.id %}">Delete</a>
-  </li>
-{% endfor %}
-</ul>
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>My blog</h1>
+  <a href="{% url 'article_create' %}">Create new article</a>
+  <h2>Articles:</h2>
+  <ul>
+  {% for article in articles %}
+    <li>
+      {{ article.title }}
+      &dash; <a href="{% url 'article_detail' pk: article.id %}">View</a>
+      &dash; <a href="{% url 'article_update' pk: article.id %}">Update</a>
+      // highlight-next-line
+      &dash; <a href="{% url 'article_delete' pk: article.id %}">Delete</a>
+    </li>
+  {% endfor %}
+  </ul>
+{% endblock %}
 ```
 
 ## Refactoring: using template partials
@@ -733,21 +763,15 @@ Let's create a `src/templates/partials/article_form.html` partial with the follo
 <form method="post" action="" novalidate>
   <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
 
-  <fieldset>
-    <div><label>Title</label></div>
-    <input type="text" name="{{ schema.title.id }}" value="{{ schema.title.value }}"/>
-    {% for error in schema.title.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
+  <div><label>Title</label></div>
+  <input type="text" name="{{ schema.title.id }}" value="{{ schema.title.value }}"/>
+  {% for error in schema.title.errors %}<p class="input-error"><small>{{ error.message }}</small></p>{% endfor %}
 
-  <fieldset>
-    <div><label>Content</label></div>
-    <textarea name="{{ schema.content.id }}" value="{{ schema.content.value }}">{{ schema.content.value }}</textarea>
-    {% for error in schema.content.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
+  <div><label>Content</label></div>
+  <textarea name="{{ schema.content.id }}" value="{{ schema.content.value }}">{{ schema.content.value }}</textarea>
+  {% for error in schema.content.errors %}<p class="input-error"><small>{{ error.message }}</small></p>{% endfor %}
 
-  <fieldset>
-    <button>Submit</button>
-  </fieldset>
+  <div><button>Submit</button></div>
 </form>
 ```
 
@@ -756,13 +780,21 @@ This partial template contains the exact same form that we used in the creation 
 Let's now make use of this partial in the `src/templates/article_create.html` and `src/templates/article_update.html` templates:
 
 ```html title="src/templates/article_create.html"
-<h1>Create a new article</h1>
-{% include "partials/article_form.html" %}
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>Create a new article</h1>
+  {% include "partials/article_form.html" %}
+{% endblock %}
 ```
 
 ```html title="src/templates/article_update.html"
-<h1>Update article "{{ article.title }}"</h1>
-{% include "partials/article_form.html" %}
+{% extend "base.html" %}
+
+{% block content %}
+  <h1>Update article "{{ article.title }}"</h1>
+  {% include "partials/article_form.html" %}
+{% endblock %}
 ```
 
 As you can see, the creation and update templates are now much more simple.

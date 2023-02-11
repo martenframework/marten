@@ -33,6 +33,7 @@ The Marten web framework is also inspired by [Ruby on Rails](https://rubyonrails
 
 * The exception page displayed while in [debug](../development/reference/settings#debug) mode is inspired by the [Exception Page](https://github.com/crystal-loot/exception_page) shard
 * The way to [handle custom objects](../templates/introduction#using-custom-objects-in-contexts) in Marten templates is inspired by a similar mechanism within [Crinja](https://github.com/straight-shoota/crinja)
+* The idea of class-based [email definitions](../emailing/introduction) is borrowed from [Carbon](https://github.com/luckyframework/carbon)
 
 ## Contributors
 

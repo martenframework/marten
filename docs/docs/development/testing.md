@@ -191,6 +191,35 @@ describe MyHandler do
 end
 ```
 
+#### Testing client and authentication
+
+When using the [marten-auth](https://github.com/martenframework/marten-auth) shard and the built-in [authentication](../authentication), a few additional helpers can be leveraged in order to easily sign in/sign out users while using the test client:
+
+* The `#sign_in` method can be used to simulate the effect of a signed-in user. This means that the user ID will be persisted into the test client session and that requests issued with it will be associated with the considered user
+* The `#sign_out` method can be used to ensure that any signed-in user is logged out and that the session is flushed
+
+For example:
+
+```crystal
+describe MyHandler do
+  describe "#get" do
+    it "shows the profile page of the authenticated user" do
+      user = Auth::User.create!(email: "test@example.com") do |user
+        user.set_password("insecure")
+      end
+
+      url = Marten.routes.reverse("auth:profile")
+
+      Marten::Spec.client.sign_in(user)
+      response = Marten::Spec.client.get(url)
+
+      response.status.should eq 200
+      response.content.includes?("Profile").should be_true
+    end
+  end
+end
+```
+
 ### Collecting emails
 
 If your code is sending [emails](../emailing/introduction), you might want to test that these emails are sent as expected. To do that, you can leverage the [development emailing backend](../emailing/reference/backends#development-backend) to ensure that sent emails are collected as part of each spec execution.

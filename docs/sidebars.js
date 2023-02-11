@@ -203,6 +203,21 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Authentication',
+      link: {type: 'doc', id: 'authentication'},
+      items: [
+        'authentication/introduction',
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'authentication/reference/generated-files',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Deployment',
       link: {type: 'doc', id: 'deployment'},
       items: [

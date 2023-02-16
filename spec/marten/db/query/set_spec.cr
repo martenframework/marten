@@ -1163,6 +1163,163 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#get_or_create" do
+    it "returns the record matched by the specified arguments" do
+      tag = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.get_or_create(name: "crystal").should eq tag
+      qset.size.should eq 2
+    end
+
+    it "creates a record using the specified arguments if no record is found" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      new_tag = qset.get_or_create(name: "newtag", is_active: true)
+      new_tag.persisted?.should be_true
+
+      qset.size.should eq 3
+    end
+
+    it "creates a record using the specified arguments and the specified block if no record is found" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      new_tag = qset.get_or_create(name: "newtag") do |t|
+        t.is_active = true
+      end
+
+      new_tag.persisted?.should be_true
+
+      qset.size.should eq 3
+    end
+
+    it "initializes a record but does not save it if it is invalid when no other record is found" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      new_tag = qset.get_or_create(name: "newtag")
+      new_tag.valid?.should be_false
+      new_tag.persisted?.should be_false
+
+      qset.size.should eq 2
+    end
+
+    it "initializes a record but does not save it if it is invalid when no other record is found and a block is used" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      new_tag = qset.get_or_create(name: "newtag") do |r|
+        r.is_active = nil
+      end
+
+      new_tag.valid?.should be_false
+      new_tag.persisted?.should be_false
+
+      qset.size.should eq 2
+    end
+
+    it "raises if multiple records are found when using predicates expressed as keyword arguments" do
+      TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
+        qset.get_or_create(email: "jd@example.com")
+      end
+    end
+  end
+
+  describe "#get_or_create!" do
+    it "returns the record matched by the specified arguments" do
+      tag = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.get_or_create!(name: "crystal").should eq tag
+      qset.size.should eq 2
+    end
+
+    it "creates a record using the specified arguments if no record is found" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      new_tag = qset.get_or_create!(name: "newtag", is_active: true)
+      new_tag.persisted?.should be_true
+
+      qset.size.should eq 3
+    end
+
+    it "creates a record using the specified arguments and the specified block if no record is found" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      new_tag = qset.get_or_create!(name: "newtag") do |t|
+        t.is_active = true
+      end
+
+      new_tag.persisted?.should be_true
+
+      qset.size.should eq 3
+    end
+
+    it "raises if the new record is invalid when no other record is found" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      expect_raises(Marten::DB::Errors::InvalidRecord) do
+        qset.get_or_create!(name: "newtag")
+      end
+
+      qset.size.should eq 2
+    end
+
+    it "raises if the new record is invalid when no other record is found and a block is used" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      expect_raises(Marten::DB::Errors::InvalidRecord) do
+        qset.get_or_create!(name: "newtag") do |r|
+          r.is_active = nil
+        end
+      end
+
+      qset.size.should eq 2
+    end
+
+    it "raises if multiple records are found when using predicates expressed as keyword arguments" do
+      TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
+        qset.get_or_create!(email: "jd@example.com")
+      end
+    end
+  end
+
   describe "#inspect" do
     it "produces the expected output for an empty queryset" do
       Marten::DB::Query::Set(Tag).new.inspect.should eq "<Marten::DB::Query::Set(Tag) []>"

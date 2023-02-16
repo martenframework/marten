@@ -432,6 +432,92 @@ module Marten
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
         end
 
+        # Returns the model record matching the given set of filters or create a new one if no one is found.
+        #
+        # Model fields that uniquely identify a record should be used here. For example:
+        #
+        # ```
+        # tag = Tag.all.get_or_create(label: "crystal")
+        # ```
+        #
+        # When no record is found, the new model instance is initialized by using the attributes defined in the `kwargs`
+        # double splat argument. Regardless of whether it is valid or not (and thus persisted to the database or not),
+        # the initialized model instance is returned by this method.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
+        def get_or_create(**kwargs)
+          get!(Node.new(**kwargs))
+        rescue Errors::RecordNotFound
+          create(**kwargs)
+        end
+
+        # Returns the model record matching the given set of filters or create a new one if no one is found.
+        #
+        # Model fields that uniquely identify a record should be used here. The provided block can be used to initialize
+        # the model instance to create (in case no record is found). For example:
+        #
+        # ```
+        # tag = Tag.all.get_or_create(label: "crystal") do |new_tag|
+        #   new_tag.active = false
+        # end
+        # ```
+        #
+        # When no record is found, the new model instance is initialized by using the attributes defined in the `kwargs`
+        # double splat argument. Regardless of whether it is valid or not (and thus persisted to the database or not),
+        # the initialized model instance is returned by this method.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
+        def get_or_create(**kwargs, &)
+          get!(Node.new(**kwargs))
+        rescue Errors::RecordNotFound
+          create(**kwargs) { |r| yield r }
+        end
+
+        # Returns the model record matching the given set of filters or create a new one if no one is found.
+        #
+        # Model fields that uniquely identify a record should be used here. For example:
+        #
+        # ```
+        # tag = Tag.all.get_or_create!(label: "crystal")
+        # ```
+        #
+        # When no record is found, the new model instance is initialized by using the attributes defined in the `kwargs`
+        # double splat argument. If the new model instance is valid, it is persisted to the database ; otherwise a
+        # `Marten::DB::Errors::InvalidRecord` exception is raised.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
+        def get_or_create!(**kwargs)
+          get!(Node.new(**kwargs))
+        rescue Errors::RecordNotFound
+          create!(**kwargs)
+        end
+
+        # Returns the model record matching the given set of filters or create a new one if no one is found.
+        #
+        # Model fields that uniquely identify a record should be used here. The provided block can be used to initialize
+        # the model instance to create (in case no record is found). For example:
+        #
+        # ```
+        # tag = Tag.all.get_or_create!(label: "crystal") do |new_tag|
+        #   new_tag.active = false
+        # end
+        # ```
+        #
+        # When no record is found, the new model instance is initialized by using the attributes defined in the `kwargs`
+        # double splat argument. If the new model instance is valid, it is persisted to the database ; otherwise a
+        # `Marten::DB::Errors::InvalidRecord` exception is raised.
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
+        def get_or_create!(**kwargs, &)
+          get!(Node.new(**kwargs))
+        rescue Errors::RecordNotFound
+          create!(**kwargs) { |r| yield r }
+        end
+
         # Appends a string representation of the query set to the passed `io`.
         def inspect(io)
           results = self[...INSPECT_RESULTS_LIMIT + 1].to_a
@@ -457,7 +543,7 @@ module Marten
         # query_set = Post.all
         #
         # p1 = query_set.get(id: 1)
-        # puts p1.author # hits the database to retrieved the related "author"
+        # puts p1.author # hits the database to retrieve the related "author"
         #
         # p2 = query_set.join(:author).get(id: 1)
         # puts p2.author # doesn't hit the database since the related "author" was already selected

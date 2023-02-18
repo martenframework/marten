@@ -6,6 +6,10 @@ pagination_next: null
 
 Here are listed the release notes for each version of the Marten web framework.
 
+## Marten 0.3
+
+* [Marten 0.3 release notes](./release-notes/0.3) _(under development)_
+
 ## Marten 0.2
 
 * [Marten 0.2 release notes](./release-notes/0.2)

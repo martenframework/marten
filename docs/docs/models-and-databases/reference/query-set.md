@@ -296,7 +296,7 @@ query_set = Post.all
 query_set.create!(title: "My blog post")
 ```
 
-This method can also be called with block that is executed for the new object. This block can be used to directly initialize the object before it is persisted to the database:
+This method can also be called with a block that is executed for the new object. This block can be used to directly initialize the object before it is persisted to the database:
 
 ```crystal
 query_set = Post.all
@@ -399,6 +399,50 @@ post_2 = query_set.get! { q(id: 456, is_published: false) }
 ```
 
 If the specified set of filters doesn't match any records, a `Marten::DB::Errors::RecordNotFound` exception will be raised. Moreover, in order to ensure data consistency this method will raise a `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
+
+### `get_or_create`
+
+Returns the model record matching the given set of filters or create a new one if no one is found.
+
+Model fields that uniquely identify a record should be used here. For example:
+
+```crystal
+tag = Tag.all.get_or_create(label: "crystal")
+```
+
+When no record is found, the new model instance is initialized by using the attributes defined in the double splat arguments. Regardless of whether it is valid or not (and thus persisted to the database or not), the initialized model instance is returned by this method.
+
+This method can also be called with a block that is executed for new objects. This block can be used to directly initialize new records before they are persisted to the database:
+
+```crystal
+tag = Tag.all.get_or_create(label: "crystal") do |new_tag|
+  new_tag.active = false
+end
+```
+
+In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
+
+### `get_or_create!`
+
+Returns the model record matching the given set of filters or create a new one if no one is found.
+
+Model fields that uniquely identify a record should be used here. For example:
+
+```crystall
+tag = Tag.all.get_or_create!(label: "crystal")
+```
+
+When no record is found, the new model instance is initialized by using the attributes defined in the double splat arguments. If the new model instance is valid, it is persisted to the database ; otherwise a `Marten::DB::Errors::InvalidRecord` exception is raised.
+
+This method can also be called with a block that is executed for new objects. This block can be used to directly initialize new records before they are persisted to the database:
+
+```crystal
+tag = Tag.all.get_or_create!(label: "crystal") do |new_tag|
+  new_tag.active = false
+end
+```
+
+In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
 
 ### `last`
 

@@ -531,8 +531,8 @@ module Marten
 
           private def solve_field_and_predicate(raw_query, raw_value)
             qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
-            raw_field = qparts[0]
-            raw_predicate = qparts[2]
+            raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
+            raw_predicate = qparts[1].empty? ? qparts[0] : qparts[2]
 
             begin
               field_path = verify_field(raw_query)

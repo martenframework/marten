@@ -131,7 +131,10 @@ describe Marten::DB::Query::SQL::Query do
 
     it "raises if a query node targeting an unknown field is added" do
       query = Marten::DB::Query::SQL::Query(Tag).new
-      expect_raises(Marten::DB::Errors::InvalidField) do
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Unable to resolve 'unknown' as a field. Valid choices are: id, name, is_active."
+      ) do
         query.add_query_node(Marten::DB::Query::Node.new(unknown: "test"))
       end
     end

@@ -2,8 +2,6 @@ module Marten
   module HTTP
     module Params
       module Core
-        include Enumerable({String, String})
-
         # Returns the last value associated with the passed parameter name.
         def [](name : String | Symbol)
           @params[name.to_s].last

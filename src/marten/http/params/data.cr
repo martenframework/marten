@@ -5,8 +5,6 @@ module Marten
     module Params
       # Represents the parsed content of a request's body, including both non-file and file inputs.
       class Data
-        include Core
-
         # :nodoc:
         alias Value = JSON::Any | String | UploadedFile
 
@@ -15,6 +13,9 @@ module Marten
 
         # :nodoc:
         alias RawHash = Hash(String, Array(String) | Array(JSON::Any) | Array(UploadedFile) | Values)
+
+        include Enumerable({String, Array(String) | Array(JSON::Any) | Array(UploadedFile) | Values})
+        include Core
 
         def initialize
           @params = RawHash.new

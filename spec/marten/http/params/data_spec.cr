@@ -233,4 +233,14 @@ describe Marten::HTTP::Params::Data do
       params.empty?.should be_false
     end
   end
+
+  describe "#to_h" do
+    it "works as expected" do
+      params = Marten::HTTP::Params::Data.new(
+        Marten::HTTP::Params::Data::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
+      )
+
+      params.to_h.should eq({"foo" => ["bar"], "xyz" => ["test1", "test2"]})
+    end
+  end
 end

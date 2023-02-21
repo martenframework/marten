@@ -5,8 +5,6 @@ module Marten
     module Params
       # Represents a set of GET parameters, extracted from a request's query string.
       class Query
-        include Core
-
         # :nodoc:
         alias Value = String
 
@@ -15,6 +13,9 @@ module Marten
 
         # :nodoc:
         alias RawHash = Hash(String, Values)
+
+        include Enumerable({String, Values})
+        include Core
 
         def initialize
           @params = RawHash.new

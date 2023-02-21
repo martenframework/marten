@@ -232,4 +232,14 @@ describe Marten::HTTP::Params::Query do
       params.as_query.should eq "foo=bar&xyz=test1&xyz=test2"
     end
   end
+
+  describe "#to_h" do
+    it "works as expected" do
+      params = Marten::HTTP::Params::Query.new(
+        Marten::HTTP::Params::Query::RawHash{"foo" => ["bar"], "xyz" => ["test1", "test2"]}
+      )
+
+      params.to_h.should eq({"foo" => ["bar"], "xyz" => ["test1", "test2"]})
+    end
+  end
 end

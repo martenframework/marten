@@ -126,7 +126,7 @@ A boolean indicating if the `X-Forwarded-Port` header is used to determine the p
 
 Default: `false`
 
-A boolean indicating if the `X-Forwarded-Proto header` is used to determine whether a request is secure. This setting can be enabled if the Marten application is served behind a proxy that sets this header. For example, if such proxy sets this header to `https`, Marten will assume that the request is secure at the application level **only** if `use_x_forwarded_proto` is set to `true`.
+A boolean indicating if the `X-Forwarded-Proto` header is used to determine whether a request is secure. This setting can be enabled if the Marten application is served behind a proxy that sets this header. For example, if such proxy sets this header to `https`, Marten will assume that the request is secure at the application level **only** if `use_x_forwarded_proto` is set to `true`.
 
 ### `handler400`
 

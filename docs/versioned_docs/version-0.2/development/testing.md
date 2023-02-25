@@ -232,7 +232,7 @@ Marten.configure :test do |config|
 end
 ```
 
-Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`#delivered_emails`](pathname:///api/0.2/Marten/Emailing/Backend/Development.html#delivered_emails%3AArray(Marten%3A%3AEmailing%3A%3AEmail)-instance-method) method, which returns an array of [`Marten::Email`](pathname:///api/0.2/Marten/Emailing/Email.html) instances. For example:
+Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`Marten::Spec#delivered_emails`](pathname:///api/0.2/Marten/Spec.html#delivered_emails%3AArray(Emailing%3A%3AEmail)-class-method) method, which returns an array of [`Marten::Email`](pathname:///api/0.2/Marten/Emailing/Email.html) instances. For example:
 
 ```crystal
 describe MyObject do
@@ -241,8 +241,8 @@ describe MyObject do
       obj = MyObject.new
       obj.do_something
 
-      Marten.settings.emailing.backend.delivered_emails.size.should eq 1
-      Marten.settings.emailing.backend.delivered_emails[0].subject.should eq "Test subject"
+      Marten::Spec.delivered_emails.size.should eq 1
+      Marten::Spec.delivered_emails[0].subject.should eq "Test subject"
     end
   end
 end

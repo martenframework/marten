@@ -21,9 +21,22 @@ module Marten
     #
     # This method is automatically called after each spec.
     def self.clear_collected_emails : Nil
-      return unless Marten.settings.emailing.backend.is_a?(Marten::Emailing::Backend::Development)
+      Marten::Emailing::Backend::Development.delivered_emails.clear
+    end
 
-      Marten.settings.emailing.backend.as(Marten::Emailing::Backend::Development).delivered_emails.clear
+    # Returns an array of all the emails that were delivered as part of the spec.
+    #
+    # Note that this method will return an empty array if the emailing backend is not set to an instance of the
+    # development backend that was initialized with `collect_emails: true`. For example:
+    #
+    # ```
+    # Marten.configure :test do |config|
+    #   # [...]
+    #   config.emailing.backend = Marten::Emailing::Backend::Development.new(collect_emails: true, print_emails: false)
+    # end
+    # ```
+    def self.delivered_emails : Array(Emailing::Email)
+      Marten::Emailing::Backend::Development.delivered_emails
     end
 
     # Returns an instance of the testing client.

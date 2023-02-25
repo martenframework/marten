@@ -3,15 +3,17 @@ module Marten
     module Backend
       # A development emailing backend that outputs details of delivered emails.
       class Development < Base
-        getter delivered_emails
+        class_getter delivered_emails = [] of Email
+
         getter? print_emails
 
+        delegate delivered_emails, to: self.class
+
         def initialize(@print_emails = false, @collect_emails = true, @stdout : IO = STDOUT)
-          @delivered_emails = [] of Email
         end
 
         def deliver(email : Email) : Nil
-          @delivered_emails << email if collect_emails?
+          @@delivered_emails << email if collect_emails?
 
           return unless print_emails?
 

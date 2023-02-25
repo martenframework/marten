@@ -28,7 +28,7 @@ Marten gives you the ability to build full-featured web applications by leveragi
 
 **🧳 Full-featured**
 
-Marten adheres to the "batteries included" philosophy. Out of the box, it provides the tools and features that are commonly required by web applications: ORM, migrations, translations, templating engines, sessions, etc.
+Marten adheres to the "batteries included" philosophy. Out of the box, it provides the tools and features that are commonly required by web applications: ORM, migrations, translations, templating engines, sessions, emailing, authentication, etc.
 
 **🔧 Extensible**
 
@@ -44,7 +44,7 @@ Marten comes with security mechanisms out of the box. Things like cross-site req
 
 ### Batteries included
 
-The tools you need are built into the framework. Database ORM, translations, migrations, templates, sessions, and many more can be leveraged right away.
+The tools you need are built into the framework. Database ORM, translations, migrations, templates, sessions, emailing, authentication, and many more can be leveraged right away.
 
 **Design your models easily**
 

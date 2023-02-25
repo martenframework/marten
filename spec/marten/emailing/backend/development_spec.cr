@@ -1,9 +1,20 @@
 require "./spec_helper"
 
 describe Marten::Emailing::Backend::Development do
+  describe "::delivered_emails" do
+    it "returns the delivered emails" do
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmail.new
+      backend = Marten::Emailing::Backend::Development.new
+
+      backend.deliver(email)
+
+      Marten::Emailing::Backend::Development.delivered_emails.includes?(email).should be_true
+    end
+  end
+
   describe "#deliver" do
     it "collects the delivered email by default" do
-      email = Marten::Emailing::Backend::DevSpec::TestEmail.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmail.new
       backend = Marten::Emailing::Backend::Development.new
 
       backend.deliver(email)
@@ -12,7 +23,7 @@ describe Marten::Emailing::Backend::Development do
     end
 
     it "does not collect the delivered email if this capability is deactivated" do
-      email = Marten::Emailing::Backend::DevSpec::TestEmail.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmail.new
       backend = Marten::Emailing::Backend::Development.new(collect_emails: false)
 
       backend.deliver(email)
@@ -23,7 +34,7 @@ describe Marten::Emailing::Backend::Development do
     it "does not output anything by default" do
       stdout = IO::Memory.new
 
-      email = Marten::Emailing::Backend::DevSpec::TestEmail.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmail.new
       backend = Marten::Emailing::Backend::Development.new(stdout: stdout)
 
       backend.deliver(email)
@@ -35,7 +46,7 @@ describe Marten::Emailing::Backend::Development do
     it "outputs a simple email as expected if this capability is activated" do
       stdout = IO::Memory.new
 
-      email = Marten::Emailing::Backend::DevSpec::TestEmail.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmail.new
       backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
@@ -57,7 +68,7 @@ describe Marten::Emailing::Backend::Development do
     it "outputs an email with CC addresses as expected if this capability is activated" do
       stdout = IO::Memory.new
 
-      email = Marten::Emailing::Backend::DevSpec::TestEmailWithCc.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmailWithCc.new
       backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
@@ -76,7 +87,7 @@ describe Marten::Emailing::Backend::Development do
     it "outputs an email with BCC addresses as expected if this capability is activated" do
       stdout = IO::Memory.new
 
-      email = Marten::Emailing::Backend::DevSpec::TestEmailWithBcc.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmailWithBcc.new
       backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
@@ -95,7 +106,7 @@ describe Marten::Emailing::Backend::Development do
     it "outputs an email with a Reply-To address as expected if this capability is activated" do
       stdout = IO::Memory.new
 
-      email = Marten::Emailing::Backend::DevSpec::TestEmailWithReplyTo.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmailWithReplyTo.new
       backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
@@ -114,7 +125,7 @@ describe Marten::Emailing::Backend::Development do
     it "outputs an email with headers as expected if this capability is activated" do
       stdout = IO::Memory.new
 
-      email = Marten::Emailing::Backend::DevSpec::TestEmailWithHeaders.new
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmailWithHeaders.new
       backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
 
       backend.deliver(email)
@@ -130,9 +141,20 @@ describe Marten::Emailing::Backend::Development do
       )
     end
   end
+
+  describe "#delivered_emails" do
+    it "returns the delivered emails" do
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmail.new
+      backend = Marten::Emailing::Backend::Development.new
+
+      backend.deliver(email)
+
+      backend.delivered_emails.includes?(email).should be_true
+    end
+  end
 end
 
-module Marten::Emailing::Backend::DevSpec
+module Marten::Emailing::Backend::DevelopmentSpec
   class TestEmail < Marten::Email
     subject "Hello World!"
     to "test@example.com"

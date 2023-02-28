@@ -159,7 +159,7 @@ end
 module Marten::SchemaSpec
   class SimpleSchema < Marten::Schema
     field :foo, :string
-    field :bar, :string
+    field :bar, :string, max_size: 200
   end
 
   class SubSchema < SimpleSchema

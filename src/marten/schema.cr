@@ -158,7 +158,7 @@ module Marten
           register_field(
             {{ field_klass }}.new(
               {{ field_id }},
-              {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% end %}
+              {% unless field_config[:kwargs].empty? %}**{{ field_config[:kwargs] }}{% end %}
             )
           )
         {% end %}

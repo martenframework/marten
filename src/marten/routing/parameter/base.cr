@@ -2,20 +2,20 @@ module Marten
   module Routing
     module Parameter
       abstract class Base
-        abstract def regex : Regex
-        abstract def loads(value : ::String)
+        # Returns the string representation of the specified route parameter object.
+        #
+        # Note that this method can either return a string or `nil`: `nil` means that the passed value cannot be
+        # serialized properly, which will make any URL reverse resolution fail with a
+        # `Marten::Routing::Errors::NoReverseMatch` error.
         abstract def dumps(value) : Nil | ::String
 
-        macro regex(regex)
-          {% sanitized_regex = regex.is_a?(RegexLiteral) ? regex : nil %}
-          {% if sanitized_regex.is_a?(NilLiteral) %}
-            {% raise "Cannot use '#{regex}' as a valid parameter regex" %}
-          {% end %}
+        # Parses a raw string parmater and returns the corresponding Crystal object.
+        #
+        # The returned object is the one that will be forwarded to the handler in the route parameters hash.
+        abstract def loads(value : ::String)
 
-          def regex : Regex
-            {{ regex }}
-          end
-        end
+        # Returns the `Regex` object to use to match parameters when routes are processed.
+        abstract def regex : Regex
       end
     end
   end

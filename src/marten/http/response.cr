@@ -38,12 +38,6 @@ module Marten
       def []=(header : String | Symbol, value)
         headers[header.to_s] = value.to_s
       end
-
-      macro override_status(status)
-        def initialize(content : String = "", content_type : String = DEFAULT_CONTENT_TYPE)
-          super(content: content, content_type: content_type, status: {{ status }})
-        end
-      end
     end
   end
 end

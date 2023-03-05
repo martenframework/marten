@@ -1,6 +1,25 @@
 require "./spec_helper"
 
 describe Marten::DB::Management::Index do
+  describe "::from" do
+    it "returns the management version of the index" do
+      index = Marten::DB::Index.new("new_index", fields: [Post.get_field("author"), Post.get_field("title")])
+      management_index = Marten::DB::Management::Index.from(index)
+      management_index.name.should eq "new_index"
+      management_index.column_names.should eq ["author_id", "title"]
+    end
+
+    it "raises if a field does not have an associated database column" do
+      index = Marten::DB::Index.new("new_index", fields: [TestUser.get_field("tags"), TestUser.get_field("email")])
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Field 'tags' cannot be used as part of an index because it is not associated with a database column"
+      ) do
+        Marten::DB::Management::Index.from(index)
+      end
+    end
+  end
+
   describe "::new" do
     it "allows to initialize an index from a name and column names strings" do
       index = Marten::DB::Management::Index.new("new_index", column_names: ["author_id", "title"])

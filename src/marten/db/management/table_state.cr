@@ -17,8 +17,8 @@ module Marten
             app_label: model.app_config.label,
             name: model.db_table,
             columns: model.fields.compact_map(&.to_column),
-            unique_constraints: model.db_unique_constraints.map(&.to_management_constraint),
-            indexes: model.db_indexes.map(&.to_management_index)
+            unique_constraints: model.db_unique_constraints.map { |c| Management::Constraint::Unique.from(c) },
+            indexes: model.db_indexes.map { |i| Management::Index.from(i) },
           )
         end
 

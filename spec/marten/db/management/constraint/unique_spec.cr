@@ -1,6 +1,31 @@
 require "./spec_helper"
 
 describe Marten::DB::Management::Constraint::Unique do
+  describe "::from" do
+    it "returns the management version of the passoed constraint" do
+      unique_constraint = Marten::DB::Constraint::Unique.new(
+        "new_constraint",
+        fields: [Post.get_field("author"), Post.get_field("title")]
+      )
+      management_constraint = Marten::DB::Management::Constraint::Unique.from(unique_constraint)
+      management_constraint.name.should eq "new_constraint"
+      management_constraint.column_names.should eq ["author_id", "title"]
+    end
+
+    it "raises if a field does not have an associated database column" do
+      unique_constraint = Marten::DB::Constraint::Unique.new(
+        "new_constraint",
+        fields: [TestUser.get_field("tags"), TestUser.get_field("email")]
+      )
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Field 'tags' cannot be used as part of a unique constraint because it is not associated with a database column"
+      ) do
+        Marten::DB::Management::Constraint::Unique.from(unique_constraint)
+      end
+    end
+  end
+
   describe "::new" do
     it "allows to initialize a unique constraint from name and column names strings" do
       unique_constraint = Marten::DB::Management::Constraint::Unique.new(

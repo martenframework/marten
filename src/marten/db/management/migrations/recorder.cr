@@ -22,7 +22,7 @@ module Marten
                 app_label: "marten",
                 name: Record.db_table,
                 columns: Record.fields.compact_map(&.to_column),
-                unique_constraints: Record.db_unique_constraints.map(&.to_management_constraint)
+                unique_constraints: Record.db_unique_constraints.map { |c| Management::Constraint::Unique.from(c) },
               )
             )
           end

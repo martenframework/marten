@@ -16,6 +16,25 @@ module Marten
         # Returns the column names that are part of the index.
         getter column_names
 
+        # Returns a management index from an index definition.
+        def self.from(index : DB::Index) : Index
+          column_names = [] of String
+          index.fields.each do |field|
+            column = field.to_column
+
+            if column.nil?
+              raise Errors::InvalidField.new(
+                "Field '#{field.id}' cannot be used as part of an index because it is not associated with " \
+                "a database column"
+              )
+            end
+
+            column_names << column.not_nil!.name
+          end
+
+          Management::Index.new(index.name, column_names)
+        end
+
         def initialize(name : String | Symbol, column_names : Array(String | Symbol))
           @name = name.to_s
           @column_names = column_names.map(&.to_s)

@@ -1,3 +1,5 @@
+require "./migrations/**"
+
 module Marten
   module DB
     module Management

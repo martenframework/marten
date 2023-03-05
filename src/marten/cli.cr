@@ -2,6 +2,10 @@ require "colorize"
 require "ecr"
 require "option_parser"
 
+require "./db/migration"
+require "./db/management/migrations"
+require "./migration"
+
 require "./cli/**"
 
 module Marten

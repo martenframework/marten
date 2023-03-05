@@ -9,9 +9,9 @@ module Marten
           # Only work on array
           return value if !value.raw.is_a?(Array)
           if arg
-            Value.from(value.to_a.map { |f| f.to_s }.join(arg.to_s))
+            Value.from(value.to_a.map(&.to_s).join(arg.to_s))
           else
-            Value.from(value.to_a.map { |f| f.to_s }.join)
+            Value.from(value.to_a.map(&.to_s).join)
           end
         end
       end

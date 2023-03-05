@@ -27,9 +27,11 @@ module Marten
       register "capitalize", Capitalize
       register "default", Default
       register "downcase", DownCase
+      register "join", Join
       register "linebreaks", LineBreaks
       register "safe", Safe
       register "size", Size
+      register "split", Split
       register "upcase", UpCase
     end
   end

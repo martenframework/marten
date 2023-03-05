@@ -5,61 +5,61 @@ for_postgresql do
     describe "#column_type_for_built_in_column" do
       it "returns the expected column type for a big int column" do
         column = Marten::DB::Management::Column::BigInt.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "bigint"
       end
 
       it "returns the expected column type for a big int column with auto increment" do
         column = Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true)
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "bigserial"
       end
 
       it "returns the expected column type for a bool column" do
         column = Marten::DB::Management::Column::Bool.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "boolean"
       end
 
       it "returns the expected column type for a float column" do
         column = Marten::DB::Management::Column::Float.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "double precision"
       end
 
       it "returns the expected column type for a datetime column" do
         column = Marten::DB::Management::Column::DateTime.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "timestamp with time zone"
       end
 
       it "returns the expected column type for an int column" do
         column = Marten::DB::Management::Column::Int.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "integer"
       end
 
       it "returns the expected column type for an int column with auto increment" do
         column = Marten::DB::Management::Column::Int.new("test", primary_key: true, auto: true)
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "serial"
       end
 
       it "returns the expected column type for a string column" do
         column = Marten::DB::Management::Column::String.new("test", max_size: 155)
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "varchar(%{max_size})"
       end
 
       it "returns the expected column type for a text column" do
         column = Marten::DB::Management::Column::Text.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "text"
       end
 
       it "returns the expected column type for a uuid column" do
         column = Marten::DB::Management::Column::UUID.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "uuid"
       end
     end
@@ -67,21 +67,23 @@ for_postgresql do
     describe "#column_type_suffix_for_built_in_column" do
       it "returns nil" do
         column = Marten::DB::Management::Column::BigInt.new("test")
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_suffix_for_built_in_column(column).should be_nil
       end
     end
 
     describe "#create_table" do
       before_each do
-        schema_editor = Marten::DB::Connection.default.schema_editor
-        if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+        introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+        if introspector.table_names.includes?("schema_editor_test_table")
           schema_editor.delete_table("schema_editor_test_table")
         end
       end
 
       it "generates a deferred statement for foreign key columns" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
         project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
 
@@ -138,24 +140,25 @@ for_postgresql do
 
     describe "#ddl_rollbackable?" do
       it "returns true" do
-        Marten::DB::Connection.default.schema_editor.ddl_rollbackable?.should be_true
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+        schema_editor.ddl_rollbackable?.should be_true
       end
     end
 
     describe "#quoted_default_value_for_built_in_column" do
       it "returns the expected string representation for a byte value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.quoted_default_value_for_built_in_column(Bytes[255, 97]).should eq "X'ff61'"
       end
 
       it "returns the expected string representation for a string value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.quoted_default_value_for_built_in_column("hello").should eq "'hello'"
         schema_editor.quoted_default_value_for_built_in_column(%{value " quote}).should eq "'value \" quote'"
       end
 
       it "returns the expected string representation for a time value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         local_time = Time.local
         schema_editor.quoted_default_value_for_built_in_column(local_time).should eq(
           "'#{Time::Format::RFC_3339.format(local_time, fraction_digits: 9)}'"
@@ -163,23 +166,23 @@ for_postgresql do
       end
 
       it "returns the expected string representation for a bool value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.quoted_default_value_for_built_in_column(false).should eq "false"
         schema_editor.quoted_default_value_for_built_in_column(true).should eq "true"
       end
 
       it "returns the expected string representation for an integer value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.quoted_default_value_for_built_in_column(42).should eq "42"
       end
 
       it "returns the expected string representation for a float value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.quoted_default_value_for_built_in_column(42.45).should eq "42.45"
       end
 
       it "returns the expected string representation for a float value" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.quoted_default_value_for_built_in_column(42.44).should eq "42.44"
       end
     end

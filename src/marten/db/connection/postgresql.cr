@@ -25,10 +25,6 @@ module Marten
           new_record_id
         end
 
-        def introspector : Management::Introspector::Base
-          Management::Introspector::PostgreSQL.new(self)
-        end
-
         def left_operand_for(id : String, predicate) : String
           transformation = PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING.fetch(predicate, nil)
           transformation.nil? ? id : (transformation % id)
@@ -52,10 +48,6 @@ module Marten
 
         def quote_char : Char
           '"'
-        end
-
-        def schema_editor : Management::SchemaEditor::Base
-          Management::SchemaEditor::PostgreSQL.new(self)
         end
 
         def scheme : String

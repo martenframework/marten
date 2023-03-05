@@ -3,8 +3,10 @@ require "./spec_helper"
 describe Marten::DB::Management::SchemaEditor::Base do
   describe "#delete_table" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -20,12 +22,13 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       schema_editor.delete_table(table_state.name)
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("schema_editor_test_table").should be_false
     end
   end
 end

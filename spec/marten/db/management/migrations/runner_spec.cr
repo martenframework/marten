@@ -15,7 +15,7 @@ describe Marten::DB::Management::Migrations::Runner do
   after_all do
     Marten::DB::Management::Migrations::Record.filter(app__startswith: "runner_spec_").delete(raw: true)
 
-    introspector = Marten::DB::Connection.default.introspector
+    introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
       schema_editor.delete_table("runner_spec_foo_tags") if introspector.table_names.includes?("runner_spec_foo_tags")
       schema_editor.delete_table("runner_spec_bar_tags") if introspector.table_names.includes?("runner_spec_bar_tags")
@@ -32,7 +32,7 @@ describe Marten::DB::Management::Migrations::Runner do
   before_each do
     Marten::DB::Management::Migrations::Record.filter(app__startswith: "runner_spec_").delete(raw: true)
 
-    introspector = Marten::DB::Connection.default.introspector
+    introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
       schema_editor.delete_table("runner_spec_foo_tags") if introspector.table_names.includes?("runner_spec_foo_tags")
       schema_editor.delete_table("runner_spec_bar_tags") if introspector.table_names.includes?("runner_spec_bar_tags")
@@ -59,7 +59,7 @@ describe Marten::DB::Management::Migrations::Runner do
         ).exists?.should be_true
       end
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_foo_tags").should be_true
       columns_details = introspector.columns_details("runner_spec_foo_tags")
@@ -84,7 +84,7 @@ describe Marten::DB::Management::Migrations::Runner do
         name: Migration::RunnerSpec::BarApp::V202108092226111.migration_name
       ).exists?.should be_true
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_bar_tags").should be_true
       columns_details = introspector.columns_details("runner_spec_bar_tags")
@@ -110,7 +110,7 @@ describe Marten::DB::Management::Migrations::Runner do
         ).exists?.should be_true
       end
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_foo_tags").should be_false
       introspector.table_names.includes?("runner_spec_bar_tags").should be_false
@@ -131,7 +131,7 @@ describe Marten::DB::Management::Migrations::Runner do
         name: Migration::RunnerSpec::BarApp::V202108092226111.migration_name
       ).exists?.should be_true
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_bar_tags").should be_false
     end
@@ -145,7 +145,7 @@ describe Marten::DB::Management::Migrations::Runner do
         name: Migration::RunnerSpec::FooApp::V202108092226113.migration_name
       ).exists?.should be_true
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_foo_tags").should be_true
     end
@@ -189,7 +189,7 @@ describe Marten::DB::Management::Migrations::Runner do
         ).exists?.should be_false
       end
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_bar_tags").should be_false
     end
@@ -210,7 +210,7 @@ describe Marten::DB::Management::Migrations::Runner do
         name: Migration::RunnerSpec::BarApp::V202108092226112.migration_name
       ).exists?.should be_false
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       introspector.table_names.includes?("runner_spec_bar_tags").should be_true
       columns_details = introspector.columns_details("runner_spec_bar_tags")

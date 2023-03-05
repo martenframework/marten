@@ -69,7 +69,7 @@ describe Marten::DB::Migration do
 
   describe "#apply_backward" do
     before_each do
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
         if introspector.table_names.includes?("migration_test_table1")
@@ -106,7 +106,7 @@ describe Marten::DB::Migration do
 
       project_state = Marten::DB::Management::ProjectState.new([table_state_1, table_state_2])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state_1)
       schema_editor.create_table(table_state_2)
 
@@ -119,8 +119,9 @@ describe Marten::DB::Migration do
 
       resulting_project_state.tables.should be_empty
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table2").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_false
+      introspector.table_names.includes?("migration_test_table2").should be_false
     end
 
     it "unapplies the expected directed operations when applicable" do
@@ -147,7 +148,7 @@ describe Marten::DB::Migration do
 
       project_state = Marten::DB::Management::ProjectState.new([table_state_1, table_state_2])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state_1)
       schema_editor.create_table(table_state_2)
 
@@ -160,8 +161,9 @@ describe Marten::DB::Migration do
 
       resulting_project_state.tables.should be_empty
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table2").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_false
+      introspector.table_names.includes?("migration_test_table2").should be_false
     end
 
     it "unapplies the expected operations in sequence" do
@@ -178,7 +180,7 @@ describe Marten::DB::Migration do
 
       project_state = Marten::DB::Management::ProjectState.new([table_state])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       migration = Marten::DB::MigrationSpec::MigrationToCreateOneTableAndToAddAColumn.new
@@ -190,7 +192,8 @@ describe Marten::DB::Migration do
 
       resulting_project_state.tables.should be_empty
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_false
     end
 
     it "unapplies the faked biderectional operations at the state level but not at the DB level" do
@@ -206,7 +209,7 @@ describe Marten::DB::Migration do
 
       project_state = Marten::DB::Management::ProjectState.new([table_state])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       migration = Marten::DB::MigrationSpec::MigrationWithBidirectionalFakedOperation.new
@@ -218,7 +221,8 @@ describe Marten::DB::Migration do
 
       resulting_project_state.tables.should be_empty
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_true
     end
 
     it "unapplies the explicitly directed faked operations at the state level but not at the DB level" do
@@ -234,7 +238,7 @@ describe Marten::DB::Migration do
 
       project_state = Marten::DB::Management::ProjectState.new([table_state])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       migration = Marten::DB::MigrationSpec::MigrationWithExplicitlyDirectedFakedOperation.new
@@ -246,13 +250,14 @@ describe Marten::DB::Migration do
 
       resulting_project_state.tables.should be_empty
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_true
     end
   end
 
   describe "#apply_forward" do
     before_each do
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
         if introspector.table_names.includes?("migration_test_table1")
@@ -267,7 +272,7 @@ describe Marten::DB::Migration do
 
     it "applies the expected biderectional operations when applicable" do
       project_state = Marten::DB::Management::ProjectState.new
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       migration = Marten::DB::MigrationSpec::MigrationToCreateTwoNewTables.new
       resulting_project_state = migration.apply_forward(project_state, schema_editor)
@@ -276,13 +281,14 @@ describe Marten::DB::Migration do
       resulting_project_state.tables.values[0].name.should eq "migration_test_table1"
       resulting_project_state.tables.values[1].name.should eq "migration_test_table2"
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table2").should be_true
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_true
+      introspector.table_names.includes?("migration_test_table2").should be_true
     end
 
     it "applies the expected directed operations when applicable" do
       project_state = Marten::DB::Management::ProjectState.new
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       migration = Marten::DB::MigrationSpec::MigrationToCreateTwoNewTablesWithExplicitDirectedOperations.new
       resulting_project_state = migration.apply_forward(project_state, schema_editor)
@@ -291,13 +297,14 @@ describe Marten::DB::Migration do
       resulting_project_state.tables.values[0].name.should eq "migration_test_table1"
       resulting_project_state.tables.values[1].name.should eq "migration_test_table2"
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table2").should be_true
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_true
+      introspector.table_names.includes?("migration_test_table2").should be_true
     end
 
     it "applies the expected operations in sequence" do
       project_state = Marten::DB::Management::ProjectState.new
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       migration = Marten::DB::MigrationSpec::MigrationToCreateOneTableAndToAddAColumn.new
       resulting_project_state = migration.apply_forward(project_state, schema_editor)
@@ -309,9 +316,8 @@ describe Marten::DB::Migration do
       resulting_project_state.tables.values[0].columns[1].name = "label"
       resulting_project_state.tables.values[0].columns[2].name = "published"
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_true
-
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_true
       columns_details = introspector.columns_details("migration_test_table1")
       columns_details.map(&.name).sort!.should eq ["id", "label", "published"]
     end
@@ -319,7 +325,7 @@ describe Marten::DB::Migration do
     it "applies the faked biderectional operations at the state level but not at the DB level" do
       project_state = Marten::DB::Management::ProjectState.new
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       migration = Marten::DB::MigrationSpec::MigrationWithBidirectionalFakedOperation.new
       resulting_project_state = migration.apply_forward(
@@ -330,13 +336,14 @@ describe Marten::DB::Migration do
       resulting_project_state.tables.size.should eq 1
       resulting_project_state.tables.values[0].name.should eq "migration_test_table1"
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_false
     end
 
     it "applies the explicitly directed faked operations at the state level but not at the DB level" do
       project_state = Marten::DB::Management::ProjectState.new
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       migration = Marten::DB::MigrationSpec::MigrationWithExplicitlyDirectedFakedOperation.new
       resulting_project_state = migration.apply_forward(
@@ -347,7 +354,8 @@ describe Marten::DB::Migration do
       resulting_project_state.tables.size.should eq 1
       resulting_project_state.tables.values[0].name.should eq "migration_test_table1"
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("migration_test_table1").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("migration_test_table1").should be_false
     end
   end
 

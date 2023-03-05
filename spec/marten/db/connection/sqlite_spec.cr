@@ -22,13 +22,6 @@ for_sqlite do
       end
     end
 
-    describe "#introspector" do
-      it "returns the expected introspector instance" do
-        conn = Marten::DB::Connection.default
-        conn.introspector.should be_a Marten::DB::Management::Introspector::SQLite
-      end
-    end
-
     describe "#left_operand_for" do
       it "returns the original id no matter the predicate" do
         conn = Marten::DB::Connection.default
@@ -132,13 +125,6 @@ for_sqlite do
       it "returns the expected quote character" do
         conn = Marten::DB::Connection.default
         conn.quote_char.should eq '"'
-      end
-    end
-
-    describe "#schema_editor" do
-      it "returns the expected schema editor instance" do
-        conn = Marten::DB::Connection.default
-        conn.schema_editor.should be_a Marten::DB::Management::SchemaEditor::SQLite
       end
     end
 

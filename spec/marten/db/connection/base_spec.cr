@@ -64,6 +64,22 @@ describe Marten::DB::Connection::Base do
     end
   end
 
+  describe "#id" do
+    it "returns the expected identifier" do
+      for_mysql do
+        Marten::DB::Connection.default.id.should eq "mysql"
+      end
+
+      for_postgresql do
+        Marten::DB::Connection.default.id.should eq "postgresql"
+      end
+
+      for_sqlite do
+        Marten::DB::Connection.default.id.should eq "sqlite"
+      end
+    end
+  end
+
   describe "#insert" do
     it "inserts a new record in a specific table and returns nil if the new ID is not requested" do
       conn = Marten::DB::Connection.default

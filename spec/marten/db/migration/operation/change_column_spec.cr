@@ -13,8 +13,10 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
 
   describe "#mutate_db_backward" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("operation_test_table")
         schema_editor.delete_table("operation_test_table")
       end
     end
@@ -45,14 +47,14 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
       )
       to_project_state = Marten::DB::Management::ProjectState.new([to_table_state])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(from_table_state)
 
       operation = Marten::DB::Migration::Operation::ChangeColumn.new("operation_test_table", new_column)
 
       operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       db_column = introspector.columns_details(from_table_state.name).find { |c| c.name == "foo" }
       db_column.should be_truthy
@@ -103,22 +105,24 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
       to_project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
       to_project_state.add_table(to_table_state)
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(from_table_state)
 
       operation = Marten::DB::Migration::Operation::ChangeColumn.new("operation_test_table", new_column)
 
       operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       introspector.foreign_key_constraint_names(from_table_state.name, "test").should be_empty
     end
   end
 
   describe "#mutate_db_forward" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("operation_test_table")
         schema_editor.delete_table("operation_test_table")
       end
     end
@@ -149,14 +153,14 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
       )
       to_project_state = Marten::DB::Management::ProjectState.new([to_table_state])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(from_table_state)
 
       operation = Marten::DB::Migration::Operation::ChangeColumn.new("operation_test_table", new_column)
 
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
       db_column = introspector.columns_details(from_table_state.name).find { |c| c.name == "foo" }
       db_column.should be_truthy
@@ -207,14 +211,14 @@ describe Marten::DB::Migration::Operation::ChangeColumn do
       to_project_state = Marten::DB::Management::ProjectState.from_apps(Marten.apps.app_configs)
       to_project_state.add_table(to_table_state)
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(from_table_state)
 
       operation = Marten::DB::Migration::Operation::ChangeColumn.new("operation_test_table", new_column)
 
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       introspector.foreign_key_constraint_names(from_table_state.name, "test").should be_empty
     end
   end

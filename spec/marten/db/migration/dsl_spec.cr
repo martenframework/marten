@@ -206,7 +206,7 @@ describe Marten::DB::Migration::DSL do
 
       from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
       to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       test.run_code_direction.should be_nil
 
@@ -227,7 +227,7 @@ describe Marten::DB::Migration::DSL do
 
       from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
       to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       test.run_code_direction.should be_nil
 

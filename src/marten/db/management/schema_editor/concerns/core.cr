@@ -51,7 +51,8 @@ module Marten
 
             # Step 1: drop possible foreign key constraints if applicable.
             if old_column.is_a?(Column::Reference) && old_column.foreign_key?
-              fk_constraint_names += @connection.introspector.foreign_key_constraint_names(table.name, old_column.name)
+              fk_constraint_names += Introspector.for(@connection)
+                .foreign_key_constraint_names(table.name, old_column.name)
               fk_constraint_names.each do |constraint_name|
                 execute(delete_foreign_key_constraint_statement(table, constraint_name))
               end
@@ -59,7 +60,7 @@ module Marten
 
             # Step 2: drop unique constraints if the new column is no longer unique (or if it became a primary key).
             if old_column.unique? && (!new_column.unique? || (!old_column.primary_key? && new_column.primary_key?))
-              constraint_names = @connection.introspector.unique_constraint_names(table.name, old_column.name)
+              constraint_names = Introspector.for(@connection).unique_constraint_names(table.name, old_column.name)
               constraint_names.select! { |cname| !table.unique_constraints.map(&.name).includes?(cname) }
               constraint_names.each do |cname|
                 execute(remove_unique_constraint_statement(table, cname))
@@ -83,7 +84,7 @@ module Marten
 
             if remake_fk_columns
               incoming_foreign_keys.each do |other_table, fk_column|
-                constraint_names = @connection.introspector.foreign_key_constraint_names(
+                constraint_names = Introspector.for(@connection).foreign_key_constraint_names(
                   other_table.name,
                   fk_column.name
                 )
@@ -97,7 +98,7 @@ module Marten
             # Step 4: delete column index if it was previously indexed (but not unique) and if the new column is not
             # indexed or is unique.
             if old_column.index? && !old_column.unique? && (!new_column.index? || new_column.unique?)
-              index_names = @connection.introspector.index_names(table.name, old_column.name)
+              index_names = Introspector.for(@connection).index_names(table.name, old_column.name)
               index_names.select! { |iname| !table.indexes.map(&.name).includes?(iname) }
               index_names.each do |iname|
                 execute(remove_index_statement(table, iname))
@@ -139,7 +140,8 @@ module Marten
 
             # Step 10: delete primary key constraints if the column is no longer a primary key.
             if old_column.primary_key? && !new_column.primary_key?
-              pk_constraint_names = @connection.introspector.primary_key_constraint_names(table.name, old_column.name)
+              pk_constraint_names = Introspector.for(@connection)
+                .primary_key_constraint_names(table.name, old_column.name)
               pk_constraint_names.each do |constraint_name|
                 execute(delete_primary_key_constraint_statement(table, constraint_name))
               end
@@ -243,7 +245,7 @@ module Marten
 
           def remove_column(table : TableState, column : Column::Base) : Nil
             # First drops possible foreign key constraints if applicable.
-            fk_constraint_names = @connection.introspector.foreign_key_constraint_names(table.name, column.name)
+            fk_constraint_names = Introspector.for(@connection).foreign_key_constraint_names(table.name, column.name)
             fk_constraint_names.each do |constraint_name|
               execute(delete_foreign_key_constraint_statement(table, constraint_name))
             end

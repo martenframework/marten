@@ -4,14 +4,16 @@ for_mysql do
   describe Marten::DB::Management::Introspector::MySQL do
     describe "#columns_info" do
       before_each do
-        schema_editor = Marten::DB::Connection.default.schema_editor
-        if Marten::DB::Connection.default.introspector.table_names.includes?("schema_introspector_test_table")
+        introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+        if introspector.table_names.includes?("schema_introspector_test_table")
           schema_editor.delete_table("schema_introspector_test_table")
         end
       end
 
       it "returns the details of the columns of a specific table" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
         table_state = Marten::DB::Management::TableState.new(
           "my_app",
@@ -25,7 +27,7 @@ for_mysql do
 
         schema_editor.create_table(table_state)
 
-        introspector = Marten::DB::Connection.default.introspector
+        introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
 
         columns_details = introspector.columns_details(table_state.name)
         columns_details.sort_by!(&.name)
@@ -55,7 +57,7 @@ for_mysql do
     describe "#foreign_key_constraint_names" do
       it "returns the foreign key constraint names of a specific table" do
         connection = Marten::DB::Connection.default
-        introspector = connection.introspector
+        introspector = Marten::DB::Management::Introspector.for(connection)
 
         fk_constraint_names_1 = introspector.foreign_key_constraint_names(Post.db_table, "author_id")
         fk_constraint_names_2 = introspector.foreign_key_constraint_names(Post.db_table, "updated_by_id")
@@ -70,7 +72,7 @@ for_mysql do
     describe "#index_names" do
       it "returns the index names for a specific table and column" do
         connection = Marten::DB::Connection.default
-        introspector = connection.introspector
+        introspector = Marten::DB::Management::Introspector.for(connection)
 
         index_names_1 = introspector.index_names(TestUser.db_table, "email")
         index_names_1.should eq ["index_app_test_user_on_email"]
@@ -80,7 +82,7 @@ for_mysql do
     describe "#table_names" do
       it "returns the table names of the associated database connection" do
         connection = Marten::DB::Connection.default
-        introspector = connection.introspector
+        introspector = Marten::DB::Management::Introspector.for(connection)
 
         introspector.table_names.should contain(TestUser.db_table)
         introspector.table_names.should_not contain("unknown_table")
@@ -90,7 +92,7 @@ for_mysql do
     describe "#primary_key_constraint_names" do
       it "returns the primary key constraint names of a specific table and column" do
         connection = Marten::DB::Connection.default
-        introspector = connection.introspector
+        introspector = Marten::DB::Management::Introspector.for(connection)
 
         introspector.primary_key_constraint_names(Post.db_table, "id").should eq ["PRIMARY"]
         introspector.primary_key_constraint_names(Post.db_table, "author_id").should be_empty
@@ -100,7 +102,7 @@ for_mysql do
     describe "#unique_constraint_names" do
       it "returns the unique constraint names of a specific table" do
         connection = Marten::DB::Connection.default
-        introspector = connection.introspector
+        introspector = Marten::DB::Management::Introspector.for(connection)
 
         constraint_names = [] of String
 

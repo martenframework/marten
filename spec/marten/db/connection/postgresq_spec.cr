@@ -22,13 +22,6 @@ for_postgresql do
       end
     end
 
-    describe "#introspector" do
-      it "returns the expected introspector instance" do
-        conn = Marten::DB::Connection.default
-        conn.introspector.should be_a Marten::DB::Management::Introspector::PostgreSQL
-      end
-    end
-
     describe "#limit_value" do
       it "returns the passed value if it is not nil" do
         conn = Marten::DB::Connection.default
@@ -152,13 +145,6 @@ for_postgresql do
       it "returns the expected quote character" do
         conn = Marten::DB::Connection.default
         conn.quote_char.should eq '"'
-      end
-    end
-
-    describe "#schema_editor" do
-      it "returns the expected schema editor instance" do
-        conn = Marten::DB::Connection.default
-        conn.schema_editor.should be_a Marten::DB::Management::SchemaEditor::PostgreSQL
       end
     end
 

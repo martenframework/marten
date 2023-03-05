@@ -17,7 +17,7 @@ describe Marten::CLI::Manage::Command::ResetMigrations do
   after_all do
     FileUtils.rm_rf(Marten::CLI::Manage::Command::ResetMigrationsSpec.expected_migration_filepath)
 
-    introspector = Marten::DB::Connection.default.introspector
+    introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
       schema_editor.delete_table("foo_tags") if introspector.table_names.includes?("foo_tags")
       schema_editor.delete_table("bar_tags") if introspector.table_names.includes?("bar_tags")

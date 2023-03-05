@@ -20,8 +20,10 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
   describe "#mutate_db_backward" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("operation_test_table")
         schema_editor.delete_table("operation_test_table")
       end
     end
@@ -46,7 +48,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
       to_project_state = Marten::DB::Management::ProjectState.new
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(from_table_state)
 
       operation = Marten::DB::Migration::Operation::CreateTable.new(
@@ -57,14 +59,17 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
       operation.mutate_db_backward("my_app", schema_editor, from_project_state, to_project_state)
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("operation_test_table").should be_false
     end
   end
 
   describe "#mutate_db_forward" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("operation_test_table")
         schema_editor.delete_table("operation_test_table")
       end
     end
@@ -89,7 +94,7 @@ describe Marten::DB::Migration::Operation::CreateTable do
       )
       to_project_state = Marten::DB::Management::ProjectState.new([to_table_state])
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       operation = Marten::DB::Migration::Operation::CreateTable.new(
         name: "operation_test_table",
@@ -99,7 +104,8 @@ describe Marten::DB::Migration::Operation::CreateTable do
 
       operation.mutate_db_forward("my_app", schema_editor, from_project_state, to_project_state)
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("operation_test_table").should be_true
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("operation_test_table").should be_true
     end
   end
 

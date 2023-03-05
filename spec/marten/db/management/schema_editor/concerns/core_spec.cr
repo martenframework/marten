@@ -3,14 +3,16 @@ require "./spec_helper"
 describe Marten::DB::Management::SchemaEditor::Base do
   describe "#add_column" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
     it "can add a simple column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -24,7 +26,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo"))
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       for_mysql { db_column.type.should eq "int" }
@@ -33,7 +35,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can add a column with a default value to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -58,7 +60,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can add a nullable column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -72,14 +74,14 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: true))
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_true
     end
 
     it "can add a non-nullable column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -93,14 +95,14 @@ describe Marten::DB::Management::SchemaEditor::Base do
       schema_editor.create_table(table_state)
       schema_editor.add_column(table_state, Marten::DB::Management::Column::Int.new("foo", null: false))
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       db_column = introspector.columns_details(table_state.name).find! { |c| c.name == "foo" }
 
       db_column.nullable?.should be_false
     end
 
     it "can add a primary key column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -158,7 +160,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can add a non-primary key column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -216,7 +218,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can add a unique column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -283,7 +285,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can add a foreign key column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -397,7 +399,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "can add a non-foreign key reference column to an existing table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -509,7 +511,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     for_db_backends :mysql, :postgresql do
       it "generates a deferred statement if the column is indexed" do
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
         table_state = Marten::DB::Management::TableState.new(
           "my_app",
@@ -531,14 +533,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#add_index" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
     it "adds an index to a table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -666,14 +670,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#add_unique_constraint" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
     it "adds a unique constraint to a table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -818,8 +824,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#create_table" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -835,10 +843,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       columns_details = introspector.columns_details(table_state.name)
       columns_details.sort_by!(&.name)
 
@@ -880,7 +888,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "properly creates unique constraints" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -1020,7 +1028,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "generates a deferred statement for indexed columns" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -1039,7 +1047,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
     end
 
     it "generates a deferred statement for custom indexes" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       table_state = Marten::DB::Management::TableState.new(
         "my_app",
@@ -1187,8 +1195,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#delete_table" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -1204,19 +1214,22 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       schema_editor.delete_table(table_state.name)
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table").should be_false
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("schema_editor_test_table").should be_false
     end
   end
 
   describe "#remove_column" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -1233,12 +1246,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       schema_editor.remove_column(table_state, column)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       columns_details = introspector.columns_details(table_state.name)
       columns_details.map(&.name).should eq ["id"]
     end
@@ -1259,12 +1272,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       schema_editor.remove_column(table_state, column)
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       columns_details = introspector.columns_details(table_state.name)
       columns_details.map(&.name).should eq ["id"]
     end
@@ -1282,9 +1295,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
           unique_constraints: [] of Marten::DB::Management::Constraint::Unique
         )
 
-        Marten::DB::Connection.default.schema_editor.create_table(table_state)
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+        schema_editor.create_table(table_state)
 
-        schema_editor = Marten::DB::Connection.default.schema_editor
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.deferred_statements << Marten::DB::Management::Statement.new(
           "tpl1",
           column: Marten::DB::Management::Statement::Columns.new(
@@ -1312,8 +1326,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#remove_index" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -1400,14 +1416,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#remove_unique_constraint" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
     it "remove a unique constraint from a table" do
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       unique_constraint = Marten::DB::Management::Constraint::Unique.new("test_constraint_to_remove", ["foo", "bar"])
       table_state = Marten::DB::Management::TableState.new(
@@ -1489,8 +1507,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#rename_column" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -1507,12 +1527,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       schema_editor.rename_column(table_state, column, "new_name")
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       columns_details = introspector.columns_details(table_state.name)
       columns_details.map(&.name).sort!.should eq ["id", "new_name"]
     end
@@ -1529,9 +1549,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      Marten::DB::Connection.default.schema_editor.create_table(table_state)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+      schema_editor.create_table(table_state)
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.deferred_statements << Marten::DB::Management::Statement.new(
         "tpl1",
         column: Marten::DB::Management::Statement::Columns.new(
@@ -1565,12 +1586,14 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#rename_table" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
 
-      if Marten::DB::Connection.default.introspector.table_names.includes?("renamed_schema_editor_test_table")
+      if introspector.table_names.includes?("renamed_schema_editor_test_table")
         schema_editor.delete_table("renamed_schema_editor_test_table")
       end
     end
@@ -1585,12 +1608,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.create_table(table_state)
 
       schema_editor.rename_table(table_state, "renamed_schema_editor_test_table")
 
-      introspector = Marten::DB::Connection.default.introspector
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
       columns_details = introspector.columns_details("renamed_schema_editor_test_table")
       columns_details.map(&.name).should eq ["id"]
     end
@@ -1607,9 +1630,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
         unique_constraints: [] of Marten::DB::Management::Constraint::Unique
       )
 
-      Marten::DB::Connection.default.schema_editor.create_table(table_state)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+      schema_editor.create_table(table_state)
 
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
       schema_editor.deferred_statements << Marten::DB::Management::Statement.new(
         "tpl1",
         table: Marten::DB::Management::Statement::Table.new(
@@ -1641,26 +1665,30 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
   describe "#change_column" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_other_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_other_test_table")
         schema_editor.delete_table("schema_editor_other_test_table")
       end
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
 
     after_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_other_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_other_test_table")
         schema_editor.delete_table("schema_editor_other_test_table")
       end
     end
 
     it "can perform a column alteration that simply sets a column as nullable" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", null: false)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
@@ -1687,8 +1715,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that simply sets a column as nullable when there are existing records" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", null: false)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
@@ -1719,8 +1747,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that simply sets a column as not nullable" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", null: false)
@@ -1747,8 +1775,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that simply sets a column as not nullable when there are existing records" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", null: true)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", null: false, default: 42)
@@ -1784,8 +1812,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that removes a column index" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", index: true)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", index: false)
@@ -1813,8 +1841,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that adds a column index" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", index: false)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", index: true)
@@ -1842,8 +1870,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that adds a unique constraint" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", unique: false)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", unique: true)
@@ -1873,8 +1901,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that removes a unique constraint" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", unique: true)
       new_column = Marten::DB::Management::Column::BigInt.new("foo", unique: false)
@@ -1904,8 +1932,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that changes the column type precision for integers" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::Int.new("foo")
       new_column = Marten::DB::Management::Column::BigInt.new("foo")
@@ -1942,8 +1970,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that changes the maximum string size for string columns" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::String.new("foo", max_size: 155)
       new_column = Marten::DB::Management::Column::String.new("foo", max_size: 255)
@@ -1988,8 +2016,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that changes a column from a string type to a text type" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::String.new("foo", max_size: 155)
       new_column = Marten::DB::Management::Column::Text.new("foo")
@@ -2026,8 +2054,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that adds a default value" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo")
       new_column = Marten::DB::Management::Column::BigInt.new("foo", default: 42)
@@ -2057,8 +2085,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can perform a column alteration that removes a default value" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", default: 42)
       new_column = Marten::DB::Management::Column::BigInt.new("foo")
@@ -2088,8 +2116,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can add a primary key constraint to a column" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo")
       new_column = Marten::DB::Management::Column::BigInt.new("foo", primary_key: true)
@@ -2130,8 +2158,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can remove a primary key constraint from a column" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("foo", primary_key: true)
       new_column = Marten::DB::Management::Column::BigInt.new("foo")
@@ -2172,8 +2200,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can change a primary key column type and update the incoming foreign keys accordingly" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
-      introspector = connection.introspector
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+      introspector = Marten::DB::Management::Introspector.for(connection)
 
       old_column = Marten::DB::Management::Column::BigInt.new("id", primary_key: true)
       new_column = Marten::DB::Management::Column::String.new("id", max_size: 255, primary_key: true)
@@ -2240,7 +2268,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can remove a foreign key constraint from a reference column" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
 
       old_column = Marten::DB::Management::Column::Reference.new(
         "table_id",
@@ -2379,7 +2407,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
     it "can add a foreign key constraint to a reference column" do
       connection = Marten::DB::Connection.default
-      schema_editor = connection.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
 
       old_column = Marten::DB::Management::Column::Reference.new(
         "table_id",

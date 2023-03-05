@@ -1,5 +1,6 @@
 require "spec"
 
+require "./cli"
 require "./spec/**"
 
 module Marten

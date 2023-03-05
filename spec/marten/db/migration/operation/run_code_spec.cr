@@ -12,7 +12,7 @@ describe Marten::DB::Migration::Operation::RunCode do
     it "run the backward proc" do
       from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
       to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       var = nil
       operation = Marten::DB::Migration::Operation::RunCode.new(
@@ -28,7 +28,7 @@ describe Marten::DB::Migration::Operation::RunCode do
     it "does nothing if the operation does not have a backward proc" do
       from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
       to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       var = nil
       operation = Marten::DB::Migration::Operation::RunCode.new(->{ var = "forward" })
@@ -43,7 +43,7 @@ describe Marten::DB::Migration::Operation::RunCode do
     it "run the forward proc" do
       from_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
       to_project_state = Marten::DB::Management::ProjectState.new([] of Marten::DB::Management::TableState)
-      schema_editor = Marten::DB::Connection.default.schema_editor
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
 
       var = nil
       operation = Marten::DB::Migration::Operation::RunCode.new(

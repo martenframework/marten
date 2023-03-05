@@ -7,15 +7,15 @@ module Marten
           macro included
             def sql_quoted_default_value(connection : Connection::Base) : ::String?
               return if default.nil?
-              connection.schema_editor.quoted_default_value_for_built_in_column(default)
+              SchemaEditor.for(connection).quoted_default_value_for_built_in_column(default)
             end
 
             def sql_type(connection : Connection::Base) : ::String
-              connection.schema_editor.column_type_for_built_in_column(self) % db_type_parameters
+              SchemaEditor.for(connection).column_type_for_built_in_column(self) % db_type_parameters
             end
 
             def sql_type_suffix(connection : Connection::Base) : ::String?
-              connection.schema_editor.column_type_suffix_for_built_in_column(self)
+              SchemaEditor.for(connection).column_type_suffix_for_built_in_column(self)
             end
 
             private def db_type_parameters

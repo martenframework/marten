@@ -24,10 +24,6 @@ module Marten
           new_record_id
         end
 
-        def introspector : Management::Introspector::Base
-          Management::Introspector::MySQL.new(self)
-        end
-
         def left_operand_for(id : String, predicate) : String
           id
         end
@@ -54,10 +50,6 @@ module Marten
 
         def quote_char : Char
           '`'
-        end
-
-        def schema_editor : Management::SchemaEditor::Base
-          Management::SchemaEditor::MySQL.new(self)
         end
 
         def scheme : String

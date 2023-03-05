@@ -23,6 +23,7 @@ module Marten
                 name: Record.db_table,
                 columns: Record.fields.compact_map(&.to_column),
                 unique_constraints: Record.db_unique_constraints.map { |c| Management::Constraint::Unique.from(c) },
+                indexes: Record.db_indexes.map { |i| Management::Index.from(i) },
               )
             )
           end
@@ -48,7 +49,7 @@ module Marten
           end
 
           private def introspector
-            @introspector ||= @connection.introspector
+            @introspector ||= Introspector.for(@connection)
           end
 
           private def record_qs
@@ -60,7 +61,7 @@ module Marten
           end
 
           private def schema_editor
-            @schema_editor ||= @connection.schema_editor
+            @schema_editor ||= SchemaEditor.for(@connection)
           end
         end
       end

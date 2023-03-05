@@ -26,12 +26,6 @@ module Marten
           pk_field_to_fetch : String? = nil
         ) : ::DB::Any
 
-        # Returns a `Marten::DB::Management::Introspector::Base` subclass instance to use to introspect the DB at hand.
-        #
-        # Each connection implementation should also implement a subclass of
-        # `Marten::DB::Management::Introspector::Base`.
-        abstract def introspector : Management::Introspector::Base
-
         # Returns the left operand to use for specific query predicate.
         #
         # Most of the time the initial ID will be left intact but depending on the connection implementation and the
@@ -55,12 +49,6 @@ module Marten
         # Returns the quote character to use to quote table names, columns, etc.
         abstract def quote_char : Char
 
-        # Returns a `Marten::DB::Management::SchemaEditor::Base` subclass instance to edit the schema of the DB at hand.
-        #
-        # Each connection implementation should also implement a subclass of
-        # `Marten::DB::Management::SchemaEditor::Base`.
-        abstract def schema_editor : Management::SchemaEditor::Base
-
         # Returns the scheme to consider for the underlying database backend.
         abstract def scheme : String
 
@@ -81,6 +69,11 @@ module Marten
         def build_sql(&)
           yield (clauses = [] of String?)
           clauses.compact!.join " "
+        end
+
+        # Returns the identifier of the connection.
+        def id : String
+          IMPLEMENTATIONS.key_for(self.class)
         end
 
         # Registers a proc to be called when the current transaction is committed to the databse.

@@ -84,7 +84,7 @@ module Marten
 
           # Flushes all model tables.
           def flush_model_tables : Nil
-            tables_to_flush = @connection.introspector.model_table_names.map { |n| quote(n) }
+            tables_to_flush = Introspector.for(@connection).model_table_names.map { |n| quote(n) }
             return if tables_to_flush.empty?
 
             flush_tables(tables_to_flush)
@@ -96,7 +96,7 @@ module Marten
           # used on production databases (those are likely to be mutated using migrations), but this can be usefull when
           # initializing a database for the first time in development or when running tests.
           def sync_models : Nil
-            table_names = @connection.introspector.table_names
+            table_names = Introspector.for(@connection).table_names
             project_state = ProjectState.from_apps(Marten.apps.app_configs)
             project_state.tables.values.each do |table|
               next if table_names.includes?(table.name)

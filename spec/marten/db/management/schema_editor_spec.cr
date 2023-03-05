@@ -1,10 +1,30 @@
 require "./spec_helper"
 
 describe Marten::DB::Management::SchemaEditor do
+  describe "::for" do
+    it "returns the expected schema editor object for the passed connection" do
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      for_mysql do
+        schema_editor.should be_a Marten::DB::Management::SchemaEditor::MySQL
+      end
+
+      for_postgresql do
+        schema_editor.should be_a Marten::DB::Management::SchemaEditor::PostgreSQL
+      end
+
+      for_sqlite do
+        schema_editor.should be_a Marten::DB::Management::SchemaEditor::SQLite
+      end
+    end
+  end
+
   describe "::run_for" do
     before_each do
-      schema_editor = Marten::DB::Connection.default.schema_editor
-      if Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table")
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      if introspector.table_names.includes?("schema_editor_test_table")
         schema_editor.delete_table("schema_editor_test_table")
       end
     end
@@ -139,8 +159,10 @@ describe Marten::DB::Management::SchemaEditor do
         end
       end
 
-      if Marten::DB::Connection.default.schema_editor.ddl_rollbackable?
-        Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table").should be_false
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+      if schema_editor.ddl_rollbackable?
+        introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+        introspector.table_names.includes?("schema_editor_test_table").should be_false
       end
     end
 
@@ -162,7 +184,8 @@ describe Marten::DB::Management::SchemaEditor do
         end
       end
 
-      Marten::DB::Connection.default.introspector.table_names.includes?("schema_editor_test_table").should be_true
+      introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
+      introspector.table_names.includes?("schema_editor_test_table").should be_true
     end
   end
 end

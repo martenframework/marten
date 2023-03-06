@@ -41,6 +41,18 @@ For example:
 
 If `value` is "Hello", then the output will be "hello".
 
+## `join`
+
+The `join` filter converts an array of elements into a string separated by `arg`.
+
+For example:
+
+```html
+{{ value|join: arg }}
+```
+
+If `value` is `["Bananas","Apples","Oranges"]` and `arg` is `, `, then the output will be "Bananas, Apples, Oranges".
+
 ## `linebreaks`
 
 The `linebreaks` filter allows to convert a string replacing all newlines with HTML line breaks (`<br />`).
@@ -76,6 +88,18 @@ For example:
 ```
 
 If `value` is `hello`, then the output will be 5.
+
+## `split`
+
+The `split` filter converts a string into an array of elements separated by `arg`.
+
+For example:
+
+```html
+{{ value|split: arg }}
+```
+
+If `value` is `Bananas,Apples,Oranges` and `arg` is `,`, then the output will be ["Bananas","Apples","Oranges"].
 
 ## `upcase`
 

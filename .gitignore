@@ -19,3 +19,5 @@
 /spec/assets/
 /spec/media/
 /spec/marten/cli/manage/command/new_spec
+
+.*.swp

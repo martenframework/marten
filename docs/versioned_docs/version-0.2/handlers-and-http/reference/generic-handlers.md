@@ -87,7 +87,7 @@ The [`#template_name`](pathname:///api/0.2/Marten/Handlers/Rendering/ClassMethod
 
 Optionally, it is possible to configure that records should be [paginated](../../models-and-databases/reference/query-set#paginator) by specifying a page size through the use of the [`page_size`](pathname:///api/0.2/Marten/Handlers/RecordListing/ClassMethods.html#page_size(page_size%3AInt32%3F)-instance-method) class method:
 
-```
+```crystal
 class MyHandler < Marten::Handlers::RecordList
   template_name = "my_template"
   model Post
@@ -96,6 +96,23 @@ end
 ```
 
 When records are paginated, a [`Marten::DB::Query::Page`](pathname:///api/0.2/Marten/DB/Query/Page.html) object will be exposed in the template context (instead of the raw query set). It should be noted that the page number that should be displayed is determined by looking for a `page` GET parameter by default; this parameter name can be configured as well by calling the [`page_number_param`](pathname:///api/0.2/Marten/Handlers/RecordListing/ClassMethods.html#page_number_param(param%3AString|Symbol)-instance-method) class method.
+
+:::tip How to customize the query set?
+By default, handlers that inherit from [`Marten::Handlers::RecordList`](pathname:///api/0.2/Marten/Handlers/RecordList.html) will use a query set targetting _all_ the records of the specified model. It should be noted that you can customize this behavior easily by overriding the [`#queryset`](pathname:///api/0.2/Marten/Handlers/RecordListing.html#queryset-instance-method) method and by applying additional filters to the default query set.
+
+For example:
+
+```crystal
+class MyHandler < Marten::Handlers::RecordList
+  template_name = "my_template"
+  model Article
+
+  def queryset
+    super.filter(user: request.user)
+  end
+end
+```
+:::
 
 ## Updating a record
 

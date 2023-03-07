@@ -49,6 +49,25 @@ describe Marten::DB::Field::String do
     end
   end
 
+  describe "#max_size" do
+    it "returns the configured max size" do
+      field = Marten::DB::Field::String.new("my_field", db_column: "my_field_col", max_size: 128)
+      field.max_size.should eq 128
+    end
+  end
+
+  describe "#min_size" do
+    it "returns nil by default" do
+      field = Marten::DB::Field::String.new("my_field", db_column: "my_field_col", max_size: 128)
+      field.min_size.should be_nil
+    end
+
+    it "returns the configured min size" do
+      field = Marten::DB::Field::String.new("my_field", db_column: "my_field_col", max_size: 128, min_size: 5)
+      field.min_size.should eq 5
+    end
+  end
+
   describe "#to_column" do
     it "returns the expected column" do
       field = Marten::DB::Field::String.new("my_field", db_column: "my_field_col", max_size: 128)
@@ -143,7 +162,7 @@ describe Marten::DB::Field::String do
   end
 
   describe "#validate" do
-    it "adds an error to the record if the string size is greater than the allowed limit" do
+    it "adds an error to the record if the string size is greater than the allowed max limit" do
       obj = Tag.new(name: nil)
 
       field = Marten::DB::Field::String.new("name", null: false, max_size: 128)
@@ -154,7 +173,18 @@ describe Marten::DB::Field::String do
       obj.errors.first.message.should eq "The maximum allowed length is 128"
     end
 
-    it "does not add an error to the record if the string size is equal to the allowed limit" do
+    it "adds an error to the record if the string size is lesser than the allowed min limit" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", null: false, min_size: 5, max_size: 128)
+      field.validate(obj, "a" * 4)
+
+      obj.errors.size.should eq 1
+      obj.errors.first.field.should eq "name"
+      obj.errors.first.message.should eq "The minimum allowed length is 5"
+    end
+
+    it "does not add an error to the record if the string size is equal to the allowed max limit" do
       obj = Tag.new(name: nil)
 
       field = Marten::DB::Field::String.new("name", null: false, max_size: 128)
@@ -163,11 +193,29 @@ describe Marten::DB::Field::String do
       obj.errors.size.should eq 0
     end
 
-    it "does not add an error to the record if the string size is less than the allowed limit" do
+    it "does not add an error to the record if the string size is equal to the allowed min limit" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", null: false, min_size: 5, max_size: 128)
+      field.validate(obj, "a" * 5)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if the string size is less than the allowed max limit" do
       obj = Tag.new(name: nil)
 
       field = Marten::DB::Field::String.new("name", null: false, max_size: 128)
       field.validate(obj, "a" * 100)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if the string size is greater than the allowed min limit" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", null: false, min_size: 5, max_size: 128)
+      field.validate(obj, "a" * 6)
 
       obj.errors.size.should eq 0
     end

@@ -3,11 +3,17 @@ module Marten
     module Field
       class String < Base
         getter default
+
+        # Returns the maximum string size allowed.
         getter max_size
+
+        # Returns the minimum string size allowed.
+        getter min_size
 
         def initialize(
           @id : ::String,
           @max_size : ::Int32,
+          @min_size : ::Int32? = nil,
           @primary_key = false,
           @default : ::String? = nil,
           @blank = false,
@@ -72,8 +78,12 @@ module Marten
         def validate(record, value)
           return if !value.is_a?(::String)
 
-          if value.size > @max_size
+          if value.size > max_size
             record.errors.add(id, I18n.t("marten.db.field.string.errors.too_long", max_size: max_size))
+          end
+
+          if !min_size.nil? && value.size < min_size.not_nil!
+            record.errors.add(id, I18n.t("marten.db.field.string.errors.too_short", min_size: min_size))
           end
         end
 

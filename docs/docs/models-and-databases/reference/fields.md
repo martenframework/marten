@@ -166,6 +166,10 @@ A `string` field allows to persist small or medium string values. In addition to
 
 The `max_size` argument **is required** and allows to specify the maximum size of the persisted string. This maximum size is used for the corresponding column definition and when it comes to validate field values.
 
+#### `min_size`
+
+The `min_size` argument allows defining the minimum size allowed for the persisted string. The default value for this argument is `nil`, which means that the minimum size is not validated by default.
+
 ### `text`
 
 A `text` field allows to persist large text values. In addition to the [common field options](#common-field-options), such fields support the following arguments:

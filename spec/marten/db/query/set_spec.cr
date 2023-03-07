@@ -865,7 +865,6 @@ describe Marten::DB::Query::Set do
     end
   end
 
-
   describe "#first" do
     it "returns the first result for an ordered queryset" do
       Tag.create!(name: "ruby", is_active: true)

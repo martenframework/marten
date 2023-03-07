@@ -312,7 +312,7 @@ module Marten
         #
         # ```
         # query_set = Post.all
-        # query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
+        # query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
         # ```
         def filter(&)
           expr = Expression::Filter.new
@@ -323,6 +323,40 @@ module Marten
         # Returns a query set whose records match the given query node object.
         def filter(query_node : Node)
           add_query_node(query_node)
+        end
+
+        # Returns if a query set includes a specific model.
+        def includes?(value : DB::Model)
+          query_node = Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})
+          add_query_node(query_node)
+          exists?
+        end
+
+        # Returns if a query set matches a specific set of advanced filters.
+        #
+        # This method returns a `Bool` object and allows to define complex database queries involving
+        # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
+        # expression. These expressions can then be used to build complex queries such as:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.includes? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
+        # ```
+        def includes?(&)
+          expr = Expression::Filter.new
+          query : Node = with expr yield
+          filter(query)
+          exists?
+        end
+
+        # Returns if a query set includes a specific node.
+        # ```
+        # query_set = Post.all
+        # query_set.includes?(Marten::DB::Query::Node.new(name__startswith: "Fr"))
+        # ```
+        def includes?(query_node : Node)
+          filter(query_node)
+          exists?
         end
 
         # Returns the first record that is matched by the query set, or `nil` if no records are found.

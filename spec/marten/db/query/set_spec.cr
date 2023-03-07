@@ -843,6 +843,29 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#includes?" do
+    it "works as expected" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+
+      inc_1 = Marten::DB::Query::Set(Tag).new.includes? { q(name: "ruby") }
+
+      inc_2 = Marten::DB::Query::Set(Tag).new.includes?(tag_2)
+
+      inc_3 = Marten::DB::Query::Set(Tag).new.includes?(Marten::DB::Query::Node.new(name__startswith: :c))
+
+      inc_4 = Marten::DB::Query::Set(Tag).new.includes?("programming")
+
+      inc_1.should eq true
+      inc_2.should eq true
+      inc_3.should eq true
+      inc_4.should eq false
+    end
+  end
+
+
   describe "#first" do
     it "returns the first result for an ordered queryset" do
       Tag.create!(name: "ruby", is_active: true)

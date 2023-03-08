@@ -35,7 +35,7 @@ module Marten
                 if File.exists?(filepath)
                   lines += File.read_lines(filepath).map_with_index do |code, line_index|
                     next unless (line_number - 5..line_number + 5).includes?(line_index + 1)
-                    {code, line_index + 1, line_index + 1 == line_number}
+                    {HTML.escape(code), line_index + 1, line_index + 1 == line_number}
                   end
                 end
 

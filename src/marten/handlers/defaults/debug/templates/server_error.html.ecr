@@ -387,7 +387,7 @@
         </svg>
       </div>
       <h1><span class="exception-class"><%= error.class %></span> at <%= request.path %></h1>
-      <div class="exception-message"><%= error.message ? error.message.to_s.lines.first : "Error" %></div>
+      <div class="exception-message"><%= error.message ? HTML.escape(error.message.to_s.lines.first) : "Error" %></div>
     </header>
     <% if !frames.empty? %>
     <section class="exception-details">

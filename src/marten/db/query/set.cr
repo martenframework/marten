@@ -327,6 +327,7 @@ module Marten
 
         # Returns if a specific model exists in the query set.
         def exists?(value : M)
+          raise Marten::DB::Errors::UnmetQuerySetCondition.new("Record Must Be Persisted.") unless value.persisted?
           if @result_cache.nil?
             filter(Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})).exists?
           else

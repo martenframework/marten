@@ -137,7 +137,7 @@ module Marten
 
                       break unless deps_satisfied
 
-                      if migrations_per_app.includes?(dependency.app_label)
+                      if migrations_per_app.has_key?(dependency.app_label)
                         resolved_operation_dependencies << {
                           dependency.app_label,
                           migrations_per_app[dependency.app_label].last.name,

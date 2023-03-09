@@ -325,11 +325,13 @@ module Marten
           add_query_node(query_node)
         end
 
-        # Returns if a query set includes a specific model.
-        def includes?(value : DB::Model)
-          query_node = Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})
-          add_query_node(query_node)
-          exists?
+        # Returns if a specific model exists in the query set.
+        def exists?(value : M)
+          if @result_cache.nil?
+            filter(Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})).exists?
+          else
+            @result_cache.not_nil!.includes?(value)
+          end
         end
 
         # Returns if a query set matches a specific set of advanced filters.
@@ -340,23 +342,21 @@ module Marten
         #
         # ```
         # query_set = Post.all
-        # query_set.includes? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
+        # query_set.exists? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
         # ```
-        def includes?(&)
+        def exists?(&)
           expr = Expression::Filter.new
           query : Node = with expr yield
-          filter(query)
-          exists?
+          filter(query).exists?
         end
 
-        # Returns if a query set includes a specific node.
+        # Returns if a specific node exists in a query set.
         # ```
         # query_set = Post.all
-        # query_set.includes?(Marten::DB::Query::Node.new(name__startswith: "Fr"))
+        # query_set.exists?(Marten::DB::Query::Node.new(name__startswith: "Fr"))
         # ```
-        def includes?(query_node : Node)
-          filter(query_node)
-          exists?
+        def exists?(query_node : Node)
+          filter(query_node).exists?
         end
 
         # Returns the first record that is matched by the query set, or `nil` if no records are found.

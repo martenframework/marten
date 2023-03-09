@@ -804,25 +804,29 @@ describe Marten::DB::Management::Migrations::Diff do
         ]
       )
 
-      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-      changes = diff.detect
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
 
-      changes.size.should eq 2
-      changes["app"].size.should eq 1
-      changes["other_app"].size.should eq 1
+        changes.size.should eq 2
+        changes["app"].size.should eq 1
+        changes["other_app"].size.should eq 1
 
-      changes["other_app"][0].operations.size.should eq 1
-      changes["other_app"][0].dependencies.should be_empty
-      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
-      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
-      operation_1.name.should eq "other_table"
+        changes["other_app"][0].operations.size.should eq 1
+        changes["other_app"][0].dependencies.should be_empty
+        changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+        operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_1.name.should eq "other_table"
 
-      changes["app"][0].operations.size.should eq 1
-      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
-      changes["app"][0].dependencies.size.should eq 1
-      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
-      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
-      operation_2.name.should eq "test_table"
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+        changes["app"][0].dependencies.size.should eq 1
+        changes["app"][0].dependencies[0].should eq(
+          {"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_other_table_table"}
+        )
+        operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_2.name.should eq "test_table"
+      end
     end
 
     it "properly generates a dependency between an added foreign key and the target table" do
@@ -858,26 +862,30 @@ describe Marten::DB::Management::Migrations::Diff do
         ]
       )
 
-      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-      changes = diff.detect
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
 
-      changes.size.should eq 2
-      changes["app"].size.should eq 1
-      changes["other_app"].size.should eq 1
+        changes.size.should eq 2
+        changes["app"].size.should eq 1
+        changes["other_app"].size.should eq 1
 
-      changes["other_app"][0].operations.size.should eq 1
-      changes["other_app"][0].dependencies.should be_empty
-      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
-      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
-      operation_1.name.should eq "other_table"
+        changes["other_app"][0].operations.size.should eq 1
+        changes["other_app"][0].dependencies.should be_empty
+        changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::CreateTable
+        operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_1.name.should eq "other_table"
 
-      changes["app"][0].operations.size.should eq 1
-      changes["app"][0].dependencies.size.should eq 1
-      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
-      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddColumn
-      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
-      operation_2.table_name.should eq "test_table"
-      operation_2.column.name.should eq "other_id"
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].dependencies.size.should eq 1
+        changes["app"][0].dependencies[0].should eq(
+          {"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_other_table_table"}
+        )
+        changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::AddColumn
+        operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
+        operation_2.table_name.should eq "test_table"
+        operation_2.column.name.should eq "other_id"
+      end
     end
 
     it "properly orders operations that have in-app dependencies" do
@@ -1048,26 +1056,30 @@ describe Marten::DB::Management::Migrations::Diff do
         ]
       )
 
-      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-      changes = diff.detect
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
 
-      changes.size.should eq 2
-      changes["app"].size.should eq 1
-      changes["other_app"].size.should eq 1
+        changes.size.should eq 2
+        changes["app"].size.should eq 1
+        changes["other_app"].size.should eq 1
 
-      changes["other_app"][0].operations.size.should eq 1
-      changes["other_app"][0].dependencies.should be_empty
-      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::ChangeColumn
-      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::ChangeColumn)
-      operation_1.table_name.should eq "other_table"
-      operation_1.column.should eq changed_column
+        changes["other_app"][0].operations.size.should eq 1
+        changes["other_app"][0].dependencies.should be_empty
+        changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::ChangeColumn
+        operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::ChangeColumn)
+        operation_1.table_name.should eq "other_table"
+        operation_1.column.should eq changed_column
 
-      changes["app"][0].operations.size.should eq 1
-      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
-      changes["app"][0].dependencies.size.should eq 1
-      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
-      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
-      operation_2.name.should eq "test_table"
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
+        changes["app"][0].dependencies.size.should eq 1
+        changes["app"][0].dependencies[0].should eq(
+          {"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_change_test_table_id_on_other_table_table"}
+        )
+        operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
+        operation_2.name.should eq "test_table"
+      end
     end
 
     it "properly generates a dependency between a deleted table and the removal of a FK to the deleted table" do
@@ -1103,26 +1115,30 @@ describe Marten::DB::Management::Migrations::Diff do
         ]
       )
 
-      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
-      changes = diff.detect
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
 
-      changes.size.should eq 2
-      changes["app"].size.should eq 1
-      changes["other_app"].size.should eq 1
+        changes.size.should eq 2
+        changes["app"].size.should eq 1
+        changes["other_app"].size.should eq 1
 
-      changes["other_app"][0].operations.size.should eq 1
-      changes["other_app"][0].dependencies.should be_empty
-      changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveColumn
-      operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveColumn)
-      operation_1.table_name.should eq "other_table"
-      operation_1.column_name.should eq "test_table_id"
+        changes["other_app"][0].operations.size.should eq 1
+        changes["other_app"][0].dependencies.should be_empty
+        changes["other_app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RemoveColumn
+        operation_1 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::RemoveColumn)
+        operation_1.table_name.should eq "other_table"
+        operation_1.column_name.should eq "test_table_id"
 
-      changes["app"][0].operations.size.should eq 1
-      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
-      changes["app"][0].dependencies.size.should eq 1
-      changes["app"][0].dependencies[0].should eq({"other_app", "__first__"})
-      operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
-      operation_2.name.should eq "test_table"
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::DeleteTable
+        changes["app"][0].dependencies.size.should eq 1
+        changes["app"][0].dependencies[0].should eq(
+          {"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_remove_test_table_id_on_other_table_table"}
+        )
+        operation_2 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::DeleteTable)
+        operation_2.name.should eq "test_table"
+      end
     end
 
     it "is able to detect the creation of a table that depends on an existing table from another app" do

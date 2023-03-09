@@ -856,12 +856,9 @@ describe Marten::DB::Query::Set do
 
       inc_3 = Marten::DB::Query::Set(Tag).new.exists?(Marten::DB::Query::Node.new(name__startswith: :c))
 
-      inc_4 = Marten::DB::Query::Set(Tag).new.exists?("programming")
-
       inc_1.should eq true
       inc_2.should eq true
       inc_3.should eq true
-      inc_4.should eq false
     end
   end
 

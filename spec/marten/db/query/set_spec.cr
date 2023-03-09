@@ -845,10 +845,10 @@ describe Marten::DB::Query::Set do
 
   describe "#exists?" do
     it "works as expected" do
-      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
-      tag_4 = Tag.create!(name: "programming", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
 
       inc_1 = Marten::DB::Query::Set(Tag).new.exists? { q(name: "ruby") }
 

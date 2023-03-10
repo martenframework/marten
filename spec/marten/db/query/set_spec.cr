@@ -786,6 +786,54 @@ describe Marten::DB::Query::Set do
       qset_2.each { }
       qset_2.exists?.should be_false
     end
+
+    it "returns true if the specified filters matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.exists?(name: "crystal").should be_true
+    end
+
+    it "returns false if the specified filters does not match anythin" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.exists?(name: "ruby").should be_false
+    end
+
+    it "returns true if the passed q() expression matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.exists? { q(name: "crystal") }.should be_true
+    end
+
+    it "returns false if the passed q() expression does not match anythin" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.exists? { q(name: "ruby") }.should be_false
+    end
+
+    it "returns true if the passed query node matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.exists?(Marten::DB::Query::Node.new(name: "crystal")).should be_true
+    end
+
+    it "returns true if the passed query node does not match anything" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.exists?(Marten::DB::Query::Node.new(name: "ruby")).should be_false
+    end
   end
 
   describe "#filter" do
@@ -840,25 +888,6 @@ describe Marten::DB::Query::Set do
       qset_1.to_a.should eq [tag_2, tag_3]
       qset_2.to_a.should eq [tag_1, tag_4]
       qset_3.to_a.should eq [tag_2, tag_3]
-    end
-  end
-
-  describe "#exists?" do
-    it "works as expected" do
-      Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
-      Tag.create!(name: "coding", is_active: true)
-      Tag.create!(name: "programming", is_active: true)
-
-      inc_1 = Marten::DB::Query::Set(Tag).new.exists? { q(name: "ruby") }
-
-      inc_2 = Marten::DB::Query::Set(Tag).new.exists?(tag_2)
-
-      inc_3 = Marten::DB::Query::Set(Tag).new.exists?(Marten::DB::Query::Node.new(name__startswith: :c))
-
-      inc_1.should eq true
-      inc_2.should eq true
-      inc_3.should eq true
     end
   end
 
@@ -1335,6 +1364,58 @@ describe Marten::DB::Query::Set do
 
       expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
         qset.get_or_create!(email: "jd@example.com")
+      end
+    end
+  end
+
+  describe "#includes?" do
+    it "returns true if the passed record is present in the query set" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.includes?(tag_2).should be_true
+    end
+
+    it "returns true if the passed record is present in a query set that was already fetched" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+      qset.each { }
+
+      qset.includes?(tag_2).should be_true
+    end
+
+    it "returns false if the passed record is not present in the query set" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: false)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Marten::DB::Query::Set(Tag).new.filter(is_active: true).includes?(tag_2).should be_false
+    end
+
+    it "returns false if the passed record is not present in a query set that was already fetched" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: false)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.filter(is_active: true)
+      qset.each { }
+
+      qset.includes?(tag_2).should be_false
+    end
+
+    it "raises if the passed record is not persisted" do
+      tag = Tag.new(name: "crystal")
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "#{tag} is not persisted") do
+        Marten::DB::Query::Set(Tag).new.includes?(tag)
       end
     end
   end

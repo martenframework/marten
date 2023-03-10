@@ -288,6 +288,47 @@ module Marten
           @result_cache.nil? ? @query.exists? : !@result_cache.not_nil!.empty?
         end
 
+        # Returns `true` if the query set corresponding to the specified filters matches at least one record.
+        #
+        # This method returns `true` if the filters passed to this method match at least one record. These filters must
+        # be specified using the predicate format:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.exists?(title: "Test")
+        # query_set.exists?(title__startswith: "A")
+        # ```
+        #
+        # If multiple filters are specified, they will be joined using an **AND** operator at the SQL level.
+        def exists?(**kwargs)
+          filter(Node.new(**kwargs)).exists?
+        end
+
+        # Returns `true` if the query set corresponding to the specified advanced filters matches at least one record.
+        #
+        # This method returns a `Bool` object and allows to define complex database queries involving **AND** and **OR**
+        # operators. It yields a block where each filter has to be wrapped using a `q(...)` expression. These
+        # expressions can then be used to build complex queries such as:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.exists? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
+        # ```
+        def exists?(&)
+          expr = Expression::Filter.new
+          query : Node = with expr yield
+          filter(query).exists?
+        end
+
+        # Returns `true` if the a query set filtered with the given query node object matches at least one record.
+        # ```
+        # query_set = Post.all
+        # query_set.exists?(Marten::DB::Query::Node.new(name__startswith: "Fr"))
+        # ```
+        def exists?(query_node : Node)
+          filter(query_node).exists?
+        end
+
         # Returns a query set matching a specific set of filters.
         #
         # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be
@@ -323,41 +364,6 @@ module Marten
         # Returns a query set whose records match the given query node object.
         def filter(query_node : Node)
           add_query_node(query_node)
-        end
-
-        # Returns if a specific model exists in the query set.
-        def exists?(value : M)
-          raise Marten::DB::Errors::UnmetQuerySetCondition.new("Record Must Be Persisted.") unless value.persisted?
-          if @result_cache.nil?
-            filter(Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})).exists?
-          else
-            @result_cache.not_nil!.includes?(value)
-          end
-        end
-
-        # Returns if a query set matches a specific set of advanced filters.
-        #
-        # This method returns a `Bool` object and allows to define complex database queries involving
-        # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
-        # expression. These expressions can then be used to build complex queries such as:
-        #
-        # ```
-        # query_set = Post.all
-        # query_set.exists? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
-        # ```
-        def exists?(&)
-          expr = Expression::Filter.new
-          query : Node = with expr yield
-          filter(query).exists?
-        end
-
-        # Returns if a specific node exists in a query set.
-        # ```
-        # query_set = Post.all
-        # query_set.exists?(Marten::DB::Query::Node.new(name__startswith: "Fr"))
-        # ```
-        def exists?(query_node : Node)
-          filter(query_node).exists?
         end
 
         # Returns the first record that is matched by the query set, or `nil` if no records are found.
@@ -551,6 +557,17 @@ module Marten
           get!(Node.new(**kwargs))
         rescue Errors::RecordNotFound
           create!(**kwargs) { |r| yield r }
+        end
+
+        # Returns `true` if a specific model record is included in the query set.
+        def includes?(value : M)
+          raise Errors::UnmetQuerySetCondition.new("#{value} is not persisted") unless value.persisted?
+
+          if @result_cache.nil?
+            filter(Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})).exists?
+          else
+            @result_cache.not_nil!.includes?(value)
+          end
         end
 
         # Appends a string representation of the query set to the passed `io`.

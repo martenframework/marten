@@ -338,6 +338,14 @@ Article.filter(title__startswith: "Top").exists?
 
 Note that this method will trigger a very simple `SELECT EXISTS` SQL query if the query set was not already evaluated: when this happens, no model records will be instantiated since the records existence will be determined at the database level. If the query set was already evaluated, the underlying array of records will be used to determine if records exist or not.
 
+It should be noted that `#exists?` can also take additional filters or `q()` expressions as arguments. This allows to apply additional filters to the considered query set in order to perform the check. For example:
+
+```crystal
+query_set = Tag.filter(name__startswith: "c")
+query_set.exists?(is_active: true)
+query_set.exists? { q(is_active: true) }
+```
+
 ### `first`
 
 Returns the first record that is matched by the query set, or `nil` if no records are found.
@@ -443,6 +451,18 @@ end
 ```
 
 In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
+
+### `includes?`
+
+Returns `true` if a specific model record is included in the query set.
+
+This method can be used to verify the membership of a specific model record in a given query set. If the query set is not evaluated yet, a dedicated SQL query will be executed in order to perform this check (without loading the entire list of records that are targeted by the query set). This is especially interesting for large query sets where we don't want all the records to be loaded in memory in order to perform such check.
+
+```crystal
+tag = Tag.get!(name: "crystal")
+query_set = Tag.filter(name__startswith: "c")
+query_set.includes?(tag) # => true
+```
 
 ### `last`
 

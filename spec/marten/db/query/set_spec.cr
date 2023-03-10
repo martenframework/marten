@@ -843,6 +843,25 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#exists?" do
+    it "works as expected" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      inc_1 = Marten::DB::Query::Set(Tag).new.exists? { q(name: "ruby") }
+
+      inc_2 = Marten::DB::Query::Set(Tag).new.exists?(tag_2)
+
+      inc_3 = Marten::DB::Query::Set(Tag).new.exists?(Marten::DB::Query::Node.new(name__startswith: :c))
+
+      inc_1.should eq true
+      inc_2.should eq true
+      inc_3.should eq true
+    end
+  end
+
   describe "#first" do
     it "returns the first result for an ordered queryset" do
       Tag.create!(name: "ruby", is_active: true)

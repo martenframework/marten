@@ -312,7 +312,7 @@ module Marten
         #
         # ```
         # query_set = Post.all
-        # query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
+        # query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
         # ```
         def filter(&)
           expr = Expression::Filter.new
@@ -323,6 +323,41 @@ module Marten
         # Returns a query set whose records match the given query node object.
         def filter(query_node : Node)
           add_query_node(query_node)
+        end
+
+        # Returns if a specific model exists in the query set.
+        def exists?(value : M)
+          raise Marten::DB::Errors::UnmetQuerySetCondition.new("Record Must Be Persisted.") unless value.persisted?
+          if @result_cache.nil?
+            filter(Node.new({Constants::PRIMARY_KEY_ALIAS => value.pk})).exists?
+          else
+            @result_cache.not_nil!.includes?(value)
+          end
+        end
+
+        # Returns if a query set matches a specific set of advanced filters.
+        #
+        # This method returns a `Bool` object and allows to define complex database queries involving
+        # **AND** and **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)`
+        # expression. These expressions can then be used to build complex queries such as:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.exists? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
+        # ```
+        def exists?(&)
+          expr = Expression::Filter.new
+          query : Node = with expr yield
+          filter(query).exists?
+        end
+
+        # Returns if a specific node exists in a query set.
+        # ```
+        # query_set = Post.all
+        # query_set.exists?(Marten::DB::Query::Node.new(name__startswith: "Fr"))
+        # ```
+        def exists?(query_node : Node)
+          filter(query_node).exists?
         end
 
         # Returns the first record that is matched by the query set, or `nil` if no records are found.

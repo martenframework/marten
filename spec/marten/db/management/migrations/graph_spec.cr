@@ -82,6 +82,25 @@ describe Marten::DB::Management::Migrations::Graph do
       graph.ensure_acyclic_property.should be_nil
     end
 
+    it "does not raise if there are no circular dependencies in the graph when migrations depend on multiple apps" do
+      app_1_migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
+      app_2_migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration3.new
+      app_2_migration_2 = Marten::DB::Management::Migrations::GraphSpec::TestMigration4.new
+      app_2_migration_3 = Marten::DB::Management::Migrations::GraphSpec::TestMigration5.new
+
+      graph = Marten::DB::Management::Migrations::Graph.new
+      graph.add_node(app_1_migration_1)
+      graph.add_node(app_2_migration_1)
+      graph.add_node(app_2_migration_2)
+      graph.add_node(app_2_migration_3)
+
+      graph.add_dependency(app_2_migration_2, app_2_migration_1.id)
+      graph.add_dependency(app_2_migration_3, app_2_migration_2.id)
+      graph.add_dependency(app_2_migration_3, app_1_migration_1.id)
+
+      graph.ensure_acyclic_property.should be_nil
+    end
+
     it "raises if there is a circular dependency in the graph" do
       migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
       migration_2 = Marten::DB::Management::Migrations::GraphSpec::TestMigration2.new

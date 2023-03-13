@@ -25,11 +25,32 @@ module Marten
 
           # Verifies that the graph does not contain cycles.
           def ensure_acyclic_property : Nil
-            seen = [] of String
+            remaining_nodes = @nodes.keys
 
-            # Perform a DFS traversal of the directed graph and verifies that no cycles are present.
-            @nodes.keys.each do |node_id|
-              acyclic_dfs_traversal(node_id, seen, forwards: false) unless seen.includes?(node_id)
+            while !remaining_nodes.empty?
+              node = remaining_nodes.pop
+              stack = [node]
+
+              while !stack.empty?
+                stack_updated = false
+
+                @nodes[stack.last].children.each do |child|
+                  child_node_id = child.migration.id
+
+                  if stack.includes?(child_node_id)
+                    raise Errors::CircularDependency.new("Circular dependency identified up to '#{child_node_id}'")
+                  end
+
+                  if remaining_nodes.includes?(child_node_id)
+                    stack << child_node_id
+                    stack_updated = true
+                    remaining_nodes.delete(child_node_id)
+                    break
+                  end
+                end
+
+                stack.pop if !stack_updated
+              end
             end
           end
 

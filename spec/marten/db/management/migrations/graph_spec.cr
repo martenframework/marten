@@ -89,14 +89,15 @@ describe Marten::DB::Management::Migrations::Graph do
       app_2_migration_3 = Marten::DB::Management::Migrations::GraphSpec::TestMigration5.new
 
       graph = Marten::DB::Management::Migrations::Graph.new
-      graph.add_node(app_1_migration_1)
       graph.add_node(app_2_migration_1)
       graph.add_node(app_2_migration_2)
       graph.add_node(app_2_migration_3)
+      graph.add_node(app_1_migration_1)
 
       graph.add_dependency(app_2_migration_2, app_2_migration_1.id)
       graph.add_dependency(app_2_migration_3, app_2_migration_2.id)
       graph.add_dependency(app_2_migration_3, app_1_migration_1.id)
+      graph.add_dependency(app_1_migration_1, app_2_migration_2.id)
 
       graph.ensure_acyclic_property.should be_nil
     end

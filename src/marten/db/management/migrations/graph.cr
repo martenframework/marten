@@ -28,8 +28,12 @@ module Marten
             remaining_nodes = @nodes.keys
 
             while !remaining_nodes.empty?
-              node = remaining_nodes.pop
-              stack = [node]
+              # Build a stack starting from the last node in the remaining set and then iterate over the stack last
+              # item's dependencies. If a dependency node is already in the stack, this means that the graph is cyclic.
+              # If it's not and if the node wasn't already traversed, this means that the node must be added to the
+              # stack (and removed from the remaining nodes set). At every iteration the last node is removed from the
+              # stack if the size of the stack did not change.
+              stack = [remaining_nodes.pop]
 
               while !stack.empty?
                 stack_updated = false

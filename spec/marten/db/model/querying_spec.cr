@@ -93,6 +93,51 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::exists?" do
+    it "returns true if the default queryset matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      Tag.exists?.should be_true
+    end
+
+    it "returns false if the queryset doesn't match at least one record" do
+      Tag.exists?.should be_false
+    end
+
+    it "returns true if the specified filters matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Tag.exists?(name: "crystal").should be_true
+    end
+
+    it "returns false if the specified filters does not match anything" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Tag.exists?(name: "ruby").should be_false
+    end
+
+    it "returns true if the passed q() expression matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Tag.exists? { q(name: "crystal") }.should be_true
+    end
+
+    it "returns false if the passed q() expression does not match anythin" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: true)
+
+      Tag.exists? { q(name: "ruby") }.should be_false
+    end
+  end
+
   describe "::filter" do
     before_each do
       TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

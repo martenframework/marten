@@ -795,7 +795,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.exists?(name: "crystal").should be_true
     end
 
-    it "returns false if the specified filters does not match anythin" do
+    it "returns false if the specified filters does not match anything" do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)

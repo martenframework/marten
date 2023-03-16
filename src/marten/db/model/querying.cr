@@ -70,6 +70,41 @@ module Marten
             default_queryset.exclude(query)
           end
 
+          # Returns `true` if the default model query set matches at least one record, or `false` otherwise.
+          def exists?
+            default_queryset.exists?
+          end
+
+          # Returns `true` if the query set corresponding to the specified filters matches at least one record.
+          #
+          # This method returns `true` if the filters passed to this method match at least one record. These filters
+          # must be specified using the predicate format:
+          #
+          # ```
+          # Post.exists?(title: "Test")
+          # Post.exists?(title__startswith: "A")
+          # ```
+          #
+          # If multiple filters are specified, they will be joined using an **AND** operator at the SQL level.
+          def exists?(**kwargs)
+            default_queryset.exists?(**kwargs)
+          end
+
+          # Returns `true` if the query set corresponding to the specified advanced filters matches at least one record.
+          #
+          # This method returns a `Bool` object and allows to define complex database queries involving **AND** and
+          # **OR** operators. It yields a block where each filter has to be wrapped using a `q(...)` expression. These
+          # expressions can then be used to build complex queries such as:
+          #
+          # ```
+          # Post.exists? { (q(name: "Foo") | q(name: "Bar")) & q(is_published: true) }
+          # ```
+          def exists?(&)
+            expr = Query::Expression::Filter.new
+            query : Query::Node = with expr yield
+            default_queryset.filter(query).exists?
+          end
+
           # Returns a queryset matching a specific set of filters.
           #
           # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be

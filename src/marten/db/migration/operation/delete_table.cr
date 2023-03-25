@@ -39,6 +39,18 @@ module Marten
             state.delete_table(app_label, @name)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            operation.references_table?(name) ? Optimization::Result.failed : Optimization::Result.unchanged
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            references_table?(other_table_name)
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            true
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/delete_table.ecr"
           end

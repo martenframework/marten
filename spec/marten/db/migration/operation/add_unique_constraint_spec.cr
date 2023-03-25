@@ -317,6 +317,74 @@ describe Marten::DB::Migration::Operation::AddUniqueConstraint do
     end
   end
 
+  describe "#optimize" do
+    it "returns the expected result if the other operation references the unique constraint table" do
+      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+        "test_table",
+        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      )
+      other_operation = Marten::DB::Migration::Operation::RenameTable.new("test_table", "renamed_table")
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expected result if the other operation does not reference the unique constraint table" do
+      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+        "test_table",
+        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      )
+      other_operation = Marten::DB::Migration::Operation::RenameTable.new("other_test_table", "renamed_table")
+
+      result = operation.optimize(other_operation)
+
+      result.unchanged?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "returns true if the specified column is referenced" do
+      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+        "test_table",
+        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      )
+
+      operation.references_column?("test_table", "foo").should be_true
+      operation.references_column?("test_table", "bar").should be_true
+    end
+
+    it "returns false if the specified column is not referenced" do
+      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+        "test_table",
+        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      )
+
+      operation.references_column?("test_table", "xyz").should be_false
+      operation.references_column?("unknown", "xyz").should be_false
+    end
+  end
+
+  describe "#references_table?" do
+    it "returns true if the specified table is referenced" do
+      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+        "test_table",
+        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      )
+
+      operation.references_table?("test_table").should be_true
+    end
+
+    it "returns false if the specified table is not referenced" do
+      operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(
+        "test_table",
+        Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"])
+      )
+
+      operation.references_table?("other_test_table").should be_false
+    end
+  end
+
   describe "#serialize" do
     it "returns the expected serialized version of the operation" do
       operation = Marten::DB::Migration::Operation::AddUniqueConstraint.new(

@@ -317,6 +317,78 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
     end
   end
 
+  describe "#optimize" do
+    it "returns the expected result if the other operation references the same table" do
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "test_table",
+        "test_constraint"
+      )
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "test_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expected result if the other operation references another table" do
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "test_table",
+        "test_constraint"
+      )
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "other_test_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.unchanged?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "returns true if the specified column is in the same table" do
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "test_table",
+        "test_constraint"
+      )
+
+      operation.references_column?("test_table", "foo").should be_true
+    end
+
+    it "returns true if the specified column is in another table" do
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "test_table",
+        "test_constraint"
+      )
+
+      operation.references_column?("other_table", "foo").should be_false
+    end
+  end
+
+  describe "#references_table?" do
+    it "returns true if the specified table is the same" do
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "test_table",
+        "test_constraint"
+      )
+
+      operation.references_table?("test_table").should be_true
+    end
+
+    it "returns true if the specified table is not the same" do
+      operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(
+        "test_table",
+        "test_constraint"
+      )
+
+      operation.references_table?("other_table").should be_false
+    end
+  end
+
   describe "#serialize" do
     it "returns the expected serialized version of the operation" do
       operation = Marten::DB::Migration::Operation::RemoveUniqueConstraint.new(

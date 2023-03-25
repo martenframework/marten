@@ -46,6 +46,18 @@ module Marten
             table.remove_index(index)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            operation.references_table?(table_name) ? Optimization::Result.failed : Optimization::Result.unchanged
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            references_table?(other_table_name)
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            table_name == other_table_name
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/remove_index.ecr"
           end

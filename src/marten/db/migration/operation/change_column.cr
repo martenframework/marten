@@ -45,6 +45,36 @@ module Marten
             table.change_column(column)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            if (op = operation).is_a?(RemoveColumn) && table_name == op.table_name && column.name == op.column_name
+              Optimization::Result.completed(operation)
+            elsif operation.references_column?(table_name, column.name)
+              Optimization::Result.failed
+            else
+              Optimization::Result.unchanged
+            end
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            return true if table_name == other_table_name && column.name == other_column_name
+
+            if (reference_column = column).is_a?(Management::Column::Reference?)
+              return reference_column.to_table == other_table_name && reference_column.to_column == other_column_name
+            end
+
+            false
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            return true if table_name == other_table_name
+
+            if (reference_column = column).is_a?(Management::Column::Reference?)
+              return reference_column.to_table == other_table_name
+            end
+
+            false
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/change_column.ecr"
           end

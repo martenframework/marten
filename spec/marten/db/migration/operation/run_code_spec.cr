@@ -72,6 +72,36 @@ describe Marten::DB::Migration::Operation::RunCode do
     end
   end
 
+  describe "#optimize" do
+    it "always returns a failed optimization result" do
+      operation = Marten::DB::Migration::Operation::RunCode.new(->{ nil })
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "test_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "always returns true" do
+      operation = Marten::DB::Migration::Operation::RunCode.new(->{ nil })
+
+      operation.references_column?("test_table", "test_column").should be_true
+    end
+  end
+
+  describe "#references_table?" do
+    it "always returns true" do
+      operation = Marten::DB::Migration::Operation::RunCode.new(->{ nil })
+
+      operation.references_table?("test_table").should be_true
+    end
+  end
+
   describe "#serialize" do
     it "raises NotImplementedError" do
       operation = Marten::DB::Migration::Operation::RunCode.new(->{ nil })

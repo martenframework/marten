@@ -117,6 +117,50 @@ describe Marten::DB::Migration::Operation::DeleteTable do
     end
   end
 
+  describe "#optimize" do
+    it "returns the expected result if the other operation references the table" do
+      operation = Marten::DB::Migration::Operation::DeleteTable.new(name: "test_table")
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "test_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expected result if the other operation does not reference the table" do
+      operation = Marten::DB::Migration::Operation::DeleteTable.new(name: "test_table")
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "other_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.unchanged?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "always return true" do
+      operation = Marten::DB::Migration::Operation::DeleteTable.new(name: "test_table")
+
+      operation.references_column?("test_table", "foo").should be_true
+      operation.references_column?("unknown", "unknown").should be_true
+    end
+  end
+
+  describe "#references_table?" do
+    it "always return true" do
+      operation = Marten::DB::Migration::Operation::DeleteTable.new(name: "test_table")
+
+      operation.references_table?("test_table").should be_true
+      operation.references_table?("unknown").should be_true
+    end
+  end
+
   describe "#serialize" do
     it "returns the expected serialized version of the operation" do
       operation = Marten::DB::Migration::Operation::DeleteTable.new(name: "operation_test_table")

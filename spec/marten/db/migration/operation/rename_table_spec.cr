@@ -133,6 +133,84 @@ describe Marten::DB::Migration::Operation::RenameTable do
     end
   end
 
+  describe "#optimize" do
+    it "returns the expected result if the other operation references the old table name" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "old_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expected result if the other operation references the new table name" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "new_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expected result if the other operation does not reference the renamed table" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "other_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.unchanged?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "returns true if the passed table and column match the old table name" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+
+      operation.references_column?("old_table", "foo").should be_true
+    end
+
+    it "returns true if the passed table and column match the new table name" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+
+      operation.references_column?("new_table", "foo").should be_true
+    end
+
+    it "returns false if the renamed table is not referenced" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+
+      operation.references_column?("other_table", "foo").should be_false
+    end
+  end
+
+  describe "#references_table?" do
+    it "returns true if the passed table matches the old table name" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+
+      operation.references_table?("old_table").should be_true
+    end
+
+    it "returns true if the passed table matches the new table name" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+
+      operation.references_table?("new_table").should be_true
+    end
+
+    it "returns false if the renamed table is not referenced" do
+      operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")
+
+      operation.references_table?("other_table").should be_false
+    end
+  end
+
   describe "#serialize" do
     it "returns the expected serialized version of the operation" do
       operation = Marten::DB::Migration::Operation::RenameTable.new("old_table", "new_table")

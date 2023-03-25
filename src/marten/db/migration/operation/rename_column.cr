@@ -48,6 +48,30 @@ module Marten
             table.rename_column(@old_name, @new_name)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            if operation.references_column?(table_name, old_name) || operation.references_column?(table_name, new_name)
+              Optimization::Result.failed
+            else
+              Optimization::Result.unchanged
+            end
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            if table_name == other_table_name
+              return old_name == other_column_name || new_name == other_column_name
+            end
+
+            references_table?(other_table_name)
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            # We can't know exactly whether the other table is referenced at this operation level: since we only know
+            # the old/new name of the column, we can't be sure that it's not a reference column that targets another
+            # column. So we assume that tables are referenced in all case to not introduce inconsistencies in generated
+            # migrations.
+            true
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/rename_column.ecr"
           end

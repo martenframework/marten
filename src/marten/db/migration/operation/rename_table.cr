@@ -42,6 +42,22 @@ module Marten
             state.rename_table(app_label, @old_name, @new_name)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            if operation.references_table?(old_name) || operation.references_table?(new_name)
+              Optimization::Result.failed
+            else
+              Optimization::Result.unchanged
+            end
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            references_table?(other_table_name)
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            old_name == other_table_name || new_name == other_table_name
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/rename_table.ecr"
           end

@@ -49,6 +49,44 @@ module Marten
             table.add_column(column)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            if (op = operation).is_a?(ChangeColumn) && table_name == op.table_name && column.name == op.column.name
+              return Optimization::Result.completed(AddColumn.new(table_name: table_name, column: op.column))
+            elsif (op = operation).is_a?(RemoveColumn) && table_name == op.table_name && column.name == op.column_name
+              return Optimization::Result.completed
+            elsif (op = operation).is_a?(RenameColumn) && table_name == op.table_name && column.name == op.old_name
+              new_column = column.clone
+              new_column.name = op.new_name
+              return Optimization::Result.completed(AddColumn.new(table_name: table_name, column: new_column))
+            end
+
+            if operation.references_column?(table_name, column.name)
+              Optimization::Result.failed
+            else
+              Optimization::Result.unchanged
+            end
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            return true if table_name == other_table_name && column.name == other_column_name
+
+            if (reference_column = column).is_a?(Management::Column::Reference?)
+              return reference_column.to_table == other_table_name && reference_column.to_column == other_column_name
+            end
+
+            false
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            return true if table_name == other_table_name
+
+            if (reference_column = column).is_a?(Management::Column::Reference?)
+              return reference_column.to_table == other_table_name
+            end
+
+            false
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/add_column.ecr"
           end

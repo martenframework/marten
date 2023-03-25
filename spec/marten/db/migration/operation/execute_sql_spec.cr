@@ -92,6 +92,36 @@ describe Marten::DB::Migration::Operation::ExecuteSQL do
     end
   end
 
+  describe "#optimize" do
+    it "always returns a failed optimization result" do
+      operation = Marten::DB::Migration::Operation::ExecuteSQL.new("SELECT 1")
+      other_operation = Marten::DB::Migration::Operation::AddColumn.new(
+        "test_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "always returns true" do
+      operation = Marten::DB::Migration::Operation::ExecuteSQL.new("SELECT 1")
+
+      operation.references_column?("test_table", "test_column").should be_true
+    end
+  end
+
+  describe "#references_table?" do
+    it "always returns true" do
+      operation = Marten::DB::Migration::Operation::ExecuteSQL.new("SELECT 1")
+
+      operation.references_table?("test_table").should be_true
+    end
+  end
+
   describe "#serialize" do
     it "returns the expected serialized version of the operation when only a forward SQL script is defined" do
       operation = Marten::DB::Migration::Operation::ExecuteSQL.new("SELECT 1")

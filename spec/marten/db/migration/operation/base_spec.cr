@@ -51,6 +51,18 @@ class Marten::DB::Migration::Operation::BaseSpec
       # noop
     end
 
+    def optimize(operation : Base) : Optimization::Result
+      Marten::DB::Migration::Operation::Optimization::Result.failed
+    end
+
+    def references_column?(other_table_name : String, other_column_name : String) : Bool
+      false
+    end
+
+    def references_table?(other_table_name : String) : Bool
+      false
+    end
+
     def serialize : String
       raise NotImplementedError.new("Can't be serialized")
     end

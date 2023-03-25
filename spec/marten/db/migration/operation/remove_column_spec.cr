@@ -126,6 +126,67 @@ describe Marten::DB::Migration::Operation::RemoveColumn do
     end
   end
 
+  describe "#optimize" do
+    it "returns the expected result if the other operation is deleting the same table" do
+      operation = Marten::DB::Migration::Operation::RemoveColumn.new("test_table", "foo")
+      other_operation = Marten::DB::Migration::Operation::DeleteTable.new("test_table")
+
+      result = operation.optimize(other_operation)
+
+      result.completed?.should be_true
+      result.operations.should eq [other_operation]
+    end
+
+    it "returns the expected result if the other operation is deleting another table" do
+      operation = Marten::DB::Migration::Operation::RemoveColumn.new("test_table", "foo")
+      other_operation = Marten::DB::Migration::Operation::DeleteTable.new("other_test_table")
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expectedd result if the other operation references the same column" do
+      operation = Marten::DB::Migration::Operation::RemoveColumn.new("test_table", "foo")
+      other_operation = Marten::DB::Migration::Operation::ChangeColumn.new(
+        "test_table",
+        Marten::DB::Management::Column::BigInt.new("foo", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.failed?.should be_true
+    end
+
+    it "returns the expectedd result if the other operation does not reference the same column" do
+      operation = Marten::DB::Migration::Operation::RemoveColumn.new("test_table", "foo")
+      other_operation = Marten::DB::Migration::Operation::ChangeColumn.new(
+        "other_table",
+        Marten::DB::Management::Column::BigInt.new("other_column", null: false)
+      )
+
+      result = operation.optimize(other_operation)
+
+      result.unchanged?.should be_true
+    end
+  end
+
+  describe "#references_column?" do
+    it "always returns true" do
+      operation = Marten::DB::Migration::Operation::RemoveColumn.new("test_table", "foo")
+
+      operation.references_column?("test_table", "test_column").should be_true
+    end
+  end
+
+  describe "#references_table?" do
+    it "always returns true" do
+      operation = Marten::DB::Migration::Operation::RemoveColumn.new("test_table", "foo")
+
+      operation.references_table?("test_table").should be_true
+    end
+  end
+
   describe "#serialize" do
     it "returns the expected serialized version of the operation" do
       operation = Marten::DB::Migration::Operation::RemoveColumn.new("operation_test_table", "foo")

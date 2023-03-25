@@ -34,6 +34,23 @@ module Marten
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            # Return a failed optimization result to ensure this operation remains consistent with the initial ordering.
+            Optimization::Result.failed
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            # We can't know whether the other column is referenced in case of arbitrary SQL statements, so we assume
+            # that it is referenced.
+            true
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            # We can't know whether the other table is referenced in case of arbitrary SQL statements, so we assume that
+            # it is referenced.
+            true
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/execute_sql.ecr"
           end

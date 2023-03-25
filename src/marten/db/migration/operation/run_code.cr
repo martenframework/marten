@@ -35,6 +35,23 @@ module Marten
             # noop
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            # Return a failed optimization result to ensure this operation remains consistent with the initial ordering.
+            Optimization::Result.failed
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            # We can't know whether the other column is referenced in case of abritrary code executions, so we assume
+            # that it is referenced.
+            true
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            # We can't know whether the other table is referenced in case of abritrary code executions, so we assume
+            # that it is referenced.
+            true
+          end
+
           def serialize : String
             raise NotImplementedError.new("RunCode operations can't be serialized")
           end

@@ -45,6 +45,30 @@ module Marten
             table.remove_column(@column_name)
           end
 
+          def optimize(operation : Base) : Optimization::Result
+            if (op = operation).is_a?(DeleteTable) && table_name == op.name
+              return Optimization::Result.completed(operation)
+            end
+
+            if operation.references_column?(table_name, column_name)
+              Optimization::Result.failed
+            else
+              Optimization::Result.unchanged
+            end
+          end
+
+          def references_column?(other_table_name : String, other_column_name : String) : Bool
+            references_table?(other_table_name)
+          end
+
+          def references_table?(other_table_name : String) : Bool
+            # We can't know exactly whether the other table is referenced at this operation level: since we only know
+            # the name of the column being removed, we can't be sure that it's not a reference column that targets
+            # another column. So we assume that tables are referenced in all case to not introduce inconsistencies in
+            # generated migrations.
+            true
+          end
+
           def serialize : String
             ECR.render "#{__DIR__}/templates/remove_column.ecr"
           end

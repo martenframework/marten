@@ -83,14 +83,20 @@ module Marten
 
         usage << USAGE_HEADER % @name
 
+        longest_command_name = @commands_per_name.values.map(&.command_name.size).max
+        description_padding = ->(command_name : String) { " " * (longest_command_name - command_name.size + 2) }
+
         per_app_commands = @commands_per_name.values.group_by do |command|
           command._marten_app_location.starts_with?(__DIR__) ? "marten" : command.app_config.label
         end
 
         per_app_commands.each do |app_label, commands|
-          usage << "[#{app_label}]\n".colorize(:green).to_s
+          usage << "[#{app_label}]\n\n".colorize(:green).to_s
           commands.each do |command|
-            usage << "  › #{command.command_name}\n"
+            usage << "  › #{command.command_name}".colorize(:light_blue).to_s
+            usage << description_padding.call(command.command_name)
+            usage << command.help
+            usage << "\n"
           end
           usage << "\n"
         end

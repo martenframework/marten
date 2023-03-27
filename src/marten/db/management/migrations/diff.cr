@@ -83,6 +83,7 @@ module Marten
 
             changes = generate_migrations
             changes = select_changes_for_apps(changes, apps) if !apps.nil?
+            changes = optimize_changes(changes)
 
             changes
           end
@@ -345,28 +346,117 @@ module Marten
             (to_tables - from_tables).each do |created_table_id|
               created_table = @to_state.get_table(created_table_id)
 
-              dependencies = [] of Dependency::Base
+              create_table_dependencies = [] of Dependency::Base
+              reference_columns = [] of Column::Reference
 
               # Extract dependencies for all the foreign key columns associated with the considered table.
-              created_table.columns.select(Column::Reference).each do |fk_column|
+              created_table.columns.select(Column::Reference).each do |reference_column|
                 related_table = @to_state.tables.values
-                  .find! { |t| t.name == fk_column.as(Column::Reference).to_table }
+                  .find! { |t| t.name == reference_column.as(Column::Reference).to_table }
 
                 next if related_table == created_table
-                dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
+
+                # Depend on the target of the primary key if it is also a reference.
+                if reference_column.primary_key?
+                  create_table_dependencies << Dependency::CreatedTable.new(related_table.app_label, related_table.name)
+                else
+                  reference_columns << reference_column
+                end
               end
 
+              reference_column_names = reference_columns.map(&.name)
+
+              # Extract unique constraints that can't be created with the table.
+              standalone_unique_constraints = [] of Constraint::Unique
+              created_table.unique_constraints.each do |unique_constraint|
+                next if (unique_constraint.column_names & reference_column_names).empty?
+
+                standalone_unique_constraints << unique_constraint
+              end
+
+              # Extract indexes that can't be created with the table.
+              standalone_indexes = [] of Index
+              created_table.indexes.each do |index|
+                next if (index.column_names & reference_column_names).empty?
+
+                standalone_indexes << index
+              end
+
+              # Insert operation to create the table.
               insert_operation(
                 created_table.app_label,
                 DB::Migration::Operation::CreateTable.new(
                   name: created_table.name,
-                  columns: created_table.columns.dup,
-                  unique_constraints: created_table.unique_constraints.dup,
-                  indexes: created_table.indexes.dup
+                  columns: created_table.columns - reference_columns,
+                  unique_constraints: created_table.unique_constraints - standalone_unique_constraints,
+                  indexes: created_table.indexes - standalone_indexes,
                 ),
-                dependencies,
+                create_table_dependencies,
                 beginning: true
               )
+
+              # Insert operations to create reference columns separately.
+              reference_columns.each do |reference_column|
+                related_table = @to_state.tables.values
+                  .find! { |t| t.name == reference_column.as(Column::Reference).to_table }
+
+                insert_operation(
+                  created_table.app_label,
+                  DB::Migration::Operation::AddColumn.new(table_name: created_table.name, column: reference_column),
+                  dependencies: [
+                    # Depends on the creation of the target table.
+                    Dependency::CreatedTable.new(related_table.app_label, related_table.name),
+                    # Depends on the creation of the current table itself since the reference column should be in it.
+                    Dependency::CreatedTable.new(created_table.app_label, created_table.name),
+                  ] of Dependency::Base
+                )
+              end
+
+              # Insert operations to create standalone unique constraints.
+              standalone_unique_constraints.each do |unique_constraint|
+                dependencies = [
+                  Dependency::CreatedTable.new(created_table.app_label, created_table.name),
+                ] of Dependency::Base
+                unique_constraint.column_names.each do |column_name|
+                  dependencies << Dependency::AddedColumn.new(
+                    created_table.app_label,
+                    created_table.name,
+                    column_name
+                  )
+                end
+
+                insert_operation(
+                  created_table.app_label,
+                  DB::Migration::Operation::AddUniqueConstraint.new(
+                    table_name: created_table.name,
+                    unique_constraint: unique_constraint.dup
+                  ),
+                  dependencies: dependencies,
+                )
+              end
+
+              # Insert operations to create standalone indexes.
+              standalone_indexes.each do |index|
+                dependencies = [
+                  Dependency::CreatedTable.new(created_table.app_label, created_table.name),
+                ] of Dependency::Base
+                index.column_names.each do |column_name|
+                  dependencies << Dependency::AddedColumn.new(
+                    created_table.app_label,
+                    created_table.name,
+                    column_name
+                  )
+                end
+
+                insert_operation(
+                  created_table.app_label,
+                  DB::Migration::Operation::AddIndex.new(
+                    table_name: created_table.name,
+                    index: index.dup
+                  ),
+                  dependencies: dependencies,
+                )
+              end
             end
           end
 
@@ -543,6 +633,88 @@ module Marten
           )
             ops = (@detected_operations[app_label] ||= [] of DetectedOperation)
             beginning ? ops.unshift({operation, dependencies}) : ops.push({operation, dependencies})
+          end
+
+          private def optimize_changes(changes)
+            changes.tap do |inner_changes|
+              inner_changes.each do |_app_label, migrations|
+                migrations.each do |migration|
+                  optimize_migration(migration)
+                end
+              end
+            end
+          end
+
+          private def optimize_migration(migration)
+            optimized_operations = migration.operations
+            optimizations_applied = true
+
+            while optimizations_applied
+              new_optimized_operations = optimization_migration_operations(optimized_operations)
+
+              if new_optimized_operations == optimized_operations
+                migration.operations = new_optimized_operations
+                optimizations_applied = false
+              else
+                optimized_operations = new_optimized_operations
+              end
+            end
+          end
+
+          private def optimization_migration_operations(operations)
+            new_operations = [] of DB::Migration::Operation::Base
+
+            operations.each_with_index do |outer_operation, outer_index|
+              halted = false
+
+              # We maintain a boolean indicating if the result of an operation optimization should be inserted before
+              # (left) or after (right) the operations that are between the current operation we are trying to optimize
+              # and the candidate operation (that we try to "combine" into the current operation). If we can put the
+              # resulting optimized operation to the right, this means that all the operations the initially come after
+              # the current operation do not depend on it. If at least one of the operations that come after the current
+              # operation depend on it (ie. the order of operations must be respected), then the result of the
+              # optimization is put to the left.
+              right = true
+
+              operations[outer_index + 1..].each_with_index do |inner_operation, inner_index|
+                optimization_result = outer_operation.optimize(inner_operation)
+
+                if optimization_result.completed?
+                  in_between = operations[outer_index + 1...outer_index + inner_index + 1]
+
+                  if right
+                    # All the in-between operations do not depend on the operation we are trying to optimize: so we can
+                    # put the result of the optimization to the right.
+                    new_operations += in_between
+                    new_operations += optimization_result.operations
+                  elsif in_between.all?(&.optimize(inner_operation).unchanged?)
+                    # At least one of the operations that come after the operation we are trying to optimize depends on
+                    # it, which means that we must put the result of the optimization to the left (only if the
+                    # in-between operations do not depend on the candidate operation).
+                    new_operations += optimization_result.operations
+                    new_operations += in_between
+                  else
+                    # If we can't optimize on the left (because at least one of the in-between operation depend on the
+                    # candidate operation), then we simply re-add the current (and unoptimized) operation to the list of
+                    # operations and we keep trying.
+                    new_operations << outer_operation
+                    halted = true
+                    break
+                  end
+
+                  new_operations += operations[outer_index + inner_index + 2..]
+                  return new_operations
+                elsif optimization_result.failed?
+                  right = false
+                end
+              end
+
+              if !halted
+                new_operations << outer_operation
+              end
+            end
+
+            new_operations
           end
 
           private def select_changes_for_apps(changes, apps)

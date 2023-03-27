@@ -15,6 +15,7 @@ module Marten
             getter replacements
             getter version
 
+            setter operations
             setter replacements
 
             def initialize(

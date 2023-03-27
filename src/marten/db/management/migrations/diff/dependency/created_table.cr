@@ -1,3 +1,5 @@
+require "./base"
+
 module Marten
   module DB
     module Management

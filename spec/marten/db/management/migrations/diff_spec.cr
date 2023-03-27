@@ -1197,5 +1197,499 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.columns[1].as(Marten::DB::Management::Column::Reference).to_table.should eq "test_table"
       operation.columns[1].as(Marten::DB::Management::Column::Reference).to_column.should eq "id"
     end
+
+    it "generates the expected changes when two tables in the same app involve circular dependencies" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_foo",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::Reference.new("bar_id", "test_bar", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_bar",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::Reference.new("foo_id", "test_foo", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+      changes["app"][0].operations.size.should eq 3
+      changes["app"][0].dependencies.size.should eq 0
+
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_1.name.should eq "test_bar"
+      operation_1.columns.map(&.name).should eq ["id"]
+
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_2.name.should eq "test_foo"
+      operation_2.columns.map(&.name).should eq ["id", "bar_id"]
+
+      operation_3 = changes["app"][0].operations[2].as(Marten::DB::Migration::Operation::AddColumn)
+      operation_3.table_name.should eq "test_bar"
+      operation_3.column.name.should eq "foo_id"
+    end
+
+    it "generates the expected changes when two tables in an app involve circular dependencies with impacted indexes" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_foo",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("bar_id", "test_bar", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            indexes: [
+              Marten::DB::Management::Index.new("test_index", ["test", "bar_id"]),
+            ]
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_bar",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("foo_id", "test_foo", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            indexes: [
+              Marten::DB::Management::Index.new("test_index", ["test", "foo_id"]),
+            ]
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+      changes["app"][0].operations.size.should eq 5
+      changes["app"][0].dependencies.size.should eq 0
+
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_1.name.should eq "test_bar"
+      operation_1.columns.map(&.name).should eq ["id", "test"]
+      operation_1.indexes.should be_empty
+
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_2.name.should eq "test_foo"
+      operation_2.columns.map(&.name).should eq ["id", "test", "bar_id"]
+      operation_2.indexes.should be_empty
+
+      operation_3 = changes["app"][0].operations[2].as(Marten::DB::Migration::Operation::AddColumn)
+      operation_3.table_name.should eq "test_bar"
+      operation_3.column.name.should eq "foo_id"
+
+      operation_4 = changes["app"][0].operations[3].as(Marten::DB::Migration::Operation::AddIndex)
+      operation_4.table_name.should eq "test_foo"
+      operation_4.index.name.should eq "test_index"
+      operation_4.index.column_names.should eq ["test", "bar_id"]
+
+      operation_5 = changes["app"][0].operations[4].as(Marten::DB::Migration::Operation::AddIndex)
+      operation_5.table_name.should eq "test_bar"
+      operation_5.index.name.should eq "test_index"
+      operation_5.index.column_names.should eq ["test", "foo_id"]
+    end
+
+    it "generates the expected changes when two circular tables in an app with impacted constraints" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_foo",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("bar_id", "test_bar", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["test", "bar_id"]),
+            ]
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_bar",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("foo_id", "test_foo", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["test", "foo_id"]),
+            ]
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes.size.should eq 1
+      changes["app"].size.should eq 1
+      changes["app"][0].operations.size.should eq 5
+      changes["app"][0].dependencies.size.should eq 0
+
+      operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_1.name.should eq "test_bar"
+      operation_1.columns.map(&.name).should eq ["id", "test"]
+      operation_1.unique_constraints.should be_empty
+
+      operation_2 = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::CreateTable)
+      operation_2.name.should eq "test_foo"
+      operation_2.columns.map(&.name).should eq ["id", "test", "bar_id"]
+      operation_2.unique_constraints.should be_empty
+
+      operation_3 = changes["app"][0].operations[2].as(Marten::DB::Migration::Operation::AddColumn)
+      operation_3.table_name.should eq "test_bar"
+      operation_3.column.name.should eq "foo_id"
+
+      operation_4 = changes["app"][0].operations[3].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+      operation_4.table_name.should eq "test_foo"
+      operation_4.unique_constraint.name.should eq "test_constraint"
+      operation_4.unique_constraint.column_names.should eq ["test", "bar_id"]
+
+      operation_5 = changes["app"][0].operations[4].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+      operation_5.table_name.should eq "test_bar"
+      operation_5.unique_constraint.name.should eq "test_constraint"
+      operation_5.unique_constraint.column_names.should eq ["test", "foo_id"]
+    end
+
+    it "generates the expected changes when two tables in the two separate apps involve circular dependencies" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_foo",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::Reference.new("bar_id", "test_bar", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "test_bar",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::Reference.new("foo_id", "test_foo", "id"),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
+
+        changes.size.should eq 2
+
+        changes["app"].size.should eq 2
+
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].dependencies.size.should eq 0
+        operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_1.name.should eq "test_foo"
+        operation_1.columns.map(&.name).should eq ["id"]
+
+        changes["app"][1].operations.size.should eq 1
+        changes["app"][1].dependencies.size.should eq 2
+        changes["app"][1].dependencies[0].should eq({"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_auto"})
+        changes["app"][1].dependencies[1].should eq(
+          {"app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_test_foo_table"}
+        )
+        operation_2 = changes["app"][1].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
+        operation_2.table_name.should eq "test_foo"
+        operation_2.column.name.should eq "bar_id"
+
+        changes["other_app"][0].operations.size.should eq 1
+        changes["other_app"][0].dependencies.size.should eq 1
+        changes["other_app"][0].dependencies[0].should eq(
+          {"app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_test_foo_table"}
+        )
+        operation_3 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_3.name.should eq "test_bar"
+        operation_3.columns.map(&.name).should eq ["id", "foo_id"]
+      end
+    end
+
+    it "generates the expected changes when two circular tables in different apps have impacted indexes" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_foo",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("bar_id", "test_bar", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            indexes: [
+              Marten::DB::Management::Index.new("test_index", ["test", "bar_id"]),
+            ]
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "test_bar",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("foo_id", "test_foo", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            indexes: [
+              Marten::DB::Management::Index.new("test_index", ["test", "foo_id"]),
+            ]
+          ),
+        ]
+      )
+
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
+
+        changes.size.should eq 2
+
+        changes["app"].size.should eq 2
+
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].dependencies.size.should eq 0
+        operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_1.name.should eq "test_foo"
+        operation_1.columns.map(&.name).should eq ["id", "test"]
+        operation_1.indexes.should be_empty
+
+        changes["app"][1].operations.size.should eq 2
+        changes["app"][1].dependencies.size.should eq 2
+        changes["app"][1].dependencies[0].should eq({"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_auto"})
+        changes["app"][1].dependencies[1].should eq(
+          {"app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_test_foo_table"}
+        )
+        operation_2 = changes["app"][1].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
+        operation_2.table_name.should eq "test_foo"
+        operation_2.column.name.should eq "bar_id"
+        operation_3 = changes["app"][1].operations[1].as(Marten::DB::Migration::Operation::AddIndex)
+        operation_3.table_name.should eq "test_foo"
+        operation_3.index.name.should eq "test_index"
+        operation_3.index.column_names.should eq ["test", "bar_id"]
+
+        changes["other_app"].size.should eq 1
+
+        changes["other_app"][0].operations.size.should eq 2
+        changes["other_app"][0].dependencies.size.should eq 1
+        changes["other_app"][0].dependencies[0].should eq(
+          {"app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_test_foo_table"}
+        )
+        operation_4 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_4.name.should eq "test_bar"
+        operation_4.columns.map(&.name).should eq ["id", "test", "foo_id"]
+        operation_4.indexes.should be_empty
+        operation_5 = changes["other_app"][0].operations[1].as(Marten::DB::Migration::Operation::AddIndex)
+        operation_5.table_name.should eq "test_bar"
+        operation_5.index.name.should eq "test_index"
+        operation_5.index.column_names.should eq ["test", "foo_id"]
+      end
+    end
+
+    it "generates the expected changes when two circular tables in different apps have impacted unique constraints" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+            ] of Marten::DB::Management::Column::Base
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_foo",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("bar_id", "test_bar", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["test", "bar_id"]),
+            ]
+          ),
+          Marten::DB::Management::TableState.new(
+            app_label: "other_app",
+            name: "test_bar",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("test"),
+              Marten::DB::Management::Column::Reference.new("foo_id", "test_foo", "id"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["test", "foo_id"]),
+            ]
+          ),
+        ]
+      )
+
+      Timecop.freeze(Time.local) do
+        diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+        changes = diff.detect
+
+        changes.size.should eq 2
+
+        changes["app"].size.should eq 2
+
+        changes["app"][0].operations.size.should eq 1
+        changes["app"][0].dependencies.size.should eq 0
+        operation_1 = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_1.name.should eq "test_foo"
+        operation_1.columns.map(&.name).should eq ["id", "test"]
+        operation_1.unique_constraints.should be_empty
+
+        changes["app"][1].operations.size.should eq 2
+        changes["app"][1].dependencies.size.should eq 2
+        changes["app"][1].dependencies[0].should eq({"other_app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_auto"})
+        changes["app"][1].dependencies[1].should eq(
+          {"app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_test_foo_table"}
+        )
+        operation_2 = changes["app"][1].operations[0].as(Marten::DB::Migration::Operation::AddColumn)
+        operation_2.table_name.should eq "test_foo"
+        operation_2.column.name.should eq "bar_id"
+        operation_3 = changes["app"][1].operations[1].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+        operation_3.table_name.should eq "test_foo"
+        operation_3.unique_constraint.name.should eq "test_constraint"
+        operation_3.unique_constraint.column_names.should eq ["test", "bar_id"]
+
+        changes["other_app"].size.should eq 1
+
+        changes["other_app"][0].operations.size.should eq 2
+        changes["other_app"][0].dependencies.size.should eq 1
+        changes["other_app"][0].dependencies[0].should eq(
+          {"app", "#{Time.local.to_s("%Y%m%d%H%M%S")}1_create_test_foo_table"}
+        )
+        operation_4 = changes["other_app"][0].operations[0].as(Marten::DB::Migration::Operation::CreateTable)
+        operation_4.name.should eq "test_bar"
+        operation_4.columns.map(&.name).should eq ["id", "test", "foo_id"]
+        operation_4.unique_constraints.should be_empty
+        operation_5 = changes["other_app"][0].operations[1].as(Marten::DB::Migration::Operation::AddUniqueConstraint)
+        operation_5.table_name.should eq "test_bar"
+        operation_5.unique_constraint.name.should eq "test_constraint"
+        operation_5.unique_constraint.column_names.should eq ["test", "foo_id"]
+      end
+    end
   end
 end

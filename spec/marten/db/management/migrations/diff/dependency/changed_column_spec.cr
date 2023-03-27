@@ -12,8 +12,8 @@ describe Marten::DB::Management::Migrations::Diff::Dependency::ChangedColumn do
     end
   end
 
-  describe "#table_name" do
-    it "returns the name of the possibly the changed column" do
+  describe "#column_name" do
+    it "returns the name of the possibly changed column" do
       dependency = Marten::DB::Management::Migrations::Diff::Dependency::ChangedColumn.new(
         "app_label",
         table_name: "table_name",

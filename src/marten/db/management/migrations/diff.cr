@@ -464,7 +464,7 @@ module Marten
             (from_tables - to_tables).each do |deleted_table_id|
               deleted_table = @from_state.get_table(deleted_table_id)
 
-              dependencies = [] of Dependency::Base
+              delete_table_dependencies = [] of Dependency::Base
 
               # Generate a dependencies on changes / removals of foreign keys pointing to the deleted table (those
               # should be applied first).
@@ -476,13 +476,13 @@ module Marten
                 end
 
                 incoming_fk_columns.each do |fk_column|
-                  dependencies << Dependency::ChangedColumn.new(
+                  delete_table_dependencies << Dependency::ChangedColumn.new(
                     other_table.app_label,
                     other_table.name,
                     fk_column.name
                   )
 
-                  dependencies << Dependency::RemovedColumn.new(
+                  delete_table_dependencies << Dependency::RemovedColumn.new(
                     other_table.app_label,
                     other_table.name,
                     fk_column.name
@@ -490,10 +490,55 @@ module Marten
                 end
               end
 
+              # Extract reference columns in order to remove them first.
+              reference_columns = [] of Column::Reference
+              deleted_table.columns.select(Column::Reference).each do |reference_column|
+                if reference_column.to_table != deleted_table.name && !reference_column.primary_key?
+                  reference_columns << reference_column
+
+                  # Also ensure that the delete table operation depends on the removal of the reference columns.
+                  delete_table_dependencies << Dependency::RemovedColumn.new(
+                    deleted_table.app_label,
+                    deleted_table.name,
+                    reference_column.name
+                  )
+                end
+              end
+              reference_column_names = reference_columns.map(&.name)
+
+              # Add dedicated operations to remove unique constraints that can't be deleted with the table directly.
+              deleted_table.unique_constraints.each do |unique_constraint|
+                next if (unique_constraint.column_names & reference_column_names).empty?
+
+                insert_operation(
+                  deleted_table.app_label,
+                  DB::Migration::Operation::RemoveUniqueConstraint.new(deleted_table.name, unique_constraint.name)
+                )
+              end
+
+              # Add dedicated operations to remove indexes that can't be deleted with the table directly.
+              deleted_table.indexes.each do |index|
+                next if (index.column_names & reference_column_names).empty?
+
+                insert_operation(
+                  deleted_table.app_label,
+                  DB::Migration::Operation::RemoveIndex.new(deleted_table.name, index.name)
+                )
+              end
+
+              # Insert operations to remove reference columns.
+              reference_columns.each do |reference_column|
+                insert_operation(
+                  deleted_table.app_label,
+                  DB::Migration::Operation::RemoveColumn.new(deleted_table.name, reference_column.name)
+                )
+              end
+
+              # Finally insert the operation to remove the table.
               insert_operation(
                 deleted_table.app_label,
                 DB::Migration::Operation::DeleteTable.new(deleted_table.name),
-                dependencies
+                delete_table_dependencies
               )
             end
           end

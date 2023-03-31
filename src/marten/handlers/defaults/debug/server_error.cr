@@ -51,7 +51,7 @@ module Marten
             lines.compact
           end
 
-          private BACKTRACE_FRAME_RE = /\s(?<file>[^\s\:]+):(?<line_number>\d+)/
+          private BACKTRACE_FRAME_RE = /\sfrom (?<file>[^\s\:]+):(?<line_number>\d+)/
 
           private def render_server_error_page
             HTTP::Response::InternalServerError.new(ECR.render("#{__DIR__}/templates/server_error.html.ecr"))

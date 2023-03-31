@@ -111,6 +111,28 @@ describe Marten::Handlers::Defaults::Debug::ServerError do
       handler.frames[0].filepath.should eq "spec/marten/handlers/defaults/debug/server_error_spec.cr"
       handler.frames[0].index.should eq 0
     end
+
+    it "does not extract host and ports as frames" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/foo/bar",
+          headers: HTTP::Headers{"Host" => "example.com", "Accept" => "text/html"}
+        )
+      )
+
+      error = expect_raises(Exception) do
+        raise "Something bad happened when reaching 192.168.1.1:8000!"
+      end
+
+      handler = Marten::Handlers::Defaults::Debug::ServerError.new(request)
+      handler.bind_error(error)
+
+      handler.frames.should_not be_empty
+
+      handler.frames[0].filepath.should eq "spec/marten/handlers/defaults/debug/server_error_spec.cr"
+      handler.frames[0].index.should eq 0
+    end
   end
 
   describe "#template_snippet_lines" do

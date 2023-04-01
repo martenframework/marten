@@ -24,7 +24,7 @@ Marten's syntax is inherited from the slickness and simplicity of the Crystal pr
 
 **⚡ Fast**
 
-Marten gives you the ability to build full-featured web applications by leveraging the bare metal performances of the Crystal programming language. It also makes moderate use of macros and tries to optimize for decent compile times.
+Marten gives you the ability to build full-featured web applications by leveraging the bare metal performances of the Crystal programming language. It also tries to optimize for decent compile times.
 
 **🧳 Full-featured**
 

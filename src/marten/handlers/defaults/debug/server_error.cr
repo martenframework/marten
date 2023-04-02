@@ -6,6 +6,9 @@ module Marten
         class ServerError < Handler
           @error : Exception?
           @frames : Array(Frame)?
+          @status : Int32 = 500
+
+          setter status
 
           def bind_error(error : Exception)
             @error = error
@@ -15,7 +18,7 @@ module Marten
             if request.accepts?("text/html")
               render_server_error_page
             else
-              HTTP::Response::InternalServerError.new(content: "Internal Server Error", content_type: "text/plain")
+              HTTP::Response.new(content: "Internal Server Error", content_type: "text/plain", status: status)
             end
           end
 
@@ -53,8 +56,10 @@ module Marten
 
           private BACKTRACE_FRAME_RE = /\sfrom (?<file>[^\s\:]+):(?<line_number>\d+)/
 
+          private getter status
+
           private def render_server_error_page
-            HTTP::Response::InternalServerError.new(ECR.render("#{__DIR__}/templates/server_error.html.ecr"))
+            HTTP::Response.new(content: ECR.render("#{__DIR__}/templates/server_error.html.ecr"), status: status)
           end
         end
       end

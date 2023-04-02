@@ -10,6 +10,17 @@ module Marten
         def call(context : ::HTTP::Server::Context)
           call_next(context)
         rescue error : Marten::HTTP::Errors::NotFound | Marten::Routing::Errors::NoResolveMatch
+          process_not_found_error(context, error)
+        rescue error : Marten::HTTP::Errors::SuspiciousOperation
+          process_suspicious_operation_error(context, error)
+        rescue Marten::HTTP::Errors::PermissionDenied
+          handler = Marten.settings.handler403.new(context.marten.request)
+          convert_handler_response(context, handler.dispatch.as(HTTP::Response))
+        rescue error : Exception
+          process_server_error(context, error)
+        end
+
+        private def process_not_found_error(context, error)
           if Marten.settings.debug
             handler = Marten::Handlers::Defaults::Debug::PageNotFound.new(context.marten.request)
             handler.error = error
@@ -18,20 +29,28 @@ module Marten
           end
 
           convert_handler_response(context, handler.dispatch.as(HTTP::Response))
-        rescue Marten::HTTP::Errors::SuspiciousOperation
-          handler = Marten.settings.handler400.new(context.marten.request)
-          convert_handler_response(context, handler.dispatch.as(HTTP::Response))
-        rescue Marten::HTTP::Errors::PermissionDenied
-          handler = Marten.settings.handler403.new(context.marten.request)
-          convert_handler_response(context, handler.dispatch.as(HTTP::Response))
-        rescue e : Exception
-          Log.error { "Internal Server Error: #{context.request.path}\n#{e.inspect_with_backtrace}" }
+        end
+
+        private def process_server_error(context, error)
+          Log.error { "Internal Server Error: #{context.request.path}\n#{error.inspect_with_backtrace}" }
 
           if Marten.settings.debug
             handler = Marten::Handlers::Defaults::Debug::ServerError.new(context.marten.request)
-            handler.bind_error(e)
+            handler.bind_error(error)
           else
             handler = Marten.settings.handler500.new(context.marten.request)
+          end
+
+          convert_handler_response(context, handler.dispatch.as(HTTP::Response))
+        end
+
+        private def process_suspicious_operation_error(context, error)
+          if Marten.settings.debug
+            handler = Marten::Handlers::Defaults::Debug::ServerError.new(context.marten.request)
+            handler.status = 400
+            handler.bind_error(error)
+          else
+            handler = Marten.settings.handler400.new(context.marten.request)
           end
 
           convert_handler_response(context, handler.dispatch.as(HTTP::Response))

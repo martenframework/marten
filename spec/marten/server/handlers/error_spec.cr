@@ -90,6 +90,35 @@ describe Marten::Server::Handlers::Error do
       output_io.rewind.gets.not_nil!.includes?("Bad Request")
     end
 
+    it "calls the debug server error handler in case of a Marten::HTTP::Errors::SuspiciousOperation error in debug" do
+      with_overridden_setting("debug", true) do
+        output_io = IO::Memory.new
+        handler = Marten::Server::Handlers::Error.new
+        handler.next = HTTP::Handler::HandlerProc.new do |ctx|
+          ctx.response.output = output_io
+          raise Marten::HTTP::Errors::SuspiciousOperation.new("This is bad")
+        end
+
+        ctx = HTTP::Server::Context.new(
+          request: ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
+          ),
+          response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+        )
+
+        handler.call(ctx)
+
+        ctx.response.status_code.should eq 400
+
+        output = output_io.rewind.gets.not_nil!
+        output.includes?("Marten::HTTP::Errors::SuspiciousOperation at")
+        output.includes?("Traceback")
+        output.includes?("General information")
+      end
+    end
+
     it "calls the permission denied handler in case of a Marten::HTTP::Errors::PermissionDenied error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new

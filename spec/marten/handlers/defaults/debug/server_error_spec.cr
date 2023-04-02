@@ -135,6 +135,26 @@ describe Marten::Handlers::Defaults::Debug::ServerError do
     end
   end
 
+  describe "#status=" do
+    it "allows to override the status returned by the handler" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/foo/bar",
+          headers: HTTP::Headers{"Host" => "example.com", "Accept" => "text/html"}
+        )
+      )
+
+      handler = Marten::Handlers::Defaults::Debug::ServerError.new(request)
+      handler.status = 400
+      handler.bind_error(Marten::HTTP::Errors::SuspiciousOperation.new("This is bad"))
+
+      response = handler.dispatch
+      response.status.should eq 400
+      response.content_type.should eq "text/html"
+    end
+  end
+
   describe "#template_snippet_lines" do
     it "returns nil if the error is not a template syntax error" do
       request = Marten::HTTP::Request.new(

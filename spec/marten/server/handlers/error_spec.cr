@@ -95,7 +95,7 @@ describe Marten::Server::Handlers::Error do
       handler = Marten::Server::Handlers::Error.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|
         ctx.response.output = output_io
-        raise Marten::HTTP::Errors::SuspiciousOperation.new("This is bad")
+        raise Marten::HTTP::Errors::PermissionDenied.new("This is bad")
       end
 
       ctx = HTTP::Server::Context.new(

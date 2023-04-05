@@ -31,7 +31,7 @@ Other session stores can be installed as separate shards. For example, the [`mar
 
 ## Using sessions
 
-When the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html), each HTTP request object will have a [`#session`](pathname:///api/dev//Marten/HTTP/Request.html#session-instance-method) method returning the session store for the current request. The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html) and provides a hash-like interface:
+When the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware is used, each HTTP request object will have a [`#session`](pathname:///api/dev//Marten/HTTP/Request.html#session-instance-method) method returning the session store for the current request. The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html) and provides a hash-like interface:
 
 ```crystal
 # Persisting values:

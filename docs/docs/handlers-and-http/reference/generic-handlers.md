@@ -24,7 +24,7 @@ end
 
 It should be noted that the redirect response issued will be a 302 (found).
 
-The model class used to create the new record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordCreate.html#model(model%3ADB%3A%3AModel.class%3F)-class-method) class method. The schema used to perform the validation can be defined through the use of the [`#schema`](pathname:///api/dev/Marten/Handlers/Schema.html#schema(schema%3AMarten%3A%3ASchema.class%3F)-class-method) class method. Alternatively, the [`#schema_class`](pathname:///api/dev/Marten/Handlers/Schema.html#schema_class-instance-method) method can also be overridden to dynamically define the schema class as part of the request handler handling.
+The model class used to create the new record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordCreate.html#model(model_klass)-macro) macro. The schema used to perform the validation can be defined through the use of the [`#schema`](pathname:///api/dev/Marten/Handlers/Schema.html#schema(schema%3AMarten%3A%3ASchema.class%3F)-class-method) class method. Alternatively, the [`#schema_class`](pathname:///api/dev/Marten/Handlers/Schema.html#schema_class-instance-method) method can also be overridden to dynamically define the schema class as part of the request handler handling.
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
@@ -38,6 +38,7 @@ This handler can be used to delete an existing model record by issuing a POST re
 
 ```crystal
 class ArticleDeleteHandler < Marten::Handlers::RecordDelete
+  model MyModel
   template_name "article_delete.html"
   success_route_name "article_delete_success"
 end
@@ -62,7 +63,7 @@ class ArticleDetailHandler < Marten::Handlers::RecordDetail
 end
 ```
 
-The model class used to retrieve the record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordDetail.html#model%3ADB%3A%3AModel.class%3F-class-method) class method. By default, a [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) subclass will always retrieve model records by looking for a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be rendered. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
+The model class used to retrieve the record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. By default, a [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) subclass will always retrieve model records by looking for a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be rendered. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the considered model record. By default, the model record is associated with a `record` key in the template context, but this can also be configured by using the [`record_context_name`](pathname:///api/dev/Marten/Handlers/RecordDetail.html#record_context_name(name%3AString|Symbol)-class-method) class method.
 
@@ -76,12 +77,12 @@ This base handler can be used to easily expose a list of model records:
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
-  template_name = "my_template"
+  template_name "my_template"
   model Post
 end
 ```
 
-The model class used to retrieve the records can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#model(model%3ADB%3A%3AModel.class%3F)-instance-method) class method. The [order](../../models-and-databases/reference/query-set#order) of these model records can also be specified by leveraging the [`#ordering`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_number_param(param%3AString|Symbol)-instance-method) class method.
+The model class used to retrieve the records can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordListing.html#model(model_klass)-macro) macro. The [order](../../models-and-databases/reference/query-set#order) of these model records can also be specified by leveraging the [`#ordering`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_number_param(param%3AString|Symbol)-instance-method) class method.
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the list of model records. By default, the list of model records is associated with a `records` key in the template context, but this can also be configured by using the [`list_context_name`](pathname:///api/dev/Marten/Handlers/RecordList.html#list_context_name(name%3AString|Symbol)-class-method) class method.
 
@@ -89,7 +90,7 @@ Optionally, it is possible to configure that records should be [paginated](../..
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
-  template_name = "my_template"
+  template_name "my_template"
   model Post
   page_size 12
 end
@@ -104,7 +105,7 @@ For example:
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
-  template_name = "my_template"
+  template_name "my_template"
   model Article
 
   def queryset
@@ -133,7 +134,7 @@ end
 
 It should be noted that the redirect response issued will be a 302 (found).
 
-The model class used to update the new record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#model(model%3ADB%3A%3AModel.class%3F)-instance-method) class method. By default, the record to update is retrieved by expecting a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be updated. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
+The model class used to update the new record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. By default, the record to update is retrieved by expecting a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be updated. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
 
 The schema used to perform the validation can be defined through the use of the [`#schema`](pathname:///api/dev/Marten/Handlers/Schema.html#schema(schema%3AMarten%3A%3ASchema.class%3F)-class-method) class method. Alternatively, the [`#schema_class`](pathname:///api/dev/Marten/Handlers/Schema.html#schema_class-instance-method) method can also be overridden to dynamically define the schema class as part of the request handler handling.
 

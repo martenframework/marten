@@ -33,19 +33,15 @@ describe Marten::Handlers::RecordRetrieving do
     end
   end
 
-  describe "::model" do
-    it "returns the configured model" do
-      Marten::Handlers::RecordRetrievingSpec::TestHandler.model.should eq TestUser
-    end
-
-    it "returns nil by default" do
-      Marten::Handlers::RecordRetrievingSpec::TestHandlerWithoutConfiguration.model.should be_nil
-    end
-  end
-
   describe "::model(model)" do
     it "allows to configure the model used to retrieve the record" do
-      Marten::Handlers::RecordRetrievingSpec::TestHandler.model.should eq TestUser
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+
+      Marten::Handlers::RecordRetrievingSpec::TestHandler.new(request).model.should eq TestUser
     end
   end
 

@@ -3,9 +3,6 @@ module Marten
     # Provides the ability to retrieve a list of model records.
     module RecordListing
       macro included
-        # Returns the configured model class.
-        class_getter model : DB::Model.class | Nil
-
         # Returns the name of the page number parameter.
         class_getter page_number_param : String = "page"
 
@@ -19,11 +16,6 @@ module Marten
       end
 
       module ClassMethods
-        # Allows to configure the model class that should be used to retrieve the list record.
-        def model(model : DB::Model.class | Nil)
-          @@model = model
-        end
-
         # Allows to configure the name of the page number parameter.
         def page_number_param(param : String | Symbol)
           @@page_number_param = param.to_s
@@ -47,10 +39,18 @@ module Marten
         end
       end
 
+      # Allows to configure the model class that should be used to retrieve the list record.
+      macro model(model_klass)
+        # Returns the model used to list the records.
+        def model
+          {{ model_klass }}
+        end
+      end
+
       # Returns the model used to list the records.
-      def model : Model.class
-        self.class.model || raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a model class via the '::model' class method method or by overriding the " \
+      def model
+        raise Errors::ImproperlyConfigured.new(
+          "'#{self.class.name}' must define a model class via the '::model' macro or by overriding the " \
           "'#model' method"
         )
       end

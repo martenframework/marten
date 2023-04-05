@@ -4,13 +4,17 @@ require "./record_create_spec/**"
 describe Marten::Handlers::RecordCreate do
   with_installed_apps Marten::Handlers::RecordCreateSpec::App
 
-  describe "::model" do
-    it "returns nil by default" do
-      Marten::Handlers::RecordCreateSpec::TestHandlerWithoutConfiguration.model.should be_nil
-    end
+  describe "::model(model)" do
+    it "allows to configure the model used when creating the record" do
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
 
-    it "returns the configured model class" do
-      Marten::Handlers::RecordCreateSpec::TestHandler.model.should eq Marten::Handlers::RecordCreateSpec::Tag
+      Marten::Handlers::RecordCreateSpec::TestHandler.new(request).model.should eq(
+        Marten::Handlers::RecordCreateSpec::Tag
+      )
     end
   end
 

@@ -9,7 +9,7 @@ module Marten
     #
     # ```
     # class MyHandler < Marten::Handlers::RecordList
-    #   template_name = "my_template"
+    #   template_name "my_template"
     #   model Post
     # end
     # ```
@@ -18,7 +18,7 @@ module Marten
     #
     # ```
     # class MyHandler < Marten::Handlers::RecordList
-    #   template_name = "my_template"
+    #   template_name "my_template"
     #   model Post
     #   page_size 12
     # end

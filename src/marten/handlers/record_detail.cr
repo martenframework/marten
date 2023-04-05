@@ -4,6 +4,20 @@ require "./template"
 module Marten
   module Handlers
     # Handler allowing to display a specific model record.
+    #
+    # This handler can be used to showcase a specific model record. It is expected that the handler will be accessed
+    # through a GET request only: as part of this request, the configured template is rendered and displayed (and the
+    # retrieved model record is inserted into the template context)
+    #
+    # ```
+    # class MyRecordHandler < Marten::Handlers::RecordDetail
+    #   model MyModel
+    #   template_name "my_record.html"
+    # end
+    # ```
+    #
+    # The model class used to retrieve the record can be configured through the use of the `#model` macro. The
+    # `#template_name` class method allows to define the name of the template to use to render the model record.
     class RecordDetail < Template
       include RecordRetrieving
 

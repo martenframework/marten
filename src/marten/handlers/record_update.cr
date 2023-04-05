@@ -23,9 +23,9 @@ module Marten
     #
     # It should be noted that the redirect response issued will be a 302 (found).
     #
-    # The model class used to update the new record can be configured through the use of the `#model` class method. The
-    # schema used to perform the validation can be defined through the use of the `#schema` class method. Alternatively,
-    # the `#schema_class` method can also be overridden to dynamically define the schema class as part of the request
+    # The model class used to update the record can be configured through the use of the `#model` macro. The schema used
+    # to perform the validation can be defined through the use of the `#schema` class method. Alternatively, the
+    # `#schema_class` method can also be overridden to dynamically define the schema class as part of the request
     # handling.
     #
     # The `#template_name` class method allows to define the name of the template to use to render the schema while the

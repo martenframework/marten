@@ -22,9 +22,9 @@ module Marten
     #
     # It should be noted that the redirect response issued will be a 302 (found).
     #
-    # The model class used to create the new record can be configured through the use of the `#model` class method. The
-    # schema used to perform the validation can be defined through the use of the `#schema` class method. Alternatively,
-    # the `#schema_class` method can also be overridden to dynamically define the schema class as part of the request
+    # The model class used to create the new record can be configured through the use of the `#model` macro. The schema
+    # used to perform the validation can be defined through the use of the `#schema` class method. Alternatively, the
+    # `#schema_class` method can also be overridden to dynamically define the schema class as part of the request
     # handling.
     #
     # The `#template_name` class method allows to define the name of the template to use to render the schema while the
@@ -33,19 +33,25 @@ module Marten
     # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
     # to redirect to.
     class RecordCreate < Handlers::Schema
-      @record : DB::Model? = nil
-
-      # Returns the configured model class.
-      class_getter model : DB::Model.class | Nil
-
-      # Returns the created record upon a valid schema processing, returns `nil` otherwise.
-      getter record
-
-      setter record
-
       # Allows to configure the model class that should be used to create the new record.
-      def self.model(model : DB::Model.class | Nil)
-        @@model = model
+      macro model(model_klass)
+        @record : {{ model_klass }}? = nil
+
+        # Returns the created record upon a valid schema processing, returns `nil` otherwise.
+        getter record
+
+        # Allows to set the created record upon a valid schema processing.
+        setter record
+
+        # Returns the model used to create the new record.
+        def model
+          {{ model_klass }}
+        end
+      end
+
+      # Returns the model used to create the new record.
+      def model
+        raise_improperly_configured_model
       end
 
       # Produces the response when the processed schema is valid.
@@ -58,10 +64,17 @@ module Marten
         super
       end
 
-      # Returns the model used to create the new record.
-      def model : Model.class
-        self.class.model || raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a model class via the '::model' class method method or by overriding the " \
+      def record
+        raise_improperly_configured_model
+      end
+
+      def record=(r)
+        raise_improperly_configured_model
+      end
+
+      private def raise_improperly_configured_model
+        raise Errors::ImproperlyConfigured.new(
+          "'#{self.class.name}' must define a model class via the '::model' macro or by overriding the " \
           "'#model' method"
         )
       end

@@ -38,6 +38,7 @@ This handler can be used to delete an existing model record by issuing a POST re
 
 ```crystal
 class ArticleDeleteHandler < Marten::Handlers::RecordDelete
+  model MyModel
   template_name "article_delete.html"
   success_route_name "article_delete_success"
 end
@@ -76,7 +77,7 @@ This base handler can be used to easily expose a list of model records:
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
-  template_name = "my_template"
+  template_name "my_template"
   model Post
 end
 ```
@@ -89,7 +90,7 @@ Optionally, it is possible to configure that records should be [paginated](../..
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
-  template_name = "my_template"
+  template_name "my_template"
   model Post
   page_size 12
 end
@@ -104,7 +105,7 @@ For example:
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
-  template_name = "my_template"
+  template_name "my_template"
   model Article
 
   def queryset

@@ -168,6 +168,17 @@ class Article < Marten::Model
 end
 ```
 
+:::tip
+It is possible to define recursive relationships by leveraging the `self` keyword. For example, if you want to define a many-to-one relationship field that targets that same model, you can do so easily by using `self` as the value for the `to` argument:
+
+```crystal
+class TreeNode < Marten::Model
+  # ...
+  field :parent, :many_to_one, to: self
+end
+```
+:::
+
 #### One-to-one relationships
 
 One-to-one relationships can be defined through the use of [`one_to_one`](./reference/fields#one_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.

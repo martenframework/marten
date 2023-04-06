@@ -133,6 +133,13 @@ module.exports = {
       items: [
         'files/uploading-files',
         'files/managing-files',
+        {
+          type: 'category',
+          label: "How-To's",
+          items: [
+            'files/how-to/create-custom-file-storages',
+          ],
+        },
       ],
     },
     {

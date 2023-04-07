@@ -111,8 +111,8 @@ It is possible to use the [`Marten::Handlers::Schema`](pathname:///api/dev/Marte
 
 To do so, it is necessary:
 
-* to specify the schema class to use to validate the incoming POST data through the use of the `#schema` class method
-* to specify the template to render by using the `#template_name` class method: this template will likely generate an HTML form 
+* to specify the schema class to use to validate the incoming POST data through the use of the `#schema` macro
+* to specify the template to render by using the `#template_name` class method: this template will likely generate an HTML form
 * to specify the route to redirect to when the schema is valid via the `#success_route_name` class method
 
 For example:

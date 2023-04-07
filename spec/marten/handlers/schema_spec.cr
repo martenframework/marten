@@ -2,16 +2,6 @@ require "./spec_helper"
 require "./schema_spec/**"
 
 describe Marten::Handlers::Schema do
-  describe "::schema" do
-    it "returns the configured schema class" do
-      Marten::Handlers::SchemaSpec::TestHandler.schema.should eq Marten::Handlers::SchemaSpec::TestSchema
-    end
-
-    it "returns nil by default" do
-      Marten::Handlers::SchemaSpec::TestHandlerWithoutConfiguration.schema.should be_nil
-    end
-  end
-
   describe "::success_route_name" do
     it "returns the configured success URL" do
       Marten::Handlers::SchemaSpec::TestHandler.success_route_name.should eq "dummy"

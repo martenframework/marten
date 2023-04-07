@@ -24,7 +24,7 @@ module Marten
     # It should be noted that the redirect response issued will be a 302 (found).
     #
     # The model class used to update the record can be configured through the use of the `#model` macro. The schema used
-    # to perform the validation can be defined through the use of the `#schema` class method. Alternatively, the
+    # to perform the validation can be defined through the use of the `#schema` macro. Alternatively, the
     # `#schema_class` method can also be overridden to dynamically define the schema class as part of the request
     # handling.
     #
@@ -68,10 +68,6 @@ module Marten
         record.update!(schema.validated_data.select(model.fields.map(&.id)))
 
         super
-      end
-
-      def schema
-        @schema ||= schema_class.new(request.data, initial: initial_data)
       end
     end
   end

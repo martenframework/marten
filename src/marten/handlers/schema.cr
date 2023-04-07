@@ -21,9 +21,9 @@ module Marten
     #
     # It should be noted that the redirect response issued will be a 302 (found).
     #
-    # The schema used to perform the validation can be defined through the use of the `#schema` class method.
-    # Alternatively, the `#schema_class` method can also be overridden to dynamically define the schema class as part of
-    # the request handling.
+    # The schema used to perform the validation can be defined through the use of the `#schema` macro. Alternatively,
+    # the `#schema_class` method can also be overridden to dynamically define the schema class as part of the request
+    # handling.
     #
     # The `#template_name` class method allows to define the name of the template to use to render the schema while the
     # `#success_route_name` method can be used to specify the name of a route to redirect to once the schema has been
@@ -31,11 +31,6 @@ module Marten
     # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
     # to redirect to.
     class Schema < Template
-      @schema : Marten::Schema? = nil
-
-      # Returns the configured schema class.
-      class_getter schema : Marten::Schema.class | Nil
-
       # Returns the route name that should be resolved to produce the URL to redirect to when processing a valid schema.
       #
       # Defaults to `nil`.
@@ -45,11 +40,6 @@ module Marten
       #
       # Defaults to `nil`.
       class_getter success_url : String?
-
-      # Allows to configure the schema class that should be used to process request data.
-      def self.schema(schema : Marten::Schema.class | Nil)
-        @@schema = schema
-      end
 
       # Allows to set the route name that should be resolved to produce the URL to when processing a valid schema.
       def self.success_route_name(success_route_name : String?)
@@ -61,8 +51,27 @@ module Marten
         @@success_url = success_url
       end
 
+      # Allows to configure the schema class that should be used to process request data.
+      macro schema(schema_klass)
+        @schema : {{ schema_klass }}? = nil
+
+        # Returns the schema, initialized using the request data.
+        def schema
+          @schema ||= schema_class.new(request.data, initial_data)
+        end
+
+        # Returns the schema class that should be used by the handler.
+        def schema_class
+          {{ schema_klass }}
+        end
+      end
+
       def context
         {"schema" => schema}
+      end
+
+      def initial_data
+        Marten::Schema::DataHash.new
       end
 
       def post
@@ -89,15 +98,12 @@ module Marten
 
       # Returns the schema, initialized using the request data.
       def schema
-        @schema ||= schema_class.new(request.data)
+        raise_improperly_configured_schema
       end
 
       # Returns the schema class that should be used by the handler.
       def schema_class
-        self.class.schema || raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a schema class name via the '#schema' class method method, " \
-          "or by overridding the '#schema_class' method"
-        )
+        raise_improperly_configured_schema
       end
 
       # Returns the URL to redirect to after the schema has been validated and processed.
@@ -114,6 +120,13 @@ module Marten
         raise Errors::ImproperlyConfigured.new(
           "'#{self.class.name}' must define a success route via the '#success_route_name' or '#success_url' class " \
           "method, or by overridding the '#success_url' method"
+        )
+      end
+
+      private def raise_improperly_configured_schema
+        raise Errors::ImproperlyConfigured.new(
+          "'#{self.class.name}' must define a schema class name via the '#schema' macro, or by overridding the " \
+          "'#schema_class' method"
         )
       end
     end

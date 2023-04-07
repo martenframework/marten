@@ -7,7 +7,7 @@ module Auth
     success_route_name "auth:profile"
 
     def process_valid_schema
-      MartenAuth.sign_in(request, schema.as(SignInSchema).user.not_nil!)
+      MartenAuth.sign_in(request, schema.user.not_nil!)
       redirect(success_url)
     end
   end

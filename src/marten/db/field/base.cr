@@ -147,7 +147,8 @@ module Marten
               @[Marten::DB::Model::Table::FieldInstanceVariable(
                 field_klass: {{ @type }},
                 field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
-                field_type: {{ field_ann[:exposed_type] }}
+                field_type: {{ field_ann[:exposed_type] }},
+                additional_type: {{ field_ann[:additional_type] }}
               )]
 
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?

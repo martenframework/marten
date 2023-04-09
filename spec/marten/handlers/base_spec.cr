@@ -854,6 +854,46 @@ describe Marten::Handlers::Base do
       response.content_type.should eq "text/plain"
       response.status.should eq 401
     end
+
+    it "returns a streaming HTTP response with an associated content and content type" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::BaseSpec::Test1Handler.new(request)
+
+      response = handler.respond(streamed_content: ["foo", "bar"].each, content_type: "text/csv")
+
+      response.should be_a Marten::HTTP::Response::Streaming
+      response = response.as(Marten::HTTP::Response::Streaming)
+
+      response.streamed_content.to_a.should eq ["foo", "bar"]
+      response.content_type.should eq "text/csv"
+      response.status.should eq 200
+    end
+
+    it "returns a streaming HTTP response with an associated status" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::BaseSpec::Test1Handler.new(request)
+
+      response = handler.respond(streamed_content: ["foo", "bar"].each, status: 400)
+
+      response.should be_a Marten::HTTP::Response::Streaming
+      response = response.as(Marten::HTTP::Response::Streaming)
+
+      response.streamed_content.to_a.should eq ["foo", "bar"]
+      response.content_type.should eq "text/html"
+      response.status.should eq 400
+    end
   end
 end
 

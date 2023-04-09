@@ -9,6 +9,9 @@ module Marten
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         response = get_response.call
 
+        # Don't compress streaming responses.
+        return response if response.is_a?(HTTP::Response::Streaming)
+
         # Don't compress short responses as this is not worth it.
         return response if response.content.bytesize < SHORT_RESPONSE_SIZE_THRESHOLD
 

@@ -197,6 +197,15 @@ module Marten
         HTTP::Response.new(content: content, content_type: content_type, status: status)
       end
 
+      # Returns a streamed HTTP response generated from an iterator of strings, content type and status code.
+      def respond(
+        streamed_content : Iterator(String),
+        content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
+        status = 200
+      )
+        HTTP::Response::Streaming.new(streamed_content: streamed_content, content_type: content_type, status: status)
+      end
+
       # Same as `#response` but with a nil-safety check.
       def response!
         response.not_nil!

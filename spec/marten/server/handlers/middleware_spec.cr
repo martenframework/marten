@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::Server::Handlers::Middleware do
   describe "#call" do
-    it "completes as expected in case no middlewares are confuseduseigured" do
+    it "completes as expected in case no middlewares are configured" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Middleware.new
       handler.next = HTTP::Handler::HandlerProc.new do |ctx|

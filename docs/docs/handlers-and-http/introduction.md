@@ -300,3 +300,46 @@ The reverse operation is also possible: you can decide to discard all the curren
 flash.discard       # discards all the flash messages
 flash.discard(:foo) # discards the message associated with the "foo" key only
 ```
+
+## Streaming responses
+
+The [`Marten::HTTP::Response::Streaming`](pathname:///api/dev/Marten/HTTP/Response/Streaming.html) response class gives you the ability to stream a response from Marten to the browser. However, unlike a standard response, this specialized class requires initialization from an [iterator](https://crystal-lang.org/api/Iterator.html) of strings instead of a content string. This approach proves to be beneficial if you intend to generate lengthy responses or responses that consume excessive memory (a classic example of this is the generation of large CSV files).
+
+Compared to a regular [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object, the [`Marten::HTTP::Response::Streaming`](pathname:///api/dev/Marten/HTTP/Response/Streaming.html) class operates differently in two ways:
+
+* Instead of initializing it with a content string, it requires initialization from an [iterator](https://crystal-lang.org/api/Iterator.html) of strings.
+* The response content is not directly accessible. The only way to obtain the actual response content is by iterating through the streamed content iterator, which can be accessed through the [`Marten::HTTP::Response::Streaming#streamed_content`](pathname:///api/dev/Marten/HTTP/Response/Streaming.html#streamed_content%3AIterator(String)-instance-method) method. However, this is handled by Marten itself when sending the response to the browser, so you shouldn't need to worry about it.
+
+To generate streaming responses, you can either instantiate [`Marten::HTTP::Response::Streaming`](pathname:///api/dev/Marten/HTTP/Response/Streaming.html) objects directly, or you can also leverage the [`#respond`](pathname:///api/dev/Marten/Handlers/Base.html#respond(streamed_content%3AIterator(String)%2Ccontent_type%3DHTTP%3A%3AResponse%3A%3ADEFAULT_CONTENT_TYPE%2Cstatus%3D200)-instance-method) helper method, which works similarly to the [`#respond`](#respond) variant for response content strings.
+
+For example, the following handler generates a CSV and streams its content by leveraging the [`#respond`](pathname:///api/dev/Marten/Handlers/Base.html#respond(streamed_content%3AIterator(String)%2Ccontent_type%3DHTTP%3A%3AResponse%3A%3ADEFAULT_CONTENT_TYPE%2Cstatus%3D200)-instance-method) helper method:
+
+```crystal
+require "csv"
+
+class StreamingTestHandler < Marten::Handler
+  def get
+    respond(streaming_iterator, content_type: "text/csv")
+  end
+
+  private def streaming_iterator
+    csv_io = IO::Memory.new
+    csv_builder = CSV::Builder.new(io: csv_io)
+
+    (1..1000000).each.map do |idx|
+      csv_builder.row("Row #{idx}", "Val #{idx}")
+
+      row_content = csv_io.to_s
+
+      csv_io.rewind
+      csv_io.flush
+
+      row_content
+    end
+  end
+end
+```
+
+:::caution
+When considering streaming responses, it is crucial to understand that the process of streaming ties up a worker process for the entire response duration. This can significantly impact your worker's performance, so it's essential to use this approach only when necessary. Generally, it's better to carry out expensive content generation tasks outside the request-response cycle to avoid any negative impact on your worker's performance.
+:::

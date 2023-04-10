@@ -35,6 +35,7 @@ module.exports = {
           label: 'Reference',
           items: [
             'models-and-databases/reference/fields',
+            'models-and-databases/reference/table-options',
             'models-and-databases/reference/query-set',
             'models-and-databases/reference/migration-operations',
           ],

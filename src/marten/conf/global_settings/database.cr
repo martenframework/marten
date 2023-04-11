@@ -86,34 +86,34 @@ module Marten
         end
 
         # Allows to set the connection backend of the database.
-        def backend=(val : String | Symbol)
-          @backend = val.to_s
+        def backend=(val : Nil | String | Symbol)
+          @backend = val.try(&.to_s)
         end
 
         # Allows to set the database host.
-        def host=(val : String | Symbol)
-          @host = val.to_s
+        def host=(val : Nil | String | Symbol)
+          @host = val.try(&.to_s)
         end
 
         # Allows to set the database name.
-        def name=(val : Path | String | Symbol)
-          @name = val.to_s
+        def name=(val : Nil | Path | String | Symbol)
+          @name = val.try(&.to_s)
           @name_set_with_env = @target_env
         end
 
         # Allows to set the database password.
-        def password=(val : String | Symbol)
-          @password = val.to_s
+        def password=(val : Nil | String | Symbol)
+          @password = val.try(&.to_s)
         end
 
         # Allows to set the database port.
-        def port=(val : Int)
-          @port = val.to_i32
+        def port=(val : Int | Nil)
+          @port = val.try(&.to_i32)
         end
 
         # Allows to set the database user name.
-        def user=(val : String | Symbol)
-          @user = val.to_s
+        def user=(val : Nil | String | Symbol)
+          @user = val.try(&.to_s)
         end
 
         # :nodoc:

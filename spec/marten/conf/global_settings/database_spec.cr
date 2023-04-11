@@ -29,6 +29,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config.backend = "sqlite"
       db_config.backend.should eq "sqlite"
     end
+
+    it "allows to set the backend identifier to nil" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.backend = "sqlite"
+      db_config.backend = nil
+      db_config.backend.should be_nil
+    end
   end
 
   describe "#backend" do
@@ -76,6 +83,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
       db_config.host = "localhost"
       db_config.host.should eq "localhost"
+    end
+
+    it "allows to set the host identifier to nil" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.host = "localhost"
+      db_config.host = nil
+      db_config.host.should be_nil
     end
   end
 
@@ -167,6 +181,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config.name = "localdb"
       db_config.name.should eq "localdb"
     end
+
+    it "allows to set the DB name to nil" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.name = "localdb"
+      db_config.name = nil
+      db_config.name.should be_nil
+    end
   end
 
   describe "#name" do
@@ -194,6 +215,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config.password = "pwd"
       db_config.password.should eq "pwd"
     end
+
+    it "allows to set the DB password to nil" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.password = "pwd"
+      db_config.password = nil
+      db_config.password.should be_nil
+    end
   end
 
   describe "#password" do
@@ -214,6 +242,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
       db_config.port = 1234
       db_config.port.should eq 1234
+    end
+
+    it "allows to set the DB port to nil" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.port = 1234
+      db_config.port = nil
+      db_config.port.should be_nil
     end
   end
 
@@ -283,6 +318,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
       db_config.user = "testuser"
       db_config.user.should eq "testuser"
+    end
+
+    it "allows to set the DB user to nil" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.user = "testuser"
+      db_config.user = nil
+      db_config.user.should be_nil
     end
   end
 

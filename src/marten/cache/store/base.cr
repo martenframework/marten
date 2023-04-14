@@ -202,9 +202,9 @@ module Marten
           return if serialized_entry.nil?
 
           packed_entry = if serialized_entry.starts_with?(COMPRESSED_PREFIX)
-                           uncompress(serialized_entry.byte_slice(1..-1))
+                           uncompress(serialized_entry.byte_slice(1))
                          else
-                           serialized_entry.byte_slice(1..-1)
+                           serialized_entry.byte_slice(1)
                          end
 
           Entry.unpack(packed_entry)

@@ -125,6 +125,7 @@ module Marten
             template "shared/.gitkeep.ecr", "src/models/.gitkeep"
             template "shared/.gitkeep.ecr", "src/schemas/.gitkeep"
             template "project/src/templates/base.html.ecr", "src/templates/base.html"
+            template "project/.editorconfig.ecr", ".editorconfig"
             template "project/.gitignore.ecr", ".gitignore"
             template "project/manage.cr.ecr", "manage.cr"
             template "project/shard.yml.ecr", "shard.yml"

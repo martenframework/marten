@@ -386,18 +386,76 @@ describe Marten::Conf::GlobalSettings::Database do
       end
     end
 
-    it "validates a valid config" do
-      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
-      db_config_1.backend = "sqlite"
-      db_config_1.name = "development.db"
-      db_config_1.validate.should be_nil
+    it "raises if MySQL is used and the database driver shard is missing" do
+      db_config = Marten::Conf::GlobalSettings::DatabaseSpec::TestDatabaseWithoutMySQLDriver.new("default")
+      db_config.backend = "mysql"
+      db_config.name = "test"
+      expect_raises(
+        Marten::Conf::Errors::InvalidConfiguration,
+        (
+          "Invalid configuration for database 'default': database driver is not installed (please add " \
+          "'crystal-lang/crystal-mysql' to your shard.yml file"
+        )
+      ) do
+        db_config.validate
+      end
+    end
 
-      db_config_2 = Marten::Conf::GlobalSettings::Database.new("default")
-      db_config_2.backend = "postgresql"
-      db_config_2.name = "localdb"
-      db_config_2.user = "postgres"
-      db_config_2.password = ""
-      db_config_2.validate.should be_nil
+    it "raises if PostgreSQL is used and the database driver shard is missing" do
+      db_config = Marten::Conf::GlobalSettings::DatabaseSpec::TestDatabaseWithoutPostgreSQLDriver.new("default")
+      db_config.backend = "postgresql"
+      db_config.name = "test"
+      expect_raises(
+        Marten::Conf::Errors::InvalidConfiguration,
+        (
+          "Invalid configuration for database 'default': database driver is not installed (please add " \
+          "'will/crystal-pg' to your shard.yml file"
+        )
+      ) do
+        db_config.validate
+      end
+    end
+
+    it "raises if SQLite is used and the database driver shard is missing" do
+      db_config = Marten::Conf::GlobalSettings::DatabaseSpec::TestDatabaseWithoutSQLiteDriver.new("default")
+      db_config.backend = "sqlite"
+      db_config.name = "test.db"
+      expect_raises(
+        Marten::Conf::Errors::InvalidConfiguration,
+        (
+          "Invalid configuration for database 'default': database driver is not installed (please add " \
+          "'crystal-lang/crystal-sqlite3' to your shard.yml file"
+        )
+      ) do
+        db_config.validate
+      end
+    end
+
+    it "validates a valid config" do
+      for_mysql do
+        db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+        db_config_1.backend = "mysql"
+        db_config_1.name = "localdb"
+        db_config_1.user = "root"
+        db_config_1.password = ""
+        db_config_1.validate.should be_nil
+      end
+
+      for_postgresql do
+        db_config_2 = Marten::Conf::GlobalSettings::Database.new("default")
+        db_config_2.backend = "postgresql"
+        db_config_2.name = "localdb"
+        db_config_2.user = "postgres"
+        db_config_2.password = ""
+        db_config_2.validate.should be_nil
+      end
+
+      for_sqlite do
+        db_config_3 = Marten::Conf::GlobalSettings::Database.new("default")
+        db_config_3.backend = "sqlite"
+        db_config_3.name = "development.db"
+        db_config_3.validate.should be_nil
+      end
     end
   end
 
@@ -441,5 +499,23 @@ end
 module Marten::Conf::GlobalSettings::DatabaseSpec
   class TestDatabase < Marten::Conf::GlobalSettings::Database
     getter target_env
+  end
+
+  class TestDatabaseWithoutMySQLDriver < Marten::Conf::GlobalSettings::Database
+    def mysql_database_driver_installed?
+      false
+    end
+  end
+
+  class TestDatabaseWithoutPostgreSQLDriver < Marten::Conf::GlobalSettings::Database
+    def postgresql_database_driver_installed?
+      false
+    end
+  end
+
+  class TestDatabaseWithoutSQLiteDriver < Marten::Conf::GlobalSettings::Database
+    def sqlite3_database_driver_installed?
+      false
+    end
   end
 end

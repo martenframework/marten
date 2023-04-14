@@ -124,6 +124,12 @@ module Marten
             raise_invalid_config("unknown database backend '#{backend}'")
           end
 
+          unless driver_installed?
+            raise_invalid_config(
+              "database driver is not installed (please add '#{driver_shard_name}' to your shard.yml file)"
+            )
+          end
+
           raise_invalid_config("missing database name") if name.to_s.empty?
         end
 
@@ -136,8 +142,54 @@ module Marten
           @target_env = current_target_env
         end
 
+        private def driver_installed?
+          case backend
+          when DB::Connection::MYSQL_ID
+            mysql_database_driver_installed?
+          when DB::Connection::POSTGRESQL_ID
+            postgresql_database_driver_installed?
+          when DB::Connection::SQLITE_ID
+            sqlite3_database_driver_installed?
+          end
+        end
+
+        private def driver_shard_name
+          case backend
+          when DB::Connection::MYSQL_ID
+            "crystal-lang/crystal-mysql"
+          when DB::Connection::POSTGRESQL_ID
+            "will/crystal-pg"
+          when DB::Connection::SQLITE_ID
+            "crystal-lang/crystal-sqlite3"
+          end
+        end
+
+        private def mysql_database_driver_installed?
+          __marten_defined?(::MySql) do
+            return true
+          end
+
+          false
+        end
+
+        private def postgresql_database_driver_installed?
+          __marten_defined?(::PG) do
+            return true
+          end
+
+          false
+        end
+
         private def raise_invalid_config(msg)
           raise Errors::InvalidConfiguration.new("Invalid configuration for database '#{id}': #{msg}")
+        end
+
+        private def sqlite3_database_driver_installed?
+          __marten_defined?(::SQLite3) do
+            return true
+          end
+
+          false
         end
       end
     end

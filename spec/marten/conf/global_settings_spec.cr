@@ -55,6 +55,31 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#cache_store" do
+    it "returns a memory store by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.cache_store.should be_a Marten::Cache::Store::Memory
+    end
+
+    it "returns the configured store" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      null_store = Marten::Cache::Store::Null.new
+
+      global_settings.cache_store = null_store
+      global_settings.cache_store.should eq null_store
+    end
+  end
+
+  describe "#cache_store=" do
+    it "allows to configure the cache store" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      null_store = Marten::Cache::Store::Null.new
+
+      global_settings.cache_store = null_store
+      global_settings.cache_store.should eq null_store
+    end
+  end
+
   describe "#csrf" do
     it "returns the CSRF configuration" do
       global_settings = Marten::Conf::GlobalSettings.new

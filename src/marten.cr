@@ -1,8 +1,9 @@
 # Marten - The pragmatic web framework.
 
-require "db"
 require "compress/gzip"
+require "compress/zlib"
 require "crypto/subtle"
+require "db"
 require "digest/md5"
 require "ecr/macros"
 require "file_utils"
@@ -11,6 +12,7 @@ require "http"
 require "i18n"
 require "log"
 require "mime/media_type"
+require "msgpack"
 require "openssl/hmac"
 require "option_parser"
 require "uuid"
@@ -18,6 +20,7 @@ require "uuid"
 require "./marten/app"
 require "./marten/apps/*"
 require "./marten/asset/**"
+require "./marten/cache/**"
 require "./marten/conf/**"
 require "./marten/core/**"
 require "./marten/db"
@@ -60,6 +63,15 @@ module Marten
   # This method returns an instance of `Marten::Asset::Engine`, which allows to find assets and to generate their URLs.
   def self.assets
     @@assets.not_nil!
+  end
+
+  # Returns the global cache store.
+  #
+  # This method returns a `Marten::Cache::Store::Base` object that can be interacted with to store string values in a
+  # global cache.
+  def self.cache : Cache::Store::Base
+    # def self.cache : Cache::Store
+    settings.cache_store
   end
 
   # Allows to configure a Marten project.

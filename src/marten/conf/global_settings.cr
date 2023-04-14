@@ -4,6 +4,7 @@ module Marten
     class GlobalSettings
       @@registered_settings_namespaces = [] of String
 
+      @cache_store : Cache::Store::Base
       @log_backend : ::Log::Backend
       @request_max_parameters : Nil | Int32
       @target_env : String?
@@ -14,6 +15,9 @@ module Marten
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
+
+      # Returns the global cache store.
+      getter cache_store
 
       # Returns the application database configurations.
       getter databases
@@ -84,6 +88,9 @@ module Marten
       # header attacks.
       setter allowed_hosts
 
+      # Allows to set the global cache store.
+      setter cache_store
+
       # Allows to activate or deactive debug mode.
       setter debug
 
@@ -150,6 +157,8 @@ module Marten
 
       def initialize
         @allowed_hosts = [] of String
+        @cache_store = Cache::Store::Memory.new
+        # @cache_store = Cache::MemoryStore(String, String).new(expires_in: 15.minutes)
         @databases = [] of Database
         @debug = false
         @host = "127.0.0.1"

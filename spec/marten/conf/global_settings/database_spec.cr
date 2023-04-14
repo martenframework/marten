@@ -365,7 +365,11 @@ describe Marten::Conf::GlobalSettings::Database do
 
     it "raises if the DB name is nil" do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
-      db_config.backend = "sqlite"
+
+      for_mysql { db_config.backend = "mysql" }
+      for_postgresql { db_config.backend = "postgresql" }
+      for_sqlite { db_config.backend = "sqlite" }
+
       expect_raises(
         Marten::Conf::Errors::InvalidConfiguration,
         "Invalid configuration for database 'default': missing database name"
@@ -376,8 +380,13 @@ describe Marten::Conf::GlobalSettings::Database do
 
     it "raises if the DB name is set to an empty string" do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
-      db_config.backend = "sqlite"
+
+      for_mysql { db_config.backend = "mysql" }
+      for_postgresql { db_config.backend = "postgresql" }
+      for_sqlite { db_config.backend = "sqlite" }
+
       db_config.name = ""
+
       expect_raises(
         Marten::Conf::Errors::InvalidConfiguration,
         "Invalid configuration for database 'default': missing database name"

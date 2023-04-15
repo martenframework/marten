@@ -133,6 +133,10 @@ module Marten
         # * `expires_in` allows to specify a relative expiration time.
         # * `version` allows to specify a version value for the entry to write into the cache. When fetching entries, a
         #   mismatch between an entry's version and the requested version is treated like a cache miss.
+        # * `race_condition_ttl` allows to specify a relative period of time during which an expired value is allowed to
+        #   be returned while the new value is being generated and written to the cache. By leveraging this capability,
+        #   it is possible to ensure that multiple processes that access an expired cache entry at the same time don't
+        #   end up regenerating the new entry all at the same time.
         # * `compress` allows to specify whether new entries written to the cache should be compressed.
         # * `compress_threshold` allows to specify a custom compression threshold. The compression threshold determines
         #   whether cached entries are compressed: if these entries are larger than the compression thresholed (which is
@@ -143,6 +147,7 @@ module Marten
           expires_at : Time? = nil,
           expires_in : Time::Span? = nil,
           version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
           compress_threshold : Int32? = nil
         )
@@ -158,6 +163,7 @@ module Marten
             key: normalize_key(key.to_s),
             entry: entry,
             expires_in: effective_expires_in,
+            race_condition_ttl: race_condition_ttl,
             compress: compress,
             compress_threshold: compress_threshold
           )
@@ -181,6 +187,7 @@ module Marten
           key : String,
           entry : Entry,
           expires_in : Time::Span? = nil,
+          race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
           compress_threshold : Int32? = nil
         )

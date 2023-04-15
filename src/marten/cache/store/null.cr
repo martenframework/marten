@@ -21,6 +21,7 @@ module Marten
           key : String,
           entry : Entry,
           expires_in : Time::Span? = nil,
+          race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
           compress_threshold : Int32? = nil
         )

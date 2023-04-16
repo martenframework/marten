@@ -31,6 +31,62 @@ module Marten
         # Clears the entire cache.
         abstract def clear
 
+        # Decrements the integer value associated with the given `key`.
+        #
+        # It should be noted that this method supports a set of optional arguments:
+        #
+        # * `amount` allows to specify the amount used to decrement the integer value (defaults to `1`)
+        # * `expires_at` allows to specify an absolute expiration time.
+        # * `expires_in` allows to specify a relative expiration time.
+        # * `version` allows to specify a version value for the entry to write into the cache. When fetching entries, a
+        #   mismatch between an entry's version and the requested version is treated like a cache miss.
+        # * `race_condition_ttl` allows to specify a relative period of time during which an expired value is allowed to
+        #   be returned while the new value is being generated and written to the cache. By leveraging this capability,
+        #   it is possible to ensure that multiple processes that access an expired cache entry at the same time don't
+        #   end up regenerating the new entry all at the same time.
+        # * `compress` allows to specify whether new entries written to the cache should be compressed.
+        # * `compress_threshold` allows to specify a custom compression threshold. The compression threshold determines
+        #   whether cached entries are compressed: if these entries are larger than the compression thresholed (which is
+        #   expressed in bytes), then they will be compressed.
+        abstract def decrement(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        ) : Int
+
+        # Increments the integer value associated with the given `key`.
+        #
+        # It should be noted that this method supports a set of optional arguments:
+        #
+        # * `amount` allows to specify the amount used to increment the integer value (defaults to `1`)
+        # * `expires_at` allows to specify an absolute expiration time.
+        # * `expires_in` allows to specify a relative expiration time.
+        # * `version` allows to specify a version value for the entry to write into the cache. When fetching entries, a
+        #   mismatch between an entry's version and the requested version is treated like a cache miss.
+        # * `race_condition_ttl` allows to specify a relative period of time during which an expired value is allowed to
+        #   be returned while the new value is being generated and written to the cache. By leveraging this capability,
+        #   it is possible to ensure that multiple processes that access an expired cache entry at the same time don't
+        #   end up regenerating the new entry all at the same time.
+        # * `compress` allows to specify whether new entries written to the cache should be compressed.
+        # * `compress_threshold` allows to specify a custom compression threshold. The compression threshold determines
+        #   whether cached entries are compressed: if these entries are larger than the compression thresholed (which is
+        #   expressed in bytes), then they will be compressed.
+        abstract def increment(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        ) : Int
+
         # Deletes an entry associated with a given `key` from the cache. Returns `true` if an entry was deleted.
         def delete(key : String | Symbol) : Bool
           delete_entry(normalize_key(key.to_s))

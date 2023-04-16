@@ -26,7 +26,84 @@ module Marten
           @data.clear
         end
 
+        def decrement(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        ) : Int
+          apply_increment(
+            key,
+            amount: -amount,
+            expires_at: expires_at,
+            expires_in: expires_in,
+            version: version,
+            race_condition_ttl: race_condition_ttl,
+            compress: compress,
+            compress_threshold: compress_threshold
+          )
+        end
+
+        def increment(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        ) : Int
+          apply_increment(
+            key,
+            amount: amount,
+            expires_at: expires_at,
+            expires_in: expires_in,
+            version: version,
+            race_condition_ttl: race_condition_ttl,
+            compress: compress,
+            compress_threshold: compress_threshold
+          )
+        end
+
         private getter data
+
+        private def apply_increment(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        )
+          normalized_key = normalize_key(key.to_s)
+          entry = read_entry(normalized_key)
+
+          if entry.nil? || entry.expired? || entry.mismatched?(version || self.version)
+            write(
+              key: key,
+              value: amount.to_s,
+              expires_at: expires_at,
+              expires_in: expires_in,
+              version: version,
+              race_condition_ttl: race_condition_ttl,
+              compress: compress,
+              compress_threshold: compress_threshold
+            )
+            amount
+          else
+            new_amount = entry.value.to_i + amount
+            entry = Entry.new(new_amount.to_s, expires_at: entry.expires_at, version: entry.version)
+            write_entry(normalized_key, entry)
+            new_amount
+          end
+        end
 
         private def delete_entry(key : String) : Bool
           deleted_entry = @data.delete(key)

@@ -10,6 +10,32 @@ module Marten
         def clear
         end
 
+        def decrement(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        ) : Int
+          0
+        end
+
+        def increment(
+          key : String,
+          amount : Int32 = 1,
+          expires_at : Time? = nil,
+          expires_in : Time::Span? = nil,
+          version : Int32? = nil,
+          race_condition_ttl : Time::Span? = nil,
+          compress : Bool? = nil,
+          compress_threshold : Int32? = nil
+        ) : Int
+          0
+        end
+
         private def delete_entry(key : String) : Bool
           false
         end

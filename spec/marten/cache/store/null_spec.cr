@@ -9,6 +9,16 @@ describe Marten::Cache::Store::Null do
     end
   end
 
+  describe "#decrement" do
+    it "always returns 0" do
+      store = Marten::Cache::Store::Null.new
+      store.write("foo", "bar")
+
+      store.decrement("foo").should eq 0
+      store.decrement("unknown", amount: 2).should eq 0
+    end
+  end
+
   describe "#delete" do
     it "always returns false" do
       store = Marten::Cache::Store::Null.new
@@ -16,6 +26,16 @@ describe Marten::Cache::Store::Null do
 
       store.delete("foo").should be_false
       store.delete("unknown").should be_false
+    end
+  end
+
+  describe "#increment" do
+    it "always returns 0" do
+      store = Marten::Cache::Store::Null.new
+      store.write("foo", "bar")
+
+      store.increment("foo").should eq 0
+      store.increment("unknown", amount: 2).should eq 0
     end
   end
 

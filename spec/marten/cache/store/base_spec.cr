@@ -224,6 +224,15 @@ describe Marten::Cache::Store::Base do
       store.read("foo").should eq "bar"
     end
 
+    it "returns the raw cached value if there is one" do
+      store = Marten::Cache::Store::BaseSpec::TestStore.new
+      store.write("foo", "bar", raw: true)
+      store.write("xyz", "test")
+
+      store.read("foo", raw: true).should eq "bar"
+      store.read("xyz", raw: true).should_not eq "test"
+    end
+
     it "returns nil if the key does not exist" do
       store = Marten::Cache::Store::BaseSpec::TestStore.new
 
@@ -271,11 +280,18 @@ describe Marten::Cache::Store::Base do
   end
 
   describe "#write" do
-    it "write a store value as expected" do
+    it "writes a store value as expected" do
       store = Marten::Cache::Store::BaseSpec::TestStore.new
 
       store.write("foo", "bar")
       store.read("foo").should eq "bar"
+    end
+
+    it "writes a raw valie to the store" do
+      store = Marten::Cache::Store::BaseSpec::TestStore.new
+      store.write("foo", "bar", raw: true)
+
+      store.read("foo", raw: true).should eq "bar"
     end
 
     it "properly uses the store default expires_in value" do

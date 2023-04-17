@@ -98,7 +98,7 @@ module Marten
         # the existence of the entry. When fetching entries, a mismatch between an entry's version and the requested
         # version is treated like a cache miss.
         def exists?(key : String | Symbol, version : Int32? = nil) : Bool
-          entry = read_entry(normalize_key(key.to_s))
+          entry = deserialize_entry(read_entry(normalize_key(key.to_s)))
           !entry.nil? && !entry.expired? && !entry.mismatched?(version || self.version)
         end
 
@@ -137,7 +137,11 @@ module Marten
           entry = nil
 
           unless force
-            entry = process_entry_expiry(read_entry(normalized_key), normalized_key, race_condition_ttl)
+            entry = process_entry_expiry(
+              deserialize_entry(read_entry(normalized_key)),
+              normalized_key,
+              race_condition_ttl
+            )
             entry = nil if !entry.nil? && entry.mismatched?(version || self.version)
           end
 
@@ -166,8 +170,11 @@ module Marten
         #
         # The `#read` method allows specifying an additional `version` argument. When fetching entries, a mismatch
         # between an entry's version and the requested version is treated like a cache miss.
-        def read(key : String | Symbol, version : Int32? = nil) : String?
-          entry = read_entry(normalize_key(key.to_s))
+        def read(key : String | Symbol, raw : Bool = false, version : Int32? = nil) : String?
+          raw_entry = read_entry(normalize_key(key.to_s))
+          return raw_entry if raw
+
+          entry = deserialize_entry(raw_entry)
 
           if !entry.nil?
             if entry.expired?
@@ -200,6 +207,7 @@ module Marten
         def write(
           key : String | Symbol,
           value : String,
+          raw : Bool = false,
           expires_at : Time? = nil,
           expires_in : Time::Span? = nil,
           version : Int32? = nil,
@@ -213,15 +221,21 @@ module Marten
                                    expires_in.nil? ? self.expires_in : expires_in
                                  end
 
-          entry = Entry.new(value, expires_in: effective_expires_in, version: version || self.version)
+          value = if raw
+                    value
+                  else
+                    serialize_entry(
+                      Entry.new(value, expires_in: effective_expires_in, version: version || self.version),
+                      compress,
+                      compress_threshold
+                    )
+                  end
 
           write_entry(
             key: normalize_key(key.to_s),
-            entry: entry,
+            value: value,
             expires_in: effective_expires_in,
-            race_condition_ttl: race_condition_ttl,
-            compress: compress,
-            compress_threshold: compress_threshold
+            race_condition_ttl: race_condition_ttl
           )
         end
 
@@ -237,15 +251,13 @@ module Marten
 
         private abstract def delete_entry(key : String) : Bool
 
-        private abstract def read_entry(key : String) : Entry?
+        private abstract def read_entry(key : String) : String?
 
         private abstract def write_entry(
           key : String,
-          entry : Entry,
+          value : String,
           expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil,
-          compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          race_condition_ttl : Time::Span? = nil
         )
 
         private def compress(data : String) : String
@@ -287,7 +299,7 @@ module Marten
               # When an entry with a race condition TTL is encountered, we store the outdated entry in the cache for the
               # duration of the TTL, during which time the entry is re-calculated.
               entry.expires_at = Time.utc.to_unix_f + race_condition_ttl.to_f
-              write_entry(key, entry, expires_in: race_condition_ttl * 2)
+              write_entry(key, value: serialize_entry(entry), expires_in: race_condition_ttl * 2)
             else
               delete_entry(key)
             end

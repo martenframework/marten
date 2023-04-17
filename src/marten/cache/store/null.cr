@@ -40,16 +40,14 @@ module Marten
           false
         end
 
-        private def read_entry(key : String) : Entry?
+        private def read_entry(key : String) : String?
         end
 
         private def write_entry(
           key : String,
-          entry : Entry,
+          value : String,
           expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil,
-          compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          race_condition_ttl : Time::Span? = nil
         )
           true
         end

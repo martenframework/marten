@@ -83,7 +83,7 @@ module Marten
           compress_threshold : Int32? = nil
         )
           normalized_key = normalize_key(key.to_s)
-          entry = read_entry(normalized_key)
+          entry = deserialize_entry(read_entry(normalized_key))
 
           if entry.nil? || entry.expired? || entry.mismatched?(version || self.version)
             write(
@@ -100,7 +100,7 @@ module Marten
           else
             new_amount = entry.value.to_i + amount
             entry = Entry.new(new_amount.to_s, expires_at: entry.expires_at, version: entry.version)
-            write_entry(normalized_key, entry)
+            write_entry(normalized_key, serialize_entry(entry))
             new_amount
           end
         end
@@ -110,21 +110,17 @@ module Marten
           !!deleted_entry
         end
 
-        private def read_entry(key : String) : Entry?
-          deserialize_entry(data[key]?)
+        private def read_entry(key : String) : String?
+          data[key]?
         end
 
         private def write_entry(
           key : String,
-          entry : Entry,
+          value : String,
           expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil,
-          compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          race_condition_ttl : Time::Span? = nil
         )
-          serialized_entry = serialize_entry(entry, compress, compress_threshold)
-
-          data[key] = serialized_entry
+          data[key] = value
           true
         end
       end

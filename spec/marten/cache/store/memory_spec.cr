@@ -79,20 +79,6 @@ describe Marten::Cache::Store::Memory do
       end
     end
 
-    it "writes the amount value to the cache in case the key is expired" do
-      store = Marten::Cache::Store::Memory.new
-      5.times { store.increment("foo", expires_in: 2.hours) }
-      5.times { store.increment("bar", expires_in: 2.hours) }
-
-      Timecop.freeze(Time.local + 4.hours) do
-        store.decrement("foo").should eq -1
-        store.read("foo").try(&.to_i).should eq -1
-
-        store.decrement("bar", amount: 2).should eq -2
-        store.read("bar").try(&.to_i).should eq -2
-      end
-    end
-
     it "writes the amount value to the cache in case the key version does not match the persisted version" do
       store = Marten::Cache::Store::Memory.new
       5.times { store.increment("foo", version: 1) }
@@ -186,20 +172,6 @@ describe Marten::Cache::Store::Memory do
 
       store.increment("bar", amount: 2).should eq 2
       store.read("bar").try(&.to_i).should eq 2
-    end
-
-    it "writes the amount value to the cache in case the key is expired" do
-      store = Marten::Cache::Store::Memory.new
-      5.times { store.increment("foo", expires_in: 2.hours) }
-      5.times { store.increment("bar", expires_in: 2.hours) }
-
-      Timecop.freeze(Time.local + 4.hours) do
-        store.increment("foo").should eq 1
-        store.read("foo").try(&.to_i).should eq 1
-
-        store.increment("bar", amount: 2).should eq 2
-        store.read("bar").try(&.to_i).should eq 2
-      end
     end
 
     it "writes the amount value to the cache in case the key is expired" do

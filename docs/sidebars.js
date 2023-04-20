@@ -226,6 +226,21 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Caching',
+      link: {type: 'doc', id: 'caching'},
+      items: [
+        'caching/introduction',
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'caching/reference/stores',
+          ],
+        },
+      ],
+    },
+    {
+      type: 'category',
       label: 'Deployment',
       link: {type: 'doc', id: 'deployment'},
       items: [

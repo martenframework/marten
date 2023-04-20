@@ -24,6 +24,16 @@ It should be noted that this setting is automatically set to the following array
 [".localhost", "127.0.0.1", "[::1]"]
 ```
 
+### `cache_store`
+
+Default: `Marten::Cache::Store::Memory.new`
+
+The global cache store instance.
+
+This setting allows to configure the cache store returned by the [`Marten#cache`](pathname:///api/dev/Marten.html#cache%3ACache%3A%3AStore%3A%3ABase-class-method) method (which can be used to perform low-level caching operations), and which is also leveraged for other caching features such as template fragment caching. Please refer to [Caching](../../caching) to learn more about the caching features provided by Marten.
+
+By default, the global cache store is set to be an in-memory cache (instance of [`Marten::Cache::Store::Memory`](pathname:///api/dev/Marten/Cache/Store/Memory.html)). In test environments you might want to use the "null store" by assigning an instance of the [`Marten::Cache::Store::Null](pathname:///api/dev/Marten/Cache/Store/Null.html) to this setting. Additional caching store shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your caching requirements. These backends are listed in the [caching stores backend reference](../../caching/reference/stores).
+
 ### `debug`
 
 Default: `false`

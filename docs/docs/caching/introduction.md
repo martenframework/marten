@@ -35,7 +35,7 @@ The main way to put new values in cache is to leverage the [`#fetch`](pathname:/
 For example:
 
 ```crystal
-Marten.cache("mykey", expires_in: 4.hours) do
+Marten.cache.fetch("mykey", expires_in: 4.hours) do
   "myvalue"
 end
 ```

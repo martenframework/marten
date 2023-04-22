@@ -48,6 +48,11 @@ module Marten
           )
         end
 
+        def delete_entry(key : String) : Bool
+          deleted_entry = @data.delete(key)
+          !!deleted_entry
+        end
+
         def increment(
           key : String,
           amount : Int32 = 1,
@@ -68,6 +73,20 @@ module Marten
             compress: compress,
             compress_threshold: compress_threshold
           )
+        end
+
+        def read_entry(key : String) : String?
+          data[key]?
+        end
+
+        def write_entry(
+          key : String,
+          value : String,
+          expires_in : Time::Span? = nil,
+          race_condition_ttl : Time::Span? = nil
+        )
+          data[key] = value
+          true
         end
 
         private getter data
@@ -103,25 +122,6 @@ module Marten
             write_entry(normalized_key, serialize_entry(entry))
             new_amount
           end
-        end
-
-        private def delete_entry(key : String) : Bool
-          deleted_entry = @data.delete(key)
-          !!deleted_entry
-        end
-
-        private def read_entry(key : String) : String?
-          data[key]?
-        end
-
-        private def write_entry(
-          key : String,
-          value : String,
-          expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil
-        )
-          data[key] = value
-          true
         end
       end
     end

@@ -59,6 +59,9 @@ module Marten
           compress_threshold : Int32? = nil
         ) : Int
 
+        # Deletes an entry from the cache.
+        abstract def delete_entry(key : String) : Bool
+
         # Increments the integer value associated with the given `key`.
         #
         # It should be noted that this method supports a set of optional arguments:
@@ -86,6 +89,17 @@ module Marten
           compress : Bool? = nil,
           compress_threshold : Int32? = nil
         ) : Int
+
+        # Reads an entry from the cache.
+        abstract def read_entry(key : String) : String?
+
+        # Writes an entry to the cache.
+        abstract def write_entry(
+          key : String,
+          value : String,
+          expires_in : Time::Span? = nil,
+          race_condition_ttl : Time::Span? = nil
+        )
 
         # Deletes an entry associated with a given `key` from the cache. Returns `true` if an entry was deleted.
         def delete(key : String | Symbol) : Bool
@@ -248,17 +262,6 @@ module Marten
         private getter version
 
         private getter? compress
-
-        private abstract def delete_entry(key : String) : Bool
-
-        private abstract def read_entry(key : String) : String?
-
-        private abstract def write_entry(
-          key : String,
-          value : String,
-          expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil
-        )
 
         private def compress(data : String) : String
           compressed_io = IO::Memory.new

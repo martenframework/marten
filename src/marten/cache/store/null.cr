@@ -23,6 +23,10 @@ module Marten
           0
         end
 
+        def delete_entry(key : String) : Bool
+          false
+        end
+
         def increment(
           key : String,
           amount : Int32 = 1,
@@ -36,14 +40,10 @@ module Marten
           0
         end
 
-        private def delete_entry(key : String) : Bool
-          false
+        def read_entry(key : String) : String?
         end
 
-        private def read_entry(key : String) : String?
-        end
-
-        private def write_entry(
+        def write_entry(
           key : String,
           value : String,
           expires_in : Time::Span? = nil,

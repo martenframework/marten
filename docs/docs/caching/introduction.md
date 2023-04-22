@@ -54,7 +54,7 @@ Marten.cache.read("foo") # => nil
 Marten.cache.exists?("foo") => false
 
 # Let's add the entry to the cache.
-Marten.cache.write("foo", "bar", expries_in: 10.minutes) => true
+Marten.cache.write("foo", "bar", expires_in: 10.minutes) => true
 
 # Let's read from the cache.
 Marten.cache.read("foo") # => "bar"
@@ -72,7 +72,7 @@ For example:
 Marten.cache.delete("foo") # => false
 
 # Let's add an entry to the cache and then delete it.
-Marten.cache.write("foo", "bar", expries_in: 10.minutes) => true
+Marten.cache.write("foo", "bar", expires_in: 10.minutes) => true
 Marten.cache.delete("foo") # => true
 ```
 
@@ -96,7 +96,7 @@ For example:
 
 ```crystal
 # Let's add an entry to the cache and then let's clear the cache.
-Marten.cache.write("foo", "bar", expries_in: 10.minutes)
+Marten.cache.write("foo", "bar", expires_in: 10.minutes)
 Marten.cache.clear
 ```
 

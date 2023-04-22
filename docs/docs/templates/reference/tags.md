@@ -33,6 +33,26 @@ For example:
 
 The `block` template tag allows to define that some specific portions of a template can be overridden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
 
+## `cache`
+
+The `cache` template tag allows to cache the content of a template fragment (enclosed within the `{% cache %}...{% endcache %}` tags) for a specific duration. This caching operation is done by leveraging the configured [cache store](../../caching/introduction#configuration-and-cache-stores).
+
+At least a cache key and and a cache expiry (expressed in seconds) must be specified when using this tag:
+
+```html
+{% cache "mykey" 3600 %}
+  Cached content!
+{% endcache %}
+```
+
+It should be noted that the `cache` template tag also supports specifying additional "vary on" arguments that allow to invalidate the cache based on the value of other template variables:
+
+```html
+{% cache "mykey" 3600 current_locale user.id %}
+  Cached content!
+{% endcache %}
+```
+
 ## `csrf_token`
 
 The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used for templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers) involving rendered templates).

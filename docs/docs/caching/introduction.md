@@ -105,3 +105,49 @@ You should be extra careful when using this method because it will fully remove 
 :::
 
 ## Template fragment caching
+
+You can leverage template fragment caching when you want to cache some parts of your [templates](../templates). This capability is enabled by the use of the [`cache`](../templates/reference/tags#cache) template tag.
+
+This template tag allows caching the content of a template fragment (enclosed within the `{% cache %}...{% endcache %}` tags) for a specific duration. This caching operation is done by leveraging the configured [global cache store](#configuration-and-cache-stores). The tag itself takes at least two arguments: the name to give to the cache fragment and a cache timeout - expressed in seconds.
+
+For example, the following snippet caches the content enclosed within the `{% cache %}...{% endcache %}` tags for a duration of 3600 seconds and associates it to the "articles" fragment name:
+
+```html
+{% cache "articles" 3600 %}
+  <ul>
+  {% for article in articles %}
+    <li>{{ article.title }}</li>
+  {% endfor %}
+  </ul>
+{% endcache %}
+```
+
+It's worth noting that the [`cache`](../templates/reference/tags#cache) template tag allows for the inclusion of additional arguments. These arguments, referred to as "vary on" values, play a crucial role in generating the cache key of the template fragment. Essentially, the cache is invalidated if the value of any of these arguments changes. This feature comes in handy when you need to ensure that the template fragment is cached based on other dynamic values that may impact the generation of the cached content itself.
+
+For instance, suppose the cached content is dependent on the current locale. In that case, you'd want to make sure that the current locale value is taken into account while caching the template fragment. The ability to pass additional arguments as "vary on" values enables you to achieve precisely that.
+
+For example:
+
+```html
+{% cache "articles" 3600 current_locale user.id %}
+  <ul>
+  {% for article in articles %}
+    <li>{{ article.title }}</li>
+  {% endfor %}
+  </ul>
+{% endcache %}
+```
+
+:::tip
+The "key" used for the template fragment cache entry can be a template variable. The same goes for the cache timeout. For example:
+
+```html
+{% cache fragment_name fragment_expiry %}
+  <ul>
+  {% for article in articles %}
+    <li>{{ article.title }}</li>
+  {% endfor %}
+  </ul>
+{% endcache %}
+```
+:::

@@ -103,3 +103,5 @@ Marten.cache.clear
 :::caution
 You should be extra careful when using this method because it will fully remove all the entries stored in the cache. Depending on the store implementation, only _namespaced_ entries may be removed (this is the case for the [Redis cache store](https://github.com/martenframework/marten-redis-cache) for example).
 :::
+
+## Template fragment caching

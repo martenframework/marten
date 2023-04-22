@@ -232,6 +232,13 @@ module.exports = {
         'caching/introduction',
         {
           type: 'category',
+          label: "How-To's",
+          items: [
+            'caching/how-to/create-custom-cache-stores',
+          ],
+        },
+        {
+          type: 'category',
           label: 'Reference',
           items: [
             'caching/reference/stores',

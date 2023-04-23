@@ -102,6 +102,20 @@ The maximum number of allowed parameters per request (such as GET or POST parame
 
 A large number of parameters will require more time to process and might be the sign of a denial-of-service attack, which is why this setting can be used. This protection can also be disabled by setting `request_max_parameters` to `nil`.
 
+### `root_path`
+
+Default: `nil`
+
+The root path of the application.
+
+The root path of the application specifies the actual location of the project sources in your system. This can prove helpful in scenarios where the project was compiled in a specific location different from the final destination where the project sources (and the `lib` folder) are copied. For instance, platforms like Heroku often fall under this category. By configuring the root path, you can ensure that your application correctly locates the required project sources and avoids any discrepancies arising from inconsistent source paths. This can prevent issues related to missing dependencies or missing app-related files (eg. locales, assets, or templates) and make your application more robust and reliable.
+
+For example, deploying a Marten app on Heroku will usually involves setting the root path as follows:
+
+```crystal
+config.root_path = "/app"
+```
+
 ### `secret_key`
 
 Default: `""`

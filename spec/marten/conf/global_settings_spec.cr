@@ -349,6 +349,46 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#root_path" do
+    it "returns nil by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.root_path.should be_nil
+    end
+
+    it "returns the configured root path" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.root_path = "/app"
+      global_settings.root_path.should eq "/app"
+    end
+  end
+
+  describe "#root_path=" do
+    it "allows to configure the root path from a string" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.root_path = "/app"
+      global_settings.root_path.should eq "/app"
+    end
+
+    it "allows to configure the root path from a symbol" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.root_path = :"/app"
+      global_settings.root_path.should eq "/app"
+    end
+
+    it "allows to configure the root path from a path object" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.root_path = Path["/app"]
+      global_settings.root_path.should eq "/app"
+    end
+
+    it "allows to reset the configured value by specifying nil" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.root_path = "/app"
+      global_settings.root_path = nil
+      global_settings.root_path.should be_nil
+    end
+  end
+
   describe "#secret_key" do
     it "returns an empty string by default" do
       global_settings = Marten::Conf::GlobalSettings.new

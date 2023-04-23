@@ -10,10 +10,19 @@ module Marten
 
       @@label = "app"
 
+      @effective_app_location : String? = nil
+
       getter models
 
       delegate label, to: self.class
 
+      # :nodoc:
+      def self.compilation_root_path : String
+        # Returns the root path from which the application was originally compiled.
+        {{ run("./config/fetch_compilation_root_path.cr") }}
+      end
+
+      # Allows to define the lable of the application config.
       def self.label(label : String | Symbol)
         unless LABEL_RE.match(label.to_s)
           raise Errors::InvalidAppConfig.new("A label can only contain lowercase letters and underscores")
@@ -44,14 +53,14 @@ module Marten
       #
       # If the application doesn't have a dedicated assets directory, `nil` is returned.
       def assets_finder
-        assets_dir = Path[self.class._marten_app_location].join(ASSETS_DIR)
+        assets_dir = Path[effective_app_location].join(ASSETS_DIR)
         return unless Dir.exists?(assets_dir)
         Asset::Finder::FileSystem.new(assets_dir.to_s)
       end
 
       # Returns the migrations path for the application.
       def migrations_path
-        Path[self.class._marten_app_location].join(MIGRATIONS_DIR)
+        Path[effective_app_location].join(MIGRATIONS_DIR)
       end
 
       # Associates a model to the current app config.
@@ -71,7 +80,7 @@ module Marten
       #
       # If the application doesn't have a dedicated templates directory, `nil` is returned.
       def templates_loader
-        templates_dir = Path[self.class._marten_app_location].join(TEMPLATES_DIR)
+        templates_dir = Path[effective_app_location].join(TEMPLATES_DIR)
         return unless Dir.exists?(templates_dir)
         Template::Loader::FileSystem.new(templates_dir.to_s)
       end
@@ -80,7 +89,7 @@ module Marten
       #
       # If the application doesn't define translations in a dedicated directory, `nil` is returned.
       def translations_loader
-        locales_dir = Path[self.class._marten_app_location].join(LOCALES_DIR)
+        locales_dir = Path[effective_app_location].join(LOCALES_DIR)
         return unless Dir.exists?(locales_dir)
         I18n::Loader::YAML.new(locales_dir.to_s)
       end
@@ -94,6 +103,17 @@ module Marten
       private LOCALES_DIR    = "locales"
       private MIGRATIONS_DIR = "migrations"
       private TEMPLATES_DIR  = "templates"
+
+      private def effective_app_location : String
+        @effective_app_location ||= if !(root_path = Marten.settings.root_path).nil?
+                                      Path[self.class._marten_app_location]
+                                        .relative_to(Path[self.class.compilation_root_path])
+                                        .expand(root_path)
+                                        .to_s
+                                    else
+                                      self.class._marten_app_location
+                                    end
+      end
     end
   end
 end

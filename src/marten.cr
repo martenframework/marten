@@ -214,7 +214,7 @@ module Marten
     I18n.config.available_locales = settings.i18n.available_locales
 
     # Add Marten's built-in translations first.
-    I18n.config.loaders << I18n::Loader::YAML.new("#{__DIR__}/marten/locales")
+    I18n.config.loaders << I18n::Loader::YAML.new("#{effective_marten_location}/marten/locales")
 
     # Ensure each app config translation loader is properly bound to the I18n config.
     I18n.config.loaders += apps.app_configs.compact_map(&.translations_loader)
@@ -250,8 +250,20 @@ module Marten
     @@templates.not_nil!
   end
 
-  protected def self.dir_location
+  # :nodoc:
+  def self._marten_app_location : String
     __DIR__
+  end
+
+  private def self.effective_marten_location : String
+    if !(root_path = Marten.settings.root_path).nil?
+      Path[_marten_app_location]
+        .relative_to(Path[Marten::Apps::Config.compilation_root_path])
+        .expand(root_path)
+        .to_s
+    else
+      _marten_app_location
+    end
   end
 
   private def self.override_server_host(host : String)

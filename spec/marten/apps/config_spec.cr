@@ -53,12 +53,30 @@ describe Marten::Apps::Config do
   end
 
   describe "#assets_finder" do
+    around_each do |t|
+      FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
+      t.run
+      FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
+    end
+
     it "returns an assets finder targetting the app assets folder" do
-      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config = Marten::Apps::ConfigSpec::AppWithAssets::App.new
       assets_finder = app_config.assets_finder
       assets_finder.should be_a Marten::Asset::Finder::FileSystem
 
-      assets_finder.not_nil!.root.should eq Path[__DIR__].join("assets").to_s
+      assets_finder.not_nil!.root.should eq Path[__DIR__].join("config_spec/app_with_assets/assets").to_s
+    end
+
+    it "takes into account the root path if one is configured" do
+      FileUtils.ln_s(Path["."].expand.to_s, "/tmp/marten_spec")
+
+      with_overridden_setting("root_path", "/tmp/marten_spec", nilable: true) do
+        app_config = Marten::Apps::ConfigSpec::AppWithAssets::App.new
+        assets_finder = app_config.assets_finder
+        assets_finder.should be_a Marten::Asset::Finder::FileSystem
+
+        assets_finder.not_nil!.root.should eq "/tmp/marten_spec/spec/marten/apps/config_spec/app_with_assets/assets"
+      end
     end
 
     it "returns nil if the app does not define an assets directory" do
@@ -98,12 +116,32 @@ describe Marten::Apps::Config do
   end
 
   describe "#templates_loader" do
+    around_each do |t|
+      FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
+      t.run
+      FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
+    end
+
     it "returns a templates loader targetting the app templates" do
-      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config = Marten::Apps::ConfigSpec::AppWithTemplates::App.new
       templates_loader = app_config.templates_loader
       templates_loader.should be_a Marten::Template::Loader::FileSystem
 
-      templates_loader.not_nil!.path.should eq Path[__DIR__].join("templates").to_s
+      templates_loader.not_nil!.path.should eq Path[__DIR__].join("config_spec/app_with_templates/templates").to_s
+    end
+
+    it "takes into account the root path if one is configured" do
+      FileUtils.ln_s(Path["."].expand.to_s, "/tmp/marten_spec")
+
+      with_overridden_setting("root_path", "/tmp/marten_spec", nilable: true) do
+        app_config = Marten::Apps::ConfigSpec::AppWithTemplates::App.new
+        templates_loader = app_config.templates_loader
+        templates_loader.should be_a Marten::Template::Loader::FileSystem
+
+        templates_loader.not_nil!.path.should eq(
+          "/tmp/marten_spec/spec/marten/apps/config_spec/app_with_templates/templates"
+        )
+      end
     end
 
     it "returns nil if the app does not define a templates directory" do
@@ -113,8 +151,14 @@ describe Marten::Apps::Config do
   end
 
   describe "#translations_loader" do
+    around_each do |t|
+      FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
+      t.run
+      FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
+    end
+
     it "returns a translations loader containing the app locales data" do
-      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config = Marten::Apps::ConfigSpec::AppWithTranslations::App.new
       translations_loader = app_config.translations_loader
       translations_loader.should be_a I18n::Loader::YAML
 
@@ -125,6 +169,24 @@ describe Marten::Apps::Config do
           },
         }
       )
+    end
+
+    it "takes into account the root path if one is configured" do
+      FileUtils.ln_s(Path["."].expand.to_s, "/tmp/marten_spec")
+
+      with_overridden_setting("root_path", "/tmp/marten_spec", nilable: true) do
+        app_config = Marten::Apps::ConfigSpec::AppWithTranslations::App.new
+        translations_loader = app_config.translations_loader
+        translations_loader.should be_a I18n::Loader::YAML
+
+        translations_loader.not_nil!.load.should eq(
+          I18n::TranslationsHash{
+            "en" => I18n::TranslationsHash{
+              "simple" => "Simple translation",
+            },
+          }
+        )
+      end
     end
 
     it "returns nil if the app does not define locales data" do

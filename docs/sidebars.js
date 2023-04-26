@@ -257,6 +257,7 @@ module.exports = {
           label: "How-To's",
           items: [
             'deployment/how-to/deploy-to-an-ubuntu-server',
+            'deployment/how-to/deploy-to-heroku',
           ],
         },
       ],

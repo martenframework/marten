@@ -99,9 +99,16 @@ end
 When records are paginated, a [`Marten::DB::Query::Page`](pathname:///api/dev/Marten/DB/Query/Page.html) object will be exposed in the template context (instead of the raw query set). It should be noted that the page number that should be displayed is determined by looking for a `page` GET parameter by default; this parameter name can be configured as well by calling the [`page_number_param`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_number_param(param%3AString|Symbol)-instance-method) class method.
 
 :::tip How to customize the query set?
-By default, handlers that inherit from [`Marten::Handlers::RecordList`](pathname:///api/dev/Marten/Handlers/RecordList.html) will use a query set targetting _all_ the records of the specified model. It should be noted that you can customize this behavior easily by overriding the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordListing.html#queryset-instance-method) method and by applying additional filters to the default query set.
+By default, handlers that inherit from [`Marten::Handlers::RecordList`](pathname:///api/dev/Marten/Handlers/RecordList.html) will use a query set targetting _all_ the records of the specified model. It should be noted that you can customize this behavior easily by leveraging the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordListing.html#queryset(queryset)-macro) macro instead of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordListing.html#model(model_klass)-macro) macro. For example:
 
-For example:
+```crystal
+class MyHandler < Marten::Handlers::RecordList
+  template_name "my_template"
+  queryset Article.filter(user: request.user)
+end
+```
+
+Alternatively, it is also possible to override the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordListing.html#queryset-instance-method) method and apply additional filters to the default query set:
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList

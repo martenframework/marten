@@ -96,6 +96,24 @@ Marten.configure :production do |config|
 end
 ```
 
+### Optional: set up the asset serving middleware
+
+In order to easily serve your application's assets in Heroku, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares#asset-serving-middleware) middleware. Indeed, it won't be possible to configure a web server such as [Nginx](https://nginx.org) to serve your assets directly on Heroku if you intend to use a "local file system" asset store (such as [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)).
+
+To palliate this, you can make use of the [`Marten::Middleware::AssetServing`](../handlers-and-http/reference/middlewares#asset-serving-middleware) middleware. Obviously this is not necessary if you intend to leverage a cloud storage provider (like Amazon's S3 or GCS) to store and serve your collected assets (in this case, you can simply skip this section).
+
+In order to use this middleware, you can "insert" the corresponding class at the beginning of the [`middleware`](../development/reference/settings#middleware) setting when defining production settings. For example:
+
+```crystal
+Marten.configure :production do |config|
+  config.middleware.unshift(Marten::Middleware::AssetServing)
+
+  # Other settings...
+end
+```
+
+The middleware will serve the collected assets available under the assets root ([`assets.root`](../development/reference/settings#root) setting). It is also important to note that the [`assets.url`](../development/reference/settings#url) setting must align with the Marten application domain or correspond to a relative URL path (e.g., `/assets/`) for this middleware to work correctly.
+
 ## Create the Heroku app
 
 To begin, the initial action required is to generate your Heroku application itself. This can be achieved by executing the `heroku create` command as follows:

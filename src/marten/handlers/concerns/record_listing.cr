@@ -39,11 +39,27 @@ module Marten
         end
       end
 
-      # Allows to configure the model class that should be used to retrieve the list record.
+      # Allows to configure the model class that should be used to retrieve the list of records.
+      #
+      # This macro should only be used in situations where the `queryset` macro is not used.
       macro model(model_klass)
         # Returns the model used to list the records.
         def model
           {{ model_klass }}
+        end
+      end
+
+      # Allows to configure the query set that should be used to retrieve the list of records.
+      #
+      # This macro should only be used in situations where the `model` macro is not used.
+      macro queryset(queryset)
+        # Returns the queryset used to list the records.
+        def queryset
+          if ordering = self.class.ordering
+            {{ queryset }}.order(ordering)
+          else
+            {{ queryset }}
+          end
         end
       end
 
@@ -68,7 +84,7 @@ module Marten
         queryset.paginator(self.class.page_size.not_nil!).page(page_number)
       end
 
-      # Returns the queryset used to retrieve the record displayed by the handler.
+      # Returns the queryset used to retrieve the records displayed by the handler.
       def queryset
         if ordering = self.class.ordering
           model.all.order(ordering)

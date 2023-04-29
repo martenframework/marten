@@ -203,6 +203,34 @@ describe Marten::Handlers::RecordListing do
       page.number.should eq 2
       page.to_a.should eq [user_3, user_4]
     end
+
+    it "paginates as expected when a the #queryset macro was used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "Foo", last_name: "Test")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+      user_4 = TestUser.create!(username: "jd4", email: "jd4@example.com", first_name: "John", last_name: "Doe")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      params_1 = Hash(String, Marten::Routing::Parameter::Types){"p" => 1}
+      handler_1 = Marten::Handlers::RecordListingSpec::TestHandlerWithQueryset.new(request, params_1)
+      page_1 = handler_1.paginate_queryset
+      page_1.number.should eq 1
+      page_1.to_a.should eq [user_1, user_2]
+
+      params_2 = Hash(String, Marten::Routing::Parameter::Types){"p" => 2}
+      handler_2 = Marten::Handlers::RecordListingSpec::TestHandlerWithQueryset.new(request, params_2)
+      page_2 = handler_2.paginate_queryset
+      page_2.number.should eq 2
+      page_2.to_a.should eq [user_3, user_4]
+    end
   end
 
   describe "#queryset" do
@@ -222,6 +250,23 @@ describe Marten::Handlers::RecordListing do
       handler.queryset.to_a.should eq [user_1, user_2]
     end
 
+    it "returns the expected queryset when the #queryset macro was used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "Foo", last_name: "Test")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RecordListingSpec::TestHandlerWithQueryset.new(request)
+
+      handler.queryset.to_a.should eq [user_1, user_2]
+    end
+
     it "uses the configured ordering" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
@@ -234,6 +279,23 @@ describe Marten::Handlers::RecordListing do
         )
       )
       handler = Marten::Handlers::RecordListingSpec::TestHandlerWithOrdering.new(request)
+
+      handler.queryset.to_a.should eq [user_2, user_1]
+    end
+
+    it "uses the configured ordering when the #queryset macro was used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "Foo", last_name: "Test")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RecordListingSpec::TestHandlerWithQuerysetAndOrdering.new(request)
 
       handler.queryset.to_a.should eq [user_2, user_1]
     end
@@ -266,6 +328,21 @@ module Marten::Handlers::RecordListingSpec
     include Marten::Handlers::RecordListing
 
     model TestUser
+    ordering "-username"
+  end
+
+  class TestHandlerWithQueryset < Marten::Handler
+    include Marten::Handlers::RecordListing
+
+    queryset TestUser.filter(username__startswith: "jd")
+    page_number_param "p"
+    page_size 2
+  end
+
+  class TestHandlerWithQuerysetAndOrdering < Marten::Handler
+    include Marten::Handlers::RecordListing
+
+    queryset TestUser.filter(username__startswith: "jd")
     ordering "-username"
   end
 

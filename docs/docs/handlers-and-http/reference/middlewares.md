@@ -5,6 +5,24 @@ description: Middlewares reference
 
 This page provides a reference for all the available [middlewares](../middlewares).
 
+## Asset serving middleware
+
+**Class:** [`Marten::Middleware::AssetServing`](pathname:///api/dev/Marten/Middleware/AssetServing.html)
+
+The purpose of this middleware is to handle the distribution of collected assets, which are stored under the configured assets root ([`assets.root`](../../development/reference/settings#root) setting). The assumption is that these assets have been "collected" using the [`collectassets`](../../development/reference/management-commands#collectassets) management command and that the file system storage ([`Marten::Core::Storage::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)) is being used.
+
+Additionally, the [`assets.url`](../../development/reference/settings#url) setting must either align with the domain of your Marten application or correspond to a relative URL path, such as `/assets/`. This ensures proper mapping and accessibility of the assets within your application (so that they can be served by this middleware).
+
+It is important to mention that this middleware automatically applies compression to the served assets, utilizing GZip or deflate based on the Accept-Encoding header of the incoming request. Additionally, the middleware sets the Cache-Control header and defines a max-age of 3600 seconds, ensuring efficient caching of the assets.
+
+:::info
+This middleware should be placed at the first position in the [`middleware`](../../development/reference/settings#middleware) setting (ie. before all other configured middlewares).
+:::
+
+:::tip
+This middleware is provided to make it easy to serve assets in situations where you can't easily configure a web server such as [Nginx](https://nginx.org) or a third-party service (like Amazon's S3 or GCS) to serve your assets directly.
+:::
+
 ## Flash middleware
 
 **Class:** [`Marten::Middleware::Flash`](pathname:///api/dev/Marten/Middleware/Flash.html)

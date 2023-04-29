@@ -158,3 +158,21 @@ Marten does not provide file storage implementations for the most frequently enc
 :::
 
 Writing a custom file storage implementation will involve subclassing the [`Marten::Core::Storage::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html) abstract class and implementing a set of mandatory methods. The main difference compared to a "local file system" storage here is that you would need to make use of the API of the chosen cloud storage to perform low-level file operations (such as reading a file's content, verifying that a file exists, or generating a file URL).
+
+### Serving assets using a middleware
+
+There are some situations where it is not possible to easily configure a web server such as [Nginx](https://nginx.org) or a third-party service (like Amazon's S3 or GCS) to serve your assets directly. To palliate this, Marten provides the [`Marten::Middleware::AssetServing`](../handlers-and-http/reference/middlewares#asset-serving-middleware) middleware.
+
+The purpose of this middleware is to distribute collected assets stored under the configured assets root ([`assets.root`](../development/reference/settings#root) setting). These assets are assumed to have been collected using the [`collectassets`](../../development/reference/management-commands#collectassets) management command, and it is also assumed that a "local file system" storage (such as [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)) is used.
+
+In order to use this middleware, you can "insert" the corresponding class at the beginning of the [`middleware`](../development/reference/settings#middleware) setting when defining production settings. For example:
+
+```crystal
+Marten.configure :production do |config|
+  config.middleware.unshift(Marten::Middleware::AssetServing)
+
+  # Other settings...
+end
+```
+
+It is important to note that the [`assets.url`](../development/reference/settings#url) setting must align with the Marten application domain or correspond to a relative URL path (e.g., /assets/) for this middleware to work correctly. This guarantees proper mapping and accessibility of the assets within the application, allowing them to be served by this middleware.

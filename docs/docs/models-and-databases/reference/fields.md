@@ -84,6 +84,10 @@ The `auto_now` argument allows ensuring that the corresponding field value is au
 
 The `auto_now_add` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
 
+### `duration`
+
+A `duration` field allows persisting duration values, which map to [`Time::Span`](https://crystal-lang.org/api/Time/Span.html) objects in Crystal. `duration` fields are persisted as big integer values (number of nanoseconds) at the database level.
+
 ### `email`
 
 An `email` field allows to persist _valid_ email addresses. In addition to the [common field options](#common-field-options), such fields support the following arguments:

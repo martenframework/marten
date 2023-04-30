@@ -27,6 +27,10 @@ A `date_time` field allows validating date time values. Fields using this type a
 
 A `date` field allows validating date values. Fields using this type are converted to `Time` objects in Crystal.
 
+### `duration`
+
+A `duration` field allows validating duration values, which map to [`Time::Span`](https://crystal-lang.org/api/Time/Span.html) objects in Crystal. `duration` fields expect serialized values to be in the `DD.HH:MM:SS.nnnnnnnnn` format (with `n` corresponding to nanoseconds) or in the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) format (eg. `P3DT2H15M20S`, which corresponds to a `3.2:15:20` time span).
+
 ### `email`
 
 An `email` field allows validating email address values. In addition to the [common field options](#common-field-options), such fields support the following arguments:

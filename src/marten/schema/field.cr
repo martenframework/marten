@@ -2,6 +2,7 @@ require "./field/base"
 require "./field/bool"
 require "./field/date"
 require "./field/date_time"
+require "./field/duration"
 require "./field/email"
 require "./field/file"
 require "./field/float"
@@ -78,6 +79,7 @@ module Marten
       register "bool", Bool
       register "date", Date
       register "date_time", DateTime
+      register "duration", Duration
       register "email", Email
       register "file", File
       register "float", Float

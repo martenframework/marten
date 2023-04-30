@@ -49,6 +49,9 @@ en:
             - "%m/%d/%Y %H:%M:%S"
             - "%m/%d/%Y %H:%M:%S.%f"
             - "%m/%d/%Y %H:%M"
+        duration:
+          errors:
+            invalid: "Enter a valid duration."
         email:
           errors:
             invalid: "Enter a valid email address."

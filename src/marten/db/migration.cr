@@ -166,6 +166,16 @@ module Marten
       def unapply
       end
 
+      protected def operations_backward
+        load_plan unless plan_loaded?
+        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
+      end
+
+      protected def operations_forward
+        load_plan unless plan_loaded?
+        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
+      end
+
       private def faked_operations_registration?
         @faked_operations_registration
       end
@@ -181,16 +191,6 @@ module Marten
         apply
 
         @plan_loaded = true
-      end
-
-      private def operations_backward
-        load_plan unless plan_loaded?
-        @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
-      end
-
-      private def operations_forward
-        load_plan unless plan_loaded?
-        {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
       end
 
       private def plan_loaded?

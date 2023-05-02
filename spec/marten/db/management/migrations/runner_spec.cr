@@ -299,4 +299,77 @@ describe Marten::DB::Management::Migrations::Runner do
       ).should be_false
     end
   end
+
+  describe "#plan" do
+    it "returns the expected migrations when no migrations are already applied" do
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+      plan = runner.plan
+
+      plan.size.should eq 3
+
+      [
+        Migration::RunnerSpec::FooApp::V202108092226113,
+        Migration::RunnerSpec::BarApp::V202108092226111,
+        Migration::RunnerSpec::BarApp::V202108092226112,
+      ].each_with_index do |migration_klass, index|
+        plan[index][0].class.should eq migration_klass
+        plan[index][1].should be_false
+      end
+    end
+
+    it "returns the expected migrations when applying specific app migrations up to a certain version" do
+      bar_app = Marten::DB::Management::Migrations::RunnerSpec::BarApp.new
+
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+      plan = runner.plan(
+        app_config: bar_app,
+        migration_name: Migration::RunnerSpec::BarApp::V202108092226111.migration_name
+      )
+
+      plan.size.should eq 2
+
+      [
+        Migration::RunnerSpec::FooApp::V202108092226113,
+        Migration::RunnerSpec::BarApp::V202108092226111,
+      ].each_with_index do |migration_klass, index|
+        plan[index][0].class.should eq migration_klass
+        plan[index][1].should be_false
+      end
+    end
+
+    it "returns the expected migrations when unapplying all the migrations of a specific app" do
+      Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default).execute
+
+      bar_app = Marten::DB::Management::Migrations::RunnerSpec::BarApp.new
+
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+      plan = runner.plan(app_config: bar_app, migration_name: "zero")
+
+      plan.size.should eq 2
+
+      [
+        Migration::RunnerSpec::BarApp::V202108092226112,
+        Migration::RunnerSpec::BarApp::V202108092226111,
+      ].each_with_index do |migration_klass, index|
+        plan[index][0].class.should eq migration_klass
+        plan[index][1].should be_true # backward
+      end
+    end
+
+    it "returns the expected migrations when unapplying the migrations of a specific app up to a specific version" do
+      Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default).execute
+
+      bar_app = Marten::DB::Management::Migrations::RunnerSpec::BarApp.new
+
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+      plan = runner.plan(
+        app_config: bar_app,
+        migration_name: Migration::RunnerSpec::BarApp::V202108092226111.migration_name
+      )
+
+      plan.size.should eq 1
+      plan[0][0].class.should eq Migration::RunnerSpec::BarApp::V202108092226112
+      plan[0][1].should be_true # backward
+    end
+  end
 end

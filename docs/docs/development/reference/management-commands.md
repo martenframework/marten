@@ -83,6 +83,7 @@ The `migrate` command allows you to apply (or unapply) migrations to your databa
 ### Options
 
 * `--fake` - Allows marking migrations as applied or unapplied without actually running them
+* `--plan` - Provides a comprehensive overview of the operations that will be performed by the applied or unapplied migrations
 * `--db=ALIAS` - Allows specifying the alias of the database on which migrations will be applied or unapplied (default to `default`)
 
 ### Arguments

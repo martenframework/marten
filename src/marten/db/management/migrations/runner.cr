@@ -10,10 +10,19 @@ module Marten
             @recorder = Recorder.new(@connection)
           end
 
+          # Executes the migrations up until the specified app config / migration name (if specified).
+          #
+          # If no app config / migration name is specified, the method executes all the non-applied migrations.
           def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false)
             execute(app_config: app_config, migration_name: migration_name, fake: fake) { }
           end
 
+          # Executes the migrations up until the specified app config / migration name (if specified).
+          #
+          # If no app config / migration name is specified, the method executes all the non-applied migrations.
+          #
+          # It should be noted that this method yields a `Marten::DB::Management::Migrations::Runner::Progress` object
+          # at each execution of a migration (before and after).
           def execute(app_config : Apps::Config? = nil, migration_name : String? = nil, fake = false, &)
             targets = find_targets(app_config, migration_name)
 
@@ -33,9 +42,18 @@ module Marten
             mark_elligible_replacements_as_applied { |progress| yield progress }
           end
 
+          # Returns `true` if the execution of the runner is needed for the specified app config and migration name.
           def execution_needed?(app_config : Apps::Config? = nil, migration_name : String? = nil) : Bool
             targets = find_targets(app_config, migration_name)
             !generate_plan(targets).empty?
+          end
+
+          # Returns the migration plan for the specified app config and migration name.
+          #
+          # This method returns an array of tuples containing (i) a migration to apply and (ii) a boolean indicating if
+          # the migration should be applied in a backward way.
+          def plan(app_config : Apps::Config? = nil, migration_name : String? = nil) : Array(Tuple(Migration, Bool))
+            generate_plan(find_targets(app_config, migration_name))
           end
 
           private def execute_backward(plan, full_plan, fake, &)

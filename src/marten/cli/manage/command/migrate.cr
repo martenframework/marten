@@ -9,6 +9,7 @@ module Marten
           @db : String?
           @fake : Bool = false
           @migration : String?
+          @plan : Bool = false
 
           def setup
             on_argument(:app_label, "The name of an application to run migrations for") { |v| @app_label = v }
@@ -22,6 +23,13 @@ module Marten
             end
 
             on_option(:fake, "Set migrations as applied or unapplied without running them") { @fake = true }
+
+            on_option(
+              :plan,
+              "Provides a comprehensive overview of the operations that will be performed by the migrations."
+            ) do
+              @plan = true
+            end
 
             on_option_with_arg(
               :db,
@@ -43,18 +51,19 @@ module Marten
 
             if !runner.execution_needed?(app_config, migration_name)
               print("No pending migrations to apply")
+            elsif plan?
+              show_planned_migrations(runner, app_config, migration_name)
             else
-              print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n")
-            end
-
-            runner.execute(app_config, migration_name, @fake) do |progress|
-              process_execution_progress(progress)
+              run_migrations(runner, app_config, migration_name)
             end
           rescue e : Apps::Errors::AppNotFound | DB::Management::Migrations::Errors::MigrationNotFound
             print_error(e.message)
           end
 
           private getter db
+
+          private getter? fake
+          private getter? plan
 
           private def process_execution_progress(progress)
             case progress.type
@@ -66,6 +75,26 @@ module Marten
               print("  › Applying #{style(progress.migration.not_nil!.id, mode: :dim)}...", ending: "")
             when Marten::DB::Management::Migrations::Runner::ProgressType::MIGRATION_APPLY_FORWARD_SUCCESS
               print(style(@fake ? " FAKED" : " DONE", fore: :light_green, mode: :bold))
+            end
+          end
+
+          private def run_migrations(runner, app_config, migration_name)
+            print(style("Running migrations:", fore: :light_blue, mode: :bold), ending: "\n")
+
+            runner.execute(app_config, migration_name, fake?) do |progress|
+              process_execution_progress(progress)
+            end
+          end
+
+          private def show_planned_migrations(runner, app_config, migration_name)
+            print(style("Planned operations:", fore: :light_blue, mode: :bold), ending: "\n")
+
+            runner.plan(app_config, migration_name).each do |migration, backward|
+              print("  › For #{style(migration.id, mode: :dim)}:")
+
+              (backward ? migration.operations_backward : migration.operations_forward).first.each do |operation|
+                print("      ○ #{backward ? "Undo " : ""}#{operation.describe}")
+              end
             end
           end
         end

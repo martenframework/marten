@@ -276,15 +276,16 @@ module Marten
 
           # Allows to apply a style to a specific text value.
           #
-          # This method can be used to apply `fore` and `mode` styles to a specific text values. This method is likely
-          # to be used in conjunction with the `#print` method when outputting messages:
+          # This method can be used to apply `fore`, `back`, and `mode` styles to a specific text values. This method is
+          # likely to be used in conjunction with the `#print` method when outputting messages:
           #
           # ```
-          # print(style("This is a text", fore: :light_blue, mode: :bold))
+          # print(style("This is a text", fore: :light_blue, back: :green, mode: :bold))
           # ```
-          def style(msg, fore = nil, mode = nil)
+          def style(msg, fore = nil, back = nil, mode = nil)
             output = msg.colorize.toggle(color)
             output.fore(fore) unless fore.nil?
+            output.back(back) unless back.nil?
             output.mode(Colorize::Mode.parse(mode.to_s)) unless mode.nil?
             output.to_s
           end

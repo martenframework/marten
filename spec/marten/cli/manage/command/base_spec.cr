@@ -176,16 +176,16 @@ describe Marten::CLI::Manage::Command::Base do
   end
 
   describe "#style" do
-    it "allows to set fore and mode styles" do
+    it "allows to set fore, back, and mode styles" do
       stdout = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(options: [] of String, stdout: stdout)
       command.setup
 
-      command.print(command.style("Hello World!", fore: :light_blue, mode: :bold))
+      command.print(command.style("Hello World!", fore: :light_blue, back: :dark_gray, mode: :bold))
 
       stdout.rewind
-      stdout.gets_to_end.should eq "\e[94;1mHello World!\e[0m\n"
+      stdout.gets_to_end.should eq "\e[94;100;1mHello World!\e[0m\n"
     end
 
     it "does nothing if the no-color flag is set" do

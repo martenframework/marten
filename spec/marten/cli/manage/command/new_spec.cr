@@ -9,19 +9,54 @@ describe Marten::CLI::Manage::Command::New do
       FileUtils.rm_rf(Marten::CLI::Manage::Command::NewSpec::PATH)
     end
 
-    it "prints an error if no project type is specified" do
+    it "uses the iterative mode when no structure type is specified" do
+      stdin = IO::Memory.new("project\ndummy_project\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::New.new(
         options: [] of String,
+        stdin: stdin,
         stdout: stdout,
         stderr: stderr
       )
 
       command.handle
 
-      stderr.rewind.gets_to_end.includes?("You must specify a valid structure type ('project or 'app')").should be_true
+      output = stdout.rewind.gets_to_end
+
+      output.includes?("Structure type ('project or 'app'):").should be_true
+      output.includes?("Project name:").should be_true
+      output.includes?("Include authentication [yes/no]?").should be_true
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
+    it "properly takes into account the with auth question answer" do
+      stdin = IO::Memory.new("project\ndummy_project\nno")
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: [] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+
+      output.includes?("Structure type ('project or 'app'):").should be_true
+      output.includes?("Project name:").should be_true
+      output.includes?("Include authentication [yes/no]?").should be_true
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
     end
 
     it "prints an error if an invalid project type is specified" do
@@ -39,34 +74,54 @@ describe Marten::CLI::Manage::Command::New do
       stderr.rewind.gets_to_end.includes?("Unrecognized structure type, you must use 'project or 'app'").should be_true
     end
 
-    it "prints an error when trying to create a project without specifying a name" do
+    it "uses the interactive mode to create a project when no name is specified" do
+      stdin = IO::Memory.new("dummy_project\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::New.new(
         options: ["project"],
+        stdin: stdin,
         stdout: stdout,
         stderr: stderr
       )
 
       command.handle
 
-      stderr.rewind.gets_to_end.includes?("You must specify a project or application name").should be_true
+      output = stdout.rewind.gets_to_end
+
+      output.includes?("Structure type ('project or 'app'):").should be_false
+      output.includes?("Project name:").should be_true
+      output.includes?("Include authentication [yes/no]?").should be_true
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
     end
 
-    it "prints an error when trying to create an app without specifying a name" do
+    it "uses the interactive mode to create an app when no name is specified" do
+      stdin = IO::Memory.new("dummy_app")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::New.new(
-        options: ["project"],
+        options: ["app"],
+        stdin: stdin,
         stdout: stdout,
         stderr: stderr
       )
 
       command.handle
 
-      stderr.rewind.gets_to_end.includes?("You must specify a project or application name").should be_true
+      output = stdout.rewind.gets_to_end
+
+      output.includes?("Structure type ('project or 'app'):").should be_false
+      output.includes?("App name:").should be_true
+      output.includes?("Include authentication [yes/no]?").should be_false
+
+      Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_app", path)).should be_true, "File #{path} does not exist"
+      end
     end
 
     it "prints an error when trying to use --with-auth for an app structure" do
@@ -186,6 +241,58 @@ describe Marten::CLI::Manage::Command::New do
 
       Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
         File.exists?(File.join(".", "sub", "custom", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
+    it "prompts the user for the structure type again if the provided value is invalid" do
+      stdin = IO::Memory.new("bad\nproject\ndummy_project\nyes")
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: [] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+
+      output.includes?("Structure type ('project or 'app'):").should be_true
+      output.includes?("Project name:").should be_true
+      output.includes?("Include authentication [yes/no]?").should be_true
+      output.includes?("Unrecognized structure type, you must use 'project or 'app'.").should be_true
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
+    it "prompts the user for the project name again if the provided value is invalid" do
+      stdin = IO::Memory.new("project\ndummy project\ndummy_project\nyes")
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: [] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+
+      output.includes?("Structure type ('project or 'app'):").should be_true
+      output.includes?("Project name:").should be_true
+      output.includes?("Include authentication [yes/no]?").should be_true
+      output.includes?("Project name can only contain letters, numbers, underscores, and dashes.").should be_true
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
       end
     end
   end

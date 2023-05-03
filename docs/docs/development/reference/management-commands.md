@@ -119,6 +119,10 @@ The command allows you to fully define the name of your project or application, 
 * `type` - The type of structure to create (must be either `project` or `app`)
 * `name` - The name of the project or app to create
 
+:::tip
+The `type` and `name` arguments are optional: if they are not provided, an interactive mode will be used and the command will prompt the user for inputting the structure type, the app or project name, and whether the auth app should be generated.
+:::
+
 ### Examples
 
 ```bash

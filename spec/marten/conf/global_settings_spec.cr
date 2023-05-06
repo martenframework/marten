@@ -417,6 +417,13 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#ssl_redirect" do
+    it "returns the SSL redirect configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.ssl_redirect.should be_a Marten::Conf::GlobalSettings::SSLRedirect
+    end
+  end
+
   describe "#strict_transport_security" do
     it "returns the strict transport security configuration" do
       global_settings = Marten::Conf::GlobalSettings.new

@@ -61,6 +61,14 @@ When this middleware is used, each request will have a session store initialized
 
 The session store is initialized from a session key that is stored as a regular cookie. If the session store ends up being empty after a request's handling, the associated cookie is deleted. Otherwise, the cookie is refreshed if the session store is modified as part of the considered request. Each session cookie is set to expire according to a configured cookie max age (the default cookie max age is 2 weeks).
 
+## SSL redirect middleware
+
+**Class:** [`Marten::Middleware::SSLRedirect`](pathname:///api/dev/Marten/Middleware/SSLRedirect.html)
+
+Redirects all non-HTTPS requests to HTTPS.
+
+This middleware will permanently redirect all non-HTTP requests to HTTPS. By default the middleware will redirect to the incoming request's host, but a different host to redirect to can be configured with the [`ssl_redirect.host`](../../development/reference/settings#host-2) setting. Additionally, specific request paths can also be exempted from this SSL redirect if the corresponding strings or regexes are specified in the [`ssl_redirect.exempted_paths`](../../development/reference/settings#exempted_paths) setting.
+
 ## Strict-Transport-Security middleware
 
 **Class:** [`Marten::Middleware::StrictTransportSecurity`](pathname:///api/dev/Marten/Middleware/StrictTransportSecurity.html)

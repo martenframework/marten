@@ -576,6 +576,27 @@ A string containing the identifier of the store used to handle sessions.
 
 By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions) for more details about this capability.
 
+## SSL redirect settings
+
+SSL redirect settings allow to configure how Marten should redirect non-HTTPS requests to HTTPS when the [`Marten::Middleware::SSLRedirect`](../../handlers-and-http/reference/middlewares#ssl-redirect-middleware) middleware is used:
+
+```crystal
+config.ssl_redirect.host = "example-redirect.com"
+config.exempted_paths = [/^\/no-ssl\/$/]
+```
+
+### `exempted_paths`
+
+Default: `[] of Regex | String`
+
+Allows to set the array of paths that should be exempted from HTTPS redirects. Both strings and regexes are accepted.
+
+### `host`
+
+Default: `nil`
+
+Allows to set the host that should be used when redirecting non-HTTPS requests. If set to `nil`, the HTTPS redirect will be performed using the request's host.
+
 ## Strict transport security policy settings
 
 Strict transport security policy settings allow to configure how Marten should set the HTTP Strict-Transport-Security response header when the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares#strict-transport-security-middleware) middleware is used:

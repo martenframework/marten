@@ -266,6 +266,11 @@ module Marten
         @sessions ||= GlobalSettings::Sessions.new
       end
 
+      # Provides access to SSL redirect settings.
+      def ssl_redirect
+        @ssl_redirect ||= GlobalSettings::SSLRedirect.new
+      end
+
       # Provides access to strict transport security settings.
       def strict_transport_security
         @strict_transport_security ||= GlobalSettings::StrictTransportSecurity.new

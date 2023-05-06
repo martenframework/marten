@@ -929,6 +929,19 @@ describe Marten::HTTP::Request do
       request.scheme.should eq "https"
     end
 
+    it "returns http if the use_x_forwarded_proto setting is set to true and the header is not present" do
+      Marten.settings.use_x_forwarded_proto = true
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.scheme.should eq "http"
+    end
+
     it "returns http if the use_x_forwarded_proto setting is set to true and the header doesn't have the right value" do
       Marten.settings.use_x_forwarded_proto = true
 

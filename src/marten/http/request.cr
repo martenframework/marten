@@ -144,7 +144,7 @@ module Marten
       # Returns the scheme of the request (either `"http"` or `"https"`).
       def scheme : String
         @scheme ||= begin
-          if Marten.settings.use_x_forwarded_proto && headers[:X_FORWARDED_PROTO] == "https"
+          if Marten.settings.use_x_forwarded_proto && headers[:X_FORWARDED_PROTO]? == "https"
             SCHEME_HTTPS
           else
             SCHEME_HTTP

@@ -49,7 +49,7 @@ module Marten
 
       # Returns `true` if the request is a DELETE.
       def delete?
-        method == "DELETE"
+        method == METHOD_DELETE
       end
 
       # Returns the flash store for the considered request.
@@ -79,12 +79,12 @@ module Marten
 
       # Returns `true` if the request is a GET.
       def get?
-        method == "GET"
+        method == METHOD_GET
       end
 
       # Returns `true` if the request is a HEAD.
       def head?
-        method == "HEAD"
+        method == METHOD_HEAD
       end
 
       # Returns the HTTP headers embedded in the request.
@@ -106,12 +106,12 @@ module Marten
 
       # Returns `true` if the request is an OPTIONS.
       def options?
-        method == "OPTIONS"
+        method == METHOD_OPTIONS
       end
 
       # Returns `true` if the request is a PATCH.
       def patch?
-        method == "PATCH"
+        method == METHOD_PATCH
       end
 
       # Returns the request path as a string.
@@ -128,12 +128,12 @@ module Marten
 
       # Returns `true` if the request is a POST.
       def post?
-        method == "POST"
+        method == METHOD_POST
       end
 
       # Returns `true` if the request is a PUT.
       def put?
-        method == "PUT"
+        method == METHOD_PUT
       end
 
       # Returns the HTTP GET parameters embedded in the request.
@@ -145,16 +145,16 @@ module Marten
       def scheme : String
         @scheme ||= begin
           if Marten.settings.use_x_forwarded_proto && headers[:X_FORWARDED_PROTO] == "https"
-            "https"
+            SCHEME_HTTPS
           else
-            "http"
+            SCHEME_HTTP
           end
         end
       end
 
       # Returns `true` if the request is secure (if it is an HTTPS request).
       def secure?
-        scheme == "https"
+        scheme == SCHEME_HTTPS
       end
 
       # Returns the session store for the considered request.
@@ -179,7 +179,7 @@ module Marten
 
       # Returns `true` if the request is a TRACE.
       def trace?
-        method == "TRACE"
+        method == METHOD_TRACE
       end
 
       protected getter? disable_request_forgery_protection
@@ -191,6 +191,16 @@ module Marten
       private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"
       private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
       private HOST_VALIDATION_RE            = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
+      private METHOD_DELETE                 = "DELETE"
+      private METHOD_GET                    = "GET"
+      private METHOD_HEAD                   = "HEAD"
+      private METHOD_OPTIONS                = "OPTIONS"
+      private METHOD_PATCH                  = "PATCH"
+      private METHOD_POST                   = "POST"
+      private METHOD_PUT                    = "PUT"
+      private METHOD_TRACE                  = "TRACE"
+      private SCHEME_HTTP                   = "http"
+      private SCHEME_HTTPS                  = "https"
 
       private def allowed_host?(domain)
         allowed_hosts.find do |host_pattern|

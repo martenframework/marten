@@ -1,6 +1,22 @@
 require "./spec_helper"
 
 describe Marten::CLI::Manage::Command::Base do
+  describe "::command_aliases" do
+    it "returns an empty array by default" do
+      Marten::CLI::Manage::Command::BaseSpec::EmptyCommand.command_aliases.should be_empty
+    end
+
+    it "returns the configured command aliases if applicable" do
+      Marten::CLI::Manage::Command::BaseSpec::TestCommand.command_aliases.should eq ["t", "tt"]
+    end
+  end
+
+  describe "::command_aliases(*aliases)" do
+    it "allows to configure command aliases" do
+      Marten::CLI::Manage::Command::BaseSpec::TestCommand.command_aliases.should eq ["t", "tt"]
+    end
+  end
+
   describe "::command_name" do
     it "returns an automatically-generated command name if no one is defined" do
       Marten::CLI::Manage::Command::BaseSpec::EmptyCommand.command_name.should eq "empty_command"
@@ -208,6 +224,7 @@ module Marten::CLI::Manage::Command::BaseSpec
 
   class TestCommand < Marten::CLI::Manage::Command::Base
     command_name "test"
+    command_aliases "t", :tt
     help "Do something"
 
     @arg : String? = nil

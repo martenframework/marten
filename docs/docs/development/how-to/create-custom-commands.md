@@ -189,3 +189,17 @@ class MyCommand < Marten::CLI::Command
   end
 end
 ```
+
+It is also worth mentioning that command aliases can be configured easily by using the [`#command_aliases`](pathname:///api/dev/Marten/CLI/Manage/Command/Base.html#command_aliases(*aliases%3AString|Symbol)-class-method) helper method. For example:
+
+```crystal
+class MyCommand < Marten::CLI::Command
+  command_name :test
+  command_aliases :t
+  help "Command that does something"
+
+  def run
+    # Do something
+  end
+end
+```

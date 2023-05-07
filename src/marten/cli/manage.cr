@@ -15,6 +15,11 @@ module Marten
         @@command_registry << command_klass
       end
 
+      # :nodoc:
+      def self.registry : Array(Command::Base.class)
+        @@command_registry
+      end
+
       def initialize(
         @options : Array(String),
         @stdout : IO = STDOUT,
@@ -22,7 +27,14 @@ module Marten
         @name : String = Marten::CLI::DEFAULT_COMMAND_NAME
       )
         @commands_per_name = Hash(String, Command::Base.class).new
-        @@command_registry.each { |k| @commands_per_name[k.command_name] = k }
+
+        @@command_registry.each do |command_klass|
+          @commands_per_name[command_klass.command_name] = command_klass
+
+          command_klass.command_aliases.each do |command_alias|
+            @commands_per_name[command_alias] = command_klass
+          end
+        end
       end
 
       def run
@@ -92,7 +104,7 @@ module Marten
 
         per_app_commands.each do |app_label, commands|
           usage << "[#{app_label}]\n\n".colorize(:green).to_s
-          commands.each do |command|
+          commands.uniq.each do |command|
             usage << "  › #{command.command_name}".colorize(:light_blue).to_s
             usage << description_padding.call(command.command_name)
             usage << command.help

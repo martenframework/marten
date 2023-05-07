@@ -6,6 +6,7 @@ module Marten
           @host : String?
           @port : Int32?
 
+          command_aliases :s
           help "Start a development server that is automatically recompiled when source files change."
 
           def setup

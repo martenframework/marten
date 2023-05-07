@@ -48,8 +48,6 @@ module Marten
           s << " --error-trace" if options.includes?("--error-trace")
         end
 
-        # stdout.print("⧖ Compiling...")
-
         tmp_stdout = IO::Memory.new
         tmp_stderr = IO::Memory.new
 
@@ -65,10 +63,11 @@ module Marten
       end
 
       private def handle_inside_of_project_invocation
-        case options.first?
-        when "new"
+        command = options.first?.to_s
+
+        if command_invoked?(command, Manage::Command::New)
           Manage::Command::New.new(options: options[1..], stdout: stdout, stderr: stderr).handle
-        when "serve"
+        elsif command_invoked?(command, Manage::Command::Serve)
           Manage::Command::Serve.new(options: options[1..], stdout: stdout, stderr: stderr).handle
         else
           build_and_run_manage_command
@@ -99,6 +98,10 @@ module Marten
 
       private def manage_filepath
         ENV.fetch("MARTEN_MANAGE_FILE", "./manage.cr")
+      end
+
+      private def command_invoked?(name : String, command_klass : Manage::Command::Base.class) : Bool
+        name == command_klass.command_name || command_klass.command_aliases.includes?(name)
       end
 
       private def show_new_command_usage

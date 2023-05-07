@@ -18,8 +18,12 @@ module Marten
           record ArgumentHandler, name : String, block : String ->
 
           @@app_config : Marten::Apps::Config?
+          @@command_aliases = [] of String
           @@command_name : String = ""
           @@help : String = ""
+
+          # Returns the aliases of the command.
+          class_getter command_aliases
 
           # Returns the help description of the command.
           class_getter help
@@ -32,6 +36,11 @@ module Marten
 
           # Returns the `IO` object that should be used by the command as the main output file descriptor.
           getter stdout
+
+          # Allows to configure aliases for the command.
+          def self.command_aliases(*aliases : String | Symbol)
+            @@command_aliases += aliases.map(&.to_s).to_a
+          end
 
           # Returns the name of the considered command.
           def self.command_name

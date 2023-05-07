@@ -14,10 +14,14 @@
 *.dwarf
 .icr_*
 *.db
+.*.swp
 /shard.lock
+
 .spec.env.json
 /spec/assets/
 /spec/media/
+/spec/marten/cli/admin_spec/new_project
+/spec/marten/cli/admin_spec/existing_project/*
+!/spec/marten/cli/admin_spec/existing_project/manage.cr
 /spec/marten/cli/manage/command/new_spec
 
-.*.swp

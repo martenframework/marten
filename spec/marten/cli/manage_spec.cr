@@ -5,14 +5,23 @@ describe Marten::CLI::Manage do
     it "displays all the commands and their descriptions when the top-level usage is outputted" do
       output = Marten::CLI::ManageSpec.run_command
 
-      [
-        Marten::CLI::Manage::Command::CollectAssets,
-        Marten::CLI::Manage::Command::GenMigrations,
-        Marten::CLI::Manage::Command::Migrate,
-      ].each do |c|
+      Marten::CLI::Manage.registry.each do |c|
         output.includes?(c.command_name).should be_true
         output.includes?(c.help).should be_true
       end
+    end
+
+    it "does not display the same commands mulitple times when the top-level usage is outputted due to aliases" do
+      output = Marten::CLI::ManageSpec.run_command
+
+      output.scan(Marten::CLI::Manage::Command::Serve.help).size.should eq 1
+    end
+
+    it "supports invoking commands through their associated aliases" do
+      output = Marten::CLI::ManageSpec.run_command(["s", "--help"])
+
+      output.includes?("Usage: marten serve [options]").should be_true
+      output.includes?(Marten::CLI::Manage::Command::Serve.help).should be_true
     end
   end
 end

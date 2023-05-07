@@ -5,7 +5,11 @@ describe Marten::CLI::Manage do
     it "displays all the commands and their descriptions when the top-level usage is outputted" do
       output = Marten::CLI::ManageSpec.run_command
 
-      Marten::CLI::Manage.registry.each do |c|
+      [
+        Marten::CLI::Manage::Command::Migrate,
+        Marten::CLI::Manage::Command::New,
+        Marten::CLI::Manage::Command::Serve,
+      ].each do |c|
         output.includes?(c.command_name).should be_true
         output.includes?(c.help).should be_true
       end

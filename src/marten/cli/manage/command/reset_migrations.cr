@@ -4,7 +4,7 @@ module Marten
       module Command
         class ResetMigrations < Base
           command_name :resetmigrations
-          help "Resets an existing set of migrations into a single one."
+          help "Reset an existing set of migrations into a single one."
 
           @app_label : String?
 

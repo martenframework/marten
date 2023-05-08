@@ -396,6 +396,26 @@ Default: `nil`
 
 The name of the database to connect to. If you use the `sqlite` backend, this can be a string or a `Path` object containing the path (absolute or relative) to the considered database path.
 
+### `options`
+
+Default: `{} of String => String`
+
+A set of additional database options. This setting can be used to set additional database options that may be required in order to connect to the database at hand.
+
+For example:
+
+```crystal
+config.database do |db|
+  db.backend = :postgresql
+  db.host = "localhost"
+  db.name = "my_db"
+  db.user = "my_user"
+  db.password = "my_passport"
+  // highlight-next-line
+  db.options = {"sslmode" => "disable"}
+end
+```
+
 ### `password`
 
 Default: `nil`

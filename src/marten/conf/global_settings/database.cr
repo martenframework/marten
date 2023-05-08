@@ -11,6 +11,7 @@ module Marten
         @max_pool_size : Int32 = 0 # unlimited
         @name : String?
         @name_set_with_env : String?
+        @options = {} of String => String
         @password : String?
         @port : Int32?
         @retry_attempts : Int32 = 1
@@ -46,6 +47,9 @@ module Marten
         # Returns the database name.
         getter name
 
+        # Returns the database options.
+        getter options
+
         # Returns the database password.
         getter password
 
@@ -75,6 +79,9 @@ module Marten
 
         # Allows to set the maximum number of connections that will be held by the database connections pool.
         setter max_pool_size
+
+        # Allows to set additional database options.
+        setter options
 
         # Allows to set the maximum number of attempts to retry re-establishing a lost connection.
         setter retry_attempts

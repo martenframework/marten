@@ -148,6 +148,8 @@ module Marten
             params.add("max_pool_size", @config.max_pool_size.to_s)
             params.add("retry_attempts", @config.retry_attempts.to_s)
             params.add("retry_delay", @config.retry_delay.to_s)
+
+            @config.options.each { |k, v| params.add(k, v) }
           end
         end
 

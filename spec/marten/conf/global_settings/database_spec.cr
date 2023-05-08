@@ -203,6 +203,30 @@ describe Marten::Conf::GlobalSettings::Database do
     end
   end
 
+  describe "#options" do
+    it "returns an empty hash by default" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+
+      db_config.options.should be_empty
+    end
+
+    it "returns the configured DB options" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.options = {"sslmode" => "disable"}
+
+      db_config.options.should eq({"sslmode" => "disable"})
+    end
+  end
+
+  describe "#options=" do
+    it "allows to configure DB options" do
+      db_config = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config.options = {"sslmode" => "disable"}
+
+      db_config.options.should eq({"sslmode" => "disable"})
+    end
+  end
+
   describe "#password=" do
     it "allows to set the DB password from a symbol" do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")

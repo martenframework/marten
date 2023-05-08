@@ -28,6 +28,35 @@ describe Marten::DB::Connection::Base do
         end
       end
     end
+
+    it "takes into account DB options" do
+      config = Marten.settings.databases.first.dup
+      config.options = {"foo" => "bar"}
+
+      conn = Marten::DB::Connection::SQLite.new(config)
+
+      expected_db_uri = URI.new(
+        scheme: conn.scheme,
+        user: config.user,
+        password: config.password,
+        host: config.host,
+        port: config.port,
+        path: (config.name || "").gsub(":memory:", ""),
+        query: URI::Params.build do |params|
+          params.add("checkout_timeout", config.checkout_timeout.to_s)
+          params.add("initial_pool_size", config.initial_pool_size.to_s)
+          params.add("max_idle_pool_size", config.max_idle_pool_size.to_s)
+          params.add("max_pool_size", config.max_pool_size.to_s)
+          params.add("retry_attempts", config.retry_attempts.to_s)
+          params.add("retry_delay", config.retry_delay.to_s)
+          params.add("foo", "bar")
+        end
+      ).to_s
+
+      conn.open do |db_conn|
+        db_conn.context.uri.to_s.should eq expected_db_uri
+      end
+    end
   end
 
   describe "#alias" do

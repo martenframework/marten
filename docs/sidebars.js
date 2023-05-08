@@ -258,6 +258,7 @@ module.exports = {
           items: [
             'deployment/how-to/deploy-to-an-ubuntu-server',
             'deployment/how-to/deploy-to-heroku',
+            'deployment/how-to/deploy-to-fly-io',
           ],
         },
       ],

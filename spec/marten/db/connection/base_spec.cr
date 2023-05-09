@@ -33,7 +33,7 @@ describe Marten::DB::Connection::Base do
       config = Marten.settings.databases.first.dup
       config.options = {"foo" => "bar"}
 
-      conn = Marten::DB::Connection::SQLite.new(config)
+      conn = Marten::DB::Connection::IMPLEMENTATIONS[config.backend.to_s].new(config)
 
       expected_db_uri = URI.new(
         scheme: conn.scheme,

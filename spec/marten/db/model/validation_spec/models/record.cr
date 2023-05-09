@@ -1,6 +1,6 @@
 module Marten::DB::Model::ValidationSpec
   class Record < Marten::Model
-    property before_validation_errors_presence = false
+    property? before_validation_errors_presence = false
 
     field :id, :big_int, primary_key: true, auto: true
     field :name, :string, blank: false, null: false, max_size: 64, unique: true

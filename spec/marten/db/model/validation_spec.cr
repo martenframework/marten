@@ -30,7 +30,7 @@ describe Marten::DB::Model::Validation do
       object.errors[0].field.should eq "name"
       object.errors[0].type.should eq "null"
 
-      object.before_validation_errors_presence.should eq false
+      object.before_validation_errors_presence?.should eq false
     end
   end
 end

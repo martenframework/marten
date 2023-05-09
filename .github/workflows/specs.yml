@@ -44,7 +44,7 @@ jobs:
       env:
         PGPASSWORD: mysql
     - name: Install shards
-      run: shards install --ignore-crystal-version --skip-postinstall
+      run: shards install --ignore-crystal-version
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
@@ -88,7 +88,7 @@ jobs:
       env:
         PGPASSWORD: postgres
     - name: Install shards
-      run: shards install --ignore-crystal-version --skip-postinstall
+      run: shards install --ignore-crystal-version
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
@@ -116,7 +116,7 @@ jobs:
         apt-get update
         apt-get -yqq install libsqlite3-dev
     - name: Install shards
-      run: shards install --ignore-crystal-version --skip-postinstall
+      run: shards install --ignore-crystal-version
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests

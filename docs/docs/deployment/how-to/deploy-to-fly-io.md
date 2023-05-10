@@ -120,6 +120,10 @@ Marten.configure :production do |config|
       db.user = database_uri.user
       db.password = database_uri.password
       db.name = database_uri.path[1..]
+
+      # Fly.io's Postgres works over an internal & encrypted network which does not support SSL.
+      # Hence, SSL must be disabled.
+      db.options = {"sslmode" => "disable"}
     end
   end
 

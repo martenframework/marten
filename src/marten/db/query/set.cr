@@ -92,6 +92,11 @@ module Marten
           clone
         end
 
+        # Returns `true` if the query set matches at least one record, or `false` otherwise. Alias for `#exists?`.
+        def any?
+          exists?
+        end
+
         # Returns the number of records that are targeted by the current query set.
         def count
           @result_cache.nil? ? @query.count : @result_cache.not_nil!.size

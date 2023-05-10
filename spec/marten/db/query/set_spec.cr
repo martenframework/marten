@@ -354,6 +354,55 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#any?" do
+    it "returns true if the queryset matches existing records and if it wasn't already fetched" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      qset_1 = Marten::DB::Query::Set(Tag).new.all
+      qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
+
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+    end
+
+    it "returns true if the queryset matches existing records and if it was already fetched" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      qset_1 = Marten::DB::Query::Set(Tag).new.all
+      qset_1.each { }
+
+      qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
+      qset_2.each { }
+
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+    end
+
+    it "returns false if the queryset doesn't match existing records and if it wasn't already fetched" do
+      qset_1 = Marten::DB::Query::Set(Tag).new.all
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+    end
+
+    it "returns false if the queryset doesn't match existing records and if it was already fetched" do
+      qset_1 = Marten::DB::Query::Set(Tag).new.all
+      qset_1.each { }
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
+      qset_2.each { }
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+    end
+  end
+
   describe "#count" do
     it "returns the expected number of record for an unfiltered query set" do
       Tag.create!(name: "ruby", is_active: true)

@@ -30,6 +30,19 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::any?" do
+    it "returns true if the default queryset matches at least one record" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      Tag.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+    end
+
+    it "returns false if the queryset doesn't match at least one record" do
+      Tag.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+    end
+  end
+
   describe "::default_queryset" do
     it "returns a queryset containing all the objects by default" do
       TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")

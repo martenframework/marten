@@ -29,6 +29,11 @@ module Marten
             default_queryset
           end
 
+          # Returns `true` if the model query set matches at least one record or `false` otherwise. Alias of `#exists?`.
+          def any?
+            exists?
+          end
+
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
             {% begin %}

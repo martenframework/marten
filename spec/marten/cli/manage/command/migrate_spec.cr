@@ -164,7 +164,10 @@ describe Marten::CLI::Manage::Command::Migrate do
       output.includes?(Marten::CLI::Manage::Command::MigrateSpec::BarApp::V202108092226111.id).should be_true
       output.includes?(Marten::CLI::Manage::Command::MigrateSpec::BarApp::V202108092226112.id).should be_true
 
-      Marten::DB::Management::Migrations::Record.all.size.should eq 0
+      Marten::DB::Management::Migrations::Record
+        .filter(app__startswith: "cli_manage_command_migrate_spec_")
+        .size
+        .should eq 0
     end
 
     it "is able to apply specific app migrations up to a certain version" do
@@ -187,7 +190,10 @@ describe Marten::CLI::Manage::Command::Migrate do
       output.includes?(Marten::CLI::Manage::Command::MigrateSpec::FooApp::V202108092226113.id).should be_true
       output.includes?(Marten::CLI::Manage::Command::MigrateSpec::BarApp::V202108092226111.id).should be_true
 
-      Marten::DB::Management::Migrations::Record.all.size.should eq 0
+      Marten::DB::Management::Migrations::Record
+        .filter(app__startswith: "cli_manage_command_migrate_spec_")
+        .size
+        .should eq 0
     end
   end
 end

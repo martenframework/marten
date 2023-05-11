@@ -171,6 +171,14 @@ marten serve         # Starts a development server using the configured host and
 marten serve -p 3000 # Starts a development server by overriding the port
 ```
 
+:::tip
+You can also use the alias `s` to start the development server:
+
+```bash
+marten s
+```
+:::
+
 ## `version`
 
 **Usage:** `marten version [options]`

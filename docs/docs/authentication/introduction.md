@@ -79,7 +79,7 @@ end
 
 ### Creating users
 
-Creating a user is as simple as initializing an instance of the `Auth::User` model and defining its properties. That being said it is important to note that the user's password (`password` field) must be set using the `#set_password` method: this will ensure that the _raw_ password you provide to this method is properly encrypted and that the resulting hash is assigned to the `password` field. Because of this, you should not attempt to manipulate the `password` field attribute of user recorrds directly.
+Creating a user is as simple as initializing an instance of the `Auth::User` model and defining its properties. That being said it is important to note that the user's password (`password` field) must be set using the `#set_password` method: this will ensure that the _raw_ password you provide to this method is properly encrypted and that the resulting hash is assigned to the `password` field. Because of this, you should not attempt to manipulate the `password` field attribute of user records directly.
 
 For example:
 

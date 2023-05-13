@@ -99,7 +99,6 @@ module Marten
 
       protected getter reversers
 
-      private RULE_NAME_RE               = /^[\.a-zA-Z_0-9]+$/
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
 
       private def path_with_duplicated_parameters?(path_for_interpolation)

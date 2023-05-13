@@ -24,9 +24,13 @@ module Marten
       # or another `Marten::Routing::Map` instance (in case of nested routes maps). Each <path, target> pair must be
       # given a name that will be used to uniquely identify the route.
       def path(path : String, target : Marten::Handlers::Base.class | Map, name : String | Symbol) : Nil
-        unless RULE_NAME_RE.match(name)
+        if name.empty?
+          raise Errors::InvalidRuleName.new("Route names cannot be empty")
+        end
+
+        if name.includes?(':')
           raise Errors::InvalidRuleName.new(
-            "A rule name can only contain letters, numbers, dashes or underscores"
+            "Cannot use '#{name}' as a valid route name: route names cannot contain ':'"
           )
         end
 
@@ -95,7 +99,7 @@ module Marten
 
       protected getter reversers
 
-      private RULE_NAME_RE               = /^[a-zA-Z_0-9]+$/
+      private RULE_NAME_RE               = /^[\.a-zA-Z_0-9]+$/
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
 
       private def path_with_duplicated_parameters?(path_for_interpolation)

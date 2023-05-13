@@ -2,17 +2,23 @@ require "./spec_helper"
 
 describe Marten::Routing::Match do
   describe "#path" do
-    it "raises if the inserted rule doesn't have a valid name" do
+    it "raises if the inserted rule is an empty string" do
       map = Marten::Routing::Map.new
-      expect_raises(Marten::Routing::Errors::InvalidRuleName) do
-        map.path("/", Marten::Handlers::Base, name: ":$in~")
+      expect_raises(
+        Marten::Routing::Errors::InvalidRuleName,
+        "Route names cannot be empty"
+      ) do
+        map.path("/", Marten::Handlers::Base, name: "")
       end
     end
 
-    it "raises if the inserted rule is an empty string" do
+    it "raises if the inserted rule contains ':'" do
       map = Marten::Routing::Map.new
-      expect_raises(Marten::Routing::Errors::InvalidRuleName) do
-        map.path("/", Marten::Handlers::Base, name: "")
+      expect_raises(
+        Marten::Routing::Errors::InvalidRuleName,
+        "Cannot use 'foo:bar' as a valid route name: route names cannot contain ':'"
+      ) do
+        map.path("/", Marten::Handlers::Base, name: "foo:bar")
       end
     end
 

@@ -366,7 +366,7 @@ module Marten
             if values.has_key?({{ field_var.name.stringify }})
               value = values[{{ field_var.name.stringify }}]
               if !value.is_a?(
-                {{ field_var.type }}{% if ann[:additional_type] %} | {{ ann[:additional_type] }}{% end %}
+                {{ field_var.type }}{% if ann[:field_type] %} | {{ ann[:field_type] }}{% end %}
               )
                 raise Errors::UnexpectedFieldValue.new(
                   "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"

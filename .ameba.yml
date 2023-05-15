@@ -15,3 +15,9 @@ Performance/AnyInsteadOfEmpty:
 Layout/LineLength:
   Enabled: true
   MaxLength: 120
+
+Style/ParenthesesAroundCondition:
+  Enabled: false
+
+Style/QueryBoolMethods:
+  Enabled: false

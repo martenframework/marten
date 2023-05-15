@@ -18,7 +18,7 @@ dependencies:
 development_dependencies:
   ameba:
     github: crystal-ameba/ameba
-    version: ~> 1.3.0
+    branch: master
   mysql:
     github: crystal-lang/crystal-mysql
   pg:

@@ -251,7 +251,9 @@ module Marten
 
         return {host: host, port: port} if domain && allowed_host?(domain)
 
-        raise Errors::UnexpectedHost.new("Unexpected Host header: #{host}.")
+        raise Errors::UnexpectedHost.new(
+          "Unexpected Host header: #{host}. You may need to add #{host} to the allowed_hosts setting."
+        )
       end
 
       private def extract_domain_and_port(host)

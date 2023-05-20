@@ -51,6 +51,7 @@ module Marten
             "Marten::DB::Management::Column::DateTime" => "timestamp with time zone",
             "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",
+            "Marten::DB::Management::Column::JSON"     => "jsonb",
             "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
             "Marten::DB::Management::Column::Text"     => "text",
             "Marten::DB::Management::Column::UUID"     => "uuid",

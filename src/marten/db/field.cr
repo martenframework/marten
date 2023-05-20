@@ -8,6 +8,7 @@ require "./field/email"
 require "./field/file"
 require "./field/float"
 require "./field/int"
+require "./field/json"
 require "./field/string"
 require "./field/text"
 require "./field/uuid"
@@ -103,6 +104,7 @@ module Marten
       register "file", File
       register "float", Float
       register "int", Int
+      register "json", JSON
       register "many_to_many", ManyToMany
       register "many_to_one", ManyToOne
       register "one_to_one", OneToOne

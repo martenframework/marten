@@ -96,6 +96,7 @@ module Marten
             "Marten::DB::Management::Column::DateTime" => "datetime",
             "Marten::DB::Management::Column::Float"    => "real",
             "Marten::DB::Management::Column::Int"      => "integer",
+            "Marten::DB::Management::Column::JSON"     => "text",
             "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
             "Marten::DB::Management::Column::Text"     => "text",
             "Marten::DB::Management::Column::UUID"     => "char(32)",

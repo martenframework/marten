@@ -162,6 +162,51 @@ class MyModel < Marten::Model
 end
 ```
 
+### `json`
+
+A `json` field allows persisting JSON values to the database.
+
+JSON values are automatically parsed from the underlying database column and exposed as a [`JSON::Any`](https://crystal-lang.org/api/JSON/Any.html) object (or `nil` if no values are available) by default in Crystal:
+
+```crystal
+class MyModel < Marten::Model
+  # Other fields...
+  field :metadata, :json
+end
+
+MyModel.last!.metadata # => JSON::Any object
+```
+
+Additionally, it is also possible to specify a [`serializable`](#serializable) option in order to specify a class that makes use of [`JSON::Serializable`](https://crystal-lang.org/api/JSON/Serializable.html). When doing so, the parsing of the JSON values will result in the initialization of the corresponding serializable objects:
+
+```crystal
+class MySerializable
+  include JSON::Serializable
+
+  property a : Int32 | Nil
+  property b : String | Nil
+end
+
+class MyModel < Marten::Model
+  # Other fields...
+  field :metadata, :json, serializable: MySerializable
+end
+
+MyModel.last!.metadata # => MySerializable object
+```
+
+:::info
+It should be noted that `json` fields are mapped to: 
+
+* `jsonb` columns in PostgreSQL databases
+* `json` columns in MySQL databases
+* `text` columns in SQLite databases
+:::
+
+#### `serializable`
+
+The `serializable` arguments allows to specify that a class making use of [`JSON::Serializable`](https://crystal-lang.org/api/JSON/Serializable.html) should be used in order to parse the JSON values for the model field at hand. When specifying a `serializable` class, the values returned for the considered model fields will be instances of that class instead of [`JSON::Any`](https://crystal-lang.org/api/JSON/Any.html) objects.
+
 ### `string`
 
 A `string` field allows to persist small or medium string values. In addition to the [common field options](#common-field-options), such fields support the following arguments:

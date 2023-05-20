@@ -7,6 +7,7 @@ require "./column/date"
 require "./column/date_time"
 require "./column/float"
 require "./column/int"
+require "./column/json"
 require "./column/string"
 require "./column/text"
 require "./column/uuid"
@@ -41,6 +42,7 @@ module Marten
         register "float", Float
         register "reference", Reference
         register "int", Int
+        register "json", JSON
         register "string", String
         register "text", Text
         register "uuid", UUID

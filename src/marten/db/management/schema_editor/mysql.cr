@@ -47,7 +47,7 @@ module Marten
             "Marten::DB::Management::Column::DateTime" => "datetime(6)",
             "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",
-            "Marten::DB::Management::Column::JSON"     => "json",
+            "Marten::DB::Management::Column::JSON"     => "text",
             "Marten::DB::Management::Column::String"   => "varchar(%{max_size})",
             "Marten::DB::Management::Column::Text"     => "longtext",
             "Marten::DB::Management::Column::UUID"     => "char(32)",

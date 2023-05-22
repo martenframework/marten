@@ -199,7 +199,7 @@ MyModel.last!.metadata # => MySerializable object
 It should be noted that `json` fields are mapped to: 
 
 * `jsonb` columns in PostgreSQL databases
-* `json` columns in MySQL databases
+* `text` columns in MySQL databases
 * `text` columns in SQLite databases
 :::
 

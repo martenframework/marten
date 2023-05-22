@@ -143,7 +143,7 @@ describe Marten::DB::Management::Column::JSON do
   describe "#sql_type" do
     it "returns the expected SQL type" do
       column = Marten::DB::Management::Column::JSON.new("test")
-      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "json" }
+      for_mysql { column.sql_type(Marten::DB::Connection.default).should eq "text" }
       for_postgresql { column.sql_type(Marten::DB::Connection.default).should eq "jsonb" }
       for_sqlite { column.sql_type(Marten::DB::Connection.default).should eq "text" }
     end

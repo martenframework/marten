@@ -72,6 +72,12 @@ describe Marten::DB::Field::JSON do
         end
       end
     end
+
+    it "properly handles JSON pull parser results" do
+      Marten::DB::Field::JSONSpec::Record.create!(metadata: JSON.parse(%{{ "foo": "bar" }}))
+
+      Marten::DB::Field::JSONSpec::Record.first!.metadata!.as_h.should eq({"foo" => "bar"})
+    end
   end
 
   describe "#to_column" do

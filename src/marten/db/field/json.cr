@@ -51,6 +51,8 @@ module Marten
 
         def from_db(value) : ::String | Nil
           case value
+          when ::JSON::PullParser
+            ::JSON::Any.new(value).to_json
           when Nil | ::String
             value.as?(Nil | ::String)
           else
@@ -59,7 +61,7 @@ module Marten
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : ::String | Nil
-          from_db(result_set.read(::String | Nil))
+          from_db(result_set.read(::JSON::PullParser | ::String | Nil))
         end
 
         def to_column : Management::Column::Base?

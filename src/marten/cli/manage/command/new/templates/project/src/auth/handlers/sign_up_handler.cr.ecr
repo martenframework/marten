@@ -8,16 +8,13 @@ module Auth
     success_route_name "auth:profile"
 
     def process_valid_schema
-      new_record = model.new(email: schema.validated_data["email"])
-      new_record.set_password(schema.validated_data["password1"].as(String))
+      new_record = model.new(email: schema.email!)
+      new_record.set_password(schema.password1!)
       new_record.save!
 
       self.record = new_record
 
-      user = MartenAuth.authenticate(
-        schema.validated_data["email"].as(String),
-        schema.validated_data["password1"].as(String)
-      )
+      user = MartenAuth.authenticate(schema.email!, schema.password1!)
       MartenAuth.sign_in(request, user.not_nil!)
 
       redirect(success_url)

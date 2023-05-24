@@ -66,11 +66,44 @@ describe Marten::Schema::Field::Base do
       field.required?.should be_false
     end
   end
+
+  describe "::contribute_to_schema" do
+    it "sets up the expected getter method allowing to fetch type-safe validated field data" do
+      schema = Marten::Schema::Field::BaseSpec::FooBarSchema.new(
+        Marten::Schema::DataHash{"foo" => "hello", "bar" => "42"}
+      )
+
+      schema.foo.should be_nil
+      expect_raises(NilAssertionError) { schema.foo! }
+      schema.foo?.should be_false
+
+      schema.bar.should be_nil
+      schema.bar?.should be_false
+      expect_raises(NilAssertionError) { schema.bar! }
+
+      schema.valid?.should be_true
+
+      schema.foo.should eq "hello"
+      schema.foo!.should eq "hello"
+      schema.foo?.should be_true
+      typeof(schema.foo).should eq String?
+
+      schema.bar.should eq 42
+      schema.bar!.should eq 42
+      schema.bar?.should be_true
+      typeof(schema.bar).should eq Int64?
+    end
+  end
 end
 
 module Marten::Schema::Field::BaseSpec
   class TestSchema < Marten::Schema
     field :test_field, :string
+  end
+
+  class FooBarSchema < Marten::Schema
+    field :foo, :string
+    field :bar, :int
   end
 
   class TestField < Marten::Schema::Field::Base

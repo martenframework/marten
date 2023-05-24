@@ -9,6 +9,9 @@ module Marten
     include Core::Validation
 
     # :nodoc:
+    annotation FieldInstanceVariable; end
+
+    # :nodoc:
     alias DataHash = Hash(String, Field::Any | Nil | HTTP::UploadedFile | Routing::Parameter::Types)
 
     # :nodoc:
@@ -64,11 +67,16 @@ module Marten
 
       {% FIELDS_[sanitized_id.stringify] = {type: sanitized_type.stringify, kwargs: kwargs} %}
 
-      register_field(
-        {{ field_klass }}.new(
-          {{ sanitized_id.stringify }},
-          {% unless kwargs.empty? %}**{{ kwargs }}{% end %}
-        )
+      {{ field_klass }}.check_definition(
+        {{ sanitized_id }},
+        {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
+      )
+
+      {{ field_klass }}.contribute_to_schema(
+        {{ @type }},
+        {{ sanitized_id }},
+        {{ field_ann }},
+        {% unless kwargs.empty? %}{{ kwargs }}{% else %}nil{% end %}
       )
     end
 
@@ -155,11 +163,11 @@ module Marten
             {% end %}
           {% end %}
 
-          register_field(
-            {{ field_klass }}.new(
-              {{ field_id }},
-              {% unless field_config[:kwargs].empty? %}**{{ field_config[:kwargs] }}{% end %}
-            )
+          {{ field_klass }}.contribute_to_schema(
+            {{ @type }},
+            {{ field_id.id }},
+            {{ field_ann }},
+            {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %}
           )
         {% end %}
       {% end %}

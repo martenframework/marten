@@ -47,10 +47,40 @@ module Marten
         def validate(schema, value)
         end
 
+        # :nodoc:
+        macro check_definition(field_id, kwargs)
+        end
+
+        # :nodoc:
+        macro contribute_to_schema(schema_klass, field_id, field_ann, kwargs)
+          # Registers the field to the schema class.
+
+          class ::{{ schema_klass }}
+            register_field(
+              {{ @type }}.new(
+                {{ field_id.stringify }},
+                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %}
+              )
+            )
+
+            def {{ field_id }} : {{ field_ann[:exposed_type] }}?
+              validated_data[{{ field_id.stringify }}]?.as({{ field_ann[:exposed_type] }}?)
+            end
+
+            def {{ field_id }}!
+              {{ field_id }}.not_nil!
+            end
+
+            def {{ field_id }}?
+              !{{ field_id }}.nil?
+            end
+          end
+        end
+
         private EMPTY_VALUES = [nil, ""]
 
         private def empty_value?(value) : ::Bool
-          EMPTY_VALUES.includes?(value.is_a?(JSON::Any) ? value.raw : value)
+          EMPTY_VALUES.includes?(value.is_a?(::JSON::Any) ? value.raw : value)
         end
 
         private def invalid_error_message(_schema)

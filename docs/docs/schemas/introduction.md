@@ -64,7 +64,7 @@ end
 Let's break it down a bit more:
 
 * when the incoming request is a `GET`, the handler will simply render the `article_create.html` template, and initialize the schema (instance of `ArticleSchema`) with any data currently present in the request object (which is returned by the `#request` method). This schema object is made available to the template context
-* when the incoming request is a `POST`, it will initialize the schema and try to see if it is valid considering the incoming data (using the `#valid?` method). If it's valid, then a new `Article` record will be created using the schema's validated data (`#validated_data`), and the user will be redirect to a home page. Otherwise, the `article_create.html` template will be rendered again with the invalid schema in the associated context
+* when the incoming request is a `POST`, it will initialize the schema and try to see if it is valid considering the incoming data (using the [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) method). If it's valid, then a new `Article` record will be created using the schema's validated data ([`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method)), and the user will be redirect to a home page. Otherwise, the `article_create.html` template will be rendered again with the invalid schema in the associated context
 
 It should be noted that templates can easily interact with schema objects in order to introspect them and render a corresponding HTML form. In the above example, the schema could be used as follows to render an equivalent form in the `article_create.html` template:
 
@@ -191,9 +191,46 @@ class SignUpSchema < Marten::Schema
 end
 ```
 
-Schema validations are always triggered by the use of the `#valid?` or `#invalid?` methods: these methods return `true` or `false` depending on whether the data is valid or invalid.
+Schema validations are always triggered by the use of the [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/dev/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) methods: these methods return `true` or `false` depending on whether the data is valid or invalid.
 
 Please head over to the [Schema validations](./validations) guide in order to learn more about schema validations and how to customize it.
+
+## Accessing validated data
+
+After performing [schema validations](#validations) (ie. after calling [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/dev/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) on a schema object), accessing the validated data is often necessary. For instance, you may need to persist the validated data as part of a model record. To achieve this, you can make use of the [`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method, which is accessible in all schema instances.
+
+This method provides access to a hash that contains the deserialized and validated field values of the schema. For instance, let's consider the example of the `ArticleSchema` schema [mentioned earlier](#the-schema-class):
+
+```crystal
+schema = ArticleSchema.new(Marten::Schema::DataHash{"title" => "Test article", "content" => "Test content"})
+schema.valid? # => true
+
+schema.validated_data["title"]   # => "Test article"
+schema.validated_data["content"] # => "Test content"
+```
+
+It is important to note that accessing values using [`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) as shown in the above example is not type-safe. The [`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) hash can return any supported schema field values, and as a result, you may need to utilize the [`#as`](https://crystal-lang.org/reference/syntax_and_semantics/as.html) pseudo-method to handle the fetched validated data appropriately, depending on how and where you intend to use it.
+
+To palliate this, Marten automatically defines type-safe methods that you can utilize to access your validated schema field values:
+
+* `#<field>` returns a nillable version of the `<field>` field value
+* `#<field>!` returns a non-nillable version of the `<field>` field value
+* `#<field>?` returns a boolean indicating if the `<field>` field has a value
+
+For example:
+
+```crystal
+schema = ArticleSchema.new(Marten::Schema::DataHash{"title" => "Test article"})
+schema.valid? # => true
+
+schema.title    # => "Test article"
+schema.title!   # => "Test article"
+schema.title?   # => true
+
+schema.content  # => nil
+schema.content! # => raises NilAssertionError
+schema.content? # => false
+```
 
 ## Callbacks
 
@@ -220,4 +257,4 @@ class ArticleSchema < Marten::Schema
 end
 ```
 
-The use of methods like `#valid?` or `#invalid?` will trigger validation callbacks. See [Schema validations](./validations) for more details.
+The use of methods like [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/dev/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) will trigger validation callbacks. See [Schema validations](./validations) for more details.

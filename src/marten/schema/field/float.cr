@@ -29,7 +29,7 @@ module Marten
             value.to_f64
           when ::Int
             value.to_f64
-          when JSON::Any
+          when ::JSON::Any
             deserialize(value.raw)
           else
             raise_unexpected_field_value(value)

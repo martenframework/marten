@@ -27,7 +27,7 @@ module Marten
             value
           when ::String
             value.empty? ? nil : raise_unexpected_field_value(value)
-          when JSON::Any
+          when ::JSON::Any
             deserialize(value.raw)
           else
             raise_unexpected_field_value(value)

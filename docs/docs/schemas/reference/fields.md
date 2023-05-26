@@ -83,6 +83,32 @@ The `max_value` argument allows defining the maximum value allowed. The default 
 
 The `min_value` argument allows defining the minimum value allowed. The default value for this argument is `nil`, which means that the minimum value is not validated by default.
 
+### `json`
+
+A `json` field allows validating JSON values, which are automatically parsed to [`JSON::Any`](https://crystal-lang.org/api/JSON/Any.html) objects. Additionally, it is also possible to leverage the [`serializable`](#serializable) option in order to specify a class that makes use of [`JSON::Serializable`](https://crystal-lang.org/api/JSON/Serializable.html). When doing so, the parsing of the JSON values will result in the initialization of the corresponding serializable objects:
+
+```crystal
+class MySerializable
+  include JSON::Serializable
+
+  property a : Int32 | Nil
+  property b : String | Nil
+end
+
+class MySchema < Marten::Schema
+  # Other fields...
+  field :metadata, :json, serializable: MySerializable
+end
+
+schema = MySchema.new(Marten::Schema::DataHash{"metadata" => %{{"a": 42, "b": "foo"}}})
+schema.valid?    # => true
+schema.metadata! # => MySerializable object
+```
+
+#### `serializable`
+
+The `serializable` arguments allows to specify that a class making use of [`JSON::Serializable`](https://crystal-lang.org/api/JSON/Serializable.html) should be used in order to parse the JSON values for the schema field at hand. When specifying a `serializable` class, the values returned for the considered schema fields will be instances of that class instead of [`JSON::Any`](https://crystal-lang.org/api/JSON/Any.html) objects.
+
 ### `string`
 
 A `string` field allows validating string values. In addition to the [common field options](#common-field-options), such fields support the following arguments:

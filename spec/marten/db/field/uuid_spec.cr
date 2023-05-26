@@ -100,6 +100,19 @@ describe Marten::DB::Field::UUID do
       field.to_db(UUID.new("d764c9a6-439b-11eb-b378-0242ac130002")).should eq "d764c9a6439b11ebb3780242ac130002"
     end
 
+    it "returns a string value if the initial value is a UUID string" do
+      field = Marten::DB::Field::UUID.new("my_field")
+      field.to_db("d764c9a6-439b-11eb-b378-0242ac130002").should eq "d764c9a6439b11ebb3780242ac130002"
+    end
+
+    it "raises UnexpectedFieldValue if the initial value is a string that cannot be parsed as a UUID" do
+      field = Marten::DB::Field::UUID.new("my_field")
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.to_db("bad value")
+      end
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::UUID.new("my_field")
 

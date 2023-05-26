@@ -48,6 +48,8 @@ module Marten
           case value
           when Nil
             nil
+          when ::String
+            (v = ::UUID.parse?(value.as(::String))).nil? ? raise_unexpected_field_value(value) : v.hexstring
           when ::UUID
             value.hexstring
           else

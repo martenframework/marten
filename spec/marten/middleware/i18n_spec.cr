@@ -184,5 +184,25 @@ describe Marten::Middleware::I18n do
 
       I18n.locale.should eq "FR-CA"
     end
+
+    it "patches the Vary header accordingly" do
+      Marten.settings.i18n.default_locale = :en
+      Marten.settings.i18n.available_locales = [:en, :fr]
+      Marten.setup_i18n
+
+      middleware = Marten::Middleware::I18n.new
+
+      response = middleware.call(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
+        ),
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      I18n.locale.should eq "fr"
+      response.headers[:VARY].should eq "Accept-Language"
+    end
   end
 end

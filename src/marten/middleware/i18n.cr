@@ -10,7 +10,13 @@ module Marten
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         locale = get_locale_from(request)
         ::I18n.activate(locale)
-        get_response.call
+
+        response = get_response.call
+
+        # Ensures the Vary header includes Accept-Language so that caches take it into account.
+        response.headers.patch_vary("Accept-Language")
+
+        response
       end
 
       private ACCEPT_LANGUAGE_RE = %r{

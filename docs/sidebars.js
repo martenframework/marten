@@ -51,8 +51,9 @@ module.exports = {
         'handlers-and-http/routing',
         'handlers-and-http/generic-handlers',
         'handlers-and-http/error-handlers',
-        'handlers-and-http/middlewares',
         'handlers-and-http/sessions',
+        'handlers-and-http/cookies',
+        'handlers-and-http/middlewares',
         {
           type: 'category',
           label: "How-To's",

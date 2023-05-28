@@ -253,6 +253,8 @@ cookies.encrypted[:secret_message] = "Hello!"
 cookies.signed[:signed_message] = "Hello!"
 ```
 
+Please refer to [Cookies](./cookies) for more information around using cookies.
+
 ## Using sessions
 
 Handlers can interact with a session store, which you can use to store small amounts of data that will be persisted between requests. How much data you can persist in this store depends on the session backend being used. The default backend persists session data using an encrypted cookie. Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages.

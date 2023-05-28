@@ -503,6 +503,12 @@ Default: `"en"`
 
 The default locale used by the Marten project.
 
+### `locale_cookie_name`
+
+Default: `"marten_locale"`
+
+The name of the cookie to use for saving the locale of the current user and activating the right locale (when the [`Marten::Middleware::I18n`](../../handlers-and-http/reference/middlewares#i18n-middleware) middleware is used). See [Internationalization](../../i18n/introduction) to learn more about this capability.
+
 ## Media files settings
 
 Media files settings allow configuring how Marten should interact with [media files](../../files/managing-files). These settings are all available under the `media_files` namespace:

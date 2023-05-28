@@ -34,4 +34,35 @@ describe Marten::Conf::GlobalSettings::I18n do
       i18n_conf.default_locale.should eq "fr"
     end
   end
+
+  describe "#locale_cookie_name" do
+    it "returns the expected default value if not configured" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+
+      i18n_conf.locale_cookie_name.should eq "marten_locale"
+    end
+
+    it "returns the configured locale cookie name" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.locale_cookie_name = "custom_locale"
+
+      i18n_conf.locale_cookie_name.should eq "custom_locale"
+    end
+  end
+
+  describe "#locale_cookie_name=" do
+    it "allows to configure the locale cookie name using a string value" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.locale_cookie_name = "custom_locale"
+
+      i18n_conf.locale_cookie_name.should eq "custom_locale"
+    end
+
+    it "allows to configure the locale cookie name using a symbol value" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.locale_cookie_name = :custom_locale
+
+      i18n_conf.locale_cookie_name.should eq "custom_locale"
+    end
+  end
 end

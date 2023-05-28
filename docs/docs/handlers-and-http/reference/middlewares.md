@@ -49,7 +49,7 @@ The GZip middleware should be positioned before any other middleware that needs 
 
 Activates the right I18n locale based on incoming requests.
 
-This middleware will activate the right locale based on the Accept-Language header. Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../../development/reference/settings#available_locales) and [`i18n.default_locale`](../../development/reference/settings#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead.
+This middleware will activate the right locale based on the Accept-Language header or the value provided by the [locale cookie](../../development/reference/settings#locale_cookie_name). Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../../development/reference/settings#available_locales) and [`i18n.default_locale`](../../development/reference/settings#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead.
 
 ## Session middleware
 

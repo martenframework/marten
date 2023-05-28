@@ -185,6 +185,94 @@ describe Marten::Middleware::I18n do
       I18n.locale.should eq "FR-CA"
     end
 
+    it "activates the right locale for a simple tag from the locale cookie" do
+      Marten.settings.i18n.default_locale = :en
+      Marten.settings.i18n.available_locales = [:en, :fr]
+      Marten.setup_i18n
+
+      middleware = Marten::Middleware::I18n.new
+
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+      request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr"
+
+      middleware.call(
+        request,
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      I18n.locale.should eq "fr"
+    end
+
+    it "activates the right locale for an unsupported tag whose base locale tag is supported from the locale cookie" do
+      Marten.settings.i18n.default_locale = :en
+      Marten.settings.i18n.available_locales = [:en, :fr]
+      Marten.setup_i18n
+
+      middleware = Marten::Middleware::I18n.new
+
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+      request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr-CA"
+
+      middleware.call(
+        request,
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      I18n.locale.should eq "fr"
+    end
+
+    it "activates the right locale for an unknown tag if a similar tag is supported for the base tag of the cookie" do
+      Marten.settings.i18n.default_locale = :en
+      Marten.settings.i18n.available_locales = [:en, "fr-CA"]
+      Marten.setup_i18n
+
+      middleware = Marten::Middleware::I18n.new
+
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+      request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr-FR"
+
+      middleware.call(
+        request,
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      I18n.locale.should eq "fr-CA"
+    end
+
+    it "ensures that the locale cookie value has precedence over the Accept-Language header value" do
+      Marten.settings.i18n.default_locale = :en
+      Marten.settings.i18n.available_locales = [:en, :fr, :es]
+      Marten.setup_i18n
+
+      middleware = Marten::Middleware::I18n.new
+
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "es,en;q=0.5"}
+      )
+      request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr"
+
+      middleware.call(
+        request,
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      I18n.locale.should eq "fr"
+    end
+
     it "patches the Vary header accordingly" do
       Marten.settings.i18n.default_locale = :en
       Marten.settings.i18n.available_locales = [:en, :fr]

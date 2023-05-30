@@ -16,8 +16,10 @@ module Marten
 
         response = get_response.call
 
-        # Ensures the Vary header includes Accept-Language so that caches take it into account.
+        # Ensures the Vary header includes Accept-Language (so that caches take it into account) and sets the
+        # Content-Language header.
         response.headers.patch_vary("Accept-Language")
+        response.headers["Content-Language"] ||= ::I18n.locale
 
         response
       end

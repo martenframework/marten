@@ -139,6 +139,18 @@ en:
 
 In this case, the `foo` application's codebase would request translations using the `foo.message` key, which makes it impossible to encounter conflict issues with other application translations.
 
+## How Marten resolves the current locale
+
+Marten will attempt to determine the "current" locale for activation only when the [I18n middleware](../handlers-and-http/reference/middlewares#i18n-middleware) is used.
+
+This middleware can activate the appropriate locale by considering the following:
+
+* The value of the Accept-Language header.
+* The value of a cookie, with its name defined by the [`i18n.locale_cookie_name`](../development/reference/settings#locale_cookie_name) setting.
+
+
+The [I18n middleware](../handlers-and-http/reference/middlewares#i18n-middleware) only allows activation of explicitly configured locales, which are specified in the  [`i18n.available_locales`](../development/reference/settings#available_locales) and [`i18n.default_locale`](../development/reference/settings#default_locale) settings. If the incoming locale is not found in the project configuration, the default locale will be used instead. By utilizing this middleware, you can be sure that the right locale is automatically enabled for your users, so that you don't need to take care of it.
+
 ## Limitations
 
 It's important to be aware of a few limitations when working with translations powered by [Crystal I18n](https://crystal-i18n.github.io/) within a Marten project:

@@ -26,17 +26,19 @@ module Marten
           # No-op
         end
 
-        def from_db(value) : Int32 | Int64 | Nil
+        def from_db(value) : Marten::DB::Field::ReferenceDBTypes
           case value
-          when Int32 | Int64 | Nil
-            value.as?(Int32 | Int64 | Nil)
+          when Marten::DB::Field::ReferenceDBTypes
+            value
+          when ::UUID
+            value.hexstring
           else
             raise_unexpected_field_value(value)
           end
         end
 
-        def from_db_result_set(result_set : ::DB::ResultSet) : Int32 | Int64 | Nil
-          result_set.read(Int32 | Int64 | Nil)
+        def from_db_result_set(result_set : ::DB::ResultSet) : Marten::DB::Field::ReferenceDBTypes
+          from_db(result_set.read(Marten::DB::Field::ReferenceDBTypes | ::UUID))
         end
 
         # Returns a boolean indicating whether the column is a foreign key.
@@ -70,16 +72,7 @@ module Marten
         end
 
         def to_db(value) : ::DB::Any
-          case value
-          when Nil
-            nil
-          when Int32, Int64
-            value
-          when Int8, Int16
-            value.as(Int8 | Int16).to_i32
-          else
-            raise_unexpected_field_value(value)
-          end
+          @to.pk_field.to_db(value).as(ReferenceDBTypes)
         end
 
         # :nodoc:
@@ -162,7 +155,12 @@ module Marten
               end
 
               def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)
-                @{{ field_id }} = related_object.try(&.id)
+                @{{ field_id }} = if related_object.nil?
+                  nil
+                else
+                  related_object.class.pk_field.to_db(related_object.pk)
+                end
+
                 @{{ relation_attribute_name }} = related_object
               end
             {% end %}

@@ -20,6 +20,10 @@ require "./field/one_to_one"
 module Marten
   module DB
     module Field
+      # :nodoc:
+      alias ReferenceDBTypes = ::Bool | Float32 | Float64 | Int32 | Int64 | Nil | ::String | Time
+
+      # :nodoc:
       annotation Registration
       end
 

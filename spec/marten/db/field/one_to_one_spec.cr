@@ -1,4 +1,5 @@
 require "./spec_helper"
+require "./one_to_one_spec/**"
 
 describe Marten::DB::Field::OneToOne do
   describe "#default" do
@@ -44,14 +45,6 @@ describe Marten::DB::Field::OneToOne do
       field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, foreign_key: false)
       field.from_db(nil).should be_nil
     end
-
-    it "raises UnexpectedFieldValue if the value is not supported" do
-      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, foreign_key: false)
-
-      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
-        field.from_db(true)
-      end
-    end
   end
 
   describe "#from_db_result_set" do
@@ -64,6 +57,20 @@ describe Marten::DB::Field::OneToOne do
             value = field.from_db_result_set(rs)
             value.should be_a Int32 | Int64
             value.should eq 42
+          end
+        end
+      end
+    end
+
+    it "is able to read a string value from a DB result set" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)
+
+      Marten::DB::Connection.default.open do |db|
+        db.query("SELECT 'foo'") do |rs|
+          rs.each do
+            value = field.from_db_result_set(rs)
+            value.should be_a String
+            value.should eq "foo"
           end
         end
       end
@@ -156,6 +163,13 @@ describe Marten::DB::Field::OneToOne do
       field.to_db(42.to_i16).should eq 42
     end
 
+    it "returns the expected value if the target pk field is not an integer field" do
+      field = Marten::DB::Field::OneToOne.new("article_id", "article", Marten::DB::Field::OneToOneSpec::Article)
+      uuid = UUID.random
+
+      field.to_db(uuid.to_s).should eq uuid.hexstring
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)
 
@@ -166,6 +180,8 @@ describe Marten::DB::Field::OneToOne do
   end
 
   describe "::contribute_to_model" do
+    with_installed_apps Marten::DB::Field::OneToOneSpec::App
+
     it "properly generates a getter? method for the related ID on the model class" do
       obj_1 = TestUserProfile.new(
         user: TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
@@ -184,6 +200,17 @@ describe Marten::DB::Field::OneToOne do
 
       obj_2 = TestUserProfile.new
       obj_2.user?.should be_false
+    end
+
+    it "works as expected when target models don't involve interger pk fields" do
+      article = Marten::DB::Field::OneToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
+      comment = Marten::DB::Field::OneToOneSpec::Comment.create!(article: article, text: "This article is dope")
+
+      comment = Marten::DB::Field::OneToOneSpec::Comment.get!(id: comment.id)
+
+      comment.article.should eq article
+
+      comment.article_id.should eq article.id!.hexstring
     end
   end
 end

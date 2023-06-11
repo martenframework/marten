@@ -80,6 +80,20 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#content_security_policy" do
+    it "returns the content security configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.content_security_policy.should be_a Marten::Conf::GlobalSettings::ContentSecurityPolicy
+    end
+
+    it "yiels the content security policy configuration" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.content_security_policy do |csp|
+        csp.should be_a Marten::Conf::GlobalSettings::ContentSecurityPolicy
+      end
+    end
+  end
+
   describe "#csrf" do
     it "returns the CSRF configuration" do
       global_settings = Marten::Conf::GlobalSettings.new

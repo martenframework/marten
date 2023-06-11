@@ -200,6 +200,19 @@ module Marten
         @assets ||= GlobalSettings::Assets.new
       end
 
+      # Provides access to the content security policy settings.
+      #
+      # These setting values will be used by the `Marten::Middleware::ContentSecurityPolicy` middleware when inserting
+      # the Content-Security-Policy header in HTTP responses.
+      def content_security_policy
+        @content_security_policy ||= GlobalSettings::ContentSecurityPolicy.new
+      end
+
+      # :ditto:
+      def content_security_policy(&)
+        yield content_security_policy
+      end
+
       # Provides access to request forgery protection settings.
       def csrf
         @csrf ||= GlobalSettings::CSRF.new
@@ -292,7 +305,7 @@ module Marten
 
       # Allows to set the value to use for the X-Frame-Options header when the associated middleware is used.
       #
-      # This value will  be used by the `Marten::Middleware::XFrameOptions` middleware when inserting the
+      # This value will be used by the `Marten::Middleware::XFrameOptions` middleware when inserting the
       # X-Frame-Options header in HTTP responses.
       def x_frame_options=(x_frame_options : String | Symbol)
         @x_frame_options = x_frame_options.to_s

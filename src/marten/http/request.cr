@@ -6,6 +6,8 @@ module Marten
     # metadata of the incoming request.
     class Request
       @accepted_media_types : Array(MIME::MediaType)?
+      @content_security_policy : ContentSecurityPolicy?
+      @content_security_policy_nonce : String?
       @disable_request_forgery_protection = false
       @flash : FlashStore?
       @host_and_port : NamedTuple(host: String, port: String)?
@@ -35,6 +37,21 @@ module Marten
       # Returns the raw body of the request as a string.
       def body : String
         @body ||= @request.body.nil? ? "" : @request.body.as(IO).gets_to_end
+      end
+
+      # Returns the content security policy assigned with the request.
+      def content_security_policy : ContentSecurityPolicy?
+        @content_security_policy
+      end
+
+      # Allows to assign a new content security policy to the request (or reset it if the passed value is `nil`).
+      def content_security_policy=(content_security_policy : ContentSecurityPolicy?)
+        @content_security_policy = content_security_policy
+      end
+
+      # Returns the value of a Content-Security-Policy nonce associated with the request.
+      def content_security_policy_nonce
+        @content_security_policy_nonce ||= Random::Secure.urlsafe_base64(16)
       end
 
       # Returns the cookies associated with the request.

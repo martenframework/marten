@@ -165,6 +165,55 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#content_security_policy" do
+    it "returns nil by default" do
+      request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+
+      request.content_security_policy.should be_nil
+    end
+
+    it "returns the assigned Content-Security-Policy object" do
+      request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+
+      csp = Marten::HTTP::ContentSecurityPolicy.new
+      request.content_security_policy = csp
+
+      request.content_security_policy.should eq csp
+    end
+  end
+
+  describe "#content_security_policy=" do
+    it "allows to assign a Content-Security-Policy object to the request" do
+      request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+
+      csp = Marten::HTTP::ContentSecurityPolicy.new
+      request.content_security_policy = csp
+
+      request.content_security_policy.should eq csp
+    end
+
+    it "can be used to reset a previously assigned Content-Security-Policy object" do
+      request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+
+      csp = Marten::HTTP::ContentSecurityPolicy.new
+      request.content_security_policy = csp
+      request.content_security_policy = nil
+
+      request.content_security_policy.should be_nil
+    end
+  end
+
+  describe "#content_security_policy_nonce" do
+    it "returns a Base64 value" do
+      request_1 = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+      request_2 = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+
+      request_1.content_security_policy_nonce.size.should eq 22
+      request_2.content_security_policy_nonce.size.should eq 22
+      request_1.content_security_policy_nonce.should_not eq request_2.content_security_policy_nonce
+    end
+  end
+
   describe "#cookies" do
     it "returns the request cookies" do
       raw_request = ::HTTP::Request.new(method: "GET", resource: "/test/xyz")

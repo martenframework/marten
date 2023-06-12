@@ -17,6 +17,9 @@ module Marten
         getter nonce_directives
 
         # Indicates whether policy violations are reported without enforcing it.
+        getter report_only
+
+        # :ditto:
         getter? report_only
 
         # Allows to set the default Content-Security-Policy.

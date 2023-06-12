@@ -53,6 +53,21 @@ describe Marten::Conf::GlobalSettings::ContentSecurityPolicy do
     end
   end
 
+  describe "#report_only" do
+    it "returns false by default" do
+      csp_conf = Marten::Conf::GlobalSettings::ContentSecurityPolicy.new
+
+      csp_conf.report_only.should be_false
+    end
+
+    it "returns the configured value" do
+      csp_conf = Marten::Conf::GlobalSettings::ContentSecurityPolicy.new
+      csp_conf.report_only = true
+
+      csp_conf.report_only.should be_true
+    end
+  end
+
   describe "#report_only?" do
     it "returns false by default" do
       csp_conf = Marten::Conf::GlobalSettings::ContentSecurityPolicy.new

@@ -89,6 +89,14 @@ describe Marten::HTTP::ContentSecurityPolicy do
 
       csp.directives[{{ directive.gsub(/_/, "-") }}].should eq ["'self'", "bar"]
     end
+
+    it "deletes the previously assigned value if the passed value is nil" do
+      csp = Marten::HTTP::ContentSecurityPolicy.new
+
+      csp.{{ directive.id }} = nil
+
+      csp.directives[{{ directive.gsub(/_/, "-") }}]?.should be_nil
+    end
   end
   {% end %}
 

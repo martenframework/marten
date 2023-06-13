@@ -65,6 +65,6 @@ This is why the value of the [`strict_security_policy.max_age`](../../developmen
 
 Sets the X-Frame-Options header in the response if it wasn't already set.
 
-When this middleware is used, a X-Frame-Options header will be inserted into the HTTP response. The default value for this header (which is configurable via the [`x_frame_options`](../../development/reference/settings#xframeoptions) setting) is "DENY", which means that the response cannot be displayed in a frame. This allows preventing click-jacking attacks, by ensuring that the web app cannot be embedded into other sites.
+When this middleware is used, a X-Frame-Options header will be inserted into the HTTP response. The default value for this header (which is configurable via the [`x_frame_options`](../../development/reference/settings#x_frame_options) setting) is "DENY", which means that the response cannot be displayed in a frame. This allows preventing click-jacking attacks, by ensuring that the web app cannot be embedded into other sites.
 
 On the other hand, if the `x_frame_options` is set to "SAMEORIGIN", the page can be displayed in a frame if the including site is the same as the one serving the page.

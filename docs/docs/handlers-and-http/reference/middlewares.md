@@ -23,6 +23,14 @@ This middleware should be placed at the first position in the [`middleware`](../
 This middleware is provided to make it easy to serve assets in situations where you can't easily configure a web server such as [Nginx](https://nginx.org) or a third-party service (like Amazon's S3 or GCS) to serve your assets directly.
 :::
 
+## Content-Security-Policy middleware
+
+**Class:** [`Marten::Middleware::ContentSecurityPolicy`](pathname:///api/dev/Marten/Middleware/ContentSecurityPolicy.html)
+
+This middleware guarantees the presence of the Content-Security-Policy header in the response's headers. This header provides clients with the ability to limit the allowed sources of different types of content.
+
+By default, the middleware will include a Content-Security-Policy header that corresponds to the policy defined in the [`content_security_policy`](../../development/reference/settings#content-security-policy-settings) settings. However, if a [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object is explicitly assigned to the request object, it will take precedence over the default policy and be used instead.
+
 ## Flash middleware
 
 **Class:** [`Marten::Middleware::Flash`](pathname:///api/dev/Marten/Middleware/Flash.html)

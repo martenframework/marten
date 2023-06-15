@@ -318,6 +318,50 @@ config.csrf.trusted_origins = [
 ]
 ```
 
+## Content-Security-Policy settings
+
+These settings allow configuring how the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares#content-security-policy-middleware) middleware behaves and the actual directives of the Content-Security-Policy header that are set by this middleware.
+
+```crystal
+config.content_security_policy.report_only = true
+config.content_security_policy.default_policy.default_src = [:self, "other"]
+```
+
+:::tip
+[Content-Security-Policy](https://www.w3.org/TR/CSP/) is a complicated header and there are possibly many values you may need to tweak. Make sure you understand it before configuring the below settings.
+:::
+
+### `default_policy`
+
+Default: `Marten::HTTP::ContentSecurityPolicy.new`
+
+The default Content-Security-Policy object.
+
+This [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object will be used to set the Content-Security-Policy header when the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares#content-security-policy-middleware) middleware is used.
+
+All the attributes that can be set on this [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object through the use of methods such as [`#default_src=`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html#default_src%3D(value%3AArray|Nil|String|Symbol|Tuple)-instance-method) or [`#frame_src=`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html#frame_src%3D(value%3AArray|Nil|String|Symbol|Tuple)-instance-method) can also be used directly on the `content_security_policy` setting object. For example:
+
+```crystal
+config.content_security_policy.default_src = [:self, "other"]
+config.content_security_policy.block_all_mixed_content = true
+```
+
+### `nonce_directives`
+
+Default: `["script-src", "style-src"]`
+
+An array of directives where a dynamically-generated nonce will be included.
+
+For example, if this setting is set to `["script-src"]`, a `nonce-<b64-value>` value will be added to the `script-src` directive in the Content-Security-Policy header value.
+
+### `report_only`
+
+Default: `false`
+
+A boolean indicating whether policy violations are reported without enforcing them.
+
+If this setting is set to `true`, the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares#content-security-policy-middleware) middleware will set a [Conten-Security-Policy-Report-Only](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) header instead of the regular Content-Security-Policy header. Doing so can be useful to experiment with policies without enforcing them.
+
 ## Database settings
 
 These settings allow configuring the databases used by the considered Marten project. At least one default database must be configured if your project makes use of [models](../../models-and-databases/introduction), and additional databases can optionally be configured as well.

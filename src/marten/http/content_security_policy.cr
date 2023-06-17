@@ -25,6 +25,9 @@ module Marten
       def initialize
       end
 
+      def initialize(@directives : Hash(String, Array(String) | Bool))
+      end
+
       def block_all_mixed_content=(enabled : Bool)
         if enabled
           @directives["block-all-mixed-content"] = true
@@ -33,17 +36,21 @@ module Marten
         end
       end
 
+      def build(nonce : String? = nil, nonce_directives : Array(String)? = nil)
+        nonce_directives ||= Marten.settings.content_security_policy.nonce_directives
+        build_directives(nonce, nonce_directives).join("; ")
+      end
+
+      def clone
+        self.class.new(directives.clone)
+      end
+
       def upgrade_insecure_requests=(enabled : Bool)
         if enabled
           @directives["upgrade-insecure-requests"] = true
         else
           @directives.delete("upgrade-insecure-requests")
         end
-      end
-
-      def build(nonce : String? = nil, nonce_directives : Array(String)? = nil)
-        nonce_directives ||= Marten.settings.content_security_policy.nonce_directives
-        build_directives(nonce, nonce_directives).join("; ")
       end
 
       # :nodoc:

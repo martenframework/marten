@@ -177,4 +177,27 @@ describe Marten::HTTP::ContentSecurityPolicy do
       end
     end
   end
+
+  describe "#clone" do
+    it "returns a clone of the Content-Security-Policy" do
+      csp = Marten::HTTP::ContentSecurityPolicy.new
+      csp.default_src = :self
+      csp.font_src = [:self, "example.com"]
+      csp.script_src = [:self, "example.com"]
+      csp.script_src = :self
+
+      cloned_csp = csp.clone
+
+      cloned_csp.build(nonce: "testnonce").should eq(
+        "default-src 'self'; font-src 'self' example.com; script-src 'self' 'nonce-testnonce'"
+      )
+
+      cloned_csp.object_id.should_not eq csp.object_id
+      cloned_csp.directives.each do |k, v|
+        next if v.is_a?(Bool)
+
+        v.object_id.should_not eq csp.directives[k].as(Array).object_id
+      end
+    end
+  end
 end

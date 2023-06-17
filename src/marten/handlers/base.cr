@@ -1,4 +1,5 @@
 require "./concerns/callbacks"
+require "./concerns/content_security_policy"
 require "./concerns/cookies"
 require "./concerns/flash"
 require "./concerns/request_forgery_protection"
@@ -17,6 +18,7 @@ module Marten
       include Flash
       include RequestForgeryProtection
       include Session
+      include ContentSecurityPolicy
       include XFrameOptions
 
       # :nodoc:

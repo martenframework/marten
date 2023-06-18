@@ -327,6 +327,8 @@ config.content_security_policy.report_only = true
 config.content_security_policy.default_policy.default_src = [:self, "other"]
 ```
 
+Please refer to [Content Security Policy](../../security/content-security-policy) to learn more about the Content-Security-Policy header protection.
+
 :::tip
 [Content-Security-Policy](https://www.w3.org/TR/CSP/) is a complicated header and there are possibly many values you may need to tweak. Make sure you understand it before configuring the below settings.
 :::

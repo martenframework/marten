@@ -47,3 +47,5 @@ Marten implements a protection mechanism against this type of attack by validati
 SQL injection attacks happen when a malicious user is able to execute arbitrary SQL queries on a database, which usually occurs when submitting input data to a web application. This can lead to database records being leaked and/or altered.
 
 The [query sets](../models-and-databases/queries) API provided by Marten generates SQL code by using query parameterization. This means that the actual code of a query is defined separately from its parameters, which ensures that any user-provided parameter is escaped by the considered database driver before the query is executed.
+
+## Content Security Policy

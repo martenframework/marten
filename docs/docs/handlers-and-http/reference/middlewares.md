@@ -31,6 +31,8 @@ This middleware guarantees the presence of the Content-Security-Policy header in
 
 By default, the middleware will include a Content-Security-Policy header that corresponds to the policy defined in the [`content_security_policy`](../../development/reference/settings#content-security-policy-settings) settings. However, if a [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object is explicitly assigned to the request object, it will take precedence over the default policy and be used instead.
 
+Please refer to [Content Security Policy](../../security/content-security-policy) to learn more about the Content-Security-Policy header and how to configure it.
+
 ## Flash middleware
 
 **Class:** [`Marten::Middleware::Flash`](pathname:///api/dev/Marten/Middleware/Flash.html)

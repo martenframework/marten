@@ -178,6 +178,7 @@ module.exports = {
         'security/introduction',
         'security/csrf',
         'security/clickjacking',
+        'security/content-security-policy',
       ],
     },
     {

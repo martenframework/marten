@@ -29,6 +29,7 @@ docs_api:
 	crystal docs --output=docs/static/api/dev
 	cp -R docs/static/api/dev/ docs/static/api/0.1
 	cp -R docs/static/api/dev/ docs/static/api/0.2
+	cp -R docs/static/api/dev/ docs/static/api/0.3
 
 .PHONY: docs_site
 docs_site:

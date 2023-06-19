@@ -49,3 +49,9 @@ SQL injection attacks happen when a malicious user is able to execute arbitrary 
 The [query sets](../models-and-databases/queries) API provided by Marten generates SQL code by using query parameterization. This means that the actual code of a query is defined separately from its parameters, which ensures that any user-provided parameter is escaped by the considered database driver before the query is executed.
 
 ## Content Security Policy
+
+The [Content-Security-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP) (CSP) header is a collection of guidelines that the browser follows to allow specific sources for scripts, styles, embedded content, and more. It ensures that only these approved sources are allowed while blocking all other sources.
+
+Marten comes with a built-in [Content Security Policy mechanism](./content-security-policy), that involves using a dedicated middleware (the [Content-Security-Policy middleware](../handlers-and-http/reference/middlewares#content-security-policy-middleware)). This middleware guarantees the presence of the Content-Security-Policy header in the response's headers.
+
+You can learn about the Content-Security-Policy header and how to configure it in the [dedicated documentation](./content-security-policy).

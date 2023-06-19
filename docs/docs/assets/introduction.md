@@ -163,7 +163,7 @@ Writing a custom file storage implementation will involve subclassing the [`Mart
 
 There are some situations where it is not possible to easily configure a web server such as [Nginx](https://nginx.org) or a third-party service (like Amazon's S3 or GCS) to serve your assets directly. To palliate this, Marten provides the [`Marten::Middleware::AssetServing`](../handlers-and-http/reference/middlewares#asset-serving-middleware) middleware.
 
-The purpose of this middleware is to distribute collected assets stored under the configured assets root ([`assets.root`](../development/reference/settings#root) setting). These assets are assumed to have been collected using the [`collectassets`](../../development/reference/management-commands#collectassets) management command, and it is also assumed that a "local file system" storage (such as [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)) is used.
+The purpose of this middleware is to distribute collected assets stored under the configured assets root ([`assets.root`](../development/reference/settings#root) setting). These assets are assumed to have been collected using the [`collectassets`](../development/reference/management-commands#collectassets) management command, and it is also assumed that a "local file system" storage (such as [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)) is used.
 
 In order to use this middleware, you can "insert" the corresponding class at the beginning of the [`middleware`](../development/reference/settings#middleware) setting when defining production settings. For example:
 

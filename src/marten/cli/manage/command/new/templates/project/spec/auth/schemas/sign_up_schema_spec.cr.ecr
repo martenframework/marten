@@ -30,6 +30,42 @@ describe Auth::SignUpSchema do
       schema.errors[2].type.should eq "required"
     end
 
+    it "returns false if the email address is already taken" do
+      create_user(email: "test@example.com", password: "insecure")
+
+      schema = Auth::SignUpSchema.new(
+        Marten::HTTP::Params::Data{
+          "email"     => ["test@example.com"],
+          "password1" => ["insecure"],
+          "password2" => ["insecure"],
+        }
+      )
+
+      schema.valid?.should be_false
+
+      schema.errors.size.should eq 1
+      schema.errors[0].field.should eq "email"
+      schema.errors[0].message.should eq "This email address is already taken"
+    end
+
+    it "returns false if the email address is already taken in a case insensitive way" do
+      create_user(email: "test@example.com", password: "insecure")
+
+      schema = Auth::SignUpSchema.new(
+        Marten::HTTP::Params::Data{
+          "email"     => ["TesT@ExamPLE.com"],
+          "password1" => ["insecure"],
+          "password2" => ["insecure"],
+        }
+      )
+
+      schema.valid?.should be_false
+
+      schema.errors.size.should eq 1
+      schema.errors[0].field.should eq "email"
+      schema.errors[0].message.should eq "This email address is already taken"
+    end
+
     it "returns false if the two password values do not match" do
       schema = Auth::SignUpSchema.new(
         Marten::HTTP::Params::Data{

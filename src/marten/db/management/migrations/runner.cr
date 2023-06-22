@@ -112,7 +112,7 @@ module Marten
               migration_klass = @reader.get_migration(app_config, migration_name)
               [@reader.graph.find_node(migration_klass.id)]
             else
-              @reader.graph.leaves
+              @reader.graph.leaves.select { |n| Marten.apps.app_configs.includes?(n.migration.class.app_config) }
             end
           end
 

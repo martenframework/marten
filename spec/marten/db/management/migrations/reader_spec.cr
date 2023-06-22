@@ -31,13 +31,15 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader.applied_migrations.size.should eq 1
-      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
     end
 
     it "identifies already applied migrations that are no longer defined" do
@@ -51,7 +53,7 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
@@ -61,7 +63,9 @@ describe Marten::DB::Management::Migrations::Reader do
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader.applied_migrations.size.should eq 2
-      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
 
       old_migration_id = [
         Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
@@ -81,15 +85,15 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.using(:other).create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
 
       reader_1 = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.get(:other))
       reader_2 = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader_1.applied_migrations.size.should eq 1
-      reader_1.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a(
-        Migration::FooApp::V202108092226111
+      reader_1.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
       )
 
       reader_2.applied_migrations.should be_empty
@@ -106,23 +110,29 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226112.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.migration_name
       )
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226113.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader.applied_migrations.size.should eq 3
-      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
-      reader.applied_migrations[Migration::FooApp::V202108092226112.id].should be_a Migration::FooApp::V202108092226112
-      reader.applied_migrations[Migration::FooApp::V202108092226113.id].should be_a Migration::FooApp::V202108092226113
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112
+      )
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113
+      )
     end
 
     it "does not identify a replacement migration if it is not recorded and the replaced migrations are applied" do
@@ -136,18 +146,22 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226112.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader.applied_migrations.size.should eq 2
-      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
-      reader.applied_migrations[Migration::FooApp::V202108092226112.id].should be_a Migration::FooApp::V202108092226112
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112
+      )
     end
 
     it "does not identify a replacement migration as applied if not all the replaced migrations were applied" do
@@ -161,13 +175,15 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader.applied_migrations.size.should eq 1
-      reader.applied_migrations[Migration::FooApp::V202108092226111.id].should be_a Migration::FooApp::V202108092226111
+      reader.applied_migrations[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
     end
 
     it "adds a node for each defined migration" do
@@ -181,8 +197,8 @@ describe Marten::DB::Management::Migrations::Reader do
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      node = reader.graph.find_node(Migration::BarApp::V202108092226111.id)
-      node.migration.should be_a Migration::BarApp::V202108092226111
+      node = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111.id)
+      node.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111
     end
 
     it "adds the replacement migration to the graph if no replaced migration was applied" do
@@ -197,15 +213,15 @@ describe Marten::DB::Management::Migrations::Reader do
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       expect_raises(Marten::DB::Management::Migrations::Errors::UnknownNode) do
-        reader.graph.find_node(Migration::FooApp::V202108092226111.id)
+        reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id)
       end
 
       expect_raises(Marten::DB::Management::Migrations::Errors::UnknownNode) do
-        reader.graph.find_node(Migration::FooApp::V202108092226112.id)
+        reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.id)
       end
 
-      node = reader.graph.find_node(Migration::FooApp::V202108092226113.id)
-      node.migration.should be_a Migration::FooApp::V202108092226113
+      node = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.id)
+      node.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113
     end
 
     it "adds the replacement migration to the graph if all the replaced migrations were applied" do
@@ -219,25 +235,25 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226112.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       expect_raises(Marten::DB::Management::Migrations::Errors::UnknownNode) do
-        reader.graph.find_node(Migration::FooApp::V202108092226111.id)
+        reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id)
       end
 
       expect_raises(Marten::DB::Management::Migrations::Errors::UnknownNode) do
-        reader.graph.find_node(Migration::FooApp::V202108092226112.id)
+        reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.id)
       end
 
-      node = reader.graph.find_node(Migration::FooApp::V202108092226113.id)
-      node.migration.should be_a Migration::FooApp::V202108092226113
+      node = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.id)
+      node.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113
     end
 
     it "does not add the replacement migration to the graph if only some replaced replaced migrations were applied" do
@@ -251,19 +267,19 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      node_1 = reader.graph.find_node(Migration::FooApp::V202108092226111.id)
-      node_1.migration.should be_a Migration::FooApp::V202108092226111
+      node_1 = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id)
+      node_1.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
 
-      node_2 = reader.graph.find_node(Migration::FooApp::V202108092226112.id)
-      node_2.migration.should be_a Migration::FooApp::V202108092226112
+      node_2 = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.id)
+      node_2.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112
 
       expect_raises(Marten::DB::Management::Migrations::Errors::UnknownNode) do
-        reader.graph.find_node(Migration::FooApp::V202108092226113.id)
+        reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.id)
       end
     end
 
@@ -278,16 +294,16 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      node_1 = reader.graph.find_node(Migration::FooApp::V202108092226111.id)
-      node_1.migration.should be_a Migration::FooApp::V202108092226111
+      node_1 = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id)
+      node_1.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
 
-      node_2 = reader.graph.find_node(Migration::FooApp::V202108092226112.id)
-      node_2.migration.should be_a Migration::FooApp::V202108092226112
+      node_2 = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112.id)
+      node_2.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226112
 
       node_1.parents.should be_empty
       node_1.children.includes?(node_2).should be_true
@@ -307,16 +323,16 @@ describe Marten::DB::Management::Migrations::Reader do
 
       Marten::DB::Management::Migrations::Record.create!(
         app: Marten::DB::Management::Migrations::ReaderSpec::FooApp.label,
-        name: Migration::FooApp::V202108092226111.migration_name
+        name: Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.migration_name
       )
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      node_1 = reader.graph.find_node(Migration::FooApp::V202108092226111.id)
-      node_1.migration.should be_a Migration::FooApp::V202108092226111
+      node_1 = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111.id)
+      node_1.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
 
-      node_2 = reader.graph.find_node(Migration::BarApp::V202108092226111.id)
-      node_2.migration.should be_a Migration::BarApp::V202108092226111
+      node_2 = reader.graph.find_node(Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111.id)
+      node_2.migration.should be_a Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111
 
       node_1.parents.should be_empty
       node_1.children.includes?(node_2).should be_true
@@ -326,7 +342,7 @@ describe Marten::DB::Management::Migrations::Reader do
     end
 
     it "assigns an empty set of replacements when apps do not have replacement migrations" do
-      Migration::FooApp::V202108092226113.reset_app_config
+      Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.reset_app_config
 
       Marten.apps.app_configs_store = {
         "reader_spec_bar_app"                => Marten::DB::Management::Migrations::ReaderSpec::BarApp.new,
@@ -349,7 +365,9 @@ describe Marten::DB::Management::Migrations::Reader do
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
       reader.replacements.size.should eq 1
-      reader.replacements[Migration::FooApp::V202108092226113.id].should be_a Migration::FooApp::V202108092226113
+      reader.replacements[Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113.id].should(
+        be_a Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113
+      )
     end
   end
 
@@ -386,8 +404,12 @@ describe Marten::DB::Management::Migrations::Reader do
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      reader.get_migration(foo_app, "202108092226111_auto").should eq Migration::FooApp::V202108092226111
-      reader.get_migration(bar_app, "202108092226111_auto").should eq Migration::BarApp::V202108092226111
+      reader.get_migration(foo_app, "202108092226111_auto").should(
+        eq Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
+      reader.get_migration(bar_app, "202108092226111_auto").should(
+        eq Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111
+      )
     end
 
     it "returns the migration class corresponding to a partial migration name" do
@@ -404,8 +426,12 @@ describe Marten::DB::Management::Migrations::Reader do
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      reader.get_migration(foo_app, "202108092226111").should eq Migration::FooApp::V202108092226111
-      reader.get_migration(bar_app, "202108092226111").should eq Migration::BarApp::V202108092226111
+      reader.get_migration(foo_app, "202108092226111").should(
+        eq Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226111
+      )
+      reader.get_migration(bar_app, "202108092226111").should(
+        eq Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111
+      )
     end
 
     it "raises the expected error if the migration name does not exists within the app" do
@@ -462,8 +488,12 @@ describe Marten::DB::Management::Migrations::Reader do
 
       reader = Marten::DB::Management::Migrations::Reader.new(Marten::DB::Connection.default)
 
-      reader.latest_migration(foo_app).should eq Migration::FooApp::V202108092226113
-      reader.latest_migration(bar_app).should eq Migration::BarApp::V202108092226111
+      reader.latest_migration(foo_app).should(
+        eq Marten::DB::Management::Migrations::ReaderSpec::FooApp::V202108092226113
+      )
+      reader.latest_migration(bar_app).should(
+        eq Marten::DB::Management::Migrations::ReaderSpec::BarApp::V202108092226111
+      )
     end
 
     it "returns nil if the app config does not have any migrations" do

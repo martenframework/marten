@@ -19,8 +19,13 @@ describe Marten::CLI::Manage::Command::ResetMigrations do
 
     introspector = Marten::DB::Management::Introspector.for(Marten::DB::Connection.default)
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
-      schema_editor.delete_table("foo_tags") if introspector.table_names.includes?("foo_tags")
-      schema_editor.delete_table("bar_tags") if introspector.table_names.includes?("bar_tags")
+      if introspector.table_names.includes?("reset_migrations_spec_foo_app_tags")
+        schema_editor.delete_table("reset_migrations_spec_foo_app_tags")
+      end
+
+      if introspector.table_names.includes?("reset_migrations_spec_bar_app_tags")
+        schema_editor.delete_table("reset_migrations_spec_bar_app_tags")
+      end
     end
 
     # Reset local migration app configs to avoid them to be used elsewhere.

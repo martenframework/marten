@@ -107,7 +107,7 @@ for_postgresql do
 
       it "returns the expected operator for an iexact predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("iexact").should eq "LIKE UPPER(%s)"
+        conn.operator_for("iexact").should eq "= UPPER(%s)"
       end
 
       it "returns the expected operator for an istartswith predicate" do

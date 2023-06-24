@@ -9,9 +9,6 @@ module Marten
           TEMPLATE_DIR = "#{__DIR__}/new/templates"
 
           # :nodoc:
-          SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
-
-          # :nodoc:
           TPL_ = {} of Nil => Nil
 
           help "Initialize a new Marten project or application structure."
@@ -59,7 +56,7 @@ module Marten
               return
             end
 
-            ask_for_database if interactive_mode?
+            ask_for_database if interactive_mode? && !app?
             if !database_valid?
               print_error(invalid_database_engine_error_message)
               return
@@ -204,6 +201,7 @@ module Marten
           private NAME_RE      = /^[-a-zA-Z0-9_]+$/
           private TYPE_APP     = "app"
           private TYPE_PROJECT = "project"
+          private SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
 
           private getter dir
           private getter name

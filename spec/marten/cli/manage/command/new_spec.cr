@@ -103,7 +103,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the interactive mode to create an app when no name is specified" do
-      stdin = IO::Memory.new("dummy_app\nsqlite3")
+      stdin = IO::Memory.new("dummy_app")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -121,7 +121,7 @@ describe Marten::CLI::Manage::Command::New do
       output.includes?("Structure type ('project or 'app'):").should be_false
       output.includes?("App name:").should be_true
       output.includes?("Include authentication [yes/no]?").should be_false
-      output.includes?("Database:").should be_true
+      output.includes?("Database:").should be_false
 
       Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
         File.exists?(File.join(".", "dummy_app", path)).should be_true, "File #{path} does not exist"

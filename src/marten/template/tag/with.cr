@@ -17,18 +17,22 @@ module Marten
       class With < Base
         include CanExtractAssignments
 
-        @assignments : Array(Tuple(String, String))
+        @assignments : Array(Tuple(String, FilterExpression))
         @with_nodes : NodeSet
 
         def initialize(parser : Parser, source : String)
-          @assignments = extract_assignments(source)
+          assignments = extract_assignments(source)
           @with_nodes = parser.parse(up_to: {"endwith"})
           parser.shift_token
 
-          if @assignments.size == 0
+          if assignments.size == 0
             raise Errors::InvalidSyntax.new(
-              "Malformed with tag:at least on assignment must be present"
+              "Malformed with tag:at least one assignment must be present"
             )
+          end
+
+          @assignments = assignments.map do |variable_name, raw_filter_expression|
+            {variable_name, FilterExpression.new(raw_filter_expression)}
           end
         end
 
@@ -36,7 +40,7 @@ module Marten
           context.stack do |with_context|
             String.build do |io|
               @assignments.each do |assignment|
-                context[assignment[0]] = FilterExpression.new(assignment.[1]).resolve(context)
+                context[assignment[0]] = assignment[1].resolve(context)
               end
 
               io << @with_nodes.render(with_context)

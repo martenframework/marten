@@ -9,7 +9,7 @@ describe Marten::Template::Tag::With do
 
       expect_raises(
         Marten::Template::Errors::InvalidSyntax,
-        "Malformed with tag:at least on assignment must be present"
+        "Malformed with tag:at least one assignment must be present"
       ) do
         Marten::Template::Tag::With.new(parser, "with x")
       end

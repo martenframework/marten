@@ -89,7 +89,7 @@ module Marten
           "gte"         => ">= %s",
           "icontains"   => "LIKE UPPER(%s)",
           "iendswith"   => "LIKE UPPER(%s)",
-          "iexact"      => "LIKE UPPER(%s)",
+          "iexact"      => "= UPPER(%s)",
           "istartswith" => "LIKE UPPER(%s)",
           "lt"          => "< %s",
           "lte"         => "<= %s",

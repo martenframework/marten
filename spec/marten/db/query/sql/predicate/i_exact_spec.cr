@@ -13,7 +13,7 @@ describe Marten::DB::Query::SQL::Predicate::IExact do
 
       for_postgresql do
         predicate.to_sql(Marten::DB::Connection.default).should eq(
-          {"UPPER(table.title) LIKE UPPER(%s)", ["foo"]}
+          {"UPPER(table.title) = UPPER(%s)", ["foo"]}
         )
       end
 

@@ -26,10 +26,28 @@ Marten.configure do |config|
 
   # Databases
   # https://martenframework.com/docs/development/reference/settings#database-settings
+  <%- if @context.database == "sqlite3" -%>
   config.database do |db|
     db.backend = :sqlite
     db.name = Path["<%= @context.name %>.db"].expand
   end
+  <%- elsif @context.database == "mysql" -%>
+  config.database do |db|
+    db.backend = :mysql
+    db.host = "localhost"
+    db.name = "<%= @context.name %>_db"
+    # db.user = "my_user"
+    # db.password = "my_passport"
+  end
+  <%- elsif @context.database == "postgresql" -%>
+  config.database do |db|
+    db.backend = :postgresql
+    db.host = "localhost"
+    db.name = "<%= @context.name %>_db"
+    # db.user = "my_user"
+    # db.password = "my_passport"
+  end
+  <%- end -%>
 
   # Templates context producers
   # https://martenframework.com/docs/development/reference/settings#context_producers

@@ -9,6 +9,9 @@ module Marten
           TEMPLATE_DIR = "#{__DIR__}/new/templates"
 
           # :nodoc:
+          SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
+
+          # :nodoc:
           TPL_ = {} of Nil => Nil
 
           help "Initialize a new Marten project or application structure."
@@ -21,6 +24,7 @@ module Marten
           @name : String?
           @type : String?
           @with_auth : Bool = false
+          @database : String = "sqlite3"
 
           class_getter app_templates
           class_getter project_templates
@@ -30,6 +34,12 @@ module Marten
             on_argument(:name, "Name of the project or app to initialize") { |v| @name = v }
             on_option_with_arg(:d, :dir, arg: "dir", description: "Optional destination directory") { |v| @dir = v }
             on_option(:"with-auth", "Adds authentication to newly created projects") { @with_auth = true }
+            on_option_with_arg(
+              :database,
+              arg: "db",
+              description: "Configure for default database (options: mysql/postgresql/sqlite3)") do |db|
+              @database = db
+            end
           end
 
           def run
@@ -49,6 +59,12 @@ module Marten
               return
             end
 
+            ask_for_database if interactive_mode?
+            if !database_valid?
+              print_error(invalid_database_engine_error_message)
+              return
+            end
+
             ask_for_auth_app_addition if interactive_mode? && project? && !with_auth?
 
             if app? && with_auth?
@@ -59,6 +75,7 @@ module Marten
             context.name = name.not_nil!
             context.dir = (@dir.nil? || @dir.not_nil!.empty?) ? name.not_nil! : @dir.not_nil!
             context.targets << Context::TARGET_AUTH if with_auth?
+            context.database = database
 
             create_files(
               project? ? self.class.project_templates : self.class.app_templates,
@@ -191,6 +208,7 @@ module Marten
           private getter dir
           private getter name
           private getter type
+          private getter database
 
           private getter? interactive_mode
           private getter? with_auth
@@ -233,6 +251,27 @@ module Marten
             end
           end
 
+          private def ask_for_database(show_explanation : Bool = true) : Nil
+            if show_explanation
+              print_explanation(
+                "Which database to use? " \
+                "Select from sqlite3, mysql and postgresql (default: sqlite3)"
+              )
+            end
+
+            print(style("\nDatabase:", mode: :bold), ending: " ")
+            @database = stdin.gets.to_s.downcase.strip
+
+            if @database.empty?
+              @database = "sqlite3"
+            end
+
+            if !database_valid?
+              print(invalid_database_engine_error_message)
+              ask_for_database(show_explanation: false)
+            end
+          end
+
           private def ask_for_structure_type(show_explanation : Bool = true) : Nil
             if show_explanation
               print_explanation(
@@ -262,6 +301,10 @@ module Marten
             end
           end
 
+          private def invalid_database_engine_error_message : String
+            "Invalid database. Supported databases are: mysql, postgresql, sqlite3."
+          end
+
           private def invalid_project_or_app_name_error_message : String
             "#{project? ? "Project" : "App"} name can only contain letters, numbers, underscores, and dashes."
           end
@@ -272,6 +315,10 @@ module Marten
 
           private def name_valid? : Bool
             !@name.nil? && !@name.not_nil!.empty? && NAME_RE.matches?(@name.to_s)
+          end
+
+          private def database_valid? : Bool
+            SUPPORTED_DATABASES.includes? @database.downcase
           end
 
           private def print_explanation(explanation : String) : Nil

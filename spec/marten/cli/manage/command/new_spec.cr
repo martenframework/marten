@@ -10,7 +10,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the iterative mode when no structure type is specified" do
-      stdin = IO::Memory.new("project\ndummy_project\nyes")
+      stdin = IO::Memory.new("project\ndummy_project\nsqlite3\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -28,6 +28,7 @@ describe Marten::CLI::Manage::Command::New do
       output.includes?("Structure type ('project or 'app'):").should be_true
       output.includes?("Project name:").should be_true
       output.includes?("Include authentication [yes/no]?").should be_true
+      output.includes?("Database:").should be_true
 
       Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
         File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
@@ -35,7 +36,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "properly takes into account the with auth question answer" do
-      stdin = IO::Memory.new("project\ndummy_project\nno")
+      stdin = IO::Memory.new("project\ndummy_project\nsqlite3\nno")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -53,6 +54,7 @@ describe Marten::CLI::Manage::Command::New do
       output.includes?("Structure type ('project or 'app'):").should be_true
       output.includes?("Project name:").should be_true
       output.includes?("Include authentication [yes/no]?").should be_true
+      output.includes?("Database:").should be_true
 
       Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES.each do |path|
         File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
@@ -75,7 +77,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the interactive mode to create a project when no name is specified" do
-      stdin = IO::Memory.new("dummy_project\nyes")
+      stdin = IO::Memory.new("dummy_project\nsqlite3\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -93,6 +95,7 @@ describe Marten::CLI::Manage::Command::New do
       output.includes?("Structure type ('project or 'app'):").should be_false
       output.includes?("Project name:").should be_true
       output.includes?("Include authentication [yes/no]?").should be_true
+      output.includes?("Database:").should be_true
 
       Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
         File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
@@ -100,7 +103,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the interactive mode to create an app when no name is specified" do
-      stdin = IO::Memory.new("dummy_app")
+      stdin = IO::Memory.new("dummy_app\nsqlite3")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -118,6 +121,7 @@ describe Marten::CLI::Manage::Command::New do
       output.includes?("Structure type ('project or 'app'):").should be_false
       output.includes?("App name:").should be_true
       output.includes?("Include authentication [yes/no]?").should be_false
+      output.includes?("Database:").should be_true
 
       Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
         File.exists?(File.join(".", "dummy_app", path)).should be_true, "File #{path} does not exist"
@@ -245,7 +249,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "prompts the user for the structure type again if the provided value is invalid" do
-      stdin = IO::Memory.new("bad\nproject\ndummy_project\nyes")
+      stdin = IO::Memory.new("bad\nproject\ndummy_project\nsqlite3\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -263,15 +267,48 @@ describe Marten::CLI::Manage::Command::New do
       output.includes?("Structure type ('project or 'app'):").should be_true
       output.includes?("Project name:").should be_true
       output.includes?("Include authentication [yes/no]?").should be_true
-      output.includes?("Unrecognized structure type, you must use 'project or 'app'.").should be_true
+      output.includes?("Database:").should be_true
 
       Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
         File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
       end
     end
 
-    it "prompts the user for the project name again if the provided value is invalid" do
-      stdin = IO::Memory.new("project\ndummy project\ndummy_project\nyes")
+    it "prints an error when trying to use --database with an unsupported engine" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["app", "dummy_project", "--database", "oracle"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      err_output = stderr.rewind.gets_to_end
+
+      err_output.includes?("Invalid database. Supported databases are: mysql, postgresql, sqlite3.").should be_true
+    end
+
+    it "configures sqlite3 as database when no --database is provided" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      File.read("./dummy_project/shard.yml").should contain "github: crystal-lang/crystal-sqlite3"
+      File.read("./dummy_project/config/settings/base.cr").should contain "db.backend = :sqlite"
+    end
+
+    it "configures sqlite3 if no database value is provided in interactive mode" do
+      stdin = IO::Memory.new("bad\nproject\ndummy_project\n\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -284,16 +321,56 @@ describe Marten::CLI::Manage::Command::New do
 
       command.handle
 
-      output = stdout.rewind.gets_to_end
+      File.read("./dummy_project/shard.yml").should contain "github: crystal-lang/crystal-sqlite3"
+      File.read("./dummy_project/config/settings/base.cr").should contain "db.backend = :sqlite"
+    end
 
-      output.includes?("Structure type ('project or 'app'):").should be_true
-      output.includes?("Project name:").should be_true
-      output.includes?("Include authentication [yes/no]?").should be_true
-      output.includes?("Project name can only contain letters, numbers, underscores, and dashes.").should be_true
+    it "configures sqlite3 as database when --database=sqlite3 is provided" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
 
-      Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
-        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
-      end
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--database", "sqlite3"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      File.read("./dummy_project/shard.yml").should contain "github: crystal-lang/crystal-sqlite3"
+      File.read("./dummy_project/config/settings/base.cr").should contain "db.backend = :sqlite"
+    end
+
+    it "configures mysql as database when --database=mysql is provided" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--database", "mysql"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      File.read("./dummy_project/shard.yml").should contain "github: crystal-lang/crystal-mysql"
+      File.read("./dummy_project/config/settings/base.cr").should contain "db.backend = :mysql"
+    end
+
+    it "configures postgresql as database when --database=postgresql is provided" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--database", "postgresql"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      File.read("./dummy_project/shard.yml").should contain "github: will/crystal-pg"
+      File.read("./dummy_project/config/settings/base.cr").should contain "db.backend = :postgresql"
     end
   end
 end

@@ -257,3 +257,17 @@ For example:
 ```
 
 Would output `This should not be {{ processed }}.`.
+
+## `with`
+
+The `with` template tag assigns one or more variables inside a block. After the end of the block has been reached the block variables are no longer available.
+
+For example:
+
+```
+{% with x = 'Hello World', y = 1 %}
+  {{ x }} {{ y }}!
+{% endwith %}
+```
+
+Would output `Hello World 1!`.

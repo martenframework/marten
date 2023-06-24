@@ -37,7 +37,7 @@ module Marten
             on_option_with_arg(
               :database,
               arg: "db",
-              description: "Configure for default database (options: mysql/postgresql/sqlite3)") do |db|
+              description: "Configure default database (options: mysql/postgresql/sqlite3)") do |db|
               @database = db
             end
           end

@@ -59,7 +59,7 @@ describe Marten::Template::Tag::With do
     end
   end
 
-  it "context for the variables is locally" do
+  it "does not pollute the outer context with local variables" do
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE
           {{ x }} - {{ y }}

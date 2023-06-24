@@ -98,6 +98,8 @@ module Marten
           # Saves the session store data.
           abstract def save : Nil
 
+          abstract def clear_expired_entries : Nil
+
           private def session_hash
             @session_hash ||= begin
               @accessed = true

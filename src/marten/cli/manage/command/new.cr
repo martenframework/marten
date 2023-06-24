@@ -198,9 +198,9 @@ module Marten
             template "project/src/auth/routes.cr.ecr", "src/auth/routes.cr"
           end
 
-          private NAME_RE      = /^[-a-zA-Z0-9_]+$/
-          private TYPE_APP     = "app"
-          private TYPE_PROJECT = "project"
+          private NAME_RE             = /^[-a-zA-Z0-9_]+$/
+          private TYPE_APP            = "app"
+          private TYPE_PROJECT        = "project"
           private SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
 
           private getter dir
@@ -259,10 +259,7 @@ module Marten
 
             print(style("\nDatabase:", mode: :bold), ending: " ")
             @database = stdin.gets.to_s.downcase.strip
-
-            if @database.empty?
-              @database = "sqlite3"
-            end
+            @database = "sqlite3" if @database.empty?
 
             if !database_valid?
               print(invalid_database_engine_error_message)

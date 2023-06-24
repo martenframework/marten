@@ -40,7 +40,7 @@ module Marten
           context.stack do |with_context|
             String.build do |io|
               @assignments.each do |assignment|
-                context[assignment[0]] = assignment[1].resolve(context)
+                with_context[assignment[0]] = assignment[1].resolve(context)
               end
 
               io << @with_nodes.render(with_context)

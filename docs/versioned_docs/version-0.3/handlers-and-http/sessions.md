@@ -27,7 +27,7 @@ How session data is actually persisted can be defined by configuring the right s
 
 By default, sessions are stored within a single cookie (`:cookie` session store). Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. `:cookie` is the only store that is built in the Marten web framework presently.
 
-Other session stores can be installed as separate shards. For example, the [`marten-db-session`](https://github.com/martenframework/marten-db-session) shard can be leveraged to persist session data in the database.
+Other session stores can be installed as separate shards. For example, the [`marten-db-session`](https://github.com/martenframework/marten-db-session) shard can be leveraged to persist session data in the database while the [`marten-redis-session`](https://github.com/martenframework/marten-redis-session) shard can be used for persisting session data using Redis.
 
 ## Using sessions
 

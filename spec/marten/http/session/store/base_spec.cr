@@ -255,6 +255,9 @@ module Marten::HTTP::Session::Store::BaseSpec
       {"foo" => "bar"}
     end
 
+    def clear_expired_entries : Nil
+    end
+
     def save : Nil
     end
   end

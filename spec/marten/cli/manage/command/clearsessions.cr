@@ -40,5 +40,25 @@ describe Marten::CLI::Manage::Command::ClearSessions do
         "Cancelling...\n"
       )
     end
+
+    it "does not show prompt if -no-input is provided" do
+      stdin = IO::Memory.new("")
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::ClearSessions.new(
+        options: ["--no-input"] of String,
+        stdin: stdin,
+        stdout: stdout
+      )
+
+      command.handle
+
+      stdout.rewind.gets_to_end.should_not contain(
+        "All expired sessions will be removed.\n" \
+        "These sessions can't be restored.\n" \
+        "Do you want to continue [yes/no]? " \
+        "Cancelling...\n"
+      )
+    end
   end
 end

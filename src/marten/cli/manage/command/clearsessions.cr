@@ -5,15 +5,16 @@ module Marten
         class ClearSessions < Base
           command_name :clearsessions
           help "Clears all expired sessions."
+          getter no_input
 
-          @no_prompt : Bool = false
+          @no_input : Bool = false
 
           def setup
-            on_option("-y", "Do not show prompts to the user") { @no_prompt = true }
+            on_option("no-input", "Do not show prompts to the user") { @no_input = true }
           end
 
           def run
-            unless no_prompt?
+            unless no_input
               print("All expired sessions will be removed.")
               print("These sessions can't be restored.")
               print("Do you want to continue [yes/no]?", ending: " ")
@@ -25,14 +26,8 @@ module Marten
 
             print(style("Clearing expired sessions", fore: :light_blue, mode: :bold), ending: "\n")
 
-            HTTP::Session::Store.registry.each_value do |session_store_klass|
-              store = session_store_klass.new(nil)
-              store.clear_expired_entries
-            end
-          end
-
-          private def no_prompt?
-            @no_prompt
+            session_store_klass = HTTP::Session::Store.get(Marten.settings.sessions.store)
+            session_store_klass.new(nil).clear_expired_entries
           end
         end
       end

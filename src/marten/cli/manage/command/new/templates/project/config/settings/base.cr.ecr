@@ -37,7 +37,7 @@ Marten.configure do |config|
     db.host = "localhost"
     db.name = "<%= @context.name %>_db"
     # db.user = "my_user"
-    # db.password = "my_passport"
+    # db.password = "my_password"
   end
   <%- elsif @context.database == "postgresql" -%>
   config.database do |db|
@@ -45,7 +45,7 @@ Marten.configure do |config|
     db.host = "localhost"
     db.name = "<%= @context.name %>_db"
     # db.user = "my_user"
-    # db.password = "my_passport"
+    # db.password = "my_password"
   end
   <%- end -%>
 

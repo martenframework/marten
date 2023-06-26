@@ -199,14 +199,14 @@ module Marten
           end
 
           private NAME_RE             = /^[-a-zA-Z0-9_]+$/
+          private SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
           private TYPE_APP            = "app"
           private TYPE_PROJECT        = "project"
-          private SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
 
+          private getter database
           private getter dir
           private getter name
           private getter type
-          private getter database
 
           private getter? interactive_mode
           private getter? with_auth
@@ -232,23 +232,6 @@ module Marten
             @with_auth = %w(y yes).includes?(answer)
           end
 
-          private def ask_for_project_or_app_name(show_explanation : Bool = true) : Nil
-            if show_explanation
-              print_explanation(
-                "How to name your #{project? ? "project" : "app"}? " \
-                "#{project? ? "Project" : "App"} names can only contain letters, numbers, underscores, and dashes."
-              )
-            end
-
-            print(style("\n#{project? ? "Project" : "App"} name:", mode: :bold), ending: " ")
-            @name = stdin.gets.to_s.downcase.strip
-
-            if !name_valid?
-              print(invalid_project_or_app_name_error_message)
-              ask_for_project_or_app_name(show_explanation: false)
-            end
-          end
-
           private def ask_for_database(show_explanation : Bool = true) : Nil
             if show_explanation
               print_explanation(
@@ -264,6 +247,23 @@ module Marten
             if !database_valid?
               print(invalid_database_engine_error_message)
               ask_for_database(show_explanation: false)
+            end
+          end
+
+          private def ask_for_project_or_app_name(show_explanation : Bool = true) : Nil
+            if show_explanation
+              print_explanation(
+                "How to name your #{project? ? "project" : "app"}? " \
+                "#{project? ? "Project" : "App"} names can only contain letters, numbers, underscores, and dashes."
+              )
+            end
+
+            print(style("\n#{project? ? "Project" : "App"} name:", mode: :bold), ending: " ")
+            @name = stdin.gets.to_s.downcase.strip
+
+            if !name_valid?
+              print(invalid_project_or_app_name_error_message)
+              ask_for_project_or_app_name(show_explanation: false)
             end
           end
 
@@ -296,6 +296,10 @@ module Marten
             end
           end
 
+          private def database_valid? : Bool
+            SUPPORTED_DATABASES.includes? @database.downcase
+          end
+
           private def invalid_database_engine_error_message : String
             "Invalid database. Supported databases are: mysql, postgresql, sqlite3."
           end
@@ -310,10 +314,6 @@ module Marten
 
           private def name_valid? : Bool
             !@name.nil? && !@name.not_nil!.empty? && NAME_RE.matches?(@name.to_s)
-          end
-
-          private def database_valid? : Bool
-            SUPPORTED_DATABASES.includes? @database.downcase
           end
 
           private def print_explanation(explanation : String) : Nil

@@ -113,7 +113,7 @@ The command allows you to fully define the name of your project or application, 
 
 * `-d DIR, --dir=DIR` - An optional destination directory
 * `--with-auth` - Adds an authentication application to newly created projects. See [Authentication](../../authentication) to learn more about this capability
-* `--database` - Configures the applications database. Currently `mysql`, `postgresq` and `sqlite3` are supported. See [Database settings](../settings#database-settings) for more information.
+* `--database` - Preconfigures the application database. Currently `mysql`, `postgresq` and `sqlite3` are supported. See [Database settings](../../development/reference/settings#database-settings) for more information.
 
 ### Arguments
 

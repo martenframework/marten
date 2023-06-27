@@ -28,6 +28,9 @@ module Marten
             @session_key = encryptor.encrypt(session_hash.to_json)
           end
 
+          def clear_expired_entries : Nil
+          end
+
           private def encryptor
             @encryptor ||= Core::Encryptor.new
           end

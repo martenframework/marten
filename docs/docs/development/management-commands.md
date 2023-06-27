@@ -45,6 +45,7 @@ Usage: marten [command] [arguments]
 Available commands:
 
 [marten]
+  › clearsessions
   › collectassets
   › genmigrations
   › listmigrations

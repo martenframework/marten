@@ -56,6 +56,9 @@ module Marten::HTTP::Session::StoreSpec
       SessionHash.new
     end
 
+    def clear_expired_entries : Nil
+    end
+
     def save : Nil
     end
   end

@@ -6,6 +6,25 @@ toc_max_heading_level: 2
 
 This page provides a reference for all the available management commands and their options.
 
+## `clearsessions`
+
+**Usage:** `marten clearsessions [options]`
+
+Clears all expired sessions for the configured session store.
+
+Please refer to [Sessions](../../handlers-and-http/sessions.md) to learn more about sessions.
+
+### Options
+
+* `--no-input` - Does not show prompts to the user
+
+### Examples
+
+```bash
+marten clearsessions            # Clears all expired sessions
+marten clearsessions --no-input # Clears all expired sessions without any prompts
+```
+
 ## `collectassets`
 
 **Usage:** `marten collectassets [options]`

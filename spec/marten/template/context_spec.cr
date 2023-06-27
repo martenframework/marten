@@ -148,6 +148,11 @@ describe Marten::Template::Context do
       ctx["foo"].should eq "bar"
     end
 
+    it "returns the value corresponding to the passed key symbol" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx[:foo].should eq "bar"
+    end
+
     it "returns the value corresponding to most recent values stack" do
       ctx = Marten::Template::Context{"foo" => "bar"}
       ctx.stack do |depth_1_ctx|
@@ -179,6 +184,11 @@ describe Marten::Template::Context do
     it "returns the value corresponding to the passed key" do
       ctx = Marten::Template::Context{"foo" => "bar"}
       ctx["foo"]?.should eq "bar"
+    end
+
+    it "returns the value corresponding to the passed key" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx[:foo]?.should eq "bar"
     end
 
     it "returns the value corresponding to most recent values stack" do
@@ -213,6 +223,13 @@ describe Marten::Template::Context do
       value = Marten::Template::Value.from("bar")
       ctx = Marten::Template::Context.new
       ctx["foo"] = value
+      ctx["foo"].should eq value
+    end
+
+    it "allows to insert a specific template value for a given key symbol into the context" do
+      value = Marten::Template::Value.from("bar")
+      ctx = Marten::Template::Context.new
+      ctx[:foo] = value
       ctx["foo"].should eq value
     end
 

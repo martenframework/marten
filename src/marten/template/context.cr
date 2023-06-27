@@ -54,29 +54,29 @@ module Marten
       end
 
       # Returns a specific context value for a given key.
-      def [](key : String) : Value
+      def [](key : String | Symbol) : Value
         @values.reverse_each do |values|
-          return values[key] if values.has_key?(key)
+          return values[key.to_s] if values.has_key?(key.to_s)
         end
 
-        raise KeyError.new(key)
+        raise KeyError.new(key.to_s)
       end
 
       # Returns a specific context value for a given key or `nil` if not found.
-      def []?(key : String) : Value?
-        self[key]
+      def []?(key : String | Symbol) : Value?
+        self[key.to_s]
       rescue KeyError
         nil
       end
 
       # Allows to add a new value into the context.
-      def []=(key : String, value)
-        @values.last.not_nil![key] = Value.from(value)
+      def []=(key : String | Symbol, value)
+        @values.last.not_nil![key.to_s] = Value.from(value)
       end
 
       # :ditto:
-      def []=(key : String, value : Value)
-        @values.last.not_nil![key] = value
+      def []=(key : String | Symbol, value : Value)
+        @values.last.not_nil![key.to_s] = value
       end
 
       # Returns `true` if the context is empty.

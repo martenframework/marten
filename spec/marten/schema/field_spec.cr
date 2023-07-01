@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Marten::Schema::Field do
   describe "#registry" do
     it "returns the expected field abstractions" do
-      Marten::Schema::Field.registry.size.should eq 11
+      Marten::Schema::Field.registry.size.should eq 12
       Marten::Schema::Field.registry["bool"].should eq Marten::Schema::Field::Bool
       Marten::Schema::Field.registry["date"].should eq Marten::Schema::Field::Date
       Marten::Schema::Field.registry["date_time"].should eq Marten::Schema::Field::DateTime
@@ -14,6 +14,7 @@ describe Marten::Schema::Field do
       Marten::Schema::Field.registry["int"].should eq Marten::Schema::Field::Int
       Marten::Schema::Field.registry["json"].should eq Marten::Schema::Field::JSON
       Marten::Schema::Field.registry["string"].should eq Marten::Schema::Field::String
+      Marten::Schema::Field.registry["url"].should eq Marten::Schema::Field::URL
       Marten::Schema::Field.registry["uuid"].should eq Marten::Schema::Field::UUID
     end
   end

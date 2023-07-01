@@ -9,6 +9,7 @@ require "./field/float"
 require "./field/int"
 require "./field/json"
 require "./field/string"
+require "./field/url"
 require "./field/uuid"
 
 module Marten
@@ -87,6 +88,7 @@ module Marten
       register "int", Int
       register "json", JSON
       register "string", String
+      register "url", URL
       register "uuid", UUID
     end
   end

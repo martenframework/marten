@@ -16,6 +16,9 @@ en:
         text:
           errors:
             too_long: "The maximum allowed length is %{max_size}"
+        url:
+          errors:
+            invalid: "Enter a valid URL."
         uuid:
           errors:
             invalid: "A valid UUID must be provided"
@@ -76,6 +79,9 @@ en:
           errors:
             too_short: "The minimum allowed length is %{min_size}."
             too_long: "The maximum allowed length is %{max_size}."
+        url:
+          errors:
+            invalid: "Enter a valid URL."
         uuid:
           errors:
             invalid: "Enter a valid UUID."

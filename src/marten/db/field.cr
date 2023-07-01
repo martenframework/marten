@@ -11,6 +11,7 @@ require "./field/int"
 require "./field/json"
 require "./field/string"
 require "./field/text"
+require "./field/url"
 require "./field/uuid"
 
 require "./field/many_to_many"
@@ -114,6 +115,7 @@ module Marten
       register "one_to_one", OneToOne
       register "string", String
       register "text", Text
+      register "url", URL
       register "uuid", UUID
     end
   end

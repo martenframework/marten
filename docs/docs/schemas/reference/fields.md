@@ -128,3 +128,19 @@ The `strip` argument allows defining whether the string value should be stripped
 ### `uuid`
 
 A `uuid` field allows validating Universally Unique IDentifiers (UUID) values. Fields using this type are converted to `UUID` objects in Crystal.
+
+### `url`
+
+A `url` field allows validating URL address values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_size`
+
+The `max_size` argument allows defining the maximum size allowed for the URL string. The default value for this argument is `200`.
+
+#### `min_size`
+
+The `min_size` argument allows defining the minimum size allowed for the URL string. The default value for this argument is `nil`, which means that the minimum size is not validated by default.
+
+#### `strip`
+
+The `strip` argument allows defining whether the string value should be stripped of leading and trailing whitespaces. The default is `true`.

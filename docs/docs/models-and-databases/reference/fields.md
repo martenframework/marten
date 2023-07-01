@@ -227,6 +227,14 @@ A `text` field allows to persist large text values. In addition to the [common f
 
 The `max_size` argument allows to specify the maximum size of the persisted string. This maximum size is used when it comes to validate field values. Defaults to `nil`.
 
+### `url`
+
+A `url` field allows persisting _valid_ URL addresses. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_size`
+
+The `max_size` argument is optional and defaults to 200 characters. It allows to specify the maximum size of the persisted URLs. This maximum size is used for the corresponding column definition and when it comes to validate field values.
+
 ### `uuid`
 
 A `uuid` field allows persisting Universally Unique IDentifiers (`UUID` objects).

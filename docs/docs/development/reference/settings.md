@@ -745,3 +745,9 @@ config.templates.dirs = [
   :"src/path2/templates",
 ]
 ```
+
+### `strict_variables`
+
+Default: `false`
+
+A boolean allowing to enable or disable the [strict variables](../../templates/introduction#strict-variables) for templates. When this setting is set to `true`, unknown variables encountered in templates will result in [`Marten::Template::Errors::UnknownVariable`](pathname:///api/dev/Marten/Template/Errors/UnknownVariable.html) exceptions to be raised. When set to `false`, unknown variables will simply be treated as `nil` values in templates.

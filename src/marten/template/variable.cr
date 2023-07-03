@@ -32,7 +32,7 @@ module Marten
         end
       end
 
-      def resolve(context : Context)
+      def resolve(context : Context) : Value
         return @literal.not_nil! unless @literal.nil?
 
         current = nil
@@ -44,6 +44,8 @@ module Marten
                       current.not_nil![bit]
                     end
         rescue KeyError | Errors::UnknownVariable
+          return Value.from(nil) unless Marten.settings.templates.strict_variables?
+
           raise Errors::UnknownVariable.new(
             String.build do |s|
               s << "Failed lookup for attribute '"

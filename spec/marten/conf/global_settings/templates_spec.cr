@@ -152,4 +152,44 @@ describe Marten::Conf::GlobalSettings::Templates do
       ])
     end
   end
+
+  describe "#strict_variables" do
+    it "returns false by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.strict_variables.should be_false
+    end
+
+    it "returns true if the strict variables mode is enabled" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.strict_variables = true
+
+      templates_conf.strict_variables.should be_true
+    end
+  end
+
+  describe "#strict_variables?" do
+    it "returns false by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.strict_variables?.should be_false
+    end
+
+    it "returns true if the strict variables mode is enabled" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.strict_variables = true
+
+      templates_conf.strict_variables?.should be_true
+    end
+  end
+
+  describe "#strict_variables=" do
+    it "enables the strict variables mode" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.strict_variables = true
+
+      templates_conf.strict_variables?.should be_true
+    end
+  end
 end

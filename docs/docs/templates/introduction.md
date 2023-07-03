@@ -351,3 +351,9 @@ When rendered with `<b>John</b>` as the content of the `name` variable, the abov
 Hello, &lt;b&gt;John&lt;/b&gt;!
 Hello, <b>John</b>!
 ```
+
+## Strict variables
+
+By default, when a template variable is unknown or undefined, Marten treats it as a `nil` value. Consequently, nothing will be displayed for such variables, and they will be evaluated as falsey in if conditions.
+
+However, it is possible to modify this behavior by enabling the [`templates.strict_variables`](../development/reference/settings#strict_variables) setting. When this setting is set to `true`, unknown variables encountered in templates will raise [`Marten::Template::Errors::UnknownVariable`](pathname:///api/dev/Marten/Template/Errors/UnknownVariable.html) exceptions.

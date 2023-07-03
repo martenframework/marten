@@ -7,6 +7,7 @@ module Marten
         @cached : Bool = false
         @context_producers = [] of Template::ContextProducer.class
         @dirs : Array(String) = [] of String
+        @strict_variables : Bool = false
 
         # Returns a boolean indicating whether templates should be looked for inside installed applications.
         getter app_dirs
@@ -22,6 +23,12 @@ module Marten
         # The order of these directories is important as it defines the order in which templates are searched for.
         getter dirs
 
+        # Returns `true` if the strict variables mode is enabled.
+        getter strict_variables
+
+        # :ditto:
+        getter? strict_variables
+
         # Allows to set whether templates should be looked for inside installed applications.
         setter app_dirs
 
@@ -31,6 +38,12 @@ module Marten
         # setting this configuration option to `true`, compiled templates will be kept in memory and further renderings
         # of the same templates will result in previous compiled templates to be reused.
         setter cached
+
+        # Alows to enable or disable the strict variables mode.
+        #
+        # When this setting is set to `true`, unknown variables encountered in templates will result in
+        # `Marten::Template::Errors::UnknownVariable` exceptions to be raised.
+        setter strict_variables
 
         # Allows to set the context producers that will be used to populate the context for each template.
         def context_producers=(v)

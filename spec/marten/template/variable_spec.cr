@@ -73,17 +73,35 @@ describe Marten::Template::Variable do
       variable.resolve(Marten::Template::Context{"foo" => {"user" => {"first_name" => "bar"}}}).should eq "bar"
     end
 
-    it "raises if a single variable is not in the context" do
+    it "returns nil string value if a single variable is not in the context by default" do
       variable = Marten::Template::Variable.new("foo")
-      expect_raises(Marten::Template::Errors::UnknownVariable) do
-        variable.resolve(Marten::Template::Context{"text" => "xyz"})
+
+      variable.resolve(Marten::Template::Context{"text" => "xyz"}).raw.should be_nil
+    end
+
+    it "returns nil string if a lookup is not found for a variable that is in the context by default" do
+      variable = Marten::Template::Variable.new("foo.user.last_name")
+
+      variable.resolve(Marten::Template::Context{"foo" => {"user" => {"first_name" => "bar"}}}).raw.should be_nil
+    end
+
+    it "raises if a single variable is not in the context when the strict variables mode is on" do
+      with_overridden_setting("templates.strict_variables", true) do
+        variable = Marten::Template::Variable.new("foo")
+
+        expect_raises(Marten::Template::Errors::UnknownVariable) do
+          variable.resolve(Marten::Template::Context{"text" => "xyz"})
+        end
       end
     end
 
-    it "raises if lookup is not found for a variable that is in the context" do
-      variable = Marten::Template::Variable.new("foo.user.last_name")
-      expect_raises(Marten::Template::Errors::UnknownVariable) do
-        variable.resolve(Marten::Template::Context{"foo" => {"user" => {"first_name" => "bar"}}})
+    it "raises if a lookup is not found for a variable that is in the context when the strict variables mode is on" do
+      with_overridden_setting("templates.strict_variables", true) do
+        variable = Marten::Template::Variable.new("foo.user.last_name")
+
+        expect_raises(Marten::Template::Errors::UnknownVariable) do
+          variable.resolve(Marten::Template::Context{"foo" => {"user" => {"first_name" => "bar"}}})
+        end
       end
     end
   end

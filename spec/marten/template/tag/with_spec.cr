@@ -42,23 +42,6 @@ describe Marten::Template::Tag::With do
     tag.render(Marten::Template::Context.new).strip.should eq "1 - 2"
   end
 
-  it "raises if a variable was defined but not set" do
-    parser = Marten::Template::Parser.new(
-      <<-TEMPLATE
-          {{ x }}|{{ y }}
-          {% endwith %}
-          TEMPLATE
-    )
-    tag = Marten::Template::Tag::With.new(parser, "with x=1, y")
-
-    expect_raises(
-      Marten::Template::Errors::UnknownVariable,
-      "Failed lookup for attribute 'y'"
-    ) do
-      tag.render(Marten::Template::Context.new)
-    end
-  end
-
   it "does not pollute the outer context with local variables" do
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE

@@ -45,7 +45,9 @@ module Marten
       end
 
       def context
-        super.not_nil!.merge({self.class.record_context_name => record})
+        ctx = super || Marten::Template::Context.new
+        ctx[self.class.record_context_name] = record
+        ctx
       end
 
       # Returns a hash of initial data, computed from the considered record, to prepare the schema.

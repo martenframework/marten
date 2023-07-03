@@ -33,9 +33,10 @@ describe Marten::Handlers::Schema do
       )
       handler = Marten::Handlers::SchemaSpec::TestHandler.new(request)
 
-      handler.context["schema"].should be_a Marten::Handlers::SchemaSpec::TestSchema
-      handler.context["schema"]["foo"].value.should be_nil
-      handler.context["schema"]["bar"].value.should be_nil
+      handler.context["schema"].raw.should be_a Marten::Handlers::SchemaSpec::TestSchema
+      schema = handler.context["schema"].raw.as(Marten::Schema)
+      schema["foo"].value.should be_nil
+      schema["bar"].value.should be_nil
     end
 
     it "includes the schema instance with data if the request provides data" do
@@ -49,9 +50,10 @@ describe Marten::Handlers::Schema do
       )
       handler = Marten::Handlers::SchemaSpec::TestHandler.new(request)
 
-      handler.context["schema"].should be_a Marten::Handlers::SchemaSpec::TestSchema
-      handler.context["schema"]["foo"].value.should eq "123"
-      handler.context["schema"]["bar"].value.should eq "456"
+      handler.context["schema"].raw.should be_a Marten::Handlers::SchemaSpec::TestSchema
+      schema = handler.context["schema"].raw.as(Marten::Schema)
+      schema["foo"].value.should eq "123"
+      schema["bar"].value.should eq "456"
     end
   end
 

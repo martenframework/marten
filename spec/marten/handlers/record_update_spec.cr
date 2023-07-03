@@ -29,7 +29,7 @@ describe Marten::Handlers::RecordUpdate do
       )
       handler = Marten::Handlers::RecordUpdateSpec::TestHandler.new(request, params)
 
-      handler.context["schema"].should be_a Marten::Handlers::RecordUpdateSpec::TagSchema
+      handler.context["schema"].raw.should be_a Marten::Handlers::RecordUpdateSpec::TagSchema
       handler.context["tag"].should eq tag
     end
   end

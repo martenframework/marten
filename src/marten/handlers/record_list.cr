@@ -39,7 +39,7 @@ module Marten
 
       def context
         records = self.class.page_size.nil? ? queryset : paginate_queryset
-        {self.class.list_context_name => records}
+        Marten::Template::Context{self.class.list_context_name => records}
       end
     end
   end

@@ -30,7 +30,7 @@ module Marten
       end
 
       def context
-        {self.class.record_context_name => record}
+        Marten::Template::Context{self.class.record_context_name => record}
       end
     end
   end

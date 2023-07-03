@@ -67,7 +67,7 @@ module Marten
       end
 
       def context
-        {"schema" => schema}
+        Marten::Template::Context{"schema" => schema}
       end
 
       def initial_data

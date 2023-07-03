@@ -32,7 +32,7 @@ describe Marten::Handlers::RecordList do
       )
       handler = Marten::Handlers::RecordListSpec::TestHandler.new(request, params)
 
-      handler.context["users"].should be_a Marten::DB::Query::Set(TestUser)
+      handler.context["users"].raw.should be_a Marten::DB::Query::Set(TestUser)
       handler.context["users"].to_a.should eq [user_1, user_2]
     end
 
@@ -51,8 +51,8 @@ describe Marten::Handlers::RecordList do
       )
       handler = Marten::Handlers::RecordListSpec::TestHandlerWithPagination.new(request, params)
 
-      handler.context["users"].should be_a Marten::DB::Query::Page(TestUser)
-      handler.context["users"].as(Marten::DB::Query::Page(TestUser)).number.should eq 1
+      handler.context["users"].raw.should be_a Marten::DB::Query::Page(TestUser)
+      handler.context["users"].raw.as(Marten::DB::Query::Page(TestUser)).number.should eq 1
       handler.context["users"].to_a.should eq [user_1, user_2]
     end
   end

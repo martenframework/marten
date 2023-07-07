@@ -1,8 +1,35 @@
 ---
+hide_title: true
+pagination_prev: null
+pagination_next: null
 slug: /
+title: Prologue
 ---
 
-# Prologue
+import logo from "./static/img/prologue/logo.png";
+
+<div
+  style={{
+    margin: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  }}
+>
+  <img src={logo} alt="logo" style={{ width: "200px", height: "215px" }} />
+</div>
+<div
+  style={{
+    marginBottom: "80px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  }}
+>
+  <h2>
+    Welcome to the <i>Marten</i> documentation!
+  </h2>
+</div>
 
 **Marten** is a Crystal Web framework that enables pragmatic development and rapid prototyping. It provides a consistent and extensible set of tools that developers can leverage to build web applications without reinventing the wheel.
 

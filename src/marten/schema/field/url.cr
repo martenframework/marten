@@ -20,7 +20,7 @@ module Marten
           # Leverage string's built-in validations (max size).
           super
 
-          if !value.empty? && !Emailing::Address.valid?(value)
+          if !value.empty? && !Core::Validator::URL.valid?(value)
             schema.errors.add(id, I18n.t("marten.schema.field.url.errors.invalid"))
           end
         end

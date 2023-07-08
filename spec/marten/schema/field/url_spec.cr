@@ -36,7 +36,7 @@ describe Marten::Schema::Field::URL do
 
     it "does not add an error to the schema if the string contains a valid URL" do
       schema = Marten::Schema::Field::URLSpec::TestSchema.new(
-        Marten::HTTP::Params::Data{"test_field" => ["test@example.com"]}
+        Marten::HTTP::Params::Data{"test_field" => ["https://example.com"]}
       )
 
       field = Marten::Schema::Field::URL.new("test_field")

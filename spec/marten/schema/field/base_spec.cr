@@ -1,6 +1,27 @@
 require "./spec_helper"
 
 describe Marten::Schema::Field::Base do
+  describe "#empty_value?" do
+    it "returns true for nil values" do
+      field = Marten::Schema::Field::BaseSpec::TestField.new("test_field")
+
+      field.empty_value?(nil).should be_true
+    end
+
+    it "returns true for blank strings" do
+      field = Marten::Schema::Field::BaseSpec::TestField.new("test_field")
+
+      field.empty_value?("").should be_true
+    end
+
+    it "returns false for other values" do
+      field = Marten::Schema::Field::BaseSpec::TestField.new("test_field")
+
+      field.empty_value?(42).should be_false
+      field.empty_value?("foo").should be_false
+    end
+  end
+
   describe "#id" do
     it "returns the field identifier" do
       field = Marten::Schema::Field::BaseSpec::TestField.new("test_field")
@@ -70,7 +91,7 @@ describe Marten::Schema::Field::Base do
   describe "::contribute_to_schema" do
     it "sets up the expected getter method allowing to fetch type-safe validated field data" do
       schema = Marten::Schema::Field::BaseSpec::FooBarSchema.new(
-        Marten::Schema::DataHash{"foo" => "hello", "bar" => "42"}
+        Marten::Schema::DataHash{"foo" => "", "bar" => "42"}
       )
 
       schema.foo.should be_nil
@@ -83,9 +104,9 @@ describe Marten::Schema::Field::Base do
 
       schema.valid?.should be_true
 
-      schema.foo.should eq "hello"
-      schema.foo!.should eq "hello"
-      schema.foo?.should be_true
+      schema.foo.should eq ""
+      schema.foo!.should eq ""
+      schema.foo?.should be_false
       typeof(schema.foo).should eq String?
 
       schema.bar.should eq 42
@@ -102,7 +123,7 @@ module Marten::Schema::Field::BaseSpec
   end
 
   class FooBarSchema < Marten::Schema
-    field :foo, :string
+    field :foo, :string, required: false
     field :bar, :int
   end
 

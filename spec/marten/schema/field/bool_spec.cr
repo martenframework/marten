@@ -1,6 +1,22 @@
 require "./spec_helper"
 
 describe Marten::Schema::Field::Bool do
+  describe "#empty_value?" do
+    it "returns true for falsey values" do
+      field = Marten::Schema::Field::Bool.new("test_field")
+
+      field.empty_value?(nil).should be_true
+      field.empty_value?(false).should be_true
+    end
+
+    it "returns false for truthy values" do
+      field = Marten::Schema::Field::Bool.new("test_field")
+
+      field.empty_value?(true).should be_false
+      field.empty_value?("foo").should be_false
+    end
+  end
+
   describe "#deserialize" do
     it "returns true if the value is true" do
       field = Marten::Schema::Field::Bool.new("test_field")

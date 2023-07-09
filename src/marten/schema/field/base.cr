@@ -18,6 +18,11 @@ module Marten
         # Serializes a field value.
         abstract def serialize(value) : ::String?
 
+        # Returns `true` if the value is considered empty by the field.
+        def empty_value?(value) : ::Bool
+          EMPTY_VALUES.includes?(value.is_a?(::JSON::Any) ? value.raw : value)
+        end
+
         # :nodoc:
         def perform_validation(schema : Schema)
           begin
@@ -72,16 +77,12 @@ module Marten
             end
 
             def {{ field_id }}?
-              !{{ field_id }}.nil?
+              !self.class.get_field({{ field_id.stringify }}).empty_value?({{ field_id }})
             end
           end
         end
 
         private EMPTY_VALUES = [nil, ""]
-
-        private def empty_value?(value) : ::Bool
-          EMPTY_VALUES.includes?(value.is_a?(::JSON::Any) ? value.raw : value)
-        end
 
         private def invalid_error_message(_schema)
           I18n.t("marten.schema.field.base.errors.invalid")

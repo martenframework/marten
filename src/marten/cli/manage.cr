@@ -95,7 +95,7 @@ module Marten
 
         usage << USAGE_HEADER % @name
 
-        longest_command_name = @commands_per_name.values.map(&.command_name.size).max
+        longest_command_name = @commands_per_name.values.max_of(&.command_name.size)
         description_padding = ->(command_name : String) { " " * (longest_command_name - command_name.size + 2) }
 
         per_app_commands = @commands_per_name.values.group_by do |command|

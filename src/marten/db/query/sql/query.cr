@@ -49,11 +49,8 @@ module Marten
 
           def add_query_node(query_node : Node)
             predicate_node = process_query_node(query_node)
-            if @predicate_node.nil?
-              @predicate_node = predicate_node
-            else
-              @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
-            end
+            @predicate_node ||= PredicateNode.new
+            @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
           end
 
           def add_selected_join(relation : String) : Nil

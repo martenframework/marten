@@ -129,6 +129,24 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.should eq [user_2]
     end
 
+    it "adds a root predicate to prevent inconsistencies based on the order of negated and non-negated predicates" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: :c))
+      query_1.add_query_node(-Marten::DB::Query::Node.new(pk: tag_3.pk))
+      query_1.count.should eq 1
+      query_1.execute.should eq [tag_2]
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(-Marten::DB::Query::Node.new(pk: tag_3.pk))
+      query_2.add_query_node(Marten::DB::Query::Node.new(name__startswith: :c))
+      query_2.count.should eq 1
+      query_2.execute.should eq [tag_2]
+    end
+
     it "raises if a query node targeting an unknown field is added" do
       query = Marten::DB::Query::SQL::Query(Tag).new
       expect_raises(

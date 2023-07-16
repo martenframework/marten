@@ -19,7 +19,7 @@ If `value` is "marten", the output will be "Marten".
 
 ## `default`
 
-The `default` filter allows to fallback to a specific value if the left side of the filter expression is not truthy. A filter argument is mandatory. It should be noted that empty strings are considered truthy and will be returned by this filter.
+The `default` filter allows to fallback to a specific value if the left side of the filter expression is empty or not truthy. A filter argument is mandatory. It should be noted that empty strings are considered truthy and will be returned by this filter.
 
 For example:
 

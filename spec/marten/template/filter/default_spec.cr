@@ -17,9 +17,9 @@ describe Marten::Template::Filter::Default do
       filter.apply(Marten::Template::Value.from(nil), Marten::Template::Value.from("default")).should eq "default"
     end
 
-    it "returns the initial value if it is an empty string" do
+    it "returns the default value if it is an empty string" do
       filter = Marten::Template::Filter::Default.new
-      filter.apply(Marten::Template::Value.from(""), Marten::Template::Value.from("default")).should eq ""
+      filter.apply(Marten::Template::Value.from(""), Marten::Template::Value.from("default")).should eq "default"
     end
 
     it "returns the initial value if it is truthy" do

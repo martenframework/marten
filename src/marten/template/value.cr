@@ -63,11 +63,21 @@ module Marten
         yield_each_from_raw { |r| yield Value.from(r) }
       end
 
+      # Returns `true` if the value is empty.
+      def empty?
+        if (object = raw).responds_to?(:empty?)
+          return object.empty?
+        end
+
+        false
+      end
+
       # :nodoc:
       def to_s(io)
         @raw.to_s(io)
       end
 
+      # Returns `true` if the value is truthy (ie. if it is not `false`, `0`, or `nil`).
       def truthy?
         !(@raw == false || @raw == 0 || @raw.nil?)
       end

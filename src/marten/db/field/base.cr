@@ -57,6 +57,21 @@ module Marten
           !db_column.nil?
         end
 
+        # Returns `true` if the value is considered empty by the field.
+        def empty_value?(value) : ::Bool
+          value.nil?
+        end
+
+        # Returns `true` if true should be returned for `getter?`-like methods for the field.
+        #
+        # Usually, `true` would be returned for values that are truthy and not empty, but this logic can be overridden
+        # on a per-field implementation basis.
+        def getter_value?(value) : ::Bool
+          return false if !truthy_value?(value)
+
+          !empty_value?(value)
+        end
+
         # Returns true if an index should be created at the database level for the field.
         def index?
           @index
@@ -116,6 +131,11 @@ module Marten
           raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
         end
 
+        # Returns `true` if the if the value is considered truthy by the field.
+        def truthy_value?(value)
+          !(value == false || value == 0 || value.nil?)
+        end
+
         # Returns a boolean indicating whether the field value should be unique throughout the associated table.
         def unique?
           @unique
@@ -161,7 +181,7 @@ module Marten
               end
 
               def {{ field_id }}?
-                !@{{ field_id }}.nil?
+                self.class.get_field({{ field_id.stringify }}).getter_value?({{ field_id }})
               end
 
               def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
@@ -171,10 +191,6 @@ module Marten
 
         private def blank_error_message(_record)
           I18n.t("marten.db.field.base.errors.blank")
-        end
-
-        private def empty_value?(value) : ::Bool
-          value.nil?
         end
 
         private def null_error_message(_record)

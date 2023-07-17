@@ -14,6 +14,48 @@ describe Marten::DB::Field::Base do
     end
   end
 
+  describe "#empty_value?" do
+    it "returns true for nil values" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
+
+      field.empty_value?(nil).should be_true
+    end
+
+    it "returns false for other values" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
+
+      field.empty_value?("").should be_false
+      field.empty_value?("  ").should be_false
+      field.empty_value?("foo bar").should be_false
+      field.empty_value?([] of String).should be_false
+      field.empty_value?(["foo", "bar"]).should be_false
+    end
+  end
+
+  describe "#getter_value?" do
+    it "returns true for truthy values" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
+
+      field.getter_value?("foobar").should be_true
+      field.getter_value?(42).should be_true
+      field.getter_value?(true).should be_true
+    end
+
+    it "returns false for non-truthy values" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
+
+      field.getter_value?(nil).should be_false
+      field.getter_value?(false).should be_false
+      field.getter_value?(0).should be_false
+    end
+
+    it "returns false for empty values" do
+      field = Marten::DB::Field::BaseSpec::TestFieldWithCustomEmptyValues.new("my_field")
+
+      field.getter_value?("").should be_false
+    end
+  end
+
   describe "#id" do
     it "returns the field ID" do
       field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
@@ -110,6 +152,24 @@ describe Marten::DB::Field::Base do
     end
   end
 
+  describe "#truthy_value?" do
+    it "returns true for truthy values" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
+
+      field.truthy_value?("").should be_true
+      field.truthy_value?("foobar").should be_true
+      field.truthy_value?(42).should be_true
+    end
+
+    it "returns false for non-truthy values" do
+      field = Marten::DB::Field::BaseSpec::TestField.new("my_field")
+
+      field.truthy_value?(nil).should be_false
+      field.truthy_value?(false).should be_false
+      field.truthy_value?(0).should be_false
+    end
+  end
+
   describe "#unique?" do
     it "returns true if the field has a unicity constraint" do
       field = Marten::DB::Field::BaseSpec::TestField.new("my_field", unique: true)
@@ -158,6 +218,20 @@ describe Marten::DB::Field::Base do
 
       obj_2 = Tag.new
       obj_2.name?.should be_false
+    end
+
+    it "properly generates a getter? method that makes use of the field-specific empty value logic" do
+      obj_1 = Tag.create!(name: "crystal", is_active: true)
+      obj_1.name?.should be_true
+      obj_1.is_active?.should be_true
+
+      obj_2 = Tag.new(is_active: false)
+      obj_2.name?.should be_false
+      obj_2.is_active?.should be_false
+
+      obj_2 = Tag.new(name: "", is_active: false)
+      obj_2.name?.should be_false
+      obj_2.is_active?.should be_false
     end
 
     it "properly generates a setter method for the field on the model class" do
@@ -274,6 +348,12 @@ module Marten::DB::Field::BaseSpec
       else
         raise_unexpected_field_value(value)
       end
+    end
+  end
+
+  class TestFieldWithCustomEmptyValues < TestField
+    def empty_value?(value)
+      super || value == ""
     end
   end
 end

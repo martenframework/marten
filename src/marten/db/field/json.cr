@@ -147,7 +147,7 @@ module Marten
               end
 
               def {{ field_id }}?
-                !{{ field_id }}.nil?
+                self.class.get_field({{ field_id.stringify }}).getter_value?({{ field_id }})
               end
             {% end %}
           end

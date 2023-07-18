@@ -145,6 +145,10 @@ module Marten
                 _{{ field_id }}_file
               end
 
+              def {{ field_id }}?
+                self.class.get_field({{ field_id.stringify }}).getter_value?({{ field_id }})
+              end
+
               def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
 
               def {{ field_id }}=(file : ::File)

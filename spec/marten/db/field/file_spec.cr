@@ -254,4 +254,15 @@ describe Marten::DB::Field::File do
       end
     end
   end
+
+  describe "::contribute_to_model" do
+    it "defines a getter? method for the field as expected" do
+      object_1 = Marten::DB::Field::FileSpec::Attachment.new
+      object_1.file?.should be_false
+
+      object_2 = Marten::DB::Field::FileSpec::Attachment.create!
+      object_2.file = File.new(File.join(__DIR__, "file_spec/fixtures/helloworld.txt"))
+      object_2.file?.should be_true
+    end
+  end
 end

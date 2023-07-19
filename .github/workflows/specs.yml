@@ -27,7 +27,7 @@ jobs:
         crystal: [
           '1.7.3',
           '1.8.2',
-          '1.9.0',
+          '1.9.2',
           'nightly',
         ]
     container:
@@ -71,7 +71,7 @@ jobs:
         crystal: [
           '1.7.3',
           '1.8.2',
-          '1.9.0',
+          '1.9.2',
           'nightly',
         ]
     container:
@@ -104,7 +104,7 @@ jobs:
         crystal: [
           '1.7.3',
           '1.8.2',
-          '1.9.0',
+          '1.9.2',
           'nightly',
         ]
     container:

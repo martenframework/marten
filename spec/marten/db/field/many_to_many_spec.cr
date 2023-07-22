@@ -1,7 +1,38 @@
 require "./spec_helper"
+require "./many_to_many_spec/**"
 
 describe Marten::DB::Field::ManyToMany do
+  with_installed_apps Marten::DB::Field::ManyToManySpec::App
+
   describe "::contribute_to_model" do
+    it "works as expected for non-recursive many-to-many relationships" do
+      article = Marten::DB::Field::ManyToManySpec::Article.create!(title: "My article")
+      tag_1 = Marten::DB::Field::ManyToManySpec::Tag.create!(label: "Tag 1")
+      tag_2 = Marten::DB::Field::ManyToManySpec::Tag.create!(label: "Tag 2")
+
+      article.tags.add(tag_1, tag_2)
+
+      article = Marten::DB::Field::ManyToManySpec::Article.get!(id: article.id)
+      article.tags.to_a.to_set.should eq [tag_1, tag_2].to_set
+
+      tag_1 = Marten::DB::Field::ManyToManySpec::Tag.get!(id: tag_1.id)
+      tag_1.articles.to_a.should eq [article]
+    end
+
+    it "works as expected for recursive many-to-many relationships" do
+      parent_node = Marten::DB::Field::ManyToManySpec::TreeNode.create!(label: "Parent")
+      child_node_1 = Marten::DB::Field::ManyToManySpec::TreeNode.create!(label: "Child 1")
+      child_node_2 = Marten::DB::Field::ManyToManySpec::TreeNode.create!(label: "Child 2")
+
+      parent_node.children.add(child_node_1, child_node_2)
+
+      parent_node = Marten::DB::Field::ManyToManySpec::TreeNode.get!(id: parent_node.id)
+      parent_node.children.to_a.to_set.should eq [child_node_1, child_node_2].to_set
+
+      child_node_1 = Marten::DB::Field::ManyToManySpec::TreeNode.get!(id: child_node_1.id)
+      child_node_1.parents.to_a.should eq [parent_node]
+    end
+
     it "sets up a reverse queryset method when the related option is used" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")

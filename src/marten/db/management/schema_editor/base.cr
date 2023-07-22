@@ -127,9 +127,10 @@ module Marten
             digest = Digest::MD5.new
             digest.update(table_name)
             columns.each { |c| digest.update(c) }
-            index_suffix = digest.final.hexstring[...8] + suffix
+            digest.update(suffix)
 
-            remaining_size = @connection.max_name_size - index_suffix.size - 8
+            index_suffix = (digest.final.hexstring[...8] + suffix)[...(@connection.max_name_size - 20)]
+            remaining_size = @connection.max_name_size - 8 - index_suffix.size
 
             String.build do |s|
               s << "index_"

@@ -73,6 +73,9 @@ module Marten
             # model and the related model.
 
             {% related_model_klass = kwargs[:to] %}
+            {% if related_model_klass.id.stringify == "self" %}
+              {% related_model_klass = model_klass %}
+            {% end %}
 
             {% from_model_name = model_klass.stringify.split("::").last %}
             {% to_model_name = related_model_klass.stringify.split("::").last %}
@@ -81,12 +84,16 @@ module Marten
 
             {% through_model_name = "#{model_klass}#{field_id_string.capitalize.id}" %}
             {% through_related_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
+            {% through_from_related_name = through_related_name %}
+            {% through_to_related_name = through_related_name %}
             {% through_model_from_field_id = from_model_name.downcase %}
             {% through_model_to_field_id = to_model_name.downcase %}
 
             {% if through_model_from_field_id == through_model_to_field_id %}
-              {% through_model_from_field_id = "from_#{through_model_from_field_id}" %}
-              {% through_model_to_field_id = "to_#{through_model_to_field_id}" %}
+              {% through_from_related_name = "from_" + through_related_name %}
+              {% through_to_related_name = "to_" + through_related_name %}
+              {% through_model_from_field_id = "from_#{through_model_from_field_id.id}" %}
+              {% through_model_to_field_id = "to_#{through_model_to_field_id.id}" %}
             {% end %}
 
             class ::{{ model_klass }}
@@ -102,7 +109,7 @@ module Marten
                 Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
                   self,
                   {{ field_id.stringify }},
-                  {{ through_related_name }},
+                  {{ through_to_related_name }},
                   {{ through_model_from_field_id }},
                   {{ through_model_to_field_id }}
                 )
@@ -116,14 +123,14 @@ module Marten
                 :many_to_one,
                 to: {{ model_klass }},
                 on_delete: :cascade,
-                related: {{ through_related_name }}
+                related: {{ through_from_related_name }}
               )
               field(
                 :{{ through_model_to_field_id.id }},
                 :many_to_one,
                 to: {{ related_model_klass }},
                 on_delete: :cascade,
-                related: {{ through_related_name }}
+                related: {{ through_to_related_name }}
               )
             end
 
@@ -136,7 +143,7 @@ module Marten
                     def {{ related_field_name.id }}
                       Marten::DB::Query::Set({{ model_klass }}).new.filter(
                         Marten::DB::Query::Node.new(
-                          {"{{ through_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
+                          {"{{ through_from_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
                         )
                       )
                     end

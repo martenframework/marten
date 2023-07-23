@@ -28,6 +28,9 @@ module Marten
                    end
         end
 
+        # Adds the given objects to the many-to-many relationship.
+        #
+        # If the objects specified in `objs` are already in the relationship, they will be skipped and not added again.
         def add(*objs : M)
           query.connection.transaction do
             # Identify which objects are already added to the many to many relationship and skip them.
@@ -49,6 +52,20 @@ module Marten
               through_obj.set_field_value(m2m_through_to_field.id, obj.pk)
               through_obj.save!
             end
+          end
+        end
+
+        # Removes the given objects from the many-to-many relationship.
+        def remove(*objs : M) : Nil
+          query.connection.transaction do
+            m2m_field.as(Field::ManyToMany).through._base_queryset.filter(
+              Query::Node.new(
+                {
+                  m2m_through_from_field.id        => @instance.pk.as(Field::Any),
+                  "#{m2m_through_to_field.id}__in" => objs.map(&.pk!.as(Field::Any)).to_a,
+                }
+              )
+            ).delete
           end
         end
 

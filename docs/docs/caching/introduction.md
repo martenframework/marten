@@ -51,14 +51,14 @@ For example:
 ```crystal
 # No entry in the cache yet.
 Marten.cache.read("foo") # => nil
-Marten.cache.exists?("foo") => false
+Marten.cache.exists?("foo") # => false
 
 # Let's add the entry to the cache.
-Marten.cache.write("foo", "bar", expires_in: 10.minutes) => true
+Marten.cache.write("foo", "bar", expires_in: 10.minutes) # => true
 
 # Let's read from the cache.
 Marten.cache.read("foo") # => "bar"
-Marten.cache.exists?("foo") => true
+Marten.cache.exists?("foo") # => true
 ```
 
 ### Deleting an entry from the cache
@@ -72,7 +72,7 @@ For example:
 Marten.cache.delete("foo") # => false
 
 # Let's add an entry to the cache and then delete it.
-Marten.cache.write("foo", "bar", expires_in: 10.minutes) => true
+Marten.cache.write("foo", "bar", expires_in: 10.minutes) # => true
 Marten.cache.delete("foo") # => true
 ```
 
@@ -83,9 +83,9 @@ If you need to persist integer values that are intended to be incremented or dec
 For example:
 
 ```crystal
-Marten.cache.increment("mycounter") => 1
-Marten.cache.increment("mycounter", amount: 2) => 3
-Marten.cache.decrement("mycounter") => 2
+Marten.cache.increment("mycounter") # => 1
+Marten.cache.increment("mycounter", amount: 2) # => 3
+Marten.cache.decrement("mycounter") # => 2
 ```
 
 ### Clearing the cache

@@ -134,28 +134,11 @@ end
 
 Marten provides special fields allowing to define the three most common types of database relationships: many-to-many, many-to-one, and one-to-one.
 
-#### Many-to-many relationships
-
-Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields#many_to_many) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
-
-For example, an `Article` model could have a many-to-many field towards a `Tag` model. In such case, an `Article` record could have many associated `Tag` records, and every `Tag` record could be associated to many `Article` records as well:
-
-```crystal
-class Tag < Marten::Model
-  # ...
-end
-
-class Article < Marten::Model
-  # ...
-  field :tags, :many_to_many, to: Tag
-end
-```
-
 #### Many-to-one relationships
 
 Many-to-one relationships can be defined through the use of [`many_to_one`](./reference/fields#many_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
-For example, an `Article` model could have a many-to-one field towards an `Author` model. In such case, an `Article` record would only have one associated `Author` record, but every `Author` record could be associated to many `Article` records:
+For example, an `Article` model could have a many-to-one field towards an `Author` model. In such case, an `Article` record would only have one associated `Author` record, but every `Author` record could be associated with many `Article` records:
 
 ```crystal
 class Author < Marten::Model
@@ -179,6 +162,10 @@ end
 ```
 :::
 
+:::info
+Please refer to [Many-to-one relationships](./relationships#many-to-one-relationships) to learn more about this type of model relationship.
+:::
+
 #### One-to-one relationships
 
 One-to-one relationships can be defined through the use of [`one_to_one`](./reference/fields#one_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
@@ -195,6 +182,31 @@ class User < Marten::Model
   field :profile, :one_to_one, to: Profile
 end
 ```
+
+:::info
+Please refer to [One-to-one relationships](./relationships#one-to-one-relationships) to learn more about this type of model relationship.
+:::
+
+#### Many-to-many relationships
+
+Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields#many_to_many) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
+
+For example, an `Article` model could have a many-to-many field towards a `Tag` model. In such case, an `Article` record could have many associated `Tag` records, and every `Tag` record could be associated with many `Article` records as well:
+
+```crystal
+class Tag < Marten::Model
+  # ...
+end
+
+class Article < Marten::Model
+  # ...
+  field :tags, :many_to_many, to: Tag
+end
+```
+
+:::info
+Please refer to [Many-to-many relationships](./relationships#many-to-many-relationships) to learn more about this type of model relationship.
+:::
 
 ### Timestamps
 

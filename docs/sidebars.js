@@ -17,6 +17,7 @@ module.exports = {
       items: [
         'models-and-databases/introduction',
         'models-and-databases/queries',
+        'models-and-databases/relationships',
         'models-and-databases/validations',
         'models-and-databases/callbacks',
         'models-and-databases/migrations',

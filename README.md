@@ -1,6 +1,6 @@
 # Marten
 
-![logo](https://raw.githubusercontent.com/martenframework/marten/main/docs/static/img/hero.svg)
+![logo](https://raw.githubusercontent.com/martenframework/marten/main/docs/static/img/hero.png)
 
 [![Version](https://img.shields.io/github/v/tag/martenframework/marten?label=Version)](https://github.com/martenframework/marten/tags)
 [![License](https://img.shields.io/github/license/martenframework/marten?label=License)](https://github.com/martenframework/marten/blob/main/LICENSE)

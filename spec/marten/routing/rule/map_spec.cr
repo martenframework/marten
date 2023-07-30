@@ -92,8 +92,6 @@ describe Marten::Routing::Rule::Map do
       reversers.should be_a Array(Marten::Routing::Reverser)
       reversers.size.should eq 1
 
-      reverser = reversers[0]
-
       reversers[0].name.should eq "xyz_abc"
       reversers[0].path_for_interpolation.should eq "/abc/xyz"
     end
@@ -108,8 +106,6 @@ describe Marten::Routing::Rule::Map do
 
       reversers.should be_a Array(Marten::Routing::Reverser)
       reversers.size.should eq 1
-
-      reverser = reversers[0]
 
       reversers[0].name.should eq "abc:xyz_abc"
       reversers[0].path_for_interpolation.should eq "/abc/xyz"

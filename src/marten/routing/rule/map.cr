@@ -38,8 +38,10 @@ module Marten
 
         protected def reversers : Array(Reverser)
           @reversers ||= @map.reversers.values.map do |reverser|
+            name = @name.empty? ? reverser.name : "#{@name}:#{reverser.name}"
+
             Reverser.new(
-              "#{@name}:#{reverser.name}",
+              name,
               @path_for_interpolation + reverser.path_for_interpolation,
               @parameters.merge(reverser.parameters)
             )

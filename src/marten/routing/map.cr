@@ -23,7 +23,7 @@ module Marten
       # The target associated with the considered path must be a `Marten::Routing::Map`
       # instance. The <path, target> pair has an optional
       # name that will be prepended to each <path, target> pair inside the `Marten::Routing::Map`.
-      def path(path : String, target : Map, name : String | Symbol = "") : Nil
+      def path(path : String, target : Map, name : String | Symbol | Nil = nil) : Nil
         insert_path(path, target, name)
       end
 
@@ -32,18 +32,24 @@ module Marten
       # The target associated with the considered path must be a handler (subclass of `Marten::Handlers::Base`).
       # Each <path, target> pair must be given a name that will be used to uniquely identify the route.
       def path(path : String, target : Marten::Handlers::Base.class, name : String | Symbol) : Nil
-        raise Errors::InvalidRuleName.new("Route names cannot be empty") if name.empty?
-
         insert_path(path, target, name)
       end
 
-      private def insert_path(path : String, target : Marten::Handlers::Base.class | Map, name : String | Symbol) : Nil
-        name = name.to_s
+      private def insert_path(
+        path : String,
+        target : Marten::Handlers::Base.class | Map,
+        rule_name : String | Symbol | Nil
+      ) : Nil
+        name = rule_name.to_s
 
-        if name.includes?(':')
-          raise Errors::InvalidRuleName.new(
-            "Cannot use '#{name}' as a valid route name: route names cannot contain ':'"
-          )
+        unless rule_name.nil?
+          raise Errors::InvalidRuleName.new("Route names cannot be empty") if name.empty?
+
+          if name.includes?(':')
+            raise Errors::InvalidRuleName.new(
+              "Cannot use '#{name}' as a valid route name: route names cannot contain ':'"
+            )
+          end
         end
 
         unless @rules.find { |r| r.name == name }.nil?

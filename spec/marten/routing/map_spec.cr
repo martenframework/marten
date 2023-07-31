@@ -203,7 +203,7 @@ describe Marten::Routing::Match do
       map.reverse("not_inc:xyz", {} of String => String).should eq "/home/xyz"
     end
 
-    it "returns the interpolated path for a sub sub with the name instead of the namespace" do
+    it "returns the interpolated path for a sub sub map" do
       article_map = Marten::Routing::Map.new :article
       article_map.path("/list", Marten::Handlers::Base, name: "list")
 
@@ -216,6 +216,17 @@ describe Marten::Routing::Match do
 
       map.reverse("article:list", {} of String => String).should eq "/articles/list"
       map.reverse("admin:article:list", {} of String => String).should eq "/admin/articles/list"
+    end
+
+    it "returns the interpolated path for a sub with the name instead of the namespace" do
+      article_map = Marten::Routing::Map.new :article
+      article_map.path("/list", Marten::Handlers::Base, name: "list")
+
+
+      map = Marten::Routing::Map.new
+      map.path("/articles", article_map, name: :not_article)
+
+      map.reverse("not_article:list", {} of String => String).should eq "/articles/list"
     end
 
     it "returns the interpolated path for a sub given route name without parameters" do

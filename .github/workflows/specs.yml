@@ -48,7 +48,7 @@ jobs:
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
-      run: make tests
+      run: scripts/run_batched_specs
       env:
         MARTEN_SPEC_DB_CONNECTION: mysql
   postgresql:
@@ -92,7 +92,7 @@ jobs:
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
-      run: make tests
+      run: scripts/run_batched_specs
       env:
         MARTEN_SPEC_DB_CONNECTION: postgresql
   sqlite:
@@ -120,4 +120,4 @@ jobs:
     - name: Setup env JSON file
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
-      run: make tests
+      run: scripts/run_batched_specs

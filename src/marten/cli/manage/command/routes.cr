@@ -22,9 +22,10 @@ module Marten
 
           private def print_path(rule, parent_path, parent_name)
             parts = [] of String
+            empty_parent_name = parent_name.nil? || parent_name.empty?
 
             parts << style(parent_path + rule.path, fore: :light_blue)
-            parts << style("[#{parent_name.nil? ? rule.name : "#{parent_name}:#{rule.name}"}]", fore: :light_yellow)
+            parts << style("[#{empty_parent_name ? rule.name : "#{parent_name}:#{rule.name}"}]", fore: :light_yellow)
             parts << "›"
             parts << style(rule.handler.name, fore: :light_green)
 

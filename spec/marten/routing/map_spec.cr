@@ -173,6 +173,62 @@ describe Marten::Routing::Match do
       map.reverse(:home, {"sid" => "hello-world", "number" => 42}).should eq "/home/hello-world/test/42"
     end
 
+    it "returns the interpolated path for a sub given route name mounted without name parameters" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/xyz", Marten::Handlers::Base, name: "inc_xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home", sub_map)
+
+      map.reverse("inc_xyz", {} of String => String).should eq "/home/xyz"
+    end
+
+    it "returns the interpolated path for a sub given route name mounted with namespace" do
+      sub_map = Marten::Routing::Map.new(:inc)
+      sub_map.path("/xyz", Marten::Handlers::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home", sub_map)
+
+      map.reverse("inc:xyz", {} of String => String).should eq "/home/xyz"
+    end
+
+    it "returns the interpolated path for a sub with the name instead of the namespace" do
+      sub_map = Marten::Routing::Map.new
+      sub_map.path("/xyz", Marten::Handlers::Base, name: "xyz")
+
+      map = Marten::Routing::Map.new
+      map.path("/home", sub_map, :not_inc)
+
+      map.reverse("not_inc:xyz", {} of String => String).should eq "/home/xyz"
+    end
+
+    it "returns the interpolated path for a sub sub map" do
+      article_map = Marten::Routing::Map.new :article
+      article_map.path("/list", Marten::Handlers::Base, name: "list")
+
+      admin_map = Marten::Routing::Map.new
+      admin_map.path("/articles", article_map)
+
+      map = Marten::Routing::Map.new
+      map.path("/articles", article_map)
+      map.path("/admin", admin_map, name: :admin)
+
+      map.reverse("article:list", {} of String => String).should eq "/articles/list"
+      map.reverse("admin:article:list", {} of String => String).should eq "/admin/articles/list"
+    end
+
+    it "returns the interpolated path for a sub with the name instead of the namespace" do
+      article_map = Marten::Routing::Map.new :article
+      article_map.path("/list", Marten::Handlers::Base, name: "list")
+
+
+      map = Marten::Routing::Map.new
+      map.path("/articles", article_map, name: :not_article)
+
+      map.reverse("not_article:list", {} of String => String).should eq "/articles/list"
+    end
+
     it "returns the interpolated path for a sub given route name without parameters" do
       sub_map = Marten::Routing::Map.new
       sub_map.path("/xyz", Marten::Handlers::Base, name: "xyz")

@@ -80,6 +80,36 @@ describe Marten::Routing::Rule::Map do
       reversers[1].parameters.size.should eq 1
       reversers[1].parameters["sid"].should be_a Marten::Routing::Parameter::Slug
     end
+
+    it "does not add a colon for a sub if no name is given" do
+      map = Marten::Routing::Map.new
+      map.path("/xyz", Marten::Handlers::Base, name: "xyz_abc")
+
+      rule = Marten::Routing::Rule::MapSpec::TestMapRule.new("/abc", map, name: "")
+
+      reversers = rule.exposed_reversers
+
+      reversers.should be_a Array(Marten::Routing::Reverser)
+      reversers.size.should eq 1
+
+      reversers[0].name.should eq "xyz_abc"
+      reversers[0].path_for_interpolation.should eq "/abc/xyz"
+    end
+
+    it "add a colon for a sub if a name is given" do
+      map = Marten::Routing::Map.new
+      map.path("/xyz", Marten::Handlers::Base, name: "xyz_abc")
+
+      rule = Marten::Routing::Rule::MapSpec::TestMapRule.new("/abc", map, name: "abc")
+
+      reversers = rule.exposed_reversers
+
+      reversers.should be_a Array(Marten::Routing::Reverser)
+      reversers.size.should eq 1
+
+      reversers[0].name.should eq "abc:xyz_abc"
+      reversers[0].path_for_interpolation.should eq "/abc/xyz"
+    end
   end
 end
 

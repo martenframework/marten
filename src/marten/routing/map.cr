@@ -3,13 +3,13 @@ module Marten
     class Map
       getter rules
 
-      def self.draw(&)
-        map = new
+      def self.draw(namespace : String | Symbol | Nil = nil, &)
+        map = new(namespace)
         with map yield map
         map
       end
 
-      def initialize
+      def initialize(@namespace : String | Symbol | Nil = nil)
         @rules = [] of Rule::Base
         @reversers = {} of String => Reverser
       end
@@ -20,18 +20,36 @@ module Marten
 
       # Inserts a new path into the routes map.
       #
-      # The target associated with the considered path must be either a handler (subclass of `Marten::Handlers::Base`)
-      # or another `Marten::Routing::Map` instance (in case of nested routes maps). Each <path, target> pair must be
-      # given a name that will be used to uniquely identify the route.
-      def path(path : String, target : Marten::Handlers::Base.class | Map, name : String | Symbol) : Nil
-        if name.empty?
-          raise Errors::InvalidRuleName.new("Route names cannot be empty")
-        end
+      # The target associated with the considered path must be a `Marten::Routing::Map`
+      # instance. The <path, target> pair has an optional
+      # name that will be prepended to each <path, target> pair inside the `Marten::Routing::Map`.
+      def path(path : String, target : Map, name : String | Symbol | Nil = nil) : Nil
+        insert_path(path, target, name)
+      end
 
-        if name.includes?(':')
-          raise Errors::InvalidRuleName.new(
-            "Cannot use '#{name}' as a valid route name: route names cannot contain ':'"
-          )
+      # Inserts a new path into the routes map.
+      #
+      # The target associated with the considered path must be a handler (subclass of `Marten::Handlers::Base`).
+      # Each <path, target> pair must be given a name that will be used to uniquely identify the route.
+      def path(path : String, target : Marten::Handlers::Base.class, name : String | Symbol) : Nil
+        insert_path(path, target, name)
+      end
+
+      private def insert_path(
+        path : String,
+        target : Marten::Handlers::Base.class | Map,
+        rule_name : String | Symbol | Nil
+      ) : Nil
+        name = rule_name.to_s
+
+        unless rule_name.nil?
+          raise Errors::InvalidRuleName.new("Route names cannot be empty") if name.empty?
+
+          if name.includes?(':')
+            raise Errors::InvalidRuleName.new(
+              "Cannot use '#{name}' as a valid route name: route names cannot contain ':'"
+            )
+          end
         end
 
         unless @rules.find { |r| r.name == name }.nil?
@@ -41,7 +59,10 @@ module Marten
         if target.is_a?(Marten::Handlers::Base.class)
           rule = Rule::Path.new(path, target, name.to_s)
         else # Nested routes map
-          rule = Rule::Map.new(path, target, name.to_s)
+          # Use Map::namespace only if defined and no name was given for this path
+          name = target.namespace.to_s if name.empty? && target.namespace
+
+          rule = Rule::Map.new(path, target, name)
         end
 
         @rules << rule
@@ -97,6 +118,7 @@ module Marten
         perform_reverse(name.to_s, params)
       end
 
+      protected getter namespace
       protected getter reversers
 
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/

@@ -222,7 +222,6 @@ describe Marten::Routing::Match do
       article_map = Marten::Routing::Map.new :article
       article_map.path("/list", Marten::Handlers::Base, name: "list")
 
-
       map = Marten::Routing::Map.new
       map.path("/articles", article_map, name: :not_article)
 

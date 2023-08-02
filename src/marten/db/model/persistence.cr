@@ -200,6 +200,10 @@ module Marten
 
         protected setter new_record
 
+        private def auto_increment_field?(pk_field : Field::Base) : Bool
+          (pk_field.is_a?(Field::BigInt) || pk_field.is_a?(Field::Int)) && pk_field.auto?
+        end
+
         private def insert_or_update(connection)
           # Prevents saving if an unsaved related object is assigned to the current model instance. This situation could
           # lead to data loss since the current model instance could be saved but not the related object.
@@ -216,10 +220,12 @@ module Marten
           # save operation.
           self.class.fields.each do |field|
             next if field.primary_key?
-            field.prepare_save(self, new_record: new_record?)
+            field.prepare_save(self, new_record: !persisted?)
           end
 
           run_before_save_callbacks
+
+          save_parents(connection)
 
           if has_after_save_commit_callbacks?
             connection.observe_transaction_commit(->run_after_save_commit_callbacks)
@@ -249,10 +255,10 @@ module Marten
             connection.observe_transaction_rollback(->run_after_create_rollback_callbacks)
           end
 
-          values = field_db_values
+          values = local_field_db_values
 
           pk_field = self.class.pk_field
-          if (pk_field.is_a?(Field::BigInt) || pk_field.is_a?(Field::Int)) && pk_field.auto?
+          if auto_increment_field?(pk_field)
             pk_field_to_fetch = pk_field.db_column!
             values.delete(pk_field_to_fetch)
           else
@@ -261,10 +267,48 @@ module Marten
 
           inserted_pk = connection.insert(self.class.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
 
-          assign_field_values({pk_field.id => pk_field.from_db(inserted_pk)}) if pk.nil?
+          assign_field_values({pk_field.id => pk_field.from_db(inserted_pk)}) if pk.nil? && !inserted_pk.nil?
           self.new_record = false
 
           run_after_create_callbacks
+        end
+
+        private def insert_parent(parent_model, connection)
+          values = parent_model_field_db_values(parent_model)
+
+          parent_pk_field = parent_model.pk_field
+          if auto_increment_field?(parent_pk_field)
+            pk_field_to_fetch = parent_pk_field.db_column!
+            values.delete(pk_field_to_fetch)
+          else
+            pk_field_to_fetch = nil
+          end
+
+          inserted_pk = connection.insert(parent_model.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
+
+          if parent_model.parent_models.empty?
+            # If the parent model being inserted does not have concrete parent models, then this must be the first one
+            # (ie. the one containing the actual primary key). In that case we must assign the value of the primary key
+            # to the pointer many-to-one fields of all the underlying child models (including the current model
+            # instance).
+            effective_pk = inserted_pk || get_field_value(parent_model.pk_field.id)
+
+            self.class.parent_models.each do |other_parent_model|
+              assign_field_values({other_parent_model.pk_field.id => other_parent_model.pk_field.from_db(effective_pk)})
+            end
+
+            assign_field_values({self.class.pk_field.id => self.class.pk_field.from_db(effective_pk)})
+          end
+        end
+
+        private def save_parents(connection)
+          self.class.parent_models.reverse.each do |parent_model|
+            if persisted?
+              update_parent(parent_model, connection)
+            else
+              insert_parent(parent_model, connection)
+            end
+          end
         end
 
         private def update(connection)
@@ -278,7 +322,7 @@ module Marten
             connection.observe_transaction_rollback(->run_after_update_rollback_callbacks)
           end
 
-          values = field_db_values
+          values = local_field_db_values
           values.delete(self.class.pk_field.db_column!)
 
           connection.update(
@@ -289,6 +333,18 @@ module Marten
           )
 
           run_after_update_callbacks
+        end
+
+        private def update_parent(parent_model, connection)
+          values = parent_model_field_db_values(parent_model)
+          values.delete(parent_model.pk_field.db_column!)
+
+          connection.update(
+            parent_model.db_table,
+            values,
+            pk_column_name: parent_model.pk_field.db_column!,
+            pk_value: parent_model.pk_field.to_db(pk)
+          )
         end
       end
     end

@@ -21,7 +21,7 @@ module Marten
               TableState.new(
                 app_label: "marten",
                 name: Record.db_table,
-                columns: Record.fields.compact_map(&.to_column),
+                columns: Record.local_fields.compact_map(&.to_column),
                 unique_constraints: Record.db_unique_constraints.map { |c| Management::Constraint::Unique.from(c) },
                 indexes: Record.db_indexes.map { |i| Management::Index.from(i) },
               )

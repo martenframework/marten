@@ -89,6 +89,48 @@ describe Marten::DB::Field::OneToOne do
     end
   end
 
+  describe "#parent_link?" do
+    it "returns false by default" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)
+
+      field.parent_link?.should be_false
+    end
+
+    it "returns true if explicitly set to true" do
+      field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag, parent_link: true)
+
+      field.parent_link?.should be_true
+    end
+  end
+
+  describe "#perform_validation" do
+    it "performs validations by default" do
+      obj = TestUserProfile.new
+
+      field = Marten::DB::Field::OneToOne.new("user_id", to: TestUser, relation_name: "user", null: false)
+      field.perform_validation(obj)
+
+      obj.errors.size.should eq 1
+      obj.errors.first.field.should eq "user_id"
+      obj.errors.first.type.should eq "null"
+    end
+
+    it "does not perform validations if the field is a parent link" do
+      obj = TestUserProfile.new
+
+      field = Marten::DB::Field::OneToOne.new(
+        "user_id",
+        to: TestUser,
+        relation_name: "user",
+        null: false,
+        parent_link: true,
+      )
+      field.perform_validation(obj)
+
+      obj.errors.should be_empty
+    end
+  end
+
   describe "#related_model" do
     it "returns the related model" do
       field = Marten::DB::Field::OneToOne.new("tag_id", "tag", Tag)

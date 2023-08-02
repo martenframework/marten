@@ -101,7 +101,8 @@ module Marten
               @[Marten::DB::Model::Table::FieldInstanceVariable(
                 field_klass: {{ @type }},
                 field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
-                field_type: {{ serializable_klass.is_a?(NilLiteral) ? ::JSON::Any : ::JSON::Serializable }} | Nil
+                field_type: {{ serializable_klass.is_a?(NilLiteral) ? ::JSON::Any : ::JSON::Serializable }} | Nil,
+                model_klass: {{ model_klass }}
               )]
 
               {% if serializable_klass.is_a?(NilLiteral) %}

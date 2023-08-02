@@ -167,7 +167,8 @@ module Marten
               @[Marten::DB::Model::Table::FieldInstanceVariable(
                 field_klass: {{ @type }},
                 field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
-                field_type: {{ field_ann[:exposed_type] }}{% if field_ann[:additional_type] %} | {{ field_ann[:additional_type] }}{% end %} # ameba:disable Layout/LineLength
+                field_type: {{ field_ann[:exposed_type] }}{% if field_ann[:additional_type] %} | {{ field_ann[:additional_type] }}{% end %}, # ameba:disable Layout/LineLength
+                model_klass: {{ model_klass }}
               )]
 
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?

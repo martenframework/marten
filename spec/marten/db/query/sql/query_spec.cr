@@ -1,6 +1,9 @@
 require "./spec_helper"
+require "./query_spec/app"
 
 describe Marten::DB::Query::SQL::Query do
+  with_installed_apps Marten::DB::Query::SQL::QuerySpec::App
+
   describe "#add_query_node" do
     it "can add a new filter to an unfiltered query" do
       Tag.create!(name: "ruby", is_active: true)
@@ -182,6 +185,327 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Tag).new
       expect_raises(Marten::DB::Errors::InvalidField) do
         query.add_query_node(Marten::DB::Query::Node.new(name__id: "test"))
+      end
+    end
+
+    context "with multiple table inheritance" do
+      it "can filter on local attributes seamlessly" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11"
+        )
+        Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address,
+          grade: "12"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(grade: "11"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on local attributes seamlessly with multiple levels of inheritance" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "21"
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(alt_grade: "21"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on parent attributes seamlessly" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11"
+        )
+        Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address,
+          grade: "12"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(name__istartswith: "student"))
+        query.count.should eq 2
+        query.execute.should eq [student_1, student_2]
+      end
+
+      it "can filter on parent attributes seamlessly with multiple levels of inheritance" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "21"
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(name__istartswith: "student"))
+        query.count.should eq 2
+        query.execute.should eq [student_1, student_2]
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(grade: "11"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on local relation attributes seamlessly" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+        alt_address_1 = Marten::DB::Query::SQL::QuerySpec::AltAddress.create!(street: "Street 1")
+        alt_address_2 = Marten::DB::Query::SQL::QuerySpec::AltAddress.create!(street: "Main Street")
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10",
+          alt_grade: "20",
+          alt_address: alt_address_1
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11",
+          alt_grade: "21",
+          alt_address: alt_address_2
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12",
+          alt_address: alt_address_1,
+          alt_grade: "22"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(alt_address__street__istartswith: "main"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on parent relation attributes seamlessly" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+        Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11"
+        )
+        Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(address__street__istartswith: "main"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on parent relation attributes seamlessly with multiple levels of inheritance" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11",
+          alt_grade: "21"
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(address__street__istartswith: "main"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on local reverse relation attributes seamlessly" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11",
+          alt_grade: "21"
+        )
+        student_3 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "Top things", author: student_1)
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "10 reasons to code", author: student_2)
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "Test article", author: student_3)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(alt_articles__title__icontains: "reasons"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on parent reverse relation attributes seamlessly" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+
+        student_1 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11"
+        )
+        student_3 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12"
+        )
+
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "Top things", author: student_1)
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "10 reasons to code", author: student_2)
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "Test article", author: student_3)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(articles__title__icontains: "reasons"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
+      end
+
+      it "can filter on parent reverse relation attributes seamlessly with multiple levels of inheritance" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11",
+          alt_grade: "21"
+        )
+        student_3 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "Top things", author: student_1)
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "10 reasons to code", author: student_2)
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "Test article", author: student_3)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(articles__title__icontains: "reasons"))
+        query.count.should eq 1
+        query.execute.should eq [student_2]
       end
     end
   end

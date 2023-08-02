@@ -491,6 +491,234 @@ describe Marten::DB::Model::Persistence do
       obj.not_nil!.after_save_commit_track.should eq "unset"
       obj.not_nil!.after_delete_commit_track.should eq "unset"
     end
+
+    context "with multiple table inheritance" do
+      it "allows to save new records and their parent records" do
+        address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        student = Marten::DB::Model::PersistenceSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        check_student = ->(s : Marten::DB::Model::PersistenceSpec::Student) do
+          s.persisted?.should be_true
+          s.address!.persisted?.should be_true
+          s.person_ptr!.persisted?.should be_true
+          s.id.should_not be_nil
+          s.pk.should_not be_nil
+          s.person_ptr_id.should eq s.id
+          s.name.should eq "Student 1"
+          s.email.should eq "student-1@example.com"
+          s.address.should eq address
+          s.grade.should eq "10"
+        end
+
+        check_student.call(student)
+        check_student.call(student.reload)
+        check_student.call(Marten::DB::Model::PersistenceSpec::Student.get!(pk: student.pk))
+      end
+
+      it "allows to save new records and their parent records with multiple levels of inheritance" do
+        address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        alt_student = Marten::DB::Model::PersistenceSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        check_student = ->(s : Marten::DB::Model::PersistenceSpec::AltStudent) do
+          s.persisted?.should be_true
+          s.address!.persisted?.should be_true
+          s.person_ptr!.persisted?.should be_true
+          s.id.should_not be_nil
+          s.pk.should_not be_nil
+          s.person_ptr_id.should eq s.id
+          s.name.should eq "Student 1"
+          s.email.should eq "student-1@example.com"
+          s.address.should eq address
+          s.grade.should eq "10"
+          s.alt_grade.should eq "11"
+        end
+
+        check_student.call(alt_student)
+        check_student.call(alt_student.reload)
+        check_student.call(Marten::DB::Model::PersistenceSpec::AltStudent.get!(pk: alt_student.pk))
+      end
+
+      it "allows to save new records and their parent records when they involve PKs without auto increment" do
+        address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        restaurant = Marten::DB::Model::PersistenceSpec::Restaurant.create!(
+          name: "Super restaurant",
+          address: address,
+          serves_hot_dogs: true,
+          serves_pizza: false,
+        )
+
+        check_restaurant = ->(r : Marten::DB::Model::PersistenceSpec::Restaurant) do
+          r.persisted?.should be_true
+          r.address!.persisted?.should be_true
+          r.place_ptr!.persisted?.should be_true
+          r.id.should_not be_nil
+          r.pk.should_not be_nil
+          r.place_ptr_id.should eq ::UUID.new(r.id!).hexstring
+          r.name.should eq "Super restaurant"
+          r.address.should eq address
+          r.serves_hot_dogs.should be_true
+          r.serves_pizza.should be_false
+        end
+
+        check_restaurant.call(restaurant)
+        check_restaurant.call(restaurant.reload)
+        check_restaurant.call(Marten::DB::Model::PersistenceSpec::Restaurant.get!(pk: restaurant.pk))
+      end
+
+      it "allows to update records and their parent records" do
+        old_address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        new_address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Model::PersistenceSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: old_address,
+          grade: "10"
+        )
+
+        student = Marten::DB::Model::PersistenceSpec::Student.get!(pk: student.pk)
+        student.name = "Student 2"
+        student.email = "student-2@example.com"
+        student.address = new_address
+        student.grade = "11"
+        student.save
+
+        check_student = ->(s : Marten::DB::Model::PersistenceSpec::Student) do
+          s.persisted?.should be_true
+          s.address!.persisted?.should be_true
+          s.person_ptr!.persisted?.should be_true
+          s.id.should_not be_nil
+          s.pk.should_not be_nil
+          s.person_ptr_id.should eq s.id
+          s.name.should eq "Student 2"
+          s.email.should eq "student-2@example.com"
+          s.address.should eq new_address
+          s.grade.should eq "11"
+        end
+
+        check_student.call(student)
+        check_student.call(student.reload)
+        check_student.call(Marten::DB::Model::PersistenceSpec::Student.get!(pk: student.pk))
+      end
+
+      it "allows to update records and their parent records with multiple levels of inheritance" do
+        old_address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        new_address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 2")
+
+        alt_student = Marten::DB::Model::PersistenceSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: old_address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        alt_student = Marten::DB::Model::PersistenceSpec::AltStudent.get!(pk: alt_student.pk)
+        alt_student.name = "Student 2"
+        alt_student.email = "student-2@example.com"
+        alt_student.address = new_address
+        alt_student.grade = "11"
+        alt_student.alt_grade = "12"
+        alt_student.save
+
+        check_student = ->(s : Marten::DB::Model::PersistenceSpec::AltStudent) do
+          s.persisted?.should be_true
+          s.address!.persisted?.should be_true
+          s.person_ptr!.persisted?.should be_true
+          s.id.should_not be_nil
+          s.pk.should_not be_nil
+          s.person_ptr_id.should eq s.id
+          s.name.should eq "Student 2"
+          s.email.should eq "student-2@example.com"
+          s.address.should eq new_address
+          s.grade.should eq "11"
+          s.alt_grade.should eq "12"
+        end
+
+        check_student.call(alt_student)
+        check_student.call(alt_student.reload)
+        check_student.call(Marten::DB::Model::PersistenceSpec::AltStudent.get!(pk: alt_student.pk))
+      end
+
+      it "allows to update records and their parent records when they involve PKs without auto increment" do
+        old_address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        new_address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 2")
+
+        restaurant = Marten::DB::Model::PersistenceSpec::Restaurant.create!(
+          name: "Super restaurant",
+          address: old_address,
+          serves_hot_dogs: true,
+          serves_pizza: false,
+        )
+
+        restaurant = Marten::DB::Model::PersistenceSpec::Restaurant.get!(pk: restaurant.pk)
+        restaurant.name = "Super restaurant 2"
+        restaurant.address = new_address
+        restaurant.serves_hot_dogs = false
+        restaurant.serves_pizza = true
+        restaurant.save
+
+        check_restaurant = ->(r : Marten::DB::Model::PersistenceSpec::Restaurant) do
+          r.persisted?.should be_true
+          r.address!.persisted?.should be_true
+          r.place_ptr!.persisted?.should be_true
+          r.id.should_not be_nil
+          r.pk.should_not be_nil
+          r.place_ptr_id.should eq ::UUID.new(r.id!).hexstring
+          r.name.should eq "Super restaurant 2"
+          r.address.should eq new_address
+          r.serves_hot_dogs.should be_false
+          r.serves_pizza.should be_true
+        end
+
+        check_restaurant.call(restaurant)
+        check_restaurant.call(restaurant.reload)
+        check_restaurant.call(Marten::DB::Model::PersistenceSpec::Restaurant.get!(pk: restaurant.pk))
+      end
+
+      it "validates records and their parent records as expected" do
+        student = Marten::DB::Model::PersistenceSpec::Student.new
+
+        student.valid?.should be_false
+        student.errors.size.should eq 4
+        student.errors[0].field.should eq "name"
+        student.errors[0].type.should eq "null"
+        student.errors[1].field.should eq "email"
+        student.errors[1].type.should eq "null"
+        student.errors[2].field.should eq "address_id"
+        student.errors[2].type.should eq "null"
+        student.errors[3].field.should eq "grade"
+        student.errors[3].type.should eq "null"
+      end
+
+      it "validates records and their parent records as expected with multiple levels of inheritance" do
+        student = Marten::DB::Model::PersistenceSpec::AltStudent.new
+
+        student.valid?.should be_false
+        student.errors.size.should eq 5
+        student.errors[0].field.should eq "grade"
+        student.errors[0].type.should eq "null"
+        student.errors[1].field.should eq "name"
+        student.errors[1].type.should eq "null"
+        student.errors[2].field.should eq "email"
+        student.errors[2].type.should eq "null"
+        student.errors[3].field.should eq "address_id"
+        student.errors[3].type.should eq "null"
+        student.errors[4].field.should eq "alt_grade"
+        student.errors[4].type.should eq "null"
+      end
+    end
   end
 
   describe "#save!" do

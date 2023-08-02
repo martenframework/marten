@@ -10,6 +10,7 @@ module Marten
           @limit = nil
           @offset = nil
           @order_clauses = [] of {String, Bool}
+          @parent_model_joins : Array(Join)?
           @predicate_node = nil
           @using = nil
 
@@ -217,7 +218,7 @@ module Marten
             values_to_update = Hash(String, ::DB::Any).new
 
             values.each do |name, value|
-              field = get_relation_field(name, Model, silent: true) || get_field(name, Model)
+              field = get_field_context(name, Model).field
               next unless field.db_column?
 
               if value.is_a?(DB::Model) && !value.persisted?
@@ -256,7 +257,7 @@ module Marten
               end
 
               s << "FROM #{table_name}"
-              s << @joins.join(" ", &.to_sql)
+              s << build_joins
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -284,7 +285,7 @@ module Marten
                 s << "  SELECT * FROM ("
                 s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
                 s << "    FROM #{table_name}"
-                s << @joins.join(" ", &.to_sql)
+                s << build_joins
                 s << where
                 s << "  ) subquery"
                 s << ")"
@@ -304,7 +305,7 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT EXISTS("
               s << "SELECT 1 FROM #{table_name}"
-              s << @joins.join(" ", &.to_sql)
+              s << build_joins
               s << where
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -312,6 +313,15 @@ module Marten
             end
 
             {sql, parameters}
+          end
+
+          private def build_joins
+            String.build do |s|
+              # Note: the order in which joins are generated is important because parent model joins are read in order
+              # and before any other additional joins.
+              s << parent_model_joins.join(" ", &.to_sql)
+              s << @joins.join(" ", &.to_sql)
+            end
           end
 
           private def build_pluck_query(plucked_columns)
@@ -323,7 +333,7 @@ module Marten
               s << connection.distinct_clause_for(distinct_columns) if distinct
               s << plucked_columns.map(&.last).join(", ")
               s << "FROM #{table_name}"
-              s << @joins.join(" ", &.to_sql)
+              s << build_joins
               s << where
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
@@ -342,7 +352,7 @@ module Marten
               s << connection.distinct_clause_for(distinct_columns) if distinct
               s << columns
               s << "FROM #{table_name}"
-              s << @joins.join(" ", &.to_sql)
+              s << build_joins
               s << where
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
@@ -374,7 +384,7 @@ module Marten
                       s << "  SELECT * FROM ("
                       s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
                       s << "    FROM #{table_name}"
-                      s << @joins.join(" ", &.to_sql)
+                      s << build_joins
                       s << where
                       s << "  ) subquery"
                       s << ")"
@@ -394,10 +404,12 @@ module Marten
           private def columns
             columns = [] of String
 
-            columns += Model.fields.compact_map do |field|
+            columns += Model.local_fields.compact_map do |field|
               next unless field.db_column?
               "#{Model.db_table}.#{field.db_column!}"
             end
+
+            parent_model_joins.each { |join| columns += join.columns }
 
             @joins.select(&.selected?).each { |join| columns += join.columns }
 
@@ -481,13 +493,17 @@ module Marten
           end
 
           private def get_field(raw_field, model)
-            model.get_field(raw_field.to_s)
+            get_field_context(raw_field, model).field
+          end
+
+          private def get_field_context(raw_field, model)
+            model.get_field_context(raw_field.to_s)
           rescue Errors::UnknownField
             raise_invalid_field_error_with_valid_choices(raw_field, model)
           end
 
-          private def get_relation_field(raw_relation, model, silent = false)
-            model.get_relation_field(raw_relation.to_s)
+          private def get_relation_field_context(raw_relation, model, silent = false)
+            model.get_relation_field_context(raw_relation.to_s)
           rescue Errors::UnknownField
             return nil if silent
             raise_invalid_field_error_with_valid_choices(raw_relation, model, "relation field")
@@ -499,6 +515,21 @@ module Marten
               reversed ^ @default_ordering ? "#{field} ASC" : "#{field} DESC"
             end
             "ORDER BY #{clauses.join(", ")}"
+          end
+
+          private def parent_model_joins
+            @parent_model_joins ||= Model.parent_models.map_with_index do |parent_model, i|
+              Join.new(
+                id: i,
+                type: JoinType::INNER,
+                from_model: Model,
+                from_common_field: Model.pk_field,
+                to_model: parent_model,
+                to_common_field: parent_model.pk_field,
+                selected: true,
+                table_alias_prefix: "p"
+              )
+            end
           end
 
           private def process_query_node(query_node)
@@ -596,44 +627,86 @@ module Marten
           private def verify_field(raw_field, only_relations = false, allow_reverse_relations = true)
             field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
 
+            current_model = Model
+
             raw_field.split(Constants::LOOKUP_SEP).each_with_index do |part, i|
               if i > 0
                 # In this case we are trying to process a query field like "author__username", so we have to ensure that
                 # we are considering a relation field (such as a foreign key).
-                previous_field, previous_reverse_relation = field_path[i - 1]
+                previous_field, _ = field_path[i - 1]
 
-                if previous_field.relation?
-                  model = if previous_reverse_relation.nil?
-                            previous_field.related_model
-                          else
-                            previous_reverse_relation.model
-                          end
-                else
+                if !previous_field.relation?
                   # If the previous was not a relation, it means that we are in the presence of a query field like
                   # "firstname__lastname", which is an invalid one and does not correspond to an actual existing field.
                   raise Errors::InvalidField.new("Unable to resolve '#{raw_field}' as an existing field")
                 end
-              else
-                model = Model
               end
 
-              part = model.pk_field.id if part == Constants::PRIMARY_KEY_ALIAS
+              part = current_model.pk_field.id if part == Constants::PRIMARY_KEY_ALIAS
 
-              reverse_relation = nil
+              reverse_relation_context = nil
 
-              field = begin
+              field_context = begin
                 if only_relations
-                  get_relation_field(part, model)
+                  get_relation_field_context(part, current_model)
                 else
-                  get_relation_field(part, model, silent: true) || get_field(part, model)
+                  get_field_context(part, current_model)
                 end
               rescue e : Errors::InvalidField
                 raise e unless allow_reverse_relations
-                reverse_relation = model.reverse_relations.find { |r| r.id == part.to_s }
-                reverse_relation.nil? ? raise e : reverse_relation.not_nil!.model.get_field(reverse_relation.field_id)
+
+                reverse_relation_context = current_model.get_reverse_relation_context(part.to_s)
+
+                if reverse_relation_context.nil?
+                  raise e
+                else
+                  reverse_relation_context.reverse_relation.model.get_field_context(
+                    reverse_relation_context.reverse_relation.field_id
+                  )
+                end
               end
 
-              field_path << {field.as(Field::Base), reverse_relation}
+              field_context = field_context.as(DB::Model::Table::FieldContext)
+
+              # If we are in the presence of a field or reverse relation that is not local to the current model, we have
+              # to add the necessary joins in order to be able to access it. This can be the case when filtering on
+              # "local" attributes that are inherited from concrete models in case of multi table inheritance scenarios.
+              # To do so we first identify the actual targeted parent model (which can vary depending on whether we are
+              # considering a field or a reverse relation).
+              target_parent_model = if reverse_relation_context.nil? && field_context.model != current_model
+                                      field_context.model
+                                    elsif !reverse_relation_context.nil? &&
+                                          reverse_relation_context.model != current_model
+                                      reverse_relation_context.model
+                                    else
+                                      nil
+                                    end
+
+              # Given the identified targeted parent model, we can build a chain of models that must be joined in order
+              # to reach it (and the requested field).
+              if !target_parent_model.nil?
+                model_chain = [] of DB::Model.class
+                current_model.parent_models.each do |int_model|
+                  model_chain << int_model
+
+                  break if int_model == target_parent_model
+                end
+
+                model_chain.map_with_index do |_, j|
+                  child_model = (j == 0) ? current_model : model_chain[j - 1]
+                  field_path << {child_model.pk_field, nil}
+                end
+              end
+
+              # The current model must be set in order to be able to correctly identify the actual targeted model field
+              # in the next iteration.
+              if reverse_relation_context.nil? && field_context.field.relation?
+                current_model = field_context.field.related_model
+              elsif !reverse_relation_context.nil?
+                current_model = reverse_relation_context.reverse_relation.model
+              end
+
+              field_path << {field_context.field, reverse_relation_context.try(&.reverse_relation)}
             end
 
             field_path

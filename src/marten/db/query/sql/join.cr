@@ -26,7 +26,8 @@ module Marten
             @from_common_field : Field::Base,
             @to_model : Model.class,
             @to_common_field : Field::Base,
-            @selected : Bool
+            @selected : Bool,
+            @table_alias_prefix = "t"
           )
             @children = [] of self
           end
@@ -41,7 +42,7 @@ module Marten
           end
 
           def columns : Array(String)
-            to_model.fields.compact_map do |f|
+            to_model.local_fields.compact_map do |f|
               next unless f.db_column?
               column_name(f.db_column)
             end + children.flat_map(&.columns)
@@ -52,7 +53,7 @@ module Marten
           end
 
           def table_alias : String
-            "t#{@id}"
+            "#{@table_alias_prefix}#{@id}"
           end
 
           def to_a : Array(self)

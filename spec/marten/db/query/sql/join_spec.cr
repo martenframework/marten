@@ -83,8 +83,8 @@ describe Marten::DB::Query::SQL::Join do
       parent_join.add_child(child_join)
 
       parent_join.columns.should eq(
-        Post.fields.map { |f| parent_join.column_name(f.db_column) } +
-        TestUser.fields.compact_map do |f|
+        Post.local_fields.map { |f| parent_join.column_name(f.db_column) } +
+        TestUser.local_fields.compact_map do |f|
           next unless f.db_column?
           child_join.column_name(f.db_column)
         end
@@ -136,6 +136,34 @@ describe Marten::DB::Query::SQL::Join do
 
       parent_join.table_alias.should eq "t1"
       child_join.table_alias.should eq "t2"
+    end
+
+    it "returns the alias of the table based on the join node ID and specified table prefix" do
+      parent_join = Marten::DB::Query::SQL::Join.new(
+        1,
+        Marten::DB::Query::SQL::JoinType::INNER,
+        ShowcasedPost,
+        ShowcasedPost.get_field("post_id"),
+        Post,
+        Post.get_field("id"),
+        true,
+        "p"
+      )
+      child_join = Marten::DB::Query::SQL::Join.new(
+        2,
+        Marten::DB::Query::SQL::JoinType::INNER,
+        Post,
+        Post.get_field("author_id"),
+        TestUser,
+        TestUser.get_field("id"),
+        true,
+        "p"
+      )
+
+      parent_join.add_child(child_join)
+
+      parent_join.table_alias.should eq "p1"
+      child_join.table_alias.should eq "p2"
     end
   end
 

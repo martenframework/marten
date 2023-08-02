@@ -117,7 +117,8 @@ module Marten
                 field_kwargs: {{ kwargs }},
                 field_type: {{ field_ann[:exposed_type] }},
                 relation_name: {{ relation_attribute_name }},
-                related_model: {{ related_model_klass }}
+                related_model: {{ related_model_klass }},
+                model_klass: {{ model_klass }}
               )]
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?
 

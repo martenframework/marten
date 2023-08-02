@@ -12,8 +12,8 @@ describe Marten::DB::Model::Table do
 
   describe "::inherited" do
     it "ensures that the model inherits its parent fields" do
-      Marten::DB::Model::TableSpec::Article.fields.size.should eq 9
-      Marten::DB::Model::TableSpec::Article.fields.map(&.id).should eq(
+      Marten::DB::Model::TableSpec::Article.local_fields.size.should eq 9
+      Marten::DB::Model::TableSpec::Article.local_fields.map(&.id).should eq(
         [
           "created_at",
           "updated_at",
@@ -112,6 +112,91 @@ describe Marten::DB::Model::Table do
       article.tags.to_a.should eq [tag_1, tag_2]
       tag_1.articles.to_a.should eq [article]
     end
+
+    context "with multiple table inheritance" do
+      it "contributes a pointer one-to-one field to the child models" do
+        field_1 = Marten::DB::Model::TableSpec::Student.get_field(:person_ptr)
+        field_1.should be_a Marten::DB::Field::OneToOne
+        field_1 = field_1.as(Marten::DB::Field::OneToOne)
+        field_1.id.should eq "person_ptr_id"
+        field_1.relation_name.should eq "person_ptr"
+        field_1.related_model.should eq Marten::DB::Model::TableSpec::Person
+        field_1.primary_key?.should be_true
+        field_1.parent_link?.should be_true
+        field_1.on_delete.should eq Marten::DB::Deletion::Strategy::CASCADE
+
+        field_2 = Marten::DB::Model::TableSpec::AltStudent.get_field(:student_ptr)
+        field_2.should be_a Marten::DB::Field::OneToOne
+        field_2 = field_2.as(Marten::DB::Field::OneToOne)
+        field_2.id.should eq "student_ptr_id"
+        field_2.relation_name.should eq "student_ptr"
+        field_2.related_model.should eq Marten::DB::Model::TableSpec::Student
+        field_2.primary_key?.should be_true
+        field_2.parent_link?.should be_true
+        field_2.on_delete.should eq Marten::DB::Deletion::Strategy::CASCADE
+      end
+
+      it "produces child models that can create properties of parent models seamlessly" do
+        address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
+        student = Marten::DB::Model::TableSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        student.persisted?.should be_true
+        student.id.should_not be_nil
+        student.pk.should_not be_nil
+        student.person_ptr_id.should eq student.id
+        student.name.should eq "Student 1"
+        student.email.should eq "student-1@example.com"
+        student.address.should eq address
+        student.grade.should eq "10"
+
+        student.reload
+        student.id.should_not be_nil
+        student.pk.should_not be_nil
+        student.person_ptr_id.should eq student.id
+        student.name.should eq "Student 1"
+        student.email.should eq "student-1@example.com"
+        student.address.should eq address
+        student.grade.should eq "10"
+      end
+
+      it "produces child models that can create properties of parent models with multiple levels of inheritance" do
+        address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
+        alt_student = Marten::DB::Model::TableSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        alt_student.persisted?.should be_true
+        alt_student.id.should_not be_nil
+        alt_student.pk.should_not be_nil
+        alt_student.student_ptr_id.should eq alt_student.id
+        alt_student.person_ptr_id.should eq alt_student.id
+        alt_student.name.should eq "Student 1"
+        alt_student.email.should eq "student-1@example.com"
+        alt_student.address.should eq address
+        alt_student.grade.should eq "10"
+        alt_student.alt_grade.should eq "11"
+
+        alt_student.reload
+        alt_student.id.should_not be_nil
+        alt_student.pk.should_not be_nil
+        alt_student.student_ptr_id.should eq alt_student.id
+        alt_student.person_ptr_id.should eq alt_student.id
+        alt_student.name.should eq "Student 1"
+        alt_student.email.should eq "student-1@example.com"
+        alt_student.address.should eq address
+        alt_student.grade.should eq "10"
+        alt_student.alt_grade.should eq "11"
+      end
+    end
   end
 
   describe "::db_index" do
@@ -209,6 +294,13 @@ describe Marten::DB::Model::Table do
       Tag.fields.size.should eq 3
       Tag.fields.map(&.id).should eq ["id", "name", "is_active"]
     end
+
+    it "includes the field instances associated with parent model classes" do
+      Marten::DB::Model::TableSpec::Student.fields.size.should eq 6
+      Marten::DB::Model::TableSpec::Student.fields.map(&.id).should eq(
+        ["id", "name", "email", "address_id", "person_ptr_id", "grade"]
+      )
+    end
   end
 
   describe "::get_field" do
@@ -230,10 +322,90 @@ describe Marten::DB::Model::Table do
       field.id.should eq "author_id"
     end
 
+    it "allows to retrieve a field from a parent model" do
+      field_1 = Marten::DB::Model::TableSpec::Student.get_field(:name)
+      field_1.should be_a Marten::DB::Field::String
+      field_1.id.should eq "name"
+
+      field_2 = Marten::DB::Model::TableSpec::AltStudent.get_field(:name)
+      field_2.should be_a Marten::DB::Field::String
+      field_2.id.should eq "name"
+    end
+
+    it "allows to retrieve a field from a parent model using a relation name" do
+      field = Marten::DB::Model::TableSpec::Student.get_field(:address)
+      field.should be_a Marten::DB::Field::ManyToOne
+      field.id.should eq "address_id"
+    end
+
     it "raises if the field cannot be found" do
       expect_raises(Marten::DB::Errors::UnknownField) do
         Tag.get_field(:unknown)
       end
+    end
+  end
+
+  describe "::get_local_field" do
+    it "allows to retrieve a specific model fields from an ID string" do
+      field = Tag.get_local_field("name")
+      field.should be_a Marten::DB::Field::String
+      field.id.should eq "name"
+    end
+
+    it "allows to retrieve a specific model fields from an ID symbol" do
+      field = Tag.get_local_field(:name)
+      field.should be_a Marten::DB::Field::String
+      field.id.should eq "name"
+    end
+
+    it "allows to retrieve a specific model fields from a relation name" do
+      field = Post.get_local_field(:author)
+      field.should be_a Marten::DB::Field::ManyToOne
+      field.id.should eq "author_id"
+    end
+
+    it "raises if the field cannot be found" do
+      expect_raises(Marten::DB::Errors::UnknownField) do
+        Tag.get_local_field(:unknown)
+      end
+    end
+
+    it "raises when trying to retrieve a field from a parent model" do
+      expect_raises(Marten::DB::Errors::UnknownField) do
+        Marten::DB::Model::TableSpec::Student.get_local_field(:name)
+      end
+    end
+
+    it "raises when trying to retrieve a field from a parent model using a relation name" do
+      expect_raises(Marten::DB::Errors::UnknownField) do
+        Marten::DB::Model::TableSpec::Student.get_local_field(:address)
+      end
+    end
+  end
+
+  describe "::local_fields" do
+    it "returns the field instances associated with the considered model class" do
+      Tag.local_fields.size.should eq 3
+      Tag.local_fields.map(&.id).should eq ["id", "name", "is_active"]
+    end
+
+    it "does not include the field instances associated with parent model classes" do
+      Marten::DB::Model::TableSpec::Student.local_fields.size.should eq 2
+      Marten::DB::Model::TableSpec::Student.local_fields.map(&.id).should eq ["person_ptr_id", "grade"]
+      Marten::DB::Model::TableSpec::AltStudent.local_fields.map(&.id).should eq ["student_ptr_id", "alt_grade"]
+    end
+  end
+
+  describe "::parent_models" do
+    it "returns an empty array for models without parent models" do
+      Tag.parent_models.should be_empty
+    end
+
+    it "returns an array of the parent models for models with parent models" do
+      Marten::DB::Model::TableSpec::Student.parent_models.should eq [Marten::DB::Model::TableSpec::Person]
+      Marten::DB::Model::TableSpec::AltStudent.parent_models.should eq(
+        [Marten::DB::Model::TableSpec::Student, Marten::DB::Model::TableSpec::Person]
+      )
     end
   end
 

@@ -1,3 +1,5 @@
+require "./table/**"
+
 module Marten
   module DB
     abstract class Model
@@ -11,10 +13,13 @@ module Marten
           @@db_indexes : Array(Index) = [] of Index
           @@db_table : String?
           @@db_unique_constraints : Array(Constraint::Unique) = [] of Constraint::Unique
-          @@fields : Hash(String, Field::Base) = {} of String => Field::Base
-          @@fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
-          @@relation_fields_per_relation_name : Hash(String, Field::Base) = {} of String => Field::Base
-          @@reverse_relations : Array(ReverseRelation) = [] of ReverseRelation
+          @@field_contexts_map : Hash(String, FieldContext) | Nil = nil
+          @@local_fields : Hash(String, Field::Base) = {} of String => Field::Base
+          @@local_fields_per_column : Hash(String, Field::Base) = {} of String => Field::Base
+          @@local_relation_fields_per_relation_name : Hash(String, Field::Base) = {} of String => Field::Base
+          @@local_reverse_relations : Array(ReverseRelation) = [] of ReverseRelation
+          @@parent_models : Array(Marten::DB::Model.class) = [] of Marten::DB::Model.class
+          @@reverse_relation_contexts : Array(ReverseRelationContext) | Nil = nil
 
           extend Marten::DB::Model::Table::ClassMethods
 
@@ -91,35 +96,65 @@ module Marten
           end
 
           # Returns all the fields instances associated with the current model.
+          #
+          # It is worth mentioning that this method will return all the fields of the considered model: the local model
+          # fields and model fields from parent classes.
           def fields
-            @@fields.values
+            field_contexts_map.values.map(&.field).uniq!
           end
 
           # Allows to retrieve a specific field instance associated with the current model.
           #
-          # The returned object will be an instance of a subclass of `Marten::DB::Field::Base`.
-          def get_field(id : String | Symbol)
-            @@fields.fetch(id.to_s) do
-              @@relation_fields_per_relation_name.fetch(id.to_s) do
+          # The returned object will be an instance of a subclass of `Marten::DB::Field::Base`. It is worth mentioning
+          # that this method will return local model fields as well as parent model fields.
+          def get_field(id : String | Symbol) : Field::Base
+            get_field_context(id).field
+          end
+
+          # Allows to retrieve a specific field instance associated with the current model.
+          #
+          # The returned object will be an instance of a subclass of `Marten::DB::Field::Base`. It is worth mentioning
+          # that this method will return local model fields only.
+          def get_local_field(id : String | Symbol) : Field::Base
+            @@local_fields.fetch(id.to_s) do
+              @@local_relation_fields_per_relation_name.fetch(id.to_s) do
                 raise Errors::UnknownField.new("Unknown field '#{id}'")
               end
             end
           end
 
+          # Returns all the local fields instances associated with the current model.
+          def local_fields
+            @@local_fields.values
+          end
+
+          # Returns the parent models.
+          def parent_models
+            @@parent_models
+          end
+
           # :nodoc:
           def register_field(field : Field::Base)
-            @@fields[field.id] = field
-            @@fields_per_column[field.db_column!] = field if field.db_column?
-            @@relation_fields_per_relation_name[field.relation_name] = field if field.relation?
+            @@local_fields[field.id] = field
+            @@local_fields_per_column[field.db_column!] = field if field.db_column?
+            @@local_relation_fields_per_relation_name[field.relation_name] = field if field.relation?
           end
 
           # :nodoc:
           def register_reverse_relation(reverse_relation : ReverseRelation)
-            @@reverse_relations << reverse_relation
+            @@local_reverse_relations << reverse_relation
           end
 
-          protected def fields_per_column
-            @@fields_per_column
+          protected def local_fields_per_column
+            @@local_fields_per_column
+          end
+
+          protected def local_fields_per_id
+            @@local_fields
+          end
+
+          protected def local_relation_fields_per_relation_name
+            @@local_relation_fields_per_relation_name
           end
 
           protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
@@ -129,10 +164,36 @@ module Marten
             obj
           end
 
-          protected def get_relation_field(relation_name)
-            @@relation_fields_per_relation_name.fetch(relation_name) do
+          protected def get_field_context(id : String | Symbol) : FieldContext
+            field_contexts_map.fetch(id.to_s) do
+              raise Errors::UnknownField.new("Unknown field '#{id}'")
+            end
+          end
+
+          protected def get_local_relation_field(relation_name : String | Symbol) : Field::Base
+            @@local_relation_fields_per_relation_name.fetch(relation_name.to_s) do
               raise Errors::UnknownField.new("Unknown relation field '#{relation_name}'")
             end
+          end
+
+          protected def get_relation_field_context(relation_name : String | Symbol) : FieldContext
+            field_context = field_contexts_map[relation_name.to_s]?
+
+            if field_context.nil? || !field_context.field.relation?
+              raise Errors::UnknownField.new("Unknown relation field '#{relation_name}'")
+            end
+
+            field_context
+          end
+
+          protected def get_reverse_relation_context(relation_name : String | Symbol) : Nil | ReverseRelationContext
+            reverse_relation_contexts.find do |r|
+              r.reverse_relation.id == relation_name.to_s
+            end
+          end
+
+          protected def local_reverse_relations
+            @@local_reverse_relations
           end
 
           protected def pk_field
@@ -140,7 +201,41 @@ module Marten
           end
 
           protected def reverse_relations
-            @@reverse_relations
+            reverse_relation_contexts.map(&.reverse_relation).uniq!
+          end
+
+          private def field_contexts_map
+            @@field_contexts_map ||= begin
+              map = {} of String => FieldContext
+
+              @@parent_models.each do |parent_model|
+                parent_model.local_fields.each { |f| map[f.id] = FieldContext.new(f, parent_model) }
+                parent_model.local_relation_fields_per_relation_name.each do |k, v|
+                  map[k] = FieldContext.new(v, parent_model)
+                end
+              end
+
+              @@local_relation_fields_per_relation_name.each { |k, v| map[k] = FieldContext.new(v, self) }
+              @@local_fields.values.each { |f| map[f.id] = FieldContext.new(f, self) }
+
+              map
+            end
+          end
+
+          private def reverse_relation_contexts
+            @@reverse_relation_contexts ||= begin
+              contexts = [] of ReverseRelationContext
+
+              @@parent_models.each do |parent_model|
+                parent_model.local_reverse_relations.each do |r|
+                  contexts << ReverseRelationContext.new(r, parent_model)
+                end
+              end
+
+              @@local_reverse_relations.each { |r| contexts << ReverseRelationContext.new(r, self) }
+
+              contexts
+            end
           end
 
           private def _pk_field
@@ -148,11 +243,11 @@ module Marten
             {%
               pkey = @type.instance_vars.find do |ivar|
                 ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
-                ann && ann[:field_kwargs] && ann[:field_kwargs][:primary_key]
+                ann && ann[:model_klass].id == @type.name.id && ann[:field_kwargs] && ann[:field_kwargs][:primary_key]
               end
             %}
 
-            @@fields[{{ pkey.id.stringify }}]
+            @@local_fields[{{ pkey.id.stringify }}]
             {% end %}
           end
         end
@@ -233,7 +328,7 @@ module Marten
           {%
             pkey = @type.instance_vars.find do |ivar|
               ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
-              ann && ann[:field_kwargs] && ann[:field_kwargs][:primary_key]
+              ann && ann[:model_klass].id == @type.name.id && ann[:field_kwargs] && ann[:field_kwargs][:primary_key]
             end
           %}
 
@@ -296,7 +391,11 @@ module Marten
 
         protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
           row_iterator.each_local_column do |result_set, column_name|
-            assign_field_from_db_result_set(result_set, column_name)
+            assign_local_field_from_db_result_set(result_set, column_name)
+          end
+
+          row_iterator.each_parent_column do |parent_model, result_set, column_name|
+            assign_parent_model_field_from_db_result_set(parent_model, result_set, column_name)
           end
 
           row_iterator.each_joined_relation do |relation_row_iterator, relation_field|
@@ -311,9 +410,29 @@ module Marten
           end
         end
 
-        protected def assign_field_from_db_result_set(result_set : ::DB::ResultSet, column_name : String)
+        protected def assign_local_field_from_db_result_set(result_set : ::DB::ResultSet, column_name : String)
           {% begin %}
-          field = self.class.fields_per_column[column_name]?
+          field = self.class.local_fields_per_column[column_name]?
+          return if field.nil?
+          case field.as(Field::Base).id
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          when {{ field_var.name.stringify }}
+          self.{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          {% end %}
+          else
+          end
+          {% end %}
+        end
+
+        protected def assign_parent_model_field_from_db_result_set(
+          parent_model : Model.class,
+          result_set : ::DB::ResultSet,
+          column_name : String
+        )
+          {% begin %}
+          field = parent_model.local_fields_per_column[column_name]?
           return if field.nil?
           case field.as(Field::Base).id
           {% for field_var in @type.instance_vars
@@ -390,16 +509,6 @@ module Marten
           end
         end
 
-        private def field_db_values
-          values = {} of String => ::DB::Any
-          {% for field_var in @type.instance_vars
-                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-            field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
-          {% end %}
-          values
-        end
-
         private def get_cached_related_object(relation_field)
           {% begin %}
           case relation_field.id
@@ -416,34 +525,93 @@ module Marten
           {% end %}
         end
 
+        private def local_field_db_values
+          {% begin %}
+          values = {} of String => ::DB::Any
+
+          {%
+            local_field_vars = @type.instance_vars.select do |ivar|
+              ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
+              ann && ann[:model_klass].id == @type.name.id
+            end
+          %}
+
+          {% for field_var in local_field_vars %}
+            field = self.class.get_field({{ field_var.name.stringify }})
+            values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
+          {% end %}
+
+          values
+          {% end %}
+        end
+
+        private def parent_model_field_db_values(model_klass)
+          {% begin %}
+          values = {} of String => ::DB::Any
+
+          {%
+            local_field_vars = @type.instance_vars.select do |ivar|
+              ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
+            end
+          %}
+
+          {% for field_var in local_field_vars %}
+            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            if model_klass.name == {{ ann[:model_klass].id.stringify }}
+              field = {{ ann[:model_klass].id }}.get_field({{ field_var.name.stringify }})
+              values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
+            end
+          {% end %}
+
+          values
+          {% end %}
+        end
+
         # :nodoc:
         macro _inherit_table_attributes
           {% ancestor_model = @type.ancestors.first %}
 
           {% if ancestor_model.has_constant?("FIELDS_") %}
-            {% for field_id, field_config in ancestor_model.constant("FIELDS_") %}
-              {% FIELDS_[field_id] = field_config %}
+            {% if ancestor_model.abstract? %}
+              {% for field_id, field_config in ancestor_model.constant("FIELDS_") %}
+                {% FIELDS_[field_id] = field_config %}
 
-              {% field_klass = nil %}
-              {% field_ann = nil %}
-              {% for k in Marten::DB::Field::Base.all_subclasses %}
-                {% ann = k.annotation(Marten::DB::Field::Registration) %}
-                {% if ann && ann[:id] == field_config[:type] %}
-                  {% field_klass = k %}
-                  {% field_ann = ann %}
+                {% field_klass = nil %}
+                {% field_ann = nil %}
+                {% for k in Marten::DB::Field::Base.all_subclasses %}
+                  {% ann = k.annotation(Marten::DB::Field::Registration) %}
+                  {% if ann && ann[:id] == field_config[:type] %}
+                    {% field_klass = k %}
+                    {% field_ann = ann %}
+                  {% end %}
                 {% end %}
+
+                {{ field_klass }}.contribute_to_model(
+                  {{ @type }},
+                  {{ field_id.id }},
+                  {{ field_ann }},
+                  {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %}
+                )
               {% end %}
 
-              {{ field_klass }}.contribute_to_model(
-                {{ @type }},
-                {{ field_id.id }},
-                {{ field_ann }},
-                {% unless field_config[:kwargs].empty? %}{{ field_config[:kwargs] }}{% else %}nil{% end %}
-              )
-            {% end %}
+              @@db_indexes = {{ ancestor_model.name }}.db_indexes.clone
+              @@db_unique_constraints = {{ ancestor_model.name }}.db_unique_constraints.clone
+            {% else %}
+              @@parent_models = [{{ ancestor_model }}] + {{ ancestor_model }}.parent_models
 
-            @@db_indexes = {{ ancestor_model.name }}.db_indexes.clone
-            @@db_unique_constraints = {{ ancestor_model.name }}.db_unique_constraints.clone
+              {% for field_id, field_config in ancestor_model.constant("FIELDS_") %}
+                {% if field_config[:kwargs][:primary_key] %}
+                  field(
+                    :{{ ancestor_model.name.split("::").last.underscore.id }}_ptr,
+                    :one_to_one,
+                    to: {{ ancestor_model.name }},
+                    primary_key: true,
+                    parent_link: true,
+                    on_delete: :cascade,
+                  )
+                {% end %}
+              {% end %}
+            {% end %}
           {% end %}
         end
 
@@ -452,10 +620,13 @@ module Marten
           @@db_indexes = [] of Marten::DB::Index
           @@db_table = nil
           @@db_unique_constraints = [] of Marten::DB::Constraint::Unique
-          @@fields = {} of ::String => Marten::DB::Field::Base
-          @@fields_per_column = {} of ::String => Marten::DB::Field::Base
-          @@relation_fields_per_relation_name = {} of ::String => Marten::DB::Field::Base
-          @@reverse_relations = [] of Marten::DB::ReverseRelation
+          @@field_contexts_map = nil
+          @@local_fields = {} of ::String => Marten::DB::Field::Base
+          @@local_fields_per_column = {} of ::String => Marten::DB::Field::Base
+          @@local_relation_fields_per_relation_name = {} of ::String => Marten::DB::Field::Base
+          @@local_reverse_relations = [] of Marten::DB::ReverseRelation
+          @@parent_models : Array(Marten::DB::Model.class) = [] of Marten::DB::Model.class
+          @@reverse_relation_contexts = nil
         end
 
         # :nodoc:

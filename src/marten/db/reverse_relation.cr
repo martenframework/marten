@@ -34,7 +34,7 @@ module Marten
       end
 
       private def field
-        @field ||= model.get_field(@field_id)
+        @field ||= model.get_local_field(@field_id)
       end
     end
   end

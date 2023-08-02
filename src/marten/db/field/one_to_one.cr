@@ -4,6 +4,8 @@ module Marten
       class OneToOne < Base
         getter on_delete
 
+        getter? parent_link
+
         def initialize(
           @id : ::String,
           @relation_name : ::String,
@@ -16,6 +18,7 @@ module Marten
           @index = true,
           @db_column = nil,
           @related : Nil | ::String | Symbol = nil,
+          @parent_link : ::Bool = false,
           on_delete : ::String | Symbol = :do_nothing
         )
           @related = @related.try(&.to_s)
@@ -44,6 +47,10 @@ module Marten
         # Returns a boolean indicating whether the column is a foreign key.
         def foreign_key?
           @foreign_key
+        end
+
+        def perform_validation(record : Model)
+          super if !parent_link?
         end
 
         def related_model
@@ -117,7 +124,8 @@ module Marten
                 field_kwargs: {{ kwargs }},
                 field_type: {{ field_ann[:exposed_type] }},
                 relation_name: {{ relation_attribute_name }},
-                related_model: {{ related_model_klass }}
+                related_model: {{ related_model_klass }},
+                model_klass: {{ model_klass }}
               )]
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?
 

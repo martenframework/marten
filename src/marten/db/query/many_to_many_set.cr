@@ -87,13 +87,13 @@ module Marten
         private def m2m_through_from_field
           @m2m_through_from_field ||= m2m_field.as(Field::ManyToMany)
             .through
-            .get_relation_field(@through_model_from_field_id)
+            .get_local_relation_field(@through_model_from_field_id)
         end
 
         private def m2m_through_to_field
           @m2m_through_to_field ||= m2m_field.as(Field::ManyToMany)
             .through
-            .get_relation_field(@through_model_to_field_id)
+            .get_local_relation_field(@through_model_to_field_id)
         end
       end
     end

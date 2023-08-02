@@ -132,7 +132,8 @@ module Marten
               @[Marten::DB::Model::Table::FieldInstanceVariable(
                 field_klass: {{ @type }},
                 field_kwargs: {% unless kwargs.is_a?(NilLiteral) %}{{ kwargs }}{% else %}nil{% end %},
-                field_type: ::File | Marten::DB::Field::File::File | Marten::HTTP::UploadedFile | Nil
+                field_type: ::File | Marten::DB::Field::File::File | Marten::HTTP::UploadedFile | Nil,
+                model_klass: {{ model_klass }}
               )]
 
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?

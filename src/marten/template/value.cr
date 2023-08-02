@@ -6,8 +6,7 @@ module Marten
       include Enumerable(self)
 
       alias Raw = Array(Value) | Bool | Float64 | Hash(Value, Value) | Int32 | Int64 | Iterator(Value) |
-                  Marten::DB::Field::Any | Marten::DB::Model | Marten::DB::Query::Page::Any |
-                  Marten::DB::Query::Set::Any | Marten::Schema | Marten::Schema::BoundField |
+                  Marten::DB::Field::Any | Marten::DB::Model | Marten::Schema | Marten::Schema::BoundField |
                   Marten::Schema::Field::Base | Marten::Template::Object | Nil | SafeString |
                   String | Time | Handlers::Base | Emailing::Email
 

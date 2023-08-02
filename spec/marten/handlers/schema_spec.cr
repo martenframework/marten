@@ -220,6 +220,126 @@ describe Marten::Handlers::Schema do
     end
   end
 
+  describe "callbacks" do
+    it "executes success callback" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithSuccessCallbacks.new(request)
+
+
+      handler.foo.should eq nil
+      handler.bar.should eq nil
+      handler.baz.should eq nil
+      handler.foobar.should eq nil
+
+      handler.post
+
+      handler.schema.valid?.should eq true
+      handler.foo.should eq "set_foo"
+      handler.bar.should eq "set_bar"
+      handler.baz.should eq "set_baz"
+      handler.foobar.should eq nil
+    end
+
+    it "executes failed callback" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithFailedCallbacks.new(request)
+
+
+      handler.foo.should eq nil
+      handler.bar.should eq nil
+      handler.baz.should eq nil
+      handler.foobar.should eq nil
+
+      handler.post
+
+      handler.schema.valid?.should eq false
+      handler.foo.should eq "set_foo"
+      handler.bar.should eq "set_bar"
+      handler.baz.should eq nil
+      handler.foobar.should eq "set_foobar"
+    end
+
+    it "returns any early response returned by the before_schema_validation callbacks" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithBeforeValidateResponse.new(request)
+
+      response = handler.post
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "before_schema_validation response"
+    end
+
+    it "returns any early response returned by the after_schema_validation callbacks" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithAfterValidateResponse.new(request)
+
+      response = handler.post
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "after_schema_validation response"
+    end
+
+    it "returns any early response returned by the after_successful_schema_validation callbacks" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithAfterSuccessfulValidateResponse.new(request)
+
+      response = handler.post
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "after_successful_schema_validation response"
+    end
+
+    it "returns any early response returned by the after_failed_schema_validation callbacks" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithAfterFailedValidateResponse.new(request)
+
+      response = handler.post
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "after_failed_schema_validation response"
+    end
+  end
+
   describe "#success_url" do
     it "returns the raw success URL if configured" do
       request = Marten::HTTP::Request.new(
@@ -272,6 +392,143 @@ module Marten::Handlers::SchemaSpec
   class TestHandlerWithSuccessUrl < Marten::Handlers::Schema
     schema TestSchema
     success_url "https://example.com"
+  end
+
+  class TestHandlerWithSuccessCallbacks < Marten::Handlers::Schema
+    property foo : String? = nil
+    property bar : String? = nil
+    property baz : String? = nil
+    property foobar : String? = nil
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema EmptySchema
+
+    before_schema_validation :set_foo
+    after_schema_validation :set_bar
+    after_successful_schema_validation :set_baz
+    after_failed_schema_validation :set_foobar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
+
+    private def set_baz
+      self.baz = "set_baz"
+    end
+
+    private def set_foobar
+      self.foobar = "set_foobar"
+    end
+  end
+
+  class TestHandlerWithFailedCallbacks < Marten::Handlers::Schema
+    property foo : String? = nil
+    property bar : String? = nil
+    property baz : String? = nil
+    property foobar : String? = nil
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema TestSchema
+
+    before_schema_validation :set_foo
+    after_schema_validation :set_bar
+    after_successful_schema_validation :set_baz
+    after_failed_schema_validation :set_foobar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
+
+    private def set_baz
+      self.baz = "set_baz"
+    end
+
+    private def set_foobar
+      self.foobar = "set_foobar"
+    end
+  end
+
+  class TestHandlerWithBeforeValidateResponse < Marten::Handlers::Schema
+    before_schema_validation :return_before_schema_validation_response
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema TestSchema
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_before_schema_validation_response
+      Marten::HTTP::Response.new("before_schema_validation response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithBeforeValidateResponse < Marten::Handlers::Schema
+    before_schema_validation :return_before_schema_validation_response
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema TestSchema
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_before_schema_validation_response
+      Marten::HTTP::Response.new("before_schema_validation response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithAfterValidateResponse < Marten::Handlers::Schema
+    after_schema_validation :return_after_schema_validation_response
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema TestSchema
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_after_schema_validation_response
+      Marten::HTTP::Response.new("after_schema_validation response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithAfterSuccessfulValidateResponse < Marten::Handlers::Schema
+    after_successful_schema_validation :return_after_successful_schema_validation_response
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema EmptySchema
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_after_successful_schema_validation_response
+      Marten::HTTP::Response.new("after_successful_schema_validation response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithAfterFailedValidateResponse < Marten::Handlers::Schema
+    after_failed_schema_validation :return_after_failed_schema_validation_response
+    success_url "https://example.com"
+    template_name "specs/handlers/schema/test.html"
+    schema TestSchema
+
+    def get
+      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
+    end
+
+    private def return_after_failed_schema_validation_response
+      Marten::HTTP::Response.new("after_failed_schema_validation response", content_type: "text/plain", status: 200)
+    end
   end
 
   class TestHandlerWithoutConfiguration < Marten::Handlers::Schema

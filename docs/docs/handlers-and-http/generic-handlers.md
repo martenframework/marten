@@ -138,4 +138,88 @@ end
 
 By default, such a handler will render the configured template when the incoming request is a GET or for POST requests if the data cannot be validated using the specified schema (in that case, the template is expected to use the invalid schema to display a form with the right errored inputs). The specified template can have access to the configured schema through the use of the `schema` object in the template context.
 
-If the schema is valid, a temporary redirect is issued by using the URL corresponding to the `#success_route_name` value (although it should be noted that the way to generate this success URL can be overridden by defining a `#success_url` method). By default, the handler does nothing when the processed schema is valid (except redirecting to the success URL). That's why it can be helpful to override the `#process_valid_schema` method to implement any logic that should be triggered after a successful schema validation.
+If the schema is valid, a temporary redirect is issued by using the URL corresponding to the `#success_route_name` value (although it should be noted that the way to generate this success URL can be overridden by defining a `#success_url` method). By default, the handler does nothing when the processed schema is valid (except redirecting to the success URL).
+
+
+#### Callbacks
+
+Callbacks let you define logics that are triggered before or after the validation of the schema. This allows you to easily intercept validation
+and handle the response independently of the schema validty. Two callbacks are supported: `before_schema_validation`, `after_schema_validation`,
+`after_successful_schema_validation` and `after_failed_schema_validation`.
+
+All callbacks can optionally return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html). When a HTTP response is returned
+all pending callbacks and the success/fail response are skipped.
+
+##### `before_schema_validation`
+
+`before_schema_validation` callbacks are executed _before_ a schema is checked for validty.
+For example, this capability can be leveraged to inspect the incoming request and verify that a user is logged in:
+
+```crystal
+class ArticleCreateHandler < Marten::Handlers::Schema
+  before_schema_validation :require_authenticated_user
+  success_url "https://example.com/articles/list"
+  template_name "articles/create.html"
+  schema ArticleSchema
+
+  private def require_authenticated_user
+    redirect(login_url) unless user_authenticated?(request)
+  end
+end
+```
+
+##### `after_schema_validation`
+
+`after_schema_validation` callbacks are executed right _after_ a schema is checked for validty.
+For example, this capability can be leveraged to add additional cookies to the response:
+
+```crystal
+class ArticleCreateHandler < Marten::Handlers::Schema
+  after_schema_validation :add_new_header
+  success_url "https://example.com/articles/list"
+  template_name "articles/create.html"
+  schema ArticleSchema
+
+  private def add_new_header : Nil
+    response!.headers["X-Foo"] = "Bar"
+  end
+end
+```
+
+##### `after_successful_schema_validation`
+
+`after_successful_schema_validation` callbacks are executed right _after_ a schema is checked for validty and the
+`after_schema_validation` callbacks, but only if the schema wasn't valid.
+For example, this capability can be leveraged to add additional cookies to the response:
+
+```crystal
+class ArticleCreateHandler < Marten::Handlers::Schema
+  after_successful_schema_validation :add_new_header
+  success_url "https://example.com/articles/list"
+  template_name "articles/create.html"
+  schema ArticleSchema
+
+  private def add_new_header : Nil
+    response!.headers["X-Foo"] = "Bar"
+  end
+end
+```
+
+##### `after_failed_schema_validation`
+
+`after_failed_schema_validation` callbacks are executed right _after_ a schema is checked for validty and the
+`after_schema_validation` callbacks, but only if the schema was valid.
+For example, this capability can be leveraged to add additional cookies to the response:
+
+```crystal
+class ArticleCreateHandler < Marten::Handlers::Schema
+  after_failed_schema_validation :add_new_header
+  success_url "https://example.com/articles/list"
+  template_name "articles/create.html"
+  schema ArticleSchema
+
+  private def add_new_header : Nil
+    response!.headers["X-Foo"] = "Bar"
+  end
+end
+```

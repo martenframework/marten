@@ -196,7 +196,7 @@ MyModel.last!.metadata # => MySerializable object
 ```
 
 :::info
-It should be noted that `json` fields are mapped to: 
+It should be noted that `json` fields are mapped to:
 
 * `jsonb` columns in PostgreSQL databases
 * `text` columns in MySQL databases
@@ -206,6 +206,17 @@ It should be noted that `json` fields are mapped to:
 #### `serializable`
 
 The `serializable` arguments allows to specify that a class making use of [`JSON::Serializable`](https://crystal-lang.org/api/JSON/Serializable.html) should be used in order to parse the JSON values for the model field at hand. When specifying a `serializable` class, the values returned for the considered model fields will be instances of that class instead of [`JSON::Any`](https://crystal-lang.org/api/JSON/Any.html) objects.
+
+### `slug`
+
+An `slug` field allows to persist _valid_ slug. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_size`
+
+The `max_size` argument is optional and defaults to 50 characters. It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validate field values.
+
+:::note
+As slug fields are normally used to query records the slug field is indexed by default. To disable indexing set `index: false`
 
 ### `string`
 

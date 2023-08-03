@@ -109,6 +109,22 @@ schema.metadata! # => MySerializable object
 
 The `serializable` arguments allows to specify that a class making use of [`JSON::Serializable`](https://crystal-lang.org/api/JSON/Serializable.html) should be used in order to parse the JSON values for the schema field at hand. When specifying a `serializable` class, the values returned for the considered schema fields will be instances of that class instead of [`JSON::Any`](https://crystal-lang.org/api/JSON/Any.html) objects.
 
+### `slug`
+
+An `slug` field allows validating slug values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_size`
+
+The `max_size` argument allows defining the maximum size allowed for the slug string. The default value for this argument is `50`.
+
+#### `min_size`
+
+The `min_size` argument allows defining the minimum size allowed for the slug string. The default value for this argument is `nil`, which means that the minimum size is not validated by default.
+
+#### `strip`
+
+The `strip` argument allows defining whether the string value should be stripped of leading and trailing whitespaces. The default is `true`.
+
 ### `string`
 
 A `string` field allows validating string values. In addition to the [common field options](#common-field-options), such fields support the following arguments:

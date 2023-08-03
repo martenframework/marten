@@ -216,7 +216,7 @@ An `slug` field allows to persist _valid_ slug. In addition to the [common field
 The `max_size` argument is optional and defaults to 50 characters. It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validate field values.
 
 :::note
-As slug fields are normally used to query records the slug field is indexed by default. To disable indexing set `index: false`
+As slug fields are usually used to query records the slug field is indexed by default. To disable indexing set `index: false`
 
 ### `string`
 

@@ -231,7 +231,6 @@ describe Marten::Handlers::Schema do
       )
       handler = Marten::Handlers::SchemaSpec::TestHandlerWithSuccessCallbacks.new(request)
 
-
       handler.foo.should eq nil
       handler.bar.should eq nil
       handler.baz.should eq nil
@@ -255,7 +254,6 @@ describe Marten::Handlers::Schema do
         )
       )
       handler = Marten::Handlers::SchemaSpec::TestHandlerWithFailedCallbacks.new(request)
-
 
       handler.foo.should eq nil
       handler.bar.should eq nil

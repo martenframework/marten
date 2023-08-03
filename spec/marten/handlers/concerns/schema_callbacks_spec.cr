@@ -48,7 +48,6 @@ describe Marten::Handlers::SchemaCallbacks do
       obj.foo.should eq "set_foo"
     end
 
-
     it "allows to register multiple after_validate callbacks through a single call" do
       obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterValidateCallbacksRegisteredWithSingleCall.new
 
@@ -85,7 +84,6 @@ describe Marten::Handlers::SchemaCallbacks do
       obj.foo.should eq "set_foo"
     end
 
-
     it "allows to register multiple after_successful_validate callbacks through a single call" do
       obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithSingleCall.new
 
@@ -99,7 +97,8 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple after_successful_validate callbacks through multiple calls" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithMultipleCalls.new
+      obj =
+        Marten::Handlers::SchemaCallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithMultipleCalls.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -121,7 +120,6 @@ describe Marten::Handlers::SchemaCallbacks do
 
       obj.foo.should eq "set_foo"
     end
-
 
     it "allows to register multiple after_failed_validate callbacks through a single call" do
       obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterFailedValidateCallbacksRegisteredWithSingleCall.new

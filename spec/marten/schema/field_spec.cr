@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Marten::Schema::Field do
   describe "#registry" do
     it "returns the expected field abstractions" do
-      Marten::Schema::Field.registry.size.should eq 12
+      Marten::Schema::Field.registry.size.should eq 13
       Marten::Schema::Field.registry["bool"].should eq Marten::Schema::Field::Bool
       Marten::Schema::Field.registry["date"].should eq Marten::Schema::Field::Date
       Marten::Schema::Field.registry["date_time"].should eq Marten::Schema::Field::DateTime

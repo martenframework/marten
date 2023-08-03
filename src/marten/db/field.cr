@@ -9,6 +9,7 @@ require "./field/file"
 require "./field/float"
 require "./field/int"
 require "./field/json"
+require "./field/slug"
 require "./field/string"
 require "./field/text"
 require "./field/url"
@@ -113,6 +114,7 @@ module Marten
       register "many_to_many", ManyToMany
       register "many_to_one", ManyToOne
       register "one_to_one", OneToOne
+      register "slug", Slug
       register "string", String
       register "text", Text
       register "url", URL

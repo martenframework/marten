@@ -74,9 +74,13 @@ module Marten
 
           # Add the model's parents to the list of records to delete first.
           model.parent_fields.each do |parent_field|
+            # Ensure that the current model is a dependency of the parent models. This means that parent records should
+            # be deleted before any child records.
+            @dependencies[parent_field.related_model] ||= [] of Model.class
+            @dependencies[parent_field.related_model] << model
+
             add(
               records.compact_map { |r| r.get_relation(parent_field.as(Field::OneToOne).relation_name) },
-              source: model,
               reverse_relations: false
             )
           end

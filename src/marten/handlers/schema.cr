@@ -1,6 +1,6 @@
 require "./concerns/record_listing"
-require "./schema/callbacks"
 require "./template"
+require "./schema/*"
 
 module Marten
   module Handlers
@@ -32,7 +32,7 @@ module Marten
     # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
     # to redirect to.
     class Schema < Template
-      include SchemaCallbacks
+      include Callbacks
 
       # Returns the route name that should be resolved to produce the URL to redirect to when processing a valid schema.
       #

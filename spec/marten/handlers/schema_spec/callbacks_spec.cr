@@ -1,9 +1,9 @@
 require "./spec_helper"
 
-describe Marten::Handlers::SchemaCallbacks do
+describe Marten::Handlers::Schema::Callbacks do
   describe "::before_validate" do
     it "allows to register a single before_validate callback" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::SingleBeforeValidateCallback.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::SingleBeforeValidateCallback.new
 
       obj.foo.should be_nil
 
@@ -13,7 +13,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple before_validate callbacks through a single call" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleBeforeValidateCallbacksRegisteredWithSingleCall.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::MultipleBeforeValidateCallbacksRegisteredWithSingleCall.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -25,7 +25,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple before_validate callbacks through multiple calls" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleBeforeValidateCallbacksRegisteredWithMultipleCalls.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::MultipleBeforeValidateCallbacksRegisteredWithMultipleCalls.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -39,7 +39,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "::after_validate" do
     it "allows to register a single after_validate callback" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::SingleAfterValidateCallback.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::SingleAfterValidateCallback.new
 
       obj.foo.should be_nil
 
@@ -49,7 +49,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple after_validate callbacks through a single call" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterValidateCallbacksRegisteredWithSingleCall.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::MultipleAfterValidateCallbacksRegisteredWithSingleCall.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -61,7 +61,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple after_validate callbacks through multiple calls" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterValidateCallbacksRegisteredWithMultipleCalls.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::MultipleAfterValidateCallbacksRegisteredWithMultipleCalls.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -75,7 +75,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "::after_successful_validate" do
     it "allows to register a single after_successful_validate callback" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::SingleAfterSuccessfulValidateCallback.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::SingleAfterSuccessfulValidateCallback.new
 
       obj.foo.should be_nil
 
@@ -85,7 +85,8 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple after_successful_validate callbacks through a single call" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithSingleCall.new
+      obj =
+        Marten::Handlers::Schema::CallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithSingleCall.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -98,7 +99,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
     it "allows to register multiple after_successful_validate callbacks through multiple calls" do
       obj =
-        Marten::Handlers::SchemaCallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithMultipleCalls.new
+        Marten::Handlers::Schema::CallbacksSpec::MultipleAfterSuccessfulValidateCallbacksRegisteredWithMultipleCalls.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -112,7 +113,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "::after_failed_validate" do
     it "allows to register a single after_failed_validate callback" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::SingleAfterFailedValidateCallback.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::SingleAfterFailedValidateCallback.new
 
       obj.foo.should be_nil
 
@@ -122,7 +123,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple after_failed_validate callbacks through a single call" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterFailedValidateCallbacksRegisteredWithSingleCall.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::MultipleAfterFailedValidateCallbacksRegisteredWithSingleCall.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -134,7 +135,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "allows to register multiple after_failed_validate callbacks through multiple calls" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::MultipleAfterFailedValidateCallbacksRegisteredWithMultipleCalls.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::MultipleAfterFailedValidateCallbacksRegisteredWithMultipleCalls.new
 
       obj.foo.should be_nil
       obj.bar.should be_nil
@@ -148,7 +149,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "#run_before_validate_callbacks" do
     it "runs the before_validate callbacks in the order they were registered" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Parent.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Parent.new
 
       obj.shared_before.should be_nil
 
@@ -158,7 +159,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "runs inherited callbacks as well as local callbacks" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Child.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Child.new
 
       obj.shared_before.should be_nil
       obj.foo_before.should be_nil
@@ -174,7 +175,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "#run_after_validate_callbacks" do
     it "runs the after_validate callbacks in the order they were registered" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Parent.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Parent.new
 
       obj.shared_after.should be_nil
 
@@ -184,7 +185,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "runs inherited callbacks as well as local callbacks" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Child.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Child.new
 
       obj.shared_after.should be_nil
       obj.foo_after.should be_nil
@@ -200,7 +201,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "#run_after_successful_validate_callbacks" do
     it "runs the after_successful_validate callbacks in the order they were registered" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Parent.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Parent.new
 
       obj.shared_after_successful.should be_nil
 
@@ -210,7 +211,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "runs inherited callbacks as well as local callbacks" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Child.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Child.new
 
       obj.shared_after_successful.should be_nil
       obj.foo_after_successful.should be_nil
@@ -226,7 +227,7 @@ describe Marten::Handlers::SchemaCallbacks do
 
   describe "#run_after_failed_validate_callbacks" do
     it "runs the after_failed_validate callbacks in the order they were registered" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Parent.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Parent.new
 
       obj.shared_after_failed.should be_nil
 
@@ -236,7 +237,7 @@ describe Marten::Handlers::SchemaCallbacks do
     end
 
     it "runs inherited callbacks as well as local callbacks" do
-      obj = Marten::Handlers::SchemaCallbacksSpec::Child.new
+      obj = Marten::Handlers::Schema::CallbacksSpec::Child.new
 
       obj.shared_after_failed.should be_nil
       obj.foo_after_failed.should be_nil
@@ -251,9 +252,9 @@ describe Marten::Handlers::SchemaCallbacks do
   end
 end
 
-module Marten::Handlers::SchemaCallbacksSpec
+module Marten::Handlers::Schema::CallbacksSpec
   class Base
-    include Marten::Handlers::SchemaCallbacks
+    include Marten::Handlers::Schema::Callbacks
 
     def run_callbacks
       run_before_validation_callbacks

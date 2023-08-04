@@ -9,6 +9,9 @@ en:
         email:
           errors:
             invalid: "Enter a valid email address."
+        slug:
+          errors:
+            invalid: "Enter a valid slug."
         string:
           errors:
             too_short: "The minimum allowed length is %{min_size}"
@@ -58,6 +61,9 @@ en:
         email:
           errors:
             invalid: "Enter a valid email address."
+        slug:
+          errors:
+            invalid: "Enter a valid slug."
         file:
           errors:
             empty: "Empty files are not allowed."

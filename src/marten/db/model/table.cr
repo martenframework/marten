@@ -196,6 +196,14 @@ module Marten
             @@local_reverse_relations
           end
 
+          protected def parent_fields
+            parent_models.compact_map do |parent_model|
+              if (f = pk_field).is_a?(Field::OneToOne) && f.parent_link?
+                pk_field
+              end
+            end
+          end
+
           protected def pk_field
             _pk_field
           end
@@ -322,6 +330,28 @@ module Marten
           {% end %}
         end
 
+        # Allows to return the record associated with a specific relation name.
+        #
+        # If no record is associated with the specified relation (eg. if the corresponding field is nullable), then
+        # `nil` is returned. If the specified relation name is not defined on the model, then a
+        # `Marten::DB::Errors::UnknownField` exception is raised.
+        def get_relation(relation_name : String | Symbol)
+          {% begin %}
+          case relation_name.to_s
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% if ann && ann[:relation_name] %}
+          when {{ ann[:relation_name].stringify }}
+            {{ ann[:relation_name] }}
+          {% end %}
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown relation '#{relation_name.to_s}'")
+          end
+          {% end %}
+        end
+
         # Returns the primary key value.
         def pk
           {% begin %}
@@ -387,27 +417,6 @@ module Marten
           {% end %}
           {% end %}
           io << ">"
-        end
-
-        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
-          row_iterator.each_local_column do |result_set, column_name|
-            assign_local_field_from_db_result_set(result_set, column_name)
-          end
-
-          row_iterator.each_parent_column do |parent_model, result_set, column_name|
-            assign_parent_model_field_from_db_result_set(parent_model, result_set, column_name)
-          end
-
-          row_iterator.each_joined_relation do |relation_row_iterator, relation_field|
-            if get_field_value(relation_field.id).nil?
-              # In that case the local relation field (relation ID, likely) is nil, which means that we need to
-              # "advance" the row cursor so that the next relation can be correctly picked up afterwards.
-              relation_row_iterator.advance
-            else
-              related_object = relation_field.related_model.from_db_row_iterator(relation_row_iterator)
-              assign_related_object(related_object, relation_field.id)
-            end
-          end
         end
 
         protected def assign_local_field_from_db_result_set(result_set : ::DB::ResultSet, column_name : String)
@@ -476,6 +485,27 @@ module Marten
             values[field.db_column!] = {{ field_var.id }} if field.db_column?
           {% end %}
           values
+        end
+
+        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
+          row_iterator.each_local_column do |result_set, column_name|
+            assign_local_field_from_db_result_set(result_set, column_name)
+          end
+
+          row_iterator.each_parent_column do |parent_model, result_set, column_name|
+            assign_parent_model_field_from_db_result_set(parent_model, result_set, column_name)
+          end
+
+          row_iterator.each_joined_relation do |relation_row_iterator, relation_field|
+            if get_field_value(relation_field.id).nil?
+              # In that case the local relation field (relation ID, likely) is nil, which means that we need to
+              # "advance" the row cursor so that the next relation can be correctly picked up afterwards.
+              relation_row_iterator.advance
+            else
+              related_object = relation_field.related_model.from_db_row_iterator(relation_row_iterator)
+              assign_related_object(related_object, relation_field.id)
+            end
+          end
         end
 
         private def assign_field_values(values : Hash(String, Field::Any | Model))

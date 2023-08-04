@@ -1583,6 +1583,42 @@ describe Marten::DB::Model::Persistence do
       obj.not_nil!.after_update_rollback_track.should eq "unset"
       obj.not_nil!.after_save_rollback_track.should eq "unset"
     end
+
+    context "with multiple table inheritance" do
+      it "deletes the object and its parents as expected" do
+        address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Model::PersistenceSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        student.delete
+
+        Marten::DB::Model::PersistenceSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Model::PersistenceSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "deletes the object and its parents as expected with multiple levels of inheritance" do
+        address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Model::PersistenceSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        student.delete
+
+        Marten::DB::Model::PersistenceSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Model::PersistenceSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Model::PersistenceSpec::Person.get(name: "Student 1").should be_nil
+      end
+    end
   end
 
   describe "#deleted?" do

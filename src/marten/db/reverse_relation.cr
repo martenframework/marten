@@ -33,6 +33,11 @@ module Marten
         field.is_a?(Field::OneToOne)
       end
 
+      # Returns `true` if the reverse relation is a parent link.
+      def parent_link?
+        one_to_one? && field.as(Field::OneToOne).parent_link?
+      end
+
       private def field
         @field ||= model.get_local_field(@field_id)
       end

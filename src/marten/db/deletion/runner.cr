@@ -9,12 +9,12 @@ module Marten
           @querysets_to_raw_delete = [] of Tuple(Model.class, Query::Node)
         end
 
-        def add(obj : Model, source : Nil | Model.class = nil) : Nil
-          register_records_for_deletion([obj], source)
+        def add(obj : Model, source : Nil | Model.class = nil, reverse_relations = true) : Nil
+          register_records_for_deletion([obj], source, reverse_relations: reverse_relations)
         end
 
-        def add(qset, source : Nil | Model.class = nil)
-          register_records_for_deletion(qset, source)
+        def add(qset, source : Nil | Model.class = nil, reverse_relations = true)
+          register_records_for_deletion(qset, source, reverse_relations: reverse_relations)
         end
 
         def execute : Int64
@@ -57,7 +57,7 @@ module Marten
           end
         end
 
-        private def register_records_for_deletion(records, source)
+        private def register_records_for_deletion(records, source, reverse_relations = true)
           return if records.empty?
 
           model = records[0].class
@@ -72,9 +72,21 @@ module Marten
             @dependencies[source] << model
           end
 
+          # Add the model's parents to the list of records to delete first.
+          model.parent_fields.each do |parent_field|
+            add(
+              records.compact_map { |r| r.get_relation(parent_field.as(Field::OneToOne).relation_name) },
+              source: model,
+              reverse_relations: false
+            )
+          end
+
+          return unless reverse_relations
+
           # Loop over each of the deleted records model's reverse relations in order to identify how these can be
           # deleted too if applicable.
           model.reverse_relations.each do |reverse_relation|
+            next if reverse_relation.parent_link?
             next if reverse_relation.on_delete.do_nothing?
 
             related_records = reverse_relation.model._base_queryset.using(@connection.alias)

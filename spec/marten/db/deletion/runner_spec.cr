@@ -1,6 +1,9 @@
 require "./spec_helper"
+require "./runner_spec/app"
 
 describe Marten::DB::Deletion::Runner do
+  with_installed_apps Marten::DB::Deletion::RunnerSpec::App
+
   describe "::new" do
     it "initializes a deletion runner for a specific DB connection only" do
       Tag.using(:other).create!(name: "coding", is_active: true)
@@ -152,6 +155,138 @@ describe Marten::DB::Deletion::Runner do
       Post.all.map(&.id).should eq [post_4.id]
       ShowcasedPost.all.size.should eq 0
       Tag.all.map(&.id).should eq [tag_2.id]
+    end
+
+    context "with multi table inheritance" do
+      it "registers the record's parents for deletion" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Deletion::RunnerSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(student)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "registers the record's parents for deletion with multiple levels of inheritance" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11",
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(student)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "registers the record's parents for deletion with multiple levels of inheritance" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11",
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(student)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "deletes applicable reverse relation of parent records too" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Deletion::RunnerSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        other_student = Marten::DB::Deletion::RunnerSpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11"
+        )
+
+        Marten::DB::Deletion::RunnerSpec::Article.create(title: "Article 1", author: student)
+        Marten::DB::Deletion::RunnerSpec::Article.create(title: "Article 2", author: other_student)
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(student)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Article.get(title: "Article 1").should be_nil
+
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 2").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 2").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::Article.get(title: "Article 2").should_not be_nil
+      end
+
+      it "deletes applicable reverse relation of parent records too and local reverse relations" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11",
+        )
+        other_student = Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "12",
+        )
+
+        Marten::DB::Deletion::RunnerSpec::Article.create(title: "Article 1-1", author: student)
+        Marten::DB::Deletion::RunnerSpec::AltArticle.create(title: "Article 1-2", author: student)
+        Marten::DB::Deletion::RunnerSpec::Article.create(title: "Article 2-1", author: other_student)
+        Marten::DB::Deletion::RunnerSpec::AltArticle.create(title: "Article 2-2", author: other_student)
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(student)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Article.get(title: "Article 1-1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::AltArticle.get(title: "Article 1-2").should be_nil
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 2").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 2").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 2").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::Article.get(title: "Article 2-1").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::AltArticle.get(title: "Article 2-2").should_not be_nil
+      end
     end
   end
 end

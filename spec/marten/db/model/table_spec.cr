@@ -443,6 +443,56 @@ describe Marten::DB::Model::Table do
     end
   end
 
+  describe "#get_relation" do
+    it "returns the relation record corresponding to the passed string" do
+      address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
+      student = Marten::DB::Model::TableSpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      student.get_relation("address").should eq address
+    end
+
+    it "returns the relation record corresponding to the passed symbol" do
+      address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
+      student = Marten::DB::Model::TableSpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      student.get_relation(:address).should eq address
+    end
+
+    it "returns nil if the corresponding field has no value yet" do
+      student = Marten::DB::Model::TableSpec::Student.new(
+        name: "Student 1",
+        email: "student-1@example.com",
+        grade: "10"
+      )
+
+      student.get_relation(:address).should be_nil
+    end
+
+    it "raises if the relation name does not correspond to any model relation" do
+      address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
+      student = Marten::DB::Model::TableSpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      expect_raises(Marten::DB::Errors::UnknownField) do
+        student.get_relation(:unknown)
+      end
+    end
+  end
+
   describe "#pk" do
     it "returns the primary key field value" do
       tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")

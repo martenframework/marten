@@ -209,7 +209,7 @@ The `serializable` arguments allows to specify that a class making use of [`JSON
 
 ### `slug`
 
-A `slug` field allows to persist _valid_ slug values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `slug` field allows to persist _valid_ slug values (ie. strings that can only include characters, numbers, dashes, and underscores). In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `max_size`
 

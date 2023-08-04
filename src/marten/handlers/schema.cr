@@ -1,4 +1,5 @@
 require "./concerns/record_listing"
+require "./schema/callbacks"
 require "./template"
 
 module Marten
@@ -31,6 +32,8 @@ module Marten
     # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
     # to redirect to.
     class Schema < Template
+      include SchemaCallbacks
+
       # Returns the route name that should be resolved to produce the URL to redirect to when processing a valid schema.
       #
       # Defaults to `nil`.
@@ -75,7 +78,21 @@ module Marten
       end
 
       def post
-        schema.valid? ? process_valid_schema : process_invalid_schema
+        @response = run_before_validation_callbacks
+        return response! if !@response.nil?
+
+        valid_schema = schema.valid?
+
+        @response ||= run_after_validation_callbacks
+        return response! if !@response.nil?
+
+        if valid_schema
+          @response ||= run_after_successful_validation_callbacks
+          @response ||= process_valid_schema
+        else
+          @response ||= run_after_failed_validation_callbacks
+          @response ||= process_invalid_schema
+        end
       end
 
       # Produces the response when the processed schema is invalid.

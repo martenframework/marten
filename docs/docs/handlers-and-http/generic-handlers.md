@@ -140,19 +140,19 @@ By default, such a handler will render the configured template when the incoming
 
 If the schema is valid, a temporary redirect is issued by using the URL corresponding to the `#success_route_name` value (although it should be noted that the way to generate this success URL can be overridden by defining a `#success_url` method). By default, the handler does nothing when the processed schema is valid (except redirecting to the success URL).
 
-
 #### Callbacks
 
 Callbacks let you define logics that are triggered before or after the validation of the schema. This allows you to easily intercept validation
-and handle the response independently of the schema validty. Two callbacks are supported: `before_schema_validation`, `after_schema_validation`,
+and handle the response independently of the schema validity. Four callbacks are supported: `before_schema_validation`, `after_schema_validation`,
 `after_successful_schema_validation` and `after_failed_schema_validation`.
 
-All callbacks can optionally return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html). When a HTTP response is returned
-all pending callbacks and the success/fail response are skipped.
+All callbacks can optionally return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html). When a HTTP response is returned,
+all following callbacks are skipped and the obtained response is returned directly, thus bypassing responses that might have been
+returned after by the handler.
 
 ##### `before_schema_validation`
 
-`before_schema_validation` callbacks are executed _before_ a schema is checked for validty.
+`before_schema_validation` callbacks are executed _before_ a schema is checked for validity.
 For example, this capability can be leveraged to inspect the incoming request and verify that a user is logged in:
 
 ```crystal
@@ -170,7 +170,7 @@ end
 
 ##### `after_schema_validation`
 
-`after_schema_validation` callbacks are executed right _after_ a schema is checked for validty.
+`after_schema_validation` callbacks are executed right _after_ a schema is checked for validity.
 For example, this capability can be leveraged to add additional cookies to the response:
 
 ```crystal
@@ -188,8 +188,7 @@ end
 
 ##### `after_successful_schema_validation`
 
-`after_successful_schema_validation` callbacks are executed right _after_ a schema is checked for validty and the
-`after_schema_validation` callbacks, but only if the schema wasn't valid.
+`after_successful_schema_validation` callbacks are executed right _after_ a schema is checked for validity (and after possible `after_schema_validation` callbacks), and only if the schema validation was successful.
 For example, this capability can be leveraged to add additional cookies to the response:
 
 ```crystal
@@ -207,8 +206,8 @@ end
 
 ##### `after_failed_schema_validation`
 
-`after_failed_schema_validation` callbacks are executed right _after_ a schema is checked for validty and the
-`after_schema_validation` callbacks, but only if the schema was valid.
+`after_failed_schema_validation` callbacks are executed right _after_ a schema is checked for validity (and after possible
+`after_schema_validation` callbacks), but only if the schema validation failed.
 For example, this capability can be leveraged to add additional cookies to the response:
 
 ```crystal

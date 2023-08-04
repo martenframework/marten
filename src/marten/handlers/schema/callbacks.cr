@@ -4,7 +4,7 @@ module Marten
     #
     # This module provides the ability to define callbacks that are executed before, after, after success or/and after
     # failed validation of a schema.
-    # They allow to intercept the incoming request and to return early HTTP responses. TwFouro hooks
+    # They allow to intercept the incoming request and to return early HTTP responses. Four hooks
     # are enabled by the use of this module:
     # - `before_schema_validation` callbacks are executed before the validation of the schema
     # - `after_schema_validation` callbacks are executed right after the validation of the schema
@@ -29,11 +29,11 @@ module Marten
         end
       end
 
-      # Allows to do define callbacks that are called after executing `Marten::Schema#valid?`.
+      # Allows to define callbacks that are called before validating the schema.
       #
       # Those callbacks have access to the incoming `#request` object and they can return a custom HTTP response.
       # If one of such callbacks returns a custom HTTP response, the following callbacks will be skipped and this
-      # custom response will be returned by the handler instead of the success or fail HTTP response.
+      # custom response will be returned by the handler right away.
       macro before_schema_validation(*names)
           {%
             names.reduce(VALIDATION_CALLBACKS[:before_validation]) do |array, name|
@@ -43,11 +43,11 @@ module Marten
           %}
         end
 
-      # Allows to do define callbacks that are called after executing `Marten::Schema#valid?`.
+      # Allows to define callbacks that are called after validating the schema (whether it's valid or not).
       #
       # Those callbacks have access to the incoming `#request` object and they can return a custom HTTP response.
       # If one of such callbacks returns a custom HTTP response, the following callbacks will be skipped and this
-      # custom response will be returned by the handler instead of the success or fail HTTP response.
+      # custom response will be returned by the handler right away.
       macro after_schema_validation(*names)
           {%
             names.reduce(VALIDATION_CALLBACKS[:after_validation]) do |array, name|
@@ -57,11 +57,11 @@ module Marten
           %}
         end
 
-      # Allows to do define callbacks that are called after executing `Marten::Schema#valid?`.
+      # Allows to define callbacks that are called after a successful schema validation.
       #
       # Those callbacks have access to the incoming `#request` object and they can return a custom HTTP response.
       # If one of such callbacks returns a custom HTTP response, the following callbacks will be skipped and this
-      # custom response will be returned by the handler instead of the success or fail HTTP response.
+      # custom response will be returned by the handler right away.
       macro after_successful_schema_validation(*names)
           {%
             names.reduce(VALIDATION_CALLBACKS[:after_successful_validation]) do |array, name|
@@ -71,11 +71,11 @@ module Marten
           %}
         end
 
-      # Allows to do define callbacks that are called after executing `Marten::Schema#valid?`.
+      # Allows to define callbacks that are called after a failed schema validation.
       #
       # Those callbacks have access to the incoming `#request` object and they can return a custom HTTP response.
       # If one of such callbacks returns a custom HTTP response, the following callbacks will be skipped and
-      # this custom response will be returned by the handler instead of the success or fail HTTP response.
+      # this custom response will be returned by the handler right away.
       macro after_failed_schema_validation(*names)
           {%
             names.reduce(VALIDATION_CALLBACKS[:after_failed_validation]) do |array, name|

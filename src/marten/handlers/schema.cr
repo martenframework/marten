@@ -1,5 +1,5 @@
 require "./concerns/record_listing"
-require "./concerns/schema_callbacks"
+require "./schema/callbacks"
 require "./template"
 
 module Marten
@@ -79,10 +79,12 @@ module Marten
 
       def post
         @response = run_before_validation_callbacks
+        return response! if !@response.nil?
 
         valid_schema = schema.valid?
 
         @response ||= run_after_validation_callbacks
+        return response! if !@response.nil?
 
         if valid_schema
           @response ||= run_after_successful_validation_callbacks

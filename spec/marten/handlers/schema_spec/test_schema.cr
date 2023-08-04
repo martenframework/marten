@@ -3,7 +3,4 @@ module Marten::Handlers::SchemaSpec
     field :foo, :string
     field :bar, :string
   end
-
-  class EmptySchema < Marten::Schema
-  end
 end

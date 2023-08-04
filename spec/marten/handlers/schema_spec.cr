@@ -220,7 +220,7 @@ describe Marten::Handlers::Schema do
     end
   end
 
-  describe "callbacks" do
+  describe "#post" do
     it "executes success callback" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
@@ -451,21 +451,6 @@ module Marten::Handlers::SchemaSpec
 
     private def set_foobar
       self.foobar = "set_foobar"
-    end
-  end
-
-  class TestHandlerWithBeforeValidateResponse < Marten::Handlers::Schema
-    before_schema_validation :return_before_schema_validation_response
-    success_url "https://example.com"
-    template_name "specs/handlers/schema/test.html"
-    schema TestSchema
-
-    def get
-      Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200)
-    end
-
-    private def return_before_schema_validation_response
-      Marten::HTTP::Response.new("before_schema_validation response", content_type: "text/plain", status: 200)
     end
   end
 

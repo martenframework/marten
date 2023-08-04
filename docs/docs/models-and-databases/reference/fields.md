@@ -209,14 +209,15 @@ The `serializable` arguments allows to specify that a class making use of [`JSON
 
 ### `slug`
 
-An `slug` field allows to persist _valid_ slug. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `slug` field allows to persist _valid_ slug values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `max_size`
 
 The `max_size` argument is optional and defaults to 50 characters. It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validate field values.
 
-:::note
-As slug fields are usually used to query records the slug field is indexed by default. To disable indexing set `index: false`
+:::info
+As slug fields are usually used to query records, they are indexed by default. You can use the [`index`](#index) option (`index: false`) to disable auto-indexing.
+:::
 
 ### `string`
 

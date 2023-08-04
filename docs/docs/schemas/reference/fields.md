@@ -111,7 +111,7 @@ The `serializable` arguments allows to specify that a class making use of [`JSON
 
 ### `slug`
 
-An `slug` field allows validating slug values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `slug` field allows validating slug values. In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `max_size`
 

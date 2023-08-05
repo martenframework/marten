@@ -154,47 +154,9 @@ Unless specified, the `status` is set to `200`.
 
 ### Callbacks
 
-Callbacks let you define logics that are triggered before or after a handler's dispatch flow. This allows you to easily intercept the incoming request and completely bypass the execution of the regular `#dispatch` method for example. Two callbacks are supported: `before_dispatch` and `after_dispatch`.
+It is possible to define callbacks in order to bind methods and logics to specific events in the lifecycle of your handlers. For example, it is possible to define callbacks that run before a handler's `#dispatch` method gets executed, or after it!
 
-#### `before_dispatch`
-
-`before_dispatch` callbacks are executed _before_ a request is processed as part of the handler's `#dispatch` method. For example, this capability can be leveraged to inspect the incoming request and verify that a user is logged in:
-
-```crystal
-class MyHandler < Marten::Handler
-  before_dispatch :require_authenticated_user
-
-  def get
-    respond "Hello, authenticated user!"
-  end
-
-  private def require_authenticated_user
-    redirect(login_url) unless user_authenticated?(request)
-  end
-end
-```
-
-When one of the defined `before_dispatch` callbacks returns a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object, this response is always used instead of calling the handler's `#dispatch` method (the latest is thus completely bypassed).
-
-#### `after_dispatch`
-
-`after_dispatch` callbacks are executed _after_ a request is processed as part of the handler's `#dispatch` method. For example, such a callback can be leveraged to automatically add headers or cookies to the returned response.
-
-```crystal
-class MyHandler < Marten::Handler
-  after_dispatch :add_required_header
-
-  def get
-    respond "Hello, authenticated user!"
-  end
-
-  private def add_required_header : Nil
-    response!.headers["X-Foo"] = "Bar"
-  end
-end
-```
-
-Similarly to `#before_dispatch` callbacks, `#after_dispatch` callbacks can return a brand new [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When this is the case, this response is always used instead of the one that was returned by the handler's `#dispatch` method.
+Please head over to the [Handler callbacks](./callbacks) guide in order to learn more about handler callbacks.
 
 ### Returning errors
 

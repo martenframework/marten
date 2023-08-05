@@ -28,6 +28,10 @@ The model class used to create the new record can be configured through the use 
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
+:::tip
+Handlers making use of the [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks#schema-handler-callbacks) to learn more about those.
+:::
+
 ## Deleting a record
 
 **Class:** [`Marten::Handlers::RecordDelete`](pathname:///api/dev/Marten/Handlers/RecordDelete.html)
@@ -147,6 +151,10 @@ The schema used to perform the validation can be defined through the use of the 
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
+:::tip
+Handlers making use of the [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks#schema-handler-callbacks) to learn more about those.
+:::
+
 ## Performing a redirect
 
 **Class:** [`Marten::Handlers::Redirect`](pathname:///api/dev/Marten/Handlers/Redirect.html)
@@ -186,6 +194,10 @@ It should be noted that the redirect response issued will be a 302 (found).
 The schema used to perform the validation can be defined through the use of the [`#schema`](pathname:///api/dev/Marten/Handlers/Schema.html#schema(schema_klass)-macro) macro. Alternatively, the [`#schema_class`](pathname:///api/dev/Marten/Handlers/Schema.html#schema_class-instance-method) method can also be overridden to dynamically define the schema class as part of the request handler handling.
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
+
+:::tip
+Handlers making use of the [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks#schema-handler-callbacks) to learn more about those.
+:::
 
 ## Rendering a template
 

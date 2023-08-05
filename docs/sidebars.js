@@ -54,6 +54,7 @@ module.exports = {
         'handlers-and-http/error-handlers',
         'handlers-and-http/sessions',
         'handlers-and-http/cookies',
+        'handlers-and-http/callbacks',
         'handlers-and-http/middlewares',
         {
           type: 'category',

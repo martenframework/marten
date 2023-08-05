@@ -174,7 +174,7 @@ As mentioned previously, you should not attempt to manipulate the `password` fie
 
 ### Limiting access to signed-in users
 
-Limiting access to signed-in users can easily be achieved by leveraging the `#user?` method that is available from [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html) objects. Using this method, you can easily implement  [`#before_dispatch`](../handlers-and-http/introduction#before_dispatch) handler callbacks in order to redirect anonymous users to a sign-in page or to an error page.
+Limiting access to signed-in users can easily be achieved by leveraging the `#user?` method that is available from [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html) objects. Using this method, you can easily implement  [`#before_dispatch`](../handlers-and-http/callbacks#before_dispatch) handler callbacks in order to redirect anonymous users to a sign-in page or to an error page.
 
 For example:
 

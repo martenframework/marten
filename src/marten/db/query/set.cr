@@ -180,6 +180,9 @@ module Marten
         # When the `raw` argument is set to `true`, a raw SQL delete statement will be used to delete all the records
         # matching the currently applied filters. Note that using this option could cause errors if the underlying
         # database enforces referential integrity.
+        #
+        # Moreover, it is important to note that using `raw: true` won't delete parent records if considered query set
+        # is targeting model records that make use of multi table inheritance.
         def delete(raw : Bool = false) : Int64
           raise Errors::UnmetQuerySetCondition.new("Delete with sliced queries is not supported") if query.sliced?
           raise Errors::UnmetQuerySetCondition.new("Delete with joins is not supported") if query.joins?

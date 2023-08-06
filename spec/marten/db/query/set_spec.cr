@@ -1,6 +1,9 @@
 require "./spec_helper"
+require "./set_spec/app"
 
 describe Marten::DB::Query::Set do
+  with_installed_apps Marten::DB::Query::SetSpec::App
+
   describe "#[]" do
     it "returns the expected record for a given index when the query set didn't already fetch the records" do
       Tag.create!(name: "coding", is_active: true)
@@ -615,6 +618,76 @@ describe Marten::DB::Query::Set do
 
       expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Delete with joins is not supported") do
         Marten::DB::Query::Set(Post).new.join(:author).delete
+      end
+    end
+
+    context "with multi table inheritance" do
+      it "deletes the targeted objects and their parents as expected" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Query::SetSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new.delete
+
+        Marten::DB::Query::SetSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Query::SetSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "deletes only the targeted objects and not their parents in raw mode" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Query::SetSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new.delete(raw: true)
+
+        Marten::DB::Query::SetSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Query::SetSpec::Person.get(name: "Student 1").should_not be_nil
+      end
+
+      it "deletes the targeted objects and their parents as expected with multiple levels of inheritance" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Query::SetSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::AltStudent).new.delete
+
+        Marten::DB::Query::SetSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Query::SetSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Query::SetSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "deletes the only targeted objects and not their parents in raw mode with multiple levels of inheritance" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Query::SetSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::AltStudent).new.delete(raw: true)
+
+        Marten::DB::Query::SetSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Query::SetSpec::Student.get(name: "Student 1").should_not be_nil
+        Marten::DB::Query::SetSpec::Person.get(name: "Student 1").should_not be_nil
       end
     end
   end

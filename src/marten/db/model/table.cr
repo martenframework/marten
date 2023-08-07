@@ -638,6 +638,7 @@ module Marten
                     primary_key: true,
                     parent_link: true,
                     on_delete: :cascade,
+                    related: {{ @type.name.stringify.split("::").last.underscore }}
                   )
                 {% end %}
               {% end %}

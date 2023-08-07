@@ -136,6 +136,31 @@ describe Marten::DB::Model::Table do
         field_2.on_delete.should eq Marten::DB::Deletion::Strategy::CASCADE
       end
 
+      it "contributes reverse relations on parent models" do
+        address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
+
+        student = Marten::DB::Model::TableSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        person = Marten::DB::Model::TableSpec::Person.get!(id: student.id)
+        person.student.should eq student
+
+        alt_student = Marten::DB::Model::TableSpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "12"
+        )
+        other_student = Marten::DB::Model::TableSpec::Student.get!(id: alt_student.id)
+        other_student.alt_student.should eq alt_student
+        person = Marten::DB::Model::TableSpec::Person.get!(id: alt_student.id)
+        person.student.should eq other_student
+      end
+
       it "produces child models that can create properties of parent models seamlessly" do
         address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
         student = Marten::DB::Model::TableSpec::Student.create!(

@@ -1655,6 +1655,29 @@ describe Marten::DB::Model::Persistence do
       object.new_record?.should be_false
     end
 
+    it "resets direct relations as expected" do
+      user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      post = Post.create(author: user, title: "Test")
+
+      TestUser.all.update(username: "updated")
+
+      post.reload
+      post.author!.username.should eq "updated"
+    end
+
+    it "resets reverse relations as expected" do
+      user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      TestUserProfile.create!(user: user, bio: "Test")
+
+      user.profile!.bio.should eq "Test"
+
+      TestUserProfile.all.update(bio: "Updated")
+
+      user.reload
+
+      user.profile!.bio.should eq "Updated"
+    end
+
     context "with multi table inheritance" do
       it "reloads parent objects as well" do
         address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")

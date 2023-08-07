@@ -136,8 +136,12 @@ module Marten
         # values.
         def reload
           reloaded = self.class.get!(pk: pk)
-          self.assign_field_values(reloaded.field_values)
+
+          assign_field_values(reloaded.field_values)
+          reset_reverse_relations
+
           @new_record = false
+
           self
         end
 

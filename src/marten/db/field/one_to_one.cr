@@ -197,12 +197,17 @@ module Marten
               class ::{{ model_klass }}
                 macro finished
                   class ::{{ related_model_klass }}
+                    @[Marten::DB::Model::Table::ReverseRelationInstanceVariable(
+                      reverse_relation_name: {{ related_field_name.id }}
+                    )]
+                    @_reverse_relation_{{ related_field_name.id }} : {{ model_klass }}?
+
                     def {{ related_field_name.id }}
-                      {{ model_klass }}.get({{ field_id }}: pk)
+                      @_reverse_relation_{{ related_field_name.id }} ||= {{ model_klass }}.get({{ field_id }}: pk)
                     end
 
                     def {{ related_field_name.id }}!
-                      {{ model_klass }}.get!({{ field_id }}: pk)
+                      {{ related_field_name.id }}.not_nil!
                     end
                   end
                 end

@@ -1654,6 +1654,29 @@ describe Marten::DB::Model::Persistence do
       object.reload.username.should eq "jd"
       object.new_record?.should be_false
     end
+
+    context "with multi table inheritance" do
+      it "reloads parent objects as well" do
+        address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")
+        alt_student = Marten::DB::Model::PersistenceSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        Marten::DB::Model::PersistenceSpec::Person.all.update(name: "Updated")
+        Marten::DB::Model::PersistenceSpec::Student.all.update(grade: "10-updated")
+        Marten::DB::Model::PersistenceSpec::AltStudent.all.update(alt_grade: "11-updated")
+
+        alt_student.reload
+
+        alt_student.name.should eq "Updated"
+        alt_student.grade.should eq "10-updated"
+        alt_student.alt_grade.should eq "11-updated"
+      end
+    end
   end
 
   describe "#new_record?" do

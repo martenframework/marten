@@ -32,6 +32,31 @@ module Marten
           delegate build_sql, to: connection
           delegate quote, to: connection
 
+          macro finished
+            {% if flag?(:debug_log) %}
+            def execute : Array(Model)
+              query_string = ""
+              query_params = ""
+              results = Array(Model).new
+
+              elapsed = Time.measure do
+                query = build_query
+
+                query_string = query[0]
+
+                if query_args = query[1]
+                  query_params = " (#{query_args.join(", ")})"
+                end
+
+                results = execute_query(*query)
+              end
+
+              Log.info { "[#{elapsed.total_milliseconds}ms] #{query_string}#{query_params}".colorize(235, 104, 100) }
+              results
+            end
+            {% end %}
+          end
+
           def initialize
           end
 

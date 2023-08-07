@@ -1,3 +1,7 @@
+{% if flag?(:debug_log) %}
+  require "colorize"
+{% end %}
+
 module Marten
   # Wrapper around the Marten server.
   module Server

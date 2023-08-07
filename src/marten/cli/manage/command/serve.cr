@@ -58,7 +58,7 @@ module Marten
             FileUtils.mkdir_p("tmp")
 
             command = String.build do |s|
-              s << "crystal build src/server.cr -o #{SERVER_BUILD_PATH}"
+              s << "crystal build -Ddebug_log src/server.cr -o #{SERVER_BUILD_PATH}"
               s << " --error-trace" if show_error_trace?
             end
 

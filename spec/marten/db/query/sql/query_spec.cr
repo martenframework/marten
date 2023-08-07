@@ -1450,6 +1450,184 @@ describe Marten::DB::Query::SQL::Query do
       post_3.reload
       post_3.title.should eq "Updated"
     end
+
+    context "with multi table inheritance" do
+      it "can update local attributes seamlessly" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(grade: "11"))
+        query.update_with({"grade" => "11-updated"}).should eq 1
+
+        student_1.reload
+        student_1.grade.should eq "10"
+
+        student_2.reload
+        student_2.grade.should eq "11-updated"
+      end
+
+      it "can update parent attributes seamlessly" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(grade: "11"))
+        query.update_with({"name" => "Updated"}).should eq 1
+
+        student_1.reload
+        student_1.name.should eq "Student 1"
+
+        student_2.reload
+        student_2.name.should eq "Updated"
+      end
+
+      it "can update both local and parent attributes seamlessly" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_query_node(Marten::DB::Query::Node.new(grade: "11"))
+        query.update_with({"name" => "Updated", "grade" => "11-updated"}).should eq 1
+
+        student_1.reload
+        student_1.name.should eq "Student 1"
+        student_1.grade.should eq "10"
+
+        student_2.reload
+        student_2.name.should eq "Updated"
+        student_2.grade.should eq "11-updated"
+      end
+
+      it "can update local attributes seamlessly with multiple levels of inheritance" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "12"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(alt_grade: "12"))
+        query.update_with({"alt_grade" => "12-updated"}).should eq 1
+
+        student_1.reload
+        student_1.alt_grade.should eq "11"
+
+        student_2.reload
+        student_2.alt_grade.should eq "12-updated"
+      end
+
+      it "can update parent attributes seamlessly with multiple levels of inheritance" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "12"
+        )
+
+        query_1 = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query_1.add_query_node(Marten::DB::Query::Node.new(alt_grade: "12"))
+        query_1.update_with({"name" => "Updated"}).should eq 1
+
+        query_2 = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query_2.add_query_node(Marten::DB::Query::Node.new(alt_grade: "11"))
+        query_2.update_with({"grade" => "10-updated"}).should eq 1
+
+        student_1.reload
+        student_1.name.should eq "Student 1"
+        student_1.grade.should eq "10-updated"
+        student_1.alt_grade.should eq "11"
+
+        student_2.reload
+        student_2.name.should eq "Updated"
+        student_2.grade.should eq "11"
+        student_2.alt_grade.should eq "12"
+      end
+
+      it "can update both local and parent attributes seamlessly with multiple levels of inheritance" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address,
+          grade: "11",
+          alt_grade: "12"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+        query.add_query_node(Marten::DB::Query::Node.new(grade: "11"))
+        query.update_with({"name" => "Updated", "grade" => "11-updated", "alt_grade" => "12-updated"}).should eq 1
+
+        student_1.reload
+        student_1.name.should eq "Student 1"
+        student_1.grade.should eq "10"
+        student_1.alt_grade.should eq "11"
+
+        student_2.reload
+        student_2.name.should eq "Updated"
+        student_2.grade.should eq "11-updated"
+        student_2.alt_grade.should eq "12-updated"
+      end
+    end
   end
 end
 

@@ -8,6 +8,17 @@ module Marten
 
         module ClassMethods
           # :nodoc:
+          def _base_query
+            {% begin %}
+            {% if @type.abstract? %}
+            raise "Records can only be queried from non-abstract model classes"
+            {% else %}
+            Query::SQL::Query({{ @type }}).new
+            {% end %}
+            {% end %}
+          end
+
+          # :nodoc:
           # Returns a base queryset that intentionally targets all the records in the database for the model at hand.
           # Although this method is public (because it's generated for all models), it is used internally by Marten to
           # ensure correct behaviours when deleting records.

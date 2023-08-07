@@ -216,28 +216,67 @@ module Marten
 
           def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))
             values_to_update = Hash(String, ::DB::Any).new
+            related_values_to_update = Hash(DB::Model.class, Hash(String | Symbol, Field::Any | DB::Model)).new
 
             values.each do |name, value|
-              field = get_field_context(name, Model).field
-              next unless field.db_column?
+              field_context = get_field_context(name, Model)
+              next unless field_context.field.db_column?
 
               if value.is_a?(DB::Model) && !value.persisted?
                 raise Errors::UnexpectedFieldValue.new("#{value} is not persisted and cannot be used in update queries")
               end
 
-              values_to_update[field.db_column!] = case value
-                                                   when Field::Any
-                                                     field.to_db(value)
-                                                   when DB::Model
-                                                     Model.pk_field.to_db(value.pk)
-                                                   end
+              if field_context.model == Model
+                values_to_update[field_context.field.db_column!] = case value
+                                                                   when Field::Any
+                                                                     field_context.field.to_db(value)
+                                                                   when DB::Model
+                                                                     Model.pk_field.to_db(value.pk)
+                                                                   end
+              else
+                related_values_to_update[field_context.model] ||= Hash(String | Symbol, Field::Any | DB::Model).new
+                related_values_to_update[field_context.model][name] = value
+              end
             end
 
             sql, parameters = build_update_query(values_to_update)
-            connection.open do |db|
-              result = db.exec(sql, args: parameters)
-              result.rows_affected
+
+            rows_affected = nil
+
+            # If related model values also need to be updated (which can be the case when attempting to update records
+            # making use of multi table inheritance), then we have to fetch the IDs of the targeted records in order to
+            # be able to update the related models as well.
+            if !related_values_to_update.empty?
+              related_plucked_pk_columns = solve_plucked_columns([Model.pk_field.id])
+              related_pks = execute_pluck_query(
+                *build_pluck_query(related_plucked_pk_columns),
+                related_plucked_pk_columns
+              ).flatten
             end
+
+            connection.transaction do
+              # First attempts to update the current model (only if local values need to be updated).
+              rows_affected = if !values_to_update.empty?
+                                connection.open do |db|
+                                  result = db.exec(sql, args: parameters)
+                                  result.rows_affected
+                                end
+                              end
+
+              # Then updates related models if necessary.
+              if !related_values_to_update.empty?
+                related_values_to_update.each do |model, v|
+                  related_model_query = model._base_query
+                  related_model_query.add_query_node(Node.new(pk__in: related_pks))
+                  related_rows_affected = related_model_query.update_with(v)
+
+                  # Only return the number of rows affected by related model updates if no local columns were updated.
+                  rows_affected = related_rows_affected if rows_affected.nil?
+                end
+              end
+            end
+
+            rows_affected.not_nil!
           end
 
           private def build_count_query
@@ -362,17 +401,17 @@ module Marten
             {sql, parameters}
           end
 
-          private def build_update_query(values)
-            where, where_parameters = where_clause_and_parameters(offset: values.size)
+          private def build_update_query(local_values)
+            where, where_parameters = where_clause_and_parameters(offset: local_values.size)
 
-            column_names = values.keys.map_with_index do |column_name, i|
+            column_names = local_values.keys.map_with_index do |column_name, i|
               "#{quote(column_name)}=#{connection.parameter_id_for_ordered_argument(i + 1)}"
             end.join(", ")
 
-            final_parameters = values.values
+            final_parameters = local_values.values
             final_parameters += where_parameters if !where_parameters.nil?
 
-            sql = if !where_parameters.nil? && !@joins.empty?
+            sql = if !where_parameters.nil? && (!@joins.empty? || !parent_model_joins.empty?)
                     # Construct an update query involving subqueries in order to counteract the fact that we have to
                     # rely on joined tables. The extra subquery is necessary because MySQL doesn't allow to reference
                     # update tables in a where clause.

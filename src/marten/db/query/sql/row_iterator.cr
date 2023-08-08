@@ -24,11 +24,12 @@ module Marten
             # iterator and to handle the case of null foreign keys for example.
 
             each_local_column { |rs, _c| rs.read(Int8 | ::DB::Any) }
+            each_parent_column { |_pm, rs, _c| rs.read(Int8 | ::DB::Any) }
             each_joined_relation { |ri, _c| ri.advance }
           end
 
           def each_joined_relation(&)
-            @joins.select(&.selected?).each do |join|
+            effective_joins.each do |join|
               relation_iterator = self.class.new(
                 join.to_model,
                 @result_set,
@@ -54,6 +55,18 @@ module Marten
               parent_model.local_fields.count(&.db_column?).times do
                 yield parent_model, @result_set, @result_set.column_names[@cursor]
                 @cursor += 1
+              end
+            end
+          end
+
+          private def effective_joins(sub_joins : Array(Join)? = nil)
+            (sub_joins || @joins).select(&.selected?).flat_map do |join|
+              # We skip the join if the model has already been included in the result set, which is the case for models
+              # using multi table inheritance.
+              if @model.parent_models.includes?(join.to_model)
+                effective_joins(join.children)
+              else
+                join
               end
             end
           end

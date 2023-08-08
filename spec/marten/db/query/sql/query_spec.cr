@@ -188,7 +188,7 @@ describe Marten::DB::Query::SQL::Query do
       end
     end
 
-    context "with multiple table inheritance" do
+    context "with multi table inheritance" do
       it "can filter on local attributes seamlessly" do
         address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
         Marten::DB::Query::SQL::QuerySpec::Student.create!(
@@ -507,6 +507,84 @@ describe Marten::DB::Query::SQL::Query do
         query.count.should eq 1
         query.execute.should eq [student_2]
       end
+
+      it "can filter on local attributes of relations that target models using multi table inheritance" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11",
+          alt_grade: "21"
+        )
+        student_3 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "Top things", author: student_1)
+        article_2 = Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(
+          title: "10 reasons to code",
+          author: student_2
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "Test article", author: student_3)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltArticle).new
+        query.add_query_node(Marten::DB::Query::Node.new(author__alt_grade: "21"))
+        query.count.should eq 1
+        query.execute.should eq [article_2]
+      end
+
+      it "can filter on parent attributes of relations that target models using multi table inheritance" do
+        address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+
+        student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address_1,
+          grade: "10",
+          alt_grade: "20"
+        )
+        student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 2",
+          email: "student-2@example.com",
+          address: address_2,
+          grade: "11",
+          alt_grade: "21"
+        )
+        student_3 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Other Student",
+          email: "other-student@example.com",
+          address: address_1,
+          grade: "12",
+          alt_grade: "22"
+        )
+
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "Top things", author: student_1)
+        article_2 = Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(
+          title: "10 reasons to code",
+          author: student_2
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(title: "Test article", author: student_3)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltArticle).new
+        query.add_query_node(Marten::DB::Query::Node.new(author__name: "Student 2"))
+        query.count.should eq 1
+        query.execute.should eq [article_2]
+      end
     end
   end
 
@@ -544,6 +622,65 @@ describe Marten::DB::Query::SQL::Query do
         "Unable to resolve 'posts' as a relation field. Valid choices are:"
       ) do
         query.add_selected_join("posts")
+      end
+    end
+
+    context "with multi table inheritance" do
+      it "allows to specify a relation that targets a top-level parent model" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+        Marten::DB::Query::SQL::QuerySpec::Article.create!(author: student, title: "Test article")
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Article).new
+        query.add_selected_join("author")
+
+        results = query.execute
+
+        results[0].__query_spec_author.should eq student.person_ptr
+      end
+
+      it "allows to specify a relation that targets a child model" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(author: student, title: "Test article")
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltArticle).new
+        query.add_selected_join("author")
+
+        results = query.execute
+
+        results[0].__query_spec_author.should eq student
+      end
+
+      it "allows to specify a relation that goes through a child model" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+        student = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+        Marten::DB::Query::SQL::QuerySpec::AltArticle.create!(author: student, title: "Test article")
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltArticle).new
+        query.add_selected_join("author__address")
+
+        results = query.execute
+
+        results[0].__query_spec_author.should eq student
+        results[0].__query_spec_author.not_nil!.__query_spec_address.should eq address
       end
     end
   end

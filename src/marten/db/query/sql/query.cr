@@ -55,10 +55,17 @@ module Marten
           end
 
           def add_selected_join(relation : String) : Nil
-            ensure_join_for_field_path(
-              verify_field(relation, only_relations: true, allow_reverse_relations: false),
-              selected: true
-            )
+            field_path = verify_field(relation, only_relations: true, allow_reverse_relations: false)
+
+            # Special case: if the last model makes use of multi table inheritance, we have to ensure that the parent
+            # models are retrieved as well in order to ensure that the joined records can properly be instantiated.
+            child_model = field_path.last[0].related_model
+
+            if !child_model.nil? && child_model.pk_field.relation? && !child_model.parent_models.empty?
+              field_path += construct_inheritance_field_path(child_model, child_model.parent_models.last)
+            end
+
+            ensure_join_for_field_path(field_path, selected: true)
           end
 
           def clone
@@ -455,6 +462,24 @@ module Marten
             columns.flatten.join(", ")
           end
 
+          private def construct_inheritance_field_path(current_model, target_model)
+            field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
+            model_chain = [] of DB::Model.class
+
+            current_model.parent_models.each do |int_model|
+              model_chain << int_model
+
+              break if int_model == target_model
+            end
+
+            model_chain.map_with_index do |_, j|
+              child_model = (j == 0) ? current_model : model_chain[j - 1]
+              field_path << {child_model.pk_field, nil}
+            end
+
+            field_path
+          end
+
           private def ensure_join_for_field_path(field_path, selected = false)
             model = Model
             parent_join = nil
@@ -465,8 +490,10 @@ module Marten
               to_model = reverse_relation.nil? ? field.related_model : reverse_relation.model
               to_common_field = reverse_relation.nil? ? field.related_model.pk_field : field
 
+              all_joins = flattened_parent_model_joins + flattened_joins
+
               # First try to find if any Join object is already created for the considered field.
-              join = flattened_joins.find do |j|
+              join = all_joins.find do |j|
                 j.from_model == from_model &&
                   j.from_common_field == from_common_field &&
                   j.to_model == to_model &&
@@ -476,7 +503,7 @@ module Marten
               # No existing join means that we must create a new one.
               if join.nil?
                 join = Join.new(
-                  id: @joins.empty? ? 1 : (flattened_joins.size + 1),
+                  id: all_joins.size + 1,
                   type: field.null? || !reverse_relation.nil? ? JoinType::LEFT_OUTER : JoinType::INNER,
                   from_model: from_model,
                   from_common_field: from_common_field,
@@ -520,7 +547,9 @@ module Marten
 
             connection.open do |db|
               db.query query, args: parameters do |result_set|
-                result_set.each { results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, @joins)) }
+                result_set.each do
+                  results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, @joins + parent_model_joins))
+                end
               end
             end
 
@@ -529,6 +558,10 @@ module Marten
 
           private def flattened_joins
             @joins.flat_map(&.to_a)
+          end
+
+          private def flattened_parent_model_joins
+            parent_model_joins.flat_map(&.to_a)
           end
 
           private def get_field(raw_field, model)
@@ -557,17 +590,30 @@ module Marten
           end
 
           private def parent_model_joins
-            @parent_model_joins ||= Model.parent_models.map_with_index do |parent_model, i|
-              Join.new(
-                id: i,
-                type: JoinType::INNER,
-                from_model: Model,
-                from_common_field: Model.pk_field,
-                to_model: parent_model,
-                to_common_field: parent_model.pk_field,
-                selected: true,
-                table_alias_prefix: "p"
-              )
+            @parent_model_joins ||= begin
+              flat_joins = Model.parent_models.map_with_index do |parent_model, i|
+                previous_model = (i == 0) ? Model : Model.parent_models[i - 1]
+                Join.new(
+                  id: i + 1,
+                  type: JoinType::INNER,
+                  from_model: previous_model,
+                  from_common_field: previous_model.pk_field,
+                  to_model: parent_model,
+                  to_common_field: parent_model.pk_field,
+                  selected: true,
+                  table_alias_prefix: "p"
+                )
+              end
+
+              if flat_joins.empty?
+                flat_joins
+              else
+                flat_joins[1..].each do |join|
+                  flat_joins[0].add_child(join)
+                end
+
+                [flat_joins.first]
+              end
             end
           end
 
@@ -724,17 +770,7 @@ module Marten
               # Given the identified targeted parent model, we can build a chain of models that must be joined in order
               # to reach it (and the requested field).
               if !target_parent_model.nil?
-                model_chain = [] of DB::Model.class
-                current_model.parent_models.each do |int_model|
-                  model_chain << int_model
-
-                  break if int_model == target_parent_model
-                end
-
-                model_chain.map_with_index do |_, j|
-                  child_model = (j == 0) ? current_model : model_chain[j - 1]
-                  field_path << {child_model.pk_field, nil}
-                end
+                field_path += construct_inheritance_field_path(current_model, target_parent_model)
               end
 
               # The current model must be set in order to be able to correctly identify the actual targeted model field

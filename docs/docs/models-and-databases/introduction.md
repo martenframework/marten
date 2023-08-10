@@ -405,13 +405,9 @@ Please head over to the [Model validations](./validations) guide in order to lea
 
 Model classes can inherit from each other. This allows you to easily reuse the field definitions and table attributes of a parent model within a child model.
 
-Presently, the Marten web framework only allows [abstract model inheritance](#inheriting-from-abstract-models) (which is useful in order to reuse shared model fields and patterns over multiple child models without having a database table created for the parent model). Support for multi-table inheritance is planned for future releases.
+Presently, the Marten web framework allows [abstract model inheritance](#inheriting-from-abstract-models) (which is useful in order to reuse shared model fields and patterns over multiple child models without having a database table created for the parent model) and [multi-table inheritance](#multi-table-inheritance).
 
-:::caution
-You can technically inherit from concrete model classes, but this will result in the same behavior as the [abstract model technique](#inheriting-from-abstract-models). As mentioned previously, this behavior is likely to change in future Marten versions and you should probably not rely on it.
-:::
-
-### Inheriting from abstract models
+### Abstract model inheritance
 
 You can define abstract model classes by leveraging [Crystal's abstract type mechanism](https://crystal-lang.org/reference/syntax_and_semantics/virtual_and_abstract_types.html). Doing so allows to easily reuse model field definitions, table properties, and custom logics within child models. In this situation, the parent's model does not contribute any table to the considered database.
 
@@ -430,6 +426,44 @@ end
 ```
 
 The `Student` model will have four model fields in total (`id`, `name`, `email`, and `grade`). Moreover, all the methods of the parent model fields will be available on the child model. It should be noted that in this case the `Person` model cannot be used like a regular model: for example, trying to query records will return an error since no table is actually associated with the abstract model. Since it is an [abstract type](https://crystal-lang.org/reference/syntax_and_semantics/virtual_and_abstract_types.html), the `Student` class can't be instantiated either.
+
+### Multi table inheritance
+
+Marten also supports another form of model inheritance, where each model in the hierarchy is a concrete model (i.e., a model that is not abstract). In this situation, each model can be used/queried individually and has its own associated database. The framework upholds "links" between each model that uses multi table inheritance and its parent models in order to ensure that the relational structure and inheritance hierarchy are accurately maintained.
+
+For example, let's consider the following models:
+
+```crystal
+class Person < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :first_name, :string, max_size: 100
+  field :last_name, :string, max_size: 100
+end
+
+class Employee < Person
+  field :company_name, :string, max_size: 100
+end
+```
+
+All the fields defined in the `Person` model will be accessible when interacting with records of the `Employee` model, despite the fact that the data itself is stored in distinct tables. This means that it will be possible to filter `Employee` records using fields defined in the `Person` model, and to interact with the corresponding attributes when manipulating the obtained model instances:
+
+```crystal
+employee = Employee.filter(first_name: "John").first!
+employee.first_name # => "John"
+```
+
+Additionaly, it's important to note that attempting to filter or retrieve `Person` records will return `Person` instances. When manipulating a parent model instance, it is possible to get a child model record by calling the `#<child_model>` method - with `child_model` being the downcased version of the child model name. For example:
+
+```crystal
+person = Person.filter(first_name: "John").first!
+person.employee # => #<Employee:0x101590c40 person_ptr_id: 1, first_name: "John" ...>
+```
+
+You should note that if the `Person` record is not an employee, then calling `#employee` will return `nil`.
+
+:::note
+It's important to note that when retrieving and filtering model records that utilize multi-table inheritance (such as child model records), there will be added join operations within the underlying SQL queries. These joins are necessary to assemble the complete data from various related tables, potentially affecting the overall query performance.
+:::
 
 ## Callbacks
 

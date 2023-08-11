@@ -452,6 +452,16 @@ employee = Employee.filter(first_name: "John").first!
 employee.first_name # => "John"
 ```
 
+Initializing or creating `Employee` records will also work as you would expect if all the fields were defined in the `Employee` model class:
+
+```crystal
+employee = Employee.create!(
+  first_name: "John",
+  last_name: "Doe",
+  company_name: "Super org"
+)
+```
+
 Additionaly, it's important to note that attempting to filter or retrieve `Person` records will return `Person` instances. When manipulating a parent model instance, it is possible to get a child model record by calling the `#<child_model>` method - with `child_model` being the downcased version of the child model name. For example:
 
 ```crystal

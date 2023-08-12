@@ -26,6 +26,14 @@ On Ubuntu, Debian or any other Linux distribution using the APT package manager,
 curl -fsSL https://crystal-lang.org/install.sh | sudo bash
 ```
 
+### Using pacman
+
+On ArchLinux and derivatives you can install Crystal and shards package manager through Pacman:
+
+```bash
+sudo pacman -S crystal shards
+```
+
 ## Install a database
 
 New Marten projects will use a SQLite database by default: this lightweight serverless database application is usually already pre-installed on most of the existing operating systems, which makes it an ideal candidate for a development or a testing database. As such, if you choose to use SQLite for your new Marten project, you can very probably skip this section. 
@@ -53,6 +61,14 @@ On macOS or Linux, Marten can be installed using [Homebrew](https://brew.sh/) (a
 ```bash
 brew tap martenframework/marten
 brew install marten
+```
+
+### Using AUR on ArchLinux and derivatives
+
+Assuming you use some AUR helper (`yay` in this example) it will be as simple as:
+
+```bash
+yay -S marten
 ```
 
 Once the installation is complete, you should be able to use the `marten` command:

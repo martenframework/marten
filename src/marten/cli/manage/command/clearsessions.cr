@@ -4,7 +4,8 @@ module Marten
       module Command
         class ClearSessions < Base
           command_name :clearsessions
-          help "Clears all expired sessions."
+          help "Clear all expired sessions."
+
           getter no_input
 
           @no_input : Bool = false

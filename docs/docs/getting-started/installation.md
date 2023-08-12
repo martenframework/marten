@@ -28,7 +28,7 @@ curl -fsSL https://crystal-lang.org/install.sh | sudo bash
 
 ### Using pacman
 
-On ArchLinux and derivatives you can install Crystal and shards package manager through Pacman:
+On ArchLinux and derivates you can install Crystal and the `shards` command line tool through Pacman:
 
 ```bash
 sudo pacman -S crystal shards
@@ -63,7 +63,7 @@ brew tap martenframework/marten
 brew install marten
 ```
 
-### Using AUR on ArchLinux and derivatives
+### Using AUR on ArchLinux and derivates
 
 Assuming you use some AUR helper (`yay` in this example) it will be as simple as:
 

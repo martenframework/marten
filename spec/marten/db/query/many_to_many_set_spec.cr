@@ -56,6 +56,19 @@ describe Marten::DB::Query::ManyToManySet do
       qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
       qset.all.to_set.should eq(Set{tag_1, tag_2})
     end
+
+    it "adds the given array of records to the considered object's set of associated objects" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
+
+      user.tags.add([tag_1, tag_2])
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset.all.to_set.should eq(Set{tag_1, tag_2})
+    end
   end
 
   describe "#remove" do
@@ -108,6 +121,25 @@ describe Marten::DB::Query::ManyToManySet do
       qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
       qset.remove(tag_3)
       qset.all.to_set.should eq(Set{tag_1, tag_2})
+    end
+
+    it "removes the given array of records from the considered object's set of associated objects" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
+      tag_4 = Tag.create!(name: "syntax", is_active: true)
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset.add(tag_1, tag_2, tag_4)
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset.all.to_set.should eq(Set{tag_1, tag_2, tag_4})
+      qset.remove([tag_1, tag_4])
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset.all.to_set.should eq(Set{tag_2})
     end
   end
 end

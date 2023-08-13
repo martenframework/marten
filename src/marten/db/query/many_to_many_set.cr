@@ -32,6 +32,11 @@ module Marten
         #
         # If the objects specified in `objs` are already in the relationship, they will be skipped and not added again.
         def add(*objs : M)
+          add(objs.to_a)
+        end
+
+        # :ditto:
+        def add(objs : Enumerable(M) | Iterable(M))
           query.connection.transaction do
             # Identify which objects are already added to the many to many relationship and skip them.
             existing_obj_ids = m2m_field.as(Field::ManyToMany).through._base_queryset.filter(
@@ -57,6 +62,11 @@ module Marten
 
         # Removes the given objects from the many-to-many relationship.
         def remove(*objs : M) : Nil
+          remove(objs.to_a)
+        end
+
+        # :ditto:
+        def remove(objs : Enumerable(M) | Iterable(M)) : Nil
           query.connection.transaction do
             m2m_field.as(Field::ManyToMany).through._base_queryset.filter(
               Query::Node.new(

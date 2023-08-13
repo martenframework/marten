@@ -358,6 +358,8 @@ article.tags.to_a # => [#<Tag:0x1036e3ee0 id: 1, label: "Tag 1">,
                   #     #<Tag:0x1036e3ee2 id: 3, label: "Tag 3">]
 ```
 
+Take note of the utilization of the [`#add`](pathname:///api/dev/Marten/DB/Query/ManyToManySet.html#add(*objs%3AM)-instance-method) and [`#remove`](pathname:///api/dev/Marten/DB/Query/ManyToManySet.html#remove(*objs%3AM)%3ANil-instance-method) methods, facilitating the addition or removal of objects from the record's many-to-many collection of associated items. These methods are callable with single or multiple records as parameters, as well as with arrays of records for streamlined addition or removal.
+
 ### Backward relations
 
 By default, [`many_to_many`](./reference/fields#many_to_many) fields do not establish a backward relation. This means that you cannot directly retrieve records that target a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve all the `Article` records associated with a specific `Tag` record.

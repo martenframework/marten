@@ -139,6 +139,23 @@ describe Marten::CLI::Manage::Command::Base do
     end
   end
 
+  describe "#on_unknown_argument" do
+    it "allows to configure a callback for unknown arguments" do
+      unknown_args = [] of String
+
+      command = Marten::CLI::Manage::Command::BaseSpec::EmptyCommand.new(options: ["value1", "value2"])
+      command.setup
+
+      command.on_unknown_argument do |v|
+        unknown_args << v
+      end
+
+      command.handle
+
+      unknown_args.should eq ["value1", "value2"]
+    end
+  end
+
   describe "#print" do
     it "allows to print a specific message to the output file descriptor" do
       stdout = IO::Memory.new

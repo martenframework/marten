@@ -65,11 +65,12 @@ module Marten
             @@app_config ||= Marten.apps.get_containing(self)
           end
 
-          @arguments = [] of String
+          @argument_descriptions = {} of String => String
           @argument_handlers = [] of ArgumentHandler
           @color = true
           @parser : OptionParser?
           @show_error_trace = false
+          @unknown_args_proc : Proc(String, Nil)?
 
           def initialize(
             @options : Array(String),
@@ -88,26 +89,21 @@ module Marten
           def handle
             setup
 
-            parser.on("--error-trace", "Show full error trace (if a compilation is involved)") do
-              @show_error_trace = true
-            end
-
-            parser.on("--no-color", "Disable colored output") do
-              @color = false
-            end
-
-            parser.on("-h", "--help", "Show this help") do
-              print(parser)
-              exit
-            end
+            setup_shared_options
 
             parser.banner = banner_parts.join("")
 
             parser.unknown_args do |args, _args_after_two_dashes|
               args.each_with_index do |arg, i|
                 handler = argument_handlers[i]?
-                print_error_and_exit("Unrecognized argument: #{arg}") if handler.nil?
-                handler.block.call(arg)
+
+                if handler.nil? && unknown_args_proc.nil?
+                  print_error_and_exit("Unrecognized argument: #{arg}")
+                elsif handler.nil?
+                  unknown_args_proc.not_nil!.call(arg)
+                else
+                  handler.block.call(arg)
+                end
               end
             end
 
@@ -136,8 +132,8 @@ module Marten
           # ```
           def on_argument(name : String | Symbol, description : String, &block : String ->)
             name = name.to_s
-            append_argument(name, description)
-            @argument_handlers << ArgumentHandler.new(name, block)
+            @argument_descriptions[name.to_s] = description
+            @argument_handlers << ArgumentHandler.new(name.to_s, block)
           end
 
           # Allows to configure a specific command option.
@@ -239,6 +235,14 @@ module Marten
             parser.on("-#{short_flag} #{arg.to_s.upcase}", "--#{long_flag}=#{arg.to_s.upcase}", description, &block)
           end
 
+          # Allows to configure a proc to call when unknown arguments are encountered.
+          #
+          # This method will configure a proc to call when unknown arguments are encountered. The proc will be called
+          # for each unknown argument, and it will receive the argument value as the first argument.
+          def on_unknown_argument(&block : String ->)
+            @unknown_args_proc = block
+          end
+
           # Allows to print a message to the output file descriptor.
           #
           # This method will print a textual value to the output file descriptor, and it allows to optionally specify
@@ -283,6 +287,14 @@ module Marten
           def setup
           end
 
+          # Shows the command usage.
+          #
+          # This method is called when the help option is specified by the user. It will print the command usage to the
+          # output file descriptor by default.
+          def show_usage
+            print(parser)
+          end
+
           # Allows to apply a style to a specific text value.
           #
           # This method can be used to apply `fore`, `back`, and `mode` styles to a specific text values. This method is
@@ -299,42 +311,63 @@ module Marten
             output.to_s
           end
 
-          private getter arguments
+          private getter argument_descriptions
           private getter argument_handlers
           private getter color
           private getter options
-
-          private def append_argument(name, description)
-            if name.size >= 33
-              @arguments << "    #{name}\n#{" " * 37}#{description}"
-            else
-              @arguments << "    #{name}#{" " * (33 - name.size)}#{description}"
-            end
-          end
+          private getter unknown_args_proc
 
           private def banner_parts
             banner_parts = [] of String
 
             banner_parts << "Usage: #{@main_command_name} #{self.class.command_name} [options]"
-            unless arguments.empty?
-              banner_parts << " #{argument_handlers.join(" ") { |h| "[#{h.name}]" }}"
+            unless argument_handlers.empty?
+              arguments_line = " #{argument_handlers.join(" ") { |h| "[#{h.name}]" }}"
+              if !unknown_args_proc.nil?
+                arguments_line += " [arguments]"
+              end
+
+              banner_parts << arguments_line
             end
 
             banner_parts << "\n\n"
 
             banner_parts << "#{self.class.help}\n\n" unless self.class.help.empty?
 
-            unless arguments.empty?
+            unless argument_descriptions.empty?
               banner_parts << "Arguments:\n"
-              banner_parts << arguments.join("\n")
+              banner_parts << argument_descriptions.map { |n, d| format_argument_name_and_description(n, d) }.join("\n")
               banner_parts << "\n\n"
             end
 
             banner_parts << "Options:"
           end
 
+          private def format_argument_name_and_description(name, description)
+            if name.size >= 33
+              "    #{name}\n#{" " * 37}#{description}"
+            else
+              "    #{name}#{" " * (33 - name.size)}#{description}"
+            end
+          end
+
           private def parser
             @parser.not_nil!
+          end
+
+          private def setup_shared_options
+            parser.on("--error-trace", "Show full error trace (if a compilation is involved)") do
+              @show_error_trace = true
+            end
+
+            parser.on("--no-color", "Disable colored output") do
+              @color = false
+            end
+
+            parser.on("-h", "--help", "Show this help") do
+              show_usage
+              exit
+            end
           end
 
           private def show_error_trace?

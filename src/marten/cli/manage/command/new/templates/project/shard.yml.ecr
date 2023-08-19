@@ -1,21 +1,21 @@
-name: <%= @context.name %>
+name: <%= context.name %>
 version: 0.1.0
 
 dependencies:
   marten:
     github: martenframework/marten
-<%- if @context.targets_auth? -%>
+<%- if context.targets_auth? -%>
   marten_auth:
     github: martenframework/marten-auth
     version: ">= 0.2.0"
 <%- end -%>
-<%- if @context.database == "sqlite3"  -%>
+<%- if context.database == "sqlite3"  -%>
   sqlite3:
     github: crystal-lang/crystal-sqlite3
-<%- elsif @context.database == "postgresql"  -%>
+<%- elsif context.database == "postgresql"  -%>
   pg:
     github: will/crystal-pg
-<%- elsif @context.database == "mysql"  -%>
+<%- elsif context.database == "mysql"  -%>
   mysql:
     github: crystal-lang/crystal-mysql
 <%- end -%>

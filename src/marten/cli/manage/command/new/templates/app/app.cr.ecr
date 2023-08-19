@@ -2,6 +2,6 @@ require "./handlers/**"
 require "./models/**"
 require "./schemas/**"
 
-class <%= @context.name.capitalize %><% if !@context.name.downcase.ends_with?("app") %>App<% end %> < Marten::App
-  label "<%= @context.name %>"
+class <%= context.name.capitalize %><% if !context.name.downcase.ends_with?("app") %>App<% end %> < Marten::App
+  label "<%= context.name %>"
 end

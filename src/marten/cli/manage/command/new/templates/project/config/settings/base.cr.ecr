@@ -4,7 +4,7 @@ Marten.configure do |config|
 
   # Installed applications
   # https://martenframework.com/docs/development/reference/settings#installed_apps
-  <%- if @context.targets_auth? -%>
+  <%- if context.targets_auth? -%>
   config.installed_apps = [
     Auth::App,
   ]
@@ -17,7 +17,7 @@ Marten.configure do |config|
   config.middleware = [
     Marten::Middleware::Session,
     Marten::Middleware::Flash,
-    <%- if @context.targets_auth? -%>
+    <%- if context.targets_auth? -%>
     MartenAuth::Middleware,
     <%- end -%>
     Marten::Middleware::GZip,
@@ -26,24 +26,24 @@ Marten.configure do |config|
 
   # Databases
   # https://martenframework.com/docs/development/reference/settings#database-settings
-  <%- if @context.database == "sqlite3" -%>
+  <%- if context.database == "sqlite3" -%>
   config.database do |db|
     db.backend = :sqlite
-    db.name = Path["<%= @context.name %>.db"].expand
+    db.name = Path["<%= context.name %>.db"].expand
   end
-  <%- elsif @context.database == "mysql" -%>
+  <%- elsif context.database == "mysql" -%>
   config.database do |db|
     db.backend = :mysql
     db.host = "localhost"
-    db.name = "<%= @context.name %>_db"
+    db.name = "<%= context.name %>_db"
     # db.user = "my_user"
     # db.password = "my_password"
   end
-  <%- elsif @context.database == "postgresql" -%>
+  <%- elsif context.database == "postgresql" -%>
   config.database do |db|
     db.backend = :postgresql
     db.host = "localhost"
-    db.name = "<%= @context.name %>_db"
+    db.name = "<%= context.name %>_db"
     # db.user = "my_user"
     # db.password = "my_password"
   end
@@ -57,7 +57,7 @@ Marten.configure do |config|
     Marten::Template::ContextProducer::Debug,
     Marten::Template::ContextProducer::I18n,
   ]
-  <%- if @context.targets_auth? -%>
+  <%- if context.targets_auth? -%>
 
   # Authentication model
   config.auth.user_model = Auth::User

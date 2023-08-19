@@ -4,7 +4,6 @@ module Marten
       module Command
         class New < Base
           class Context
-            property dir : String
             property name : String
             property targets : Array(String)
             property database : String
@@ -13,15 +12,10 @@ module Marten
             TARGET_GENERAL = "general"
 
             def initialize(
-              @dir = "example",
               @name = "example",
               @database = "sqlite3",
               @targets = [TARGET_GENERAL]
             )
-            end
-
-            def expanded_dir
-              Path.new(dir).expand
             end
 
             def targets_auth?

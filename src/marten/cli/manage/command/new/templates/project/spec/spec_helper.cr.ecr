@@ -4,7 +4,7 @@ require "spec"
 
 require "../src/project"
 require "marten/spec"
-<%- if @context.targets_auth? -%>
+<%- if context.targets_auth? -%>
 require "marten_auth/spec"
 
 def create_user(email : String, password : String)

@@ -121,3 +121,36 @@ jobs:
       run: cp .spec.env.json.ci .spec.env.json
     - name: Run tests
       run: scripts/run_batched_specs
+  generated-auth:
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.crystal == 'nightly' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        crystal: [
+          '1.9.2',
+          'nightly',
+        ]
+    container:
+      image: crystallang/crystal:${{ matrix.crystal }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for SQLite
+      run: |
+        apt-get update
+        apt-get -yqq install libsqlite3-dev
+    - name: Install shards
+      run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Build the Marten CLI
+      run: crystal build src/marten_cli.cr -o bin/marten
+    - name: Generate a project with authentication
+      run: |
+        mkdir tmp
+        bin/marten new project test-auth --with-auth --dir=./tmp/test-auth
+    - name: Install generated project dependencies
+      run: |
+        cd tmp/test-auth
+        echo -e 'dependencies:\n  marten:\n    path: ../../' > shard.override.yml
+        shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Run tests
+      run: crystal spec

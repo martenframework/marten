@@ -142,7 +142,9 @@ jobs:
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI
-      run: crystal build src/marten_cli.cr -o bin/marten
+      run: |
+        mkdir bin
+        crystal build src/marten_cli.cr -o bin/marten
     - name: Generate a project with authentication
       run: |
         mkdir tmp
@@ -150,7 +152,7 @@ jobs:
     - name: Install generated project dependencies
       run: |
         cd tmp/test-auth
-        echo -e 'dependencies:\n  marten:\n    path: ../../' > shard.override.yml
         shards install --ignore-crystal-version --skip-postinstall --skip-executables
-    - name: Run tests
-      run: crystal spec
+        cd lib && rm -rf marten && ln -s ../../.. marten
+    - name: Run generated project tests
+      run: cd tmp/test-auth && crystal spec

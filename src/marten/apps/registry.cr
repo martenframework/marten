@@ -21,6 +21,11 @@ module Marten
         @app_configs_store.values
       end
 
+      # Returns the default application config, which corresponds to the standard `src/` folder.
+      def default
+        get(MainConfig::RESERVED_LABEL)
+      end
+
       # Returns the app config instance for the passed app label.
       #
       # Raises `Marten::Apps::Errors::AppNotFound` if the app config cannot be found.

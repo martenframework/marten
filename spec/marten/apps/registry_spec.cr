@@ -18,6 +18,15 @@ describe Marten::Apps::Registry do
     end
   end
 
+  describe "#default" do
+    it "returns the default app config" do
+      registry = Marten::Apps::Registry.new
+      registry.insert_main_app
+
+      registry.default.should be_a Marten::Apps::MainConfig
+    end
+  end
+
   describe "#get" do
     it "returns the registered app corresponding to the passed app label" do
       registry = Marten::Apps::Registry.new

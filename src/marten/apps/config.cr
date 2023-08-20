@@ -58,6 +58,11 @@ module Marten
         Asset::Finder::FileSystem.new(assets_dir.to_s)
       end
 
+      # Returns `false` in order to indicate that this is not the main application.
+      def main?
+        false
+      end
+
       # Returns the migrations path for the application.
       def migrations_path
         Path[effective_app_location].join(MIGRATIONS_DIR)

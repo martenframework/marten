@@ -92,6 +92,13 @@ describe Marten::Apps::Config do
     end
   end
 
+  describe "#main?" do
+    it "returns false" do
+      app_config = Marten::Apps::ConfigSpec::TestConfig.new
+      app_config.main?.should be_false
+    end
+  end
+
   describe "#migrations_path" do
     it "returns the app config migrations path" do
       app_config = Marten::Apps::ConfigSpec::TestConfig.new

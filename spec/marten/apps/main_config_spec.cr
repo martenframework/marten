@@ -12,4 +12,11 @@ describe Marten::Apps::MainConfig do
       Marten::Apps::MainConfig._marten_app_location.should eq Path["src"].expand.to_s
     end
   end
+
+  describe "#main?" do
+    it "returns true" do
+      app_config = Marten::Apps::MainConfig.new
+      app_config.main?.should be_true
+    end
+  end
 end

@@ -16,6 +16,11 @@ module Marten
       def self._marten_app_location
         {{ run("./main_config/fetch_src_path.cr") }}
       end
+
+      # Returns `true` in order to indicate that this is the main application.
+      def main?
+        true
+      end
     end
   end
 end

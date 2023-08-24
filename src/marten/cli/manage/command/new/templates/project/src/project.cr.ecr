@@ -7,7 +7,7 @@ require "sqlite3"
 
 # Project requirements.
 <%- if context.targets_auth? -%>
-require "./auth/app"
+require "./apps/auth/app"
 <%- end -%>
 require "./handlers/**"
 require "./models/**"

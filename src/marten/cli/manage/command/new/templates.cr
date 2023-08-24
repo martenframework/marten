@@ -69,176 +69,201 @@ module Marten
               # Add authentification files if needed.
               if context.targets_auth?
                 files << {
-                  "spec/auth/emails/password_reset_email_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/emails/password_reset_email_spec.cr.ecr"),
+                  "spec/apps/auth/emails/password_reset_email_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/emails/password_reset_email_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/emails/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/emails/spec_helper.cr.ecr"),
+                  "spec/apps/auth/emails/spec_helper.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/emails/spec_helper.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/handlers/concerns/require_anonymous_user_spec.cr",
+                  "spec/apps/auth/handlers/concerns/require_anonymous_user_spec.cr",
                   ECR.render(
-                    "#{__DIR__}/templates/project/spec/auth/handlers/concerns/require_anonymous_user_spec.cr.ecr"
+                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/concerns/require_anonymous_user_spec.cr.ecr"
                   ),
                 }
                 files << {
-                  "spec/auth/handlers/concerns/require_signed_in_user_spec.cr",
+                  "spec/apps/auth/handlers/concerns/require_signed_in_user_spec.cr",
                   ECR.render(
-                    "#{__DIR__}/templates/project/spec/auth/handlers/concerns/require_signed_in_user_spec.cr.ecr"
+                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/concerns/require_signed_in_user_spec.cr.ecr"
                   ),
                 }
                 files << {
-                  "spec/auth/handlers/concerns/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/handlers/concerns/spec_helper.cr.ecr"),
+                  "spec/apps/auth/handlers/concerns/spec_helper.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/concerns/spec_helper.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/handlers/password_reset_confirm_handler_spec.cr",
+                  "spec/apps/auth/handlers/password_reset_confirm_handler_spec.cr",
                   ECR.render(
-                    "#{__DIR__}/templates/project/spec/auth/handlers/password_reset_confirm_handler_spec.cr.ecr"
+                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/password_reset_confirm_handler_spec.cr.ecr"
                   ),
                 }
                 files << {
-                  "spec/auth/handlers/password_reset_initiate_handler_spec.cr",
+                  "spec/apps/auth/handlers/password_reset_initiate_handler_spec.cr",
                   ECR.render(
-                    "#{__DIR__}/templates/project/spec/auth/handlers/password_reset_initiate_handler_spec.cr.ecr"
+                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/password_reset_initiate_handler_spec.cr.ecr"
                   ),
                 }
                 files << {
-                  "spec/auth/handlers/profile_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/handlers/profile_handler_spec.cr.ecr"),
+                  "spec/apps/auth/handlers/profile_handler_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/profile_handler_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/handlers/sign_in_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/handlers/sign_in_handler_spec.cr.ecr"),
+                  "spec/apps/auth/handlers/sign_in_handler_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/sign_in_handler_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/handlers/sign_out_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/handlers/sign_out_handler_spec.cr.ecr"),
+                  "spec/apps/auth/handlers/sign_out_handler_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/sign_out_handler_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/handlers/sign_up_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/handlers/sign_up_handler_spec.cr.ecr"),
+                  "spec/apps/auth/handlers/sign_up_handler_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/sign_up_handler_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/handlers/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/handlers/spec_helper.cr.ecr"),
+                  "spec/apps/auth/handlers/spec_helper.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/spec_helper.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/spec_helper.cr.ecr"),
+                  "spec/apps/auth/spec_helper.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/spec_helper.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/schemas/password_reset_confirm_schema_spec.cr",
+                  "spec/apps/auth/schemas/password_reset_confirm_schema_spec.cr",
                   ECR.render(
-                    "#{__DIR__}/templates/project/spec/auth/schemas/password_reset_confirm_schema_spec.cr.ecr"
+                    "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_reset_confirm_schema_spec.cr.ecr"
                   ),
                 }
                 files << {
-                  "spec/auth/schemas/password_reset_initiate_schema_spec.cr",
+                  "spec/apps/auth/schemas/password_reset_initiate_schema_spec.cr",
                   ECR.render(
-                    "#{__DIR__}/templates/project/spec/auth/schemas/password_reset_initiate_schema_spec.cr.ecr"
+                    "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_reset_initiate_schema_spec.cr.ecr"
                   ),
                 }
                 files << {
-                  "spec/auth/schemas/sign_in_schema_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/schemas/sign_in_schema_spec.cr.ecr"),
+                  "spec/apps/auth/schemas/sign_in_schema_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/schemas/sign_in_schema_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/schemas/sign_up_schema_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/schemas/sign_up_schema_spec.cr.ecr"),
+                  "spec/apps/auth/schemas/sign_up_schema_spec.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/schemas/sign_up_schema_spec.cr.ecr"),
                 }
                 files << {
-                  "spec/auth/schemas/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/auth/schemas/spec_helper.cr.ecr"),
+                  "spec/apps/auth/schemas/spec_helper.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/schemas/spec_helper.cr.ecr"),
                 }
                 files << {
-                  "src/auth/emails/password_reset_email.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/emails/password_reset_email.cr.ecr"),
+                  "spec/apps/spec_helper.cr",
+                  ECR.render("#{__DIR__}/templates/project/spec/apps/spec_helper.cr.ecr"),
                 }
                 files << {
-                  "src/auth/handlers/concerns/require_anonymous_user.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/concerns/require_anonymous_user.cr.ecr"),
+                  "src/apps/auth/emails/password_reset_email.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/emails/password_reset_email.cr.ecr"),
                 }
                 files << {
-                  "src/auth/handlers/concerns/require_signed_in_user.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/concerns/require_signed_in_user.cr.ecr"),
+                  "src/apps/auth/handlers/concerns/require_anonymous_user.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/handlers/concerns/require_anonymous_user.cr.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/handlers/password_reset_confirm_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/password_reset_confirm_handler.cr.ecr"),
+                  "src/apps/auth/handlers/concerns/require_signed_in_user.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/handlers/concerns/require_signed_in_user.cr.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/handlers/password_reset_initiate_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/password_reset_initiate_handler.cr.ecr"),
+                  "src/apps/auth/handlers/password_reset_confirm_handler.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/handlers/password_reset_confirm_handler.cr.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/handlers/profile_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/profile_handler.cr.ecr"),
+                  "src/apps/auth/handlers/password_reset_initiate_handler.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/handlers/password_reset_initiate_handler.cr.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/handlers/sign_in_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/sign_in_handler.cr.ecr"),
+                  "src/apps/auth/handlers/profile_handler.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/profile_handler.cr.ecr"),
                 }
                 files << {
-                  "src/auth/handlers/sign_out_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/sign_out_handler.cr.ecr"),
+                  "src/apps/auth/handlers/sign_in_handler.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/sign_in_handler.cr.ecr"),
                 }
                 files << {
-                  "src/auth/handlers/sign_up_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/handlers/sign_up_handler.cr.ecr"),
+                  "src/apps/auth/handlers/sign_out_handler.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/sign_out_handler.cr.ecr"),
                 }
                 files << {
-                  "src/auth/migrations/0001_create_auth_user_table.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/migrations/0001_create_auth_user_table.cr.ecr"),
+                  "src/apps/auth/handlers/sign_up_handler.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/sign_up_handler.cr.ecr"),
                 }
                 files << {
-                  "src/auth/models/user.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/models/user.cr.ecr"),
+                  "src/apps/auth/migrations/0001_create_auth_user_table.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/migrations/0001_create_auth_user_table.cr.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/schemas/password_reset_confirm_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/schemas/password_reset_confirm_schema.cr.ecr"),
+                  "src/apps/auth/models/user.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/models/user.cr.ecr"),
                 }
                 files << {
-                  "src/auth/schemas/password_reset_initiate_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/schemas/password_reset_initiate_schema.cr.ecr"),
+                  "src/apps/auth/schemas/password_reset_confirm_schema.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/password_reset_confirm_schema.cr.ecr"),
                 }
                 files << {
-                  "src/auth/schemas/sign_in_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/schemas/sign_in_schema.cr.ecr"),
+                  "src/apps/auth/schemas/password_reset_initiate_schema.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/schemas/password_reset_initiate_schema.cr.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/schemas/sign_up_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/schemas/sign_up_schema.cr.ecr"),
+                  "src/apps/auth/schemas/sign_in_schema.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/sign_in_schema.cr.ecr"),
                 }
                 files << {
-                  "src/auth/templates/auth/emails/password_reset.html",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/templates/auth/emails/password_reset.html.ecr"),
+                  "src/apps/auth/schemas/sign_up_schema.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/sign_up_schema.cr.ecr"),
                 }
                 files << {
-                  "src/auth/templates/auth/password_reset_confirm.html",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/templates/auth/password_reset_confirm.html.ecr"),
+                  "src/apps/auth/templates/auth/emails/password_reset.html",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/emails/password_reset.html.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/templates/auth/password_reset_initiate.html",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/templates/auth/password_reset_initiate.html.ecr"),
+                  "src/apps/auth/templates/auth/password_reset_confirm.html",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_reset_confirm.html.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/templates/auth/profile.html",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/templates/auth/profile.html.ecr"),
+                  "src/apps/auth/templates/auth/password_reset_initiate.html",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_reset_initiate.html.ecr"
+                  ),
                 }
                 files << {
-                  "src/auth/templates/auth/sign_in.html",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/templates/auth/sign_in.html.ecr"),
+                  "src/apps/auth/templates/auth/profile.html",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/templates/auth/profile.html.ecr"),
                 }
                 files << {
-                  "src/auth/templates/auth/sign_up.html",
-                  ECR.render("#{__DIR__}/templates/project/src/auth/templates/auth/sign_up.html.ecr"),
+                  "src/apps/auth/templates/auth/sign_in.html",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/templates/auth/sign_in.html.ecr"),
                 }
-                files << {"src/auth/app.cr", ECR.render("#{__DIR__}/templates/project/src/auth/app.cr.ecr")}
-                files << {"src/auth/cli.cr", ECR.render("#{__DIR__}/templates/project/src/auth/cli.cr.ecr")}
-                files << {"src/auth/routes.cr", ECR.render("#{__DIR__}/templates/project/src/auth/routes.cr.ecr")}
+                files << {
+                  "src/apps/auth/templates/auth/sign_up.html",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/templates/auth/sign_up.html.ecr"),
+                }
+                files << {"src/apps/auth/app.cr", ECR.render("#{__DIR__}/templates/project/src/apps/auth/app.cr.ecr")}
+                files << {"src/apps/auth/cli.cr", ECR.render("#{__DIR__}/templates/project/src/apps/auth/cli.cr.ecr")}
+                files << {
+                  "src/apps/auth/routes.cr",
+                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/routes.cr.ecr"),
+                }
               end
 
               files

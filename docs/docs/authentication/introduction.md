@@ -30,7 +30,7 @@ For example:
 marten new project myblog --with-auth
 ```
 
-When using this option, Marten will generate an `auth` [application](../development/applications) under the `src/auth` folder of your project. As mentioned previously, this application provides a set of [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) that implement basic authentication operations.
+When using this option, Marten will generate an `auth` [application](../development/applications) under the `src/apps/auth` folder of your project. As mentioned previously, this application provides a set of [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) that implement basic authentication operations.
 
 You can test the generated authentication application by going to your application at [http://localhost:8000/auth/signup](http://localhost:8000/auth/signup) after having started the Marten development server (using `marten serve`).
 

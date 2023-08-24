@@ -8,6 +8,6 @@ require "marten/cli"
 
 # Project CLI requirements.
 <%- if context.targets_auth? -%>
-require "./auth/cli"
+require "./apps/auth/cli"
 <%- end -%>
 require "./migrations/**"

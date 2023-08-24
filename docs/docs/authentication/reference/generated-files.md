@@ -7,7 +7,7 @@ This page provides a reference of the files that are generated for the `auth` ap
 
 ## Application
 
-The `auth` application is generated under the `src/auth` folder. In addition to the abstractions mentioned below, this folder defines the following top-level files:
+The `auth` application is generated under the `src/apps/auth` folder. In addition to the abstractions mentioned below, this folder defines the following top-level files:
 
 * `app.cr` - The entrypoint of the `auth` application, where all the other abstractions are required
 * `cli.cr` - The CLI entrypoint of the `auth` application, where CLI-related abstractions (like migrations) are required
@@ -54,4 +54,4 @@ The `auth` application is generated under the `src/auth` folder. In addition to 
 
 ## Specs
 
-All the previously mentioned abstractions have associated specs that are defined under the `spec/auth` folder.
+All the previously mentioned abstractions have associated specs that are defined under the `spec/apps/auth` folder.

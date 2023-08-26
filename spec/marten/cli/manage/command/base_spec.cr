@@ -75,6 +75,23 @@ describe Marten::CLI::Manage::Command::Base do
     end
   end
 
+  describe "#on_invalid_option" do
+    it "allows to configure a callback for invalid options" do
+      unknown_options = [] of String
+
+      command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(options: ["arg", "--opt1", "--opt2"])
+
+      command.on_unknown_argument { }
+      command.on_invalid_option do |v|
+        unknown_options << v
+      end
+
+      command.handle
+
+      unknown_options.should eq ["--opt1", "--opt2"]
+    end
+  end
+
   describe "#on_option" do
     it "allows to configure a new command option" do
       option_set = false

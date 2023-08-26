@@ -68,6 +68,7 @@ module Marten
           @argument_descriptions = {} of String => String
           @argument_handlers = [] of ArgumentHandler
           @color = true
+          @invalid_option_proc : Proc(String, Nil)?
           @parser : OptionParser?
           @show_error_trace = false
           @unknown_args_proc : Proc(String, Nil)?
@@ -108,7 +109,11 @@ module Marten
             end
 
             parser.invalid_option do |flag|
-              print_error_and_exit("Unrecognized option: #{flag}")
+              if invalid_option_proc.nil?
+                print_error_and_exit("Unrecognized option: #{flag}")
+              else
+                invalid_option_proc.not_nil!.call(flag)
+              end
             end
 
             parser.parse(options)
@@ -134,6 +139,14 @@ module Marten
             name = name.to_s
             @argument_descriptions[name.to_s] = description
             @argument_handlers << ArgumentHandler.new(name.to_s, block)
+          end
+
+          # Allows to configure a proc to call when invalid options are encountered.
+          #
+          # This method will confiugure a proc to call when invalid options are encountered. The proc will be called for
+          # each invalid option, and it will receive the option flag as the first argument.
+          def on_invalid_option(&block : String ->)
+            @invalid_option_proc = block
           end
 
           # Allows to configure a specific command option.
@@ -314,6 +327,7 @@ module Marten
           private getter argument_descriptions
           private getter argument_handlers
           private getter color
+          private getter invalid_option_proc
           private getter options
           private getter unknown_args_proc
 

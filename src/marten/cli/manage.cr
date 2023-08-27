@@ -1,6 +1,3 @@
-require "./manage/errors"
-require "./manage/command/**"
-
 module Marten
   module CLI
     # The manage CLI.

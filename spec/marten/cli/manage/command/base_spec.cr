@@ -56,6 +56,43 @@ describe Marten::CLI::Manage::Command::Base do
 
       command.arg.should eq "Run with arg: value"
     end
+
+    it "returns the status code in case the exit_raises flag is set" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::BaseSpec::ErroredCommand.new(
+        options: [] of String,
+        stdout: stdout,
+        stderr: stderr,
+        exit_raises: true
+      )
+
+      command.handle.should eq 1
+
+      stderr.rewind.gets_to_end.includes?("This is bad").should be_true
+    end
+  end
+
+  describe "#handle!" do
+    it "raises the expected exception in case the exit_raises flag is set" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::BaseSpec::ErroredCommand.new(
+        options: [] of String,
+        stdout: stdout,
+        stderr: stderr,
+        exit_raises: true
+      )
+
+      error = expect_raises(Marten::CLI::Manage::Errors::Exit) do
+        command.handle!
+      end
+
+      error.code.should eq 1
+      stderr.rewind.gets_to_end.includes?("This is bad").should be_true
+    end
   end
 
   describe "#on_argument" do
@@ -271,6 +308,12 @@ module Marten::CLI::Manage::Command::BaseSpec
 
     def run
       @arg = "Run with arg: #{@arg}"
+    end
+  end
+
+  class ErroredCommand < Marten::CLI::Manage::Command::Base
+    def run
+      print_error_and_exit("This is bad")
     end
   end
 end

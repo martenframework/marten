@@ -66,9 +66,9 @@ module Marten
         command = options.first?.to_s
 
         if command_invoked?(command, Manage::Command::New)
-          Manage::Command::New.new(options: options[1..], stdout: stdout, stderr: stderr).handle
+          Manage::Command::New.new(options: options[1..], stdout: stdout, stderr: stderr).handle!
         elsif command_invoked?(command, Manage::Command::Serve)
-          Manage::Command::Serve.new(options: options[1..], stdout: stdout, stderr: stderr).handle
+          Manage::Command::Serve.new(options: options[1..], stdout: stdout, stderr: stderr).handle!
         else
           build_and_run_manage_command
         end
@@ -89,7 +89,7 @@ module Marten
 
         options.shift
 
-        Manage::Command::New.new(options: options, stdout: stdout, stderr: stderr).handle
+        Manage::Command::New.new(options: options, stdout: stdout, stderr: stderr).handle!
       end
 
       private def inside_project?
@@ -105,11 +105,11 @@ module Marten
       end
 
       private def show_new_command_usage
-        Manage::Command::New.new(options: ["--help"], stdout: stdout, stderr: stderr).handle
+        Manage::Command::New.new(options: ["--help"], stdout: stdout, stderr: stderr).handle!
       end
 
       private def show_version
-        Manage::Command::Version.new(options: [] of String, stdout: stdout, stderr: stderr).handle
+        Manage::Command::Version.new(options: [] of String, stdout: stdout, stderr: stderr).handle!
       end
     end
   end

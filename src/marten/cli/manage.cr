@@ -69,7 +69,7 @@ module Marten
         options.shift
 
         command = command_klass.not_nil!.new(options, main_command_name: @name)
-        command.handle
+        command.handle!
       end
 
       private USAGE_HEADER = <<-USAGE_HEADER
@@ -119,7 +119,7 @@ module Marten
       end
 
       private def show_version
-        Manage::Command::Version.new(options: [] of String, stdout: stdout, stderr: stderr).handle
+        Manage::Command::Version.new(options: [] of String, stdout: stdout, stderr: stderr).handle!
       end
     end
   end

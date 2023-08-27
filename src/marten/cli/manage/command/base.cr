@@ -78,7 +78,8 @@ module Marten
             @stdin : IO = STDIN,
             @stdout : IO = STDOUT,
             @stderr : IO = STDERR,
-            @main_command_name = Marten::CLI::DEFAULT_COMMAND_NAME
+            @main_command_name = Marten::CLI::DEFAULT_COMMAND_NAME,
+            @exit_raises : Bool = false
           )
             @parser = OptionParser.new
           end
@@ -86,39 +87,23 @@ module Marten
           # Setups the command and runs it.
           #
           # This method will call the `#setup` method, configure the arguments / options parser and then execute the
-          # command through the use of the `#run` method.
-          def handle
-            setup
+          # command through the use of the `#run` method. If the execution of the command produces an `Errors::Exit`
+          # exception (because the `exit_raises` option was set to `true` at initialization time), then the exception
+          # will be caught and the method will return the exit code.
+          def handle : Int32
+            handle!
+            0
+          rescue error : Errors::Exit
+            error.code
+          end
 
-            setup_shared_options
-
-            parser.banner = banner_parts.join("")
-
-            parser.unknown_args do |args, _args_after_two_dashes|
-              args.each_with_index do |arg, i|
-                handler = argument_handlers[i]?
-
-                if handler.nil? && unknown_args_proc.nil?
-                  print_error_and_exit("Unrecognized argument: #{arg}")
-                elsif handler.nil?
-                  unknown_args_proc.not_nil!.call(arg)
-                else
-                  handler.block.call(arg)
-                end
-              end
-            end
-
-            parser.invalid_option do |flag|
-              if invalid_option_proc.nil?
-                print_error_and_exit("Unrecognized option: #{flag}")
-              else
-                invalid_option_proc.not_nil!.call(flag)
-              end
-            end
-
-            parser.parse(options)
-
-            run
+          # Setups the command and runs it.
+          #
+          # This method will call the `#setup` method, configure the arguments / options parser and then execute the
+          # command through the use of the `#run` method. Note this method won't silence `Errors::Exit` exceptions if
+          # the `exit_raises` option was set to `true` at initialization time.
+          def handle! : Nil
+            setup_and_run
           end
 
           # Allows to configure a specific command argument.
@@ -283,7 +268,7 @@ module Marten
           def print_error_and_exit(msg, exit_code = 1)
             @stderr.print(style("Error: ", fore: :red, mode: :bold))
             print_error(msg)
-            exit(exit_code)
+            do_exit(exit_code)
           end
 
           # Runs the command.
@@ -331,6 +316,8 @@ module Marten
           private getter options
           private getter unknown_args_proc
 
+          private getter? exit_raises
+
           private def banner_parts
             banner_parts = [] of String
 
@@ -357,6 +344,14 @@ module Marten
             banner_parts << "Options:"
           end
 
+          private def do_exit(exit_code)
+            if exit_raises?
+              raise Errors::Exit.new(exit_code)
+            else
+              exit(exit_code)
+            end
+          end
+
           private def format_argument_name_and_description(name, description)
             if name.size >= 33
               "    #{name}\n#{" " * 37}#{description}"
@@ -367,6 +362,40 @@ module Marten
 
           private def parser
             @parser.not_nil!
+          end
+
+          private def setup_and_run
+            setup
+
+            setup_shared_options
+
+            parser.banner = banner_parts.join("")
+
+            parser.unknown_args do |args, _args_after_two_dashes|
+              args.each_with_index do |arg, i|
+                handler = argument_handlers[i]?
+
+                if handler.nil? && unknown_args_proc.nil?
+                  print_error_and_exit("Unrecognized argument: #{arg}")
+                elsif handler.nil?
+                  unknown_args_proc.not_nil!.call(arg)
+                else
+                  handler.block.call(arg)
+                end
+              end
+            end
+
+            parser.invalid_option do |flag|
+              if invalid_option_proc.nil?
+                print_error_and_exit("Unrecognized option: #{flag}")
+              else
+                invalid_option_proc.not_nil!.call(flag)
+              end
+            end
+
+            parser.parse(options)
+
+            run
           end
 
           private def setup_shared_options
@@ -380,7 +409,7 @@ module Marten
 
             parser.on("-h", "--help", "Show this help") do
               show_usage
-              exit
+              do_exit(0)
             end
           end
 

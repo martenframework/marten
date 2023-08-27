@@ -1,3 +1,5 @@
+require "./errors"
+
 module Marten
   module CLI
     class Manage

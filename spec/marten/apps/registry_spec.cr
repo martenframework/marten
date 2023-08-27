@@ -28,10 +28,16 @@ describe Marten::Apps::Registry do
   end
 
   describe "#get" do
-    it "returns the registered app corresponding to the passed app label" do
+    it "returns the registered app corresponding to the passed app label string" do
       registry = Marten::Apps::Registry.new
       registry.populate([Marten::Apps::RegistrySpec::App])
       registry.get("test_a").should be_a Marten::Apps::RegistrySpec::App
+    end
+
+    it "returns the registered app corresponding to the passed app label symbol" do
+      registry = Marten::Apps::Registry.new
+      registry.populate([Marten::Apps::RegistrySpec::App])
+      registry.get(:test_a).should be_a Marten::Apps::RegistrySpec::App
     end
 
     it "raises if the app label does not correspond to any registered apps" do

@@ -35,6 +35,11 @@ module Marten
         end
       end
 
+      # :ditto:
+      def get(label : Symbol)
+        get(label.to_s)
+      end
+
       # Returns the application config object contaning the passed class.
       def get_containing(klass)
         candidates = [] of Config.class

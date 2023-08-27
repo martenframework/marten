@@ -1,0 +1,19 @@
+class <%= context.class_name %> < Marten::Email
+  # Learn more about emailing in Marten at:
+  # https://martenframework.com/docs/emailing/introduction
+  #
+  # This email can be sent with the following code:
+  #
+  # ```
+  # email = <%= context.class_name %>.new("recipient@example.com")
+  # email.deliver
+  # ```
+
+  to @recipient
+  subject "Example email"
+  template_name "<%= context.html_template_filepath %>", content_type: :html
+  template_name "<%= context.html_template_filepath %>", content_type: :text
+
+  def initialize(@recipient : String)
+  end
+end

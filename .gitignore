@@ -18,11 +18,14 @@
 /shard.lock
 /tmp/
 
+# Specs
 .spec.env.json
 /spec/assets/
 /spec/media/
 /spec/marten/cli/admin_spec/new_project
 /spec/marten/cli/admin_spec/existing_project/*
 !/spec/marten/cli/admin_spec/existing_project/manage.cr
+/spec/marten/cli/generator_spec/*
+!/spec/marten/cli/generator_spec/app.cr
+/spec/marten/cli/generator/email_spec/main_app/*
 /spec/marten/cli/manage/command/new_spec
-

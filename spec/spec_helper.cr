@@ -62,6 +62,16 @@ macro with_installed_apps(*apps)
   end
 end
 
+macro with_main_app_location(location)
+  around_each do |t|
+    Marten::Apps::MainConfig.overridden_location = {{ location }}
+
+    t.run
+
+    Marten::Apps::MainConfig.overridden_location = nil
+  end
+end
+
 macro with_overridden_setting(setting_name, setting_value, nilable = false)
   begin
     {% old_setting_var_name = "old_#{setting_name.gsub(/\./, "_").id}_value" %}

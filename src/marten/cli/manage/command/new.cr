@@ -157,7 +157,7 @@ module Marten
             print("") if interactive_mode?
 
             files.sort_by { |f| f[0] }.each do |file_path, file_content|
-              print("› Creating #{style(file_path, mode: :dim)}...", ending: "")
+              print("› Creating #{style(file_path, fore: :cyan, mode: :bold)}...", ending: "")
 
               full_path = expanded_dir.join(file_path)
               Dir.mkdir_p(full_path.dirname)

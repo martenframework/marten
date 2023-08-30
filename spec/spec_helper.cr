@@ -53,6 +53,7 @@ macro with_installed_apps(*apps)
 
     Marten.apps.app_configs_store = {} of String => Marten::Apps::Config
     Marten.apps.populate(Marten.settings.installed_apps + {{ apps }}.to_a)
+    Marten.apps.insert_main_app
     Marten::Spec.setup_databases
 
     t.run

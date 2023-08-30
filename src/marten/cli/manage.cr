@@ -95,7 +95,12 @@ module Marten
 
         usage << USAGE_HEADER % @name
 
-        longest_command_name = @commands_per_name.values.max_of(&.command_name.size)
+        full_command_name = ->(command : Command::Base.class) {
+          ([command.command_name] + command.command_aliases).join(" / ")
+        }
+
+        longest_command_name = @commands_per_name.values.max_of { |command| full_command_name.call(command).size }
+
         description_padding = ->(command_name : String) { " " * (longest_command_name - command_name.size + 2) }
 
         per_app_commands = @commands_per_name.values.group_by do |command|
@@ -105,9 +110,15 @@ module Marten
         per_app_commands.each do |app_label, commands|
           usage << "[#{app_label}]\n\n".colorize(:green).to_s
           commands.uniq.each do |command|
-            usage << "  › #{command.command_name}".colorize(:light_blue).to_s
-            usage << description_padding.call(command.command_name)
+            usage << "  › ".colorize(:green).to_s
+
+            usage << ([command.command_name] + command.command_aliases)
+              .map(&.colorize(:yellow).to_s)
+              .join(" / ".colorize(:dark_gray).to_s)
+
+            usage << description_padding.call(full_command_name.call(command))
             usage << command.help
+
             usage << "\n"
           end
           usage << "\n"

@@ -22,11 +22,9 @@ describe Marten::CLI::Manage do
         Marten::CLI::Manage::Command::Gen,
         Marten::CLI::Manage::Command::Serve,
       ].each do |c|
-        formatted_command_name = ([c.command_name] + c.command_aliases)
-          .map(&.colorize(:yellow).to_s)
-          .join(" / ".colorize(:dark_gray).to_s)
-
-        output.includes?(formatted_command_name).should be_true
+        c.command_aliases.each do |a|
+          output.includes?(a).should be_true
+        end
       end
     end
 

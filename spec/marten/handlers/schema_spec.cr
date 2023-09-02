@@ -2,6 +2,23 @@ require "./spec_helper"
 require "./schema_spec/**"
 
 describe Marten::Handlers::Schema do
+  describe "::schema_context_name" do
+    it "returns the expected value by default" do
+      Marten::Handlers::SchemaSpec::TestHandler.schema_context_name.should eq "schema"
+    end
+
+    it "returns the specified value" do
+      Marten::Handlers::SchemaSpec::TestWithCustomSchemaContextName.schema_context_name.should eq "my_schema"
+    end
+  end
+
+  describe "::schema_context_name(name)" do
+    it "allows to specify the schema context name" do
+      Marten::Handlers::SchemaSpec::TestWithCustomSchemaContextName.schema_context_name("my_schema")
+      Marten::Handlers::SchemaSpec::TestWithCustomSchemaContextName.schema_context_name.should eq "my_schema"
+    end
+  end
+
   describe "::success_route_name" do
     it "returns the configured success URL" do
       Marten::Handlers::SchemaSpec::TestHandler.success_route_name.should eq "dummy"
@@ -523,5 +540,10 @@ module Marten::Handlers::SchemaSpec
   end
 
   class TestHandlerWithoutConfiguration < Marten::Handlers::Schema
+  end
+
+  class TestWithCustomSchemaContextName < Marten::Handlers::Schema
+    schema TestSchema
+    schema_context_name "my_schema"
   end
 end

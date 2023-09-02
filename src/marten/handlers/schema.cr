@@ -34,6 +34,9 @@ module Marten
     class Schema < Template
       include Callbacks
 
+      # Returns the name to use to include the schema object into the template context (defaults to `schema`).
+      class_getter schema_context_name : String = "schema"
+
       # Returns the route name that should be resolved to produce the URL to redirect to when processing a valid schema.
       #
       # Defaults to `nil`.
@@ -43,6 +46,11 @@ module Marten
       #
       # Defaults to `nil`.
       class_getter success_url : String?
+
+      # Allows to configure the name to use to include the schema into the template context.
+      def self.schema_context_name(name : String | Symbol)
+        @@schema_context_name = name.to_s
+      end
 
       # Allows to set the route name that should be resolved to produce the URL to when processing a valid schema.
       def self.success_route_name(success_route_name : String?)
@@ -70,7 +78,7 @@ module Marten
       end
 
       def context
-        Marten::Template::Context{"schema" => schema}
+        Marten::Template::Context{self.class.schema_context_name => schema}
       end
 
       def initial_data

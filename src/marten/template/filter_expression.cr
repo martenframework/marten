@@ -61,7 +61,7 @@ module Marten
         ^(?P<variable>#{VARIABLE_RE})|
         (?:\s*\|\s*
           (?P<filter_name>\w+)
-          (?:\:
+          (?:\s*\:\s*
             (?:
               (?P<filter_arg>#{VARIABLE_RE})
             )

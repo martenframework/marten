@@ -17,6 +17,11 @@ describe Marten::Template::FilterExpression do
       expr.resolve(Marten::Template::Context{"foo" => nil, "bar" => 42}).should eq 42
     end
 
+    it "initializes a filter expression with spaces between the filter name and the filter argument" do
+      expr = Marten::Template::FilterExpression.new("foo | default : bar")
+      expr.resolve(Marten::Template::Context{"foo" => nil, "bar" => 42}).should eq 42
+    end
+
     it "initializes a filter expression for a simple variable with multiple filters applied" do
       expr = Marten::Template::FilterExpression.new("foo|default:bar|upcase")
       expr.resolve(Marten::Template::Context{"foo" => nil, "bar" => "hello"}).should eq "HELLO"

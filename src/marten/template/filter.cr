@@ -32,6 +32,7 @@ module Marten
       register "safe", Safe
       register "size", Size
       register "split", Split
+      register "time", Time
       register "upcase", UpCase
     end
   end

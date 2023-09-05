@@ -87,8 +87,6 @@ For example:
 {{ value|size }}
 ```
 
-If `value` is `hello`, then the output will be 5.
-
 ## `split`
 
 The `split` filter converts a string into an array of elements separated by `arg`.
@@ -100,6 +98,16 @@ For example:
 ```
 
 If `value` is `Bananas,Apples,Oranges` and `arg` is `,`, then the output will be ["Bananas","Apples","Oranges"].
+
+## `time`
+
+The `time` filter allows outputting the string representation of a time variable. It requires the specification of a filter argument, which is the format string used to format the time (whose available directives are part of [`Time::Format`](https://crystal-lang.org/api/Time/Format.html)).
+
+```html
+{{ value | time: "%Y-%m-%d" }}
+```
+
+In the above example, the output will be a date string such as `2023-09-25`.
 
 ## `upcase`
 

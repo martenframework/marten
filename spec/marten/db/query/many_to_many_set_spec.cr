@@ -71,6 +71,69 @@ describe Marten::DB::Query::ManyToManySet do
     end
   end
 
+  describe "#clear" do
+    it "clears all the associated records from the many-to-many relationship when no other filters where defined" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag").add(tag_1, tag_2)
+      Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag").add(tag_1, tag_2)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag").clear
+
+      qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+      qset_1.exists?.should be_false
+
+      qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag")
+      qset_2.all.to_set.should eq(Set{tag_1, tag_2})
+    end
+
+    it "clears only the right associated records from the many-to-many relationship when filters where defined" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag").add(tag_1, tag_2)
+      Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag").add(tag_1, tag_2)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+        .filter(name__endswith: "ing")
+        .clear
+
+      qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+      qset_1.all.to_a.should eq [tag_2]
+
+      qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag")
+      qset_2.all.to_set.should eq(Set{tag_1, tag_2})
+    end
+
+    it "does not clear any records from the many-to-many relationship is empty" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "ruby", is_active: true)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag").add(tag_1, tag_2)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag").clear
+
+      qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+      qset_1.exists?.should be_false
+
+      qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag")
+      qset_2.all.to_set.should eq(Set{tag_1, tag_2})
+    end
+  end
+
   describe "#remove" do
     it "removes a given record from the considered object's set of associated objects" do
       user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

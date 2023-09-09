@@ -69,6 +69,24 @@ describe Marten::DB::Query::ManyToManySet do
       qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
       qset.all.to_set.should eq(Set{tag_1, tag_2})
     end
+
+    it "respects the specified connection alias" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.new(name: "coding", is_active: true)
+      tag_1.save!(using: :other)
+      tag_2 = Tag.new(name: "crystal", is_active: true)
+      tag_2.save!(using: :other)
+      Tag.new(name: "ruby", is_active: true).save!(using: :other)
+
+      user.tags.using(:other).add([tag_1, tag_2])
+
+      qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset_1.exists?.should be_false
+
+      qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset_2.using(:other).all.to_set.should eq(Set{tag_1, tag_2})
+    end
   end
 
   describe "#clear" do
@@ -131,6 +149,37 @@ describe Marten::DB::Query::ManyToManySet do
 
       qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag")
       qset_2.all.to_set.should eq(Set{tag_1, tag_2})
+    end
+
+    it "respects the specified connection alias" do
+      user_1 = TestUser.new(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_1.save!(using: :other)
+      user_2 = TestUser.new(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_2.save!(using: :other)
+
+      tag_1 = Tag.new(name: "coding", is_active: true)
+      tag_1.save!(using: :other)
+      tag_2 = Tag.new(name: "crystal", is_active: true)
+      tag_2.save!(using: :other)
+      Tag.new(name: "ruby", is_active: true).save!(using: :other)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+        .using(:other)
+        .add(tag_1, tag_2)
+      Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag")
+        .using(:other)
+        .add(tag_1, tag_2)
+
+      Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+        .using(:other)
+        .filter(name__endswith: "ing")
+        .clear
+
+      qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user_1, "tags", "testuser_tags", "testuser", "tag")
+      qset_1.using(:other).all.to_a.should eq [tag_2]
+
+      qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user_2, "tags", "testuser_tags", "testuser", "tag")
+      qset_2.using(:other).all.to_set.should eq(Set{tag_1, tag_2})
     end
   end
 
@@ -202,6 +251,27 @@ describe Marten::DB::Query::ManyToManySet do
       qset.remove([tag_1, tag_4])
 
       qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset.all.to_set.should eq(Set{tag_2})
+    end
+
+    it "respects the specified connection alias" do
+      user = TestUser.new(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user.save!(using: :other)
+
+      tag_1 = Tag.new(name: "coding", is_active: true)
+      tag_1.save!(using: :other)
+      tag_2 = Tag.new(name: "crystal", is_active: true)
+      tag_2.save!(using: :other)
+      Tag.new(name: "ruby", is_active: true).save!(using: :other)
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag").using(:other)
+      qset.add(tag_1, tag_2)
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag").using(:other)
+      qset.all.to_set.should eq(Set{tag_1, tag_2})
+      qset.remove(tag_1)
+
+      qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag").using(:other)
       qset.all.to_set.should eq(Set{tag_2})
     end
   end

@@ -31,23 +31,26 @@ module Marten
         def add(*objs : M)
           query.connection.transaction do
             # Identify which objects are already added to the many to many relationship and skip them.
-            existing_obj_ids = m2m_field.as(Field::ManyToMany).through._base_queryset.filter(
-              Query::Node.new(
-                {
-                  m2m_through_from_field.id        => @instance.pk.as(Field::Any),
-                  "#{m2m_through_to_field.id}__in" => objs.map(&.pk!.as(Field::Any)).to_a,
-                }
+            existing_object_ids = m2m_field.as(Field::ManyToMany).through._base_queryset
+              .using(query.using)
+              .filter(
+                Query::Node.new(
+                  {
+                    m2m_through_from_field.id        => @instance.pk.as(Field::Any),
+                    "#{m2m_through_to_field.id}__in" => objs.map(&.pk!.as(Field::Any)).to_a,
+                  }
+                )
               )
-            ).pluck([m2m_through_to_field.id]).flatten
+              .pluck([m2m_through_to_field.id]).flatten
 
             # Add each object that was not already in the relationship.
             # TODO: bulk insert those objects instead of insert them one by one.
             objs.each do |obj|
-              next if existing_obj_ids.includes?(obj.id)
+              next if existing_object_ids.includes?(obj.id)
               through_obj = m2m_field.as(Field::ManyToMany).through.new
               through_obj.set_field_value(m2m_through_from_field.id, @instance.pk)
               through_obj.set_field_value(m2m_through_to_field.id, obj.pk)
-              through_obj.save!
+              through_obj.save!(using: query.using)
             end
           end
         end

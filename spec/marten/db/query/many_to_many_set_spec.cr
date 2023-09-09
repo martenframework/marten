@@ -56,5 +56,23 @@ describe Marten::DB::Query::ManyToManySet do
       qset = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
       qset.all.to_set.should eq(Set{tag_1, tag_2})
     end
+
+    it "respects the specified connection alias" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      tag_1 = Tag.new(name: "coding", is_active: true)
+      tag_1.save!(using: :other)
+      tag_2 = Tag.new(name: "crystal", is_active: true)
+      tag_2.save!(using: :other)
+      Tag.new(name: "ruby", is_active: true).save!(using: :other)
+
+      user.tags.using(:other).add([tag_1, tag_2])
+
+      qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset_1.exists?.should be_false
+
+      qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
+      qset_2.using(:other).all.to_set.should eq(Set{tag_1, tag_2})
+    end
   end
 end

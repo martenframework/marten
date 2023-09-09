@@ -71,7 +71,8 @@ describe Marten::DB::Query::ManyToManySet do
     end
 
     it "respects the specified connection alias" do
-      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user = TestUser.new(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user.save!(using: :other)
 
       tag_1 = Tag.new(name: "coding", is_active: true)
       tag_1.save!(using: :other)

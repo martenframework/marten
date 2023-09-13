@@ -127,7 +127,11 @@ module Marten
 
       # Returns an empty response associated with a given status code.
       def head(status : StatusCode) : HTTP::Response
-        HTTP::Response.new(content: "", content_type: "", status: HTTP::Status.status_code(status))
+        HTTP::Response.new(
+          content: "",
+          content_type: "",
+          status: HTTP::Status.status_code(status)
+        )
       end
 
       # Returns an HTTP response containing the passed raw JSON string.
@@ -135,7 +139,11 @@ module Marten
       # The response will use the `application/json` content type and the `200` status code (the latest can be set to
       # something else through the use of the `status` argument).
       def json(raw_json : String, status : Int32 | Symbol = 200)
-        HTTP::Response.new(content: raw_json, content_type: "application/json", status: HTTP::Status.status_code(status))
+        HTTP::Response.new(
+          content: raw_json,
+          content_type: "application/json",
+          status: HTTP::Status.status_code(status)
+        )
       end
 
       # Returns an HTTP response containing the passed object serialized as JSON.
@@ -143,7 +151,11 @@ module Marten
       # The response will use the `application/json` content type and the `200` status code (the latest can be set to
       # something else through the use of the `status` argument).
       def json(serializable, status : StatusCode = 200)
-        HTTP::Response.new(content: serializable.to_json, content_type: "application/json", status: HTTP::Status.status_code(status))
+        HTTP::Response.new(
+          content: serializable.to_json,
+          content_type: "application/json",
+          status: HTTP::Status.status_code(status)
+        )
       end
 
       # Handles an `OPTIONS` HTTP request and returns a `Marten::HTTP::Response` object.

@@ -817,7 +817,6 @@ describe Marten::Handlers::Base do
       response.content.strip.should eq "Hello World, John Doe!"
     end
 
-
     it "allows to specify a specific content type" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

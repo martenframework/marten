@@ -1678,6 +1678,62 @@ describe Marten::DB::Model::Persistence do
       user.profile!.bio.should eq "Updated"
     end
 
+    it "resets reverse many-to-one query sets as expected" do
+      user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      post_1 = Post.create!(title: "Test 1", author: user)
+      post_2 = Post.create!(title: "Test 2", author: user)
+
+      user.posts.map(&.title).to_set.should eq(Set{"Test 1", "Test 2"})
+
+      Post.filter(id: post_1.id).update(title: "Test 1 - Updated")
+      Post.filter(id: post_2.id).update(title: "Test 2 - Updated")
+
+      user.posts.map(&.title).to_set.should eq(Set{"Test 1", "Test 2"})
+
+      user.reload
+
+      user.posts.map(&.title).to_set.should eq(Set{"Test 1 - Updated", "Test 2 - Updated"})
+    end
+
+    it "resets many-to-many query sets as expected" do
+      tag_1 = Tag.create!(name: "Tag 1", is_active: true)
+      tag_2 = Tag.create!(name: "Tag 2", is_active: true)
+
+      user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      user.tags.add(tag_1)
+      user.tags.add(tag_2)
+
+      user.tags.map(&.name).to_set.should eq(Set{"Tag 1", "Tag 2"})
+
+      Tag.filter(id: tag_1.id).update(name: "Tag 1 - Updated")
+
+      user.tags.map(&.name).to_set.should eq(Set{"Tag 1", "Tag 2"})
+
+      user.reload
+
+      user.tags.map(&.name).to_set.should eq(Set{"Tag 1 - Updated", "Tag 2"})
+    end
+
+    it "resets reverse many-to-many query sets as expected" do
+      tag = Tag.create!(name: "Tag 1", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_1.tags.add(tag)
+
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_2.tags.add(tag)
+
+      tag.test_users.map(&.username).to_set.should eq(Set{"jd1", "jd2"})
+
+      TestUser.filter(id: user_1.id).update(username: "jd1updated")
+
+      tag.test_users.map(&.username).to_set.should eq(Set{"jd1", "jd2"})
+
+      tag.reload
+
+      tag.test_users.map(&.username).to_set.should eq(Set{"jd1updated", "jd2"})
+    end
+
     context "with multi table inheritance" do
       it "reloads parent objects as well" do
         address = Marten::DB::Model::PersistenceSpec::Address.create!(street: "Street 1")

@@ -8,7 +8,7 @@ module Marten
         annotation FieldInstanceVariable; end
 
         # :nodoc:
-        annotation ReverseRelationInstanceVariable; end
+        annotation RelationInstanceVariable; end
 
         macro included
           LOOKUP_SEP = {{ Marten::DB::Constants::LOOKUP_SEP }}
@@ -600,8 +600,8 @@ module Marten
           {% end %}
         end
 
-        private def reset_reverse_relations : Nil
-          {% for field_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::Table::ReverseRelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+        private def reset_relation_instance_variables : Nil
+          {% for field_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
             @{{ field_var.id }} = nil
           {% end %}
         end

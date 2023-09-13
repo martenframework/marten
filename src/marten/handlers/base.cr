@@ -23,6 +23,7 @@ module Marten
 
       # :nodoc:
       alias ParamsHash = Hash(String, Routing::Parameter::Types)
+      alias StatusCode = Int32 | Symbol
 
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 
@@ -125,24 +126,24 @@ module Marten
       end
 
       # Returns an empty response associated with a given status code.
-      def head(status : Int32) : HTTP::Response
-        HTTP::Response.new(content: "", content_type: "", status: status)
+      def head(status : StatusCode) : HTTP::Response
+        HTTP::Response.new(content: "", content_type: "", status: HTTP::Status.status_code(status))
       end
 
       # Returns an HTTP response containing the passed raw JSON string.
       #
       # The response will use the `application/json` content type and the `200` status code (the latest can be set to
       # something else through the use of the `status` argument).
-      def json(raw_json : String, status = 200)
-        HTTP::Response.new(content: raw_json, content_type: "application/json", status: status)
+      def json(raw_json : String, status : Int32 | Symbol = 200)
+        HTTP::Response.new(content: raw_json, content_type: "application/json", status: HTTP::Status.status_code(status))
       end
 
       # Returns an HTTP response containing the passed object serialized as JSON.
       #
       # The response will use the `application/json` content type and the `200` status code (the latest can be set to
       # something else through the use of the `status` argument).
-      def json(serializable, status = 200)
-        HTTP::Response.new(content: serializable.to_json, content_type: "application/json", status: status)
+      def json(serializable, status : StatusCode = 200)
+        HTTP::Response.new(content: serializable.to_json, content_type: "application/json", status: HTTP::Status.status_code(status))
       end
 
       # Handles an `OPTIONS` HTTP request and returns a `Marten::HTTP::Response` object.
@@ -183,27 +184,27 @@ module Marten
         template_name : String,
         context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status = 200
+        status : StatusCode = 200
       )
         template_context = Marten::Template::Context.from(context, request)
         template_context["handler"] = self
         HTTP::Response.new(
           content: Marten.templates.get_template(template_name).render(template_context),
           content_type: content_type,
-          status: status
+          status: HTTP::Status.status_code(status)
         )
       end
 
       # Returns an HTTP response generated from a content string, content type and status code.
-      def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status = 200)
-        HTTP::Response.new(content: content, content_type: content_type, status: status)
+      def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status : StatusCode = 200)
+        HTTP::Response.new(content: content, content_type: content_type, status: HTTP::Status.status_code(status))
       end
 
       # Returns a streamed HTTP response generated from an iterator of strings, content type and status code.
       def respond(
         streamed_content : Iterator(String),
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status = 200
+        status : StatusCode = 200
       )
         HTTP::Response::Streaming.new(streamed_content: streamed_content, content_type: content_type, status: status)
       end

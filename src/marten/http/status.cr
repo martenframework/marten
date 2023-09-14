@@ -4,11 +4,7 @@ module Marten
       class UnrecognizedStatusException < Exception
       end
 
-      def self.status_code(status = Int32 | Symbol) : Int32
-        if status.is_a?(Int32)
-          return status
-        end
-
+      def self.status_code(status : Symbol) : Int32
         # https://crystal-lang.org/api/1.9.2/HTTP/Status.html
         case status
         when :continue

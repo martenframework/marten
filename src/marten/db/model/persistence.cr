@@ -138,7 +138,7 @@ module Marten
           reloaded = self.class.get!(pk: pk)
 
           assign_field_values(reloaded.field_values)
-          reset_reverse_relations
+          reset_relation_instance_variables
 
           @new_record = false
 

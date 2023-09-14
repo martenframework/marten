@@ -190,8 +190,12 @@ module Marten
               class ::{{ model_klass }}
                 macro finished
                   class ::{{ related_model_klass }}
+                    @[Marten::DB::Model::Table::RelationInstanceVariable]
+                    @_reverse_m2o_{{ related_field_name.id }} : Marten::DB::Query::RelatedSet({{ model_klass }})?
+
                     def {{ related_field_name.id }}
-                      Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
+                      @_reverse_m2o_{{ related_field_name.id }} ||=
+                        Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
                     end
                   end
                 end

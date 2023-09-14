@@ -97,6 +97,9 @@ module Marten
             {% end %}
 
             class ::{{ model_klass }}
+              @[Marten::DB::Model::Table::RelationInstanceVariable]
+              @_m2m_{{ field_id }} : Marten::DB::Query::ManyToManySet({{ related_model_klass }})?
+
               register_field(
                 {{ @type }}.new(
                   {{ field_id.stringify }},
@@ -106,7 +109,7 @@ module Marten
               )
 
               def {{ field_id }}
-                Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
+                @_m2m_{{ field_id }} ||= Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
                   self,
                   {{ field_id.stringify }},
                   {{ through_to_related_name }},
@@ -140,12 +143,17 @@ module Marten
               class ::{{ model_klass }}
                 macro finished
                   class ::{{ related_model_klass }}
+                    @[Marten::DB::Model::Table::RelationInstanceVariable]
+                    @_reverse_m2m_{{ related_field_name.id }} : Marten::DB::Query::Set({{ model_klass }})?
+
+
                     def {{ related_field_name.id }}
-                      Marten::DB::Query::Set({{ model_klass }}).new.filter(
-                        Marten::DB::Query::Node.new(
-                          {"{{ through_from_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
+                      @_reverse_m2m_{{ related_field_name.id }} ||= Marten::DB::Query::Set({{ model_klass }}).new
+                        .filter(
+                          Marten::DB::Query::Node.new(
+                            {"{{ through_from_related_name.id }}__{{ through_model_to_field_id.id }}" => self}
+                          )
                         )
-                      )
                     end
                   end
                 end

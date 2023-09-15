@@ -189,13 +189,17 @@ module Marten
 
           qs = clone
 
-          if raw
+          deleted_count = if raw
             qs.query.raw_delete
           else
             deletion = Deletion::Runner.new(qs.query.connection)
             deletion.add(qs)
             deletion.execute
           end
+
+          reset_result_cache
+
+          deleted_count
         end
 
         # Returns a new query set that will use SELECT DISTINCT in its query.
@@ -899,14 +903,18 @@ module Marten
         # ```
         #
         # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
-        # are updated through  the use of this method won't be validated, and no callbacks will be executed for them
+        # are updated through the use of this method won't be validated, and no callbacks will be executed for them
         # either.
         def update(values : Hash | NamedTuple)
           update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
           update_hash.merge!(values.to_h)
 
           qs = clone
-          qs.query.update_with(update_hash)
+          updated_count = qs.query.update_with(update_hash)
+
+          reset_result_cache
+
+          updated_count
         end
 
         # Updates all the records matched by the current query set with the passed values.
@@ -920,7 +928,7 @@ module Marten
         # ```
         #
         # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
-        # are updated through  the use of this method won't be validated, and no callbacks will be executed for them
+        # are updated through the use of this method won't be validated, and no callbacks will be executed for them
         # either.
         def update(**kwargs)
           update(kwargs.to_h)
@@ -963,6 +971,10 @@ module Marten
 
         private def raise_negative_indexes_not_supported
           raise Errors::UnmetQuerySetCondition.new("Negative indexes are not supported")
+        end
+
+        private def reset_result_cache
+          @result_cache = nil
         end
       end
     end

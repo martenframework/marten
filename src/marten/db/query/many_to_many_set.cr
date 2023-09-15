@@ -52,6 +52,8 @@ module Marten
               through_obj.set_field_value(m2m_through_to_field.id, obj.pk)
               through_obj.save!(using: query.using)
             end
+
+            reset_result_cache
           end
         end
 

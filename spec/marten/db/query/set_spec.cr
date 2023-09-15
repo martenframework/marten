@@ -617,6 +617,22 @@ describe Marten::DB::Query::Set do
         Marten::DB::Query::Set(Post).new.join(:author).delete
       end
     end
+
+    it "resets cached records" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c)
+
+      qset.to_set.should eq(Set{tag_2, tag_3})
+
+      qset.delete.should eq 2
+
+      qset.to_a.should be_empty
+
+      Marten::DB::Query::Set(Tag).new.to_a.should eq [tag_1]
+    end
   end
 
   describe "#distinct" do
@@ -2182,6 +2198,20 @@ describe Marten::DB::Query::Set do
       user_3.first_name.should eq "Bob"
       user_3.last_name.should eq "Abc"
       user_3.is_admin.should be_falsey
+    end
+
+    it "resets cached records" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      qset = Marten::DB::Query::Set(TestUser).new.filter(first_name: "John")
+
+      qset.to_set.should eq(Set{user_1, user_2})
+
+      qset.update(first_name: "Updated", is_admin: true).should eq 2
+
+      qset.to_a.should be_empty
     end
   end
 

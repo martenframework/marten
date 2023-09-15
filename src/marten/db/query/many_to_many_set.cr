@@ -60,6 +60,8 @@ module Marten
               through_obj.set_field_value(m2m_through_to_field.id, obj.pk)
               through_obj.save!(using: query.using)
             end
+
+            reset_result_cache
           end
         end
 
@@ -77,6 +79,8 @@ module Marten
             end
 
             deletion_qs.delete
+
+            reset_result_cache
           end
         end
 
@@ -99,6 +103,8 @@ module Marten
                 )
               )
               .delete
+
+            reset_result_cache
           end
         end
 

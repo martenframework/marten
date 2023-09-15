@@ -125,48 +125,36 @@ module Marten
       end
 
       # Returns an empty response associated with a given status code.
-      def head(status : Int32) : HTTP::Response
+      def head(status : ::HTTP::Status | Int32) : HTTP::Response
         HTTP::Response.new(
           content: "",
           content_type: "",
-          status: status
+          status: ::HTTP::Status.new(status).to_i
         )
-      end
-
-      def head(status : Symbol) : HTTP::Response
-        head(HTTP::Status.status_code(status))
       end
 
       # Returns an HTTP response containing the passed raw JSON string.
       #
       # The response will use the `application/json` content type and the `200` status code (the latest can be set to
       # something else through the use of the `status` argument).
-      def json(raw_json : String, status : Int32 = 200)
+      def json(raw_json : String, status : ::HTTP::Status | Int32 = 200)
         HTTP::Response.new(
           content: raw_json,
           content_type: "application/json",
-          status: status
+          status: ::HTTP::Status.new(status).to_i
         )
-      end
-
-      def json(raw_json : String, status : Symbol)
-        json(raw_json, HTTP::Status.status_code(status))
       end
 
       # Returns an HTTP response containing the passed object serialized as JSON.
       #
       # The response will use the `application/json` content type and the `200` status code (the latest can be set to
       # something else through the use of the `status` argument).
-      def json(serializable, status : Int32 = 200)
+      def json(serializable, status : ::HTTP::Status | Int32 = 200)
         HTTP::Response.new(
           content: serializable.to_json,
           content_type: "application/json",
-          status: status
+          status: ::HTTP::Status.new(status).to_i
         )
-      end
-
-      def json(serializable, status : Symbol)
-        json(serializable, HTTP::Status.status_code(status))
       end
 
       # Handles an `OPTIONS` HTTP request and returns a `Marten::HTTP::Response` object.
@@ -207,50 +195,41 @@ module Marten
         template_name : String,
         context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : Int32 = 200
+        status : ::HTTP::Status | Int32 = 200
       )
         template_context = Marten::Template::Context.from(context, request)
         template_context["handler"] = self
         HTTP::Response.new(
           content: Marten.templates.get_template(template_name).render(template_context),
           content_type: content_type,
-          status: status
+          status: ::HTTP::Status.new(status).to_i
         )
       end
 
-      def render(
-        template_name : String,
-        context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
-        content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : Symbol = :ok
-      )
-        render(template_name, context, content_type, HTTP::Status.status_code(status))
-      end
-
       # Returns an HTTP response generated from a content string, content type and status code.
-      def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status : Int32 = 200)
-        HTTP::Response.new(content: content, content_type: content_type, status: status)
-      end
-
-      def respond(content = "", content_type = HTTP::Response::DEFAULT_CONTENT_TYPE, status : Symbol = :ok)
-        respond(content, content_type, HTTP::Status.status_code(status))
+      def respond(
+        content = "",
+        content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
+        status : ::HTTP::Status | Int32 = 200
+      )
+        HTTP::Response.new(
+          content: content,
+          content_type: content_type,
+          status: ::HTTP::Status.new(status).to_i
+        )
       end
 
       # Returns a streamed HTTP response generated from an iterator of strings, content type and status code.
       def respond(
         streamed_content : Iterator(String),
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : Int32 = 200
+        status : ::HTTP::Status | Int32 = 200
       )
-        HTTP::Response::Streaming.new(streamed_content: streamed_content, content_type: content_type, status: status)
-      end
-
-      def respond(
-        streamed_content : Iterator(String),
-        content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : Symbol = :ok
-      )
-        respond(streamed_content, content_type, HTTP::Status.status_code(status))
+        HTTP::Response::Streaming.new(
+          streamed_content: streamed_content,
+          content_type: content_type,
+          status: ::HTTP::Status.new(status).to_i
+        )
       end
 
       # Same as `#response` but with a nil-safety check.

@@ -190,12 +190,12 @@ module Marten
           qs = clone
 
           deleted_count = if raw
-            qs.query.raw_delete
-          else
-            deletion = Deletion::Runner.new(qs.query.connection)
-            deletion.add(qs)
-            deletion.execute
-          end
+                            qs.query.raw_delete
+                          else
+                            deletion = Deletion::Runner.new(qs.query.connection)
+                            deletion.add(qs)
+                            deletion.execute
+                          end
 
           reset_result_cache
 

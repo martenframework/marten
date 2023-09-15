@@ -2276,7 +2276,7 @@ describe Marten::DB::Query::Set do
     it "resets cached records" do
       user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
-      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+      TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
 
       qset = Marten::DB::Query::Set(TestUser).new.filter(first_name: "John")
 

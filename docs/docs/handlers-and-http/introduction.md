@@ -115,7 +115,7 @@ respond("Response content", content_type: "text/html", status: 200)
 Unless specified, the `content_type` is set to `text/html` and the `status` is set to `200`.
 
 :::tip
-You can also express the `status` of the response as a symbol that must comply to the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
+You can also express the `status` of the response as a symbol that must comply with the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
 
 ```crystal
 respond("Response content", content_type: "text/html", status: :ok)
@@ -133,7 +133,7 @@ render("path/to/template.html", context: { foo: "bar" }, content_type: "text/htm
 Unless specified, the `content_type` is set to `text/html` and the `status` is set to `200`.
 
 :::tip
-You can also express the `status` of the response as a symbol that must comply to the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
+You can also express the `status` of the response as a symbol that must comply with the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
 
 ```crystal
 render("path/to/template.html", context: { foo: "bar" }, content_type: "text/html", status: :ok)
@@ -159,7 +159,7 @@ head(404)
 ```
 
 :::tip
-You can also express the `status` of the response as a symbol that must comply to the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
+You can also express the `status` of the response as a symbol that must comply with the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
 
 ```crystal
 head :not_found
@@ -177,7 +177,7 @@ json({ foo: "bar" }, status: 200)
 Unless specified, the `status` is set to `200`.
 
 :::tip
-You can also express the `status` of the response as a symbol that must comply to the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
+You can also express the `status` of the response as a symbol that must comply with the values of the [`HTTP::Status`](https://crystal-lang.org/api/HTTP/Status.html) enum. For example:
 
 ```crystal
 json({ foo: "bar" }, status: :ok)

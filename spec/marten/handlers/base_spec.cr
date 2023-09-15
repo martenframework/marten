@@ -800,6 +800,23 @@ describe Marten::Handlers::Base do
       response.content.strip.should eq "Hello World, John Doe!"
     end
 
+    it "allows to specify a specific status code as symbol" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response = handler.render("specs/handlers/base/test.html", context: {name: "John Doe"}, status: :not_found)
+
+      response.status.should eq 404
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
     it "allows to specify a specific content type" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

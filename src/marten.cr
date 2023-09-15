@@ -16,6 +16,7 @@ require "msgpack"
 require "openssl/hmac"
 require "option_parser"
 require "uuid"
+require "http/status"
 
 require "./marten/app"
 require "./marten/apps/*"

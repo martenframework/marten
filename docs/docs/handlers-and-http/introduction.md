@@ -100,6 +100,10 @@ class FormHandler < Marten::Handler
 end
 ```
 
+:::tip
+Note that you can use either strings or symbols when interacting with the routing parameters returned by the `#params` method.
+:::
+
 ### Response helper methods
 
 Technically, it is possible to forge HTTP responses by instantiating the [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) class directly (or one of its subclasses such as [`Marten::HTTP::Response::Found`](pathname:///api/dev/Marten/HTTP/Response/Found.html) for example). That being said, Marten provides a set of helper methods that can be used to conveniently forge responses for various use cases:

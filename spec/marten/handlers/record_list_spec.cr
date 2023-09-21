@@ -22,7 +22,7 @@ describe Marten::Handlers::RecordList do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => user_1.id!}
+      params = Marten::Routing::MatchParameters{"pk" => user_1.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -41,7 +41,7 @@ describe Marten::Handlers::RecordList do
       user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
       TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => user_1.id!}
+      params = Marten::Routing::MatchParameters{"pk" => user_1.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",

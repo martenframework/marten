@@ -24,15 +24,15 @@ describe Marten::Handlers::Base do
         )
       )
 
-      params_1 = Hash(String, Marten::Routing::Parameter::Types){"id" => 42}
+      params_1 = Marten::Routing::MatchParameters{"id" => 42}
       handler_1 = Marten::Handlers::Base.new(request, params_1)
       handler_1.params.should eq({"id" => 42})
 
-      params_2 = Hash(String, Marten::Routing::Parameter::Types){"slug" => "my-slug"}
+      params_2 = Marten::Routing::MatchParameters{"slug" => "my-slug"}
       handler_2 = Marten::Handlers::Base.new(request, params_2)
       handler_2.params.should eq({"slug" => "my-slug"})
 
-      params_3 = Hash(String, Marten::Routing::Parameter::Types){
+      params_3 = Marten::Routing::MatchParameters{
         "id" => ::UUID.new("a288e10f-fffe-46d1-b71a-436e9190cdc3"),
       }
       handler_3 = Marten::Handlers::Base.new(request, params_3)
@@ -102,7 +102,7 @@ describe Marten::Handlers::Base do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"id" => 42}
+      params = Marten::Routing::MatchParameters{"id" => 42}
       handler = Marten::Handlers::Base.new(request, params)
       handler.params.should eq params
     end

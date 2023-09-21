@@ -5,7 +5,7 @@ module Marten
       getter handler
       getter kwargs
 
-      def initialize(@handler : Marten::Handlers::Base.class, @kwargs = {} of String => Parameter::Types)
+      def initialize(@handler : Marten::Handlers::Base.class, @kwargs = MatchParameters.new)
       end
     end
   end

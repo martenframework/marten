@@ -68,7 +68,7 @@ describe Marten::Handlers::RecordRetrieving do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"identifier" => user_1.id!}
+      params = Marten::Routing::MatchParameters{"identifier" => user_1.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -82,7 +82,7 @@ describe Marten::Handlers::RecordRetrieving do
     end
 
     it "raises as expected if the model is not configured" do
-      params = Hash(String, Marten::Routing::Parameter::Types){"identifier" => 42}
+      params = Marten::Routing::MatchParameters{"identifier" => 42}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -99,7 +99,7 @@ describe Marten::Handlers::RecordRetrieving do
       TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"identifier" => -1}
+      params = Marten::Routing::MatchParameters{"identifier" => -1}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",

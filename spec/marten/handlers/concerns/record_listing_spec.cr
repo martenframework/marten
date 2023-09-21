@@ -60,13 +60,13 @@ describe Marten::Handlers::RecordListing do
         )
       )
 
-      params_1 = Hash(String, Marten::Routing::Parameter::Types){"p" => 1}
+      params_1 = Marten::Routing::MatchParameters{"p" => 1}
       handler_1 = Marten::Handlers::RecordListingSpec::TestHandler.new(request, params_1)
       page_1 = handler_1.paginate_queryset
       page_1.number.should eq 1
       page_1.to_a.should eq [user_1, user_2]
 
-      params_2 = Hash(String, Marten::Routing::Parameter::Types){"p" => 2}
+      params_2 = Marten::Routing::MatchParameters{"p" => 2}
       handler_2 = Marten::Handlers::RecordListingSpec::TestHandler.new(request, params_2)
       page_2 = handler_2.paginate_queryset
       page_2.number.should eq 2
@@ -87,13 +87,13 @@ describe Marten::Handlers::RecordListing do
         )
       )
 
-      params_1 = Hash(String, Marten::Routing::Parameter::Types){"p" => "1"}
+      params_1 = Marten::Routing::MatchParameters{"p" => "1"}
       handler_1 = Marten::Handlers::RecordListingSpec::TestHandler.new(request, params_1)
       page_1 = handler_1.paginate_queryset
       page_1.number.should eq 1
       page_1.to_a.should eq [user_1, user_2]
 
-      params_2 = Hash(String, Marten::Routing::Parameter::Types){"p" => "2"}
+      params_2 = Marten::Routing::MatchParameters{"p" => "2"}
       handler_2 = Marten::Handlers::RecordListingSpec::TestHandler.new(request, params_2)
       page_2 = handler_2.paginate_queryset
       page_2.number.should eq 2
@@ -219,13 +219,13 @@ describe Marten::Handlers::RecordListing do
         )
       )
 
-      params_1 = Hash(String, Marten::Routing::Parameter::Types){"p" => 1}
+      params_1 = Marten::Routing::MatchParameters{"p" => 1}
       handler_1 = Marten::Handlers::RecordListingSpec::TestHandlerWithQueryset.new(request, params_1)
       page_1 = handler_1.paginate_queryset
       page_1.number.should eq 1
       page_1.to_a.should eq [user_1, user_2]
 
-      params_2 = Hash(String, Marten::Routing::Parameter::Types){"p" => 2}
+      params_2 = Marten::Routing::MatchParameters{"p" => 2}
       handler_2 = Marten::Handlers::RecordListingSpec::TestHandlerWithQueryset.new(request, params_2)
       page_2 = handler_2.paginate_queryset
       page_2.number.should eq 2

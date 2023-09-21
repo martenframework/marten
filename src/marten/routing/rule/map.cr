@@ -19,7 +19,7 @@ module Marten
           match = @regex.match(path)
           return if match.nil?
 
-          kwargs = {} of String => Parameter::Types
+          kwargs = MatchParameters.new
           match.named_captures.each do |name, value|
             param_handler = @parameters[name]
             kwargs[name] = param_handler.loads(value.to_s)

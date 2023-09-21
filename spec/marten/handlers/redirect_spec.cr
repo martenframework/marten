@@ -111,7 +111,7 @@ describe Marten::Handlers::Redirect do
       request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::DynamicRedirectWithParams.new(
         request,
-        Hash(String, Marten::Routing::Parameter::Types){"id" => 42}
+        Marten::Routing::MatchParameters{"id" => 42}
       )
       response = handler.dispatch
       response.status.should eq 302
@@ -128,7 +128,7 @@ describe Marten::Handlers::Redirect do
       )
       handler = Marten::Handlers::RedirectSpec::HandlerWithQueryStringForwardingEnabled.new(
         request,
-        Hash(String, Marten::Routing::Parameter::Types){"id" => 42}
+        Marten::Routing::MatchParameters{"id" => 42}
       )
       response = handler.dispatch
       response.status.should eq 302

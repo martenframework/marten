@@ -18,7 +18,7 @@ describe Marten::Handlers::RecordUpdate do
     it "returns the expected hash" do
       tag = Marten::Handlers::RecordUpdateSpec::Tag.create(name: "oldtag")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => tag.id!}
+      params = Marten::Routing::MatchParameters{"pk" => tag.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
@@ -38,7 +38,7 @@ describe Marten::Handlers::RecordUpdate do
     it "updates an existing record and returns the expected redirect response if the schema is valid" do
       tag = Marten::Handlers::RecordUpdateSpec::Tag.create(name: "oldtag")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => tag.id!}
+      params = Marten::Routing::MatchParameters{"pk" => tag.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
@@ -59,7 +59,7 @@ describe Marten::Handlers::RecordUpdate do
     it "is able to do partial updatesà" do
       tag = Marten::Handlers::RecordUpdateSpec::Tag.create(name: "oldtag", description: "This is a tag")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => tag.id!}
+      params = Marten::Routing::MatchParameters{"pk" => tag.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
@@ -83,7 +83,7 @@ describe Marten::Handlers::RecordUpdate do
     it "re-renders the template if the schema is not valid and does not update the record" do
       tag = Marten::Handlers::RecordUpdateSpec::Tag.create(name: "oldtag")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => tag.id!}
+      params = Marten::Routing::MatchParameters{"pk" => tag.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
@@ -107,7 +107,7 @@ describe Marten::Handlers::RecordUpdate do
     it "updates the record and returns the expected redirect response" do
       tag = Marten::Handlers::RecordUpdateSpec::Tag.create(name: "oldtag")
 
-      params = Hash(String, Marten::Routing::Parameter::Types){"pk" => tag.id!}
+      params = Marten::Routing::MatchParameters{"pk" => tag.id!}
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",

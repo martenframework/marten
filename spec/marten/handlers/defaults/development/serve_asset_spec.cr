@@ -10,7 +10,7 @@ describe Marten::Handlers::Defaults::Development::ServeAsset do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "css/test.css"}
+      params = Marten::Routing::MatchParameters{"path" => "css/test.css"}
       handler = Marten::Handlers::Defaults::Development::ServeAsset.new(request, params)
 
       response = handler.dispatch
@@ -28,7 +28,7 @@ describe Marten::Handlers::Defaults::Development::ServeAsset do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "unidentified_file"}
+      params = Marten::Routing::MatchParameters{"path" => "unidentified_file"}
       handler = Marten::Handlers::Defaults::Development::ServeAsset.new(request, params)
 
       response = handler.dispatch
@@ -46,7 +46,7 @@ describe Marten::Handlers::Defaults::Development::ServeAsset do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "css/unknown.css"}
+      params = Marten::Routing::MatchParameters{"path" => "css/unknown.css"}
       handler = Marten::Handlers::Defaults::Development::ServeAsset.new(request, params)
 
       response = handler.dispatch
@@ -62,7 +62,7 @@ describe Marten::Handlers::Defaults::Development::ServeAsset do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "css"}
+      params = Marten::Routing::MatchParameters{"path" => "css"}
       handler = Marten::Handlers::Defaults::Development::ServeAsset.new(request, params)
 
       response = handler.dispatch

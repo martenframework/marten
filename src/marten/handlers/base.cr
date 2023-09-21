@@ -21,9 +21,6 @@ module Marten
       include ContentSecurityPolicy
       include XFrameOptions
 
-      # :nodoc:
-      alias ParamsHash = Hash(String, Routing::Parameter::Types)
-
       HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
@@ -50,11 +47,11 @@ module Marten
         @@http_method_names = method_names.to_a.map(&.to_s)
       end
 
-      def initialize(@request : HTTP::Request, @params : ParamsHash)
+      def initialize(@request : HTTP::Request, @params : Routing::MatchParameters)
       end
 
       def initialize(@request : HTTP::Request, **kwargs)
-        @params = ParamsHash.new
+        @params = Routing::MatchParameters.new
         kwargs.each { |key, value| @params[key.to_s] = value }
       end
 

@@ -16,7 +16,7 @@ describe Marten::Handlers::Defaults::Development::ServeMediaFile do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "test/test.txt"}
+      params = Marten::Routing::MatchParameters{"path" => "test/test.txt"}
       handler = Marten::Handlers::Defaults::Development::ServeMediaFile.new(request, params)
 
       response = handler.dispatch
@@ -34,7 +34,7 @@ describe Marten::Handlers::Defaults::Development::ServeMediaFile do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "test/unknown.txt"}
+      params = Marten::Routing::MatchParameters{"path" => "test/unknown.txt"}
       handler = Marten::Handlers::Defaults::Development::ServeMediaFile.new(request, params)
 
       response = handler.dispatch
@@ -52,7 +52,7 @@ describe Marten::Handlers::Defaults::Development::ServeMediaFile do
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
-      params = Hash(String, Marten::Routing::Parameter::Types){"path" => "test"}
+      params = Marten::Routing::MatchParameters{"path" => "test"}
       handler = Marten::Handlers::Defaults::Development::ServeMediaFile.new(request, params)
 
       response = handler.dispatch

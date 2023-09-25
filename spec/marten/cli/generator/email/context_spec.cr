@@ -1,5 +1,5 @@
 require "./spec_helper"
-require "./context/app"
+require "./context_spec/app"
 
 describe Marten::CLI::Generator::Email::Context do
   with_installed_apps Marten::CLI::Generator::Email::ContextSpec::App

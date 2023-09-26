@@ -28,4 +28,5 @@
 /spec/marten/cli/generator_spec/*
 !/spec/marten/cli/generator_spec/app.cr
 /spec/marten/cli/generator/email_spec/main_app/*
+/spec/marten/cli/generator/model_spec/main_app/*
 /spec/marten/cli/manage/command/new_spec

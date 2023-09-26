@@ -1,0 +1,12 @@
+class <%= context.class_name %> < Marten::Model
+  # Learn more about models in Marten at:
+  # https://martenframework.com/docs/models-and-databases/introduction
+
+  <%= context.pk_field_definition.render -%>
+  <% context.field_definitions.each do |field_definition| %>
+  <%= field_definition.render -%>
+  <% end %>
+  <%- if !context.no_timestamps? %>
+  with_timestamps
+  <%- end -%>
+end

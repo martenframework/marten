@@ -11,6 +11,7 @@ module Marten
         @model_arguments = [] of String
         @model_name = ""
         @no_timestamps = false
+        @parent : String? = nil
 
         def setup
           command.on_argument(:name, "Name of the model to generate") { |v| @model_name = v }
@@ -22,6 +23,14 @@ module Marten
             description: "Target app where the model should be created"
           ) do |v|
             @app_label = v
+          end
+
+          command.on_option_with_arg(
+            :parent,
+            arg: "parent",
+            description: "Parent class name for the generated model"
+          ) do |v|
+            @parent = v
           end
 
           command.on_option("no-timestamps", "Do not include timestamp fields in the generated model") do
@@ -54,6 +63,7 @@ module Marten
             name: model_name,
             field_definitions: field_definitions,
             no_timestamps: no_timestamps?,
+            parent: parent,
           )
           create_app_files(app_config, Templates.app_files(context))
         rescue error : Apps::Errors::AppNotFound
@@ -62,6 +72,7 @@ module Marten
 
         private getter app_label
         private getter model_name
+        private getter parent
 
         private getter? no_timestamps
 

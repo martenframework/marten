@@ -75,12 +75,42 @@ describe Marten::CLI::Generator::Model do
         model_content.includes?("with_timestamps").should be_false,
           "Model file should not contain a with_timestamps call"
       end
+
+      it "generates the expected model file when the --parent option is used" do
+        stdin = IO::Memory.new
+        stdout = IO::Memory.new
+        stderr = IO::Memory.new
+        command = Marten::CLI::Manage::Command::Gen.new(
+          options: ["model", "AuthorProfile", "name:string", "bio:text", "--parent=FooBar"],
+          stdin: stdin,
+          stdout: stdout,
+          stderr: stderr
+        )
+
+        command.handle
+
+        File.exists?(File.join("#{__DIR__}/model_spec/main_app/models/author_profile.cr")).should be_true,
+          "Model file does not exist"
+
+        model_content = File.read(File.join("#{__DIR__}/model_spec/main_app/models/author_profile.cr"))
+
+        model_content.includes?("class AuthorProfile < FooBar").should be_true,
+          "Model file does not contain the expected class name"
+        model_content.includes?("field :id, :big_int, primary_key: true, auto: true").should be_true,
+          "Model file does not contain the expected id field"
+        model_content.includes?("field :name, :string, max_size: 255").should be_true,
+          "Model file does not contain the expected name field"
+        model_content.includes?("field :bio, :text").should be_true,
+          "Model file does not contain the expected bio field"
+        model_content.includes?("with_timestamps").should be_true,
+          "Model file does not contain the expected with_timestamps call"
+      end
     end
 
     context "when targetting a specific application" do
       with_installed_apps Marten::CLI::Generator::ModelSpec::App
 
-      it "generates the expected model files" do
+      it "generates the expected model file" do
         stdin = IO::Memory.new
         stdout = IO::Memory.new
         stderr = IO::Memory.new

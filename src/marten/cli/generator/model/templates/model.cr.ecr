@@ -1,4 +1,4 @@
-class <%= context.class_name %> < Marten::Model
+class <%= context.class_name %> < <% if !context.parent.nil? %><%= context.parent %><% else %>Marten::Model<% end %>
   # Learn more about models in Marten at:
   # https://martenframework.com/docs/models-and-databases/introduction
 

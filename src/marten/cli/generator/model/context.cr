@@ -8,6 +8,7 @@ module Marten
           getter app_config
           getter field_definitions
           getter name
+          getter parent
           getter pk_field_definition
 
           getter? no_timestamps
@@ -16,7 +17,8 @@ module Marten
             @app_config : Apps::Config,
             @name : String,
             @field_definitions : Array(FieldDefinition),
-            @no_timestamps : Bool
+            @no_timestamps : Bool = false,
+            @parent : String? = nil
           )
             @pk_field_definition = field_definitions.find(&.primary_key?) || default_pk_field_definition
             field_definitions.delete(pk_field_definition)

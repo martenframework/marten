@@ -15,7 +15,9 @@ module Marten
 
         def setup
           command.on_argument(:name, "Name of the model to generate") { |v| @model_name = v }
-          command.on_unknown_argument { |v| @model_arguments << v }
+          command.on_unknown_argument(:field_definitions, "Field definitions of the model to generate") do |v|
+            @model_arguments << v
+          end
 
           command.on_option_with_arg(
             :app,

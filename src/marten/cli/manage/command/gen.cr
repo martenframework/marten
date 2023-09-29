@@ -68,11 +68,13 @@ module Marten
               effective_argument_descriptions = argument_descriptions.reject { |k, _| k == GENERATOR_ARGUMENT_NAME }
             end
 
+            effective_unknown_args_name = unknown_args_name || "arguments"
+
             banner_parts << "Usage: #{@main_command_name} #{effective_command_name} [options]"
             unless effective_argument_handlers.empty?
               arguments_line = " #{effective_argument_handlers.join(" ") { |h| "[#{h.name}]" }}"
               if !unknown_args_proc.nil?
-                arguments_line += " [arguments]"
+                arguments_line += " [#{effective_unknown_args_name}]"
               end
 
               banner_parts << arguments_line
@@ -84,9 +86,19 @@ module Marten
 
             unless effective_argument_descriptions.empty?
               banner_parts << "Arguments:\n"
+
               banner_parts << effective_argument_descriptions
                 .map { |n, d| format_argument_name_and_description(n, d) }
                 .join("\n")
+
+              if !unknown_args_proc.nil?
+                banner_parts << "\n"
+                banner_parts << format_argument_name_and_description(
+                  effective_unknown_args_name,
+                  unknown_args_description || ""
+                )
+              end
+
               banner_parts << "\n\n"
             end
 

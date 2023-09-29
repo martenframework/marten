@@ -121,7 +121,6 @@ module Marten
           # end
           # ```
           def on_argument(name : String | Symbol, description : String, &block : String ->)
-            name = name.to_s
             @argument_descriptions[name.to_s] = description
             @argument_handlers << ArgumentHandler.new(name.to_s, block)
           end
@@ -241,6 +240,18 @@ module Marten
             @unknown_args_proc = block
           end
 
+          # Allows to configure a proc to call when unknown arguments are encountered.
+          #
+          # This method will configure a proc to call when unknown arguments are encountered. The proc will be called
+          # for each unknown argument, and it will receive the argument value as the first argument. Additionally, this
+          # method allows to specify the name of the unknown arguments (which will be used in the help message) and an
+          # optional description.
+          def on_unknown_argument(name : String | Symbol, description : String? = nil, &block : String ->)
+            @unknown_args_proc = block
+            @unknown_args_name = name.to_s
+            @unknown_args_description = description
+          end
+
           # Allows to print a message to the output file descriptor.
           #
           # This method will print a textual value to the output file descriptor, and it allows to optionally specify
@@ -314,6 +325,8 @@ module Marten
           private getter color
           private getter invalid_option_proc
           private getter options
+          private getter unknown_args_description
+          private getter unknown_args_name
           private getter unknown_args_proc
 
           private getter? exit_raises
@@ -321,23 +334,36 @@ module Marten
           private def banner_parts
             banner_parts = [] of String
 
-            banner_parts << "Usage: #{@main_command_name} #{self.class.command_name} [options]"
-            unless argument_handlers.empty?
-              arguments_line = " #{argument_handlers.join(" ") { |h| "[#{h.name}]" }}"
-              if !unknown_args_proc.nil?
-                arguments_line += " [arguments]"
-              end
+            effective_unknown_args_name = unknown_args_name || "arguments"
 
-              banner_parts << arguments_line
+            banner_parts << "Usage: #{@main_command_name} #{self.class.command_name} [options]"
+
+            if !argument_handlers.empty?
+              banner_parts << " #{argument_handlers.join(" ") { |h| "[#{h.name}]" }}"
+            end
+
+            if !unknown_args_proc.nil?
+              banner_parts << " [#{effective_unknown_args_name}]"
             end
 
             banner_parts << "\n\n"
 
             banner_parts << "#{self.class.help}\n\n" unless self.class.help.empty?
 
-            unless argument_descriptions.empty?
+            if !argument_descriptions.empty? || !unknown_args_proc.nil?
               banner_parts << "Arguments:\n"
-              banner_parts << argument_descriptions.map { |n, d| format_argument_name_and_description(n, d) }.join("\n")
+
+              argument_names_and_descriptions = argument_descriptions
+                .map { |n, d| format_argument_name_and_description(n, d) }
+
+              if !unknown_args_proc.nil?
+                argument_names_and_descriptions << format_argument_name_and_description(
+                  effective_unknown_args_name,
+                  unknown_args_description || ""
+                )
+              end
+
+              banner_parts << argument_names_and_descriptions.join("\n")
               banner_parts << "\n\n"
             end
 

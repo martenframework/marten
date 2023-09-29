@@ -208,6 +208,47 @@ describe Marten::CLI::Manage::Command::Base do
 
       unknown_args.should eq ["value1", "value2"]
     end
+
+    it "allows to configure a callback for unknown arguments and the name of the unknown arguments" do
+      stdout = IO::Memory.new
+      unknown_args = [] of String
+
+      command = Marten::CLI::Manage::Command::BaseSpec::EmptyCommand.new(options: ["value1", "value2"], stdout: stdout)
+      command.setup
+
+      command.on_unknown_argument(:args) do |v|
+        unknown_args << v
+      end
+
+      command.handle
+
+      unknown_args.should eq ["value1", "value2"]
+
+      command.show_usage
+      stdout.rewind.gets_to_end.includes?("args").should be_true
+    end
+
+    it "allows to configure a callback for unknown arguments and the name and description of the unknown arguments" do
+      stdout = IO::Memory.new
+      unknown_args = [] of String
+
+      command = Marten::CLI::Manage::Command::BaseSpec::EmptyCommand.new(options: ["value1", "value2"], stdout: stdout)
+      command.setup
+
+      command.on_unknown_argument(:args, "Unknown arguments") do |v|
+        unknown_args << v
+      end
+
+      command.handle
+
+      unknown_args.should eq ["value1", "value2"]
+
+      command.show_usage
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("args").should be_true
+      output.includes?("Unknown arguments").should be_true
+    end
   end
 
   describe "#print" do

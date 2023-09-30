@@ -99,4 +99,65 @@ describe Marten::CLI::Manage::Command::Gen do
       stdout.rewind.gets_to_end.should_not be_empty
     end
   end
+
+  describe "#show_usage" do
+    it "shows the gen command usage when no generator is specified" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Gen.new(options: ["-h"], stdin: stdin, stdout: stdout, exit_raises: true)
+      command.handle
+
+      stdout.rewind.gets_to_end.chomp("\n").includes?(
+        <<-USAGE
+        Usage: marten gen [options] [generator] [arguments]
+
+        Generate various structures, abstractions, and values within an existing project.
+
+        Arguments:
+            generator                        Name of the generator to use
+
+        Options:
+            --error-trace                    Show full error trace (if a compilation is involved)
+            --no-color                       Disable colored output
+            -h, --help                       Show this help
+
+        Available generators are listed below.
+        USAGE
+      ).should be_true
+    end
+
+    it "shows the usage of the specific generator if a generator name is specified" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["model", "-h"],
+        stdin: stdin,
+        stdout: stdout,
+        exit_raises: true,
+      )
+      command.handle
+
+      stdout.rewind.gets_to_end.chomp("\n").includes?(
+        <<-USAGE
+        Usage: marten gen model [options] [name] [field_definitions]
+
+        Generate a model.
+
+        Arguments:
+            name                             Name of the model to generate
+            field_definitions                Field definitions of the model to generate
+
+        Options:
+            --app=APP                        Target app where the model should be created
+            --parent=PARENT                  Parent class name for the generated model
+            --no-timestamps                  Do not include timestamp fields in the generated model
+            --error-trace                    Show full error trace (if a compilation is involved)
+            --no-color                       Disable colored output
+            -h, --help                       Show this help
+        USAGE
+      ).should be_true
+    end
+  end
 end

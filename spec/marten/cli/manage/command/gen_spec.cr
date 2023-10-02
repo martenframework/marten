@@ -159,5 +159,36 @@ describe Marten::CLI::Manage::Command::Gen do
         USAGE
       ).should be_true
     end
+
+    it "shows the footer description if the specified generator defines one" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["model", "-h"],
+        stdin: stdin,
+        stdout: stdout,
+        exit_raises: true,
+      )
+      command.handle
+
+      stdout.rewind.gets_to_end.chomp("\n").includes?(
+        <<-USAGE
+        Options:
+            --app=APP                        Target app where the model should be created
+            --parent=PARENT                  Parent class name for the generated model
+            --no-timestamps                  Do not include timestamp fields in the generated model
+            --error-trace                    Show full error trace (if a compilation is involved)
+            --no-color                       Disable colored output
+            -h, --help                       Show this help
+
+        Description:
+
+          Generates a model with the specified name and field definitions. The model will be
+          generated in the app specified by the --app option or in the main app if no app is
+          specified.
+        USAGE
+      )
+    end
   end
 end

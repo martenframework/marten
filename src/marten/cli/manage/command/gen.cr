@@ -36,12 +36,13 @@ module Marten
           end
 
           def show_usage
-            if generator.nil?
+            if !(g = generator).nil?
               super
-
-              show_available_generators
+              print("\n")
+              print(g.class.footer_description.to_s) if !g.class.footer_description.nil?
             else
               super
+              show_available_generators
             end
           end
 

@@ -8,14 +8,23 @@ module Marten
       include Apps::Association
 
       @@app_config : Marten::Apps::Config?
+      @@footer_description : String? = nil
       @@generator_name = ""
       @@help : String = ""
+
+      # Returns the footer description of the generator.
+      class_getter footer_description
 
       # Returns the help description of the generator.
       class_getter help
 
       # Returns the command instance that is used to invoke the generator.
       getter command
+
+      # Allows to define a footer description that will be displayed after the generator usage help.
+      def self.footer_description(footer_description : String | Symbol)
+        @@footer_description = footer_description.to_s
+      end
 
       # Returns the name of the considered generator.
       def self.generator_name

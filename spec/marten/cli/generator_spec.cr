@@ -12,6 +12,22 @@ describe Marten::CLI::Generator do
     Marten::CLI::GeneratorSpec.empty_app_path
   end
 
+  describe "#footer_description" do
+    it "returns nil by default" do
+      Marten::CLI::GeneratorSpec::EmptyGenerator.footer_description.should be_nil
+    end
+
+    it "returns the specified footer description" do
+      Marten::CLI::GeneratorSpec::SimpleGenerator.footer_description.should eq "This is a simple generator footer."
+    end
+  end
+
+  describe "#footer_description(footer_description)" do
+    it "allows to configure the footer description of the generator" do
+      Marten::CLI::GeneratorSpec::SimpleGenerator.footer_description.should eq "This is a simple generator footer."
+    end
+  end
+
   describe "::generator_name" do
     it "returns a name generated from the class name if no generator name is explicitly specified" do
       Marten::CLI::GeneratorSpec::EmptyGenerator.generator_name.should eq "empty_generator"
@@ -128,6 +144,7 @@ module Marten::CLI::GeneratorSpec
   class SimpleGenerator < Marten::CLI::Generator
     generator_name :simple
     help "This is a simple generator."
+    footer_description "This is a simple generator footer."
 
     def self.app_config
       TestApp.new

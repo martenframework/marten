@@ -159,6 +159,7 @@ module.exports = {
           type: 'category',
           label: "How-To's",
           items: [
+            'development/how-to/configure-database-backends',
             'development/how-to/create-custom-commands',
           ],
         },

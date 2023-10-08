@@ -38,8 +38,11 @@ module Marten
           def show_usage
             if !(g = generator).nil?
               super
-              print("\n")
-              print(g.class.footer_description.to_s) if !g.class.footer_description.nil?
+
+              if !g.class.footer_description.nil?
+                print("\n")
+                print(g.class.footer_description.to_s)
+              end
             else
               super
               show_available_generators

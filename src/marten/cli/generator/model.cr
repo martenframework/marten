@@ -32,7 +32,7 @@ module Marten
             `modifier` is an optional field modifier. Field modifiers are used to specify additional
             (but non-mandatory) field options. For example: `name:string:uniq` will produce a string
             field whose `unique` option is set to `true`. Another example: `name:string:uniq:index`
-            will produce a string field whose `unique` and `index` options are set to `true`
+            will produce a string field whose `unique` and `index` options are set to `true`.
 
           Examples:
 

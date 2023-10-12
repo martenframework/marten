@@ -12,7 +12,7 @@ jobs:
   crystal:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.9.2
+      image: crystallang/crystal:1.10.0
     steps:
       - uses: actions/checkout@v1
       - name: Install shards
@@ -22,7 +22,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.9.2
+      image: crystallang/crystal:1.10.0
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js 16.x

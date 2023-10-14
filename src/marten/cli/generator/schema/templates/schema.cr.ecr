@@ -1,0 +1,7 @@
+class <%= context.class_name %> < <% if !context.parent.nil? %><%= context.parent %><% else %>Marten::Schema<% end %>
+  # Learn more about schemas in Marten at:
+  # https://martenframework.com/docs/schemas/introduction
+  <% context.field_definitions.each do |field_definition| %>
+  <%= field_definition.render -%>
+  <% end %>
+end

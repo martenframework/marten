@@ -3,7 +3,7 @@ require "./schema/**"
 module Marten
   module CLI
     abstract class Generator
-      # Allows to generate schema.
+      # Allows to generate schemas.
       class Schema < Generator
         help "Generate a schema."
 

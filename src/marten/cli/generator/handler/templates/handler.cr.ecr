@@ -1,0 +1,15 @@
+class <%= context.class_name %> < Marten::Handler
+  # Learn more about handlers in Marten at:
+  # https://martenframework.com/docs/handlers-and-http/introduction
+  #
+  # This handler can be mapped to a URL route by adding the following to your `config/routes.cr` file or to your
+  # application's routes map:
+  #
+  # ```
+  # path "/path/to/handler", <%= context.class_name %>, name: "my_route_name"
+  # ```
+
+  def get
+    respond "Render something for the <%= context.class_name %> handler..."
+  end
+end

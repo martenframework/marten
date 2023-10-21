@@ -24,13 +24,7 @@ module Marten
 
       # Allows to define the lable of the application config.
       def self.label(label : String | Symbol)
-        unless LABEL_RE.match(label.to_s)
-          raise Errors::InvalidAppConfig.new("A label can only contain lowercase letters and underscores")
-        end
-
-        if label.to_s == MainConfig::RESERVED_LABEL
-          raise Errors::InvalidAppConfig.new("App cannot use the 'main' reserved label")
-        end
+        validate_label(label)
 
         @@label = label.to_s
       end
@@ -38,6 +32,19 @@ module Marten
       # Returns the label of the application config.
       def self.label : String
         @@label
+      end
+
+      # Validates the label of the application config.
+      #
+      # Raises `Marten::Apps::Errors::InvalidAppConfig` if the label is invalid.
+      def self.validate_label(label : String | Symbol)
+        unless LABEL_RE.match(label.to_s)
+          raise Errors::InvalidAppConfig.new("App labels can only contain lowercase letters and underscores")
+        end
+
+        if label.to_s == MainConfig::RESERVED_LABEL
+          raise Errors::InvalidAppConfig.new("Apps cannot use the 'main' reserved label")
+        end
       end
 
       def initialize
@@ -104,7 +111,7 @@ module Marten
       end
 
       private ASSETS_DIR     = "assets"
-      private LABEL_RE       = /^[a-z_]+$/
+      private LABEL_RE       = /^[a-z\_]+[a-zA-Z\_0-9]*$/
       private LOCALES_DIR    = "locales"
       private MIGRATIONS_DIR = "migrations"
       private TEMPLATES_DIR  = "templates"

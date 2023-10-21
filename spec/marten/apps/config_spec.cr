@@ -21,6 +21,13 @@ describe Marten::Apps::Config do
 
   describe "::label(label)" do
     it "allows to configure an application label" do
+      Marten::Apps::ConfigSpec::TestConfig.label("test123")
+      Marten::Apps::ConfigSpec::TestConfig.label.should eq "test123"
+
+      Marten::Apps::ConfigSpec::TestConfig.label("test_123")
+      Marten::Apps::ConfigSpec::TestConfig.label.should eq "test_123"
+
+      Marten::Apps::ConfigSpec::TestConfig.label("test")
       Marten::Apps::ConfigSpec::TestConfig.label.should eq "test"
     end
 
@@ -32,6 +39,34 @@ describe Marten::Apps::Config do
 
     it "raises if the passed app label is reserved" do
       expect_raises(Marten::Apps::Errors::InvalidAppConfig) { Marten::Apps::ConfigSpec::DummyConfig.label("main") }
+    end
+  end
+
+  describe "::validate_label" do
+    it "validates valid application labels" do
+      Marten::Apps::ConfigSpec::TestConfig.validate_label("test123")
+      Marten::Apps::ConfigSpec::TestConfig.validate_label("test_123")
+      Marten::Apps::ConfigSpec::TestConfig.validate_label("test")
+    end
+
+    it "raises if the passed app label is not a valid app label" do
+      expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
+        Marten::Apps::ConfigSpec::DummyConfig.validate_label("foo bar")
+      end
+
+      expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
+        Marten::Apps::ConfigSpec::DummyConfig.validate_label("ABC")
+      end
+
+      expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
+        Marten::Apps::ConfigSpec::DummyConfig.validate_label("123")
+      end
+    end
+
+    it "raises if the passed app label is reserved" do
+      expect_raises(Marten::Apps::Errors::InvalidAppConfig) do
+        Marten::Apps::ConfigSpec::DummyConfig.validate_label("main")
+      end
     end
   end
 

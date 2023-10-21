@@ -12,6 +12,8 @@ module Marten
       @@generator_name = ""
       @@help : String = ""
 
+      @warnings = [] of String
+
       # Returns the footer description of the generator.
       class_getter footer_description
 
@@ -20,6 +22,12 @@ module Marten
 
       # Returns the command instance that is used to invoke the generator.
       getter command
+
+      # Returns an array of warning messages that should be printed at the end of the generator execution.
+      getter warnings
+
+      # Allows to set the warning messages that should be printed at the end of the generator execution.
+      setter warnings
 
       # Allows to define a footer description that will be displayed after the generator usage help.
       def self.footer_description(footer_description : String | Symbol)
@@ -74,6 +82,17 @@ module Marten
       end
 
       abstract def run : Nil
+
+      # Prints the warning messages that have been collected during the generator execution.
+      def print_warnings
+        if !warnings.empty?
+          command.print("\n")
+          command.print(command.style("Warnings:", fore: :yellow, mode: :bold))
+          warnings.each do |warning|
+            command.print("  ○ #{warning}")
+          end
+        end
+      end
 
       def setup
       end

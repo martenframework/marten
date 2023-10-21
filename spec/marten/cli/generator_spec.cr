@@ -12,7 +12,7 @@ describe Marten::CLI::Generator do
     Marten::CLI::GeneratorSpec.empty_app_path
   end
 
-  describe "#footer_description" do
+  describe "::footer_description" do
     it "returns nil by default" do
       Marten::CLI::GeneratorSpec::EmptyGenerator.footer_description.should be_nil
     end
@@ -22,7 +22,7 @@ describe Marten::CLI::Generator do
     end
   end
 
-  describe "#footer_description(footer_description)" do
+  describe "::footer_description(footer_description)" do
     it "allows to configure the footer description of the generator" do
       Marten::CLI::GeneratorSpec::SimpleGenerator.footer_description.should eq "This is a simple generator footer."
     end
@@ -127,6 +127,108 @@ describe Marten::CLI::Generator do
       output = stdout.rewind.gets_to_end
       output.includes?("foo/bar/test.txt").should be_true
       output.includes?("foo/bar/test2.txt").should be_true
+    end
+  end
+
+  describe "#print_warnings" do
+    it "prints nothing if the generator did not set any warnings" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+
+      generator.print_warnings
+
+      output = stdout.rewind.gets_to_end
+      output.should eq ""
+    end
+
+    it "prints the warnings set by the generator" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+
+      generator.warnings << "This is a warning"
+      generator.warnings << "Foo bar"
+
+      generator.print_warnings
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("This is a warning").should be_true
+      output.includes?("Foo bar").should be_true
+    end
+  end
+
+  describe "#warnings" do
+    it "returns an empty array of strings by default" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+
+      generator.warnings.should eq [] of String
+    end
+
+    it "returns the warnings set during the execution of the generator" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+
+      generator.warnings << "This is a warning"
+      generator.warnings << "Foo bar"
+
+      generator.warnings.should eq ["This is a warning", "Foo bar"]
+    end
+  end
+
+  describe "#warnings=" do
+    it "allows to set warning messages" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+
+      generator.warnings << "This is a warning"
+      generator.warnings << "Foo bar"
+
+      generator.warnings.should eq ["This is a warning", "Foo bar"]
     end
   end
 end

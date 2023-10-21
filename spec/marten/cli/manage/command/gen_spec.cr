@@ -98,6 +98,26 @@ describe Marten::CLI::Manage::Command::Gen do
       stderr.rewind.gets_to_end.should be_empty
       stdout.rewind.gets_to_end.should_not be_empty
     end
+
+    it "shows the generator warnings at the end of the generator execution" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["withwarnings"],
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr,
+        exit_raises: true
+      )
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("This is a warning").should be_true
+      output.includes?("Foo bar").should be_true
+    end
   end
 
   describe "#show_usage" do
@@ -189,6 +209,22 @@ describe Marten::CLI::Manage::Command::Gen do
           specified.
         USAGE
       )
+    end
+  end
+end
+
+module Marten::CLI::Manage::Command::GenSpec
+  class GeneratorWithWarnings < Marten::CLI::Generator
+    generator_name :withwarnings
+    help "This is a generator with warnings."
+
+    def self.app_config
+      TestApp.new
+    end
+
+    def run : Nil
+      self.warnings << "This is a warning"
+      self.warnings << "Foo bar"
     end
   end
 end

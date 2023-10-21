@@ -60,6 +60,7 @@ module Marten
             end
 
             generator!.run
+            generator!.print_warnings
           end
 
           private GENERATOR_ARGUMENT_NAME = "generator"

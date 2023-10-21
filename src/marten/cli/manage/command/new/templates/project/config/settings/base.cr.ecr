@@ -9,7 +9,7 @@ Marten.configure do |config|
     Auth::App,
   ]
   <%- else -%>
-  # config.installed_apps = []
+  config.installed_apps = [] of Marten::Apps::Config.class
   <%- end -%>
 
   # Application middlewares

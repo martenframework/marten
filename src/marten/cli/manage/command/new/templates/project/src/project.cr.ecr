@@ -5,6 +5,12 @@ require "marten_auth"
 <%- end -%>
 require "sqlite3"
 
+# Configuration requirements.
+require "../config/routes"
+require "../config/settings/base"
+require "../config/settings/**"
+require "../config/initializers/**"
+
 # Project requirements.
 <%- if context.targets_auth? -%>
 require "./apps/auth/app"
@@ -12,9 +18,3 @@ require "./apps/auth/app"
 require "./handlers/**"
 require "./models/**"
 require "./schemas/**"
-
-# Configuration requirements.
-require "../config/routes"
-require "../config/settings/base"
-require "../config/settings/**"
-require "../config/initializers/**"

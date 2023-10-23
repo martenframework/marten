@@ -512,6 +512,50 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::order" do
+    it "allows to order using a specific column specified as a string" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "programming", is_active: true)
+
+      Tag.order("name").to_a.should eq [tag_2, tag_3, tag_1]
+      Tag.order("-name").to_a.should eq [tag_1, tag_3, tag_2]
+    end
+
+    it "allows to order using a specific column specified as a symbol" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "programming", is_active: true)
+
+      Tag.order(:name).to_a.should eq [tag_2, tag_3, tag_1]
+      Tag.order(:"-name").to_a.should eq [tag_1, tag_3, tag_2]
+    end
+
+    it "allows to order using multiple columns" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.order(:first_name, :last_name).to_a.should eq [user_3, user_2, user_1]
+    end
+
+    it "allows to order from an array of strings" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.order(["first_name", "last_name"]).to_a.should eq [user_3, user_2, user_1]
+    end
+
+    it "allows to order from an array of symbols" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.order([:first_name, :last_name]).to_a.should eq [user_3, user_2, user_1]
+    end
+  end
+
   describe "::pluck" do
     context "with double splat arguments" do
       it "allows extracting a specific field value whose name is expressed as a symbol" do

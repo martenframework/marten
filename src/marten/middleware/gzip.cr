@@ -42,12 +42,18 @@ module Marten
       end
 
       private GZIP_ACCEPT_ENCODING_RE       = /\bgzip\b/i
+      private HTB_CHARACTER                 = "a"
+      private HTB_MAX_RANDOM_BYTES          = 100
       private SHORT_RESPONSE_SIZE_THRESHOLD = 200
 
       private def compress(content)
         compressed_io = IO::Memory.new
 
         Compress::Gzip::Writer.open(compressed_io) do |gzip|
+          # Implements Heal The Breach (HTB) attack mitigation by ensuring that the gzip header name is set to a random
+          # string of 100 bytes, which adds randomness to the length of the response.
+          gzip.header.name = random_filename
+
           IO.copy(IO::Memory.new(content), gzip)
         end
 
@@ -55,6 +61,10 @@ module Marten
         compressed_io.close
 
         compressed_content
+      end
+
+      private def random_filename
+        HTB_CHARACTER * Random::Secure.rand(HTB_MAX_RANDOM_BYTES)
       end
     end
   end

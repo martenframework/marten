@@ -200,5 +200,41 @@ describe Marten::Middleware::GZip do
       response.content.should_not eq uncompressed_content
       response.headers[:CONTENT_LENGTH].should eq response.content.bytesize.to_s
     end
+
+    it "adds a random number of bytes to mitigate the BREACH attack" do
+      middleware = Marten::Middleware::GZipSpec::DeterministicMiddleware.new
+
+      uncompressed_content = "It works!" * 100
+
+      response = middleware.call(
+        Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{
+              "Host"            => "example.com",
+              "Accept-Encoding" => "gzip, deflate, br",
+            }
+          )
+        ),
+        ->{ Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
+      )
+
+      response.headers[:CONTENT_ENCODING].should eq "gzip"
+      response.content.should_not eq uncompressed_content
+
+      Compress::Gzip::Reader.open(IO::Memory.new(response.content)) do |gzip|
+        gzip.gets_to_end.should eq uncompressed_content
+        gzip.header.not_nil!.name.should eq middleware.random_filename
+      end
+    end
+  end
+end
+
+module Marten::Middleware::GZipSpec
+  class DeterministicMiddleware < Marten::Middleware::GZip
+    def random_filename
+      "aaaaaaa"
+    end
   end
 end

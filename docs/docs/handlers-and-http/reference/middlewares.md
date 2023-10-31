@@ -53,6 +53,10 @@ This middleware will compress responses that are big enough (200 bytes or more) 
 
 The GZip middleware should be positioned before any other middleware that needs to interact with the response content in the [`middleware`](../../development/reference/settings#middleware) setting. This is to ensure that the compression happens only when the response content is no longer accessed.
 
+:::note
+The GZip middleware incorporates a mitigation strategy against the [BREACH attack](https://www.breachattack.com/). This strategy (described in the [Heal The Breach paper](https://ieeexplore.ieee.org/document/9754554)) involves introducing up to 100 random bytes into GZip responses to enhance the security against such attacks.
+:::
+
 ## I18n middleware
 
 **Class:** [`Marten::Middleware::I18n`](pathname:///api/dev/Marten/Middleware/I18n.html)

@@ -1,0 +1,45 @@
+html, body, td, input {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+body {
+  margin: 0 auto;
+  max-width: 900px;
+  padding: 3rem 6rem;
+}
+
+label, input {
+  display: flex;
+}
+
+label {
+  font-weight: 500;
+}
+
+[type='password'],
+[type='text'],
+textarea {
+  border-radius: 3px;
+  border: 1px solid #cecece;
+  margin: 7px 0 14px 0;
+  max-width: 400px;
+  padding: 8px 6px;
+  width: 100%;
+}
+
+.global-error,
+.input-error {
+  color: brown;
+}
+
+.global-error {
+  padding-bottom: 1rem;
+}
+
+form [type='submit'],
+form button {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 9px 0;
+  padding: 6px 9px;
+}

@@ -1,0 +1,10 @@
+.env
+.icr_*
+.vscode/
+.DS_Store
+*.db
+*.dwarf
+/.shards/
+/bin/
+/lib/
+/tmp/

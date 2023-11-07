@@ -5,6 +5,9 @@ Globs:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
+Lint/DocumentationAdmonition:
+  Enabled: false
+
 Lint/NotNil:
   Enabled: false
 

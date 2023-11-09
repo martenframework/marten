@@ -379,14 +379,20 @@ module Marten::CLI::Manage::Command::NewSpec
   PATH = "spec/marten/cli/manage/command/new_spec"
 
   APP_FILES = [
-    "app.cr",
-    "cli.cr",
-    "emails/.gitkeep",
-    "handlers/.gitkeep",
-    "migrations/.gitkeep",
-    "models/.gitkeep",
-    "schemas/.gitkeep",
-    "templates/.gitkeep",
+    "spec/spec_helper.cr",
+    "src/dummy_app.cr",
+    "src/dummy_app/app.cr",
+    "src/dummy_app/cli.cr",
+    "src/dummy_app/emails/.gitkeep",
+    "src/dummy_app/handlers/.gitkeep",
+    "src/dummy_app/migrations/.gitkeep",
+    "src/dummy_app/models/.gitkeep",
+    "src/dummy_app/routes.cr",
+    "src/dummy_app/schemas/.gitkeep",
+    "src/dummy_app/templates/.gitkeep",
+    ".editorconfig",
+    ".gitignore",
+    "shard.yml",
   ]
 
   PROJECT_FILES = [

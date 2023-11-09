@@ -18,6 +18,10 @@ module Marten
             )
             end
 
+            def capitalized_name : String
+              name.split("_").map(&.capitalize).join
+            end
+
             def targets_auth?
               @targets.includes?(TARGET_AUTH)
             end

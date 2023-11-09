@@ -7,14 +7,23 @@ module Marten
             def self.app_files(context : Context)
               files = Array(Tuple(String, String)).new
 
-              files << {"app.cr", ECR.render("#{__DIR__}/templates/app/app.cr.ecr")}
-              files << {"cli.cr", ECR.render("#{__DIR__}/templates/app/cli.cr.ecr")}
-              files << {"emails/.gitkeep", gitkeep}
-              files << {"handlers/.gitkeep", gitkeep}
-              files << {"migrations/.gitkeep", gitkeep}
-              files << {"models/.gitkeep", gitkeep}
-              files << {"schemas/.gitkeep", gitkeep}
-              files << {"templates/.gitkeep", gitkeep}
+              src_path = "src/#{context.name}/"
+
+              files << {"#{src_path}app.cr", ECR.render("#{__DIR__}/templates/app/src/app/app.cr.ecr")}
+              files << {"#{src_path}cli.cr", ECR.render("#{__DIR__}/templates/app/src/app/cli.cr.ecr")}
+              files << {"#{src_path}routes.cr", ECR.render("#{__DIR__}/templates/app/src/app/routes.cr.ecr")}
+              files << {"#{src_path}emails/.gitkeep", gitkeep}
+              files << {"#{src_path}handlers/.gitkeep", gitkeep}
+              files << {"#{src_path}migrations/.gitkeep", gitkeep}
+              files << {"#{src_path}models/.gitkeep", gitkeep}
+              files << {"#{src_path}schemas/.gitkeep", gitkeep}
+              files << {"#{src_path}templates/.gitkeep", gitkeep}
+              files << {"src/#{context.name}.cr", ECR.render("#{__DIR__}/templates/app/src/app.cr.ecr")}
+              files << {".editorconfig", editorconfig}
+              files << {".gitignore", gitignore}
+              files << {"shard.yml", ECR.render("#{__DIR__}/templates/app/shard.yml.ecr")}
+
+              files << {"spec/spec_helper.cr", ECR.render("#{__DIR__}/templates/app/spec/spec_helper.cr.ecr")}
 
               files
             end
@@ -61,8 +70,8 @@ module Marten
               }
 
               # Other files
-              files << {".editorconfig", ECR.render("#{__DIR__}/templates/project/.editorconfig.ecr")}
-              files << {".gitignore", ECR.render("#{__DIR__}/templates/project/.gitignore.ecr")}
+              files << {".editorconfig", editorconfig}
+              files << {".gitignore", gitignore}
               files << {"manage.cr", ECR.render("#{__DIR__}/templates/project/manage.cr.ecr")}
               files << {"shard.yml", ECR.render("#{__DIR__}/templates/project/shard.yml.ecr")}
 
@@ -267,6 +276,14 @@ module Marten
               end
 
               files
+            end
+
+            private def self.editorconfig
+              ECR.render("#{__DIR__}/templates/shared/.editorconfig.ecr")
+            end
+
+            private def self.gitignore
+              ECR.render("#{__DIR__}/templates/shared/.gitignore.ecr")
             end
 
             private def self.gitkeep

@@ -122,9 +122,9 @@ marten migrate foo 202203111821451 # Applies (or unapply) migrations for the "fo
 
 **Usage:** `marten new [options] [type] [name]`
 
-Initializes a new Marten project or application structure.
+Initializes a new Marten project or application repository structure.
 
-The `new` management command can be used to create either a new project structure or a new [application](../applications) structure. This can be handy when creating new projects or when introducing new applications into an existing project, as it ensures you are following Marten's best practices and conventions.
+The `new` management command can be used to create either a new project repository or a new [application](../applications) repository. This can be handy when creating new projects, or when creating new applications that are intended to be distributed as dedicated shards, as it ensures you are following Marten's best practices and conventions.
 
 The command allows you to fully define the name of your project or application, and in which folder it should be created.
 
@@ -146,9 +146,9 @@ The `type` and `name` arguments are optional: if they are not provided, an inter
 ### Examples
 
 ```bash
-marten new project myblog                         # Creates a "myblog" project
+marten new project myblog                         # Creates a "myblog" project repository structure
 marten new project myblog --dir=./projects/myblog # Creates a "myblog" project in the "./projects/myblog" folder
-marten new app auth                               # Creates an "auth" application
+marten new app auth                               # Creates an "auth" application repository structure
 ```
 
 ## `resetmigrations`

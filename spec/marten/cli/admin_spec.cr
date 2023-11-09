@@ -78,18 +78,24 @@ describe Marten::CLI::Admin do
         FileUtils.rm_rf(File.join(Marten::CLI::AdminSpec::EXISTING_PROJECT_PATH, "new_app"))
       end
 
-      it "supports creating new projects by using the \"new\" management command" do
+      it "supports creating new apps by using the \"new\" management command" do
         Marten::CLI::AdminSpec.run_inside_command(["new", "app", "new_app"])
 
         [
-          "app.cr",
-          "cli.cr",
-          "emails/.gitkeep",
-          "handlers/.gitkeep",
-          "migrations/.gitkeep",
-          "models/.gitkeep",
-          "schemas/.gitkeep",
-          "templates/.gitkeep",
+          "spec/spec_helper.cr",
+          "src/new_app.cr",
+          "src/new_app/app.cr",
+          "src/new_app/cli.cr",
+          "src/new_app/emails/.gitkeep",
+          "src/new_app/handlers/.gitkeep",
+          "src/new_app/migrations/.gitkeep",
+          "src/new_app/models/.gitkeep",
+          "src/new_app/routes.cr",
+          "src/new_app/schemas/.gitkeep",
+          "src/new_app/templates/.gitkeep",
+          ".editorconfig",
+          ".gitignore",
+          "shard.yml",
         ].each do |path|
           File.exists?(File.join("new_app", path)).should be_true, "File #{path} does not exist"
         end

@@ -105,8 +105,8 @@ module Marten
           # Extract field definitions.
           begin
             field_definitions = @model_arguments.map { |a| FieldDefinition.from_argument(a) }
-          rescue error : ArgumentError
-            command.print_error_and_exit(error.message)
+          rescue ex : ArgumentError
+            command.print_error_and_exit(ex.message)
           end
 
           # Generate the model.
@@ -119,8 +119,8 @@ module Marten
             parent: parent,
           )
           create_app_files(app_config, Templates.app_files(context))
-        rescue error : Apps::Errors::AppNotFound
-          command.print_error_and_exit(error.message)
+        rescue ex : Apps::Errors::AppNotFound
+          command.print_error_and_exit(ex.message)
         end
 
         private getter app_label

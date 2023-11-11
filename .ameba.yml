@@ -2,8 +2,12 @@ Globs:
   - "src/**/*.cr"
   - "spec/**/*.cr"
 
-Metrics/CyclomaticComplexity:
+Documentation/DocumentationAdmonition:
   Enabled: false
+
+Layout/LineLength:
+  Enabled: true
+  MaxLength: 120
 
 Lint/DocumentationAdmonition:
   Enabled: false
@@ -11,14 +15,19 @@ Lint/DocumentationAdmonition:
 Lint/NotNil:
   Enabled: false
 
+Lint/SpecFilename:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Naming/AccessorMethodName:
+  Enabled: false
+
 Performance/AnyInsteadOfEmpty:
   Enabled: true
   Excluded:
     - src/marten/db/management/migrations/reader.cr
-
-Layout/LineLength:
-  Enabled: true
-  MaxLength: 120
 
 Style/ParenthesesAroundCondition:
   Enabled: false

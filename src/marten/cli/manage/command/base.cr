@@ -93,8 +93,8 @@ module Marten
           def handle : Int32
             handle!
             0
-          rescue error : Errors::Exit
-            error.code
+          rescue ex : Errors::Exit
+            ex.code
           end
 
           # Setups the command and runs it.

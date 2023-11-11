@@ -178,9 +178,9 @@ module Marten
         rescue Marten::DB::Errors::Rollback
           mark_current_transaction_as_rolled_back
           false
-        rescue error
+        rescue ex
           mark_current_transaction_as_rolled_back
-          raise error
+          raise ex
         ensure
           release_current_transaction
         end

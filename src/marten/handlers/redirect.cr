@@ -2,16 +2,6 @@ module Marten
   module Handlers
     # Handler allowing to conveniently return redirect responses.
     class Redirect < Base
-      # Indicates whether query strings should be copied into the redirect URL or not.
-      #
-      # Defaults to `false`.
-      class_getter forward_query_string : Bool = false
-
-      # Indicates whether the redirection is permanent or not.
-      #
-      # Defaults to `false`.
-      class_getter permanent : Bool = false
-
       # Returns the configured route name that should be resolved to produce the URL to redirect to.
       #
       # Defaults to `nil`.
@@ -21,6 +11,16 @@ module Marten
       #
       # Defaults to `nil`.
       class_getter url : String?
+
+      # Indicates whether query strings should be copied into the redirect URL or not.
+      #
+      # Defaults to `false`.
+      class_getter? forward_query_string : Bool = false
+
+      # Indicates whether the redirection is permanent or not.
+      #
+      # Defaults to `false`.
+      class_getter? permanent : Bool = false
 
       # Allows to configure whether query strings should be copied into the redirect URL.
       def self.forward_query_string(forward_query_string : Bool)
@@ -45,7 +45,7 @@ module Marten
       def get
         url = redirect_url
         return HTTP::Response::Gone.new if url.nil?
-        redirect(url, permanent: self.class.permanent)
+        redirect(url, permanent: self.class.permanent?)
       end
 
       def head
@@ -79,7 +79,7 @@ module Marten
       # the final redirection URL.
       def redirect_url
         url = self.class.url || (self.class.route_name && reverse(self.class.route_name.not_nil!, params))
-        url = "#{url}?#{request.query_params.as_query}" if self.class.forward_query_string
+        url = "#{url}?#{request.query_params.as_query}" if self.class.forward_query_string?
         url
       end
     end

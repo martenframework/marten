@@ -9,15 +9,15 @@ module Marten
 
         def call(context : ::HTTP::Server::Context)
           call_next(context)
-        rescue error : Marten::HTTP::Errors::NotFound | Marten::Routing::Errors::NoResolveMatch
-          process_not_found_error(context, error)
-        rescue error : Marten::HTTP::Errors::SuspiciousOperation
-          process_suspicious_operation_error(context, error)
+        rescue ex : Marten::HTTP::Errors::NotFound | Marten::Routing::Errors::NoResolveMatch
+          process_not_found_error(context, ex)
+        rescue ex : Marten::HTTP::Errors::SuspiciousOperation
+          process_suspicious_operation_error(context, ex)
         rescue Marten::HTTP::Errors::PermissionDenied
           handler = Marten.settings.handler403.new(context.marten.request)
           convert_handler_response(context, handler.dispatch.as(HTTP::Response))
-        rescue error : Exception
-          process_server_error(context, error)
+        rescue ex : Exception
+          process_server_error(context, ex)
         end
 
         private def process_not_found_error(context, error)

@@ -3,25 +3,25 @@ require "./spec_helper"
 describe Marten::DB::Migration do
   describe "::atomic" do
     it "returns true by default" do
-      Marten::DB::MigrationSpec::EmptyMigration.atomic.should be_true
+      Marten::DB::MigrationSpec::EmptyMigration.atomic?.should be_true
     end
 
     it "returns true if migration atomicity is explicitly enabled" do
-      Marten::DB::MigrationSpec::AtomicMigration.atomic.should be_true
+      Marten::DB::MigrationSpec::AtomicMigration.atomic?.should be_true
     end
 
     it "returns false if migration atomicity is disabled" do
-      Marten::DB::MigrationSpec::NonAtomicMigration.atomic.should be_false
+      Marten::DB::MigrationSpec::NonAtomicMigration.atomic?.should be_false
     end
   end
 
   describe "::atomic(atomicity)" do
     it "allows to enable migration atomicity" do
-      Marten::DB::MigrationSpec::AtomicMigration.atomic.should be_true
+      Marten::DB::MigrationSpec::AtomicMigration.atomic?.should be_true
     end
 
     it "allows to disable migration atomicity" do
-      Marten::DB::MigrationSpec::NonAtomicMigration.atomic.should be_false
+      Marten::DB::MigrationSpec::NonAtomicMigration.atomic?.should be_false
     end
   end
 

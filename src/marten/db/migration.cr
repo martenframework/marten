@@ -20,9 +20,10 @@ module Marten
       @@app_config : Marten::Apps::Config?
       @@replacement_ids : Array(String)?
 
-      class_getter atomic : Bool = true
       class_getter depends_on = [] of Tuple(String, String)
       class_getter replaces = [] of Tuple(String, String)
+
+      class_getter? atomic : Bool = true
 
       @faked_operations_registration : Bool = false
       @plan_loading_direction : Symbol?
@@ -141,7 +142,7 @@ module Marten
       end
 
       def atomic?
-        self.class.atomic
+        self.class.atomic?
       end
 
       def id

@@ -23,8 +23,8 @@ module Marten
 
           begin
             Apps::Config.validate_label(app_label)
-          rescue error : Marten::Apps::Errors::InvalidAppConfig
-            command.print_error_and_exit("Invalid application label - #{error.message}")
+          rescue ex : Marten::Apps::Errors::InvalidAppConfig
+            command.print_error_and_exit("Invalid application label - #{ex.message}")
           end
 
           # Ensures that no other app with the same label already exists.

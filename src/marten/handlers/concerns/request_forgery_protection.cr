@@ -181,8 +181,8 @@ module Marten
 
         begin
           expected_csrf_token = get_expected_token(request).not_nil!
-        rescue error : InvalidTokenFormatError
-          return reject(error.message.not_nil!)
+        rescue ex : InvalidTokenFormatError
+          return reject(ex.message.not_nil!)
         rescue NilAssertionError
           return reject("CSRF token is missing")
         end

@@ -53,7 +53,7 @@ describe Marten::DB::Management::SchemaEditor do
               column_name = rs.read(String)
               next unless column_name == "foo"
               column_type = rs.read(String)
-              column_type.should eq "bigint(20)"
+              ["bigint", "bigint(20)"].includes?(column_type).should be_true
             end
           end
 

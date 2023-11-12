@@ -842,7 +842,7 @@ describe Marten::DB::Query::Set do
       tag_3 = Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
 
-      qset = Marten::DB::Query::Set(Tag).new.exclude { q(name__startswith: :r) | q(name: "programming") }
+      qset = Marten::DB::Query::Set(Tag).new.exclude { q(name__startswith: :r) | q(name: "programming") }.order(:id)
 
       qset.to_a.should eq [tag_2, tag_3]
     end

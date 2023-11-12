@@ -310,7 +310,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "foo"
               column_type = rs.read(String)
-              column_type.should eq "bigint(20)"
+              ["bigint(20)", "bigint"].includes?(column_type).should be_true
             end
           end
 
@@ -424,7 +424,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "foo"
               column_type = rs.read(String)
-              column_type.should eq "bigint(20)"
+              ["bigint(20)", "bigint"].includes?(column_type).should be_true
             end
           end
 
@@ -580,7 +580,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
               index_name = current_index_name
 
-              rs.read(Int64) # seq_in_index
+              rs.read(Int32 | Int64) # seq_in_index
 
               index_columns << rs.read(String)
             end
@@ -1105,7 +1105,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
               index_name = current_index_name
 
-              rs.read(Int64) # seq_in_index
+              rs.read(Int32 | Int64) # seq_in_index
 
               index_columns << rs.read(String)
             end
@@ -2320,7 +2320,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "table_id"
               column_type = rs.read(String)
-              column_type.should eq "bigint(20)"
+              ["bigint(20)", "bigint"].includes?(column_type).should be_true
             end
           end
 
@@ -2459,7 +2459,7 @@ describe Marten::DB::Management::SchemaEditor::Base do
               column_name = rs.read(String)
               next unless column_name == "table_id"
               column_type = rs.read(String)
-              column_type.should eq "bigint(20)"
+              ["bigint(20)", "bigint"].includes?(column_type).should be_true
             end
           end
 

@@ -13,7 +13,8 @@ module Marten
             @connection.open do |db|
               db.query(
                 build_sql do |s|
-                  s << "SELECT column_name, data_type, is_nullable, column_default, character_maximum_length"
+                  s << "SELECT column_name, CAST(data_type AS CHAR(255)), is_nullable, column_default, " \
+                       "character_maximum_length"
                   s << "FROM information_schema.columns"
                   s << "WHERE table_name = '#{table_name}' AND table_schema = DATABASE()"
                 end
@@ -69,7 +70,7 @@ module Marten
                   rs.read(String) # table
                   rs.read(Bool)   # non_unique
                   index_name = rs.read(String)
-                  rs.read(Int64) # seq_in_index
+                  rs.read(Int32 | Int64) # seq_in_index
                   index_column_name = rs.read(String)
 
                   indexes_to_columns[index_name] ||= [] of String

@@ -40,21 +40,23 @@ marten help
 This should output something like this:
 
 ```bash
-Usage: marten [command] [arguments]
+Usage: marten [command] [options] [arguments]
 
 Available commands:
 
 [marten]
-  › clearsessions
-  › collectassets
-  › genmigrations
-  › listmigrations
-  › migrate
-  › new
-  › resetmigrations
-  › routes
-  › serve
-  › version
+
+  › clearsessions    Clear all expired sessions.
+  › collectassets    Collect all the assets and copy them in a unique storage.
+  › gen / g          Generate various structures, abstractions, and values within an existing project.
+  › genmigrations    Generate new database migrations.
+  › listmigrations   List all database migrations.
+  › migrate          Run database migrations.
+  › new              Initialize a new Marten project or application repository.
+  › resetmigrations  Reset an existing set of migrations into a single one.
+  › routes           Display all the routes of the application.
+  › serve / s        Start a development server that is automatically recompiled when source files change.
+  › version          Show the Marten version.
 
 Run a command followed by --help to see command specific information, ex:
 marten [command] --help

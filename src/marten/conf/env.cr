@@ -4,8 +4,8 @@ module Marten
       DEVELOPMENT = "development"
       TEST        = "test"
 
-      def ==(value : String) : Bool
-        id == value
+      def ==(other : String) : Bool
+        id == other
       end
 
       def id

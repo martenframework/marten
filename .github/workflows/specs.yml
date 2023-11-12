@@ -13,7 +13,7 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  mysql:
+  mysql57:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -24,6 +24,48 @@ jobs:
         ports:
           - 3307:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+    continue-on-error: ${{ matrix.crystal == 'nightly' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        crystal: [
+          '1.8.2',
+          '1.9.2',
+          '1.10.0',
+          'nightly',
+        ]
+    container:
+      image: crystallang/crystal:${{ matrix.crystal }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for MySQL
+      run: |
+        apt-get update
+        apt-get -yqq install mysql-client libmysqlclient-dev
+    - name: Create additional DB for MySQL
+      run: |
+        mysql -u root -h mysql --password=mysql -e 'create database marten_other_test;'
+      env:
+        PGPASSWORD: mysql
+    - name: Install shards
+      run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Setup env JSON file
+      run: cp .spec.env.json.ci .spec.env.json
+    - name: Run tests
+      run: scripts/run_batched_specs
+      env:
+        MARTEN_SPEC_DB_CONNECTION: mysql
+  mysql8:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8
+        env:
+          MYSQL_ROOT_PASSWORD: "mysql"
+          MYSQL_DATABASE: marten_test
+        ports:
+          - 3307:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=mysql -e MYSQL_USER=marten_test -e MYSQL_PASSWORD=marten_test -e MYSQL_DATABASE=marten_test --entrypoint sh mysql:8 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
     continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false

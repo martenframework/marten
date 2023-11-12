@@ -82,7 +82,7 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
 
               index_name = current_index_name
 
-              rs.read(Int64) # seq_in_index
+              rs.read(Int32 | Int64) # seq_in_index
 
               index_columns << rs.read(String)
             end

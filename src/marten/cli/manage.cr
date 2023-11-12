@@ -73,7 +73,7 @@ module Marten
       end
 
       private USAGE_HEADER = <<-USAGE_HEADER
-        Usage: %s [command] [arguments]
+        Usage: %s [command] [options] [arguments]
 
         Available commands:
 

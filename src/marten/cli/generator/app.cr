@@ -10,7 +10,7 @@ module Marten
         @app_label = ""
 
         def setup
-          command.on_argument(:label, "Label of the application to generate") do |v|
+          command.on_argument(:label, label_argument_description) do |v|
             @app_label = v
           end
         end
@@ -40,19 +40,15 @@ module Marten
 
           # Generate the application.
           command.print("Generating app #{command.style(app_label, mode: :bold)}...\n\n")
-          context = Context.new(Marten.apps.default, app_label)
-          create_app_files(Marten.apps.default, Templates.app_files(context))
-          add_application_requirement(context)
-          add_application_cli_requirement(context)
-          add_application_to_installed_apps_setting(context)
-          add_route_to_main_routes_map(context)
+          context = Context.new(Marten.apps.main, app_label)
+          generate_app(context)
         end
 
         private getter app_label
 
         private def add_application_cli_requirement(context)
           command.print("› Adding application CLI requirement...", ending: "")
-          project_cr_file_path = Path.new(Marten.apps.default.class._marten_app_location).expand.join("cli.cr")
+          project_cr_file_path = Path.new(Marten.apps.main.class._marten_app_location).expand.join("cli.cr")
 
           if File.exists?(project_cr_file_path)
             File.open(project_cr_file_path, "a") do |f|
@@ -72,7 +68,7 @@ module Marten
 
         private def add_application_requirement(context)
           command.print("› Adding application requirement...", ending: "")
-          project_cr_file_path = Path.new(Marten.apps.default.class._marten_app_location).expand.join("project.cr")
+          project_cr_file_path = Path.new(Marten.apps.main.class._marten_app_location).expand.join("project.cr")
 
           if File.exists?(project_cr_file_path)
             File.open(project_cr_file_path, "a") do |f|
@@ -92,7 +88,7 @@ module Marten
 
         private def add_application_to_installed_apps_setting(context)
           command.print("› Adding application to installed_apps setting...", ending: "")
-          base_settings_file = Path.new(Marten.apps.default.class._marten_app_location)
+          base_settings_file = Path.new(Marten.apps.main.class._marten_app_location)
             .expand
             .join("../config/settings/base.cr")
 
@@ -117,7 +113,7 @@ module Marten
               ].join("\n")
             end
 
-            # If the content was modified, write it back to the file, otherwise adds the installed_apps setting.
+            # If the content was modified, write it back to the file, otherwise generates a warning.
             if !modified_content.empty?
               File.open(base_settings_file, "w") do |f|
                 f.rewind
@@ -138,7 +134,7 @@ module Marten
 
         private def add_route_to_main_routes_map(context)
           command.print("› Adding app route to main routes map...", ending: "")
-          routes_file = Path.new(Marten.apps.default.class._marten_app_location)
+          routes_file = Path.new(Marten.apps.main.class._marten_app_location)
             .expand
             .join("../config/routes.cr")
 
@@ -171,6 +167,22 @@ module Marten
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
             self.warnings << "Could not add app route to main routes map (no config/routes.cr file)"
           end
+        end
+
+        private def create_files(context)
+          create_app_files(Marten.apps.main, Templates.app_files(context))
+        end
+
+        private def generate_app(context)
+          create_files(context)
+          add_application_requirement(context)
+          add_application_cli_requirement(context)
+          add_application_to_installed_apps_setting(context)
+          add_route_to_main_routes_map(context)
+        end
+
+        private def label_argument_description
+          "Label of the application to generate"
         end
       end
     end

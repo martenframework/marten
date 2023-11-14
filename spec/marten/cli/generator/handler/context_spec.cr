@@ -7,7 +7,7 @@ describe Marten::CLI::Generator::Handler::Context do
   describe "#class_name" do
     it "returns the expected class name if the handler should be created in the main application" do
       context = Marten::CLI::Generator::Handler::Context.new(
-        app_config: Marten.apps.default,
+        app_config: Marten.apps.main,
         name: "TestHandler",
       )
 
@@ -36,7 +36,7 @@ describe Marten::CLI::Generator::Handler::Context do
   describe "#handler_filename" do
     it "returns the handler filename" do
       context = Marten::CLI::Generator::Handler::Context.new(
-        app_config: Marten.apps.default,
+        app_config: Marten.apps.main,
         name: "TestHandler",
       )
 

@@ -7,7 +7,7 @@ describe Marten::CLI::Generator::Schema::Context do
   describe "#class_name" do
     it "returns the expected class name if the schema should be created in the main application" do
       context = Marten::CLI::Generator::Schema::Context.new(
-        app_config: Marten.apps.default,
+        app_config: Marten.apps.main,
         name: "MySchema",
         field_definitions: [] of Marten::CLI::Generator::Schema::FieldDefinition,
       )
@@ -39,7 +39,7 @@ describe Marten::CLI::Generator::Schema::Context do
   describe "#schema_filename" do
     it "returns the schema filename" do
       context = Marten::CLI::Generator::Schema::Context.new(
-        app_config: Marten.apps.default,
+        app_config: Marten.apps.main,
         name: "ArticleSchema",
         field_definitions: [] of Marten::CLI::Generator::Schema::FieldDefinition,
       )

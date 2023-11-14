@@ -86,7 +86,7 @@ module Marten
       # `files` must be an array of tuples where the first element is the path of the file to create and the second
       # element is the content of the file.
       def create_spec_files(files : Array(Tuple(String, String)))
-        expanded_dir = Path.new(Marten.apps.default.class._marten_app_location).expand.join("../spec")
+        expanded_dir = Path.new(Marten.apps.main.class._marten_app_location).expand.join("../spec")
 
         files.sort_by { |f| f[0] }.each do |file_path, file_content|
           full_path = expanded_dir.join(file_path)

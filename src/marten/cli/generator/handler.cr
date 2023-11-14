@@ -26,7 +26,7 @@ module Marten
 
         def run : Nil
           # Fetch the specified app or default to the main one.
-          app_config = (l = app_label).nil? ? Marten.apps.default : Marten.apps.get(l)
+          app_config = (l = app_label).nil? ? Marten.apps.main : Marten.apps.get(l)
 
           # Validate the handler name.
           if handler_name.empty?

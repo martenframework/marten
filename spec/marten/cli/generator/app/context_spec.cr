@@ -15,11 +15,11 @@ describe Marten::CLI::Generator::App::Context do
   describe "#app_class_name" do
     it "returns the expected value" do
       context_1 = Marten::CLI::Generator::App::Context.new(
-        main_app_config: Marten.apps.default,
+        main_app_config: Marten.apps.main,
         label: "blog",
       )
       context_2 = Marten::CLI::Generator::App::Context.new(
-        main_app_config: Marten.apps.default,
+        main_app_config: Marten.apps.main,
         label: "test_app",
       )
 
@@ -33,7 +33,7 @@ describe Marten::CLI::Generator::App::Context do
       FileUtils.mkdir_p("#{__DIR__}/context_spec/project/apps")
 
       context = Marten::CLI::Generator::App::Context.new(
-        main_app_config: Marten.apps.default,
+        main_app_config: Marten.apps.main,
         label: "blog",
       )
 
@@ -42,7 +42,7 @@ describe Marten::CLI::Generator::App::Context do
 
     it "returns false if the apps folder does not exist" do
       context = Marten::CLI::Generator::App::Context.new(
-        main_app_config: Marten.apps.default,
+        main_app_config: Marten.apps.main,
         label: "blog",
       )
 
@@ -53,11 +53,11 @@ describe Marten::CLI::Generator::App::Context do
   describe "#module_name" do
     it "returns the expected value" do
       context_1 = Marten::CLI::Generator::App::Context.new(
-        main_app_config: Marten.apps.default,
+        main_app_config: Marten.apps.main,
         label: "blog",
       )
       context_2 = Marten::CLI::Generator::App::Context.new(
-        main_app_config: Marten.apps.default,
+        main_app_config: Marten.apps.main,
         label: "test_app",
       )
 

@@ -6,7 +6,7 @@ describe Marten::CLI::Generator::Email::Context do
 
   describe "#email_filename" do
     it "returns the email filename" do
-      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.default, "TestEmail")
+      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.main, "TestEmail")
 
       context.email_filename.should eq "test_email.cr"
     end
@@ -14,7 +14,7 @@ describe Marten::CLI::Generator::Email::Context do
 
   describe "#class_name" do
     it "returns the expected class name if the email should be created in the main application" do
-      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.default, "TestEmail")
+      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.main, "TestEmail")
 
       context.class_name.should eq "TestEmail"
     end
@@ -37,7 +37,7 @@ describe Marten::CLI::Generator::Email::Context do
 
   describe "#html_template_filepath" do
     it "returns the expected filepath if the email should be created in the main application" do
-      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.default, "TestEmail")
+      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.main, "TestEmail")
 
       context.html_template_filepath.should eq "emails/test_email.html"
     end
@@ -51,7 +51,7 @@ describe Marten::CLI::Generator::Email::Context do
 
   describe "#text_template_filepath" do
     it "returns the expected filepath if the email should be created in the main application" do
-      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.default, "TestEmail")
+      context = Marten::CLI::Generator::Email::Context.new(Marten.apps.main, "TestEmail")
 
       context.text_template_filepath.should eq "emails/test_email.txt"
     end

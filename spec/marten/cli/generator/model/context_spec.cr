@@ -7,7 +7,7 @@ describe Marten::CLI::Generator::Model::Context do
   describe "#class_name" do
     it "returns the expected class name if the model should be created in the main application" do
       context = Marten::CLI::Generator::Model::Context.new(
-        app_config: Marten.apps.default,
+        app_config: Marten.apps.main,
         name: "AuthorProfile",
         field_definitions: [] of Marten::CLI::Generator::Model::FieldDefinition,
         no_timestamps: false,
@@ -59,7 +59,7 @@ describe Marten::CLI::Generator::Model::Context do
   describe "#model_filename" do
     it "returns the model filename" do
       context = Marten::CLI::Generator::Model::Context.new(
-        app_config: Marten.apps.default,
+        app_config: Marten.apps.main,
         name: "AuthorProfile",
         field_definitions: [] of Marten::CLI::Generator::Model::FieldDefinition,
         no_timestamps: false,

@@ -130,6 +130,64 @@ describe Marten::CLI::Generator do
     end
   end
 
+  describe "#create_spec_files" do
+    with_main_app_location "#{__DIR__}/generator_spec/project/src"
+
+    it "creates top-level files under the specified spec folder" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+      generator.create_spec_files(
+        [
+          {"test.txt", "Hello world"},
+          {"test2.txt", "Hello world 2"},
+        ]
+      )
+
+      File.read("#{__DIR__}/generator_spec/project/spec/test.txt").should eq "Hello world"
+      File.read("#{__DIR__}/generator_spec/project/spec/test2.txt").should eq "Hello world 2"
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("test.txt").should be_true
+      output.includes?("test2.txt").should be_true
+    end
+
+    it "creates folders and underlying files under the spec folder" do
+      stdin = IO::Memory.new
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+      command = Marten::CLI::Manage::Command::Gen.new(
+        options: ["secretkey"] of String,
+        stdin: stdin,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      generator = Marten::CLI::GeneratorSpec::SimpleGenerator.new(command)
+      generator.create_spec_files(
+        [
+          {"foo/bar/test.txt", "Hello world"},
+          {"foo/bar/test2.txt", "Hello world 2"},
+        ]
+      )
+
+      File.read("#{__DIR__}/generator_spec/project/spec/foo/bar/test.txt").should eq "Hello world"
+      File.read("#{__DIR__}/generator_spec/project/spec/foo/bar/test2.txt").should eq "Hello world 2"
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("foo/bar/test.txt").should be_true
+      output.includes?("foo/bar/test2.txt").should be_true
+    end
+  end
+
   describe "#print_warnings" do
     it "prints nothing if the generator did not set any warnings" do
       stdin = IO::Memory.new

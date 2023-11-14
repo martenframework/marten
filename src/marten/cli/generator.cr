@@ -81,6 +81,27 @@ module Marten
         end
       end
 
+      # Creates the specified files under the project's spec folder.
+      #
+      # `files` must be an array of tuples where the first element is the path of the file to create and the second
+      # element is the content of the file.
+      def create_spec_files(files : Array(Tuple(String, String)))
+        expanded_dir = Path.new(Marten.apps.default.class._marten_app_location).expand.join("../spec")
+
+        files.sort_by { |f| f[0] }.each do |file_path, file_content|
+          full_path = expanded_dir.join(file_path)
+
+          command.print(
+            "› Creating #{command.style(full_path.relative_to(FileUtils.pwd), fore: :cyan, mode: :bold)}...", ending: ""
+          )
+
+          Dir.mkdir_p(full_path.dirname)
+          File.write(full_path, file_content)
+
+          command.print(command.style(" DONE", fore: :light_green, mode: :bold))
+        end
+      end
+
       abstract def run : Nil
 
       # Prints the warning messages that have been collected during the generator execution.

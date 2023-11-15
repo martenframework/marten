@@ -224,5 +224,6 @@ jobs:
         shards install --ignore-crystal-version --skip-postinstall --skip-executables
         cd lib && rm -rf marten && ln -s ../../.. marten
         cd .. && crystal run manage.cr -- g auth my_auth
+        shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Run generated project tests
       run: cd tmp/test-auth && crystal spec

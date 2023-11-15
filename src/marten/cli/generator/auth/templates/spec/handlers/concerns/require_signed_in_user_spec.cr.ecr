@@ -1,0 +1,41 @@
+require "./spec_helper"
+
+describe <%= context.module_name %>::RequireSignedInUser do
+  describe "#process_dispatch" do
+    it "generates the expected redirect response if the current user is not signed in" do
+      user = create_user(email: "test@example.com", password: "insecure")
+
+      request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+
+      handler = <%= context.module_name %>::RequireSignedInUserSpec::TestHandler.new(request)
+      response = handler.process_dispatch
+
+      response.status.should eq 302
+      response.headers["Location"].should eq Marten.routes.reverse("<%= context.label %>:sign_in")
+    end
+
+    it "does not redirect if the user is signed in" do
+      user = create_user(email: "test@example.com", password: "insecure")
+
+      request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
+      request.session = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
+      MartenAuth.sign_in(request, user)
+
+      handler = <%= context.module_name %>::RequireSignedInUserSpec::TestHandler.new(request)
+      response = handler.process_dispatch
+
+      response.status.should eq 200
+      response.content.should eq "It works!"
+    end
+  end
+end
+
+module <%= context.module_name %>::RequireSignedInUserSpec
+  class TestHandler < Marten::Handler
+    include <%= context.module_name %>::RequireSignedInUser
+
+    def get
+      respond "It works!"
+    end
+  end
+end

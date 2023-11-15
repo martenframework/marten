@@ -1,0 +1,12 @@
+require "./concerns/*"
+
+module <%= context.module_name %>
+  class SignOutHandler < Marten::Handler
+    include RequireSignedInUser
+
+    def dispatch
+      MartenAuth.sign_out(request)
+      redirect reverse("<%= context.label %>:sign_in")
+    end
+  end
+end

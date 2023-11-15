@@ -1,0 +1,11 @@
+module <%= context.module_name %>
+  module RequireSignedInUser
+    macro included
+      before_dispatch :require_signed_in_user
+    end
+
+    private def require_signed_in_user
+      redirect reverse("<%= context.label %>:sign_in") unless request.user?
+    end
+  end
+end

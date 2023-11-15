@@ -1,0 +1,9 @@
+require "./concerns/*"
+
+module <%= context.module_name %>
+  class ProfileHandler < Marten::Handlers::Template
+    include RequireSignedInUser
+
+    template_name "<%= context.label %>/profile.html"
+  end
+end

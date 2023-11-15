@@ -98,7 +98,8 @@ module Marten
             # Find and modify the installed_apps array definition
             modified_content = content.gsub(/\h+(config\.installed_apps\s*=\s*\[[^\]]*\])/) do |match|
               installed_app_names = match
-                .match!(/\[([\s\S]*?)\]/)[1]
+                .match(/\[([\s\S]*?)\]/)
+                .not_nil![1]
                 .split(",")
                 .map(&.strip)
                 .reject(&.empty?)

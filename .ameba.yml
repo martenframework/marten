@@ -15,6 +15,9 @@ Lint/DocumentationAdmonition:
 Lint/NotNil:
   Enabled: false
 
+Lint/NotNilAfterNoBang:
+  Enabled: false
+
 Lint/SpecFilename:
   Enabled: false
 

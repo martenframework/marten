@@ -5,8 +5,9 @@ module Marten
         class Context
           getter app_config
           getter name
+          getter parent
 
-          def initialize(@app_config : Apps::Config, @name : String)
+          def initialize(@app_config : Apps::Config, @name : String, @parent : String? = nil)
           end
 
           def email_filename

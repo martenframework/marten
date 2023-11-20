@@ -93,6 +93,33 @@ describe Marten::CLI::Generator::Email do
           .includes?("class Marten::CLI::Generator::EmailSpec::TestEmail < Marten::Email").should be_true
       end
 
+      it "uses the specified parent class" do
+        stdin = IO::Memory.new
+        stdout = IO::Memory.new
+        stderr = IO::Memory.new
+
+        command = Marten::CLI::Manage::Command::Gen.new(
+          options: ["email", "TestEmail", "--app=cli_generator_email_spec_other_app", "--parent=ParentEmail"],
+          stdin: stdin,
+          stdout: stdout,
+          stderr: stderr
+        )
+
+        command.handle
+
+        [
+          "emails/test_email.cr",
+          "templates/cli_generator_email_spec_other_app/emails/test_email.html",
+          "templates/cli_generator_email_spec_other_app/emails/test_email.txt",
+        ].each do |path|
+          File.exists?(File.join("#{__DIR__}/email_spec/other_app/", path))
+            .should be_true, "File #{path} does not exist"
+        end
+
+        File.read(File.join("#{__DIR__}/email_spec/other_app/emails/test_email.cr"))
+          .includes?("class Marten::CLI::Generator::EmailSpec::TestEmail < ParentEmail").should be_true
+      end
+
       it "prints the expected error message and exit if the application does not exist" do
         stdin = IO::Memory.new
         stdout = IO::Memory.new

@@ -1,4 +1,4 @@
-class <%= context.class_name %> < Marten::Email
+class <%= context.class_name %> < <% if !context.parent.nil? %><%= context.parent %><% else %>Marten::Email<% end %>
   # Learn more about emailing in Marten at:
   # https://martenframework.com/docs/emailing/introduction
   #

@@ -44,6 +44,39 @@ marten collectassets            # Collects all the assets
 marten collectassets --no-input # Collects all the assets without any prompts
 ```
 
+## `gen`
+
+**Usage:** `marten gen [options] [generator] [arguments]`
+
+Generate various structures, abstractions, and values within an existing project.
+
+### Options
+
+Generators support their own specific options. For an exact list of generator options, please refer to the [Generators reference](./generators).
+
+### Arguments
+
+* `generator` - Name of the generator to use
+* `arguments` - Generator-specific arguments
+
+Generators support their own specific arguments. For an exact list of generator arguments, please refer to the [Generators reference](./generators).
+
+### Examples
+
+```bash
+marten gen secretkey                    # Generate a secret key value
+marten gen email WelcomeEmail           # Generate a WelcomeEmail email in the main application
+marten gen handler MyHandler --app=blog # Generate a MyHandler handler in the blog application
+```
+
+:::tip
+You can also use the alias `g` to execute specific generators:
+
+```bash
+marten g model Test label:string:uniq
+```
+:::
+
 ## `genmigrations`
 
 **Usage:** `marten genmigrations [options] [app_label]`

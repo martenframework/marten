@@ -169,6 +169,7 @@ module.exports = {
           items: [
             'development/reference/settings',
             'development/reference/management-commands',
+            'development/reference/generators',
           ],
         },
       ],

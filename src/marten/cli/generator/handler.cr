@@ -9,6 +9,7 @@ module Marten
 
         @app_label : String? = nil
         @handler_name = ""
+        @parent : String? = nil
 
         def setup
           command.on_argument(:name, "Name of the handler to generate (must be CamelCase)") do |v|
@@ -21,6 +22,14 @@ module Marten
             description: "Target app where the handler should be created"
           ) do |v|
             @app_label = v
+          end
+
+          command.on_option_with_arg(
+            :parent,
+            arg: "parent",
+            description: "Parent class name for the generated handler"
+          ) do |v|
+            @parent = v
           end
         end
 
@@ -42,7 +51,7 @@ module Marten
 
           # Generate the handler.
           print_generation_message(app_config, handler_name)
-          context = Context.new(app_config, handler_name)
+          context = Context.new(app_config, handler_name, parent)
           create_app_files(app_config, Templates.app_files(context))
         rescue e : Apps::Errors::AppNotFound
           command.print_error_and_exit(e.message)
@@ -52,6 +61,7 @@ module Marten
 
         private getter app_label
         private getter handler_name
+        private getter parent
 
         private setter handler_name
 

@@ -86,6 +86,30 @@ describe Marten::CLI::Generator::Handler do
         ).should be_true, "Handler file does not contain the expected class name"
       end
 
+      it "generates the expected handler file when a parent class is specified" do
+        stdin = IO::Memory.new
+        stdout = IO::Memory.new
+        stderr = IO::Memory.new
+        command = Marten::CLI::Manage::Command::Gen.new(
+          options: ["handler", "TestHandler", "--app=cli_generator_handler_spec_other_app", "--parent=OtherHandler"],
+          stdin: stdin,
+          stdout: stdout,
+          stderr: stderr,
+          exit_raises: true,
+        )
+
+        command.handle
+
+        File.exists?(File.join("#{__DIR__}/handler_spec/other_app/handlers/test_handler.cr")).should be_true,
+          "Handler file does not exist"
+
+        handler_content = File.read(File.join("#{__DIR__}/handler_spec/other_app/handlers/test_handler.cr"))
+
+        handler_content.includes?(
+          "class Marten::CLI::Generator::HandlerSpec::TestHandler < OtherHandler"
+        ).should be_true, "Handler file does not contain the expected class name"
+      end
+
       it "prints the expected error message and exit if the application does not exist" do
         stdin = IO::Memory.new
         stdout = IO::Memory.new

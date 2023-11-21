@@ -1,4 +1,4 @@
-class <%= context.class_name %> < Marten::Handler
+class <%= context.class_name %> < <% if !context.parent.nil? %><%= context.parent %><% else %>Marten::Handler<% end %>
   # Learn more about handlers in Marten at:
   # https://martenframework.com/docs/handlers-and-http/introduction
   #

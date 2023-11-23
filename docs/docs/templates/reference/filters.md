@@ -41,6 +41,18 @@ For example:
 
 If `value` is "Hello", then the output will be "hello".
 
+## `escape`
+
+The `escape` filter replaces special characters (namely &, <, >, " and ')  in the template variable with their corresponding HTML entities.
+
+For example:
+
+```html
+{{ value|escape }}
+```
+
+If `value` is `<b>Let's do it</b>`, then the output will be `&lt;b&gt;Let&#39;s do it&lt;/b&gt;`.
+
 ## `join`
 
 The `join` filter converts an array of elements into a string separated by `arg`.

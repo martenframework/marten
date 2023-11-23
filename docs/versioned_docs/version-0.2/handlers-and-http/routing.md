@@ -91,7 +91,7 @@ end
 
 Marten.routes.draw do
   path "/", HomeHandler, name: "home"
-  path "/articles", Articles::ROUTES, name: "articles"
+  path "/articles", ARTICLE_ROUTES, name: "articles"
 end
 ```
 

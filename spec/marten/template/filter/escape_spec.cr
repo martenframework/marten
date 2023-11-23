@@ -9,5 +9,10 @@ describe Marten::Template::Filter::Escape do
       filter.apply(Marten::Template::Value.from("\"Tom\" & \"Jerry\""))
         .should eq "&quot;Tom&quot; &amp; &quot;Jerry&quot;"
     end
+
+    it "returns safe strings" do
+      filter = Marten::Template::Filter::Escape.new
+      filter.apply(Marten::Template::Value.from("<b>Let's do it</b>")).raw.should be_a Marten::Template::SafeString
+    end
   end
 end

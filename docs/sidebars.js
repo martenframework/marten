@@ -154,6 +154,7 @@ module.exports = {
         'development/settings',
         'development/applications',
         'development/management-commands',
+        'development/generators',
         'development/testing',
         {
           type: 'category',

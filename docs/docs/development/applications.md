@@ -4,11 +4,11 @@ description: Learn how to leverage applications to structure your projects.
 sidebar_label: Applications
 ---
 
-Marten projects can be organized into logical and reusable components called "applications". These applications can contribute specific behaviors and abstractions to a project, including [models](../models-and-databases), [handlers](../handlers-and-http), and [templates](../templates). They can be packaged and reused across various projects as well.
+Marten projects can be organized into logical and reusable components called "applications". These applications can contribute specific behaviors and abstractions to a project, including [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas/introduction), [emails](../emailing/introduction), and [templates](../templates). They can be packaged and reused across various projects as well.
 
 ## Overview
 
-A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases), [handlers](../handlers-and-http), [templates](../templates), [schemas](../schemas/), etc.
+A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases), [handlers](../handlers-and-http), [templates](../templates), [schemas](../schemas/), [emails](../emailing/introduction), etc.
 
 Marten projects always use one or many applications. Indeed, each Marten project comes with a default [main application](#the-main-application) that corresponds to the standard `src` folder: models, migrations, or other classes defined in this folder are associated with the main application by default (unless they are part of another _explicitly defined_ application). As projects grow in size and scope, it is generally encouraged to start thinking in terms of applications and how to split models, handlers, or features across multiple apps depending on their intended responsibilities.
 
@@ -60,16 +60,17 @@ This is why it is always important to _namespace_ abstractions, assets, template
 
 ## Creating applications
 
-Creating applications can be done very easily through the use of the [`new`](./reference/management-commands#new) management command. For example:
+Creating applications can be done very easily through the use of the [`app`](./reference/generators#app) generator. For example:
 
 ```bash
-marten new app blog --dir=src/blog
+marten gen app blog
 ```
 
-Running such a command will usually create the following directory structure:
+Running such a command will add a new `blog` application to the current project with the following structure:
 
 ```
 src/blog
+├── emails
 ├── handlers
 ├── migrations
 ├── models
@@ -83,21 +84,33 @@ These files and folders are described below:
 
 | Path | Description |
 | ----------- | ----------- |
-| handlers/ | Empty directory where the request handlers of the application will be defined. |
-| migrations/ | Empty directory that will store the migrations that will be generated for the models of the application. |
-| models/ | Empty directory where the models of the application will be defined. |
-| schemas/ | Empty directory where the schemas of the application will be defined. |
-| templates/ | Empty directory where the templates of the application will be defined. |
-| app.cr | Definition of the application configuration abstraction; this is also where application files requirements should be defined. |
-| cli.cr | Requirements of CLI-related files, such as migrations for example. |
+| `emails/` | Empty directory where the [emails](../emailing/introduction) of the application will be defined. |
+| `handlers/` | Empty directory where the [request handlers](../handlers-and-http/introduction) of the application will be defined. |
+| `migrations/` | Empty directory that will store the [migrations](../models-and-databases/migrations) that will be generated for the models of the application. |
+| `models/` | Empty directory where the [models](../models-and-databases/introduction) of the application will be defined. |
+| `schemas/` | Empty directory where the [schemas](../schemas/introduction) of the application will be defined. |
+| `templates/` | Empty directory where the [templates](../templates/introduction) of the application will be defined. |
+| `app.cr` | Definition of the application configuration abstraction; this is also where application-specific file requirements should be made. |
+| `cli.cr` | Requirements of CLI-related files, such as migrations for example. |
+| `routes.cr` | Module containing the [routes](../handlers-and-http/routing) of the application. |
+
+:::tip
+The [`app`](./reference/generators#app) generator automatically ensures that:
+
+* The newly created application is added to the [`installed_apps`](./reference/settings#installed_apps) setting. 
+* Requirements for the application itself are added to the `src/project.cr` and `src/cli.cr` files.
+* The application's routes are included in the main routes map (which lives in the `config/routes.cr` file).
+:::
 
 The most important file of an application is the `app.cr` one. This file usually includes all the app requirements and defines the application configuration class itself, which must be a subclass of the [`Marten::App`](pathname:///api/dev/Marten/App.html) abstract class. This class allows mainly to define the "label" identifier of the application (through the use of the [`#label`](pathname:///api/dev/Marten/Apps/Config.html#label(label%3AString|Symbol)-class-method) class method): this identifier must be unique across all the installed applications of a project and is used to generate things like model table names or migration classes.
 
 Here is an example `app.cr` file content for a hypothetic "blog" app:
 
 ```crystal
+require "./emails/**"
 require "./handlers/**"
 require "./models/**"
+require "./routes"
 require "./schemas/**"
 
 module Blog

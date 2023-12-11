@@ -42,8 +42,8 @@ describe Marten::CLI::Generator::Model do
           "Model file does not contain the expected name field"
         model_content.includes?("field :bio, :text").should be_true,
           "Model file does not contain the expected bio field"
-        model_content.includes?("with_timestamps").should be_true,
-          "Model file does not contain the expected with_timestamps call"
+        model_content.includes?("with_timestamp_fields").should be_true,
+          "Model file does not contain the expected with_timestamp_fields call"
       end
 
       it "generates the expected model file when the --no-timestamps option is set" do
@@ -72,8 +72,8 @@ describe Marten::CLI::Generator::Model do
           "Model file does not contain the expected name field"
         model_content.includes?("field :bio, :text").should be_true,
           "Model file does not contain the expected bio field"
-        model_content.includes?("with_timestamps").should be_false,
-          "Model file should not contain a with_timestamps call"
+        model_content.includes?("with_timestamp_fields").should be_false,
+          "Model file should not contain a with_timestamp_fields call"
       end
 
       it "generates the expected model file when the --parent option is used" do
@@ -102,8 +102,8 @@ describe Marten::CLI::Generator::Model do
           "Model file does not contain the expected name field"
         model_content.includes?("field :bio, :text").should be_true,
           "Model file does not contain the expected bio field"
-        model_content.includes?("with_timestamps").should be_true,
-          "Model file does not contain the expected with_timestamps call"
+        model_content.includes?("with_timestamp_fields").should be_true,
+          "Model file does not contain the expected with_timestamp_fields call"
       end
     end
 
@@ -138,8 +138,8 @@ describe Marten::CLI::Generator::Model do
           "Model file does not contain the expected name field"
         model_content.includes?("field :bio, :text").should be_true,
           "Model file does not contain the expected bio field"
-        model_content.includes?("with_timestamps").should be_true,
-          "Model file does not contain the expected with_timestamps call"
+        model_content.includes?("with_timestamp_fields").should be_true,
+          "Model file does not contain the expected with_timestamp_fields call"
       end
 
       it "prints the expected error message and exit if the application does not exist" do

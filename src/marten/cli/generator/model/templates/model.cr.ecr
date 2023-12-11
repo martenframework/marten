@@ -7,6 +7,6 @@ class <%= context.class_name %> < <% if !context.parent.nil? %><%= context.paren
   <%= field_definition.render -%>
   <% end %>
   <%- if !context.no_timestamps? %>
-  with_timestamps
+  with_timestamp_fields
   <%- end -%>
 end

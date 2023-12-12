@@ -43,7 +43,7 @@ If `value` is "Hello", then the output will be "hello".
 
 ## `escape`
 
-The `escape` filter replaces special characters (namely &, <, >, " and ')  in the template variable with their corresponding HTML entities.
+The `escape` filter replaces special characters (namely `&`, `<`, `>`, `"` and `'`)  in the template variable with their corresponding HTML entities.
 
 For example:
 

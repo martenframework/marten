@@ -8,7 +8,7 @@ Marten allows the generation of new projects with a built-in authentication appl
 
 ## Overview
 
-Marten's [`new`](../development/reference/management-commands#new) management allows the generation of projects with a built-in `auth` application. This application is part of the created project: it provides the necessary [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) allowing to authenticate users with email addresses and passwords, while also supporting standard password reset flows. On top of that, an `Auth::User` model is automatically generated for your newly created projects. Since this model is also part of your project, this means that it's possible to easily add new fields to it and generate migrations for it as well.
+Marten's [`new`](../development/reference/management-commands#new) management command allows the generation of projects with a built-in `auth` application. This application is part of the created project: it provides the necessary [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) allowing to authenticate users with email addresses and passwords, while also supporting standard password reset flows. On top of that, an `Auth::User` model is automatically generated for your newly created projects. Since this model is also part of your project, this means that it's possible to easily add new fields to it and generate migrations for it as well.
 
 Here is the list of responsibilities of the generated authentication application:
 

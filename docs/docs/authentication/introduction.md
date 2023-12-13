@@ -8,7 +8,9 @@ Marten allows the generation of new projects with a built-in authentication appl
 
 ## Overview
 
-Marten's [`new`](../development/reference/management-commands#new) management command allows the generation of projects with a built-in `auth` application. This application is part of the created project: it provides the necessary [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) allowing to authenticate users with email addresses and passwords, while also supporting standard password reset flows. On top of that, an `Auth::User` model is automatically generated for your newly created projects. Since this model is also part of your project, this means that it's possible to easily add new fields to it and generate migrations for it as well.
+Marten's [`new`](../development/reference/management-commands#new) management command allows the generation of projects with a built-in `auth` application. The same application can also be added to existing projects by leveraging the [`auth`](../development/reference/generators#auth) generator.
+
+The generated authentication application is part of your project: it provides the necessary [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) allowing to authenticate users with email addresses and passwords, while also supporting standard password reset flows. On top of that, an `Auth::User` model is automatically generated for your newly created projects. Since this model is also part of your project, this means that it's possible to easily add new fields to it and generate migrations for it as well.
 
 Here is the list of responsibilities of the generated authentication application:
 
@@ -36,6 +38,36 @@ You can test the generated authentication application by going to your applicati
 
 :::info
 You can see the full list of files generated for the `auth` application in [Generated files](./reference/generated-files).
+:::
+
+## Adding authentication to existing projects
+
+The [`auth`](../development/reference/generators#auth) generator can be leveraged in order to add an authentication application to an existing project.
+
+For example, the following command will add a new authentication app with the `auth` label to the current project:
+
+```bash
+marten gen auth
+```
+
+:::tip
+Note that you can also customize the label given to the generated authentication app by providing an additional argument containing the intended app label:
+
+```bash
+marten gen auth my_auth
+```
+:::
+
+This generator will add an authentication application under your project's `src` folder (or `src/apps` folder if it is defined). As mentioned previously, this application provides a set of [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) that implement basic authentication operations.
+
+Note that the generator will also add the generated application to the [`installed_apps`](../development/reference/settings#installed_apps) setting and will also configure Crystal requirements for it (in the `src/project.cr` and `src/cli.cr` files). It will also add authentication-related settings to your base settings file and will add the [`marten-auth`](https://github.com/martenframework/marten-auth) shard to your project's `shard.yml` automatically.
+
+:::info
+You can see the full list of files generated for the generated authentication application in [Generated files](./reference/generated-files).
+:::
+
+:::tip
+Don't forget to run [`marten migrate`](../development/reference/management-commands#migrate) after the authentication app has been generated so that your user model gets created at the database level. You should also check the `config/routes.cr` file or run the [`marten routes`](../development/reference/management-commands#routes) management command to see the routes associated with your generated authentication app.
 :::
 
 ## Usage

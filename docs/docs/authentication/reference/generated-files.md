@@ -3,11 +3,11 @@ title: Generated files
 description: Generated files reference.
 ---
 
-This page provides a reference of the files that are generated for the `auth` application when running the [`new`](../../development/reference/management-commands#new) management command with the `--with-auth` option.
+This page provides a reference of the files that are generated for the `auth` application when running the [`new`](../../development/reference/management-commands#new) management command with the `--with-auth` option or when using the [`auth`](../../development/reference/generators#auth) generator.
 
 ## Application
 
-The `auth` application is generated under the `src/apps/auth` folder. In addition to the abstractions mentioned below, this folder defines the following top-level files:
+The `auth` application is generated under the `src` or `src/apps` folder. In addition to the abstractions mentioned below, this folder defines the following top-level files:
 
 * `app.cr` - The entrypoint of the `auth` application, where all the other abstractions are required
 * `cli.cr` - The CLI entrypoint of the `auth` application, where CLI-related abstractions (like migrations) are required

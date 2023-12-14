@@ -73,7 +73,7 @@ const darkTheme = themes.dracula;
       },
       prism: {
         theme: themes.okaidia,
-        additionalLanguages: ['ruby', 'crystal'],
+        additionalLanguages: ['ruby', 'crystal', 'bash'],
       },
       algolia: {
         appId: 'EQ32BI3T7E',

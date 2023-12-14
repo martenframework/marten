@@ -3,7 +3,7 @@ title: Generators
 description: Learn how to use generators in Marten.
 ---
 
-Marten features a generator mechanism that simplifies the creation of various abstractions, files and, structures within an existing project. This feature facilitates the generation of key components such as [models](../models-and-databases/introduction), [schemas](../schemas/introduction), [emails](../emailing/introduction), or [applications](./applications). By leveraging generators, developers can improve their workflow and speed up the development of their Marten projects while following best practices.
+Marten features a generator mechanism that simplifies the creation of various abstractions, files, and structures within an existing project. This feature facilitates the generation of key components such as [models](../models-and-databases/introduction), [schemas](../schemas/introduction), [emails](../emailing/introduction), or [applications](./applications). By leveraging generators, developers can improve their workflow and speed up the development of their Marten projects while following best practices.
 
 ## Usage
 

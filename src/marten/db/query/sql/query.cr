@@ -292,23 +292,9 @@ module Marten
 
             sql = build_sql do |s|
               if column_name
-                column_name = column_name.to_s
-                s << "SELECT COUNT(#{column_name})"
+                build_count_column_specific_subquery_query(s, column_name)
               else
-                s << "SELECT COUNT(*)"
-              end
-              s << "FROM ("
-              s << "SELECT"
-
-              if distinct
-                s << connection.distinct_clause_for(distinct_columns)
-                s << columns
-              else
-                if column_name
-                  s << "#{Model.db_table}.#{column_name}"
-                else
-                  s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
-                end
+                build_count_default_subquery_query(s)
               end
 
               s << "FROM #{table_name}"
@@ -320,6 +306,33 @@ module Marten
             end
 
             {sql, parameters}
+          end
+
+          private def build_count_column_specific_subquery_query(s, column_name : String | Symbol)
+            column_name = column_name.to_s
+
+            s << "SELECT COUNT(#{column_name})"
+            s << "FROM ("
+            s << "SELECT"
+
+            if distinct
+              s << connection.distinct_clause_for(distinct_columns)
+            end
+
+            s << "#{Model.db_table}.#{column_name}"
+          end
+
+          private def build_count_default_subquery_query(s)
+            s << "SELECT COUNT(*)"
+            s << "FROM ("
+            s << "SELECT"
+
+            if distinct
+              s << connection.distinct_clause_for(distinct_columns)
+              s << columns
+            else
+              s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
+            end
           end
 
           private def build_delete_query

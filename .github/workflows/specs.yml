@@ -113,7 +113,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db_version: ['12', '13', '14', '15', 'latest']
+        db_version: ['14', '15', '16']
         crystal: [
           '1.8.2',
           '1.9.2',

@@ -541,6 +541,20 @@ describe Marten::DB::Model::Table do
     end
   end
 
+  describe "#pk?" do
+    it "returns true if a primary key value is set on the record" do
+      tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")
+
+      tag.pk?.should be_true
+    end
+
+    it "returns false if a primary key value is not set on the record" do
+      tag = Marten::DB::Model::TableSpec::Tag.new(name: "crystal")
+
+      tag.pk?.should be_false
+    end
+  end
+
   describe "#pk!" do
     it "returns the primary key field value" do
       tag = Marten::DB::Model::TableSpec::Tag.create!(name: "crystal")

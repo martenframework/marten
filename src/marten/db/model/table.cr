@@ -369,6 +369,11 @@ module Marten
           {% end %}
         end
 
+        # Returns true if a primary key value is set on the record.
+        def pk? : Bool
+          self.class.pk_field.getter_value?(pk)
+        end
+
         # Returns the primary key value or raise `NilAssertionError`.
         def pk!
           pk.not_nil!

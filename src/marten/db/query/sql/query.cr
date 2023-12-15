@@ -86,8 +86,8 @@ module Marten
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
-          def count
-            sql, parameters = build_count_query
+          def count(column_name : String | Symbol | Nil = nil)
+            sql, parameters = build_count_query(column_name)
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               result.to_s.to_i
@@ -286,12 +286,17 @@ module Marten
             rows_affected.not_nil!
           end
 
-          private def build_count_query
+          private def build_count_query(column_name : String | Symbol | Nil = nil)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << "SELECT COUNT(*)"
+              if column_name
+                column_name = column_name.to_s
+                s << "SELECT COUNT(#{column_name})"
+              else
+                s << "SELECT COUNT(*)"
+              end
               s << "FROM ("
               s << "SELECT"
 
@@ -299,7 +304,11 @@ module Marten
                 s << connection.distinct_clause_for(distinct_columns)
                 s << columns
               else
-                s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
+                if column_name
+                  s << "#{Model.db_table}.#{column_name}"
+                else
+                  s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
+                end
               end
 
               s << "FROM #{table_name}"

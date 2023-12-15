@@ -780,6 +780,31 @@ describe Marten::DB::Query::SQL::Query do
       Marten::DB::Query::SQL::Query(Tag).new.count.should eq 3
     end
 
+    it "returns the expected number of results for an unfiltered query with specific column defined" do
+      address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+
+      student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Article.create!(title: "Top things", author: student)
+      Marten::DB::Query::SQL::QuerySpec::Article.create!(
+        title: "Top things 2",
+        subtitle: "Rise of the top things",
+        author: student
+      )
+      Marten::DB::Query::SQL::QuerySpec::Article.create!(
+        title: "Top things 3",
+        subtitle: "Top things awakening",
+        author: student
+      )
+
+      Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Article).new.count(:subtitle).should eq 2
+    end
+
     it "returns the expected number of results for a filtered query" do
       Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)

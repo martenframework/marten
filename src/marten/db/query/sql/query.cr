@@ -286,15 +286,15 @@ module Marten
             rows_affected.not_nil!
           end
 
-          private def build_count_query(column_name : String | Symbol | Nil = nil)
+          private def build_count_query(field : String | Symbol | Nil = nil)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              if column_name
-                build_count_column_specific_subquery_query(s, column_name)
+              s << if field
+                build_count_column_specific_subquery_query(field)
               else
-                build_count_default_subquery_query(s)
+                build_count_default_subquery_query
               end
 
               s << "FROM #{table_name}"
@@ -308,30 +308,35 @@ module Marten
             {sql, parameters}
           end
 
-          private def build_count_column_specific_subquery_query(s, column_name : String | Symbol)
-            column_name = column_name.to_s
+          private def build_count_column_specific_subquery_query(field : String | Symbol)
+            field = field.to_s
 
-            s << "SELECT COUNT(#{column_name})"
-            s << "FROM ("
-            s << "SELECT"
+            build_sql do |s|
+              s << "SELECT COUNT(#{field})"
+              s << "FROM ("
+              s << "SELECT"
 
-            if distinct
-              s << connection.distinct_clause_for(distinct_columns)
+              if distinct
+                s << connection.distinct_clause_for(distinct_columns)
+              end
+
+              s << "#{Model.db_table}.#{field}"
             end
 
-            s << "#{Model.db_table}.#{column_name}"
           end
 
-          private def build_count_default_subquery_query(s)
-            s << "SELECT COUNT(*)"
-            s << "FROM ("
-            s << "SELECT"
+          private def build_count_default_subquery_query
+            build_sql do |s|
+              s << "SELECT COUNT(*)"
+              s << "FROM ("
+              s << "SELECT"
 
-            if distinct
-              s << connection.distinct_clause_for(distinct_columns)
-              s << columns
-            else
-              s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
+              if distinct
+                s << connection.distinct_clause_for(distinct_columns)
+                s << columns
+              else
+                s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
+              end
             end
           end
 

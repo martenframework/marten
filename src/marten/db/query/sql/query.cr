@@ -322,7 +322,6 @@ module Marten
 
               s << "#{Model.db_table}.#{field}"
             end
-
           end
 
           private def build_count_default_subquery_query

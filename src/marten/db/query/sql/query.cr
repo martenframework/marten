@@ -86,8 +86,8 @@ module Marten
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
-          def count(column_name : String | Symbol | Nil = nil)
-            sql, parameters = build_count_query(column_name)
+          def count(field : String | Symbol | Nil = nil)
+            sql, parameters = build_count_query(field)
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               result.to_s.to_i

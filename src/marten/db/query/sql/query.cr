@@ -43,6 +43,7 @@ module Marten
             @limit : Int64?,
             @offset : Int64?,
             @order_clauses : Array({String, Bool}),
+            @parent_model_joins : Array(Join)?,
             @predicate_node : PredicateNode?,
             @using : String?
           )
@@ -55,11 +56,16 @@ module Marten
           end
 
           def add_selected_join(relation : String) : Nil
-            field_path = verify_field(relation, only_relations: true, allow_reverse_relations: false)
+            field_path = verify_field(relation, only_relations: true, allow_many: false)
 
             # Special case: if the last model makes use of multi table inheritance, we have to ensure that the parent
             # models are retrieved as well in order to ensure that the joined records can properly be instantiated.
-            child_model = field_path.last[0].related_model
+
+            child_model = if (reverse_relation = field_path.last[1]).nil?
+                            field_path.last[0].related_model
+                          else
+                            reverse_relation.model
+                          end
 
             if !child_model.nil? && child_model.pk_field.relation? && !child_model.parent_models.empty?
               field_path += construct_inheritance_field_path(child_model, child_model.parent_models.last)
@@ -77,6 +83,7 @@ module Marten
               limit: @limit,
               offset: @offset,
               order_clauses: @order_clauses,
+              parent_model_joins: @parent_model_joins,
               predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
               using: @using
             )
@@ -216,6 +223,7 @@ module Marten
               limit: @limit,
               offset: @offset,
               order_clauses: @order_clauses,
+              parent_model_joins: @parent_model_joins,
               predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
               using: @using
             )
@@ -365,8 +373,7 @@ module Marten
             String.build do |s|
               # Note: the order in which joins are generated is important because parent model joins are read in order
               # and before any other additional joins.
-              s << parent_model_joins.join(" ", &.to_sql)
-              s << @joins.join(" ", &.to_sql)
+              s << (parent_model_joins + @joins).join(" ", &.to_sql)
             end
           end
 
@@ -507,12 +514,20 @@ module Marten
                   type: field.null? || !reverse_relation.nil? ? JoinType::LEFT_OUTER : JoinType::INNER,
                   from_model: from_model,
                   from_common_field: from_common_field,
+                  reverse_relation: reverse_relation,
                   to_model: to_model,
                   to_common_field: to_common_field,
-                  selected: selected && reverse_relation.nil?
+                  selected: selected
                 )
 
                 if parent_join.nil?
+                  # No parent join means that we must add the join to the top-level joins.
+                  @joins << join
+                elsif flattened_parent_model_joins.includes?(parent_join)
+                  # If the parent join is a parent model join, we must add the join to the top-level joins as well while
+                  # ensuring that the parent join is correctly set. This is because the columns that are associated to
+                  # parent model joins are always selected (and read) before the columns of other joins.
+                  join.parent = parent_join
                   @joins << join
                 else
                   parent_join.add_child(join)
@@ -598,6 +613,7 @@ module Marten
                   type: JoinType::INNER,
                   from_model: previous_model,
                   from_common_field: previous_model.pk_field,
+                  reverse_relation: nil,
                   to_model: parent_model,
                   to_common_field: parent_model.pk_field,
                   selected: true,
@@ -709,7 +725,7 @@ module Marten
             quote(Model.db_table)
           end
 
-          private def verify_field(raw_field, only_relations = false, allow_reverse_relations = true)
+          private def verify_field(raw_field, only_relations = false, allow_many = true)
             field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
 
             current_model = Model
@@ -738,11 +754,14 @@ module Marten
                   get_field_context(part, current_model)
                 end
               rescue e : Errors::InvalidField
-                raise e unless allow_reverse_relations
-
                 reverse_relation_context = current_model.get_reverse_relation_context(part.to_s)
 
-                if reverse_relation_context.nil?
+                # If allow_many is set to false, we have to ensure that the reverse relation is a one-to-one relation.
+                if reverse_relation_context.nil? || (
+                     !reverse_relation_context.nil? &&
+                     !allow_many &&
+                     !reverse_relation_context.reverse_relation.one_to_one?
+                   )
                   raise e
                 else
                   reverse_relation_context.reverse_relation.model.get_field_context(

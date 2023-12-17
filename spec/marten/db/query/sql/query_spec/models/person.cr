@@ -8,5 +8,9 @@ module Marten::DB::Query::SQL::QuerySpec
     def __query_spec_address
       @address
     end
+
+    def __query_spec_person_profile
+      @_reverse_o2o_person_profile
+    end
   end
 end

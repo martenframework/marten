@@ -37,7 +37,7 @@ module Marten
                 @cursor
               )
 
-              yield relation_iterator, join.from_common_field
+              yield relation_iterator, join.from_common_field, join.reverse_relation
 
               @cursor = relation_iterator.cursor
             end

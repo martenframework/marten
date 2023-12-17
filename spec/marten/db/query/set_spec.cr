@@ -1597,8 +1597,7 @@ describe Marten::DB::Query::Set do
       Post.create!(author: user_2, title: "Post 2")
 
       qset = Marten::DB::Query::Set(Post).new.order(:id)
-
-      qset.join("author")
+      qset = qset.join("author")
 
       qset[0].__set_spec_author.should eq user_1
       qset[1].__set_spec_author.should eq user_2
@@ -1612,8 +1611,7 @@ describe Marten::DB::Query::Set do
       Post.create!(author: user_2, title: "Post 2")
 
       qset = Marten::DB::Query::Set(Post).new.order(:id)
-
-      qset.join(:author)
+      qset = qset.join(:author)
 
       qset[0].__set_spec_author.should eq user_1
       qset[1].__set_spec_author.should eq user_2
@@ -1627,8 +1625,7 @@ describe Marten::DB::Query::Set do
       Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
 
       qset = Marten::DB::Query::Set(Post).new.order(:id)
-
-      qset.join(:author, :updated_by)
+      qset = qset.join(:author, :updated_by)
 
       qset[0].__set_spec_author.should eq user_1
       qset[0].__set_spec_updated_by.should be_nil
@@ -1637,11 +1634,105 @@ describe Marten::DB::Query::Set do
       qset[1].__set_spec_updated_by.should eq user_1
     end
 
+    it "allows to specify one-to-one reverse relations" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_profile_1 = TestUserProfile.create!(user: user_1)
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:id)
+      qset = qset.join(:profile)
+
+      qset[0].should eq user_1
+      qset[0].__set_spec_profile.should eq user_profile_1
+
+      qset[1].should eq user_2
+      qset[1].__set_spec_profile.should be_nil
+    end
+
+    it "raises if the specified relation is not a single record relation" do
+      expect_raises(Marten::DB::Errors::InvalidField, /Unable to resolve 'tags' as a relation field/) do
+        Marten::DB::Query::Set(Post).new.join(:tags)
+      end
+    end
+
+    it "raises if the specified reverse relation is not a single record relation" do
+      expect_raises(Marten::DB::Errors::InvalidField, /Unable to resolve 'posts' as a relation field/) do
+        Marten::DB::Query::Set(TestUser).new.join(:posts)
+      end
+    end
+
     it "raises as expected when called without arguments" do
       qset = Marten::DB::Query::Set(Post).new
 
       expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Relations must be specified when joining") do
         qset.join
+      end
+    end
+
+    context "with multi table inheritance" do
+      it "allows to specify direct one-to-one reverse relations" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SetSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        Marten::DB::Query::SetSpec::PersonProfile.create!(person: student)
+        student_profile = Marten::DB::Query::SetSpec::StudentProfile.create!(student: student)
+
+        qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new.order(:id)
+        qset = qset.join(:student_profile)
+
+        qset[0].should eq student
+        qset[0].__set_spec_student_profile.should eq student_profile
+      end
+
+      it "allows to specify inherited one-to-one reverse relations" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SetSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        person_profile = Marten::DB::Query::SetSpec::PersonProfile.create!(person: student)
+        Marten::DB::Query::SetSpec::StudentProfile.create!(student: student)
+
+        qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new
+        qset = qset.join(:person_profile)
+
+        qset[0].should eq student
+        qset[0].__set_spec_person_profile.should eq person_profile
+      end
+
+      it "allows to specify both direct and inherited one-to-one reverse relations at the same time" do
+        address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SetSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        person_profile = Marten::DB::Query::SetSpec::PersonProfile.create!(person: student)
+        student_profile = Marten::DB::Query::SetSpec::StudentProfile.create!(student: student)
+
+        qset_1 = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new
+        qset_1 = qset_1.join(:person_profile, :student_profile)
+
+        qset_1[0].should eq student
+        qset_1[0].__set_spec_person_profile.should eq person_profile
+        qset_1[0].__set_spec_student_profile.should eq student_profile
+
+        qset_2 = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new
+        qset_2 = qset_2.join(:student_profile, :person_profile)
+
+        qset_2[0].should eq student
+        qset_2[0].__set_spec_person_profile.should eq person_profile
+        qset_2[0].__set_spec_student_profile.should eq student_profile
       end
     end
   end
@@ -2309,5 +2400,11 @@ class Post
 
   def __set_spec_updated_by
     @updated_by
+  end
+end
+
+class TestUser
+  def __set_spec_profile
+    @_reverse_o2o_profile
   end
 end

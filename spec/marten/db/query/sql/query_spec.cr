@@ -605,6 +605,23 @@ describe Marten::DB::Query::SQL::Query do
       results[1].__query_spec_author.should eq user_2
     end
 
+    it "allows to specify a one-to-one reverse relation to join" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_profile_1 = TestUserProfile.create!(user: user_1)
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_selected_join("profile")
+
+      results = query.execute
+
+      results[0].should eq user_1
+      results[0].__query_spec_profile.should eq user_profile_1
+
+      results[1].should eq user_2
+      results[1].__query_spec_profile.should be_nil
+    end
+
     it "raises if the passed field is not a relation" do
       query = Marten::DB::Query::SQL::Query(Post).new
       expect_raises(
@@ -615,7 +632,7 @@ describe Marten::DB::Query::SQL::Query do
       end
     end
 
-    it "raises if the passed field is a reverse relation" do
+    it "raises if the passed field is not a single record reverse relation" do
       query = Marten::DB::Query::SQL::Query(TestUser).new
       expect_raises(
         Marten::DB::Errors::InvalidField,
@@ -681,6 +698,99 @@ describe Marten::DB::Query::SQL::Query do
 
         results[0].__query_spec_author.should eq student
         results[0].__query_spec_author.not_nil!.__query_spec_address.should eq address
+      end
+
+      it "allows to specify direct one-to-one reverse relations" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        Marten::DB::Query::SQL::QuerySpec::PersonProfile.create!(person: student)
+        student_profile = Marten::DB::Query::SQL::QuerySpec::StudentProfile.create!(student: student)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_selected_join("student_profile")
+
+        results = query.execute
+
+        results[0].should eq student
+        results[0].__query_spec_student_profile.should eq student_profile
+      end
+
+      it "allows to specify inherited one-to-one reverse relations" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        person_profile = Marten::DB::Query::SQL::QuerySpec::PersonProfile.create!(person: student)
+        Marten::DB::Query::SQL::QuerySpec::StudentProfile.create!(student: student)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query.add_selected_join("person_profile")
+
+        results = query.execute
+
+        results[0].should eq student
+        results[0].__query_spec_person_profile.should eq person_profile
+      end
+
+      it "allows to specify both direct and inherited one-to-one reverse relations at the same time" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        person_profile = Marten::DB::Query::SQL::QuerySpec::PersonProfile.create!(person: student)
+        student_profile = Marten::DB::Query::SQL::QuerySpec::StudentProfile.create!(student: student)
+
+        query_1 = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query_1.add_selected_join("person_profile")
+        query_1.add_selected_join("student_profile")
+        results_1 = query_1.execute
+
+        results_1[0].should eq student
+        results_1[0].__query_spec_person_profile.should eq person_profile
+        results_1[0].__query_spec_student_profile.should eq student_profile
+
+        query_2 = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Student).new
+        query_2.add_selected_join("student_profile")
+        query_2.add_selected_join("person_profile")
+        results_2 = query_2.execute
+
+        results_2[0].should eq student
+        results_2[0].__query_spec_person_profile.should eq person_profile
+        results_2[0].__query_spec_student_profile.should eq student_profile
+      end
+
+      it "allows to specify a related record that inherits from other records" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 2")
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        student_profile = Marten::DB::Query::SQL::QuerySpec::StudentProfile.create!(student: student)
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::StudentProfile).new
+        query.add_selected_join("student")
+
+        results = query.execute
+
+        results[0].should eq student_profile
+        results[0].__query_spec_student.should eq student
       end
     end
   end
@@ -1775,5 +1885,11 @@ class Post
 
   def __query_spec_updated_by
     @updated_by
+  end
+end
+
+class TestUser
+  def __query_spec_profile
+    @_reverse_o2o_profile
   end
 end

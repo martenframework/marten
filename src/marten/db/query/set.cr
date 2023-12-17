@@ -598,10 +598,9 @@ module Marten
 
         # Returns a queryset whose specified `relations` are "followed" and joined to each result.
         #
-        # When using `#join`, the specified foreign-key relationships will be followed and each record returned by the
-        # queryset will have the corresponding related objects already selected and populated. Using `#join` can result
-        # in performance improvements since it can help reduce the number of SQL queries, as illustrated by the
-        # following example:
+        # When using `#join`, the specified relationships will be followed and each record returned by the queryset will
+        # have the corresponding related objects already selected and populated. Using `#join` can result in performance
+        # improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
         #
         # ```
         # query_set = Post.all

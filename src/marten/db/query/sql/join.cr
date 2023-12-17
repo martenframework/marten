@@ -10,20 +10,22 @@ module Marten
         class Join
           @parent : Nil | self
 
-          getter id
-          getter type
-          getter from_model
-          getter from_common_field
-          getter to_model
-          getter to_common_field
-          getter parent
           getter children
+          getter id
+          getter from_common_field
+          getter from_model
+          getter parent
+          getter reverse_relation
+          getter to_common_field
+          getter to_model
+          getter type
 
           def initialize(
             @id : Int32,
             @type : JoinType,
             @from_model : Model.class,
             @from_common_field : Field::Base,
+            @reverse_relation : ReverseRelation?,
             @to_model : Model.class,
             @to_common_field : Field::Base,
             @selected : Bool,

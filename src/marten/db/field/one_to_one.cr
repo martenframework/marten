@@ -197,7 +197,10 @@ module Marten
               class ::{{ model_klass }}
                 macro finished
                   class ::{{ related_model_klass }}
-                    @[Marten::DB::Model::Table::RelationInstanceVariable]
+                    @[Marten::DB::Model::Table::RelationInstanceVariable(
+                      relation_name: {{ related_field_name.id }},
+                      related_model: {{ model_klass }},
+                    )]
                     @_reverse_o2o_{{ related_field_name.id }} : {{ model_klass }}?
 
                     def {{ related_field_name.id }}

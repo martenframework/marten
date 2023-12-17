@@ -415,6 +415,30 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.count.should eq 3
     end
 
+    it "returns the expected number of results for an unfiltered query with specific column defined" do
+      address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 1")
+      student = Marten::DB::Query::SetSpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      Marten::DB::Query::SetSpec::Article.create!(title: "Top things", author: student)
+      Marten::DB::Query::SetSpec::Article.create!(
+        title: "Top things 2",
+        subtitle: "Rise of the top things",
+        author: student
+      )
+      Marten::DB::Query::SetSpec::Article.create!(
+        title: "Top things 3",
+        subtitle: "Top things awakening",
+        author: student
+      )
+
+      Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Article).new.count(:subtitle).should eq 2
+    end
+
     it "returns the expected number of record for an unfiltered query set that was already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
@@ -1708,7 +1732,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#none" do
-    it "returns an empty queryset" do
+     it "returns an empty queryset" do
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "ruby", is_active: true)

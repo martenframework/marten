@@ -86,8 +86,20 @@ module Marten
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
-          def count(field : String | Symbol | Nil = nil)
-            sql, parameters = build_count_query(field)
+          def count(field_name : String | Symbol | Nil = nil)
+            column_name = if !field_name.nil?
+                            field_path = verify_field(field_name.to_s)
+                            relation_field_path = field_path.select { |field, _r| field.relation? }
+
+                            if relation_field_path.empty? || field_path.size == 1
+                              "#{Model.db_table}.#{field_path.first[0].db_column!}"
+                            else
+                              join = ensure_join_for_field_path(relation_field_path)
+                              join.not_nil!.column_name(field_path.last[0].db_column!)
+                            end
+                          end
+
+            sql, parameters = build_count_query(column_name)
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               result.to_s.to_i
@@ -286,13 +298,13 @@ module Marten
             rows_affected.not_nil!
           end
 
-          private def build_count_query(field : String | Symbol | Nil = nil)
+          private def build_count_query(column_name : String | Nil)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << if field
-                build_count_column_specific_subquery_query(field)
+              s << if column_name
+                build_count_column_specific_subquery_query(column_name)
               else
                 build_count_default_subquery_query
               end
@@ -308,11 +320,9 @@ module Marten
             {sql, parameters}
           end
 
-          private def build_count_column_specific_subquery_query(field : String | Symbol)
-            field = field.to_s
-
+          private def build_count_column_specific_subquery_query(column_name : String)
             build_sql do |s|
-              s << "SELECT COUNT(#{field})"
+              s << "SELECT COUNT(#{column_name.split(".")[-1]})"
               s << "FROM ("
               s << "SELECT"
 
@@ -320,7 +330,7 @@ module Marten
                 s << connection.distinct_clause_for(distinct_columns)
               end
 
-              s << "#{Model.db_table}.#{field}"
+              s << column_name
             end
           end
 

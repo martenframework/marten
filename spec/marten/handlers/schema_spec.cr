@@ -1,5 +1,4 @@
 require "./spec_helper"
-require "./schema_spec/**"
 
 describe Marten::Handlers::Schema do
   describe "::schema_context_name" do

@@ -86,9 +86,9 @@ module Marten
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
-          def count(field_name : String | Symbol | Nil = nil)
-            column_name = if !field_name.nil?
-                            field_path = verify_field(field_name.to_s)
+          def count(raw_field : String | Symbol | Nil = nil)
+            column_name = if !raw_field.nil?
+                            field_path = verify_field(raw_field.to_s)
                             relation_field_path = field_path.select { |field, _r| field.relation? }
 
                             if relation_field_path.empty? || field_path.size == 1

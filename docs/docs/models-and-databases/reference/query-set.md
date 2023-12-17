@@ -143,7 +143,7 @@ query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
 
 Returns a queryset whose specified `relations` are "followed" and joined to each result (see [Queries](../queries#joins-and-filtering-relations) for an introduction about this capability).
 
-When using `#join`, the specified foreign-key relationships will be followed and each record returned by the queryset will have the corresponding related objects already selected and populated. Using `#join` can result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
+When using `#join`, the specified relationships will be followed and each record returned by the queryset will have the corresponding related objects already selected and populated. Using `#join` can result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
 
 ```crystal
 query_set = Post.all
@@ -155,12 +155,16 @@ p2 = query_set.join(:author).get(id: 1)
 puts p2.author # doesn't hit the database since the related "author" was already selected
 ```
 
-It should be noted that it is also possible to follow foreign keys of direct related models too by using the double underscores notation (`__`). For example the following query will select the joined "author" and its associated "profile":
+It should be noted that it is also possible to follow foreign keys of direct related models too by using the double underscores notation (`__`). For example, the following query will select the joined "author" and its associated "profile":
 
 ```crystal
 query_set = Post.all
 query_set.join(:author__profile)
 ```
+
+:::info
+The `#join` method also supports targeting the reverse relation of a [`one_to_one`](./fields#one_to_one) field (such reverse relation can be defined through the use of the [`related`](./fields#related-2) field option). That way, you can traverse a [`one_to_one`](./fields#one_to_one) field back to the model record on which the field is specified.
+:::
 
 ### `none`
 

@@ -5,7 +5,7 @@ module Marten
     module Query
       module SQL
         class EmptyQuery(Model) < Query(Model)
-          def count
+          def count(field : String | Symbol | Nil = nil)
             0_i64
           end
 

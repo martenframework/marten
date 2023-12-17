@@ -322,6 +322,7 @@ module Marten
 
           private def build_count_column_specific_subquery_query(column_name : String)
             build_sql do |s|
+              # Because a subquery with the name "subquery" is used here, we cut off the table name at the front
               s << "SELECT COUNT(#{column_name.split(".")[-1]})"
               s << "FROM ("
               s << "SELECT"

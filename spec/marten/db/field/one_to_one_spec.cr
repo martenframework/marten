@@ -244,6 +244,32 @@ describe Marten::DB::Field::OneToOne do
       obj_2.user?.should be_false
     end
 
+    it "properly generates a getter method for the reverse relation" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_profile = TestUserProfile.create!(user: user)
+
+      user.profile.should eq user_profile
+
+      TestUser.new.profile.should be_nil
+    end
+
+    it "properly generates a bang getter method for the reverse relation" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_profile = TestUserProfile.create!(user: user)
+
+      user.profile!.should eq user_profile
+
+      user_profile.delete
+      user.reload
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        user.profile!
+      end
+
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        TestUser.new.profile!
+      end
+    end
+
     it "works as expected when target models don't involve interger pk fields" do
       article = Marten::DB::Field::OneToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
       comment = Marten::DB::Field::OneToOneSpec::Comment.create!(article: article, text: "This article is dope")

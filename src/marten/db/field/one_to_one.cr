@@ -208,7 +208,7 @@ module Marten
                     end
 
                     def {{ related_field_name.id }}!
-                      {{ related_field_name.id }}.not_nil!
+                      @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}.get!({{ field_id }}: pk)
                     end
                   end
                 end

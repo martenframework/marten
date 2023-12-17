@@ -13,6 +13,7 @@ const darkTheme = themes.dracula;
   favicon: 'img/favicon.ico',
   organizationName: 'martenframework',
   projectName: 'marten',
+  trailingSlash: false,
 
   plugins: [
     'docusaurus-plugin-sass',

@@ -1732,7 +1732,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#none" do
-     it "returns an empty queryset" do
+    it "returns an empty queryset" do
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "ruby", is_active: true)

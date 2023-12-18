@@ -303,7 +303,7 @@ module Marten
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << "SELECT COUNT(#{column_name ? column_name.split(".")[-1] : nil})"
+              s << "SELECT COUNT(#{column_name ? column_name.split(".")[-1] : "*"})"
               s << "FROM ("
               s << "SELECT"
 

@@ -86,7 +86,7 @@ module Marten
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
-          def count(raw_field : String | Symbol | Nil = nil)
+          def count(raw_field : String? = nil)
             column_name = if !raw_field.nil?
                             field_path = verify_field(raw_field.to_s)
                             relation_field_path = field_path.select { |field, _r| field.relation? }
@@ -298,7 +298,7 @@ module Marten
             rows_affected.not_nil!
           end
 
-          private def build_count_query(column_name : String | Nil)
+          private def build_count_query(column_name : String?)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 

@@ -477,6 +477,33 @@ describe Marten::DB::Query::Set do
       qset_3.each { }
       qset_3.count.should eq 0
     end
+
+    it "does not use cached records to do the count if a field is specified" do
+      address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 1")
+      student = Marten::DB::Query::SetSpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      Marten::DB::Query::SetSpec::Article.create!(title: "Top things", author: student)
+      Marten::DB::Query::SetSpec::Article.create!(
+        title: "Top things 2",
+        subtitle: "Rise of the top things",
+        author: student
+      )
+      Marten::DB::Query::SetSpec::Article.create!(
+        title: "Top things 3",
+        subtitle: "Top things awakening",
+        author: student
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Article).new
+      qset.each { }
+      qset.count.should eq 3
+      qset.count(:subtitle).should eq 2
+    end
   end
 
   describe "#create" do

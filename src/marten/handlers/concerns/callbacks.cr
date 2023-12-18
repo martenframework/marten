@@ -30,7 +30,7 @@ module Marten
       # `#dispatch` method.
       macro before_dispatch(*names)
         {%
-          names.reduce(DISPATCH_CALLBACKS[:before]) do |array, name|
+          names.reduce(CALLBACKS[:before_dispatch]) do |array, name|
             array << name.id.stringify
             array
           end
@@ -44,7 +44,21 @@ module Marten
       # response will be returned by the handler instead of the one returned by the `#dispatch` method.
       macro after_dispatch(*names)
         {%
-          names.reduce(DISPATCH_CALLBACKS[:after]) do |array, name|
+          names.reduce(CALLBACKS[:after_dispatch]) do |array, name|
+            array << name.id.stringify
+            array
+          end
+        %}
+      end
+
+      # Allows to do define callbacks that are called before rendering templates.
+      #
+      # Those callbacks have access to the incoming `#request` object and they can return early response. If one of such
+      # callbacks returns an early response, the following callbacks will be skipped and the response will be returned
+      # by the handler directly.
+      macro before_render(*names)
+        {%
+          names.reduce(CALLBACKS[:before_render]) do |array, name|
             array << name.id.stringify
             array
           end
@@ -54,33 +68,46 @@ module Marten
       # :nodoc:
       macro _begin_callbacks_setup
         # :nodoc:
-        DISPATCH_CALLBACKS = {
-          before: [] of String,
-          after:  [] of String,
+        CALLBACKS = {
+          before_dispatch: [] of String,
+          before_render:   [] of String,
+          after_dispatch:  [] of String,
         }
       end
 
       # :nodoc:
       macro _finish_callbacks_setup
         {% verbatim do %}
-          {% if !DISPATCH_CALLBACKS[:before].empty? %}
+          {% if !CALLBACKS[:before_dispatch].empty? %}
             protected def run_before_dispatch_callbacks : Marten::HTTP::Response | Nil
               callbacks_response = super
               return callbacks_response unless callbacks_response.nil?
 
-              {% for callback in DISPATCH_CALLBACKS[:before] %}
+              {% for callback in CALLBACKS[:before_dispatch] %}
                 result = {{ callback.id }}.as?(Marten::HTTP::Response)
                 return result unless result.nil?
               {% end %}
             end
           {% end %}
 
-          {% if !DISPATCH_CALLBACKS[:after].empty? %}
+          {% if !CALLBACKS[:before_render].empty? %}
+            protected def run_before_render_callbacks : Marten::HTTP::Response | Nil
+              callbacks_response = super
+              return callbacks_response unless callbacks_response.nil?
+
+              {% for callback in CALLBACKS[:before_render] %}
+                result = {{ callback.id }}.as?(Marten::HTTP::Response)
+                return result unless result.nil?
+              {% end %}
+            end
+          {% end %}
+
+          {% if !CALLBACKS[:after_dispatch].empty? %}
             protected def run_after_dispatch_callbacks : Marten::HTTP::Response | Nil
               callbacks_response = super
               return callbacks_response unless callbacks_response.nil?
 
-              {% for callback in DISPATCH_CALLBACKS[:after] %}
+              {% for callback in CALLBACKS[:after_dispatch] %}
                 result = {{ callback.id }}.as?(Marten::HTTP::Response)
                 return result unless result.nil?
               {% end %}
@@ -90,6 +117,9 @@ module Marten
       end
 
       protected def run_before_dispatch_callbacks
+      end
+
+      protected def run_before_render_callbacks
       end
 
       protected def run_after_dispatch_callbacks

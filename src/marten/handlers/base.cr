@@ -196,7 +196,9 @@ module Marten
       )
         template_context = Marten::Template::Context.from(context, request)
         template_context["handler"] = self
-        HTTP::Response.new(
+
+        before_render_response = run_before_render_callbacks
+        before_render_response || HTTP::Response.new(
           content: Marten.templates.get_template(template_name).render(template_context),
           content_type: content_type,
           status: ::HTTP::Status.new(status).to_i

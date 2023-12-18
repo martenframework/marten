@@ -100,6 +100,46 @@ describe Marten::Handlers::Rendering do
       response.content_type.should eq "text/html"
       response.content.strip.should eq HTML.escape(handler.to_s)
     end
+
+    it "runs before_render callbacks as expected" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithCallback.new(request)
+
+      handler.xyz.should be_nil
+
+      response = handler.render_to_response(nil)
+
+      handler.xyz.should eq "set_xyz"
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq HTML.escape(handler.to_s)
+    end
+
+    it "returns the expected response if the before_render callback returns a custom responses" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithBeforeRenderResponse.new(request)
+
+      response = handler.render_to_response(nil)
+
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "before_render response"
+    end
   end
 
   describe "#template_name" do
@@ -148,6 +188,32 @@ module Marten::Handlers::RenderingSpec
     include Marten::Handlers::Rendering
 
     template_name "specs/handlers/concerns/rendering/handler.html"
+  end
+
+  class TestHandlerWithCallback < Marten::Handler
+    include Marten::Handlers::Rendering
+
+    property xyz : String? = nil
+
+    template_name "specs/handlers/concerns/rendering/handler.html"
+
+    before_render :set_xyz
+
+    private def set_xyz
+      self.xyz = "set_xyz"
+    end
+  end
+
+  class TestHandlerWithBeforeRenderResponse < Marten::Handler
+    include Marten::Handlers::Rendering
+
+    template_name "specs/handlers/concerns/rendering/handler.html"
+
+    before_render :return_before_render_response
+
+    private def return_before_render_response
+      Marten::HTTP::Response.new("before_render response", content_type: "text/plain", status: 200)
+    end
   end
 
   class TestHandlerWithoutTemplate < Marten::Handler

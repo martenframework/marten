@@ -837,6 +837,54 @@ describe Marten::Handlers::Base do
       response.content_type.should eq "text/plain"
       response.content.strip.should eq "Hello World, John Doe!"
     end
+
+    it "runs before_render callbacks as expected" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::TestHandlerWithCallbacks.new(request)
+
+      handler.xyz.should be_nil
+
+      response = handler.render(
+        "specs/handlers/base/test.html",
+        context: {name: "John Doe"},
+        content_type: "text/plain"
+      )
+
+      handler.xyz.should eq "set_xyz"
+
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "returns the expected response if the before_render callback returns a custom responses" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::TestHandlerWithBeforeRenderResponse.new(request)
+
+      response = handler.render(
+        "specs/handlers/base/test.html",
+        context: {name: "John Doe"},
+        content_type: "text/plain"
+      )
+
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "before_render response"
+    end
   end
 
   describe "#respond" do
@@ -983,9 +1031,11 @@ module Marten::Handlers::BaseSpec
 
   class TestHandlerWithCallbacks < Marten::Handlers::Base
     property foo : String? = nil
+    property xyz : String? = nil
     property bar : String? = nil
 
     before_dispatch :set_foo
+    before_render :set_xyz
     after_dispatch :set_bar
 
     def get
@@ -994,6 +1044,10 @@ module Marten::Handlers::BaseSpec
 
     private def set_foo
       self.foo = "set_foo"
+    end
+
+    private def set_xyz
+      self.xyz = "set_xyz"
     end
 
     private def set_bar
@@ -1010,6 +1064,14 @@ module Marten::Handlers::BaseSpec
 
     private def return_before_dispatch_response
       Marten::HTTP::Response.new("before_dispatch response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithBeforeRenderResponse < Marten::Handlers::Base
+    before_render :return_before_render_response
+
+    private def return_before_render_response
+      Marten::HTTP::Response.new("before_render response", content_type: "text/plain", status: 200)
     end
   end
 

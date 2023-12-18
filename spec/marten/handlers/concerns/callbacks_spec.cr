@@ -37,6 +37,42 @@ describe Marten::Handlers::Callbacks do
     end
   end
 
+  describe "::before_render" do
+    it "allows to register a single before_render callback" do
+      obj = Marten::Handlers::CallbacksSpec::SingleBeforeRenderCallback.new
+
+      obj.foo.should be_nil
+
+      obj.run_callbacks
+
+      obj.foo.should eq "set_foo"
+    end
+
+    it "allows to register multiple before_render callbacks through a single call" do
+      obj = Marten::Handlers::CallbacksSpec::MultipleBeforeRenderCallbacksRegisteredWithSingleCall.new
+
+      obj.foo.should be_nil
+      obj.bar.should be_nil
+
+      obj.run_callbacks
+
+      obj.foo.should eq "set_foo"
+      obj.bar.should eq "set_bar"
+    end
+
+    it "allows to register multiple before_render callbacks through multiple calls" do
+      obj = Marten::Handlers::CallbacksSpec::MultipleBeforeRenderCallbacksRegisteredWithMultipleCalls.new
+
+      obj.foo.should be_nil
+      obj.bar.should be_nil
+
+      obj.run_callbacks
+
+      obj.foo.should eq "set_foo"
+      obj.bar.should eq "set_bar"
+    end
+  end
+
   describe "::after_dispatch" do
     it "allows to register a single after_dispatch callback" do
       obj = Marten::Handlers::CallbacksSpec::SingleAfterDispatchCallback.new
@@ -99,6 +135,32 @@ describe Marten::Handlers::Callbacks do
     end
   end
 
+  describe "#run_before_render_callbacks" do
+    it "runs the before_render callbacks in the order they were registered" do
+      obj = Marten::Handlers::CallbacksSpec::Parent.new
+
+      obj.shared_before_render.should be_nil
+
+      obj.run_callbacks
+
+      obj.shared_before_render.should eq "two"
+    end
+
+    it "runs inherited callbacks as well as local callbacks" do
+      obj = Marten::Handlers::CallbacksSpec::Child.new
+
+      obj.shared_before_render.should be_nil
+      obj.foo_before_render.should be_nil
+      obj.abc_before_render.should be_nil
+
+      obj.run_callbacks
+
+      obj.shared_before_render.should eq "three"
+      obj.foo_before_render.should eq "set_foo"
+      obj.abc_before_render.should eq "set_abc"
+    end
+  end
+
   describe "#run_after_dispatch_callbacks" do
     it "runs the after_dispatch callbacks in the order they were registered" do
       obj = Marten::Handlers::CallbacksSpec::Parent.new
@@ -132,6 +194,7 @@ module Marten::Handlers::CallbacksSpec
 
     def run_callbacks
       run_before_dispatch_callbacks
+      run_before_render_callbacks
       run_after_dispatch_callbacks
     end
   end
@@ -167,6 +230,47 @@ module Marten::Handlers::CallbacksSpec
 
     before_dispatch :set_foo
     before_dispatch :set_bar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
+  end
+
+  class SingleBeforeRenderCallback < Base
+    property foo : String? = nil
+
+    before_render :set_foo
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+  end
+
+  class MultipleBeforeRenderCallbacksRegisteredWithSingleCall < Base
+    property foo : String? = nil
+    property bar : String? = nil
+
+    before_render :set_foo, :set_bar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
+  end
+
+  class MultipleBeforeRenderCallbacksRegisteredWithMultipleCalls < Base
+    property foo : String? = nil
+    property bar : String? = nil
+
+    before_render :set_foo
+    before_render :set_bar
 
     private def set_foo
       self.foo = "set_foo"
@@ -222,12 +326,19 @@ module Marten::Handlers::CallbacksSpec
     property foo_before : String? = nil
     property shared_before : String? = nil
 
+    property foo_before_render : String? = nil
+    property shared_before_render : String? = nil
+
     property foo_after : String? = nil
     property shared_after : String? = nil
 
     before_dispatch :set_one_before
     before_dispatch :set_two_before
     before_dispatch :set_foo_before
+
+    before_render :set_one_before_render
+    before_render :set_two_before_render
+    before_render :set_foo_before_render
 
     after_dispatch :set_one_after
     after_dispatch :set_two_after
@@ -243,6 +354,18 @@ module Marten::Handlers::CallbacksSpec
 
     private def set_foo_before
       self.foo_before = "set_foo"
+    end
+
+    private def set_one_before_render
+      self.shared_before_render = "one"
+    end
+
+    private def set_two_before_render
+      self.shared_before_render = "two"
+    end
+
+    private def set_foo_before_render
+      self.foo_before_render = "set_foo"
     end
 
     private def set_one_after
@@ -261,10 +384,15 @@ module Marten::Handlers::CallbacksSpec
   class Child < Parent
     property abc_before : String? = nil
 
+    property abc_before_render : String? = nil
+
     property abc_after : String? = nil
 
     before_dispatch :set_three_before
     before_dispatch :set_abc_before
+
+    before_render :set_three_before_render
+    before_render :set_abc_before_render
 
     after_dispatch :set_three_after
     after_dispatch :set_abc_after
@@ -275,6 +403,14 @@ module Marten::Handlers::CallbacksSpec
 
     private def set_abc_before
       self.abc_before = "set_abc"
+    end
+
+    private def set_three_before_render
+      self.shared_before_render = "three"
+    end
+
+    private def set_abc_before_render
+      self.abc_before_render = "set_abc"
     end
 
     private def set_three_after

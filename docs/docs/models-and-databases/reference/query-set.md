@@ -264,6 +264,7 @@ For example:
 
 ```crystal
 Article.all.count                              # returns the number of article records
+Article.all.count(:subtitle)                   # returns the number of articles where the subtitle is not null
 Article.filter(title__startswith: "Top").count # returns the number of articles whose title start with "Top"
 ```
 

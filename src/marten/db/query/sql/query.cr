@@ -93,8 +93,20 @@ module Marten
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
 
-          def count
-            sql, parameters = build_count_query
+          def count(raw_field : String? = nil)
+            column_name = if !raw_field.nil?
+                            field_path = verify_field(raw_field.to_s)
+                            relation_field_path = field_path.select { |field, _r| field.relation? }
+
+                            if relation_field_path.empty? || field_path.size == 1
+                              "#{Model.db_table}.#{field_path.first[0].db_column!}"
+                            else
+                              join = ensure_join_for_field_path(relation_field_path)
+                              join.not_nil!.column_name(field_path.last[0].db_column!)
+                            end
+                          end
+
+            sql, parameters = build_count_query(column_name)
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               result.to_s.to_i
@@ -294,21 +306,23 @@ module Marten
             rows_affected.not_nil!
           end
 
-          private def build_count_query
+          private def build_count_query(column_name : String?)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << "SELECT COUNT(*)"
+              s << "SELECT COUNT(#{column_name ? column_name.split(".")[-1] : '*'})"
               s << "FROM ("
               s << "SELECT"
 
               if distinct
                 s << connection.distinct_clause_for(distinct_columns)
-                s << columns
-              else
+                s << columns if column_name.nil?
+              elsif column_name.nil?
                 s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
               end
+
+              s << column_name unless column_name.nil?
 
               s << "FROM #{table_name}"
               s << build_joins

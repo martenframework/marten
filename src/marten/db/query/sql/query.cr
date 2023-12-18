@@ -303,11 +303,18 @@ module Marten
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << if column_name
-                build_count_column_specific_subquery_query(column_name)
-              else
-                build_count_default_subquery_query
+              s << "SELECT COUNT(#{column_name ? column_name.split(".")[-1] : nil})"
+              s << "FROM ("
+              s << "SELECT"
+
+              if distinct
+                s << connection.distinct_clause_for(distinct_columns)
+                s << columns if column_name.nil?
+              elsif column_name.nil?
+                s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
               end
+
+              s << column_name unless column_name.nil?
 
               s << "FROM #{table_name}"
               s << build_joins
@@ -318,36 +325,6 @@ module Marten
             end
 
             {sql, parameters}
-          end
-
-          private def build_count_column_specific_subquery_query(column_name : String)
-            build_sql do |s|
-              # Because a subquery with the name "subquery" is used here, we cut off the table name at the front
-              s << "SELECT COUNT(#{column_name.split(".")[-1]})"
-              s << "FROM ("
-              s << "SELECT"
-
-              if distinct
-                s << connection.distinct_clause_for(distinct_columns)
-              end
-
-              s << column_name
-            end
-          end
-
-          private def build_count_default_subquery_query
-            build_sql do |s|
-              s << "SELECT COUNT(*)"
-              s << "FROM ("
-              s << "SELECT"
-
-              if distinct
-                s << connection.distinct_clause_for(distinct_columns)
-                s << columns
-              else
-                s << "#{Model.db_table}.#{Model.pk_field.db_column!}"
-              end
-            end
           end
 
           private def build_delete_query

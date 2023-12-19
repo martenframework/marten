@@ -39,6 +39,12 @@ module Marten
                 ),
               },
               {
+                "#{path_prefix}handlers/password_update_handler.cr",
+                ECR.render(
+                  "#{__DIR__}/templates/app/handlers/password_update_handler.cr.ecr"
+                ),
+              },
+              {
                 "#{path_prefix}handlers/profile_handler.cr",
                 ECR.render("#{__DIR__}/templates/app/handlers/profile_handler.cr.ecr"),
               },
@@ -101,6 +107,12 @@ module Marten
                 ),
               },
               {
+                "#{path_prefix}templates/#{context.label}/password_update.html",
+                ECR.render(
+                  "#{__DIR__}/templates/app/templates/password_update.html.ecr"
+                ),
+              },
+              {
                 "#{path_prefix}templates/#{context.label}/profile.html",
                 ECR.render("#{__DIR__}/templates/app/templates/profile.html.ecr"),
               },
@@ -157,6 +169,12 @@ module Marten
                 ),
               },
               {
+                "apps/#{context.label}/handlers/password_update_handler_spec.cr",
+                ECR.render(
+                  "#{__DIR__}/templates/spec/handlers/password_update_handler_spec.cr.ecr"
+                ),
+              },
+              {
                 "apps/#{context.label}/handlers/profile_handler_spec.cr",
                 ECR.render("#{__DIR__}/templates/spec/handlers/profile_handler_spec.cr.ecr"),
               },
@@ -190,6 +208,12 @@ module Marten
                 "apps/#{context.label}/schemas/password_reset_initiate_schema_spec.cr",
                 ECR.render(
                   "#{__DIR__}/templates/spec/schemas/password_reset_initiate_schema_spec.cr.ecr"
+                ),
+              },
+              {
+                "apps/#{context.label}/schemas/password_update_schema_spec.cr",
+                ECR.render(
+                  "#{__DIR__}/templates/spec/schemas/password_update_schema_spec.cr.ecr"
                 ),
               },
               {

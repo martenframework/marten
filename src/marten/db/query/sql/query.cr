@@ -95,7 +95,7 @@ module Marten
 
           def count(raw_field : String? = nil)
             column_name = if !raw_field.nil?
-                            field_path = verify_field(raw_field.to_s)
+                            field_path = verify_field(raw_field.to_s, allow_many: false)
                             relation_field_path = field_path.select { |field, _r| field.relation? }
 
                             if relation_field_path.empty? || field_path.size == 1
@@ -140,7 +140,7 @@ module Marten
               reversed = raw_field.starts_with?('-')
               raw_field = raw_field[1..] if reversed
 
-              field_path = verify_field(raw_field)
+              field_path = verify_field(raw_field, allow_many: false)
               relation_field_path = field_path.select { |field, _r| field.relation? }
 
               if relation_field_path.empty? || field_path.size == 1
@@ -180,7 +180,7 @@ module Marten
 
             if !fields.nil?
               fields.each do |raw_field|
-                field_path = verify_field(raw_field)
+                field_path = verify_field(raw_field, allow_many: false)
                 relation_field_path = field_path.select { |field, _r| field.relation? }
 
                 if relation_field_path.empty? || field_path.size == 1
@@ -597,17 +597,43 @@ module Marten
             get_field_context(raw_field, model).field
           end
 
-          private def get_field_context(raw_field, model)
-            model.get_field_context(raw_field.to_s)
-          rescue Errors::UnknownField
-            raise_invalid_field_error_with_valid_choices(raw_field, model)
+          private def get_field_context(raw_field, model, allow_many = true)
+            field_context = begin
+              model.get_field_context(raw_field.to_s)
+            rescue Errors::UnknownField
+              raise_invalid_field_error_with_valid_choices(raw_field, model, allow_many: allow_many)
+            end
+
+            if !allow_many && field_context.field.is_a?(Field::ManyToMany)
+              raise_invalid_field_error_with_valid_choices(raw_field, model, allow_many: allow_many)
+            end
+
+            field_context
           end
 
-          private def get_relation_field_context(raw_relation, model, silent = false)
-            model.get_relation_field_context(raw_relation.to_s)
-          rescue Errors::UnknownField
-            return nil if silent
-            raise_invalid_field_error_with_valid_choices(raw_relation, model, "relation field")
+          private def get_relation_field_context(raw_relation, model, allow_many = true, silent = false)
+            field_context = begin
+              model.get_relation_field_context(raw_relation.to_s)
+            rescue Errors::UnknownField
+              return nil if silent
+              raise_invalid_field_error_with_valid_choices(
+                raw_relation,
+                model,
+                "relation field",
+                allow_many: allow_many
+              )
+            end
+
+            if !allow_many && field_context.field.is_a?(Field::ManyToMany)
+              raise_invalid_field_error_with_valid_choices(
+                raw_relation,
+                model,
+                field_type: "relation field",
+                allow_many: allow_many
+              )
+            end
+
+            field_context
           end
 
           private def order_by
@@ -665,10 +691,17 @@ module Marten
             predicate_node
           end
 
-          private def raise_invalid_field_error_with_valid_choices(raw_field, model, field_type = "field")
-            valid_choices = model.fields.join(", ", &.id)
+          private def raise_invalid_field_error_with_valid_choices(
+            raw_field,
+            model,
+            field_type = "field",
+            allow_many = true
+          )
+            fields = model.fields
+            fields = fields.reject(Field::ManyToMany) if !allow_many
+
             raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_field}' as a #{field_type}. Valid choices are: #{valid_choices}."
+              "Unable to resolve '#{raw_field}' as a #{field_type}. Valid choices are: #{fields.join(", ", &.id)}."
             )
           end
 
@@ -719,7 +752,7 @@ module Marten
 
           private def solve_plucked_columns(fields)
             fields.each_with_object([] of Tuple(Field::Base, String)) do |raw_field, plucked_columns|
-              field_path = verify_field(raw_field)
+              field_path = verify_field(raw_field, allow_many: false)
               relation_field_path = field_path.select { |field, _r| field.relation? }
 
               if relation_field_path.empty? || field_path.size == 1
@@ -763,9 +796,9 @@ module Marten
 
               field_context = begin
                 if only_relations
-                  get_relation_field_context(part, current_model)
+                  get_relation_field_context(part, current_model, allow_many: allow_many)
                 else
-                  get_field_context(part, current_model)
+                  get_field_context(part, current_model, allow_many: allow_many)
                 end
               rescue e : Errors::InvalidField
                 reverse_relation_context = current_model.get_reverse_relation_context(part.to_s)

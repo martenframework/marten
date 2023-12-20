@@ -81,6 +81,12 @@ module Marten
                 ),
               },
               {
+                "#{path_prefix}schemas/password_update_schema.cr",
+                ECR.render(
+                  "#{__DIR__}/templates/app/schemas/password_update_schema.cr.ecr"
+                ),
+              },
+              {
                 "#{path_prefix}schemas/sign_in_schema.cr",
                 ECR.render("#{__DIR__}/templates/app/schemas/sign_in_schema.cr.ecr"),
               },

@@ -382,6 +382,7 @@ module Marten::CLI::Generator::AuthSpec
     "src/%{apps_folder}%{app_label}/models/user.cr",
     "src/%{apps_folder}%{app_label}/schemas/password_reset_confirm_schema.cr",
     "src/%{apps_folder}%{app_label}/schemas/password_reset_initiate_schema.cr",
+    "src/%{apps_folder}%{app_label}/schemas/password_update_schema.cr",
     "src/%{apps_folder}%{app_label}/schemas/sign_in_schema.cr",
     "src/%{apps_folder}%{app_label}/schemas/sign_up_schema.cr",
     "src/%{apps_folder}%{app_label}/templates/%{app_label}/emails/password_reset.html",

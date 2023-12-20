@@ -877,8 +877,8 @@ module Marten
         end
 
         # :nodoc:
-        def sum
-          raise NotImplementedError.new("#sum is not supported for query sets")
+        def sum(field : String | Symbol)
+          @query.sum(field.to_s)
         end
 
         # :nodoc:

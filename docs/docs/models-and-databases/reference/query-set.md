@@ -544,6 +544,15 @@ Post.all.pluck("title", "published")
 
 Alias for [`#count`](#count): returns the number of records that are targetted by the query set.
 
+### `sum`
+
+Returns the sum for a specific field for a query set
+
+```crystal
+Order.all.sum(:amount)
+# => 7
+```
+
 ### `update`
 
 Updates all the records matched by the current query set with the passed values.

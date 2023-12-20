@@ -2273,8 +2273,27 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#sum" do
-    it "raises NotImplementedError" do
-      expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.sum }
+    it "returns the correct amount of orders" do
+      Marten::DB::Query::SetSpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SetSpec::Order.create!(amount: 20, price: 1.25)
+
+      Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Order).new.sum(:amount).should eq 70
+    end
+
+    it "returns the correct price" do
+      Marten::DB::Query::SetSpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SetSpec::Order.create!(amount: 20, price: 1.25)
+
+      Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Order).new.sum("price").should eq 2.50
+    end
+
+    it "returns the correct amount of filtered orders" do
+      Marten::DB::Query::SetSpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SetSpec::Order.create!(amount: 20, price: 1.25)
+      Marten::DB::Query::SetSpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SetSpec::Order.create!(amount: 20, price: 1.25)
+
+      Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Order).new.filter(amount__lt: 50).sum(:amount).should eq 40
     end
   end
 

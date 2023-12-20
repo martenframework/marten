@@ -1570,6 +1570,43 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#sum" do
+    it "returns 0 if no orders are available" do
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Order).new
+
+      query.sum("amount").should eq 0
+    end
+
+    it "returns the correct amount of orders" do
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 20, price: 1.25)
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Order).new
+
+      query.sum("amount").should eq 70
+    end
+
+    it "returns the correct price" do
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 20, price: 1.25)
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Order).new
+
+      query.sum("price").should eq 2.50
+    end
+
+    it "returns the correct amount of orders" do
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 50, price: 1.25)
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 20, price: 1.25)
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: 100, price: 1.25)
+      Marten::DB::Query::SQL::QuerySpec::Order.create!(amount: -20, price: 1.25)
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Order).new
+
+      query.sum("amount").should eq 150
+    end
+  end
+
   describe "#to_empty" do
     it "results in a new EmptyQuery object" do
       query = Marten::DB::Query::SQL::Query(Tag).new

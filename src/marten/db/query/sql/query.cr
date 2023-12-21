@@ -227,6 +227,11 @@ module Marten
           end
 
           def sum(raw_field : String)
+            field_context = get_field_context(raw_field, Model)
+
+            raise Errors::InvalidField.new(
+              "Invalid type."
+            ) unless field_context.field.is_a?(Marten::DB::Field::Int) || field_context.field.is_a?(Marten::DB::Field::Float)
             column_name = if !raw_field.nil?
                             field_path = verify_field(raw_field.to_s)
                             relation_field_path = field_path.select { |field, _r| field.relation? }
@@ -245,14 +250,23 @@ module Marten
               result = db.scalar(sql, args: parameters)
               sum = result.to_s
 
-              return 0 if sum.empty?
+              if sum.empty?
+                return 0 if field_context.field.is_a?(Marten::DB::Field::Int) || field_context.field.is_a?(Marten::DB::Field::BigInt)
 
-              number = sum.to_i?
-              number ? number : sum.to_f
+                return 0.0
+              end
+
+              if field_context.field.is_a?(Marten::DB::Field::Int)
+                sum.to_i32
+              elsif field_context.field.is_a?(Marten::DB::Field::BigInt)
+                sum.to_i64
+              elsif field_context.field.is_a?(Marten::DB::Field::Float)
+                sum.to_f64
+              end
             end
           end
 
-          def build_sum_query(column_name)
+          private def build_sum_query(column_name)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 

@@ -265,6 +265,108 @@ describe Marten::Template::Context do
     end
   end
 
+  describe "#merge" do
+    it "merges another context object into the current one" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      other_context = Marten::Template::Context{"xyz" => "test", "foo" => "updated"}
+
+      context.merge(other_context).should eq context
+
+      context["foo"].should eq "updated"
+      context["john"].should eq "doe"
+      context["xyz"].should eq "test"
+    end
+
+    it "merges a hash into the current context" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      other_context = {"xyz" => "test", "foo" => "updated"}
+
+      context.merge(other_context).should eq context
+
+      context["foo"].should eq "updated"
+      context["john"].should eq "doe"
+      context["xyz"].should eq "test"
+    end
+
+    it "merges a named tuple into the current context" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      other_context = {xyz: "test", foo: "updated"}
+
+      context.merge(other_context).should eq context
+
+      context["foo"].should eq "updated"
+      context["john"].should eq "doe"
+      context["xyz"].should eq "test"
+    end
+
+    it "merges another context object on the last stack only" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      other_context = Marten::Template::Context{"xyz" => "test", "foo" => "updated"}
+
+      context.stack do |stacked_context|
+        stacked_context.merge(other_context).should eq stacked_context
+
+        stacked_context["foo"].should eq "updated"
+        stacked_context["john"].should eq "doe"
+        stacked_context["xyz"].should eq "test"
+      end
+
+      context["foo"].should eq "bar"
+      context["john"].should eq "doe"
+      context["xyz"]?.should be_nil
+    end
+
+    it "merges another hash on the last stack only" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      other_context = {"xyz" => "test", "foo" => "updated"}
+
+      context.stack do |stacked_context|
+        stacked_context.merge(other_context).should eq stacked_context
+
+        stacked_context["foo"].should eq "updated"
+        stacked_context["john"].should eq "doe"
+        stacked_context["xyz"].should eq "test"
+      end
+
+      context["foo"].should eq "bar"
+      context["john"].should eq "doe"
+      context["xyz"]?.should be_nil
+    end
+
+    it "merges another named tuple on the last stack only" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      other_context = {xyz: "test", foo: "updated"}
+
+      context.stack do |stacked_context|
+        stacked_context.merge(other_context).should eq stacked_context
+
+        stacked_context["foo"].should eq "updated"
+        stacked_context["john"].should eq "doe"
+        stacked_context["xyz"].should eq "test"
+      end
+
+      context["foo"].should eq "bar"
+      context["john"].should eq "doe"
+      context["xyz"]?.should be_nil
+    end
+
+    it "merges by following the order of stacks of the other context" do
+      context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+
+      other_context = Marten::Template::Context{"xyz" => "test", "foo" => "updated"}
+      other_context.stack do |other_stacked_context|
+        other_stacked_context["foo"] = "updated_2"
+        other_stacked_context["john"] = "doe_2"
+
+        context.merge(other_context).should eq context
+      end
+
+      context["foo"].should eq "updated_2"
+      context["john"].should eq "doe_2"
+      context["xyz"].should eq "test"
+    end
+  end
+
   describe "#stack" do
     it "adds another stack of values to the context" do
       ctx = Marten::Template::Context{"foo" => "bar"}

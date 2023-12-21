@@ -84,6 +84,24 @@ module Marten
         @values.empty? || @values.all?(&.empty?)
       end
 
+      # Merges another context into the current one.
+      def merge(other_context : self)
+        other_context.values.each do |values|
+          @values.last.merge!(values)
+        end
+
+        self
+      end
+
+      # Merges a hash or a named tuple of context values into the current context.
+      def merge(other_context : Hash | NamedTuple)
+        other_context.each do |k, v|
+          self[k] = v
+        end
+
+        self
+      end
+
       # Stack another context hash and yields itself.
       def stack(&)
         @values << Hash(String, Value).new
@@ -91,6 +109,8 @@ module Marten
       ensure
         @values.pop
       end
+
+      protected getter values
     end
   end
 end

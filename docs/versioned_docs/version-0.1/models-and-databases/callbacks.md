@@ -43,7 +43,7 @@ It should be noted that the order in which callback methods are registered for a
 
 `before_validation` callbacks are called before running validation rules for a given model instance while `after_validation` callbacks are executed after. They can be used to sanitize model instance attributes for example.
 
-The use of methods like `#valid?` or `#invalid?`, or any other methods involving validations (`#save`, `#save!`, `#create`, or `#create!`), will trigger validation callbacks. See [Model validations](./validations) for more details.
+The use of methods like `#valid?` or `#invalid?`, or any other methods involving validations (`#save`, `#save!`, `#create`, or `#create!`), will trigger validation callbacks. See [Model validations](./validations.md) for more details.
 
 ### `before_create` and `after_create`
 

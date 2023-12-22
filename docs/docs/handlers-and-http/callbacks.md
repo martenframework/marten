@@ -74,7 +74,7 @@ Similarly to `#before_dispatch` callbacks, `#after_dispatch` callbacks can retur
 
 ## Schema handler callbacks
 
-The following callbacks are only available for handlers that inherit from the [schema handler](./reference/generic-handlers#processing-a-schema). That is, handlers that inherit from [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html), but also handlers that inherit from [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) and [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html).
+The following callbacks are only available for handlers that inherit from the [schema handler](./reference/generic-handlers.md#processing-a-schema). That is, handlers that inherit from [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html), but also handlers that inherit from [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) and [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html).
 
 These callbacks let you define logics that are triggered before or after the validation of the schema. This allows you to easily intercept validation and handle the response independently of the schema validity. All these callbacks can optionally return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When an HTTP response is returned,
 all following callbacks are skipped and the obtained response is returned directly, thus bypassing responses that might have been returned after by the handler.

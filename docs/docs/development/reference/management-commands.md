@@ -31,7 +31,7 @@ marten clearsessions --no-input # Clears all expired sessions without any prompt
 
 Collects all the assets and copies them into a unique storage.
 
-Please refer to [Asset handling](../../assets/introduction) to learn more about when and how assets are "collected".
+Please refer to [Asset handling](../../assets/introduction.md) to learn more about when and how assets are "collected".
 
 ### Options
 
@@ -52,14 +52,14 @@ Generate various structures, abstractions, and values within an existing project
 
 ### Options
 
-Generators support their own specific options. For an exact list of generator options, please refer to the [Generators reference](./generators).
+Generators support their own specific options. For an exact list of generator options, please refer to the [Generators reference](./generators.md).
 
 ### Arguments
 
 * `generator` - Name of the generator to use
 * `arguments` - Generator-specific arguments
 
-Generators support their own specific arguments. For an exact list of generator arguments, please refer to the [Generators reference](./generators).
+Generators support their own specific arguments. For an exact list of generator arguments, please refer to the [Generators reference](./generators.md).
 
 ### Examples
 
@@ -83,7 +83,7 @@ marten g model Test label:string:uniq
 
 Generates new database migrations.
 
-This command will scan the table definition corresponding to your current models and will compare it to the equivalent tables that are defined by your migration files. Based on the result of this analysis, a new set of migrations will be created and persisted in your applications' `migrations` folders. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
+This command will scan the table definition corresponding to your current models and will compare it to the equivalent tables that are defined by your migration files. Based on the result of this analysis, a new set of migrations will be created and persisted in your applications' `migrations` folders. Please refer to [Migrations](../../models-and-databases/migrations.md) to learn more about this mechanism.
 
 ### Options
 
@@ -107,7 +107,7 @@ marten genmigrations foo --empty # Generates an empty migration for the "foo" ap
 
 Lists all the available database migrations.
 
-This command will introspect your project and your installed applications to list the available migrations, and indicate whether they have already been applied or not. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
+This command will introspect your project and your installed applications to list the available migrations, and indicate whether they have already been applied or not. Please refer to [Migrations](../../models-and-databases/migrations.md) to learn more about this mechanism.
 
 ### Options
 
@@ -130,7 +130,7 @@ marten listmigrations foo # Lists all the migrations of the "foo" app
 
 Runs database migrations.
 
-The `migrate` command allows you to apply (or unapply) migrations to your databases. By default, when executed without arguments, it will execute all the non-applied migrations for your installed applications. That being said, it is possible to ensure that only the migrations of a specific application are applied by specifying an additional `app_label` argument. To unapply certain migrations (or to apply some of them up to a certain version only), it is possible to specify another `migration` argument corresponding to the version of a targetted migration. Please refer to [Migrations](../../models-and-databases/migrations) to learn more about this mechanism.
+The `migrate` command allows you to apply (or unapply) migrations to your databases. By default, when executed without arguments, it will execute all the non-applied migrations for your installed applications. That being said, it is possible to ensure that only the migrations of a specific application are applied by specifying an additional `app_label` argument. To unapply certain migrations (or to apply some of them up to a certain version only), it is possible to specify another `migration` argument corresponding to the version of a targetted migration. Please refer to [Migrations](../../models-and-databases/migrations.md) to learn more about this mechanism.
 
 ### Options
 
@@ -157,15 +157,15 @@ marten migrate foo 202203111821451 # Applies (or unapply) migrations for the "fo
 
 Initializes a new Marten project or application repository structure.
 
-The `new` management command can be used to create either a new project repository or a new [application](../applications) repository. This can be handy when creating new projects, or when creating new applications that are intended to be distributed as dedicated shards, as it ensures you are following Marten's best practices and conventions.
+The `new` management command can be used to create either a new project repository or a new [application](../applications.md) repository. This can be handy when creating new projects, or when creating new applications that are intended to be distributed as dedicated shards, as it ensures you are following Marten's best practices and conventions.
 
 The command allows you to fully define the name of your project or application, and in which folder it should be created.
 
 ### Options
 
 * `-d DIR, --dir=DIR` - An optional destination directory
-* `--with-auth` - Adds an authentication application to newly created projects. See [Authentication](../../authentication) to learn more about this capability
-* `--database` - Preconfigures the application database. Currently `mysql`, `postgresq` and `sqlite3` are supported. See [Database settings](../../development/reference/settings#database-settings) for more information.
+* `--with-auth` - Adds an authentication application to newly created projects. See [Authentication](../../authentication.mdx) to learn more about this capability
+* `--database` - Preconfigures the application database. Currently `mysql`, `postgresq` and `sqlite3` are supported. See [Database settings](../../development/reference/settings.md#database-settings) for more information.
 
 ### Arguments
 
@@ -188,7 +188,7 @@ marten new app auth                               # Creates an "auth" applicatio
 
 **Usage:** `marten resetmigrations [options] [app_label]`
 
-Resets an existing set of migrations into a single one. Please refer to [Resetting migrations](../../models-and-databases/migrations#resetting-migrations) to learn more about this capability.
+Resets an existing set of migrations into a single one. Please refer to [Resetting migrations](../../models-and-databases/migrations.md#resetting-migrations) to learn more about this capability.
 
 ### Arguments
 

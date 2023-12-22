@@ -4,11 +4,11 @@ description: Learn how to leverage applications to structure your projects.
 sidebar_label: Applications
 ---
 
-Marten projects can be organized into logical and reusable components called "applications". These applications can contribute specific behaviors and abstractions to a project, including [models](../models-and-databases), [handlers](../handlers-and-http), and [templates](../templates). They can be packaged and reused across various projects as well.
+Marten projects can be organized into logical and reusable components called "applications". These applications can contribute specific behaviors and abstractions to a project, including [models](../models-and-databases.mdx), [handlers](../handlers-and-http.mdx), and [templates](../templates.mdx). They can be packaged and reused across various projects as well.
 
 ## Overview
 
-A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases), [handlers](../handlers-and-http), [templates](../templates), [schemas](../schemas/), etc.
+A Marten **application** is a set of abstractions (defined under a dedicated and unique folder) that provides some set of features. These abstractions can correspond to [models](../models-and-databases.mdx), [handlers](../handlers-and-http.mdx), [templates](../templates.mdx), [schemas](../schemas.mdx), etc.
 
 Marten projects always use one or many applications. Indeed, each Marten project comes with a default [main application](#the-main-application) that corresponds to the standard `src` folder: models, migrations, or other classes defined in this folder are associated with the main application by default (unless they are part of another _explicitly defined_ application). As projects grow in size and scope, it is generally encouraged to start thinking in terms of applications and how to split models, handlers, or features across multiple apps depending on their intended responsibilities.
 
@@ -16,7 +16,7 @@ Another benefit of applications is that they can be packaged and reused across m
 
 ## Using applications
 
-The use of applications must be manually enabled within projects: this is done through the use of the [`installed_apps`](./reference/settings#installedapps) setting.
+The use of applications must be manually enabled within projects: this is done through the use of the [`installed_apps`](./reference/settings.md#installedapps) setting.
 
 This setting corresponds to an array of installed app classes. Indeed, each Marten application must define a subclass of [`Marten::App`](pathname:///api/0.2/Marten/App.html) to specify a few things such as the application label (see [Creating applications](#creating-applications) for more information about this). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project.
 
@@ -40,7 +40,7 @@ Adding an application class inside this array will have the following impact on 
 
 ### The main application
 
-The "main" application is a default application that is always implicitly used by Marten projects (which means that it does not appear in the [`installed_apps`](./reference/settings#installedapps) setting). This application is associated with the standard `src` folder: this means that models, migrations, assets, or templates defined in this folder will be associated with the main application by default. For example, models defined under a `src/models` folder would be associated with the main application.
+The "main" application is a default application that is always implicitly used by Marten projects (which means that it does not appear in the [`installed_apps`](./reference/settings.md#installedapps) setting). This application is associated with the standard `src` folder: this means that models, migrations, assets, or templates defined in this folder will be associated with the main application by default. For example, models defined under a `src/models` folder would be associated with the main application.
 
 :::info
 The main application is associated with the `main` label. This means that models of the main application that do not define an explicit table name will have table names starting with `main_`.
@@ -52,7 +52,7 @@ In the end, the main application provides a convenient way for starting projects
 
 ### Order of installed applications
 
-You should note that the order in which installed applications are defined in the [`installed_apps`](./reference/settings#installedapps) setting can actually matter.
+You should note that the order in which installed applications are defined in the [`installed_apps`](./reference/settings.md#installedapps) setting can actually matter.
 
 For example, a "foo" app might define a `test.html` template, and a similar template with the exact same name might be defined by a "bar" app. If the "foo" app appears before the "bar" app in the array of installed apps, then requesting and rendering the `test.html` template will actually involve the "foo" app's template only. This is because template loaders associated with app directories iterate over applications in the order in which they are defined in the installed apps array.
 
@@ -60,7 +60,7 @@ This is why it is always important to _namespace_ abstractions, assets, template
 
 ## Creating applications
 
-Creating applications can be done very easily through the use of the [`new`](./reference/management-commands#new) management command. For example:
+Creating applications can be done very easily through the use of the [`new`](./reference/management-commands.md#new) management command. For example:
 
 ```bash
 marten new app blog --dir=src/blog

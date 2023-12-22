@@ -17,7 +17,7 @@ Are you new to the Marten web framework? The following resources will help you g
 
 The Marten documentation contains multiple pages and references that don't necessarily serve the same purpose. To help you browse this documentation, here is an overview of the different sorts of content you might encounter:
 
-* **Topic-specific guides** discuss the key concepts of the framework. They provide explanations and useful information about things like [models](./models-and-databases), [handlers](./handlers-and-http), and [templates](./templates)
+* **Topic-specific guides** discuss the key concepts of the framework. They provide explanations and useful information about things like [models](./models-and-databases.mdx), [handlers](./handlers-and-http.mdx), and [templates](./templates.mdx)
 * **Reference pages** provide a curated technical reference of the framework APIs
 * **How-to guides** document how to solve common problems when working with the framework. Those can cover things like deployments, app development, etc
 

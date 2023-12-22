@@ -29,7 +29,7 @@ The `get_response` proc will either call the next middleware in the chain of mid
 
 ## Activating middlewares
 
-In order to be used, middleware classes need to be specified in the [`middleware`](../development/reference/settings#middleware) setting. This setting is an array of middleware classes that defines the "chain" of middlewares that will be "hooked" into Marten's request/response lifecycle.
+In order to be used, middleware classes need to be specified in the [`middleware`](../development/reference/settings.md#middleware) setting. This setting is an array of middleware classes that defines the "chain" of middlewares that will be "hooked" into Marten's request/response lifecycle.
 
 For example:
 
@@ -45,4 +45,4 @@ It should be noted that the order of middlewares is important. For example, if o
 
 ## Available middlewares
 
-All the available middlewares are listed in the [dedicated reference section](./reference/middlewares).
+All the available middlewares are listed in the [dedicated reference section](./reference/middlewares.md).

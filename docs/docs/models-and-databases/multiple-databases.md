@@ -35,7 +35,7 @@ Think of this additional argument as a "database identifier" or alias that you c
 
 ## Applying migrations to your databases
 
-The [`migrate`](../development/reference/management-commands#migrate) management command operates on the "default" database by default, but it also accepts an optional `--db` option that lets you specify to which database the migrations should be applied. The value you specify for this option must correspond to the alias you configured when defining your databases in your project's configuration. For example:
+The [`migrate`](../development/reference/management-commands.md#migrate) management command operates on the "default" database by default, but it also accepts an optional `--db` option that lets you specify to which database the migrations should be applied. The value you specify for this option must correspond to the alias you configured when defining your databases in your project's configuration. For example:
 
 ```bash
 marten migrate --db=other_db
@@ -49,7 +49,7 @@ Marten lets you select which database you want to use when performing model-rela
 
 ### Querying records
 
-When querying records, you can use the [`#using`](./reference/query-set#using) query set method in order to specify the target database. For example:
+When querying records, you can use the [`#using`](./reference/query-set.md#using) query set method in order to specify the target database. For example:
 
 ```crystal
 Article.all                  # Will target the "default" database

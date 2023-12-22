@@ -56,7 +56,7 @@ This notation can be used to call object methods but also to perform key lookups
 
 Filters can be applied to [variables](#variables) or [tag](#tags) arguments in order to transform their values. They are applied to these variables or arguments through the use of a pipe (**`|`**) followed by the name of the filter.
 
-For example, the following snippet will apply the [`capitalize`](./reference/filters#capitalize) filter to the output of the `name` variable, which will capitalize the value of this variable:
+For example, the following snippet will apply the [`capitalize`](./reference/filters.md#capitalize) filter to the output of the `name` variable, which will capitalize the value of this variable:
 
 ```html
 Hello, {{ name|capitalize }}!
@@ -64,7 +64,7 @@ Hello, {{ name|capitalize }}!
 
 It should be noted that some filters can take an argument. When this is the case, the argument is specified following a colon character (**`:`**).
 
-For example, the following snippet will apply the [`default`](./reference/filters#default) filter to the output of the `name` variable in order to fallback to a default name if the variable has a null value:
+For example, the following snippet will apply the [`default`](./reference/filters.md#default) filter to the output of the `name` variable in order to fallback to a default name if the variable has a null value:
 
 ```html
 Hello, {{ name|default:"Stranger" }}!
@@ -72,19 +72,19 @@ Hello, {{ name|default:"Stranger" }}!
 
 It should be noted that the fact that an argument is supported or not, and mandatory or not, varies based on the considered filter. In all cases, filters can support up to **one** argument only.
 
-Please head over to the [filters reference](./reference/filters) to see a list of all the available filters. Implementing custom filters is also a possibility that is documented in [Create custom filters](./how-to/create-custom-filters).
+Please head over to the [filters reference](./reference/filters.md) to see a list of all the available filters. Implementing custom filters is also a possibility that is documented in [Create custom filters](./how-to/create-custom-filters.md).
 
 ### Tags
 
 Tags allow to do method-calling and to run any kind of logic within a template. Some tags allow to perform control flows (like if conditions, or for loops) while others simply output values. They are delimited by **`{%`** and **`%}`**.
 
-For example, the following snippet makes use of the [`assign`](./reference/tags#assign) tag to create a new variable within a template:
+For example, the following snippet makes use of the [`assign`](./reference/tags.md#assign) tag to create a new variable within a template:
 
 ```html
 {% assign my_var = "Hello World!" %}
 ```
 
-As mentioned above, some tags allow to perform control flows and require a "closing" tag, like the [`for`](./reference/tags#for) or [`if`](./reference/tags#if) tags:
+As mentioned above, some tags allow to perform control flows and require a "closing" tag, like the [`for`](./reference/tags.md#for) or [`if`](./reference/tags.md#if) tags:
 
 ```html
 {% for article in articles %}
@@ -92,13 +92,13 @@ As mentioned above, some tags allow to perform control flows and require a "clos
 {% endfor %}
 ```
 
-Some tags also require arguments. For example, the [`url`](./reference/tags#url) template tag requires at least the name of the route for which the URL resolution should be performed:
+Some tags also require arguments. For example, the [`url`](./reference/tags.md#url) template tag requires at least the name of the route for which the URL resolution should be performed:
 
 ```html
 {% url "my_route" %}
 ```
 
-Please head over to the [tags reference](./reference/tags) to see a list of all the available template tags. Implementing custom tags is also a possibility that is documented in [Create custom tags](./how-to/create-custom-tags).
+Please head over to the [tags reference](./reference/tags.md) to see a list of all the available template tags. Implementing custom tags is also a possibility that is documented in [Create custom tags](./how-to/create-custom-tags.md).
 
 ### Comments
 
@@ -130,7 +130,7 @@ For example, a "base" template could look like this:
 </html>
 ```
 
-Here the base template defines two blocks by using the [`block`](./reference/tags#block) template tag. Using this tag essentially makes it possible for any child templates to "override" the content of these blocks.
+Here the base template defines two blocks by using the [`block`](./reference/tags.md#block) template tag. Using this tag essentially makes it possible for any child templates to "override" the content of these blocks.
 
 :::tip
 Note that it is possible to specify the name of the block being closed in the `endblock` tag to improve readability. For example:
@@ -152,13 +152,13 @@ Given the above base template (that we assume is named `base.html`), a "child" t
 {% block content %}Custom page content{% endblock %}
 ```
 
-Here we make use of the [`extend`](./reference/tags#extend) template tag in order to indicate that we want to inherit from the `base.html` template that we created previously. When Marten encounters this tag, it'll make sure that the targetted template is properly loaded before resuming the evaluation of the current template.
+Here we make use of the [`extend`](./reference/tags.md#extend) template tag in order to indicate that we want to inherit from the `base.html` template that we created previously. When Marten encounters this tag, it'll make sure that the targetted template is properly loaded before resuming the evaluation of the current template.
 
 :::warning
 The `{% extend %}` tag should always be called at the top of the file, before the actual content of the template. Inheritance won't work properly if that's not the case.
 :::
 
-We also use [`block`](./reference/tags#block) tags to redefine the content of the blocks that were defined in the `base.html` template. It should be noted that if a child template does not define the content of one of its parent's blocks, the default content of this block will be used instead (if there is one!).
+We also use [`block`](./reference/tags.md#block) tags to redefine the content of the blocks that were defined in the `base.html` template. It should be noted that if a child template does not define the content of one of its parent's blocks, the default content of this block will be used instead (if there is one!).
 
 :::info
 You can use many levels of template inheritance if needed. Indeed, a `child.html` template can very well extend a `base_dashboard.html` template, which itself extends a `base.html` template for example.
@@ -182,8 +182,8 @@ It's important to remember that the `super` template tag can only be used withi
 
 Templates can be loaded from specific locations within your codebase and from application folders. This is controlled by two main settings:
 
-* [`templates.app_dirs`](../development/reference/settings#app_dirs-1) is a boolean that indicates whether or not it should be possible to load templates that are provided by [installed applications](../development/reference/settings#installed_apps). Indeed, applications can define a `templates` folder at their root, and these templates will be discoverable by Marten if this setting is set to `true`
-* [`templates.dirs`](../development/reference/settings#dirs1) is an array of additional directories where templates should be looked for
+* [`templates.app_dirs`](../development/reference/settings.md#app_dirs-1) is a boolean that indicates whether or not it should be possible to load templates that are provided by [installed applications](../development/reference/settings.md#installed_apps). Indeed, applications can define a `templates` folder at their root, and these templates will be discoverable by Marten if this setting is set to `true`
+* [`templates.dirs`](../development/reference/settings.md#dirs1) is an array of additional directories where templates should be looked for
 
 Application templates are always enabled by default (`templates.app_dirs = true`) for new Marten projects.
 
@@ -197,7 +197,7 @@ This will return a compiled [`Template`](pathname:///api/0.3/Marten/Template/Tem
 
 ## Rendering a template
 
-You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction#render) shortcut or [generic handlers](../handlers-and-http/generic-handlers) that automatically render templates for you.
+You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http.mdx), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction.md#render) shortcut or [generic handlers](../handlers-and-http/generic-handlers.md) that automatically render templates for you.
 
 That being said, it is also possible to render any [`Template`](pathname:///api/0.3/Marten/Template/Template.html) object that you loaded by leveraging the [`#render`](pathname:///api/0.3/Marten/Template/Template.html#render(context%3AHash|NamedTuple)%3AString-instance-method) method. This method can be used either with a Marten context object, a hash, or a named tuple:
 
@@ -303,7 +303,7 @@ Context producers are helpers that ensure that common variables are automaticall
 
 For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a handler and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/0.3/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
 
-Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings#contextproducers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
+Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings.md#contextproducers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
 
 ```crystal
 config.templates.context_producers = [
@@ -316,7 +316,7 @@ config.templates.context_producers = [
 
 Each context producer in this array will be applied in order when a new template context is created and will contribute "common" context values to it. This means that the order of these is important since context producers can technically overwrite the values that were added by previous context producers.
 
-Please head over to the [context producers reference](./reference/context-producers) to see a list of all the available context producers. Implementing custom context producers is also a possibility that is documented in [Create custom context producers](./how-to/create-custom-context-producers).
+Please head over to the [context producers reference](./reference/context-producers.md) to see a list of all the available context producers. Implementing custom context producers is also a possibility that is documented in [Create custom context producers](./how-to/create-custom-context-producers.md).
 
 ## Auto-escaping
 
@@ -336,7 +336,7 @@ Hello, &lt;script&gt;alert(&#39;popup&#39;)&lt;/script&gt;!
 
 It should be noted that this behavior can be disabled _explicitly_. Indeed, sometimes it is expected that some template variables will contain trusted HTML content that you intend to embed into the template's HTML.
 
-To do this, it is possible to make use of the [`safe`](./reference/filters#safe) template filter. This filter "marks" the output of a variable as safe, which ensures that its content is not escaped before being inserted in the final output of a rendered template.
+To do this, it is possible to make use of the [`safe`](./reference/filters.md#safe) template filter. This filter "marks" the output of a variable as safe, which ensures that its content is not escaped before being inserted in the final output of a rendered template.
 
 For example:
 

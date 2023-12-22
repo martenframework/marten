@@ -4,7 +4,7 @@ sidebar_label: Create context producers
 description: How to create custom context producers.
 ---
 
-Marten has built-in support for common [context producers](../reference/context-producers), but the framework also allows you to write your own context producers that you can leverage as part of your project's templates. This allows you to easily reuse common context values over multiple templates.
+Marten has built-in support for common [context producers](../reference/context-producers.md), but the framework also allows you to write your own context producers that you can leverage as part of your project's templates. This allows you to easily reuse common context values over multiple templates.
 
 ## Defining a context producer
 
@@ -13,7 +13,7 @@ Defining a context producer involves creating a subclass of the [`Marten::Templa
 * a hash or a named tuple containing the values to contribute to the template context
 * or `nil` if no values can be generated for the passed request
 
-For example, the following context producer would expose the value of the [`debug`](../../development/reference/settings#debug) setting to all the template contexts being created:
+For example, the following context producer would expose the value of the [`debug`](../../development/reference/settings.md#debug) setting to all the template contexts being created:
 
 ```crystal
 class Debug < Marten::Template::ContextProducer
@@ -25,4 +25,4 @@ end
 
 ## Activating context producers
 
-As mentioned in [Using context producers](../introduction#using-context-producers), context producers classes must be added to the [`templates.context_producers`](../../development/reference/settings#contextproducers) setting in order to be used by the Marten templates engine when initializing new context objects.
+As mentioned in [Using context producers](../introduction.md#using-context-producers), context producers classes must be added to the [`templates.context_producers`](../../development/reference/settings.md#contextproducers) setting in order to be used by the Marten templates engine when initializing new context objects.

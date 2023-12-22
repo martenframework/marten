@@ -43,7 +43,7 @@ Marten also has built-in support for PostgreSQL and MySQL. Please refer to the a
 * [MySQL Installation Guide](https://dev.mysql.com/doc/refman/8.0/en/installing.html)
 * [SQLite Installation Guide](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm)
 
-Each database necessitates the use of a dedicated shard (a package of Crystal code). If you're just beginning with the framework or planning to follow the [tutorial](./tutorial), there's no immediate need to install these shards. However, if you intend to employ other databases like MySQL or PostgreSQL, you may need to install database-specific shards. You can find instructions on how to do this in the [Configure database backends](../development/how-to/configure-database-backends) section.
+Each database necessitates the use of a dedicated shard (a package of Crystal code). If you're just beginning with the framework or planning to follow the [tutorial](./tutorial.md), there's no immediate need to install these shards. However, if you intend to employ other databases like MySQL or PostgreSQL, you may need to install database-specific shards. You can find instructions on how to do this in the [Configure database backends](../development/how-to/configure-database-backends.md) section.
 
 ## Install Marten
 
@@ -94,4 +94,4 @@ marten -v
 
 _Congrats! You’re in._
 
-You can now move on to the [introduction tutorial](./tutorial).
+You can now move on to the [introduction tutorial](./tutorial.md).

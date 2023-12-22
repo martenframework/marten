@@ -8,22 +8,22 @@ Sessions can be used to store small amounts of data that will be persisted betwe
 
 ## Configuration
 
-In order to use sessions, you need to make sure that the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware is part of your project's middleware chain, which can be configured in the [`middleware`](../development/reference/settings#middleware) setting. Note that the session middleware class is automatically added to this setting when initializing new projects.
+In order to use sessions, you need to make sure that the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware is part of your project's middleware chain, which can be configured in the [`middleware`](../development/reference/settings.md#middleware) setting. Note that the session middleware class is automatically added to this setting when initializing new projects.
 
-If your project does not require the use of sessions, you can simply ensure that the [`middleware`](../development/reference/settings#middleware) setting does not include the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware class.
+If your project does not require the use of sessions, you can simply ensure that the [`middleware`](../development/reference/settings.md#middleware) setting does not include the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware class.
 
 How the session ID cookie is generated can also be tweaked by leveraging the following settings:
 
-* [`sessions.cookie_domain`](../development/reference/settings#cookie_domain-1)
-* [`sessions.cookie_http_only`](../development/reference/settings#cookie_http_only-1)
-* [`sessions.cookie_max_age`](../development/reference/settings#cookie_max_age-1)
-* [`sessions.cookie_name`](../development/reference/settings#cookie_name-1)
-* [`sessions.cookie_same_site`](../development/reference/settings#cookie_same_site-1)
-* [`sessions.cookie_secure`](../development/reference/settings#cookie_secure-1)
+* [`sessions.cookie_domain`](../development/reference/settings.md#cookie_domain-1)
+* [`sessions.cookie_http_only`](../development/reference/settings.md#cookie_http_only-1)
+* [`sessions.cookie_max_age`](../development/reference/settings.md#cookie_max_age-1)
+* [`sessions.cookie_name`](../development/reference/settings.md#cookie_name-1)
+* [`sessions.cookie_same_site`](../development/reference/settings.md#cookie_same_site-1)
+* [`sessions.cookie_secure`](../development/reference/settings.md#cookie_secure-1)
 
 ## Session stores
 
-How session data is actually persisted can be defined by configuring the right session store backend, which can be done through the use of the [`sessions.store`](../development/reference/settings#store) setting.
+How session data is actually persisted can be defined by configuring the right session store backend, which can be done through the use of the [`sessions.store`](../development/reference/settings.md#store) setting.
 
 By default, sessions are stored within a single cookie (`:cookie` session store). Cookies have a 4K size limit, which is usually sufficient in order to persist things like a user ID and flash messages. `:cookie` is the only store that is built in the Marten web framework presently.
 

@@ -3,7 +3,7 @@ title: Generic handlers
 description: Generic handlers reference
 ---
 
-This page provides a reference for all the available [generic handlers](../generic-handlers).
+This page provides a reference for all the available [generic handlers](../generic-handlers.md).
 
 ## Creating a record
 
@@ -11,7 +11,7 @@ This page provides a reference for all the available [generic handlers](../gener
 
 Handler allowing to create a new model record by processing a schema.
 
-This handler can be used to process a form, validate its data through the use of a [schema](../../schemas), and create a record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context in order to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the corresponding model record is created and the handler returns an HTTP redirect to a configured success URL.
+This handler can be used to process a form, validate its data through the use of a [schema](../../schemas.mdx), and create a record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context in order to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the corresponding model record is created and the handler returns an HTTP redirect to a configured success URL.
 
 ```crystal
 class MyFormHandler < Marten::Handlers::RecordCreate
@@ -29,7 +29,7 @@ The model class used to create the new record can be configured through the use 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
 :::tip
-Handlers making use of the [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks#schema-handler-callbacks) to learn more about those.
+Handlers making use of the [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks.md#schema-handler-callbacks) to learn more about those.
 :::
 
 ## Deleting a record
@@ -58,7 +58,7 @@ The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethod
 
 Handler allowing to display a specific model record.
 
-This handler can be used to retrieve a [model](../../models-and-databases/introduction) record, and to display it as part of a [rendered template](../../templates).
+This handler can be used to retrieve a [model](../../models-and-databases/introduction.md) record, and to display it as part of a [rendered template](../../templates.mdx).
 
 ```crystal
 class ArticleDetailHandler < Marten::Handlers::RecordDetail
@@ -86,11 +86,11 @@ class MyHandler < Marten::Handlers::RecordList
 end
 ```
 
-The model class used to retrieve the records can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordListing.html#model(model_klass)-macro) macro. The [order](../../models-and-databases/reference/query-set#order) of these model records can also be specified by leveraging the [`#ordering`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_number_param(param%3AString|Symbol)-instance-method) class method.
+The model class used to retrieve the records can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordListing.html#model(model_klass)-macro) macro. The [order](../../models-and-databases/reference/query-set.md#order) of these model records can also be specified by leveraging the [`#ordering`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_number_param(param%3AString|Symbol)-instance-method) class method.
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the list of model records. By default, the list of model records is associated with a `records` key in the template context, but this can also be configured by using the [`list_context_name`](pathname:///api/dev/Marten/Handlers/RecordList.html#list_context_name(name%3AString|Symbol)-class-method) class method.
 
-Optionally, it is possible to configure that records should be [paginated](../../models-and-databases/reference/query-set#paginator) by specifying a page size through the use of the [`page_size`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_size(page_size%3AInt32%3F)-instance-method) class method:
+Optionally, it is possible to configure that records should be [paginated](../../models-and-databases/reference/query-set.md#paginator) by specifying a page size through the use of the [`page_size`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_size(page_size%3AInt32%3F)-instance-method) class method:
 
 ```crystal
 class MyHandler < Marten::Handlers::RecordList
@@ -132,7 +132,7 @@ end
 
 Handler allowing to update a model record by processing a schema.
 
-This handler can be used to process a form, validate its data through the use of a [schema](../../schemas), and update an existing record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the model record that was retrieved is updated and the handler returns an HTTP redirect to a configured success URL.
+This handler can be used to process a form, validate its data through the use of a [schema](../../schemas.mdx), and update an existing record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the model record that was retrieved is updated and the handler returns an HTTP redirect to a configured success URL.
 
 ```crystal
 class MyFormHandler < Marten::Handlers::RecordUpdate
@@ -152,7 +152,7 @@ The schema used to perform the validation can be defined through the use of the 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
 :::tip
-Handlers making use of the [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks#schema-handler-callbacks) to learn more about those.
+Handlers making use of the [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks.md#schema-handler-callbacks) to learn more about those.
 :::
 
 ## Performing a redirect
@@ -161,7 +161,7 @@ Handlers making use of the [`Marten::Handlers::RecordUpdate`](pathname:///api/de
 
 Handler allowing to conveniently return redirect responses.
 
-This handler can be used to generate a redirect response (temporary or permanent) to another location. To configure such a location, you can either leverage the [`#route_name`](pathname:///api/dev/Marten/Handlers/Redirect.html#route_name(route_name%3AString%3F)-class-method) class method (which expects a valid [route name](../routing#reverse-url-resolutions)) or the [`#url`](pathname:///api/dev/Marten/Handlers/Redirect.html#url(url%3AString%3F)-class-method) class method. If you need to implement a custom redirection URL logic, you can also override the [`#redirect_url`](pathname:///api/dev/Marten/Handlers/Redirect.html#redirect_url-instance-method) method.
+This handler can be used to generate a redirect response (temporary or permanent) to another location. To configure such a location, you can either leverage the [`#route_name`](pathname:///api/dev/Marten/Handlers/Redirect.html#route_name(route_name%3AString%3F)-class-method) class method (which expects a valid [route name](../routing.md#reverse-url-resolutions)) or the [`#url`](pathname:///api/dev/Marten/Handlers/Redirect.html#url(url%3AString%3F)-class-method) class method. If you need to implement a custom redirection URL logic, you can also override the [`#redirect_url`](pathname:///api/dev/Marten/Handlers/Redirect.html#redirect_url-instance-method) method.
 
 ```crystal
 class TestRedirectHandler < Marten::Handlers::Redirect
@@ -177,9 +177,9 @@ It should also be noted that by default, incoming query string parameters **are 
 
 **Class:** [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html)
 
-Handler allowing to process a form through the use of a [schema](../../schemas).
+Handler allowing to process a form through the use of a [schema](../../schemas.mdx).
 
-This handler can be used to process a form and validate its data through the use of a [schema](../../schemas). It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the handler returns an HTTP redirect to a configured success URL.
+This handler can be used to process a form and validate its data through the use of a [schema](../../schemas.mdx). It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the handler returns an HTTP redirect to a configured success URL.
 
 ```crystal
 class MyFormHandler < Marten::Handlers::Schema
@@ -196,14 +196,14 @@ The schema used to perform the validation can be defined through the use of the 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
 :::tip
-Handlers making use of the [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks#schema-handler-callbacks) to learn more about those.
+Handlers making use of the [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks.md#schema-handler-callbacks) to learn more about those.
 :::
 
 ## Rendering a template
 
 **Class:** [`Marten::Handlers::Template`](pathname:///api/dev/Marten/Handlers/Template.html)
 
-Handler allowing to respond to `GET` request with the content of a rendered HTML [template](../../templates).
+Handler allowing to respond to `GET` request with the content of a rendered HTML [template](../../templates.mdx).
 
 This handler can be used to render a specific template and returns the resulting content in the response. The template being rendered can be specified by leveraging the [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method.
 

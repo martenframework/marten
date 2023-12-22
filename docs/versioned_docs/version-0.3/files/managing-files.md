@@ -8,7 +8,7 @@ Marten gives you the ability to associate uploaded files with model records and 
 
 ## Using files with models
 
-You can make use of the [`file`](../models-and-databases/reference/fields#file) field when defining models: this allows to associate an uploaded file with specific model records.
+You can make use of the [`file`](../models-and-databases/reference/fields.md#file) field when defining models: this allows to associate an uploaded file with specific model records.
 
 For example, let's consider the following model:
 
@@ -33,7 +33,7 @@ attachment.file.url       # => "/media/test.txt"
 The object returned by the `Attachment#file` method is a "file object": an instance of [`Marten::DB::Field::File::File`](pathname:///api/0.3/Marten/DB/Field/File/File.html). These objects and their associated capabilities are described below in [File objects](#file-objects).
 
 :::tip Under which path are files persisted?
-Files are stored at the root of the media [storage](#file-storages) by default. It should be noted that the path used to persist files in storages can be configured by setting the `upload_to` [`file`](../models-and-databases/reference/fields#file) field option.
+Files are stored at the root of the media [storage](#file-storages) by default. It should be noted that the path used to persist files in storages can be configured by setting the `upload_to` [`file`](../models-and-databases/reference/fields.md#file) field option.
 
 For example, the previous `Attachment` model could be rewritten as follows to ensure that files are persisted in a `foo/bar` folder:
 
@@ -73,7 +73,7 @@ You don't need to take care of possible collisions between attached file names: 
 
 As mentioned previously, file objects are used internally by Marten to allow interacting with files that are associated with model records. These objects are instances of the [`Marten::DB::Field::File::File`](pathname:///api/0.3/Marten/DB/Field/File/File.html) class. They give access to basic file properties and they allow to interact with the associated IO.
 
-It should be noted that these "file objects" are **always** associated with a model record (persisted or not), and as such, they are only used in the context of the [`file`](../models-and-databases/reference/fields#file) model field.
+It should be noted that these "file objects" are **always** associated with a model record (persisted or not), and as such, they are only used in the context of the [`file`](../models-and-databases/reference/fields.md#file) model field.
 
 Finally, it's worth mentioning that file objects can be **attached** and/or **committed**:
 
@@ -145,7 +145,7 @@ attachment.file.committed? # => false
 
 Marten uses a file storage mechanism to perform file operations like saving files, deleting files, generating URLs, ... This file storages mechanism allows to save files in different backends by leveraging a standardized API (eg. in the local file system, in a cloud bucket, etc).
 
-By default, [`file`](../models-and-databases/reference/fields#file) model fields make use of the configured "media" storage. This storage uses the [`settings.media_files`](../development/reference/settings#media-files-settings) settings to determine what storage backend to use, and where to persist files. By default, the media storage uses the [`Marten::Core::Store::FileSystem`](pathname:///api/0.3/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that files are persisted in the local file system, where the Marten application is running.
+By default, [`file`](../models-and-databases/reference/fields.md#file) model fields make use of the configured "media" storage. This storage uses the [`settings.media_files`](../development/reference/settings.md#media-files-settings) settings to determine what storage backend to use, and where to persist files. By default, the media storage uses the [`Marten::Core::Store::FileSystem`](pathname:///api/0.3/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that files are persisted in the local file system, where the Marten application is running.
 
 ### Interacting with the media file storage
 
@@ -190,7 +190,7 @@ storage.exists?(filepath)  # => false
 
 ### Using a different storage with models
 
-As mentioned previously, [`file`](../models-and-databases/reference/fields#file) model fields make use of the configured "media" storage by default. That being said, it is possible to leverage the `storage` option in order to make use of another storage if necessary.
+As mentioned previously, [`file`](../models-and-databases/reference/fields.md#file) model fields make use of the configured "media" storage by default. That being said, it is possible to leverage the `storage` option in order to make use of another storage if necessary.
 
 For example:
 
@@ -207,7 +207,7 @@ When doing this, all the file operations will be done using the configured stora
 
 ## Serving uploaded files during development
 
-Marten provides a handler that you can use to serve media files in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeMediaFile`](pathname:///api/0.3/Marten/Handlers/Defaults/Development/ServeMediaFile.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands#new) management command:
+Marten provides a handler that you can use to serve media files in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeMediaFile`](pathname:///api/0.3/Marten/Handlers/Defaults/Development/ServeMediaFile.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands.md#new) management command:
 
 ```crystal
 Marten.routes.draw do
@@ -219,7 +219,7 @@ Marten.routes.draw do
 end
 ```
 
-As you can see, this route will automatically use the URL that is configured as part of the [`url`](../development/reference/settings#url-1) media files setting. For example, this means that a `foo/bar.txt` media file would be served by the `/media/foo/bar.txt` route in development if the [`url`](../development/reference/settings#url-1) setting is set to `/media/`.
+As you can see, this route will automatically use the URL that is configured as part of the [`url`](../development/reference/settings.md#url-1) media files setting. For example, this means that a `foo/bar.txt` media file would be served by the `/media/foo/bar.txt` route in development if the [`url`](../development/reference/settings.md#url-1) setting is set to `/media/`.
 
 :::warning
 It is very important to understand that this handler should **only** be used in development environments. Indeed, the [`Marten::Handlers::Defaults::Development::ServeMediaFile`](pathname:///api/0.3/Marten/Handlers/Defaults/Development/ServeMediaFile.html) handler is not suited for production environments as it is not really efficient or secure. A better way to serve uploaded files is to leverage a web server or a cloud bucket for example (depending on the configured media files storage).

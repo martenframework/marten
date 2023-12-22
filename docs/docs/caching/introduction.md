@@ -10,7 +10,7 @@ Marten provides a set of features allowing you to leverage caching as part of yo
 
 In order to be able to leverage caching in your application, you need to configure a "cache store". A cache store allows interacting with the underlying cache system and performing basic operations such as fetching cached entries, writing new entries, etc. Depending on the chosen cache store, these operations could be performed in-memory or by leveraging external caching systems such as [Redis](https://redis.io) or [Memcached](https://memcached.org).
 
-The global cache store used by Marten can be configured by leveraging the [`cache_store`](../development/reference/settings#cache_store) setting. All the available cache stores are listed in the [cache store reference](./reference/stores.md).
+The global cache store used by Marten can be configured by leveraging the [`cache_store`](../development/reference/settings.md#cache_store) setting. All the available cache stores are listed in the [cache store reference](./reference/stores.md).
 
 For example, the following configuration configures an in-memory cache as the global cache:
 
@@ -106,7 +106,7 @@ You should be extra careful when using this method because it will fully remove 
 
 ## Template fragment caching
 
-You can leverage template fragment caching when you want to cache some parts of your [templates](../templates). This capability is enabled by the use of the [`cache`](../templates/reference/tags#cache) template tag.
+You can leverage template fragment caching when you want to cache some parts of your [templates](../templates.mdx). This capability is enabled by the use of the [`cache`](../templates/reference/tags.md#cache) template tag.
 
 This template tag allows caching the content of a template fragment (enclosed within the `{% cache %}...{% endcache %}` tags) for a specific duration. This caching operation is done by leveraging the configured [global cache store](#configuration-and-cache-stores). The tag itself takes at least two arguments: the name to give to the cache fragment and a cache timeout - expressed in seconds.
 
@@ -122,7 +122,7 @@ For example, the following snippet caches the content enclosed within the `{% ca
 {% endcache %}
 ```
 
-It's worth noting that the [`cache`](../templates/reference/tags#cache) template tag allows for the inclusion of additional arguments. These arguments, referred to as "vary on" values, play a crucial role in generating the cache key of the template fragment. Essentially, the cache is invalidated if the value of any of these arguments changes. This feature comes in handy when you need to ensure that the template fragment is cached based on other dynamic values that may impact the generation of the cached content itself.
+It's worth noting that the [`cache`](../templates/reference/tags.md#cache) template tag allows for the inclusion of additional arguments. These arguments, referred to as "vary on" values, play a crucial role in generating the cache key of the template fragment. Essentially, the cache is invalidated if the value of any of these arguments changes. This feature comes in handy when you need to ensure that the template fragment is cached based on other dynamic values that may impact the generation of the cached content itself.
 
 For instance, suppose the cached content is dependent on the current locale. In that case, you'd want to make sure that the current locale value is taken into account while caching the template fragment. The ability to pass additional arguments as "vary on" values enables you to achieve precisely that.
 

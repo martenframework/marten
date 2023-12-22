@@ -4,9 +4,9 @@ description: Learn how to query model records.
 sidebar_label: Queries
 ---
 
-Once [models are properly defined](./introduction), it is possible to leverage the querying API in order to interact with model records. This API lets you build what is commonly referred to as "query sets": that is, representations of records collections that can be read, filtered, updated, or deleted.
+Once [models are properly defined](./introduction.md), it is possible to leverage the querying API in order to interact with model records. This API lets you build what is commonly referred to as "query sets": that is, representations of records collections that can be read, filtered, updated, or deleted.
 
-This documents covers the main features of the [query set API](./reference/query-set). Most of the examples used to illustrate these features will refer to the following models:
+This documents covers the main features of the [query set API](./reference/query-set.md). Most of the examples used to illustrate these features will refer to the following models:
 
 ```crystal
 class City < Marten::Model
@@ -64,7 +64,7 @@ end
 :::caution
 Model records will be validated before being saved to the database. If this validation fails, both the `#create` and `#save` methods will silently fail: `#create` will return the invalid model instance while `#save` will return `false`. The `#create` and `#save` methods also have bang counterparts (`#create!` and `#save!`) that will explicitly raise a validation error (`Marten::DB::Errors::InvalidRecord`) in case of an invalid record.
 
-Please refer to [Validations](./validations) in order to learn more about model validations.
+Please refer to [Validations](./validations.md) in order to learn more about model validations.
 :::
 
 ## Basic querying capabilities
@@ -198,7 +198,7 @@ Article.all.filter(author_id: 42)
 ```
 :::
 
-Marten support numerous predicate types, which are all documented in the [field predicates reference](./reference/query-set#field-predicates). The ones that you'll encounter most frequently are outlined below:
+Marten support numerous predicate types, which are all documented in the [field predicates reference](./reference/query-set.md#field-predicates). The ones that you'll encounter most frequently are outlined below:
 
 #### `exact`
 
@@ -365,4 +365,4 @@ Marten also provide the ability to delete the records that are targetted by a sp
 Article.filter(title: "My article").delete
 ```
 
-By default, related objects that are associated with the deleted records will also be deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference](./reference/fields#on_delete) for more details). The method always returns the number of deleted records.
+By default, related objects that are associated with the deleted records will also be deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference](./reference/fields.md#on_delete) for more details). The method always returns the number of deleted records.

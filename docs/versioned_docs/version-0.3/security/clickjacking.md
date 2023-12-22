@@ -16,11 +16,11 @@ The best way to mitigate this risk is to rely on the X-Frame-Options header: thi
 
 ## Basic usage
 
-Marten's clickjacking protection involves using a dedicated middleware: the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware). This middleware is automatically added to the [`middleware`](../development/reference/settings#middleware) setting when generating projects via the [`new`](../development/reference/management-commands#new) management command.
+Marten's clickjacking protection involves using a dedicated middleware: the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares.md#x-frame-options-middleware). This middleware is automatically added to the [`middleware`](../development/reference/settings.md#middleware) setting when generating projects via the [`new`](../development/reference/management-commands.md#new) management command.
 
-The [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware) simply sets the X-Frame-Options header in order to prevent the considered Marten website from being inserted into a frame. The value that is used for the X-Frame-Options header depends on the value of the [`x_frame_options`](../development/reference/settings#x_frame_options) setting (whose default value is `DENY`).
+The [X-Frame-Options middleware](../handlers-and-http/reference/middlewares.md#x-frame-options-middleware) simply sets the X-Frame-Options header in order to prevent the considered Marten website from being inserted into a frame. The value that is used for the X-Frame-Options header depends on the value of the [`x_frame_options`](../development/reference/settings.md#x_frame_options) setting (whose default value is `DENY`).
 
-It should be noted that you can decide to disable or enable the use of the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares#x-frame-options-middleware) on a per-handler basis. To do so, you can simply make use of the [`#exempt_from_x_frame_options`](pathname:///api/0.3/Marten/Handlers/XFrameOptions/ClassMethods.html#exempt_from_x_frame_options(exempt%3ABool)%3ANil-instance-method) class method, which takes a single boolean as arguments:
+It should be noted that you can decide to disable or enable the use of the [X-Frame-Options middleware](../handlers-and-http/reference/middlewares.md#x-frame-options-middleware) on a per-handler basis. To do so, you can simply make use of the [`#exempt_from_x_frame_options`](pathname:///api/0.3/Marten/Handlers/XFrameOptions/ClassMethods.html#exempt_from_x_frame_options(exempt%3ABool)%3ANil-instance-method) class method, which takes a single boolean as arguments:
 
 ```crystal
 class ProtectedHandler < Marten::Handler

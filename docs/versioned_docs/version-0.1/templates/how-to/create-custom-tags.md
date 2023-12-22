@@ -4,7 +4,7 @@ sidebar_label: Create custom tags
 description: How to create custom template tags.
 ---
 
-Marten has built-in support for common [template tags](../reference/tags), but the framework also allows you to write your own template tags that you can leverage as part of your project's templates.
+Marten has built-in support for common [template tags](../reference/tags.md), but the framework also allows you to write your own template tags that you can leverage as part of your project's templates.
 
 ## Defining a template tag
 

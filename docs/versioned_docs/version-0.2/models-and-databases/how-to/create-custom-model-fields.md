@@ -42,7 +42,7 @@ The call to `#register` can be made from anywhere in your codebase, but obviousl
 
 ## Subclassing existing model fields
 
-The easiest way to introduce a model field is probably to subclass one of the [built-in model fields](../reference/fields) provided by Marten. This can make a lot of sense if the "type" of the field you are trying to implement is already supported by Marten.
+The easiest way to introduce a model field is probably to subclass one of the [built-in model fields](../reference/fields.md) provided by Marten. This can make a lot of sense if the "type" of the field you are trying to implement is already supported by Marten.
 
 For example, implementing a custom "email" field could be done by subclassing the existing [`Marten::DB::Field::String`](pathname:///api/0.2/Marten/DB/Field/String.html) class. Indeed, an "email" field is essentially a string with a pre-defined maximum size and some additional validation logic:
 
@@ -121,7 +121,7 @@ def from_db(value) : ::UUID?
 end
 ```
 
-It should be noted that you will usually want to handle the case of `nil` values as part of this method since fields can be configured as nullable via the [`null: true`](../reference/fields#null) option. 
+It should be noted that you will usually want to handle the case of `nil` values as part of this method since fields can be configured as nullable via the [`null: true`](../reference/fields.md#null) option. 
 
 If the value can't be processed properly by your field class, then it may be necessary to raise an exception. To do that you can leverage the `#raise_unexpected_field_value` method, which will raise a `Marten::DB::Errors::UnexpectedFieldValue` exception.
 
@@ -205,7 +205,7 @@ Depending on your field requirements, you might want to override this method com
 
 #### `validate`
 
-The `#validate` method does nothing by default and can be overridden on a per-field class basis in order to implement custom validation logic. This method takes the model record being validated and the field value as arguments, which allows you to easily run validation checks and to add [validation errors](../validations) to the model record.
+The `#validate` method does nothing by default and can be overridden on a per-field class basis in order to implement custom validation logic. This method takes the model record being validated and the field value as arguments, which allows you to easily run validation checks and to add [validation errors](../validations.md) to the model record.
 
 For example:
 

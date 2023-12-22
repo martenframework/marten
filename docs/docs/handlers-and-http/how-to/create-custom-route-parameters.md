@@ -3,7 +3,7 @@ title: Create custom route parameters
 description: How to create custom route parameters.
 ---
 
-Although Marten has built-in support for [common route parameters](../routing#specifying-route-parameters), it is also possible to implement your very own parameter types. This may be necessary if your routes have more complex matching requirements.
+Although Marten has built-in support for [common route parameters](../routing.md#specifying-route-parameters), it is also possible to implement your very own parameter types. This may be necessary if your routes have more complex matching requirements.
 
 ## Defining a route parameter
 
@@ -45,7 +45,7 @@ end
 
 ## Registering route parameters
 
-In order to be able to use custom route parameters in your [route definitions](../routing#specifying-route-parameters), you must register them to Marten's global routing parameters registry.
+In order to be able to use custom route parameters in your [route definitions](../routing.md#specifying-route-parameters), you must register them to Marten's global routing parameters registry.
 
 To do so, you will have to call the [`Marten::Routing::Parameter#register`](pathname:///api/dev/Marten/Routing/Parameter.html#register(id%3A%3A%3AString|Symbol%2Cparameter_klass%3ABase.class)-class-method) method with the identifier of the parameter you wish to use in route path definitions, and the actual parameter class. For example:
 

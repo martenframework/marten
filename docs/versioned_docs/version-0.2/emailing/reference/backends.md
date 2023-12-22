@@ -8,7 +8,7 @@ sidebar_label: Backends
 
 ### Development backend
 
-This is the default backend used as part of the [`emailing.backend`](../../development/reference/settings#backend-1) setting.
+This is the default backend used as part of the [`emailing.backend`](../../development/reference/settings.md#backend-1) setting.
 
 This backend "collects" all the emails that are "delivered", which can be used in specs in order to test sent emails. This "collect" behavior can be disabled if necessary, and the backend can also be configured to print email details to the standard output.
 

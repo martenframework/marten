@@ -3,7 +3,7 @@ title: Create emailing backends
 description: How to create custom emailing backends.
 ---
 
-Marten lets you easily create custom [emailing backends](../introduction#emailing-backends) that you can then use as part of your application when it comes to sending emails.
+Marten lets you easily create custom [emailing backends](../introduction.md#emailing-backends) that you can then use as part of your application when it comes to sending emails.
 
 ## Basic backend definition
 
@@ -21,7 +21,7 @@ end
 
 ## Enabling the use of custom emailing backends
 
-Custom emailing backends can be used by assigning an instance of the corresponding class to the [`emailing.backend`](../../development/reference/settings#backend-1) setting.
+Custom emailing backends can be used by assigning an instance of the corresponding class to the [`emailing.backend`](../../development/reference/settings.md#backend-1) setting.
 
 For example:
 

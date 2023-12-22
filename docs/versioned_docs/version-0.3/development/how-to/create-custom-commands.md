@@ -3,11 +3,11 @@ title: Create custom commands
 description: How to create custom management commands.
 ---
 
-Marten lets you create custom management commands as part of your [applications](../applications). This allows you to contribute new features and behaviors to the Marten CLI.
+Marten lets you create custom management commands as part of your [applications](../applications.md). This allows you to contribute new features and behaviors to the Marten CLI.
 
 ## Basic management command definition
 
-Custom management commands are defined as subclasses of the [`Marten::CLI::Command`](pathname:///api/0.3/Marten/CLI/Manage/Command/Base.html) abstract class. Such subclasses should be defined in a `cli/` folder at the root of the application, and it should be ensured that they are required by your `cli.cr` file (see [Creating applications](../applications#creating-applications) for more details regarding the structure of an application).
+Custom management commands are defined as subclasses of the [`Marten::CLI::Command`](pathname:///api/0.3/Marten/CLI/Manage/Command/Base.html) abstract class. Such subclasses should be defined in a `cli/` folder at the root of the application, and it should be ensured that they are required by your `cli.cr` file (see [Creating applications](../applications.md#creating-applications) for more details regarding the structure of an application).
 
 Management command classes must at least define a [`#run`](pathname:///api/0.3/Marten/CLI/Manage/Command/Base.html#run-instance-method) method, which will be called when the subcommand is executed:
 

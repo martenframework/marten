@@ -32,7 +32,7 @@ In the above example, `title`, `content`, and `published_at` are fields of the `
 
 Schemas can theoretically be used to process any kind of data, including a request's data. This makes them ideal when it comes to processing form inputs data or JSON payloads for example.
 
-When used as part of [handlers](../handlers-and-http/introduction), and especially when processing HTML forms, schemas will usually be initialized and used to render a form when `GET` requests are submitted to the considered handler. Processing the actual form data will usually be done in the same handler when `POST` requests are submitted.
+When used as part of [handlers](../handlers-and-http/introduction.md), and especially when processing HTML forms, schemas will usually be initialized and used to render a form when `GET` requests are submitted to the considered handler. Processing the actual form data will usually be done in the same handler when `POST` requests are submitted.
 
 For example, the handler in the following snippets displays a schema when a `GET` request is processed, and it validates the incoming data using the schema when the request is a `POST`:
 
@@ -97,7 +97,7 @@ It should be noted that templates can easily interact with schema objects in ord
 ```
 
 :::tip
-Some [generic handlers](../handlers-and-http/generic-handlers) allow to conveniently process schemas in handlers. This is the case for the [`Marten::Handlers::Schema`](../handlers-and-http/reference/generic-handlers#processing-a-schema), the [`Marten::Handlers::RecordCreate`](../handlers-and-http/reference/generic-handlers#creating-a-record), and the [`Marten::Handlers::RecordUpdate`](../handlers-and-http/reference/generic-handlers#updating-a-record) generic handlers for example.
+Some [generic handlers](../handlers-and-http/generic-handlers.md) allow to conveniently process schemas in handlers. This is the case for the [`Marten::Handlers::Schema`](../handlers-and-http/reference/generic-handlers.md#processing-a-schema), the [`Marten::Handlers::RecordCreate`](../handlers-and-http/reference/generic-handlers.md#creating-a-record), and the [`Marten::Handlers::RecordUpdate`](../handlers-and-http/reference/generic-handlers.md#updating-a-record) generic handlers for example.
 :::
 
 Note that schemas can be used for other things than processing form data. For example, they can also be used to process JSON payloads as part of API endpoints:
@@ -151,10 +151,10 @@ The field type determines a few other things:
 * how the field is serialized and deserialized
 * how field values are actually validated
 
-Marten provides numerous built-in schema field types that cover common web development needs. The complete list of supported fields is covered in the [schema fields reference](./reference/fields).
+Marten provides numerous built-in schema field types that cover common web development needs. The complete list of supported fields is covered in the [schema fields reference](./reference/fields.md).
 
 :::note
-It is possible to write custom schema fields and to use them in your schema definitions. See [How to create custom schema fields](./how-to/create-custom-schema-fields) for more details regarding this capability.
+It is possible to write custom schema fields and to use them in your schema definitions. See [How to create custom schema fields](./how-to/create-custom-schema-fields.md) for more details regarding this capability.
 :::
 
 ### Common field options
@@ -193,7 +193,7 @@ end
 
 Schema validations are always triggered by the use of the [`#valid?`](pathname:///api/0.3/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/0.3/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) methods: these methods return `true` or `false` depending on whether the data is valid or invalid.
 
-Please head over to the [Schema validations](./validations) guide in order to learn more about schema validations and how to customize it.
+Please head over to the [Schema validations](./validations.md) guide in order to learn more about schema validations and how to customize it.
 
 ## Accessing validated data
 
@@ -257,4 +257,4 @@ class ArticleSchema < Marten::Schema
 end
 ```
 
-The use of methods like [`#valid?`](pathname:///api/0.3/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/0.3/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) will trigger validation callbacks. See [Schema validations](./validations) for more details.
+The use of methods like [`#valid?`](pathname:///api/0.3/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/0.3/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) will trigger validation callbacks. See [Schema validations](./validations.md) for more details.

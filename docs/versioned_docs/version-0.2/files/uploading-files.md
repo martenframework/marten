@@ -33,7 +33,7 @@ All uploaded files are automatically persisted to a temporary file in the system
 
 ## Expecting uploaded files with schemas
 
-If you use [schemas](../schemas/introduction) to validate input data (such as form data), then it's worth noting that you can explicitly define that you expect files in the validated data. The simplest way to do that is to make use of the [`file`](../schemas/reference/fields#file) schema field.
+If you use [schemas](../schemas/introduction.md) to validate input data (such as form data), then it's worth noting that you can explicitly define that you expect files in the validated data. The simplest way to do that is to make use of the [`file`](../schemas/reference/fields.md#file) schema field.
 
 For example, you could define the following schema:
 
@@ -43,7 +43,7 @@ class UploadFileSchema < Marten::Schema
 end
 ```
 
-And use it in a regular [schema generic handler](../handlers-and-http/reference/generic-handlers#processing-a-schema) like this:
+And use it in a regular [schema generic handler](../handlers-and-http/reference/generic-handlers.md#processing-a-schema) like this:
 
 ```crystal
 class UploadFileHandler < Marten::Handlers::Schema
@@ -64,7 +64,7 @@ The presence/absence of the file (and - optionally - some of its attributes) wil
 
 ## Persisting uploaded files in model records
 
-Models can define [`file`](../models-and-databases/reference/fields#file) fields and persist "references" of uploaded files in their rows. This allows "retaining" specific uploaded files and associating their references with specific model records.
+Models can define [`file`](../models-and-databases/reference/fields.md#file) fields and persist "references" of uploaded files in their rows. This allows "retaining" specific uploaded files and associating their references with specific model records.
 
 For example, we could modify the handler in the previous section so that it persists and associate the uploaded file to a new `Attachment` record as follows:
 

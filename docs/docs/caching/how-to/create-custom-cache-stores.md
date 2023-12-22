@@ -3,7 +3,7 @@ title: Create cache stores
 description: How to create custom cache stores.
 ---
 
-Marten lets you easily create custom [cache stores](../introduction#configuration-and-cache-stores) that you can then use as part of your application when it comes to perform caching operations.
+Marten lets you easily create custom [cache stores](../introduction.md#configuration-and-cache-stores) that you can then use as part of your application when it comes to perform caching operations.
 
 ## Basic store definition
 
@@ -138,7 +138,7 @@ end
 
 ## Enabling the use of custom cache stores
 
-Custom cache store can be used by assigning an instance of the corresponding class to the [`cache_store`](../../development/reference/settings#cache-store1) setting.
+Custom cache store can be used by assigning an instance of the corresponding class to the [`cache_store`](../../development/reference/settings.md#cache-store1) setting.
 
 For example:
 

@@ -51,7 +51,7 @@ You should avoid altering setting values outside of the configuration block prov
 
 ## Environments
 
-When creating new projects by using the [`new`](./reference/management-commands#new) management command, the following environments will be created automatically:
+When creating new projects by using the [`new`](./reference/management-commands.md#new) management command, the following environments will be created automatically:
 
 * Development (settings defined in `config/settings/development.cr`)
 * Test (settings defined in `config/settings/test.cr`)
@@ -69,4 +69,4 @@ Marten.env.development? # => true
 
 ## Available settings
 
-All the available settings are listed in the [settings reference](./reference/settings).
+All the available settings are listed in the [settings reference](./reference/settings.md).

@@ -3,17 +3,17 @@ title: Generators
 description: Learn how to use generators in Marten.
 ---
 
-Marten features a generator mechanism that simplifies the creation of various abstractions, files, and structures within an existing project. This feature facilitates the generation of key components such as [models](../models-and-databases/introduction), [schemas](../schemas/introduction), [emails](../emailing/introduction), or [applications](./applications). By leveraging generators, developers can improve their workflow and speed up the development of their Marten projects while following best practices.
+Marten features a generator mechanism that simplifies the creation of various abstractions, files, and structures within an existing project. This feature facilitates the generation of key components such as [models](../models-and-databases/introduction.md), [schemas](../schemas/introduction.md), [emails](../emailing/introduction.md), or [applications](./applications.md). By leveraging generators, developers can improve their workflow and speed up the development of their Marten projects while following best practices.
 
 ## Usage
 
-Generators can be invoked by leveraging the [`marten gen`](./reference/management-commands#gen) management command. This command is intended to be used as follows:
+Generators can be invoked by leveraging the [`marten gen`](./reference/management-commands.md#gen) management command. This command is intended to be used as follows:
 
 ```bash
 marten gen [generator] [options] [arguments]
 ```
 
-As you can see, the `marten gen` command must be used with a specific **generator** name, possibly followed by **options** and **arguments** (which may be required or not depending on the considered generator). All the built-in generators are listed in the [generators reference](./reference/generators).
+As you can see, the `marten gen` command must be used with a specific **generator** name, possibly followed by **options** and **arguments** (which may be required or not depending on the considered generator). All the built-in generators are listed in the [generators reference](./reference/generators.md).
 
 ### Displaying help information
 
@@ -66,7 +66,7 @@ marten gen [generator] --help
 
 ### Generating a model
 
-Generating a model can be achieved with the [`model`](./reference/generators#model) generator:
+Generating a model can be achieved with the [`model`](./reference/generators.md#model) generator:
 
 ```bash
 # Generate a model in the main app:
@@ -87,7 +87,7 @@ marten gen model User name:string email:string --no-timestamps
 
 ### Generating an email
 
-Generating an email can be achieved with the [`email`](./reference/generators#email) generator:
+Generating an email can be achieved with the [`email`](./reference/generators.md#email) generator:
 
 ```bash
 marten gen email TestEmail            # Generate a new TestEmail email in the main application
@@ -96,7 +96,7 @@ marten gen email TestEmail --app blog # Generate a new TestEmail email in the bl
 
 ### Generating an application
 
-Generating an application can be achieved with the [`app`](./reference/generators#app) generator:
+Generating an application can be achieved with the [`app`](./reference/generators.md#app) generator:
 
 ```bash
 marten gen app blogging # Generate a new 'blogging' application
@@ -104,4 +104,4 @@ marten gen app blogging # Generate a new 'blogging' application
 
 ## Available generators
 
-Please head over to the [generators reference](./reference/generators) to see a list of all the available generators.
+Please head over to the [generators reference](./reference/generators.md) to see a list of all the available generators.

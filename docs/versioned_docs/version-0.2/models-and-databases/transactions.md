@@ -41,9 +41,9 @@ When transaction blocks are nested, this results in all the database statements 
 
 ## Automatic transactions
 
-Basic model operations such as [creating](./introduction#create), [updating](./introduction#update), or [deleting](./introduction#delete) records are automatically wrapped in a transaction. This helps in ensuring that any exception that is raised in the context of validations or as part of `after_*` [callbacks](./callbacks) (ie. `after_create`, `after_update`, `after_save`, and `after_delete`) will also roll back the current transaction.
+Basic model operations such as [creating](./introduction.md#create), [updating](./introduction.md#update), or [deleting](./introduction.md#delete) records are automatically wrapped in a transaction. This helps in ensuring that any exception that is raised in the context of validations or as part of `after_*` [callbacks](./callbacks.md) (ie. `after_create`, `after_update`, `after_save`, and `after_delete`) will also roll back the current transaction.
 
-The consequence of this is that the changes you make to the database in these callbacks will not be "visible" until the transaction is complete. For example, this means that if you are triggering something (like an asynchronous job) that needs to leverage the changes introduced by a model operation, then you should probably not use the regular `after_*` callbacks. Instead, you should leverage [`after_commit`](./callbacks#aftercommit) callbacks (which are the only callbacks that are triggered _after_ a model operation has been committed to the database).
+The consequence of this is that the changes you make to the database in these callbacks will not be "visible" until the transaction is complete. For example, this means that if you are triggering something (like an asynchronous job) that needs to leverage the changes introduced by a model operation, then you should probably not use the regular `after_*` callbacks. Instead, you should leverage [`after_commit`](./callbacks.md#aftercommit) callbacks (which are the only callbacks that are triggered _after_ a model operation has been committed to the database).
 
 ## Exception handling and rollbacks
 

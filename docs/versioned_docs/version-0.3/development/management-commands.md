@@ -8,9 +8,9 @@ Marten comes with a built-in command line interface (CLI) that developers can le
 
 ## Usage
 
-The `marten` command is available with each Marten installation, and it is also automatically compiled when the Marten shard is installed. This means that you can either use the `marten` command from anywhere in your system (if the Marten CLI was installed globally like described in [Installation](../getting-started/installation)) or you can run the relative `bin/marten` command from inside your project structure.
+The `marten` command is available with each Marten installation, and it is also automatically compiled when the Marten shard is installed. This means that you can either use the `marten` command from anywhere in your system (if the Marten CLI was installed globally like described in [Installation](../getting-started/installation.md)) or you can run the relative `bin/marten` command from inside your project structure.
 
-When the `marten` command is executed, it will look for a relative `manage.cr` file to identify your current project, its [settings](./settings), and its installed [applications](./applications), which in turn will define the available sub-commands that you can run.
+When the `marten` command is executed, it will look for a relative `manage.cr` file to identify your current project, its [settings](./settings.md), and its installed [applications](./applications.md), which in turn will define the available sub-commands that you can run.
 
 The `marten` command is intended to be used as follows:
 
@@ -18,7 +18,7 @@ The `marten` command is intended to be used as follows:
 marten [command] [options] [arguments]
 ```
 
-As you can see, the `marten` CLI must be used with a specific **command**, possibly followed by **options** and **arguments** (which may be required or not depending on the considered command). All the built-in commands are listed in the [management commands reference](./reference/management-commands).
+As you can see, the `marten` CLI must be used with a specific **command**, possibly followed by **options** and **arguments** (which may be required or not depending on the considered command). All the built-in commands are listed in the [management commands reference](./reference/management-commands.md).
 
 ### Displaying help information
 
@@ -59,7 +59,7 @@ Run a command followed by --help to see command specific information, ex:
 marten [command] --help
 ```
 
-All the available commands are listed per application: by default, only `marten` commands are listed obviously (if no other applications are installed), but it should be noted that [applications](./applications) can contribute management commands as well. If that's the case, these additional commands will be automatically listed as well.
+All the available commands are listed per application: by default, only `marten` commands are listed obviously (if no other applications are installed), but it should be noted that [applications](./applications.md) can contribute management commands as well. If that's the case, these additional commands will be automatically listed as well.
 
 ### Shared options
 
@@ -71,4 +71,4 @@ Each command can accept its own set of arguments and options, but it should be n
 
 ## Available commands
 
-Please head over to the [management commands reference](./reference/management-commands) to see a list of all the available management commands. Implementing custom management commands is also a possibility that is documented in [Create custom commands](./how-to/create-custom-commands).
+Please head over to the [management commands reference](./reference/management-commands.md) to see a list of all the available management commands. Implementing custom management commands is also a possibility that is documented in [Create custom commands](./how-to/create-custom-commands.md).

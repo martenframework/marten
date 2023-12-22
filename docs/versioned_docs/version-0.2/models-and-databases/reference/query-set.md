@@ -93,7 +93,7 @@ query_set_1 = Post.all.distinct
 query_set_2 = Post.all.distinct(:title)
 ```
 
-It should be noted that it is also possible to follow associations of direct related models too by using the [double underscores notation](../queries#joins-and-filtering-relations) (`__`). For example the following query will select distinct records based on a joined "author" attribute:
+It should be noted that it is also possible to follow associations of direct related models too by using the [double underscores notation](../queries.md#joins-and-filtering-relations) (`__`). For example the following query will select distinct records based on a joined "author" attribute:
 
 ```
 query_set = Post.all.distinct(:author__name)
@@ -105,7 +105,7 @@ Finally, it should be noted that `#distinct` cannot be used on [sliced query set
 
 Returns a query set whose records do not match the given set of filters.
 
-The filters passed to this method method can be specified using the [standard predicate format](../queries#basic-querying-capabilities). If multiple filters are specified, they will be joined using an **AND** operator at the SQL level:
+The filters passed to this method method can be specified using the [standard predicate format](../queries.md#basic-querying-capabilities). If multiple filters are specified, they will be joined using an **AND** operator at the SQL level:
 
 ```crystal
 query_set = Post.all
@@ -113,7 +113,7 @@ query_set.exclude(title: "Test")
 query_set.exclude(title__startswith: "A")
 ```
 
-Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries#complex-filters-with-q-expressions):
+Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries.md#complex-filters-with-q-expressions):
 
 ```crystal
 query_set = Post.all
@@ -124,7 +124,7 @@ query_set.exclude { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
 
 Returns a query set matching a specific set of filters.
 
-The filters passed to this method method can be specified using the [standard predicate format](../queries#basic-querying-capabilities). If multiple filters are specified, they will be joined using an **AND** operator at the SQL level:
+The filters passed to this method method can be specified using the [standard predicate format](../queries.md#basic-querying-capabilities). If multiple filters are specified, they will be joined using an **AND** operator at the SQL level:
 
 ```crystal
 query_set = Post.all
@@ -132,7 +132,7 @@ query_set.filter(title: "Test")
 query_set.filter(title__startswith: "A")
 ```
 
-Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries#complex-filters-with-q-expressions):
+Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries.md#complex-filters-with-q-expressions):
 
 ```crystal
 query_set = Post.all
@@ -141,7 +141,7 @@ query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
 
 ### `join`
 
-Returns a queryset whose specified `relations` are "followed" and joined to each result (see [Queries](../queries#joins-and-filtering-relations) for an introduction about this capability).
+Returns a queryset whose specified `relations` are "followed" and joined to each result (see [Queries](../queries.md#joins-and-filtering-relations) for an introduction about this capability).
 
 When using `#join`, the specified foreign-key relationships will be followed and each record returned by the queryset will have the corresponding related objects already selected and populated. Using `#join` can result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
 
@@ -222,7 +222,7 @@ Article.all.raw(
 )
 ```
 
-Please refer to [Raw SQL](../raw-sql) to learn more about performing raw SQL queries.
+Please refer to [Raw SQL](../raw-sql.md) to learn more about performing raw SQL queries.
 
 ### `reverse`
 
@@ -246,7 +246,7 @@ query_set_1 = Article.all.filter(published: true)               # records are re
 query_set_2 = Article.all.filter(published: true).using(:other) # records are retrieved from the "other" database
 ```
 
-The value passed to `#using` must be a valid database alias that was used to configure an additional database as part of the [database settings](../../development/reference/settings#database-settings).
+The value passed to `#using` must be a valid database alias that was used to configure an additional database as part of the [database settings](../../development/reference/settings.md#database-settings).
 
 ## Methods that do not return new query sets
 
@@ -309,7 +309,7 @@ end
 
 Deletes the records corresponding to the current query set and returns the number of deleted records.
 
-By default, related objects will be deleted by following the [deletion strategy](./fields#on_delete) defined in each foreign key field if applicable, unless the `raw` argument is set to `true`. When the `raw` argument is set to `true`, a raw SQL delete statement will be used to delete all the records matching the currently applied filters. Note that using this option could cause errors if the underlying database enforces referential integrity.
+By default, related objects will be deleted by following the [deletion strategy](./fields.md#on_delete) defined in each foreign key field if applicable, unless the `raw` argument is set to `true`. When the `raw` argument is set to `true`, a raw SQL delete statement will be used to delete all the records matching the currently applied filters. Note that using this option could cause errors if the underlying database enforces referential integrity.
 
 ```crystal
 Article.all.delete                              # deletes all the Article records
@@ -368,7 +368,7 @@ post_1 = query_set.get(id: 123)
 post_2 = query_set.get(id: 456, is_published: false)
 ```
 
-Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries#complex-filters-with-q-expressions):
+Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries.md#complex-filters-with-q-expressions):
 
 ```crystal
 query_set = Post.all
@@ -390,7 +390,7 @@ post_1 = query_set.get!(id: 123)
 post_2 = query_set.get!(id: 456, is_published: false)
 ```
 
-Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries#complex-filters-with-q-expressions):
+Complex filters can also be used as part of this method by leveraging [`q` expressions](../queries.md#complex-filters-with-q-expressions):
 
 ```crystal
 query_set = Post.all
@@ -490,7 +490,7 @@ It should be noted that this method results in a regular `UPDATE` SQL statement.
 
 ## Field predicates
 
-Below are listed all the available [field predicates](../queries#field-predicates) that can be used when filtering query sets.
+Below are listed all the available [field predicates](../queries.md#field-predicates) that can be used when filtering query sets.
 
 ### `contains`
 

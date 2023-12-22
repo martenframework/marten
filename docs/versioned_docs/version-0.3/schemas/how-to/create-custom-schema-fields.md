@@ -41,7 +41,7 @@ The call to `#register` can be made from anywhere in your codebase, but obviousl
 
 ## Subclassing existing schema fields
 
-This is probably the easiest way to create a custom field: if the field you want to create can be derived from one of the [built-in schema fields](../reference/fields) (usually those correspond to primitive types), then you can easily subclass the corresponding class and customize it so that it suits your needs.
+This is probably the easiest way to create a custom field: if the field you want to create can be derived from one of the [built-in schema fields](../reference/fields.md) (usually those correspond to primitive types), then you can easily subclass the corresponding class and customize it so that it suits your needs.
 
 For example, implementing a custom "email" field could be done by subclassing the existing [`Marten::Schema::Field::String`](pathname:///api/0.3/Marten/Schema/Field/String.html) class. Indeed, an "email" field is essentially a string with a pre-defined maximum size and some additional validation logic:
 
@@ -102,7 +102,7 @@ rescue ArgumentError
 end
 ```
 
-Fields can be configured as required or not ([`required`](../reference/fields#required) option), this means that you will usually want to handle the case of `nil` values as part of this methods and return `nil` if the incoming value is `nil`. It should also be noted that incoming values can be any JSON data (`JSON::Any`), which means that you need to handle this case properly as well.
+Fields can be configured as required or not ([`required`](../reference/fields.md#required) option), this means that you will usually want to handle the case of `nil` values as part of this methods and return `nil` if the incoming value is `nil`. It should also be noted that incoming values can be any JSON data (`JSON::Any`), which means that you need to handle this case properly as well.
 
 If the value can't be processed properly by your field class, then it may be necessary to raise an exception. To do that you can leverage the `#raise_unexpected_field_value` method, which will raise a `Marten::Schema::Errors::UnexpectedFieldValue` exception.
 
@@ -138,7 +138,7 @@ Depending on your field requirements, you might want to override this method com
 
 #### `validate`
 
-The `#validate` method does nothing by default and can be overridden on a per-field class basis in order to implement custom validation logic. This method takes the schema object being validated and the field value as arguments, which allows you to easily run validation checks and to add [validation errors](../validations) to the schema object.
+The `#validate` method does nothing by default and can be overridden on a per-field class basis in order to implement custom validation logic. This method takes the schema object being validated and the field value as arguments, which allows you to easily run validation checks and to add [validation errors](../validations.md) to the schema object.
 
 For example:
 

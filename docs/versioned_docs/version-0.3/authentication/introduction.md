@@ -8,7 +8,7 @@ Marten allows the generation of new projects with a built-in authentication appl
 
 ## Overview
 
-Marten's [`new`](../development/reference/management-commands#new) management command allows the generation of projects with a built-in `auth` application. This application is part of the created project: it provides the necessary [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) allowing to authenticate users with email addresses and passwords, while also supporting standard password reset flows. On top of that, an `Auth::User` model is automatically generated for your newly created projects. Since this model is also part of your project, this means that it's possible to easily add new fields to it and generate migrations for it as well.
+Marten's [`new`](../development/reference/management-commands.md#new) management command allows the generation of projects with a built-in `auth` application. This application is part of the created project: it provides the necessary [models](../models-and-databases.mdx), [handlers](../handlers-and-http.mdx), [schemas](../schemas.mdx), [emails](../emailing.mdx), and [templates](../templates.mdx) allowing to authenticate users with email addresses and passwords, while also supporting standard password reset flows. On top of that, an `Auth::User` model is automatically generated for your newly created projects. Since this model is also part of your project, this means that it's possible to easily add new fields to it and generate migrations for it as well.
 
 Here is the list of responsibilities of the generated authentication application:
 
@@ -22,7 +22,7 @@ Internally, this authentication application relies on the official [`marten-auth
 
 ## Generating projects with authentication
 
-Generating new projects with authentication can be easily achieved by leveraging the `--with-auth` option of the [`new`](../development/reference/management-commands#new) management command.
+Generating new projects with authentication can be easily achieved by leveraging the `--with-auth` option of the [`new`](../development/reference/management-commands.md#new) management command.
 
 For example:
 
@@ -30,12 +30,12 @@ For example:
 marten new project myblog --with-auth
 ```
 
-When using this option, Marten will generate an `auth` [application](../development/applications) under the `src/auth` folder of your project. As mentioned previously, this application provides a set of [models](../models-and-databases), [handlers](../handlers-and-http), [schemas](../schemas), [emails](../emailing), and [templates](../templates) that implement basic authentication operations.
+When using this option, Marten will generate an `auth` [application](../development/applications.md) under the `src/auth` folder of your project. As mentioned previously, this application provides a set of [models](../models-and-databases.mdx), [handlers](../handlers-and-http.mdx), [schemas](../schemas.mdx), [emails](../emailing.mdx), and [templates](../templates.mdx) that implement basic authentication operations.
 
 You can test the generated authentication application by going to your application at [http://localhost:8000/auth/signup](http://localhost:8000/auth/signup) after having started the Marten development server (using `marten serve`).
 
 :::info
-You can see the full list of files generated for the `auth` application in [Generated files](./reference/generated-files).
+You can see the full list of files generated for the `auth` application in [Generated files](./reference/generated-files.md).
 :::
 
 ## Usage
@@ -46,11 +46,11 @@ This section covers the basics of how to use the `auth` application - powered by
 
 The `auth` application defines a single `Auth::User` model that inherits its fields from the abstract `MartenAuth::User` model. As such, this model automatically provides the following fields:
 
-* `id` - a [`big_int`](../models-and-databases/reference/fields#big_int) field containing the primary key of the user
-* `email` - an [`email`](../models-and-databases/reference/fields#email) field containing the user's email address
-* `password` - a [`string`](../models-and-databases/reference/fields#string) field containing the user's encrypted password
-* `created_at` - a [`date_time`](../models-and-databases/reference/fields#date_time) field containing the user creation date
-* `updated_at` - a [`date_time`](../models-and-databases/reference/fields#date_time) field containing the last user modification date
+* `id` - a [`big_int`](../models-and-databases/reference/fields.md#big_int) field containing the primary key of the user
+* `email` - an [`email`](../models-and-databases/reference/fields.md#email) field containing the user's email address
+* `password` - a [`string`](../models-and-databases/reference/fields.md#string) field containing the user's encrypted password
+* `created_at` - a [`date_time`](../models-and-databases/reference/fields.md#date_time) field containing the user creation date
+* `updated_at` - a [`date_time`](../models-and-databases/reference/fields.md#date_time) field containing the last user modification date
 
 ### Retrieving the current user
 
@@ -174,7 +174,7 @@ As mentioned previously, you should not attempt to manipulate the `password` fie
 
 ### Limiting access to signed-in users
 
-Limiting access to signed-in users can easily be achieved by leveraging the `#user?` method that is available from [`Marten::HTTP::Request`](pathname:///api/0.3/Marten/HTTP/Request.html) objects. Using this method, you can easily implement  [`#before_dispatch`](../handlers-and-http/introduction#before_dispatch) handler callbacks in order to redirect anonymous users to a sign-in page or to an error page.
+Limiting access to signed-in users can easily be achieved by leveraging the `#user?` method that is available from [`Marten::HTTP::Request`](pathname:///api/0.3/Marten/HTTP/Request.html) objects. Using this method, you can easily implement  [`#before_dispatch`](../handlers-and-http/introduction.md#before_dispatch) handler callbacks in order to redirect anonymous users to a sign-in page or to an error page.
 
 For example:
 

@@ -52,9 +52,9 @@ These customization options are listed below:
 
 | Error | Template name | Handler setting | 
 | ----- | ------------- | ------------ |
-| Page Not Found (404) | `404.html` | [`handler404`](../development/reference/settings#handler404) |
-| Internal Server Error (500) | `500.html` | [`handler500`](../development/reference/settings#handler500) |
-| Bad Request (400) | `400.html` | [`handler400`](../development/reference/settings#handler400) |
-| Forbidden (403) | `403.html` | [`handler403`](../development/reference/settings#handler403) |
+| Page Not Found (404) | `404.html` | [`handler404`](../development/reference/settings.md#handler404) |
+| Internal Server Error (500) | `500.html` | [`handler500`](../development/reference/settings.md#handler500) |
+| Bad Request (400) | `400.html` | [`handler400`](../development/reference/settings.md#handler400) |
+| Forbidden (403) | `403.html` | [`handler403`](../development/reference/settings.md#handler403) |
 
 For example, you could define a default "Page Not Found" template by defining a `404.html` HTML template file in your project's `templates` folder.

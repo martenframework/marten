@@ -74,11 +74,11 @@ shards install
 ```
 
 :::info
-Marten projects are organized around the concept of "apps". A Marten app is a set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example, apps can provide [models](../models-and-databases) or [handlers](../handlers-and-http). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, handlers, or templates to other projects. The use of apps is activated by simply adding app classes to the [`installed_apps`](../development/reference/settings#installed_apps) setting.
+Marten projects are organized around the concept of "apps". A Marten app is a set of abstractions (usually defined under a unique folder) that contributes specific behaviours to a project. For example, apps can provide [models](../models-and-databases.mdx) or [handlers](../handlers-and-http.mdx). They allow to separate a project into a set of logical and reusable components. Another interesting benefit of apps is that they can be extracted and distributed as external shards. This pattern allows third-party libraries to easily contribute models, migrations, handlers, or templates to other projects. The use of apps is activated by simply adding app classes to the [`installed_apps`](../development/reference/settings.md#installed_apps) setting.
 
-By default, when creating a new project through the use of the [`new`](../development/reference/management-commands#new) command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, migrations, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
+By default, when creating a new project through the use of the [`new`](../development/reference/management-commands.md#new) command, no explicit app will be created nor installed. This is because each Marten project comes with a default "main" app that corresponds to your standard `src` folder. Models, migrations, or other classes defined in this folder are associated with the main app by default, unless they are part of another explicitly defined application.
 
-As projects grow in size and scope, it is generally encouraged to start thinking in terms of apps and how to split models, handlers, or features across multiple apps depending on their intended responsibilities. Please refer to [Applications](../development/applications) to learn more about applications and how to structure your projects using them.
+As projects grow in size and scope, it is generally encouraged to start thinking in terms of apps and how to split models, handlers, or features across multiple apps depending on their intended responsibilities. Please refer to [Applications](../development/applications.md) to learn more about applications and how to structure your projects using them.
 :::
 
 ## Running the development server
@@ -151,12 +151,12 @@ Multiple routes can map to the same handler class if necessary.
 :::
 
 :::info
-Please refer to [Routing](../handlers-and-http/routing) to learn more about Marten's routing mechanism.
+Please refer to [Routing](../handlers-and-http/routing.md) to learn more about Marten's routing mechanism.
 :::
 
 ## Creating the Article model
 
-[Models](../models-and-databases/introduction) are classes that define what data can be persisted and manipulated by a Marten application. They explicitly specify fields and rules that map to database tables and columns. Model records can be queried and interacted with through a mechanism called [Query sets](../models-and-databases/queries).
+[Models](../models-and-databases/introduction.md) are classes that define what data can be persisted and manipulated by a Marten application. They explicitly specify fields and rules that map to database tables and columns. Model records can be queried and interacted with through a mechanism called [Query sets](../models-and-databases/queries.md).
 
 Let's define an `Article` model, which is the linchpin of any weblog application. To do set, let's create a `src/models/article.cr` file with the following content:
 
@@ -178,7 +178,7 @@ In its current state, our `Article` model contains the following three fields:
 
 ## Generating and running migrations
 
-Our `Article` model above is defined but is not "applied" at the database level yet. In order to create the corresponding table and columns, we will need to generate a [migration](../models-and-databases/migrations) for it.
+Our `Article` model above is defined but is not "applied" at the database level yet. In order to create the corresponding table and columns, we will need to generate a [migration](../models-and-databases/migrations.md) for it.
 
 Marten provides a migrations mechanism that is designed to be automatic: this means that migrations will be automatically derived from your model definitions. This allows to ensure that the definition of your model and its fields (and underlying columns) is done in one place only, which helps keep your project DRY.
 
@@ -214,7 +214,7 @@ Running migrations:
 The `migrate` command will identify all the migration files that weren't applied to your database yet, and will run them one by one. By doing so, Marten will ensure that the changes you made to your model definitions are applied at the database level, in the corresponding tables.
 
 :::info
-Please refer to [Migrations](../models-and-databases/migrations) to learn more about migrations.
+Please refer to [Migrations](../models-and-databases/migrations.md) to learn more about migrations.
 :::
 
 :::note
@@ -227,7 +227,7 @@ config.database do |db|
 end
 ```
 
-An SQLite database is a good choice in order to try Marten and experiment with it (since SQLite is already pre-installed on most systems). That being said, if you need to use another database backend (for example, PostgreSQL or MySQL), feel free to have a look at the [databases configuration reference](../development/reference/settings#database-settings).
+An SQLite database is a good choice in order to try Marten and experiment with it (since SQLite is already pre-installed on most systems). That being said, if you need to use another database backend (for example, PostgreSQL or MySQL), feel free to have a look at the [databases configuration reference](../development/reference/settings.md#database-settings).
 :::
 
 ## Interacting with model records
@@ -272,7 +272,7 @@ article
 # => #<Article:0x104ee1c30 id: 1, title: "My article", content: "This is my article.">
 ```
 
-If we want to fetch this record from the database again, we can use the [`#get`](../models-and-databases/reference/query-set#get) method and specify the identifier value of the record we want to retrieve. For example:
+If we want to fetch this record from the database again, we can use the [`#get`](../models-and-databases/reference/query-set.md#get) method and specify the identifier value of the record we want to retrieve. For example:
 
 ```crystal
 article = Article.get(id: 1)
@@ -289,7 +289,7 @@ Article.all
 This method returns a `Marten::DB::Query::Set` object, which is commonly referred to as a "query set". A query set is a representation of records collections from the database that can be filtered, and iterated over.
 
 :::info
-Please refer to [Queries](../models-and-databases/queries) to learn more about Marten's querying capabilities.
+Please refer to [Queries](../models-and-databases/queries.md) to learn more about Marten's querying capabilities.
 :::
 
 ## Showing a list of articles
@@ -306,7 +306,7 @@ class HomeHandler < Marten::Handler
 end
 ```
 
-The `#render` method that is used above allows to return an HTTP response whose content is generated by rendering a specific [template](../templates). The template can be rendered by specifying a context hash or a named tuple. In our case the template context contains an `articles` key that maps to a query set of all the `Article` records.
+The `#render` method that is used above allows to return an HTTP response whose content is generated by rendering a specific [template](../templates.mdx). The template can be rendered by specifying a context hash or a named tuple. In our case the template context contains an `articles` key that maps to a query set of all the `Article` records.
 
 Now if you start the Marten development server again and then try to access the home page ([http://localhost:8000](http://localhost:8000)), you should get an error stating that the `home.html` template does not exist. This is normal: we need to create it.
 
@@ -331,7 +331,7 @@ Method-calling is done by using statements (also called "template tags") delimit
 If you go back to the home page ([http://localhost:8000](http://localhost:8000)), you should be able to see a list of article titles corresponding to all the `Article` records you created previously.
 
 :::info
-Please refer to [Templates](../templates/introduction) to learn more about Marten's templating system.
+Please refer to [Templates](../templates/introduction.md) to learn more about Marten's templating system.
 :::
 
 We have now pieced together the main components of the Marten web framework (Models, Handlers, Templates). When accessing the home page of our application, the following steps are taken care of by the framework:
@@ -413,7 +413,7 @@ There is something missing though: the home page does not link to the "detail" p
 The `url` tag used in the above snippet allows to perform a reverse URL resolution. This allows to generate the final URL associated with a specific route name (the `article_detail` route name we defined earlier in this case). This reverse resolution can involve parameters if the considered route require ones.
 
 :::info
-Please refer to [Routing](../handlers-and-http/routing) to learn more about Marten's routing system.
+Please refer to [Routing](../handlers-and-http/routing.md) to learn more about Marten's routing system.
 :::
 
 ## Creating a new article
@@ -493,7 +493,7 @@ We can now create the `article_create.html` template file with the following con
 As you can see, the above snippet defines a form that includes two fields: one for the `title` schema field and the other one for the `content` schema field. Each schema field can be errored depending on the result of a validation, and this is why specific field errors are (optionally) displayed as well.
 
 :::tip What about the hidden CSRF token input?
-The `csrftoken` input in the above example is mandatory because every unsafe request (eg. POST) is automatically protected by a CSRF (Cross-Site Request Forgeries) check. Please refer to [Cross-Site Request Forgery protection](../security/csrf) to learn more about this.
+The `csrftoken` input in the above example is mandatory because every unsafe request (eg. POST) is automatically protected by a CSRF (Cross-Site Request Forgeries) check. Please refer to [Cross-Site Request Forgery protection](../security/csrf.md) to learn more about this.
 :::
 
 Finally, we need to map the `ArticleCreateHandler` handler to a proper route. We can do this by editing the `config/routes.cr` file as follows:
@@ -533,7 +533,7 @@ Obviously, we still need to a link somewhere in our application to be able to ea
 ```
 
 :::info
-Please refer to [Schemas](../schemas/introduction) to learn more about schemas.
+Please refer to [Schemas](../schemas/introduction.md) to learn more about schemas.
 :::
 
 ## Updating an article
@@ -840,17 +840,17 @@ In order to configure how the handler should behave, we make use of a few class 
 Now if you go to your application again at [http://localhost:8000](http://localhost:8000), you will notice that everything is working like it used to do before we introduced these changes (but with less code!).
 
 :::info
-Please refer to [Generic handlers](../handlers-and-http/generic-handlers) to learn more about generic handlers.
+Please refer to [Generic handlers](../handlers-and-http/generic-handlers.md) to learn more about generic handlers.
 :::
 
 ## What's next?
 
 As part of this tutorial, we covered the main features of the Marten web framework by implementing a very simple application: 
 
-* we learned to define [models](../models-and-databases) in order to interact with the database
-* we learned to create [handlers](../handlers-and-http) and to map URLs to these in order to process HTTP requests
-* we learned to render [templates](../templates) in order to define the presentation logic of an application
+* we learned to define [models](../models-and-databases.mdx) in order to interact with the database
+* we learned to create [handlers](../handlers-and-http.mdx) and to map URLs to these in order to process HTTP requests
+* we learned to render [templates](../templates.mdx) in order to define the presentation logic of an application
 
 Now that you've experimented with these core concepts of the framework, you should not hesitate to update the application we just created in order to experiment further and add new features to it.
 
-The Marten documentation also contains plenty of additional guides allowing you to keep exploring and learning more about other areas of the framework. These may be useful depending on the specific needs of your application: [Testing](../development/testing), [Applications](../development/applications), [Security](../security/), [Internationalization](../i18n), etc.
+The Marten documentation also contains plenty of additional guides allowing you to keep exploring and learning more about other areas of the framework. These may be useful depending on the specific needs of your application: [Testing](../development/testing.md), [Applications](../development/applications.md), [Security](../security.mdx), [Internationalization](../i18n.mdx), etc.

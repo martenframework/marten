@@ -3,11 +3,11 @@ title: Relationships
 description: Learn how to define relationships in models.
 ---
 
-Marten offers a powerful and intuitive solution for defining the three most common types of database relationships (many-to-one, one-to-one, and many-to-many) through the use of [model fields](./introduction#model-fields). By leveraging these special fields, developers can enhance their application's data modeling and streamline data access.
+Marten offers a powerful and intuitive solution for defining the three most common types of database relationships (many-to-one, one-to-one, and many-to-many) through the use of [model fields](./introduction.md#model-fields). By leveraging these special fields, developers can enhance their application's data modeling and streamline data access.
 
 ## Many-to-one relationships
 
-Many-to-one relationships can be defined through the use of [`many_to_one`](./reference/fields#many_to_one) fields. This special field type requires the utilization of the [`to`](./reference/fields#to-1) argument, allowing to explicitly define the target model class associated with the current model.
+Many-to-one relationships can be defined through the use of [`many_to_one`](./reference/fields.md#many_to_one) fields. This special field type requires the utilization of the [`to`](./reference/fields.md#to-1) argument, allowing to explicitly define the target model class associated with the current model.
 
 For example, an `Article` model could have a many-to-one field towards an `Author` model. In such case, an `Article` record would only have one associated `Author` record, but every `Author` record could be associated with many `Article` records:
 
@@ -27,7 +27,7 @@ end
 
 ### Interacting with related records
 
-Like for any other [model fields](./introduction#model-fields), Marten automatically generates getters and setters allowing to interact with the field's value.
+Like for any other [model fields](./introduction.md#model-fields), Marten automatically generates getters and setters allowing to interact with the field's value.
 
 With the above snippet, it would be possible to access the `Author` record associated with a specific `Article` record by leveraging the `#author` and `#author=` methods. For example:
 
@@ -62,9 +62,9 @@ article.author_id # => 1
 
 ### Backward relations
 
-By default, [`many_to_one`](./reference/fields#many_to_one) fields do not establish a backward relation. This means that you cannot directly retrieve records that target a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve all the `Article` records associated with a specific `Author` record.
+By default, [`many_to_one`](./reference/fields.md#many_to_one) fields do not establish a backward relation. This means that you cannot directly retrieve records that target a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve all the `Article` records associated with a specific `Author` record.
 
-To enable this capability, you need to make use of the [`related`](./reference/fields#related-1) argument when defining your  [`many_to_one`](./reference/fields#many_to_one) field. For instance, we could modify the previous model definitions as follows in order to define an `articles` backward relation and to let `Author` records expose their related `Article` records:
+To enable this capability, you need to make use of the [`related`](./reference/fields.md#related-1) argument when defining your  [`many_to_one`](./reference/fields.md#many_to_one) field. For instance, we could modify the previous model definitions as follows in order to define an `articles` backward relation and to let `Author` records expose their related `Article` records:
 
 ```crystal
 class Author < Marten::Model
@@ -80,7 +80,7 @@ class Article < Marten::Model
 end
 ```
 
-When the [`related`](./reference/fields#related-1) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Author` record will be accessible through the use of the `Author#articles` method:
+When the [`related`](./reference/fields.md#related-1) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Author` record will be accessible through the use of the `Author#articles` method:
 
 ```crystal
 # Create two authors
@@ -98,7 +98,7 @@ author_1.articles.to_a # [#<Article:0x1036e3ee0 id: 1, title: "First article", a
 ```
 
 :::tip
-The method generated for the backward relation returns a [query set](./queries) that you can use to further filter the list of records. For example:
+The method generated for the backward relation returns a [query set](./queries.md) that you can use to further filter the list of records. For example:
 
 ```crystal
 author.articles.filter(title__startswith: "Top")
@@ -107,9 +107,9 @@ author.articles.filter(title__startswith: "Top")
 
 ### Deletion strategy
 
-When defining [`many_to_one`](./reference/fields#many_to_one) fields, it is highly advisable to specify a deletion strategy for the associated relation. This configuration determines the behavior of records with many-to-one fields when one of the records referred to by such fields gets deleted.
+When defining [`many_to_one`](./reference/fields.md#many_to_one) fields, it is highly advisable to specify a deletion strategy for the associated relation. This configuration determines the behavior of records with many-to-one fields when one of the records referred to by such fields gets deleted.
 
-Such behavior can be configured by leveraging the [`on_delete`](./reference/fields#on_delete) argument when defining [`many_to_one`](./reference/fields#many_to_one) fields. This argument allows specifying the deletion strategy to adopt when a related record (one that is targeted by the [`many_to_one`](./reference/fields#many_to_one) field) is deleted. This argument accepts the following values (expressed as symbols):
+Such behavior can be configured by leveraging the [`on_delete`](./reference/fields.md#on_delete) argument when defining [`many_to_one`](./reference/fields.md#many_to_one) fields. This argument allows specifying the deletion strategy to adopt when a related record (one that is targeted by the [`many_to_one`](./reference/fields.md#many_to_one) field) is deleted. This argument accepts the following values (expressed as symbols):
 
 * `:do_nothing`: This is the default strategy. With this strategy, Marten won't do anything to ensure that records referencing the record being deleted are deleted or updated. If the database enforces referential integrity (which will be the case for foreign key fields), this means that deleting a record could result in database errors.
 * `:cascade`: This strategy can be used to perform cascade deletions. When deleting a record, Marten will try to first destroy the other records that reference the object being deleted.
@@ -152,7 +152,7 @@ article_1.reload # => raises Marten::DB::Errors::RecordNotFound
 
 ## One-to-one relationships
 
-One-to-one relationships can be defined through the use of [`one_to_one`](./reference/fields#one_to_one) fields. This special field type requires the utilization of the [`to`](./reference/fields#to-2) argument, allowing to explicitly define the target model class associated with the current model.
+One-to-one relationships can be defined through the use of [`one_to_one`](./reference/fields.md#one_to_one) fields. This special field type requires the utilization of the [`to`](./reference/fields.md#to-2) argument, allowing to explicitly define the target model class associated with the current model.
 
 For example, a `User` model could have a one-to-one field towards a `Profile` model. In such case, the `User` model could only have one associated `Profile` record, and the reverse would be true as well (a `Profile` record could only have one associated `User` record):
 
@@ -176,7 +176,7 @@ A one-to-one field is really similar to a many-to-one field, but with an additio
 
 ### Interacting with related records
 
-Like for any other [model fields](./introduction#model-fields), Marten automatically generates getters and setters allowing to interact with the field's value.
+Like for any other [model fields](./introduction.md#model-fields), Marten automatically generates getters and setters allowing to interact with the field's value.
 
 With the above snippet, it would be possible to access the `Profile` record associated with a specific `User` record by leveraging the `#profile` and `#profile=` methods. For example:
 
@@ -209,9 +209,9 @@ user.profile_id # => 1
 
 ### Backward relations
 
-By default, [`one_to_one`](./reference/fields#one_to_one) fields do not establish a backward relation. This means that you cannot directly retrieve the record that targets a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve the `User` record associated with a specific `Profile` record.
+By default, [`one_to_one`](./reference/fields.md#one_to_one) fields do not establish a backward relation. This means that you cannot directly retrieve the record that targets a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve the `User` record associated with a specific `Profile` record.
 
-To enable this capability, you need to make use of the [`related`](./reference/fields#related-2) argument when defining your  [`one_to_one`](./reference/fields#one_to_one) field. For instance, we could modify the previous model definitions as follows in order to define a `user` backward relation and to let `Profile` records expose their related `User` record:
+To enable this capability, you need to make use of the [`related`](./reference/fields.md#related-2) argument when defining your  [`one_to_one`](./reference/fields.md#one_to_one) field. For instance, we could modify the previous model definitions as follows in order to define a `user` backward relation and to let `Profile` records expose their related `User` record:
 
 ```crystal
 class Profile < Marten::Model
@@ -227,7 +227,7 @@ class User < Marten::Model
 end
 ```
 
-When the [`related`](./reference/fields#related-2) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record will be accessible through the use of the `Profile#user` method:
+When the [`related`](./reference/fields.md#related-2) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record will be accessible through the use of the `Profile#user` method:
 
 ```crystal
 # Create two profiles
@@ -264,7 +264,7 @@ profile_1.user! # => raises Marten::DB::Errors::RecordNotFound
 
 ### Deletion strategy
 
-Like for [many-to-one relationships](#deletion-strategy), the deletion strategy to use for [`one_to_one`](./reference/fields#one_to_one) fields can be configured by leveraging the [`on_delete`](./reference/fields#on_delete-1) argument. This argument allows specifying the deletion strategy to adopt when a related record (one that is targeted by the [`many_to_one`](./reference/fields#many_to_one) field) is deleted. This argument accepts the following values (expressed as symbols):
+Like for [many-to-one relationships](#deletion-strategy), the deletion strategy to use for [`one_to_one`](./reference/fields.md#one_to_one) fields can be configured by leveraging the [`on_delete`](./reference/fields.md#on_delete-1) argument. This argument allows specifying the deletion strategy to adopt when a related record (one that is targeted by the [`many_to_one`](./reference/fields.md#many_to_one) field) is deleted. This argument accepts the following values (expressed as symbols):
 
 * `:do_nothing`: This is the default strategy. With this strategy, Marten won't do anything to ensure that the record referencing the record being deleted is deleted or updated. If the database enforces referential integrity (which will be the case for foreign key fields), this means that deleting a record could result in database errors.
 * `:cascade`: This strategy can be used to perform cascade deletions. When deleting a record, Marten will try to first destroy the other record that references the object being deleted.
@@ -306,7 +306,7 @@ user_1.reload # => raises Marten::DB::Errors::RecordNotFound
 
 ## Many-to-many relationships
 
-Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields#many_to_many) fields. This special field type requires the utilization of the [`to`](./reference/fields#to) argument, allowing to explicitly define the target model class associated with the current model.
+Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields.md#many_to_many) fields. This special field type requires the utilization of the [`to`](./reference/fields.md#to) argument, allowing to explicitly define the target model class associated with the current model.
 
 For example, an `Article` model could have a many-to-many field towards a `Tag` model. In such case, an `Article` record could have many associated `Tag` records, and every `Tag` record could be associated with many `Article` records as well:
 
@@ -326,7 +326,7 @@ end
 
 ### Interacting with related records
 
-[`many_to_many`](./reference/fields#many_to_many) fields exhibit unique characteristics compared to other relationship fields. When using [`many_to_many`](./reference/fields#many_to_many) fields in Marten, the framework generates a `#<field_name>` getter method that returns a specialized [query set](./queries) that not only enables filtering of targeted records but also facilitates the dynamic addition and removal of records to/from the set.
+[`many_to_many`](./reference/fields.md#many_to_many) fields exhibit unique characteristics compared to other relationship fields. When using [`many_to_many`](./reference/fields.md#many_to_many) fields in Marten, the framework generates a `#<field_name>` getter method that returns a specialized [query set](./queries.md) that not only enables filtering of targeted records but also facilitates the dynamic addition and removal of records to/from the set.
 
 With the above snippet, it would be possible to access the `Tags` records associated with a specific `Article` record by leveraging the `#tags` method. For example:
 
@@ -365,9 +365,9 @@ Take note of the utilization of the [`#add`](pathname:///api/dev/Marten/DB/Query
 
 ### Backward relations
 
-By default, [`many_to_many`](./reference/fields#many_to_many) fields do not establish a backward relation. This means that you cannot directly retrieve records that target a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve all the `Article` records associated with a specific `Tag` record.
+By default, [`many_to_many`](./reference/fields.md#many_to_many) fields do not establish a backward relation. This means that you cannot directly retrieve records that target a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve all the `Article` records associated with a specific `Tag` record.
 
-To enable this capability, you need to make use of the [`related`](./reference/fields#related-1) argument when defining your  [`many_to_many`](./reference/fields#many_to_many) field. For instance, we could modify the previous model definitions as follows in order to define an `articles` backward relation and to let `Tag` records expose their related `Article` records:
+To enable this capability, you need to make use of the [`related`](./reference/fields.md#related-1) argument when defining your  [`many_to_many`](./reference/fields.md#many_to_many) field. For instance, we could modify the previous model definitions as follows in order to define an `articles` backward relation and to let `Tag` records expose their related `Article` records:
 
 ```crystal
 class Tag < Marten::Model
@@ -383,7 +383,7 @@ class Article < Marten::Model
 end
 ```
 
-When the [`related`](./reference/fields#related) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Tag` record will be accessible through the use of the `Tag#articles` method:
+When the [`related`](./reference/fields.md#related) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Tag` record will be accessible through the use of the `Tag#articles` method:
 
 ```crystal
 # Create three tags
@@ -409,7 +409,7 @@ tag_2.articles.filter(title: "First article").to_a # => [#<Article:0x1036e3ee0 i
 
 ### Recursive relationships
 
-All the relationship fields mentioned previously support defining recursive relations, ie. relations that target the same model as the model defining the relation field. To do so, you can define a [`many_to_one`](./reference/fields#many_to_one), [`one_to_one`](./reference/fields#one_to_one), or [`many_to_many`](./reference/fields#many_to_many) field whose `to` argument is set to the `self` keyword.
+All the relationship fields mentioned previously support defining recursive relations, ie. relations that target the same model as the model defining the relation field. To do so, you can define a [`many_to_one`](./reference/fields.md#many_to_one), [`one_to_one`](./reference/fields.md#one_to_one), or [`many_to_many`](./reference/fields.md#many_to_many) field whose `to` argument is set to the `self` keyword.
 
 For example:
 

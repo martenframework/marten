@@ -3,7 +3,7 @@ title: Create custom file storages
 description: Learn how to create custom file storages.
 ---
 
-Marten uses a file storage mechanism to perform file operations like saving files, deleting files, generating URLs, ... This file storages mechanism allows to save files in different backends by leveraging a standardized API. You can leverage this capability to implement custom file storages (which you can then use for [assets](../../assets/introduction) or as part of [file model fields](../uploading-files#persisting-uploaded-files-in-model-records)).
+Marten uses a file storage mechanism to perform file operations like saving files, deleting files, generating URLs, ... This file storages mechanism allows to save files in different backends by leveraging a standardized API. You can leverage this capability to implement custom file storages (which you can then use for [assets](../../assets/introduction.md) or as part of [file model fields](../uploading-files.md#persisting-uploaded-files-in-model-records)).
 
 ## Basic file storage implementation
 
@@ -74,5 +74,5 @@ end
 
 You have many options when it comes to using your custom file storage classes, and those depend on what you are trying to do:
 
-* if you want to use a custom storage for [assets](../../assets/introduction), then you will likely want to assign an instance of your custom storage class to the [`assets.storage`](../../development/reference/settings#storage) setting (see [Assets storage](../../assets/introduction#assets-storage) to learn more about assets storages specifically)
-* if you want to use a custom storage for all your [file model fields](../../models-and-databases/reference/fields#file), then you will likely want to assign an instance of your custom storage class to the [`media_files.storage`](../../development/reference/settings#storage-1) setting (see [File storages](../managing-files#file-storages) to learn more about file storages specifically)
+* if you want to use a custom storage for [assets](../../assets/introduction.md), then you will likely want to assign an instance of your custom storage class to the [`assets.storage`](../../development/reference/settings.md#storage) setting (see [Assets storage](../../assets/introduction.md#assets-storage) to learn more about assets storages specifically)
+* if you want to use a custom storage for all your [file model fields](../../models-and-databases/reference/fields.md#file), then you will likely want to assign an instance of your custom storage class to the [`media_files.storage`](../../development/reference/settings.md#storage-1) setting (see [File storages](../managing-files.md#file-storages) to learn more about file storages specifically)

@@ -10,7 +10,7 @@ This section covers the basics regarding how to test a Marten project and the va
 
 You should test your Marten project to ensure that it adheres to the specifications it was built for. Like any Crystal project, Marten lets you write "specs" (see the [official documentation related to testing in Crystal](https://crystal-lang.org/reference/guides/testing.html) to learn more about those).
 
-By default, when creating a project through the use of the [`new`](./reference/management-commands#new) management command, Marten will automatically create a `spec/` folder at the root of your project structure. This folder contains a unique `spec_helper.cr` file allowing you to initialize the test environment for your Marten project.
+By default, when creating a project through the use of the [`new`](./reference/management-commands.md#new) management command, Marten will automatically create a `spec/` folder at the root of your project structure. This folder contains a unique `spec_helper.cr` file allowing you to initialize the test environment for your Marten project.
 
 This file should look something like this:
 
@@ -77,13 +77,13 @@ As mentioned before, running specs involves making use of the standard [`crystal
 
 ### The test environment
 
-By default, the [`new`](./reference/management-commands#new) management command always creates a `test` environment when generating new projects. As such, you should ensure that the `MARTEN_ENV` environment variable is set to `test` when running your Crystal specs. It should also be reminded that this `test` environment is associated with a dedicated settings file where test-related settings can be specified and/or overridden if necessary (see [Settings](./settings#environments) for more details about this).
+By default, the [`new`](./reference/management-commands.md#new) management command always creates a `test` environment when generating new projects. As such, you should ensure that the `MARTEN_ENV` environment variable is set to `test` when running your Crystal specs. It should also be reminded that this `test` environment is associated with a dedicated settings file where test-related settings can be specified and/or overridden if necessary (see [Settings](./settings.md#environments) for more details about this).
 
 ### The test database
 
 Marten **must** use a different database when running tests in order to not tamper with your regular database. Indeed, the database used in the context of specs will be flushed and generated automatically every time the specs suite is executed. You should not set these database names to the same names as the ones used for your development or production environments. If test database names are not explicitly set, your specs suite won't be allowed to run at all.
 
-One way to ensure you use a dedicated database specifically for tests is to override the [`database`](./reference/settings#database-settings) settings as follows:
+One way to ensure you use a dedicated database specifically for tests is to override the [`database`](./reference/settings.md#database-settings) settings as follows:
 
 ```crystal title=config/settings/test.cr
 Marten.configure :test do |config|
@@ -127,7 +127,7 @@ end
 ```
 
 :::tip
-In the above example we are simply specifying a "raw" path by hardcoding its value. In a real scenario, you will likely want to [resolve your handler URLs](../handlers-and-http/routing#reverse-url-resolutions) using the [`Marten::Routing::Map#reverse`](pathname:///api/0.2/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method of the main routes map (that way, you don't hardcode route paths in your specs). For example
+In the above example we are simply specifying a "raw" path by hardcoding its value. In a real scenario, you will likely want to [resolve your handler URLs](../handlers-and-http/routing.md#reverse-url-resolutions) using the [`Marten::Routing::Map#reverse`](pathname:///api/0.2/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method of the main routes map (that way, you don't hardcode route paths in your specs). For example
 
 ```crystal
 url = Marten.routes.reverse("article_detail", pk: 42)
@@ -193,7 +193,7 @@ end
 
 #### Testing client and authentication
 
-When using the [marten-auth](https://github.com/martenframework/marten-auth) shard and the built-in [authentication](../authentication), a few additional helpers can be leveraged in order to easily sign in/sign out users while using the test client:
+When using the [marten-auth](https://github.com/martenframework/marten-auth) shard and the built-in [authentication](../authentication.mdx), a few additional helpers can be leveraged in order to easily sign in/sign out users while using the test client:
 
 * The `#sign_in` method can be used to simulate the effect of a signed-in user. This means that the user ID will be persisted into the test client session and that requests issued with it will be associated with the considered user
 * The `#sign_out` method can be used to ensure that any signed-in user is logged out and that the session is flushed
@@ -222,9 +222,9 @@ end
 
 ### Collecting emails
 
-If your code is sending [emails](../emailing/introduction), you might want to test that these emails are sent as expected. To do that, you can leverage the [development emailing backend](../emailing/reference/backends#development-backend) to ensure that sent emails are collected as part of each spec execution.
+If your code is sending [emails](../emailing/introduction.md), you might want to test that these emails are sent as expected. To do that, you can leverage the [development emailing backend](../emailing/reference/backends.md#development-backend) to ensure that sent emails are collected as part of each spec execution.
 
-To do that, the emailing backend needs to be initialized with `collect_emails: true` when configuring the [`emailing.backend`](./reference/settings#backend-1) setting. For example:
+To do that, the emailing backend needs to be initialized with `collect_emails: true` when configuring the [`emailing.backend`](./reference/settings.md#backend-1) setting. For example:
 
 ```crystal title=config/settings/test.cr
 Marten.configure :test do |config|

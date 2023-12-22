@@ -4,7 +4,7 @@ sidebar_label: Create custom filters
 description: How to create custom template filters.
 ---
 
-Marten has built-in support for common [template filters](../reference/filters), but the framework also allows you to write your own template filters that you can leverage as part of your project's templates.
+Marten has built-in support for common [template filters](../reference/filters.md), but the framework also allows you to write your own template filters that you can leverage as part of your project's templates.
 
 ## Defining a template filter
 
@@ -60,7 +60,7 @@ value.raw  # => "hello"
 
 ### Filters and HTML auto-escaping
 
-When writing filters that are intended to operate on strings, it is important to remember that [HTML is automatically escaped](../introduction#auto-escaping) in templates. As such, some string values might be flagged as "safe" and some others as "unsafe":
+When writing filters that are intended to operate on strings, it is important to remember that [HTML is automatically escaped](../introduction.md#auto-escaping) in templates. As such, some string values might be flagged as "safe" and some others as "unsafe":
 
 * regular `String` values are always assumed to be "unsafe" and will be automatically escaped by Marten's template engine
 * safe strings are wrapped in `Marten::Template::SafeString` objects

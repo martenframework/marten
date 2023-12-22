@@ -71,7 +71,7 @@ As mentioned previously, fields can contribute validation rules to your models. 
 * from the field type itself: some fields will validate that values are of a specific type (for example a `uuid` field will not validate values that don't correspond to valid UUIDs)
 * from the field options you define (for example fields using `blank: true` won't accept empty values)
 
-Please refer to the [fields reference](./reference/fields) in order to learn more about the supported field types and their associated options.
+Please refer to the [fields reference](./reference/fields.md) in order to learn more about the supported field types and their associated options.
 
 ## Custom validation rules
 

@@ -3,7 +3,7 @@ title: Generated files
 description: Generated files reference.
 ---
 
-This page provides a reference of the files that are generated for the `auth` application when running the [`new`](../../development/reference/management-commands#new) management command with the `--with-auth` option or when using the [`auth`](../../development/reference/generators#auth) generator.
+This page provides a reference of the files that are generated for the `auth` application when running the [`new`](../../development/reference/management-commands.md#new) management command with the `--with-auth` option or when using the [`auth`](../../development/reference/generators.md#auth) generator.
 
 ## Application
 
@@ -15,7 +15,7 @@ The `auth` application is generated under the `src` or `src/apps` folder. In add
 
 ### Emails
 
-* `password_reset_email.cr` - Defines the [email](../../emailing) that is sent as part of the user password reset flow
+* `password_reset_email.cr` - Defines the [email](../../emailing.mdx) that is sent as part of the user password reset flow
 
 ### Handlers
 

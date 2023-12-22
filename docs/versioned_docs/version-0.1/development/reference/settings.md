@@ -42,7 +42,7 @@ The host the HTTP server running the application will be listening on.
 
 Default: `[] of Marten::Apps::Config.class`
 
-An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/0.1/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications) to learn more about applications.
+An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/0.1/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications.md) to learn more about applications.
 
 ### `log_backend`
 
@@ -70,7 +70,7 @@ config.middleware = [
 ]
 ```
 
-Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares) to learn more about middlewares.
+Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares.md) to learn more about middlewares.
 
 ### `port`
 
@@ -132,31 +132,31 @@ A boolean indicating if the `X-Forwarded-Proto` header is used to determine whet
 
 Default: `Marten::Handlers::Defaults::BadRequest`
 
-The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
+The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
 
 ### `handler403`
 
 Default: `Marten::Handlers::Defaults::PermissionDenied`
 
-The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
+The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
 
 ### `handler404`
 
 Default: `Marten::Handlers::Defaults::PageNotFound`
 
-The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
+The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
 
 ### `handler500`
 
 Default: `Marten::Handlers::Defaults::ServerError`
 
-The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers) to learn more about error handlers.
+The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
 
 ### `x_frame_options`
 
 Default: `"DENY"`
 
-The value to use for the X-Frame-Options header when the associated middleware is used. The value of this setting will be used by the [`Marten::Middleware::XFrameOptions`](../../handlers-and-http/reference/middlewares#x-frame-options-middleware) middleware when inserting the X-Frame-Options header in HTTP responses.
+The value to use for the X-Frame-Options header when the associated middleware is used. The value of this setting will be used by the [`Marten::Middleware::XFrameOptions`](../../handlers-and-http/reference/middlewares.md#x-frame-options-middleware) middleware when inserting the X-Frame-Options header in HTTP responses.
 
 ## Assets settings
 
@@ -226,7 +226,7 @@ This setting is only used if `assets.storage` is `nil`.
 
 ## CSRF settings
 
-CSRF settings allow configuring how Cross-Site Request Forgeries (CSRF) attack protection measures are implemented within the considered Marten project. Please refer to [Cross-Site Request Forgery protection](../../security/csrf) for more details about this topic.
+CSRF settings allow configuring how Cross-Site Request Forgeries (CSRF) attack protection measures are implemented within the considered Marten project. Please refer to [Cross-Site Request Forgery protection](../../security/csrf.md) for more details about this topic.
 
 The following settings are all available under the `csrf` namespace:
 
@@ -275,7 +275,7 @@ A boolean indicating whether to use a secure cookie for the CSRF cookie. Setting
 
 Default: `true`
 
-A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf) for more details.
+A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf.md) for more details.
 
 ### `trusted_origins`
 
@@ -296,7 +296,7 @@ config.csrf.trusted_origins = [
 
 ## Database settings
 
-These settings allow configuring the databases used by the considered Marten project. At least one default database must be configured if your project makes use of [models](../../models-and-databases/introduction), and additional databases can optionally be configured as well.
+These settings allow configuring the databases used by the considered Marten project. At least one default database must be configured if your project makes use of [models](../../models-and-databases/introduction.md), and additional databases can optionally be configured as well.
 
 ```crystal
 # Default database
@@ -368,7 +368,7 @@ A string containing the name of the user that should be used to connect to the c
 
 ## I18n settings
 
-I18n settings allow configuring internationalization-related settings. Please refer to [Internationalization](../../i18n) for more details about how to leverage translations and localized content in your projects.
+I18n settings allow configuring internationalization-related settings. Please refer to [Internationalization](../../i18n.mdx) for more details about how to leverage translations and localized content in your projects.
 
 :::info
 Marten makes use of [crystal-i18n](https://crystal-i18n.github.io/) to handle translations and locales. Further [configuration options](https://crystal-i18n.github.io/configuration.html) are also provided by this shard and can be leveraged by any Marten projects if necessary.
@@ -398,7 +398,7 @@ The default locale used by the Marten project.
 
 ## Media files settings
 
-Media files settings allow configuring how Marten should interact with [media files](../../files/managing-files). These settings are all available under the `media_files` namespace:
+Media files settings allow configuring how Marten should interact with [media files](../../files/managing-files.md). These settings are all available under the `media_files` namespace:
 
 ```crystal
 config.media_files.root = "files"
@@ -437,7 +437,7 @@ This setting is only used if `media_files.storage` is `nil`.
 
 ## Sessions settings
 
-Sessions settings allow configuring how Marten should handle [sessions](../../handlers-and-http/introduction#using-sessions). These settings are all available under the `sessions` namespace:
+Sessions settings allow configuring how Marten should handle [sessions](../../handlers-and-http/introduction.md#using-sessions). These settings are all available under the `sessions` namespace:
 
 ```crystal
 config.sessions.cookie_name = "_sessions"
@@ -487,11 +487,11 @@ Default: `"cookie"`
 
 A string containing the identifier of the store used to handle sessions.
 
-By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions) for more details about this capability.
+By default, sessions are stored within a single cookie. Cookies have a 4K size limit, which is usually sufficient to persist things like a user ID and flash messages. Other stores can be implemented and leveraged to store sessions data; see [Sessions](../../handlers-and-http/sessions.md) for more details about this capability.
 
 ## Strict transport security policy settings
 
-Strict transport security policy settings allow to configure how Marten should set the HTTP Strict-Transport-Security response header when the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares#strict-transport-security-middleware) middleware is used:
+Strict transport security policy settings allow to configure how Marten should set the HTTP Strict-Transport-Security response header when the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares.md#strict-transport-security-middleware) middleware is used:
 
 ```crystal
 config.strict_transport_security.max_age = 3_600
@@ -512,7 +512,7 @@ You should be careful when enabling this option as this will prevent browsers fr
 
 Default: `nil`
 
-Defines the duration in seconds that browsers should remember that the web app must be accessed using HTTPS only. A `nil` value means that the HTTP Strict-Transport-Security response header is not inserted in responses (which is equivalent to not using the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares#strict-transport-security-middleware) middleware).
+Defines the duration in seconds that browsers should remember that the web app must be accessed using HTTPS only. A `nil` value means that the HTTP Strict-Transport-Security response header is not inserted in responses (which is equivalent to not using the [`Marten::Middleware::StrictTransportSecurity`](../../handlers-and-http/reference/middlewares.md#strict-transport-security-middleware) middleware).
 
 :::caution
 You should be careful when defining a value for this setting because this will prevent browsers from connecting to your site using HTTP for the duration you specified.
@@ -526,7 +526,7 @@ Defines whether the `preload` directive should be inserted into the HTTP Strict-
 
 ## Templates settings
 
-Templates settings allow configuring how Marten discovers and renders [templates](../../templates). These settings are all available under the `templates` namespace:
+Templates settings allow configuring how Marten discovers and renders [templates](../../templates.mdx). These settings are all available under the `templates` namespace:
 
 ```crystal
 config.templates.app_dirs = false
@@ -549,7 +549,7 @@ A boolean indicating whether templates should be kept in a memory cache upon bei
 
 Default: `[] of Marten::Template::ContextProducer.class`
 
-An array of context producer classes. Context producers are helpers that ensure that common variables are automatically inserted in the template context whenever a template is rendered. See [Using context producers](../../templates/introduction#using-context-producers) to learn more about this capability.
+An array of context producer classes. Context producers are helpers that ensure that common variables are automatically inserted in the template context whenever a template is rendered. See [Using context producers](../../templates/introduction.md#using-context-producers) to learn more about this capability.
 
 ### `dirs`
 

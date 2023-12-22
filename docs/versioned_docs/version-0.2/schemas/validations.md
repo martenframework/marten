@@ -53,7 +53,7 @@ As mentioned previously, fields can contribute validation rules to your schemas.
 * from the field type itself: some fields will validate that values are of a specific type (for example a `uuid` field will not validate values that don't correspond to valid UUIDs)
 * from the field options you define (for example fields using `required: true` will result in errors if the field is missing from the validated data)
 
-Please refer to the [fields reference](./reference/fields) to learn more about the supported field types and their associated options.
+Please refer to the [fields reference](./reference/fields.md) to learn more about the supported field types and their associated options.
 
 ## Custom validation rules
 

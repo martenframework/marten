@@ -28,7 +28,7 @@ Alternatively, you can also refer to [Crystal's official installation instructio
 Secondly, we should install a few additional packages that will be required later on:
 
 * `git` to clone the project's repository
-* `nginx` to serve the project's server behind a reverse proxy and also serve [assets](../../assets/introduction) and [media files](../../files/managing-files)
+* `nginx` to serve the project's server behind a reverse proxy and also serve [assets](../../assets/introduction.md) and [media files](../../files/managing-files.md)
 * `postgresql` to handle our database needs
 
 This can be achieved by running the following command:
@@ -71,7 +71,7 @@ su - postgres -c 'createdb -O deploy <yourapp>'
 PostgreSQL management commands are usually performed as the `postgres` user, hence the use of `su` in the above commands.
 :::
 
-Obviously, you should also ensure that your Marten project is correctly configured to target this database in production. You can have a look at the [database settings](../../development/reference/settings#database-settings) to see what are the available options when it comes to configuring databases.
+Obviously, you should also ensure that your Marten project is correctly configured to target this database in production. You can have a look at the [database settings](../../development/reference/settings.md#database-settings) to see what are the available options when it comes to configuring databases.
 
 ## Clone the project
 
@@ -96,14 +96,14 @@ The next step is to install your project's dependencies. To do so, you can use t
 shards install
 ```
 
-We then need to compile the project binary and the [management CLI](../../development/management-commands):
+We then need to compile the project binary and the [management CLI](../../development/management-commands.md):
 
 ```bash
 crystal build src/server.cr -o bin/server --release
 crystal build manage.cr -o bin/manage --release
 ```
 
-The management CLI binary will be helpful in order to [apply migrations](../../models-and-databases/migrations) and to [collect assets](../../development/reference/management-commands#collectassets).
+The management CLI binary will be helpful in order to [apply migrations](../../models-and-databases/migrations.md) and to [collect assets](../../development/reference/management-commands.md#collectassets).
 
 :::info
 Depending on how you are handling assets as part of your projects you may have to perform additional steps. For example, you may have to install Node.js, install additional dependencies, and eventually bundle assets with Webpack if this is applicable to your project!
@@ -111,17 +111,17 @@ Depending on how you are handling assets as part of your projects you may have t
 
 ## Collect assets
 
-You will then want to collect your [assets](../../assets/introduction) so that they are uploaded to their final destination. To do so you can leverage the management CLI binary you compiled previously and run the [`collectassets`](../../development/reference/management-commands#collectassets) command:
+You will then want to collect your [assets](../../assets/introduction.md) so that they are uploaded to their final destination. To do so you can leverage the management CLI binary you compiled previously and run the [`collectassets`](../../development/reference/management-commands.md#collectassets) command:
 
 ```bash
 bin/manage collectassets --no-input
 ```
 
-This management command will "collect" all the available assets from the applications' assets directories and from the directories configured in the [`dirs`](../../development/reference/settings#dirs) setting, and ensure that they are "uploaded" to their final destination based on the [assets storage](../../assets/introduction#assets-storage) that is currently configured.
+This management command will "collect" all the available assets from the applications' assets directories and from the directories configured in the [`dirs`](../../development/reference/settings.md#dirs) setting, and ensure that they are "uploaded" to their final destination based on the [assets storage](../../assets/introduction.md#assets-storage) that is currently configured.
 
 ## Apply the project's migrations
 
-Then you will want to run your project's [migrations](../../models-and-databases/migrations) to ensure that your models are created at the database level. To achieve this you can leverage the management CLI binary that you compiled in a previous step and run the [`migrate`](../../development/reference/management-commands#migrate) command:
+Then you will want to run your project's [migrations](../../models-and-databases/migrations.md) to ensure that your models are created at the database level. To achieve this you can leverage the management CLI binary that you compiled in a previous step and run the [`migrate`](../../development/reference/management-commands.md#migrate) command:
 
 ```bash
 bin/manage migrate
@@ -158,10 +158,10 @@ WantedBy=multi-user.target
 
 Don't forget to replace the `<yourapp>` placeholders with the right values and, when ready, save the file using `Ctrl-X` and `y`.
 
-As you can see in the above snippet, we are assuming that the current [Marten environment](../../development/settings#environments) is the production one by setting the `MARTEN_ENV` environment variable to `production`. You should adapt this to your deployment use case obviously.
+As you can see in the above snippet, we are assuming that the current [Marten environment](../../development/settings.md#environments) is the production one by setting the `MARTEN_ENV` environment variable to `production`. You should adapt this to your deployment use case obviously.
 
 :::tip
-This service file is also a good place to define any environment variables that may be required by your project's settings. For example, this may be the case for "sensitive" setting values such as the [`secret_key`](../../development/reference/settings#secret_key) setting: as highlighted in [Secure critical setting values](../introduction#secret-key) you could store the value of this setting in a dedicated environment variable and load it from your application's codebase. If you do so, you will also want to add additional lines to the service file in order to define these additional environment variables. For example:
+This service file is also a good place to define any environment variables that may be required by your project's settings. For example, this may be the case for "sensitive" setting values such as the [`secret_key`](../../development/reference/settings.md#secret_key) setting: as highlighted in [Secure critical setting values](../introduction.md#secret-key) you could store the value of this setting in a dedicated environment variable and load it from your application's codebase. If you do so, you will also want to add additional lines to the service file in order to define these additional environment variables. For example:
 
 ```
 Environment="MARTEN_SECRET_KEY=<secretkey>"

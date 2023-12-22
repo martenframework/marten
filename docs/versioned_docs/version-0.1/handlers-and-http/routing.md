@@ -4,7 +4,7 @@ description: Learn how to map handlers to routes.
 sidebar_label: Routing
 ---
 
-Marten gives you the ability to design your URLs the way you want, by allowing you to easily map routes to specific [handlers](./introduction), and by letting you generate paths and URLs from your application code.
+Marten gives you the ability to design your URLs the way you want, by allowing you to easily map routes to specific [handlers](./introduction.md), and by letting you generate paths and URLs from your application code.
 
 ## The basics
 
@@ -49,7 +49,7 @@ end
 
 When a URL is requested, Marten runs through all the defined routes to identify a matching one. The handler associated with this route will be initialized from the route parameters (if there are any) and the handler object will be used to respond to the considered request.
 
-It should be noted that if no route is matched for a specific URL, Marten will automatically return a 404 Not Found response, by leveraging a configurable [error handler](./error-handlers).
+It should be noted that if no route is matched for a specific URL, Marten will automatically return a 404 Not Found response, by leveraging a configurable [error handler](./error-handlers.md).
 
 ## Specifying route parameters
 
@@ -70,7 +70,7 @@ The following route parameter types are available:
 | `slug` | Matches any string containing only ASCII letters, numbers, hyphen, and underscore characters. For example `my-first-project-01` could be matched by this parameter type. |
 | `uuid` | Matches a valid UUID string. These parameter values are always deserialized as `UUID` objects. |
 
-It should be noted that it is possible to register custom route parameter implementations if needed. See [Create custom route parameters](./how-to/create-custom-route-parameters) to learn more about this capability.
+It should be noted that it is possible to register custom route parameter implementations if needed. See [Create custom route parameters](./how-to/create-custom-route-parameters.md) to learn more about this capability.
 
 ## Defining included routes
 

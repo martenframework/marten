@@ -8,7 +8,7 @@ sidebar_label: Stores
 
 ### In-memory store
 
-This is the default store used as part of the [`cache_store`](../../development/reference/settings#cache_store) setting.
+This is the default store used as part of the [`cache_store`](../../development/reference/settings.md#cache_store) setting.
 
 This cache store is implemented as part of the [`Marten::Cache::Store::Memory`](pathname:///api/0.3/Marten/Cache/Store/Memory.html) class. This cache stores all data in memory within the same process, making it a fast and reliable option for caching in single process environments. However, it's worth noting that if you're running multiple instances of your application, the cache data will not be shared between them.
 

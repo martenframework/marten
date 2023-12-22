@@ -8,7 +8,7 @@ Models define what data can be persisted and manipulated by a Marten application
 
 ## Basic model definition
 
-Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/0.3/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries) for more details).
+Marten models must be defined as subclasses of the [`Marten::Model`](pathname:///api/0.3/Marten/DB/Model.html) base class; they explicitly define "fields" through the use of the `field` macro. These classes and fields map to database tables and columns that can be queried through the use of an automatically-generated database access API (see [Queries](./queries.md) for more details).
 
 For example, the following code snippet defines a simple `Article` model:
 
@@ -78,10 +78,10 @@ The field type determines a few other things:
 * the getter and setter methods that are generated for the field in the model class
 * how field values are actually validated
 
-Marten provides numerous built-in field types that cover common web development needs. The complete list of supported fields is covered in the [model fields reference](./reference/fields).
+Marten provides numerous built-in field types that cover common web development needs. The complete list of supported fields is covered in the [model fields reference](./reference/fields.md).
 
 :::note
-It is possible to write custom model fields and use them in your model definitions. See [How to create custom model fields](./how-to/create-custom-model-fields) for more details.
+It is possible to write custom model fields and use them in your model definitions. See [How to create custom model fields](./how-to/create-custom-model-fields.md) for more details.
 :::
 
 ### Common field options
@@ -136,7 +136,7 @@ Marten provides special fields allowing to define the three most common types of
 
 #### Many-to-many relationships
 
-Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields#many_to_many) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
+Many-to-many relationships can be defined through the use of [`many_to_many`](./reference/fields.md#many_to_many) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
 For example, an `Article` model could have a many-to-many field towards a `Tag` model. In such case, an `Article` record could have many associated `Tag` records, and every `Tag` record could be associated to many `Article` records as well:
 
@@ -153,7 +153,7 @@ end
 
 #### Many-to-one relationships
 
-Many-to-one relationships can be defined through the use of [`many_to_one`](./reference/fields#many_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
+Many-to-one relationships can be defined through the use of [`many_to_one`](./reference/fields.md#many_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
 For example, an `Article` model could have a many-to-one field towards an `Author` model. In such case, an `Article` record would only have one associated `Author` record, but every `Author` record could be associated to many `Article` records:
 
@@ -181,7 +181,7 @@ end
 
 #### One-to-one relationships
 
-One-to-one relationships can be defined through the use of [`one_to_one`](./reference/fields#one_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
+One-to-one relationships can be defined through the use of [`one_to_one`](./reference/fields.md#one_to_one) fields. This special field type requires the use of a special `to` argument in order to specify the model class to which the current model is related.
 
 For example, a `User` model could have a one-to-one field towards a `Profile` model. In such case, the `User` model could only have one associated `Profile` record, and the reverse would be true as well (a `Profile` record could only have one associated `User` record). In fact, a one-to-one field is really similar to a many-to-one field, but with an additional unicity constraint:
 
@@ -198,7 +198,7 @@ end
 
 ### Timestamps
 
-Marten lets you easily add automatic `created_at` / `updated_at` [`date_time`](./reference/fields#date_time) fields to your models by leveraging the [`#with_timestamp_fields`](pathname:///api/0.3/Marten/DB/Model/Table.html#with_timestamp_fields-macro) macro:
+Marten lets you easily add automatic `created_at` / `updated_at` [`date_time`](./reference/fields.md#date_time) fields to your models by leveraging the [`#with_timestamp_fields`](pathname:///api/0.3/Marten/DB/Model/Table.html#with_timestamp_fields-macro) macro:
 
 ```crystal
 class Article < Marten::Model
@@ -212,7 +212,7 @@ end
 
 The `created_at` field is populated with the current time when new records are created while the `updated_at` field is refreshed with the current time whenever records are updated.
 
-Note that using [`#with_timestamp_fields`](pathname:///api/0.3/Marten/DB/Model/Table.html#with_timestamp_fields-macro) is technically equivalent as defining two `created_at` and `updated_at` [`date_time`](./reference/fields#date_time) fields as follows:
+Note that using [`#with_timestamp_fields`](pathname:///api/0.3/Marten/DB/Model/Table.html#with_timestamp_fields-macro) is technically equivalent as defining two `created_at` and `updated_at` [`date_time`](./reference/fields.md#date_time) fields as follows:
 
 ```crystal
 class Article < Marten::Model
@@ -228,7 +228,7 @@ end
 
 ## Multifields indexes and unique constraints
 
-Single model fields can be indexed or associated with a unique constraint _individually_ by leveraging the [`index`](./reference/fields#index) and [`unique`](./reference/fields#unique) field options. That being said, it is sometimes necessary to configure multifields indexes or unique constraints.
+Single model fields can be indexed or associated with a unique constraint _individually_ by leveraging the [`index`](./reference/fields.md#index) and [`unique`](./reference/fields.md#unique) field options. That being said, it is sometimes necessary to configure multifields indexes or unique constraints.
 
 ### Multifields indexes
 
@@ -325,7 +325,7 @@ Finally the following snippet showcases how to filter `Article` records by title
 Article.filter(name: "My article").order("-created_at")
 ```
 
-Please head over to the [Model queries](./queries) guide in order to learn more about model querying capabilities.
+Please head over to the [Model queries](./queries.md) guide in order to learn more about model querying capabilities.
 
 ### Update
 
@@ -387,7 +387,7 @@ article.save!
 # => Unhandled exception: Record is invalid (Marten::DB::Errors::InvalidRecord)
 ```
 
-Please head over to the [Model validations](./validations) guide in order to learn more about model validations.
+Please head over to the [Model validations](./validations.md) guide in order to learn more about model validations.
 
 ## Inheritance
 
@@ -423,10 +423,10 @@ The `Student` model will have four model fields in total (`id`, `name`, `email`,
 
 It is possible to define callbacks in your model in order to bind methods and logics to specific events in the life cycle of your model records. For example, it is possible to define callbacks that run before a record gets created, or before it is destroyed.
 
-Please head over to the [Model callbacks](./callbacks) guide in order to learn more about model callbacks.
+Please head over to the [Model callbacks](./callbacks.md) guide in order to learn more about model callbacks.
 
 ## Migrations
 
 When working with models, it is necessary to ensure that any changes made to model definitions are applied at the database level. This is achieved through the use of migrations. 
 
-Marten provides a migrations mechanism that is designed to be automatic: this means that migrations will be automatically generated from your model definitions when you run a dedicated command (the `genmigrations` command). Please head over to [Model migrations](./migrations) in order to learn more about migrations generations and the associated workflows.
+Marten provides a migrations mechanism that is designed to be automatic: this means that migrations will be automatically generated from your model definitions when you run a dedicated command (the `genmigrations` command). Please head over to [Model migrations](./migrations.md) in order to learn more about migrations generations and the associated workflows.

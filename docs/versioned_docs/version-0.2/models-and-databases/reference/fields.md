@@ -113,7 +113,7 @@ class Attachment < Marten::Model
 end
 ```
 
-Please refer to [Managing files](../../files/managing-files) for more details on how to manage uploaded files and the associated storages.
+Please refer to [Managing files](../../files/managing-files.md) for more details on how to manage uploaded files and the associated storages.
 
 #### `upload_to`
 

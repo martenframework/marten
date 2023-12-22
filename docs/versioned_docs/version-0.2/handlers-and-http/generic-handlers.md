@@ -11,11 +11,11 @@ Marten includes a set of generic handlers that can be leveraged to perform commo
 Marten provides generic handlers allowing to perform the following actions:
 
 * redirect to a specific URL
-* render an existing [template](../templates)
-* process a [schema](../schemas)
-* list, display, create, update, or delete [model records](../models-and-databases)
+* render an existing [template](../templates.mdx)
+* process a [schema](../schemas.mdx)
+* list, display, create, update, or delete [model records](../models-and-databases.mdx)
 
-A few of these generic handlers are described below (and all of them are listed in the [dedicated reference](./reference/generic-handlers)). Each of these handler classes must be subclassed on a per-project basis to define the required "attributes", and optionally to override methods to customize things like objects exposed in template contexts. By doing so you are essentially defining handlers that inherit these common patterns, without having to reimplement them.
+A few of these generic handlers are described below (and all of them are listed in the [dedicated reference](./reference/generic-handlers.md)). Each of these handler classes must be subclassed on a per-project basis to define the required "attributes", and optionally to override methods to customize things like objects exposed in template contexts. By doing so you are essentially defining handlers that inherit these common patterns, without having to reimplement them.
 
 Finally, it should be noted that using generic handlers is totally optional. They provide a good starting point to implement frequently encountered use cases, but you can decide to design your own set of generic handlers to accommodate for your project needs if the built-in ones don't match your requirements.
 
@@ -59,7 +59,7 @@ end
 
 ### Rendering a template
 
-One of the most frequent things you will want to do when writing handlers is to return HTML responses containing rendered [templates](../templates). To do so, you can obviously define a regular handler and make use of the [`#render`](./introduction#render) helper. But, you may also want to leverage the [`Marten::Handlers::Template`](pathname:///api/0.2/Marten/Handlers/Template.html) generic handler.
+One of the most frequent things you will want to do when writing handlers is to return HTML responses containing rendered [templates](../templates.mdx). To do so, you can obviously define a regular handler and make use of the [`#render`](./introduction.md#render) helper. But, you may also want to leverage the [`Marten::Handlers::Template`](pathname:///api/0.2/Marten/Handlers/Template.html) generic handler.
 
 This generic handler will return a 200 OK HTTP response containing a rendered HTML template. To make use of it, you can simply define a subclass of it and ensure that you call the `#template_name` class method in order to define the template that will be rendered:
 
@@ -107,7 +107,7 @@ For example, the template associated with this handler could be something like t
 
 ### Processing a form
 
-It is possible to use the [`Marten::Handlers::Schema`](pathname:///api/0.2/Marten/Handlers/Schema.html) generic handler in order to process form data with a [schema](../schemas).
+It is possible to use the [`Marten::Handlers::Schema`](pathname:///api/0.2/Marten/Handlers/Schema.html) generic handler in order to process form data with a [schema](../schemas.mdx).
 
 To do so, it is necessary:
 

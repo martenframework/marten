@@ -3,7 +3,7 @@ title: Template filters
 description: Template filters reference.
 ---
 
-This page provides a reference for all the available filters that can be used when defining [templates](../introduction).
+This page provides a reference for all the available filters that can be used when defining [templates](../introduction.md).
 
 ## `capitalize`
 

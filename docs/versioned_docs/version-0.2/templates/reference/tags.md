@@ -5,7 +5,7 @@ description: Template tags reference.
 
 ## `asset`
 
-The `asset` template tag allows to generate the URL of a given [asset](../../assets/introduction). It must take at least one argument (the filepath of the asset).
+The `asset` template tag allows to generate the URL of a given [asset](../../assets/introduction.md). It must take at least one argument (the filepath of the asset).
 
 For example, the following line is a valid usage of the `asset` tag and will output the path or URL of the `app/app.css` asset:
 
@@ -31,11 +31,11 @@ For example:
 
 ## `block`
 
-The `block` template tag allows to define that some specific portions of a template can be overridden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
+The `block` template tag allows to define that some specific portions of a template can be overridden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.
 
 ## `csrf_token`
 
-The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used for templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers) involving rendered templates).
+The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used for templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction.md#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers.md) involving rendered templates).
 
 This can be used to insert the CSRF token into a hidden form input so that it gets sent to the handler processing the form data for example. Indeed, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`):
 
@@ -47,11 +47,11 @@ This can be used to insert the CSRF token into a hidden form input so that it ge
 </form>
 ```
 
-See [Cross-Site Request Forgery protection](../../security/csrf) to learn more about this.
+See [Cross-Site Request Forgery protection](../../security/csrf.md) to learn more about this.
 
 ## `extend`
 
-The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overridden or extended by the child template. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
+The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overridden or extended by the child template. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.
 
 ## `for`
 
@@ -176,11 +176,11 @@ Would output the following:
 
 ## `super`
 
-The `super` template tag allows to render the content of a block from a parent template (in a situation where both the `extend` and `block` tags are used). This can be useful in situations where blocks in a child template need to extend (add content) to a parent's block content instead of overwriting it. See [Template inheritance](../introduction#template-inheritance) to learn more about this capability.
+The `super` template tag allows to render the content of a block from a parent template (in a situation where both the `extend` and `block` tags are used). This can be useful in situations where blocks in a child template need to extend (add content) to a parent's block content instead of overwriting it. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.
 
 ## `translate`
 
-The `translate` template tag allows to perform translation lookups by using the [I18n configuration](../../development/reference/settings#i18n-settings) of the project. It must take at least one argument (the translation key) followed by keyword arguments.
+The `translate` template tag allows to perform translation lookups by using the [I18n configuration](../../development/reference/settings.md#i18n-settings) of the project. It must take at least one argument (the translation key) followed by keyword arguments.
 
 For example the following lines are valid usages of the `translate` tag:
 
@@ -207,7 +207,7 @@ Alias for [`translate`](#translate).
 
 ## `url`
 
-The `url` template tag allows to perform [URL lookups](../../handlers-and-http/routing#reverse-url-resolutions). It must take at least one argument (the name of the targeted handler) followed by optional keyword arguments (if the route requires parameters).
+The `url` template tag allows to perform [URL lookups](../../handlers-and-http/routing.md#reverse-url-resolutions). It must take at least one argument (the name of the targeted handler) followed by optional keyword arguments (if the route requires parameters).
 
 For example, the following lines are valid usages of the `url` tag:
 

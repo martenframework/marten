@@ -41,7 +41,7 @@ RUN crystal build src/server.cr -o bin/server --release
 CMD ["/app/bin/server"]
 ```
 
-As you can see, this Dockerfile builds a Docker image based on the latest version of the Crystal programming language image. It also installs your project's Crystal dependencies, runs the [`collectassets`](../../development/reference/management-commands) management command, and compiles your server's binary.
+As you can see, this Dockerfile builds a Docker image based on the latest version of the Crystal programming language image. It also installs your project's Crystal dependencies, runs the [`collectassets`](../../development/reference/management-commands.md) management command, and compiles your server's binary.
 
 It should be noted that this Dockerfile could perform additional operations if needed. For example, some projects may require Node.js in order to install additional dependencies and build your project's assets. This could be achieved with the following additions:
 
@@ -75,7 +75,7 @@ CMD ["/app/bin/server"]
 
 ### Configure your production server's host and port
 
-You should ensure that your production server can be accessed from other containers, and on a specific port. To do so, it's important to set the [`host`](../../development/reference/settings#host) setting to `0.0.0.0` and the [`port`](../../development/reference/settings#port) setting to a specific value such as `8000` (which is the port we'll be using throughout this guide).
+You should ensure that your production server can be accessed from other containers, and on a specific port. To do so, it's important to set the [`host`](../../development/reference/settings.md#host) setting to `0.0.0.0` and the [`port`](../../development/reference/settings.md#port) setting to a specific value such as `8000` (which is the port we'll be using throughout this guide).
 
 This can be achieved by updating your `config/settings/production.cr` production settings file as follows:
 
@@ -90,7 +90,7 @@ end
 
 ### Configure key settings from environment variables
 
-When deploying to Fly.io, you will have to set a few environment variables (later in this guide) that will be used to populate key settings. This should be the case for the [`secret_key`](../../development/reference/settings#secret_key) and [`allowed_hosts`](../../development/reference/settings#allowed_hosts) settings at least.
+When deploying to Fly.io, you will have to set a few environment variables (later in this guide) that will be used to populate key settings. This should be the case for the [`secret_key`](../../development/reference/settings.md#secret_key) and [`allowed_hosts`](../../development/reference/settings.md#allowed_hosts) settings at least.
 
 As such, it is important to ensure that your project populates these settings by reading their values in corresponding environment variables. This can be achieved by updating your `config/settings/production.cr` production settings file as follows:
 
@@ -103,7 +103,7 @@ Marten.configure :production do |config|
 end
 ```
 
-It should be noted that if your application requires a database, you should also make sure to parse the `DATABASE_URL` environment variable and to configure your [database settings](../../development/reference/settings#database-settings) from the parsed database URL properties. The `DATABASE_URL` variable contains a URL-encoded string that specifies the connection details of your database, such as the database type, hostname, port, username, password, and database name.
+It should be noted that if your application requires a database, you should also make sure to parse the `DATABASE_URL` environment variable and to configure your [database settings](../../development/reference/settings.md#database-settings) from the parsed database URL properties. The `DATABASE_URL` variable contains a URL-encoded string that specifies the connection details of your database, such as the database type, hostname, port, username, password, and database name.
 
 This can be accomplished as follows for a PostgreSQL database:
 
@@ -133,11 +133,11 @@ end
 
 ### Optional: set up the asset serving middleware
 
-In order to easily serve your application's assets in Fly.io, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares#asset-serving-middleware) middleware. Indeed, it won't be possible to configure a web server such as [Nginx](https://nginx.org) to serve your assets directly on Fly.io if you intend to use a "local file system" asset store (such as [`Marten::Core::Store::FileSystem`](pathname:///api/0.3/Marten/Core/Storage/FileSystem.html)).
+In order to easily serve your application's assets in Fly.io, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares.md#asset-serving-middleware) middleware. Indeed, it won't be possible to configure a web server such as [Nginx](https://nginx.org) to serve your assets directly on Fly.io if you intend to use a "local file system" asset store (such as [`Marten::Core::Store::FileSystem`](pathname:///api/0.3/Marten/Core/Storage/FileSystem.html)).
 
-To palliate this, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares#asset-serving-middleware) middleware. Obviously, this is not necessary if you intend to leverage a cloud storage provider (like Amazon's S3 or GCS) to store and serve your collected assets (in this case, you can simply skip this section).
+To palliate this, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares.md#asset-serving-middleware) middleware. Obviously, this is not necessary if you intend to leverage a cloud storage provider (like Amazon's S3 or GCS) to store and serve your collected assets (in this case, you can simply skip this section).
 
-In order to use this middleware, you can "insert" the corresponding class at the beginning of the [`middleware`](../../development/reference/settings#middleware) setting when defining production settings. For example:
+In order to use this middleware, you can "insert" the corresponding class at the beginning of the [`middleware`](../../development/reference/settings.md#middleware) setting when defining production settings. For example:
 
 ```crystal
 Marten.configure :production do |config|
@@ -147,7 +147,7 @@ Marten.configure :production do |config|
 end
 ```
 
-The middleware will serve the collected assets available under the assets root ([`assets.root`](../../development/reference/settings#root) setting). It is also important to note that the [`assets.url`](../../development/reference/settings#url) setting must align with the Marten application domain or correspond to a relative URL path (e.g., `/assets/`) for this middleware to work correctly.
+The middleware will serve the collected assets available under the assets root ([`assets.root`](../../development/reference/settings.md#root) setting). It is also important to note that the [`assets.url`](../../development/reference/settings.md#url) setting must align with the Marten application domain or correspond to a relative URL path (e.g., `/assets/`) for this middleware to work correctly.
 
 ## Create the Fly.io app
 
@@ -181,7 +181,7 @@ In this guide, the `<yourapp>` placeholder refers to the Fly.io application name
 
 ## Set up environment secrets
 
-It is recommended to define the `MARTEN_SECRET_KEY` environment variable order to populate the [`secret_key`](../../development/reference/settings#secret_key) setting, as mentioned in [Configure key settings from environment variables](#configure-key-settings-from-environment-variables).
+It is recommended to define the `MARTEN_SECRET_KEY` environment variable order to populate the [`secret_key`](../../development/reference/settings.md#secret_key) setting, as mentioned in [Configure key settings from environment variables](#configure-key-settings-from-environment-variables).
 
 Fly.io gives the ability to define such sensitive setting values using [runtime secrets](https://fly.io/docs/reference/secrets/). In this light, we can create a `MARTEN_SECRET_KEY` secret by using the `fly secrets` command as follows:
 

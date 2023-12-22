@@ -18,7 +18,7 @@ Marten itself defines a set of translated contents for things that should be int
 
 ## Configuration
 
-Marten provides an integration allowing to configure internationalization-related settings. These settings are available under the [`i18n`](../development/reference/settings#i18n-settings) namespace and allow to define things like the default locale and the available locales:
+Marten provides an integration allowing to configure internationalization-related settings. These settings are available under the [`i18n`](../development/reference/settings.md#i18n-settings) namespace and allow to define things like the default locale and the available locales:
 
 ```crystal
 config.i18n.default_locale = :fr
@@ -37,7 +37,7 @@ As stated before, Marten relies on the [crystal-i18n](https://crystal-i18n.githu
 
 ### Defining translations
 
-Translations must be defined in a `locales` folder at the root of an application. For example, if you are using the [main application](../development/applications#the-main-application) (which corresponds to the standard `src` folder) you could define a `src/locales` folder containing an `en.yml` file as follows:
+Translations must be defined in a `locales` folder at the root of an application. For example, if you are using the [main application](../development/applications.md#the-main-application) (which corresponds to the standard `src` folder) you could define a `src/locales` folder containing an `en.yml` file as follows:
 
 ```
 myproject/
@@ -121,11 +121,11 @@ I18n.with_locale(:fr) do
 end
 ```
 
-Finally, it should be noted that Marten provides an [I18n middleware](../handlers-and-http/reference/middlewares#i18n-middleware) that activates the right locale based on the Accept-Language header. Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../development/reference/settings#available_locales) and [`i18n.default_locale`](../development/reference/settings#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead. By leveraging this middleware, you can be sure that the right locale is automatically enabled for your users, so you don't need to take care of it.
+Finally, it should be noted that Marten provides an [I18n middleware](../handlers-and-http/reference/middlewares.md#i18n-middleware) that activates the right locale based on the Accept-Language header. Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../development/reference/settings.md#available_locales) and [`i18n.default_locale`](../development/reference/settings.md#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead. By leveraging this middleware, you can be sure that the right locale is automatically enabled for your users, so you don't need to take care of it.
 
 ## Locales and apps
 
-As mentioned previously, each [application](../development/applications) can define translations inside a `locales` folder that must be located at the root of the application's directory. This `locales` folder should contain YAML files defining the translations that are required by the application.
+As mentioned previously, each [application](../development/applications.md) can define translations inside a `locales` folder that must be located at the root of the application's directory. This `locales` folder should contain YAML files defining the translations that are required by the application.
 
 The way to organize translations inside this folder is left to application developers. That being said, it is necessary to ensure that all the YAML files containing translations are namespaced with the targeted locale (eg. `en`, `fr`, etc). 
 

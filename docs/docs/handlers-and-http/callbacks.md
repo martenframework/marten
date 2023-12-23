@@ -72,6 +72,25 @@ end
 
 Similarly to `#before_dispatch` callbacks, `#after_dispatch` callbacks can return a brand new [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When this is the case, this response is always used instead of the one that was returned by the handler's `#dispatch` method.
 
+### `before_render`
+
+`before_render` callbacks are invoked prior to rendering a template when generating a response that incorporates its content. This means that these callbacks are executed as part of the [`#render`](./introduction.md#render) helper method and when rendering templates as part of subclasses of the [`Marten::Handlers::Template`](./generic-handlers.md#rendering-a-template) generic handler.
+
+Typically, these callbacks are used to add new variables to the global template context, in order to make them accessible to the template runtime. For example:
+
+```crystal
+class MyHandler < Marten::Handlers::Template
+  template_name "app/my_template.html"
+  before_render :add_variable_to_context
+
+  private def add_variable_to_context : Nil
+    context["foo"] = "bar"
+  end
+end
+```
+
+Note that `before_render` callbacks can technically be used to return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When this situation arises, this response always takes precedence over the one that would've been returned following the rendering of the template.
+
 ## Schema handler callbacks
 
 The following callbacks are only available for handlers that inherit from the [schema handler](./reference/generic-handlers.md#processing-a-schema). That is, handlers that inherit from [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html), but also handlers that inherit from [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) and [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html).

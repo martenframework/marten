@@ -61,7 +61,7 @@ module Marten
       # This context object can be mutated for the lifetime of the handler in order to define which variables will be
       # made available to the template runtime.
       def context
-        @context ||= Marten::Template::Context.new
+        @context ||= Marten::Template::Context.from(nil, request)
       end
 
       # Triggers the execution of the handler in order to produce an HTTP response.

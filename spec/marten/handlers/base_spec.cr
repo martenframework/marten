@@ -80,19 +80,25 @@ describe Marten::Handlers::Base do
   end
 
   describe "#context" do
-    it "returns an empty global template context object" do
-      handler = Marten::Handlers::Base.new(
-        Marten::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
+    it "returns an empty global template context object initialized from configured context producers" do
+      previous_context_producers = Marten.templates.context_producers
+      Marten.templates.context_producers = [
+        Marten::Template::ContextProducer::Request.new,
+      ] of Marten::Template::ContextProducer
+
+      request = Marten::HTTP::Request.new(
+        method: "GET",
+        resource: "",
+        headers: HTTP::Headers{"Host" => "example.com"}
       )
+      handler = Marten::Handlers::Base.new(request)
 
       context = handler.context
 
       context.should be_a Marten::Template::Context
-      context.empty?.should be_true
+      context["request"].should eq request
+
+      Marten.templates.context_producers = previous_context_producers
     end
 
     it "returns a global template context object that is memoized" do

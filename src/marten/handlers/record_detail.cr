@@ -31,7 +31,7 @@ module Marten
         @@record_context_name = name.to_s
       end
 
-      private def add_record_to_context
+      private def add_record_to_context : Nil
         context[self.class.record_context_name] = record
       end
     end

@@ -146,7 +146,7 @@ module Marten
         )
       end
 
-      private def add_schema_to_context
+      private def add_schema_to_context : Nil
         context[self.class.schema_context_name] = schema
       end
 

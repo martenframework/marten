@@ -39,7 +39,7 @@ module Marten
         @@list_context_name = name.to_s
       end
 
-      private def add_records_to_context
+      private def add_records_to_context : Nil
         records = self.class.page_size.nil? ? queryset : paginate_queryset
         context[self.class.list_context_name] = records
       end

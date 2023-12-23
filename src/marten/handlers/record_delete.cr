@@ -74,7 +74,7 @@ module Marten
         ).not_nil!
       end
 
-      private def add_record_to_context
+      private def add_record_to_context : Nil
         context[self.class.record_context_name] = record
       end
 

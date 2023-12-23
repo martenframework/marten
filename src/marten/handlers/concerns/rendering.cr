@@ -31,7 +31,12 @@ module Marten
       # Renders the configured template for a specific `context` object and produces an HTTP response.
       def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context)
         before_render_response = run_before_render_callbacks
-        before_render_response || get_response(render_template(context))
+
+        if before_render_response.is_a?(HTTP::Response)
+          before_render_response
+        else
+          get_response(render_template(context))
+        end
       end
 
       # Returns the template name that should be rendered by the handler.

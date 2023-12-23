@@ -207,11 +207,16 @@ module Marten
         self.context["handler"] = self
 
         before_render_response = run_before_render_callbacks
-        before_render_response || HTTP::Response.new(
-          content: Marten.templates.get_template(template_name).render(self.context),
-          content_type: content_type,
-          status: ::HTTP::Status.new(status).to_i
-        )
+
+        if before_render_response.is_a?(HTTP::Response)
+          before_render_response
+        else
+          HTTP::Response.new(
+            content: Marten.templates.get_template(template_name).render(self.context),
+            content_type: content_type,
+            status: ::HTTP::Status.new(status).to_i
+          )
+        end
       end
 
       # Returns an HTTP response generated from a content string, content type and status code.

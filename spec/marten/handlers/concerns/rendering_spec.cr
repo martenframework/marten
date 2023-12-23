@@ -158,6 +158,24 @@ describe Marten::Handlers::Rendering do
       response.content_type.should eq "text/plain"
       response.content.should eq "before_render response"
     end
+
+    it "returns the expected response if the before_render callback returns a value that is not an HTTP response" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithContextBeforeRenderResponse.new(request)
+
+      response = handler.render_to_response(nil)
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
   end
 
   describe "#template_name" do
@@ -231,6 +249,19 @@ module Marten::Handlers::RenderingSpec
 
     private def return_before_render_response
       Marten::HTTP::Response.new("before_render response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithContextBeforeRenderResponse < Marten::Handler
+    include Marten::Handlers::Rendering
+
+    template_name "specs/handlers/concerns/rendering/test.html"
+
+    before_render :add_context_values
+
+    private def add_context_values
+      context["name"] = "John Doe"
+      "bar"
     end
   end
 

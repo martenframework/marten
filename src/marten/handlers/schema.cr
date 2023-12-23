@@ -47,6 +47,8 @@ module Marten
       # Defaults to `nil`.
       class_getter success_url : String?
 
+      before_render :add_schema_to_context
+
       # Allows to configure the name to use to include the schema into the template context.
       def self.schema_context_name(name : String | Symbol)
         @@schema_context_name = name.to_s
@@ -75,10 +77,6 @@ module Marten
         def schema_class
           {{ schema_klass }}
         end
-      end
-
-      def context
-        Marten::Template::Context{self.class.schema_context_name => schema}
       end
 
       def initial_data
@@ -146,6 +144,10 @@ module Marten
           "'#{self.class.name}' must define a success route via the '#success_route_name' or '#success_url' class " \
           "method, or by overridding the '#success_url' method"
         )
+      end
+
+      private def add_schema_to_context
+        context[self.class.schema_context_name] = schema
       end
 
       private def raise_improperly_configured_schema

@@ -31,25 +31,6 @@ describe Marten::Handlers::RecordDelete do
     end
   end
 
-  describe "#context" do
-    it "includes the record associated with the configured context name" do
-      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
-      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
-
-      params = Marten::Routing::MatchParameters{"pk" => user_1.id!}
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      handler = Marten::Handlers::RecordDeleteSpec::TestHandler.new(request, params)
-
-      handler.context["test_user"].should eq user_1
-    end
-  end
-
   describe "#post" do
     it "deletes the record and returns the expected redirect" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
@@ -87,6 +68,27 @@ describe Marten::Handlers::RecordDelete do
     end
   end
 
+  describe "#render_to_response" do
+    it "includes the record associated with the configured context name in the global context" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      params = Marten::Routing::MatchParameters{"pk" => user_1.id!}
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RecordDeleteSpec::TestHandler.new(request, params)
+
+      handler.render_to_response(context: nil)
+
+      handler.context["test_user"].should eq user_1
+    end
+  end
+
   describe "#success_url" do
     it "returns the raw success URL if configured" do
       request = Marten::HTTP::Request.new(
@@ -121,12 +123,14 @@ module Marten::Handlers::RecordDeleteSpec
     model TestUser
     record_context_name "test_user"
     success_route_name "dummy"
+    template_name "specs/handlers/template/test.html"
   end
 
   class TestHandlerWithSuccessUrl < Marten::Handlers::RecordDelete
     model TestUser
     record_context_name "test_user"
     success_url "https://example.com"
+    template_name "specs/handlers/template/test.html"
   end
 
   class TestHandlerWithoutConfiguration < Marten::Handlers::RecordDelete

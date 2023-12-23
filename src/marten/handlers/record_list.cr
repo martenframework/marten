@@ -32,14 +32,16 @@ module Marten
       # Returns the name to use to include the record list into the template context (defaults to `records`).
       class_getter list_context_name : String = "records"
 
+      before_render :add_records_to_context
+
       # Allows to configure the name to use to include the list of records into the template context.
       def self.list_context_name(name : String | Symbol)
         @@list_context_name = name.to_s
       end
 
-      def context
+      private def add_records_to_context
         records = self.class.page_size.nil? ? queryset : paginate_queryset
-        Marten::Template::Context{self.class.list_context_name => records}
+        context[self.class.list_context_name] = records
       end
     end
   end

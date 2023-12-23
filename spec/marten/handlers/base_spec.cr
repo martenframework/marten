@@ -79,6 +79,38 @@ describe Marten::Handlers::Base do
     end
   end
 
+  describe "#context" do
+    it "returns an empty global template context object" do
+      handler = Marten::Handlers::Base.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      context = handler.context
+
+      context.should be_a Marten::Template::Context
+      context.empty?.should be_true
+    end
+
+    it "returns a global template context object that is memoized" do
+      handler = Marten::Handlers::Base.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"},
+        )
+      )
+
+      context = handler.context
+
+      context.should be_a Marten::Template::Context
+      handler.context.object_id.should eq context.object_id
+    end
+  end
+
   describe "#request" do
     it "returns the request handled by the handler" do
       request = Marten::HTTP::Request.new(
@@ -740,6 +772,24 @@ describe Marten::Handlers::Base do
 
       handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
       response = handler.render("specs/handlers/base/test.html", context: {"name" => "John Doe"})
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
+    it "is able to render the template using the global context" do
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler.context["name"] = "John Doe"
+
+      response = handler.render("specs/handlers/base/test.html")
 
       response.status.should eq 200
       response.content_type.should eq "text/html"

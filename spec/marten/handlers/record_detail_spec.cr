@@ -17,8 +17,8 @@ describe Marten::Handlers::RecordDetail do
     end
   end
 
-  describe "#context" do
-    it "includes the record associated with the configured context name" do
+  describe "#render_to_response" do
+    it "includes the record associated with the configured context name into the global context" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
 
@@ -31,6 +31,7 @@ describe Marten::Handlers::RecordDetail do
         )
       )
       handler = Marten::Handlers::RecordDetailSpec::TestHandler.new(request, params)
+      handler.render_to_response(context: nil)
 
       handler.context["test_user"].should eq user_1
     end
@@ -41,6 +42,7 @@ module Marten::Handlers::RecordDetailSpec
   class TestHandler < Marten::Handlers::RecordDetail
     model TestUser
     record_context_name :test_user
+    template_name "specs/handlers/template/test.html"
   end
 
   class TestHandlerWithoutConfiguration < Marten::Handlers::RecordDetail

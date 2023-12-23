@@ -1,19 +1,6 @@
 require "./spec_helper"
 
 describe Marten::Handlers::Template do
-  describe "#context" do
-    it "returns nil by default" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      Marten::Handlers::TemplateSpec::TestHandlerWithoutContext.new(request).context.should be_nil
-    end
-  end
-
   describe "#get" do
     it "returns a HTTP response containing the template rendered using the specified context" do
       request = Marten::HTTP::Request.new(
@@ -38,8 +25,10 @@ module Marten::Handlers::TemplateSpec
   class TestHandler < Marten::Handlers::Template
     template_name "specs/handlers/template/test.html"
 
-    def context
-      {name: "John Doe"}
+    before_render :add_name_to_context
+
+    private def add_name_to_context
+      context[:name] = "John Doe"
     end
   end
 

@@ -40,6 +40,8 @@ module Marten
       # Defaults to `nil`.
       class_getter success_url : String?
 
+      before_render :add_record_to_context
+
       # Allows to configure the name to use to include the model record into the template context.
       def self.record_context_name(name : String | Symbol)
         @@record_context_name = name.to_s
@@ -53,10 +55,6 @@ module Marten
       # Allows to configure a raw URL to redirect to after the deletion
       def self.success_url(success_url : String?)
         @@success_url = success_url
-      end
-
-      def context
-        Marten::Template::Context{self.class.record_context_name => record}
       end
 
       def post
@@ -74,6 +72,10 @@ module Marten
           self.class.success_url ||
             (self.class.success_route_name && reverse(self.class.success_route_name.not_nil!))
         ).not_nil!
+      end
+
+      private def add_record_to_context
+        context[self.class.record_context_name] = record
       end
 
       private def perform_deletion

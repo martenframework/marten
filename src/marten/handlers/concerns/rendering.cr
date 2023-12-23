@@ -23,9 +23,9 @@ module Marten
 
       # Renders the configured template for a specific `context` object.
       def render_template(context : Hash | NamedTuple | Nil | Marten::Template::Context)
-        template_context = Marten::Template::Context.from(context, request)
-        template_context["handler"] = self
-        Marten.templates.get_template(template_name).render(template_context)
+        self.context.merge(context) unless context.nil?
+        self.context["handler"] = self
+        Marten.templates.get_template(template_name).render(self.context)
       end
 
       # Renders the configured template for a specific `context` object and produces an HTTP response.

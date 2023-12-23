@@ -25,6 +25,7 @@ module Marten
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
 
+      @context : Marten::Template::Context? = nil
       @response : HTTP::Response? = nil
 
       # Returns the HTTP method names that are allowed for the handler.
@@ -53,6 +54,14 @@ module Marten
       def initialize(@request : HTTP::Request, **kwargs)
         @params = Routing::MatchParameters.new
         kwargs.each { |key, value| @params[key.to_s] = value }
+      end
+
+      # Returns the global template context.
+      #
+      # This context object can be mutated for the lifetime of the handler in order to define which variables will be
+      # made available to the template runtime.
+      def context
+        @context ||= Marten::Template::Context.new
       end
 
       # Triggers the execution of the handler in order to produce an HTTP response.
@@ -194,12 +203,12 @@ module Marten
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
         status : ::HTTP::Status | Int32 = 200
       )
-        template_context = Marten::Template::Context.from(context, request)
-        template_context["handler"] = self
+        self.context.merge(context) unless context.nil?
+        self.context["handler"] = self
 
         before_render_response = run_before_render_callbacks
         before_render_response || HTTP::Response.new(
-          content: Marten.templates.get_template(template_name).render(template_context),
+          content: Marten.templates.get_template(template_name).render(self.context),
           content_type: content_type,
           status: ::HTTP::Status.new(status).to_i
         )

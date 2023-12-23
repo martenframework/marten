@@ -84,6 +84,24 @@ describe Marten::Handlers::Rendering do
       response.content.strip.should eq "Hello World, John Doe!"
     end
 
+    it "is able to render the template using the global context" do
+      handler = Marten::Handlers::RenderingSpec::TestHandler.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler.context["name"] = "John Doe"
+
+      response = handler.render_to_response(nil)
+
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
+
     it "includes the handler in the context" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

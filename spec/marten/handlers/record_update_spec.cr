@@ -14,8 +14,8 @@ describe Marten::Handlers::RecordUpdate do
     end
   end
 
-  describe "#context" do
-    it "returns the expected hash" do
+  describe "#render_to_response" do
+    it "includes the record to update and the schema in the global context" do
       tag = Marten::Handlers::RecordUpdateSpec::Tag.create(name: "oldtag")
 
       params = Marten::Routing::MatchParameters{"pk" => tag.id!}
@@ -28,6 +28,8 @@ describe Marten::Handlers::RecordUpdate do
         )
       )
       handler = Marten::Handlers::RecordUpdateSpec::TestHandler.new(request, params)
+
+      handler.render_to_response(context: nil)
 
       handler.context["schema"].raw.should be_a Marten::Handlers::RecordUpdateSpec::TagSchema
       handler.context["tag"].should eq tag

@@ -29,7 +29,7 @@ module Marten
       end
 
       # Renders the configured template for a specific `context` object and produces an HTTP response.
-      def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context)
+      def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context = nil)
         before_render_response = run_before_render_callbacks
 
         if before_render_response.is_a?(HTTP::Response)

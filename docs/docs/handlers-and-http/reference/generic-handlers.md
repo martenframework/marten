@@ -213,14 +213,18 @@ class HomeHandler < Marten::Handlers::Template
 end
 ```
 
-If you need to, it is possible to customize the context that is used to render the configured template. To do so, you can define a `#context` method that returns a hash or a named tuple with the values you want to make available to your template:
+If you need to, it is possible to customize the context that is used to render the configured template. To do so, you can define a [`before_render`](../callbacks.md#before_render) callback and add new variables to the [global template context](../introduction.md#global-template-context) (which functions similarly to a hash object):
 
 ```crystal
 class HomeHandler < Marten::Handlers::Template
   template_name "app/home.html"
 
-  def context
-    { "recent_articles" => Article.all.order("-published_at")[:5] }
+  before_render add_recent_articles_to_context
+
+  private def add_recent_articles_to_context : Nil
+    context[:recent_articles] = Article.all.order("-published_at")[:5]
   end
 end
 ```
+
+Variables that are added to the global template context will automatically be available to the configured template's runtime.

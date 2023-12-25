@@ -194,6 +194,29 @@ It is possible to define callbacks in order to bind methods and logics to specif
 
 Please head over to the [Handler callbacks](./callbacks.md) guide in order to learn more about handler callbacks.
 
+### Generic handlers
+
+Marten provides a set of generic handlers that can be used to perform common application tasks such as displaying lists of records, deleting entries, or rendering [templates](../templates/introduction.md). This saves developers from reinventing common patterns.
+
+Please head over to the [Generic handlers](./generic-handlers.md) guide in order to learn more about available generic handlers.
+
+### Global template context
+
+All handlers have access to a [`#context`](pathname:///api/dev/Marten/Handlers/Base.html#context-instance-method) method that returns a [template](../templates/introduction.md) context object. This "global" context object is available for the lifetime of the considered handler and can be mutated in order to define which variables are made available to the template runtime when rendering templates through the use of the [`#render`](#render) helper method or when rendering templates as part of subclasses of the [`Marten::Handlers::Template`](./generic-handlers.md#rendering-a-template) generic handler. 
+
+To modify this context object effectively, it's recommended to utilize [`before_render`](./callbacks.md#before_render) callbacks, which are invoked just before rendering a template within a handler. For example, this can be achieved as follows when using a [`Marten::Handlers::Template`](./generic-handlers.md#rendering-a-template) subclass:
+
+```crystal
+class MyHandler < Marten::Handlers::Template
+  template_name "app/my_template.html"
+  before_render :add_variable_to_context
+
+  private def add_variable_to_context : Nil
+    context["foo"] = "bar"
+  end
+end
+```
+
 ### Returning errors
 
 It is easy to forge any error response by leveraging the `#respond` or `#head` helpers that were mentioned [previously](#response-helper-methods). Using these helpers, it is possible to forge HTTP responses that are associated with specific error status codes and specific contents. For example:

@@ -76,7 +76,7 @@ Similarly to `#before_dispatch` callbacks, `#after_dispatch` callbacks can retur
 
 `before_render` callbacks are invoked prior to rendering a template when generating a response that incorporates its content. This means that these callbacks are executed as part of the [`#render`](./introduction.md#render) helper method and when rendering templates as part of subclasses of the [`Marten::Handlers::Template`](./generic-handlers.md#rendering-a-template) generic handler.
 
-Typically, these callbacks are used to add new variables to the global template context, in order to make them accessible to the template runtime. For example:
+Typically, these callbacks are used to add new variables to the [global template context](./introduction.md#global-template-context), in order to make them accessible to the template runtime. For example:
 
 ```crystal
 class MyHandler < Marten::Handlers::Template

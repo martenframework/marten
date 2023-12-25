@@ -177,12 +177,14 @@ module Marten
 
       # :nodoc:
       def process_dispatch : Marten::HTTP::Response
-        before_callbacks_response = run_before_dispatch_callbacks
+        before_dispatch_response = run_before_dispatch_callbacks
 
-        @response = before_callbacks_response || dispatch
+        @response = before_dispatch_response.nil? ? dispatch : before_dispatch_response
 
-        after_callbacks_response = run_after_dispatch_callbacks
-        after_callbacks_response || response!
+        after_dispatch_response = run_after_dispatch_callbacks
+        @response = after_dispatch_response if !after_dispatch_response.nil?
+
+        response!
       end
 
       # Returns a redirect HTTP response for a specific `url`.

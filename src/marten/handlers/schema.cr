@@ -84,20 +84,20 @@ module Marten
       end
 
       def post
-        @response = run_before_validation_callbacks
-        return response! if !@response.nil?
+        callbacks_response = run_before_validation_callbacks
+        return callbacks_response if !callbacks_response.nil?
 
         valid_schema = schema.valid?
 
-        @response ||= run_after_validation_callbacks
-        return response! if !@response.nil?
+        callbacks_response = run_after_validation_callbacks
+        return callbacks_response if !callbacks_response.nil?
 
         if valid_schema
-          @response ||= run_after_successful_validation_callbacks
-          @response ||= process_valid_schema
+          callbacks_response = run_after_successful_validation_callbacks
+          callbacks_response.nil? ? process_valid_schema : callbacks_response
         else
-          @response ||= run_after_failed_validation_callbacks
-          @response ||= process_invalid_schema
+          callbacks_response = run_after_failed_validation_callbacks
+          callbacks_response.nil? ? process_invalid_schema : callbacks_response
         end
       end
 

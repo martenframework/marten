@@ -58,7 +58,7 @@ module Marten
 
           def to_sql(connection : Connection::Base)
             sql_parts = [] of String
-            sql_params = [] of Field::Any
+            sql_params = [] of ::DB::Any
 
             @predicates.each do |predicate|
               predicate_sql, predicate_params = predicate.to_sql(connection)

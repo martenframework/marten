@@ -36,7 +36,7 @@ module Marten
               connection.operator_for(self.class.predicate_name) % "%s"
             end
 
-            private def sql_right_operand_param(_connection)
+            private def sql_right_operand_param(_connection) : ::DB::Any
               @left_operand.to_db(@right_operand.as(Field::Any))
             end
           end

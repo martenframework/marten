@@ -95,15 +95,7 @@ module Marten
 
           def count(raw_field : String? = nil)
             column_name = if !raw_field.nil?
-                            field_path = verify_field(raw_field.to_s, allow_many: false)
-                            relation_field_path = field_path.select { |field, _r| field.relation? }
-
-                            if relation_field_path.empty? || field_path.size == 1
-                              "#{Model.db_table}.#{field_path.first[0].db_column!}"
-                            else
-                              join = ensure_join_for_field_path(relation_field_path)
-                              join.not_nil!.column_name(field_path.last[0].db_column!)
-                            end
+                            solve_field_and_column(raw_field).last
                           end
 
             sql, parameters = build_count_query(column_name)
@@ -139,18 +131,8 @@ module Marten
             fields.map(&.to_s).each do |raw_field|
               reversed = raw_field.starts_with?('-')
               raw_field = raw_field[1..] if reversed
-
-              field_path = verify_field(raw_field, allow_many: false)
-              relation_field_path = field_path.select { |field, _r| field.relation? }
-
-              if relation_field_path.empty? || field_path.size == 1
-                column = "#{Model.db_table}.#{field_path.first[0].db_column!}"
-              else
-                join = ensure_join_for_field_path(relation_field_path)
-                column = join.not_nil!.column_name(field_path.last[0].db_column!)
-              end
-
-              order_clauses << {column, reversed}
+              _, column_name = solve_field_and_column(raw_field)
+              order_clauses << {column_name, reversed}
             end
 
             @order_clauses = order_clauses
@@ -161,7 +143,7 @@ module Marten
           end
 
           def pluck(fields : Array(String)) : Array(Array(Field::Any))
-            plucked_columns = solve_plucked_columns(fields)
+            plucked_columns = solve_plucked_fields_and_columns(fields)
             execute_pluck_query(*build_pluck_query(plucked_columns), plucked_columns)
           end
 
@@ -180,17 +162,7 @@ module Marten
 
             if !fields.nil?
               fields.each do |raw_field|
-                field_path = verify_field(raw_field, allow_many: false)
-                relation_field_path = field_path.select { |field, _r| field.relation? }
-
-                if relation_field_path.empty? || field_path.size == 1
-                  column = "#{Model.db_table}.#{field_path.first[0].db_column!}"
-                else
-                  join = ensure_join_for_field_path(relation_field_path)
-                  column = join.not_nil!.column_name(field_path.last[0].db_column!)
-                end
-
-                distinct_columns << column
+                distinct_columns << solve_field_and_column(raw_field).last
               end
             end
 
@@ -274,7 +246,7 @@ module Marten
             # making use of multi table inheritance), then we have to fetch the IDs of the targeted records in order to
             # be able to update the related models as well.
             if !related_values_to_update.empty?
-              related_plucked_pk_columns = solve_plucked_columns([Model.pk_field.id])
+              related_plucked_pk_columns = solve_plucked_fields_and_columns([Model.pk_field.id])
               related_pks = execute_pluck_query(
                 *build_pluck_query(related_plucked_pk_columns),
                 related_plucked_pk_columns
@@ -705,6 +677,34 @@ module Marten
             )
           end
 
+          private def solve_field_and_column(raw_field)
+            field_path = verify_field(raw_field.to_s, allow_many: false)
+            relation_field_path = field_path.select { |field, _r| field.relation? }
+
+            if relation_field_path.empty? || (field_path.size == 1 && field_path.last[1].nil?)
+              # If we are not considering a relation field or if we are considering a direct relationship (eg. a
+              # many-to-one or one-to-one field), then we can assume that the column is available on the current model.
+              field = field_path.first[0]
+              column = "#{Model.db_table}.#{field_path.first[0].db_column!}"
+            else
+              # If we are going through a relation field (or a reverse relation), we have to ensure that the necessary
+              # joins are created in order to be able to access the targeted column.
+              join = ensure_join_for_field_path(relation_field_path)
+
+              # If the last field accessed is a reverse relation, we have to use the primary key of the related model as
+              # the targeted field.
+              field = if !(reverse_relation = field_path.last[1]).nil?
+                        reverse_relation.model.pk_field
+                      else
+                        field_path.last[0]
+                      end
+
+              column = join.not_nil!.column_name(field.db_column!)
+            end
+
+            {field, column}
+          end
+
           private def solve_field_and_predicate(raw_query, raw_value)
             qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
             raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
@@ -750,21 +750,9 @@ module Marten
             predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end
 
-          private def solve_plucked_columns(fields)
+          private def solve_plucked_fields_and_columns(fields)
             fields.each_with_object([] of Tuple(Field::Base, String)) do |raw_field, plucked_columns|
-              field_path = verify_field(raw_field, allow_many: false)
-              relation_field_path = field_path.select { |field, _r| field.relation? }
-
-              if relation_field_path.empty? || field_path.size == 1
-                field = field_path.first[0]
-                column = "#{Model.db_table}.#{field.db_column!}"
-              else
-                join = ensure_join_for_field_path(relation_field_path)
-                field = field_path.last[0]
-                column = join.not_nil!.column_name(field.db_column!)
-              end
-
-              plucked_columns << {field, column}
+              plucked_columns << solve_field_and_column(raw_field)
             end
           end
 

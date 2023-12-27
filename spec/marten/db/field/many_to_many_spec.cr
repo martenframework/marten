@@ -51,28 +51,52 @@ describe Marten::DB::Field::ManyToMany do
 
   describe "#db_column" do
     it "returns nil" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.db_column.should be_nil
     end
   end
 
   describe "#default" do
     it "returns nil" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.default.should be_nil
     end
   end
 
   describe "#from_db" do
     it "returns nil" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.from_db(42).should be_nil
     end
   end
 
   describe "#from_db_result_set" do
     it "returns nil" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
 
       Marten::DB::Connection.default.open do |db|
         db.query("SELECT 42") do |rs|
@@ -86,35 +110,91 @@ describe Marten::DB::Field::ManyToMany do
 
   describe "#related_model" do
     it "returns the related model" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.related_model.should eq Tag
     end
   end
 
   describe "#relation?" do
     it "returns true" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.relation?.should be_true
     end
   end
 
   describe "#relation_name" do
     it "returns the relation name" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.relation_name.should eq "tags"
+    end
+  end
+
+  describe "#through_from_field" do
+    it "returns the through from field" do
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
+      field.through_from_field.should eq PostTags.get_field("post")
+    end
+  end
+
+  describe "#through_to_field" do
+    it "returns the through to field" do
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
+      field.through_to_field.should eq PostTags.get_field("tag")
     end
   end
 
   describe "#to_column" do
     it "returns nil" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.to_column.should be_nil
     end
   end
 
   describe "#to_db" do
     it "always returns nil" do
-      field = Marten::DB::Field::ManyToMany.new("tags", Tag, PostTags)
+      field = Marten::DB::Field::ManyToMany.new(
+        id: "tags",
+        to: Tag,
+        through: PostTags,
+        through_from_field_id: "post",
+        through_to_field_id: "tag"
+      )
       field.to_db(nil).should be_nil
     end
   end

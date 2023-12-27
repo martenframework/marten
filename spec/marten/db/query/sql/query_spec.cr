@@ -132,6 +132,56 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.should eq [user_2]
     end
 
+    it "is able to process query nodes with filters on many-to-many relations" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_1.tags.add(tag_1, tag_2)
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_2.tags.add(tag_2, tag_3)
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(tags__name__startswith: "r"))
+      query.count.should eq 1
+      query.execute.to_a.should eq [user_1]
+    end
+
+    it "is able to process query nodes with filters on many-to-many relations plus additional relations" do
+      address_1 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+      address_2 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Main Street")
+      address_3 = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Other Street")
+
+      person_1 = Marten::DB::Query::SQL::QuerySpec::Person.create!(
+        name: "Person 1",
+        email: "person-1@example.com",
+        address: address_1,
+      )
+      person_2 = Marten::DB::Query::SQL::QuerySpec::Person.create!(
+        name: "Person 2",
+        email: "person-2@example.com",
+        address: address_2,
+      )
+      person_3 = Marten::DB::Query::SQL::QuerySpec::Person.create!(
+        name: "Person 3",
+        email: "person-3@example.com",
+        address: address_3,
+      )
+
+      book_1 = Marten::DB::Query::SQL::QuerySpec::Book.create!(title: "Book 1")
+      book_1.authors.add(person_1, person_2)
+      book_2 = Marten::DB::Query::SQL::QuerySpec::Book.create!(title: "Book 2")
+      book_2.authors.add(person_2)
+      book_3 = Marten::DB::Query::SQL::QuerySpec::Book.create!(title: "Book 3")
+      book_3.authors.add(person_3)
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Book).new
+      query.add_query_node(Marten::DB::Query::Node.new(authors__address__street__istartswith: "main"))
+      query.count.should eq 2
+      query.execute.to_set.should eq [book_1, book_2].to_set
+    end
+
     it "adds a root predicate to prevent inconsistencies based on the order of negated and non-negated predicates" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)

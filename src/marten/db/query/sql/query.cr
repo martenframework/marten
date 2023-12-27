@@ -478,10 +478,39 @@ module Marten
             parent_join = nil
 
             field_path.each do |field, reverse_relation|
-              from_model = model
-              from_common_field = reverse_relation.nil? ? field : model.pk_field
-              to_model = reverse_relation.nil? ? field.related_model : reverse_relation.model
-              to_common_field = reverse_relation.nil? ? field.related_model.pk_field : field
+              if field.is_a?(Field::ManyToMany) && reverse_relation.nil?
+                # If we are considering a many-to-many field, we first have to create a join that goes through the
+                # through model.
+                through_join = Join.new(
+                  id: (flattened_parent_model_joins + flattened_joins).size + 1,
+                  type: JoinType::INNER,
+                  from_model: model,
+                  from_common_field: model.pk_field,
+                  reverse_relation: nil,
+                  to_model: field.through,
+                  to_common_field: field.through_from_field,
+                  selected: false
+                )
+                through_join.parent = parent_join if !parent_join.nil?
+
+                parent_join = through_join
+                @joins << parent_join
+
+                from_model = field.through
+                from_common_field = field.through_to_field
+                to_model = field.related_model
+                to_common_field = field.related_model.pk_field
+              elsif !reverse_relation.nil?
+                from_model = model
+                from_common_field = model.pk_field
+                to_model = reverse_relation.model
+                to_common_field = field
+              else
+                from_model = model
+                from_common_field = field
+                to_model = field.related_model
+                to_common_field = field.related_model.pk_field
+              end
 
               all_joins = flattened_parent_model_joins + flattened_joins
 

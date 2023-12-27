@@ -3,11 +3,15 @@ module Marten
     module Field
       class ManyToMany < Base
         getter through
+        getter through_from_field_id
+        getter through_to_field_id
 
         def initialize(
           @id : ::String,
           @to : Model.class,
           @through : Model.class,
+          @through_from_field_id : ::String,
+          @through_to_field_id : ::String,
           @primary_key = false,
           @blank = false,
           @null = false,
@@ -49,6 +53,16 @@ module Marten
 
         def relation_name
           @id
+        end
+
+        # Returns the field on the through model that points to the model defining the many-to-many field.
+        def through_from_field
+          through.get_relation_field_context(through_from_field_id).field
+        end
+
+        # Returns the field on the through model that points to the model targeted by the many-to-many field.
+        def through_to_field
+          through.get_relation_field_context(through_to_field_id).field
         end
 
         def to_column : Management::Column::Base?
@@ -104,7 +118,9 @@ module Marten
                 {{ @type }}.new(
                   {{ field_id.stringify }},
                   {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
-                  through: {{ through_model_name.id }}
+                  through: {{ through_model_name.id }},
+                  through_from_field_id: {{ through_model_from_field_id.id.stringify }},
+                  through_to_field_id: {{ through_model_to_field_id.id.stringify }}
                 )
               )
 

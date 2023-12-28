@@ -90,6 +90,7 @@ module Marten
           # Loop over each of the deleted records model's reverse relations in order to identify how these can be
           # deleted too if applicable.
           model.reverse_relations.each do |reverse_relation|
+            next if reverse_relation.many_to_many?
             next if reverse_relation.parent_link?
             next if reverse_relation.on_delete.do_nothing?
 

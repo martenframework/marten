@@ -155,6 +155,20 @@ module Marten
 
             {% related_field_name = kwargs[:related] %}
 
+            # Register the reverse relation.
+
+            ::{{ related_model_klass }}.register_reverse_relation(
+              Marten::DB::ReverseRelation.new(
+                {% if !related_field_name.is_a?(NilLiteral) %}
+                  {{ related_field_name.id.stringify }},
+                {% else %}
+                  nil,
+                {% end %}
+                ::{{ model_klass }},
+                {{ field_id.stringify }}
+              )
+            )
+
             {% if !related_field_name.is_a?(NilLiteral) %}
               class ::{{ model_klass }}
                 macro finished

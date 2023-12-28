@@ -23,6 +23,11 @@ module Marten
         ).not_nil!
       end
 
+      # Returns `true` if the reverse relation is associated with a many to many field.
+      def many_to_many?
+        field.is_a?(Field::ManyToMany)
+      end
+
       # Returns `true` if the reverse relation is associated with a many to one field.
       def many_to_one?
         field.is_a?(Field::ManyToOne)

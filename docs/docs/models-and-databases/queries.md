@@ -265,7 +265,7 @@ Article.filter {
 }
 ```
 
-### Joins and filtering relations
+### Filtering relations
 
 The double underscores notation described previously (`__`) can also be used to filter based on related model fields. For example, in the considered models definitions, we have an `Article` model which defines a relation (`many_to_one` field) to the `Author` model through the `author` field. The `Author` model itself also defines a relation to a `City` record through the `hometown` field.
 
@@ -287,7 +287,15 @@ And obviously, the above query sets could also be used along with more specific 
 Author.filter(author__hometown__name__startswith: "New")
 ```
 
-When doing “deep filtering” like this, related model tables are automatically "joined" at the SQL level (inner joins or left outer joins depending on the nullability of the filtered fields). So the filtered relations are also already "selected" as part of the query, and fully initialized at the Crystal level.
+When doing “deep filtering” like this, related model tables are automatically "joined" at the SQL level to perform the query (inner joins or left outer joins are used depending on the nullability of the filtered fields).
+
+It is worth noting that this filtering capability also works for [many-to-many relationships](./relationships.md#many-to-many-relationships) and reverse relations. For example, assuming that the `Article` model defines a `tags` [many-to-many](./reference/fields.md#many_to_many) field towards a hypothetical `Tag` model, the following query would be possible:
+
+```crystal
+Article.filter(tags__label: "crystal")
+```
+
+### Pre-selecting relations with joins
 
 It is also possible to explicitly define that a specific query set must "join" a set of relations. This can result in nice performance improvements since this can help reduce the number of SQL queries performed for a given codebase. This is achieved through the use of the `#join` method:
 
@@ -306,6 +314,10 @@ The double underscores notations can also be used in the context of joins. For e
 # with the selected Article record.
 Article.join(:author__hometown).get(id: 42)
 ```
+
+:::info
+Please note that the [`#join`](./reference/query-set.md#join) query set method can only be used on [many-to-one](./relationships.md#many-to-one-relationships) relationships, [one-to-one](./relationships.md#one-to-one-relationships) relationships, and reverse one-to-one relations.
+:::
 
 ### Pagination
 

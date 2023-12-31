@@ -136,3 +136,9 @@ class WelcomeEmail < Marten::Email
 end
 ```
 :::
+
+## Callbacks
+
+It is possible to define callbacks in order to bind methods and logics to specific events in the lifecycle of your emails. For example, it is possible to define callbacks that run before or after an email gets delivered.
+
+Please head over to the [Email callbacks](./callbacks.md) guide in order to learn more about email callbacks.

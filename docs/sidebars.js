@@ -200,6 +200,7 @@ module.exports = {
       link: {type: 'doc', id: 'emailing'},
       items: [
         'emailing/introduction',
+        'emailing/callbacks',
         {
           type: 'category',
           label: "How-To's",

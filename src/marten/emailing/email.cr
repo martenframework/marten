@@ -1,3 +1,5 @@
+require "./email/callbacks"
+
 module Marten
   module Emailing
     # Abstract base email class.
@@ -6,6 +8,9 @@ module Marten
     # responsible for defining how it should be initialized, the email properties, and how it should be rendered (for
     # example, using a specific HTML template).
     abstract class Email
+      include Callbacks
+
+      @context : Template::Context? = nil
       @headers = {} of String => String
 
       # Returns the specific backend to use for this email.
@@ -48,16 +53,20 @@ module Marten
       def cc : Array(Address)?
       end
 
-      # Returns a hash containing the template context or `nil`.
+      # Returns the global template context.
       #
-      # The default implementation returns `nil`.
+      # This context object can be mutated for the lifetime of the email in order to define which variables will be
+      # made available to the template runtime when rendering the email body.
       def context
-        nil
+        @context ||= Marten::Template::Context.new
       end
 
       # Delivers the email.
       def deliver
-        backend.deliver(self)
+        run_before_deliver_callbacks
+        result = backend.deliver(self)
+        run_after_deliver_callbacks
+        result
       end
 
       # Returns the sender email address.
@@ -171,9 +180,10 @@ module Marten
       end
 
       private def render_template(template_name)
-        template_context = Marten::Template::Context.from(context)
-        template_context["email"] = self
-        Marten.templates.get_template(template_name).render(template_context)
+        context[:email] = self
+        run_before_render_callbacks
+
+        Marten.templates.get_template(template_name).render(context)
       end
     end
   end

@@ -184,9 +184,15 @@ describe Marten::Emailing::Email do
   end
 
   describe "#context" do
-    it "returns nil by default" do
+    it "returns an empty global context object" do
       email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
-      email.context.should be_nil
+      email.context.should be_a Marten::Template::Context
+      email.context.empty?.should be_true
+    end
+
+    it "is memoized" do
+      email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+      email.context.object_id.should eq email.context.object_id
     end
   end
 
@@ -196,6 +202,18 @@ describe Marten::Emailing::Email do
       email.deliver
 
       Marten::Emailing::EmailSpec::TEST_BACKEND.delivered.includes?(email).should be_true
+    end
+
+    it "runs before_deliver and after_deliver callbacks as expected" do
+      email = Marten::Emailing::EmailSpec::EmailWithCallbacks.new
+
+      email.foo.should be_nil
+      email.bar.should be_nil
+
+      email.deliver
+
+      email.foo.should eq "set_foo"
+      email.bar.should eq "set_bar"
     end
   end
 
@@ -227,6 +245,22 @@ describe Marten::Emailing::Email do
     it "renders the specified template name by including the email details and custom variables in the context" do
       email = Marten::Emailing::EmailSpec::SimpleEmail.new
       email.html_body.not_nil!.strip.should eq "Hello World! This email is sent from webmaster@localhost! Foo: bar!"
+    end
+
+    it "does not run before_render callbacks if no template is configured" do
+      email = Marten::Emailing::EmailSpec::EmailWithCallbacksWithoutTemplate.new
+
+      email.xyz.should be_nil
+      email.html_body.should be_nil
+      email.xyz.should be_nil
+    end
+
+    it "runs before_render callbacks as expected" do
+      email = Marten::Emailing::EmailSpec::EmailWithCallbacks.new
+
+      email.xyz.should be_nil
+      email.html_body.should_not be_nil
+      email.xyz.should eq "set_xyz"
     end
   end
 
@@ -265,6 +299,22 @@ describe Marten::Emailing::Email do
     it "renders the specified template name by including the email details and custom variables in the context" do
       email = Marten::Emailing::EmailSpec::SimpleEmailWithHtmlAndTextBody.new
       email.text_body.not_nil!.strip.should eq "Hello World! This email is sent from webmaster@localhost! Foo: bar!"
+    end
+
+    it "does not run before_render callbacks if no template is configured" do
+      email = Marten::Emailing::EmailSpec::EmailWithCallbacksWithoutTemplate.new
+
+      email.xyz.should be_nil
+      email.text_body.should be_nil
+      email.xyz.should be_nil
+    end
+
+    it "runs before_render callbacks as expected" do
+      email = Marten::Emailing::EmailSpec::EmailWithCallbacks.new
+
+      email.xyz.should be_nil
+      email.text_body.should_not be_nil
+      email.xyz.should eq "set_xyz"
     end
   end
 
@@ -307,8 +357,10 @@ module Marten::Emailing::EmailSpec
   class SimpleEmail < Marten::Emailing::Email
     template_name "specs/emailing/email/simple_email.html"
 
-    def context
-      {"foo" => "bar"}
+    before_render :prepare_context
+
+    def prepare_context
+      context["foo"] = "bar"
     end
   end
 
@@ -316,8 +368,10 @@ module Marten::Emailing::EmailSpec
     template_name "specs/emailing/email/simple_email.html", content_type: :html
     template_name "specs/emailing/email/simple_email.txt", content_type: :text
 
-    def context
-      {"foo" => "bar"}
+    before_render :prepare_context
+
+    def prepare_context
+      context["foo"] = "bar"
     end
   end
 
@@ -382,6 +436,53 @@ module Marten::Emailing::EmailSpec
   class EmailWithOverriddenHeaders < Marten::Emailing::Email
     def headers
       {"foo" => "bar"}
+    end
+  end
+
+  class EmailWithCallbacks < Marten::Emailing::Email
+    property foo : String? = nil
+    property xyz : String? = nil
+    property bar : String? = nil
+
+    template_name "specs/emailing/email/simple_email.html", content_type: :html
+    template_name "specs/emailing/email/simple_email.txt", content_type: :text
+
+    before_deliver :set_foo
+    before_render :set_xyz
+    after_deliver :set_bar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_xyz
+      self.xyz = "set_xyz"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
+    end
+  end
+
+  class EmailWithCallbacksWithoutTemplate < Marten::Emailing::Email
+    property foo : String? = nil
+    property xyz : String? = nil
+    property bar : String? = nil
+
+    before_deliver :set_foo
+    before_render :set_xyz
+    after_deliver :set_bar
+
+    private def set_foo
+      self.foo = "set_foo"
+    end
+
+    private def set_xyz
+      self.xyz = "set_xyz"
+    end
+
+    private def set_bar
+      self.bar = "set_bar"
     end
   end
 end

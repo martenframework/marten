@@ -2,10 +2,11 @@ module Marten
   module Handlers
     # Provides the ability to define handler callbacks.
     #
-    # This module provides the ability to define callbacks that are executed before and / or after dispatching the
-    # considered handlers. They allow to intercept the incoming request and to return early HTTP responses. Two hooks
-    # are enabled by the use of this module: `before_dispatch` callbacks are executed before the execution of the
-    # handler's `#dispatch` method while `after_dispatch` callbacks are executed after it.
+    # This module provides the ability to define callbacks that are executed during the lifecycle of the considered
+    # handlers. They allow to intercept the incoming request and to return early HTTP responses. Three hooks are enabled
+    # by the use of this module: `before_dispatch` callbacks are executed before the execution of the handler's
+    # `#dispatch` method while `after_dispatch` callbacks are executed after it, and `before_render` callbacks are
+    # executed before the rendering of the template.
     module Callbacks
       macro included
         _begin_callbacks_setup

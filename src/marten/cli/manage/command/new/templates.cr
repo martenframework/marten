@@ -114,6 +114,12 @@ module Marten
                   ),
                 }
                 files << {
+                  "spec/apps/auth/handlers/password_update_handler_spec.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/password_update_handler_spec.cr.ecr"
+                  ),
+                }
+                files << {
                   "spec/apps/auth/handlers/profile_handler_spec.cr",
                   ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/profile_handler_spec.cr.ecr"),
                 }
@@ -147,6 +153,12 @@ module Marten
                   "spec/apps/auth/schemas/password_reset_initiate_schema_spec.cr",
                   ECR.render(
                     "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_reset_initiate_schema_spec.cr.ecr"
+                  ),
+                }
+                files << {
+                  "spec/apps/auth/schemas/password_update_schema_spec.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_update_schema_spec.cr.ecr"
                   ),
                 }
                 files << {
@@ -194,6 +206,12 @@ module Marten
                   ),
                 }
                 files << {
+                  "src/apps/auth/handlers/password_update_handler.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/handlers/password_update_handler.cr.ecr"
+                  ),
+                }
+                files << {
                   "src/apps/auth/handlers/profile_handler.cr",
                   ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/profile_handler.cr.ecr"),
                 }
@@ -230,6 +248,12 @@ module Marten
                   ),
                 }
                 files << {
+                  "src/apps/auth/schemas/password_update_schema.cr",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/schemas/password_update_schema.cr.ecr"
+                  ),
+                }
+                files << {
                   "src/apps/auth/schemas/sign_in_schema.cr",
                   ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/sign_in_schema.cr.ecr"),
                 }
@@ -253,6 +277,12 @@ module Marten
                   "src/apps/auth/templates/auth/password_reset_initiate.html",
                   ECR.render(
                     "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_reset_initiate.html.ecr"
+                  ),
+                }
+                files << {
+                  "src/apps/auth/templates/auth/password_update.html",
+                  ECR.render(
+                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_update.html.ecr"
                   ),
                 }
                 files << {

@@ -50,7 +50,7 @@ module Marten
 
         def render(context : Context) : String
           name = @name_expression.resolve(context).to_s
-          vary_on = @vary_on_expressions.map(&.resolve(context).to_s)
+          vary_on = @vary_on_expressions.map(&.resolve(context).to_s.as(String))
 
           raw_expiry = @expiry_expression.resolve(context).to_s
 

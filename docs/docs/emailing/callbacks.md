@@ -107,4 +107,5 @@ class WelcomeEmail < Marten::Email
   private def prepare_context
     context[:user] = @user
   end
+end
 ```

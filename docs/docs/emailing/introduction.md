@@ -82,6 +82,32 @@ Note that it is perfectly valid to specify one template for rendering the HTML b
 Note that you can define [`#html_body`](pathname:///api/dev/Marten/Emailing/Email.html#html_body%3AString%3F-instance-method) and [`#text_body`](pathname:///api/dev/Marten/Emailing/Email.html#html_body%3AString%3F-instance-method) methods if you need to override the logic that allows generating the HTML or text body of your email.
 :::
 
+### Modifying the template context
+
+All emails have access to a [`#context`](pathname:///api/dev/Marten/Emailing/Email.html#context-instance-method) method that returns a [template](../templates/introduction.md) context object. This "global" context object is available for the lifetime of the considered email and can be mutated in order to define which variables are made available to the template runtime when rendering templates in order to generate the HTML/text bodies of your email (which happens when [sending the email](#sending-emails)).
+
+To modify this context object effectively, it's recommended to utilize [`before_render`](./callbacks.md#before_render) callbacks, which are invoked just before rendering a template within your email. For example, this can be achieved as follows:
+
+```crystal
+class WelcomeEmail < Marten::Email
+  from "no-reply@martenframework.com"
+  to @user.email
+  subject "Hello!"
+  template_name "emails/welcome_email.html"
+
+  before_render :prepare_context
+
+  def initialize(@user : User)
+  end
+
+  private def prepare_context
+    context[:user] = @user
+  end
+end
+```
+
+In the above example, the [`before_render`](./callbacks.md#before_render) callback simply assigns a new `user` variable to the email template context. Consequently, a corresponding `{{ user }}` variable will be available in the template configured for this email (`emails/welcome_email.html` in this case).
+
 ### Defining custom headers
 
 If you need to insert custom headers into your emails, then you can easily do so by defining a `#headers` method in your email class. This method must return a hash of string keys and values.

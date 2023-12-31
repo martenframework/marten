@@ -4,7 +4,7 @@ description: Learn how to define handler callbacks.
 sidebar_label: Callbacks
 ---
 
-Callbacks enable you to define logic that is triggered at different stages of a handler's lifecycle. This feature allows you to intercept incoming requests and potentially bypass the standard `#dispatch` method. This documents covers the available callbacks and introduces you to the associated API, which you can use to define hooks in your handlers.
+Callbacks enable you to define logic that is triggered at different stages of a handler's lifecycle. This feature allows you to intercept incoming requests and potentially bypass the standard `#dispatch` method. This document covers the available callbacks and introduces you to the associated API, which you can use to define hooks in your handlers.
 
 ## Overview
 

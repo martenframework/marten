@@ -444,7 +444,6 @@ module Marten::CLI::Manage::Command::NewSpec
     "spec/apps/auth/schemas/sign_in_schema_spec.cr",
     "spec/apps/auth/schemas/sign_up_schema_spec.cr",
     "spec/apps/auth/schemas/spec_helper.cr",
-    "spec/apps/spec_helper.cr",
     "spec/spec_helper.cr",
     "src/apps/auth/emails/password_reset_email.cr",
     "src/apps/auth/handlers/concerns/require_anonymous_user.cr",

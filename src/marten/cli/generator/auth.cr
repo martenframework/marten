@@ -1,5 +1,4 @@
 require "./app"
-require "./auth/**"
 
 module Marten
   module CLI
@@ -154,8 +153,12 @@ module Marten
         end
 
         private def create_files(context)
-          create_app_files(Marten.apps.main, Auth::Templates.app_files(context))
-          create_spec_files(Auth::Templates.spec_files(context))
+          app_files = Templates::Auth.app_files(context).map do |path, content|
+            {"#{path_prefix(context)}#{path}", content}
+          end
+
+          create_app_files(Marten.apps.main, app_files)
+          create_spec_files(Templates::Auth.spec_files(context))
         end
 
         private def generate_app(context)

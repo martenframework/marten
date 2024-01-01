@@ -1,0 +1,11 @@
+require "./emails/**"
+require "./handlers/**"
+require "./models/**"
+require "./routes"
+require "./schemas/**"
+
+module <%= context.module_name %>
+  class App < Marten::App
+    label "<%= context.label %>"
+  end
+end

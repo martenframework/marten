@@ -12,12 +12,12 @@ module Marten
               files << {"#{src_path}app.cr", ECR.render("#{__DIR__}/templates/app/src/app/app.cr.ecr")}
               files << {"#{src_path}cli.cr", ECR.render("#{__DIR__}/templates/app/src/app/cli.cr.ecr")}
               files << {"#{src_path}routes.cr", ECR.render("#{__DIR__}/templates/app/src/app/routes.cr.ecr")}
-              files << {"#{src_path}emails/.gitkeep", gitkeep}
-              files << {"#{src_path}handlers/.gitkeep", gitkeep}
-              files << {"#{src_path}migrations/.gitkeep", gitkeep}
-              files << {"#{src_path}models/.gitkeep", gitkeep}
-              files << {"#{src_path}schemas/.gitkeep", gitkeep}
-              files << {"#{src_path}templates/.gitkeep", gitkeep}
+              files << {"#{src_path}emails/.gitkeep", GITKEEP}
+              files << {"#{src_path}handlers/.gitkeep", GITKEEP}
+              files << {"#{src_path}migrations/.gitkeep", GITKEEP}
+              files << {"#{src_path}models/.gitkeep", GITKEEP}
+              files << {"#{src_path}schemas/.gitkeep", GITKEEP}
+              files << {"#{src_path}templates/.gitkeep", GITKEEP}
               files << {"src/#{context.name}.cr", ECR.render("#{__DIR__}/templates/app/src/app.cr.ecr")}
               files << {".editorconfig", editorconfig}
               files << {".gitignore", gitignore}
@@ -32,7 +32,7 @@ module Marten
               files = Array(Tuple(String, String)).new
 
               # Config files
-              files << {"config/initializers/.gitkeep", gitkeep}
+              files << {"config/initializers/.gitkeep", GITKEEP}
               files << {
                 "config/settings/base.cr",
                 ECR.render("#{__DIR__}/templates/project/config/settings/base.cr.ecr"),
@@ -59,11 +59,11 @@ module Marten
               files << {"src/cli.cr", ECR.render("#{__DIR__}/templates/project/src/cli.cr.ecr")}
               files << {"src/project.cr", ECR.render("#{__DIR__}/templates/project/src/project.cr.ecr")}
               files << {"src/server.cr", ECR.render("#{__DIR__}/templates/project/src/server.cr.ecr")}
-              files << {"src/emails/.gitkeep", gitkeep}
-              files << {"src/handlers/.gitkeep", gitkeep}
-              files << {"src/migrations/.gitkeep", gitkeep}
-              files << {"src/models/.gitkeep", gitkeep}
-              files << {"src/schemas/.gitkeep", gitkeep}
+              files << {"src/emails/.gitkeep", GITKEEP}
+              files << {"src/handlers/.gitkeep", GITKEEP}
+              files << {"src/migrations/.gitkeep", GITKEEP}
+              files << {"src/models/.gitkeep", GITKEEP}
+              files << {"src/schemas/.gitkeep", GITKEEP}
               files << {
                 "src/templates/base.html",
                 ECR.render("#{__DIR__}/templates/project/src/templates/base.html.ecr"),
@@ -77,236 +77,22 @@ module Marten
 
               # Add authentification files if needed.
               if context.targets_auth?
-                files << {
-                  "spec/apps/auth/emails/password_reset_email_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/emails/password_reset_email_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/emails/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/emails/spec_helper.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/handlers/concerns/require_anonymous_user_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/concerns/require_anonymous_user_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/handlers/concerns/require_signed_in_user_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/concerns/require_signed_in_user_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/handlers/concerns/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/concerns/spec_helper.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/handlers/password_reset_confirm_handler_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/password_reset_confirm_handler_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/handlers/password_reset_initiate_handler_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/password_reset_initiate_handler_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/handlers/password_update_handler_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/handlers/password_update_handler_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/handlers/profile_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/profile_handler_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/handlers/sign_in_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/sign_in_handler_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/handlers/sign_out_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/sign_out_handler_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/handlers/sign_up_handler_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/sign_up_handler_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/handlers/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/handlers/spec_helper.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/spec_helper.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/schemas/password_reset_confirm_schema_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_reset_confirm_schema_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/schemas/password_reset_initiate_schema_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_reset_initiate_schema_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/schemas/password_update_schema_spec.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/spec/apps/auth/schemas/password_update_schema_spec.cr.ecr"
-                  ),
-                }
-                files << {
-                  "spec/apps/auth/schemas/sign_in_schema_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/schemas/sign_in_schema_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/schemas/sign_up_schema_spec.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/schemas/sign_up_schema_spec.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/auth/schemas/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/auth/schemas/spec_helper.cr.ecr"),
-                }
-                files << {
-                  "spec/apps/spec_helper.cr",
-                  ECR.render("#{__DIR__}/templates/project/spec/apps/spec_helper.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/emails/password_reset_email.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/emails/password_reset_email.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/handlers/concerns/require_anonymous_user.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/handlers/concerns/require_anonymous_user.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/handlers/concerns/require_signed_in_user.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/handlers/concerns/require_signed_in_user.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/handlers/password_reset_confirm_handler.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/handlers/password_reset_confirm_handler.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/handlers/password_reset_initiate_handler.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/handlers/password_reset_initiate_handler.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/handlers/password_update_handler.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/handlers/password_update_handler.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/handlers/profile_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/profile_handler.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/handlers/sign_in_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/sign_in_handler.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/handlers/sign_out_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/sign_out_handler.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/handlers/sign_up_handler.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/handlers/sign_up_handler.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/migrations/0001_create_auth_user_table.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/migrations/0001_create_auth_user_table.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/models/user.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/models/user.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/schemas/password_reset_confirm_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/password_reset_confirm_schema.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/schemas/password_reset_initiate_schema.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/schemas/password_reset_initiate_schema.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/schemas/password_update_schema.cr",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/schemas/password_update_schema.cr.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/schemas/sign_in_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/sign_in_schema.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/schemas/sign_up_schema.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/schemas/sign_up_schema.cr.ecr"),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/emails/password_reset.html",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/emails/password_reset.html.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/password_reset_confirm.html",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_reset_confirm.html.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/password_reset_initiate.html",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_reset_initiate.html.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/password_update.html",
-                  ECR.render(
-                    "#{__DIR__}/templates/project/src/apps/auth/templates/auth/password_update.html.ecr"
-                  ),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/profile.html",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/templates/auth/profile.html.ecr"),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/sign_in.html",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/templates/auth/sign_in.html.ecr"),
-                }
-                files << {
-                  "src/apps/auth/templates/auth/sign_up.html",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/templates/auth/sign_up.html.ecr"),
-                }
-                files << {"src/apps/auth/app.cr", ECR.render("#{__DIR__}/templates/project/src/apps/auth/app.cr.ecr")}
-                files << {"src/apps/auth/cli.cr", ECR.render("#{__DIR__}/templates/project/src/apps/auth/cli.cr.ecr")}
-                files << {
-                  "src/apps/auth/routes.cr",
-                  ECR.render("#{__DIR__}/templates/project/src/apps/auth/routes.cr.ecr"),
-                }
+                auth_context = CLI::Templates::App::Context.new(Marten.apps.main, "auth")
+                auth_app_files = CLI::Templates::Auth.app_files(auth_context).map do |path, content|
+                  {"src/apps/auth/#{path}", content}
+                end
+                spec_app_files = CLI::Templates::Auth.spec_files(auth_context).map do |path, content|
+                  {"spec/#{path}", content}
+                end
+
+                files += auth_app_files
+                files += spec_app_files
               end
 
               files
             end
+
+            private GITKEEP = ""
 
             private def self.editorconfig
               ECR.render("#{__DIR__}/templates/shared/.editorconfig.ecr")
@@ -314,10 +100,6 @@ module Marten
 
             private def self.gitignore
               ECR.render("#{__DIR__}/templates/shared/.gitignore.ecr")
-            end
-
-            private def self.gitkeep
-              ECR.render("#{__DIR__}/templates/shared/.gitkeep.ecr")
             end
           end
         end

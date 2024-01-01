@@ -1,5 +1,3 @@
-require "./app/**"
-
 module Marten
   module CLI
     abstract class Generator
@@ -8,6 +6,7 @@ module Marten
         help "Generate an application."
 
         @app_label = ""
+        @path_prefix : String? = nil
 
         def setup
           command.on_argument(:label, label_argument_description) do |v|
@@ -40,7 +39,7 @@ module Marten
 
           # Generate the application.
           command.print("Generating app #{command.style(app_label, mode: :bold)}...\n\n")
-          context = Context.new(Marten.apps.main, app_label)
+          context = Templates::App::Context.new(Marten.apps.main, app_label)
           generate_app(context)
         end
 
@@ -170,7 +169,11 @@ module Marten
         end
 
         private def create_files(context)
-          create_app_files(Marten.apps.main, Templates.app_files(context))
+          app_files = Templates::App.app_files(context).map do |path, content|
+            {"#{path_prefix(context)}#{path}", content}
+          end
+
+          create_app_files(Marten.apps.main, app_files)
         end
 
         private def generate_app(context)
@@ -183,6 +186,14 @@ module Marten
 
         private def label_argument_description
           "Label of the application to generate"
+        end
+
+        private def path_prefix(context)
+          @path_prefix ||= if context.located_in_apps_folder?
+                             "apps/#{context.label}/"
+                           else
+                             "#{context.label}/"
+                           end
         end
       end
     end

@@ -39,7 +39,7 @@ module Marten
 
           # Generate the application.
           command.print("Generating app #{command.style(app_label, mode: :bold)}...\n\n")
-          context = Templates::App::Context.new(Marten.apps.main, app_label)
+          context = Templates::App::Context.new(app_label)
           generate_app(context)
         end
 
@@ -51,7 +51,7 @@ module Marten
 
           if File.exists?(project_cr_file_path)
             File.open(project_cr_file_path, "a") do |f|
-              if context.located_in_apps_folder?
+              if located_in_apps_folder?
                 f.print(%{require "./apps/#{app_label}/cli"\n})
               else
                 f.print(%{require "./#{app_label}/cli"\n})
@@ -71,7 +71,7 @@ module Marten
 
           if File.exists?(project_cr_file_path)
             File.open(project_cr_file_path, "a") do |f|
-              if context.located_in_apps_folder?
+              if located_in_apps_folder?
                 f.print(%{require "./apps/#{app_label}/app"\n})
               else
                 f.print(%{require "./#{app_label}/app"\n})
@@ -188,12 +188,12 @@ module Marten
           "Label of the application to generate"
         end
 
+        private def located_in_apps_folder?
+          Dir.exists?(Path.new(Marten.apps.main.class._marten_app_location).expand.join("apps"))
+        end
+
         private def path_prefix(context)
-          @path_prefix ||= if context.located_in_apps_folder?
-                             "apps/#{context.label}/"
-                           else
-                             "#{context.label}/"
-                           end
+          @path_prefix ||= located_in_apps_folder? ? "apps/#{context.label}/" : "#{context.label}/"
         end
       end
     end

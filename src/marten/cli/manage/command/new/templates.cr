@@ -77,7 +77,7 @@ module Marten
 
               # Add authentification files if needed.
               if context.targets_auth?
-                auth_context = CLI::Templates::App::Context.new(Marten.apps.main, "auth")
+                auth_context = CLI::Templates::App::Context.new("auth")
                 auth_app_files = CLI::Templates::Auth.app_files(auth_context).map do |path, content|
                   {"src/apps/auth/#{path}", content}
                 end

@@ -14,52 +14,18 @@ describe Marten::CLI::Templates::App::Context do
 
   describe "#app_class_name" do
     it "returns the expected value" do
-      context_1 = Marten::CLI::Templates::App::Context.new(
-        main_app_config: Marten.apps.main,
-        label: "blog",
-      )
-      context_2 = Marten::CLI::Templates::App::Context.new(
-        main_app_config: Marten.apps.main,
-        label: "test_app",
-      )
+      context_1 = Marten::CLI::Templates::App::Context.new(label: "blog")
+      context_2 = Marten::CLI::Templates::App::Context.new(label: "test_app")
 
       context_1.app_class_name.should eq "Blog::App"
       context_2.app_class_name.should eq "TestApp::App"
     end
   end
 
-  describe "#located_in_apps_folder?" do
-    it "returns true if the apps folder exists" do
-      FileUtils.mkdir_p("#{__DIR__}/context_spec/project/apps")
-
-      context = Marten::CLI::Templates::App::Context.new(
-        main_app_config: Marten.apps.main,
-        label: "blog",
-      )
-
-      context.located_in_apps_folder?.should be_true
-    end
-
-    it "returns false if the apps folder does not exist" do
-      context = Marten::CLI::Templates::App::Context.new(
-        main_app_config: Marten.apps.main,
-        label: "blog",
-      )
-
-      context.located_in_apps_folder?.should be_false
-    end
-  end
-
   describe "#module_name" do
     it "returns the expected value" do
-      context_1 = Marten::CLI::Templates::App::Context.new(
-        main_app_config: Marten.apps.main,
-        label: "blog",
-      )
-      context_2 = Marten::CLI::Templates::App::Context.new(
-        main_app_config: Marten.apps.main,
-        label: "test_app",
-      )
+      context_1 = Marten::CLI::Templates::App::Context.new(label: "blog")
+      context_2 = Marten::CLI::Templates::App::Context.new(label: "test_app")
 
       context_1.module_name.should eq "Blog"
       context_2.module_name.should eq "TestApp"

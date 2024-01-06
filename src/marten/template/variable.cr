@@ -5,20 +5,20 @@ module Marten
     # A template variable's value access such as "foo.bar". It can also correspond to a literal value such as '42' or
     # '"hello"'.
     class Variable
-      @literal : Value? = nil
+      @literal : Float32 | Float64 | Int32 | Int64 | Nil | String = nil
       @lookups : Array(String)? = nil
 
       def initialize(raw : String)
         # First try to see if the raw variable is a literal integer.
         begin
-          @literal = Value.from(raw.to_i)
+          @literal = raw.to_i
         rescue ArgumentError
         end
 
         # Then try to see uf the raw variable is a literal float.
         if @literal.nil?
           begin
-            @literal = Value.from(raw.to_f)
+            @literal = raw.to_f
           rescue ArgumentError
           end
         end
@@ -26,14 +26,14 @@ module Marten
         # Then, try to see if it is a literal string (single-quoted or double-quoted) and otherwise consider that it is
         # a standard variable access.
         if @literal.nil? && ['\'', '"'].includes?((quote_char = raw[0])) && quote_char == raw[-1]
-          @literal = Value.from(raw[1..-2].gsub(%{\\#{quote_char}}, quote_char))
+          @literal = raw[1..-2].gsub(%{\\#{quote_char}}, quote_char)
         else
           @lookups = raw.split(ATTRIBUTE_SEPARATOR)
         end
       end
 
       def resolve(context : Context) : Value
-        return @literal.not_nil! unless @literal.nil?
+        return Value.from(@literal.not_nil!) unless @literal.nil?
 
         current = nil
 

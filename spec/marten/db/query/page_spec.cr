@@ -11,6 +11,16 @@ describe Marten::DB::Query::Page do
     end
   end
 
+  describe "#count" do
+    it "returns the number of records in the page" do
+      tag = Tag.create!(name: "a_tag", is_active: true)
+      paginator = Tag.all.order(:name).paginator(2)
+
+      Marten::DB::Query::Page(Tag).new([tag], 2, paginator).count.should eq 1
+      Marten::DB::Query::Page(Tag).new([] of Tag, 2, paginator).count.should eq 0
+    end
+  end
+
   describe "#next_page?" do
     it "returns true if there is a next page number" do
       tag_1 = Tag.create!(name: "a_tag", is_active: true)

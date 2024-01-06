@@ -16,6 +16,11 @@ module Marten
           raise NotImplementedError.new("#accumulate is not supported for pages")
         end
 
+        # Returns the number of records in the page.
+        def count
+          size
+        end
+
         # Returns `true` if there is a next page.
         def next_page?
           number < paginator.pages_count

@@ -39,7 +39,7 @@ const darkTheme = themes.dracula;
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
-      image: 'img/logo_primary_zoomed_alt_white.png',
+      image: 'img/1000x420_logo.jpg',
       navbar: {
         title: 'Marten',
         logo: {

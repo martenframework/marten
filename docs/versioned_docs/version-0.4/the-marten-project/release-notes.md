@@ -8,7 +8,7 @@ Here are listed the release notes for each version of the Marten web framework.
 
 ## Marten 0.4
 
-* [Marten 0.4 release notes](./release-notes/0.4.md) _(under development)_
+* [Marten 0.4 release notes](./release-notes/0.4.md)
 
 ## Marten 0.3
 

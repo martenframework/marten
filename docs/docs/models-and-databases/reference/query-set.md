@@ -527,6 +527,18 @@ Post.filter(pk: 1).pick!("title", "published")
 # => ["First article", true]
 ```
 
+### `pks`
+
+Returns the primary key values of the considered model records targeted by the current query set.
+
+This method returns an array containing the primary key values of the model records that are targeted by the current query set.
+
+For example:
+
+```crystal
+Post.all.pks # => [1, 2, 3]
+```
+
 ### `pluck`
 
 Returns specific column values without loading entire record objects.

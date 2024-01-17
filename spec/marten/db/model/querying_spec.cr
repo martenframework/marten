@@ -556,6 +556,16 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::pks" do
+    it "extracts the primary keys of the records matched by the default query set" do
+      test_user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      test_user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      test_user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+      TestUser.pks.should eq [test_user_1.pk, test_user_2.pk, test_user_3.pk]
+    end
+  end
+
   describe "::pluck" do
     context "with double splat arguments" do
       it "allows extracting a specific field value whose name is expressed as a symbol" do

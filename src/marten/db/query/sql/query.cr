@@ -89,7 +89,7 @@ module Marten
             sql, parameters = build_average_query(column_name)
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
-              result ? result : 0.0
+              result ? result.as(Float) : 0.0
             end
           end
 

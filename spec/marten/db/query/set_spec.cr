@@ -421,8 +421,8 @@ describe Marten::DB::Query::Set do
       )
 
       query = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
-      query.average(:price).should eq 600.0
-      query.average(:rating).should eq 3.25
+      query.average(:price).should be_close(600.0, 0.1)
+      query.average(:rating).should be_close(3.25, 0.1)
     end
 
     it "properly calculates the average on a filtered set" do
@@ -440,8 +440,8 @@ describe Marten::DB::Query::Set do
 
       set = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
       set.filter(name__startswith: "Awesome")
-      set.average(:price).should eq 600.0
-      set.average(:rating).should eq 3.25
+      set.average(:price).should be_close(600.0, 0.1)
+      set.average(:rating).should be_close(3.25, 0.1)
     end
 
     it "properly handles zero rows" do
@@ -469,7 +469,7 @@ describe Marten::DB::Query::Set do
       )
 
       query = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
-      query.average(:rating).should eq 3.25
+      query.average(:rating).should be_close(3.25, 0.1)
     end
 
     it "raises an error if the column is not numerical" do

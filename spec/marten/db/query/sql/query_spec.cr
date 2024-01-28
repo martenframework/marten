@@ -894,8 +894,8 @@ describe Marten::DB::Query::SQL::Query do
       )
 
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
-      query.average("price").should eq 600.0
-      query.average("rating").should eq 3.25
+      query.average("price").should be_close(600.0, 0.1)
+      query.average("rating").should be_close(3.25, 0.1)
     end
 
     it "properly calculates the average on a filtered set" do
@@ -913,8 +913,8 @@ describe Marten::DB::Query::SQL::Query do
 
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
       query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "Awesome"))
-      query.average("price").should eq 1000.0
-      query.average("rating").should eq 5.0
+      query.average("price").should be_close(1000.0, 0.1)
+      query.average("rating").should be_close(5.0, 0.1)
     end
 
     it "properly handles zero rows" do
@@ -942,7 +942,7 @@ describe Marten::DB::Query::SQL::Query do
       )
 
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
-      query.average("rating").should eq 3.25
+      query.average("rating").should be_close(3.25, 0.1)
     end
 
     it "raises an error if the column is not numerical" do

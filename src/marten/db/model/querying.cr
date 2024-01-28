@@ -45,6 +45,11 @@ module Marten
             exists?
           end
 
+            # Returns the average of a field for the current model
+          def average(field : String | Symbol)
+            default_queryset.average(field)
+          end
+
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
             {% begin %}

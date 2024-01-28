@@ -879,6 +879,94 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#average" do
+    it "properly calculates the average" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.average("price").should eq 600.0
+      query.average("rating").should eq 3.25
+    end
+
+    it "properly calculates the average on a filtered set" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "Awesome"))
+      query.average("price").should eq 1000.0
+      query.average("rating").should eq 5.0
+    end
+
+    it "properly handles zero rows" do
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.average("price").should eq 0.0
+      query.average("rating").should eq 0.0
+    end
+
+    it "properly handles null values" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Ratingless Product",
+        price: 200,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.average("rating").should eq 3.25
+    end
+
+    it "raises an error if the column is not numerical" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Cant calculate the average of 'name' (Marten::DB::Field::String)."
+      ) do
+        Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new.average("name")
+      end
+    end
+  end
+
   describe "#clone" do
     it "results in a new object" do
       query = Marten::DB::Query::SQL::Query(Tag).new

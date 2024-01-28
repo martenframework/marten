@@ -406,6 +406,94 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#average" do
+    it "properly calculates the average" do
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      query = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
+      query.average(:price).should eq 600.0
+      query.average(:rating).should eq 3.25
+    end
+
+    it "properly calculates the average on a filtered set" do
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      set = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
+      set.filter(name__startswith: "Awesome")
+      set.average(:price).should eq 600.0
+      set.average(:rating).should eq 3.25
+    end
+
+    it "properly handles zero rows" do
+      query = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
+      query.average(:price).should eq 0.0
+      query.average(:rating).should eq 0.0
+    end
+
+    it "properly handles null values" do
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Ratingless Product",
+        price: 200,
+      )
+
+      query = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new
+      query.average(:rating).should eq 3.25
+    end
+
+    it "raises an error if the column is not numerical" do
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SetSpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Cant calculate the average of 'name' (Marten::DB::Field::String)."
+      ) do
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new.average(:name)
+      end
+    end
+  end
+
   describe "#count" do
     it "returns the expected number of record for an unfiltered query set" do
       Tag.create!(name: "ruby", is_active: true)

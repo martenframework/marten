@@ -97,6 +97,11 @@ module Marten
           exists?
         end
 
+        # Returns the average of a field for the current query set.
+        def average(field : String | Symbol)
+          @query.average(field.try(&.to_s))
+        end
+
         # Returns the number of records that are targeted by the current query set.
         def count(field : String | Symbol | Nil = nil)
           @result_cache.nil? || !field.nil? ? @query.count(field.try(&.to_s)) : @result_cache.not_nil!.size

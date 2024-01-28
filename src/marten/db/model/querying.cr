@@ -45,6 +45,19 @@ module Marten
             exists?
           end
 
+          # Returns the total count of records for the considered model.
+          #
+          # This method returns the total count of records for the considered model. If a field is specified, the method
+          # will return the total count of records for which the specified field is not `nil`. For example:
+          #
+          # ```
+          # Post.count              # => 3
+          # Post.count(:updated_by) # => 2
+          # ```
+          def count(field : String | Symbol | Nil = nil)
+            default_queryset.count(field)
+          end
+
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
             {% begin %}

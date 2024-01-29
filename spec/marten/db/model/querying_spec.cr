@@ -53,6 +53,36 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::count" do
+    it "returns the expected number of records when no field is specified" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      Tag.count.should eq 3
+    end
+
+    it "returns the expected number of records when a field is specified as a symbol" do
+      user = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", updated_by: user)
+      Post.create!(author: user, title: "Example post 2", updated_by: user)
+      Post.create!(author: user, title: "Example post 3")
+
+      Post.count(:title).should eq 3
+      Post.count(:updated_by).should eq 2
+    end
+
+    it "returns the expected number of records when a field is specified as a string" do
+      user = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", updated_by: user)
+      Post.create!(author: user, title: "Example post 2", updated_by: user)
+      Post.create!(author: user, title: "Example post 3")
+
+      Post.count("title").should eq 3
+      Post.count("updated_by").should eq 2
+    end
+  end
+
   describe "::default_queryset" do
     it "returns a queryset containing all the objects by default" do
       TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")

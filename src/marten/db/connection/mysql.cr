@@ -2,6 +2,35 @@ module Marten
   module DB
     module Connection
       class MySQL < Base
+        def bulk_batch_size(records_count : Int32, values_count : Int32) : Int32
+          records_count
+        end
+
+        def bulk_insert(
+          table_name : String,
+          values : Array(Hash(String, ::DB::Any)),
+          pk_column_to_fetch : String? = nil
+        ) : Array(::DB::Any)?
+          column_names = values[0].keys.join(", ") { |column_name| "#{quote(column_name)}" }
+
+          index = 0
+          numbered_values = values.map do |raw_values|
+            raw_values.keys.map do |_c|
+              index += 1
+              parameter_id_for_ordered_argument(index)
+            end.join(", ")
+          end
+
+          statement = "INSERT INTO #{quote(table_name)} (#{column_names}) " \
+                      "VALUES #{numbered_values.map { |v| "(#{v})" }.join(", ")}"
+
+          open do |db|
+            db.exec(statement, args: values.flat_map(&.values))
+          end
+
+          nil
+        end
+
         def distinct_clause_for(columns : Array(String)) : String
           return DISTINCT_CLAUSE if columns.empty?
           raise NotImplementedError.new("DISTINCT ON columns is not supported by this connection implementation")

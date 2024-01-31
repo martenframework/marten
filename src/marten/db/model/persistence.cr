@@ -204,8 +204,11 @@ module Marten
 
         protected setter new_record
 
-        private def auto_increment_field?(pk_field : Field::Base) : Bool
-          (pk_field.is_a?(Field::BigInt) || pk_field.is_a?(Field::Int)) && pk_field.auto?
+        protected def prepare_fields_for_save : Nil
+          self.class.fields.each do |field|
+            next if field.primary_key?
+            field.prepare_save(self, new_record: !persisted?)
+          end
         end
 
         private def insert_or_update(connection)
@@ -222,10 +225,7 @@ module Marten
 
           # Notifies each field so that they have the chance to apply changes to the model instance before the actual
           # save operation.
-          self.class.fields.each do |field|
-            next if field.primary_key?
-            field.prepare_save(self, new_record: !persisted?)
-          end
+          prepare_fields_for_save
 
           run_before_save_callbacks
 
@@ -262,7 +262,7 @@ module Marten
           values = local_field_db_values
 
           pk_field = self.class.pk_field
-          if auto_increment_field?(pk_field)
+          if self.class.auto_increment_pk_field?
             pk_field_to_fetch = pk_field.db_column!
             values.delete(pk_field_to_fetch)
           else
@@ -280,9 +280,8 @@ module Marten
         private def insert_parent(parent_model, connection)
           values = parent_model_field_db_values(parent_model)
 
-          parent_pk_field = parent_model.pk_field
-          if auto_increment_field?(parent_pk_field)
-            pk_field_to_fetch = parent_pk_field.db_column!
+          if parent_model.auto_increment_pk_field?
+            pk_field_to_fetch = parent_model.pk_field.db_column!
             values.delete(pk_field_to_fetch)
           else
             pk_field_to_fetch = nil

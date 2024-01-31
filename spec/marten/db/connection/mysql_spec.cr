@@ -2,6 +2,13 @@ require "./spec_helper"
 
 for_mysql do
   describe Marten::DB::Connection::MySQL do
+    describe "#bulk_batch_size" do
+      it "returns the specified records count" do
+        conn = Marten::DB::Connection.default
+        conn.bulk_batch_size(records_count: 1000, values_count: 10).should eq 1000
+      end
+    end
+
     describe "#distinct_clause_for" do
       it "returns the expected distinct clause if no column names are specified" do
         conn = Marten::DB::Connection.default

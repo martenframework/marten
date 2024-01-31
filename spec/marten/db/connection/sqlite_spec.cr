@@ -2,6 +2,23 @@ require "./spec_helper"
 
 for_sqlite do
   describe Marten::DB::Connection::PostgreSQL do
+    describe "#bulk_batch_size" do
+      it "returns 500 if the values count is 1" do
+        conn = Marten::DB::Connection.default
+        conn.bulk_batch_size(records_count: 1000, values_count: 1).should eq 500
+      end
+
+      it "returns the expected value if the values count is greater than 1" do
+        conn = Marten::DB::Connection.default
+        conn.bulk_batch_size(records_count: 1000, values_count: 89).should eq 999 // 89
+      end
+
+      it "returns the records count if no values will be inserted" do
+        conn = Marten::DB::Connection.default
+        conn.bulk_batch_size(records_count: 1000, values_count: 0).should eq 1000
+      end
+    end
+
     describe "#distinct_clause_for" do
       it "returns the expected distinct clause if no column names are specified" do
         conn = Marten::DB::Connection.default

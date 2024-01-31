@@ -148,6 +148,11 @@ module Marten
             @@local_reverse_relations << reverse_relation
           end
 
+          protected def auto_increment_pk_field? : Bool
+            field : Field::Base = pk_field
+            (field.is_a?(Field::BigInt) || field.is_a?(Field::Int)) && field.auto?
+          end
+
           protected def local_fields_per_column
             @@local_fields_per_column
           end
@@ -355,6 +360,41 @@ module Marten
           {% end %}
         end
 
+        def inspect(io)
+          io << "#<#{self.class.name}:0x#{object_id.to_s(16)} "
+          io << "#{self.class.pk_field.id}: #{pk.inspect}"
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% unless ann[:field_kwargs] && ann[:field_kwargs][:primary_key] %}
+          io << ", "
+          io << {{ field_var.name.stringify }} + ": #{{{ field_var.id }}.inspect}"
+          {% end %}
+          {% end %}
+          io << ">"
+        end
+
+        # :nodoc:
+        def local_field_db_values
+          {% begin %}
+          values = {} of String => ::DB::Any
+
+          {%
+            local_field_vars = @type.instance_vars.select do |ivar|
+              ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
+              ann && ann[:model_klass].id == @type.name.id
+            end
+          %}
+
+          {% for field_var in local_field_vars %}
+            field = self.class.get_field({{ field_var.name.stringify }})
+            values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
+          {% end %}
+
+          values
+          {% end %}
+        end
+
         # Returns the primary key value.
         def pk
           {% begin %}
@@ -411,20 +451,6 @@ module Marten
 
         def to_s(io)
           inspect(io)
-        end
-
-        def inspect(io)
-          io << "#<#{self.class.name}:0x#{object_id.to_s(16)} "
-          io << "#{self.class.pk_field.id}: #{pk.inspect}"
-          {% for field_var in @type.instance_vars
-                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
-          {% unless ann[:field_kwargs] && ann[:field_kwargs][:primary_key] %}
-          io << ", "
-          io << {{ field_var.name.stringify }} + ": #{{{ field_var.id }}.inspect}"
-          {% end %}
-          {% end %}
-          io << ">"
         end
 
         protected def assign_local_field_from_db_result_set(result_set : ::DB::ResultSet, column_name : String)
@@ -591,26 +617,6 @@ module Marten
           {% end %}
           else
           end
-          {% end %}
-        end
-
-        private def local_field_db_values
-          {% begin %}
-          values = {} of String => ::DB::Any
-
-          {%
-            local_field_vars = @type.instance_vars.select do |ivar|
-              ann = ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable)
-              ann && ann[:model_klass].id == @type.name.id
-            end
-          %}
-
-          {% for field_var in local_field_vars %}
-            field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
-          {% end %}
-
-          values
           {% end %}
         end
 

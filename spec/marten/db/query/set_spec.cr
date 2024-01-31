@@ -406,6 +406,159 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#bulk_create" do
+    it "allows to insert a small array of records without specifying a batch size" do
+      objects = (1..100).map do |i|
+        Tag.new(name: "tag #{i}", is_active: true)
+      end
+
+      inserted_objects = Marten::DB::Query::Set(Tag).new.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      Tag.filter(name__in: objects.map(&.name)).count.should eq objects.size
+    end
+
+    it "allows to insert a large array of records without specifying a batch size" do
+      objects = (1..5_000).map do |i|
+        Tag.new(name: "tag #{i}", is_active: true)
+      end
+
+      inserted_objects = Marten::DB::Query::Set(Tag).new.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      Tag.filter(name__in: objects.map(&.name)).count.should eq objects.size
+    end
+
+    it "allows to insert a small array of records while specifying a batch size" do
+      objects = (1..100).map do |i|
+        Tag.new(name: "tag #{i}", is_active: true)
+      end
+
+      inserted_objects = Marten::DB::Query::Set(Tag).new.bulk_create(objects, batch_size: 10)
+
+      inserted_objects.size.should eq objects.size
+      Tag.filter(name__in: objects.map(&.name)).count.should eq objects.size
+    end
+
+    it "allows to insert a large array of records while specifying a batch size" do
+      objects = (1..5_000).map do |i|
+        Tag.new(name: "tag #{i}", is_active: true)
+      end
+
+      inserted_objects = Marten::DB::Query::Set(Tag).new.bulk_create(objects, batch_size: 500)
+
+      inserted_objects.size.should eq objects.size
+      Tag.filter(name__in: objects.map(&.name)).count.should eq objects.size
+    end
+
+    it "properly calls the fields' before_save logic to ensure they can set default values on records" do
+      objects = (1..10).map do |i|
+        TestUser.new(username: "jd#{i}", email: "jd#{i}@example.com", first_name: "John", last_name: "Doe")
+      end
+
+      inserted_objects = Marten::DB::Query::Set(TestUser).new.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      TestUser.filter(username__in: objects.map(&.username)).count.should eq objects.size
+      inserted_objects.all? { |o| !o.created_at.nil? }.should be_true
+    end
+
+    it "properly marks created objects as persisted" do
+      objects = (1..10).map do |i|
+        TestUser.new(username: "jd#{i}", email: "jd#{i}@example.com", first_name: "John", last_name: "Doe")
+      end
+
+      inserted_objects = Marten::DB::Query::Set(TestUser).new.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      TestUser.filter(username__in: objects.map(&.username)).count.should eq objects.size
+      inserted_objects.all?(&.persisted?).should be_true
+    end
+
+    it "inserts records with already assigned pks when no batch size is specified" do
+      objects = (1..100).map do |i|
+        Marten::DB::Query::SetSpec::TagWithUUID.new(label: "tag #{i}")
+      end
+
+      inserted_objects = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TagWithUUID).new.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      Marten::DB::Query::SetSpec::TagWithUUID.filter(label__in: objects.map(&.label)).count.should eq objects.size
+      inserted_objects.all?(&.persisted?).should be_true
+      inserted_objects.all?(&.pk?).should be_true
+    end
+
+    it "inserts records with already assigned pks when a batch size is specified" do
+      objects = (1..100).map do |i|
+        Marten::DB::Query::SetSpec::TagWithUUID.new(label: "tag #{i}")
+      end
+
+      inserted_objects = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TagWithUUID).new.bulk_create(
+        objects,
+        batch_size: 10
+      )
+
+      inserted_objects.size.should eq objects.size
+      Marten::DB::Query::SetSpec::TagWithUUID.filter(label__in: objects.map(&.label)).count.should eq objects.size
+      inserted_objects.all?(&.persisted?).should be_true
+      inserted_objects.all?(&.pk?).should be_true
+    end
+
+    it "inserts records that have null values" do
+      objects = (1..10).map do |i|
+        user = TestUser.create!(username: "jd#{i}", email: "jd#{i}@example.com", first_name: "John", last_name: "Doe")
+        TestUserProfile.new(user: user, bio: i % 2 == 0 ? "Bio #{i}" : nil)
+      end
+
+      inserted_objects = Marten::DB::Query::Set(TestUserProfile).new.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      TestUserProfile.filter(user_id__in: objects.map(&.user_id)).count.should eq objects.size
+      inserted_objects.all?(&.persisted?).should be_true
+    end
+
+    for_db_backends :postgresql, :sqlite do
+      it "#properly assigns the returned objects' pks when they don't have one already" do
+        objects = (1..10).map do |i|
+          TestUser.new(username: "jd#{i}", email: "jd#{i}@example.com", first_name: "John", last_name: "Doe")
+        end
+
+        inserted_objects = Marten::DB::Query::Set(TestUser).new.bulk_create(objects)
+
+        inserted_objects.size.should eq objects.size
+        TestUser.filter(username__in: objects.map(&.username)).count.should eq objects.size
+        inserted_objects.all?(&.pk?).should be_true
+      end
+    end
+
+    it "raises an ArgumentError if the specified batch size is less than 1" do
+      expect_raises(ArgumentError, "Batch size must be greater than 1") do
+        Marten::DB::Query::Set(Tag).new.bulk_create([] of Tag, batch_size: 0)
+      end
+
+      expect_raises(ArgumentError, "Batch size must be greater than 1") do
+        Marten::DB::Query::Set(Tag).new.bulk_create([] of Tag, batch_size: -1)
+      end
+    end
+
+    it "raises the expected exception if the targeted model inherits from concrete models" do
+      address = Marten::DB::Query::SetSpec::Address.create!(street: "Street 1")
+      student = Marten::DB::Query::SetSpec::Student.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10"
+      )
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Bulk creation is not supported for multi table inherited model records"
+      ) do
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Student).new.bulk_create([student])
+      end
+    end
+  end
+
   describe "#count" do
     it "returns the expected number of record for an unfiltered query set" do
       Tag.create!(name: "ruby", is_active: true)

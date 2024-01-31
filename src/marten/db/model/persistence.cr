@@ -263,13 +263,13 @@ module Marten
 
           pk_field = self.class.pk_field
           if self.class.auto_increment_pk_field?
-            pk_field_to_fetch = pk_field.db_column!
-            values.delete(pk_field_to_fetch)
+            pk_column_to_fetch = pk_field.db_column!
+            values.delete(pk_column_to_fetch)
           else
-            pk_field_to_fetch = nil
+            pk_column_to_fetch = nil
           end
 
-          inserted_pk = connection.insert(self.class.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
+          inserted_pk = connection.insert(self.class.db_table, values, pk_column_to_fetch: pk_column_to_fetch)
 
           assign_field_values({pk_field.id => pk_field.from_db(inserted_pk)}) if pk.nil? && !inserted_pk.nil?
           self.new_record = false
@@ -281,13 +281,13 @@ module Marten
           values = parent_model_field_db_values(parent_model)
 
           if parent_model.auto_increment_pk_field?
-            pk_field_to_fetch = parent_model.pk_field.db_column!
-            values.delete(pk_field_to_fetch)
+            pk_column_to_fetch = parent_model.pk_field.db_column!
+            values.delete(pk_column_to_fetch)
           else
-            pk_field_to_fetch = nil
+            pk_column_to_fetch = nil
           end
 
-          inserted_pk = connection.insert(parent_model.db_table, values, pk_field_to_fetch: pk_field_to_fetch)
+          inserted_pk = connection.insert(parent_model.db_table, values, pk_column_to_fetch: pk_column_to_fetch)
 
           if parent_model.parent_models.empty?
             # If the parent model being inserted does not have concrete parent models, then this must be the first one

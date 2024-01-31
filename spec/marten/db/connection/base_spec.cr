@@ -74,7 +74,7 @@ describe Marten::DB::Connection::Base do
       record_id = conn.insert(
         Tag.db_table,
         values: {"name" => "crystal", "is_active" => true},
-        pk_field_to_fetch: "id"
+        pk_column_to_fetch: "id"
       )
 
       record_id.should be_truthy
@@ -324,7 +324,7 @@ describe Marten::DB::Connection::Base do
       record_id = conn.insert(
         Tag.db_table,
         values: {"name" => "crystal", "is_active" => true},
-        pk_field_to_fetch: "id"
+        pk_column_to_fetch: "id"
       )
 
       record_id = conn.update(

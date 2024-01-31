@@ -38,7 +38,7 @@ module Marten
         abstract def insert(
           table_name : String,
           values : Hash(String, ::DB::Any),
-          pk_field_to_fetch : String? = nil
+          pk_column_to_fetch : String? = nil
         ) : ::DB::Any
 
         # Returns the left operand to use for specific query predicate.

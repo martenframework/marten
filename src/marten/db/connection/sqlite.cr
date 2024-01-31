@@ -54,7 +54,11 @@ module Marten
           raise NotImplementedError.new("DISTINCT ON columns is not supported by this connection implementation")
         end
 
-        def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : ::DB::Any
+        def insert(
+          table_name : String,
+          values : Hash(String, ::DB::Any),
+          pk_column_to_fetch : String? = nil
+        ) : ::DB::Any
           column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
           statement = "INSERT INTO #{quote(table_name)} (#{column_names}) VALUES (#{numbered_values})"
@@ -63,7 +67,7 @@ module Marten
 
           open do |db|
             db.exec(statement, args: values.values)
-            new_record_id = unless pk_field_to_fetch.nil?
+            new_record_id = unless pk_column_to_fetch.nil?
               db.scalar("SELECT LAST_INSERT_ROWID()").as(::DB::Any)
             end
           end

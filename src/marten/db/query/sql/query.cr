@@ -295,7 +295,7 @@ module Marten
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << "SELECT AVG(*)"
+              s << "SELECT AVG(#{column_name.split(".")[-1]})"
               s << "FROM ("
               s << "SELECT"
 

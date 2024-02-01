@@ -894,8 +894,8 @@ describe Marten::DB::Query::SQL::Query do
       )
 
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
-      query.average("price").should be_close(600.0, 0.00001)
-      query.average("rating").should be_close(3.25, 0.00001)
+      query.average("price").not_nil!.should be_close(600.0, 0.00001)
+      query.average("rating").not_nil!.should be_close(3.25, 0.00001)
     end
 
     it "properly calculates the average on a filtered set" do
@@ -913,14 +913,13 @@ describe Marten::DB::Query::SQL::Query do
 
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
       query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "Awesome"))
-      query.average("price").should be_close(1000.0, 0.00001)
-      query.average("rating").should be_close(5.0, 0.00001)
+      query.average("price").not_nil!.should be_close(1000.0, 0.00001)
+      query.average("rating").not_nil!.should be_close(5.0, 0.00001)
     end
 
     it "properly handles zero rows" do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
-      query.average("price").should eq 0.0
-      query.average("rating").should eq 0.0
+      query.average("price").should be_nil
     end
 
     it "properly handles null values" do
@@ -942,7 +941,7 @@ describe Marten::DB::Query::SQL::Query do
       )
 
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
-      query.average("rating").should be_close(3.25, 0.00001)
+      query.average("rating").not_nil!.should be_close(3.25, 0.00001)
     end
   end
 

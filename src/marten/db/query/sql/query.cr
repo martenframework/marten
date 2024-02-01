@@ -75,8 +75,6 @@ module Marten
           end
 
           def average(raw_field : String)
-            field_context = get_field_context(raw_field, Model)
-
             column_name = solve_field_and_column(raw_field).last
 
             sql, parameters = build_average_query(column_name)

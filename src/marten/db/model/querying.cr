@@ -46,6 +46,14 @@ module Marten
           end
 
           # Returns the average of a field for the current model
+          #
+          # This method calculates the average value of the specified field for the considered model. For example:
+          #
+          # ```
+          # Product.average(:price) # => 25.0
+          # ```
+          #
+          # This will return the average price of all products in the database.
           def average(field : String | Symbol)
             default_queryset.average(field)
           end

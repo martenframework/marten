@@ -98,6 +98,15 @@ module Marten
         end
 
         # Returns the average of a field for the current query set.
+        #
+        # This method calculates the average value of the specified field for the considered query set. For example:
+        #
+        # ```
+        # query_set = Product.all
+        # query_set.average(:price) # => 25.0
+        # ```
+        #
+        # This will return the average price of all products in the database.
         def average(field : String | Symbol)
           @query.average(field.try(&.to_s))
         end

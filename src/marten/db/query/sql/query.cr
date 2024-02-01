@@ -77,13 +77,6 @@ module Marten
           def average(raw_field : String)
             field_context = get_field_context(raw_field, Model)
 
-            unless field_context.field.is_a?(Marten::DB::Field::Int) ||
-                   field_context.field.is_a?(Marten::DB::Field::Float)
-              raise Errors::InvalidField.new(
-                "Cant calculate the average of '#{raw_field}' (#{field_context.field.class})."
-              )
-            end
-
             column_name = solve_field_and_column(raw_field).last
 
             sql, parameters = build_average_query(column_name)
@@ -302,7 +295,7 @@ module Marten
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
-              s << "SELECT AVG(#{column_name.split(".")[-1]})"
+              s << "SELECT AVG(*)"
               s << "FROM ("
               s << "SELECT"
 

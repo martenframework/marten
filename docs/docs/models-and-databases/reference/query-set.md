@@ -92,7 +92,7 @@ For example:
 average_price = Product.average(:price) # Calculate the average price of all products
 
 # Calculate the average rating for a specific category of products
-electronic_products = Product.where(category: "Electronics")
+electronic_products = Product.filter(category: "Electronics")
 average_rating = electronic_products.average(:rating)
 ```
 

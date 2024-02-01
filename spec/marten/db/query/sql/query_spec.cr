@@ -944,27 +944,6 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
       query.average("rating").should be_close(3.25, 0.00001)
     end
-
-    it "raises an error if the column is not numerical" do
-      Marten::DB::Query::SQL::QuerySpec::Product.create!(
-        name: "Awesome Product",
-        price: 1000,
-        rating: 5.0,
-      )
-
-      Marten::DB::Query::SQL::QuerySpec::Product.create!(
-        name: "Necessary Product",
-        price: 200,
-        rating: 1.5,
-      )
-
-      expect_raises(
-        Marten::DB::Errors::InvalidField,
-        "Cant calculate the average of 'name' (Marten::DB::Field::String)."
-      ) do
-        Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new.average("name")
-      end
-    end
   end
 
   describe "#clone" do

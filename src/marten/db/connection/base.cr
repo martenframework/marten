@@ -14,6 +14,21 @@ module Marten
           @url = build_url
         end
 
+        # Returns the batch size to use when inserting multiple rows in a specific table.
+        abstract def bulk_batch_size(records_count : Int32, values_count : Int32) : Int32
+
+        # Allows to insert multiple rows in a specific table and returns the primary key values for the inserted rows.
+        #
+        # This method allow inserting individual rows defined in `values` in the `table_name` table. When
+        # `pk_column_to_fetch` is specified, the primary key values for the inserted rows will be returned. Note that
+        # this method can return `nil` if the underlying database does not support returning primary key values for bulk
+        # inserts.
+        abstract def bulk_insert(
+          table_name : String,
+          values : Array(Hash(String, ::DB::Any)),
+          pk_column_to_fetch : String? = nil
+        ) : Array(::DB::Any)?
+
         # Returns a distinct clause to remove duplicates from a query's results.
         #
         # If column names are specified, only these specific columns will be checked to identify duplicates.
@@ -23,7 +38,7 @@ module Marten
         abstract def insert(
           table_name : String,
           values : Hash(String, ::DB::Any),
-          pk_field_to_fetch : String? = nil
+          pk_column_to_fetch : String? = nil
         ) : ::DB::Any
 
         # Returns the left operand to use for specific query predicate.

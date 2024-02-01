@@ -53,6 +53,30 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::bulk_create" do
+    it "allows to insert an array of records without specifying a batch size" do
+      objects = (1..100).map do |i|
+        Tag.new(name: "tag #{i}", is_active: true)
+      end
+
+      inserted_objects = Tag.bulk_create(objects)
+
+      inserted_objects.size.should eq objects.size
+      Tag.filter(name__in: objects.map(&.name)).count.should eq objects.size
+    end
+
+    it "allows to insert a small array of records while specifying a batch size" do
+      objects = (1..100).map do |i|
+        Tag.new(name: "tag #{i}", is_active: true)
+      end
+
+      inserted_objects = Tag.bulk_create(objects, batch_size: 10)
+
+      inserted_objects.size.should eq objects.size
+      Tag.filter(name__in: objects.map(&.name)).count.should eq objects.size
+    end
+  end
+
   describe "::count" do
     it "returns the expected number of records when no field is specified" do
       Tag.create!(name: "ruby", is_active: true)

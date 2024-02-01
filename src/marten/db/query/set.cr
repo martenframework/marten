@@ -111,6 +111,75 @@ module Marten
           @query.average(field.try(&.to_s))
         end
 
+        # Bulk inserts the passed model instances into the database.
+        #
+        # This method allows to insert multiple model instances into the database in a single query. This can be useful
+        # when dealing with large amounts of data that need to be inserted into the database. For example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.bulk_create(
+        #   [
+        #     Post.new(title: "First post"),
+        #     Post.new(title: "Second post"),
+        #     Post.new(title: "Third post"),
+        #   ]
+        # )
+        # ```
+        #
+        # An optional `batch_size` argument can be passed to this method in order to specify the number of records that
+        # should be inserted in a single query. By default, all records are inserted in a single query (except for
+        # SQLite databases where the limit of variables in a single query is 999). For example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.bulk_create(
+        #   [
+        #     Post.new(title: "First post"),
+        #     Post.new(title: "Second post"),
+        #     Post.new(title: "Third post"),
+        #   ],
+        #   batch_size: 2
+        # )
+        # ```
+        def bulk_create(objects : Array(M), batch_size : Int32? = nil)
+          if !batch_size.nil? && batch_size < 1
+            raise ArgumentError.new("Batch size must be greater than 1")
+          end
+
+          return objects if objects.empty?
+
+          # Check that objects are not descendants of concrete models (multi table inheritance).
+          if !M.parent_models.empty?
+            raise Errors::UnmetQuerySetCondition.new(
+              "Bulk creation is not supported for multi table inherited model records"
+            )
+          end
+
+          query.connection.transaction do
+            objects_with_pk, objects_without_pk = objects.partition(&.pk?)
+
+            if !objects_with_pk.empty?
+              perform_batched_insert(objects_with_pk, batch_size)
+            end
+
+            if !objects_without_pk.empty?
+              inserted_pks = perform_batched_insert(objects_without_pk, batch_size)
+
+              if !inserted_pks.empty?
+                objects_without_pk.zip(inserted_pks).each do |object, pk|
+                  object.pk = pk.as?(Field::Any)
+                end
+              end
+            end
+          end
+
+          # Mark all objects as persisted.
+          objects.each(&.new_record=(false))
+
+          objects
+        end
+
         # Returns the number of records that are targeted by the current query set.
         def count(field : String | Symbol | Nil = nil)
           @result_cache.nil? || !field.nil? ? @query.count(field.try(&.to_s)) : @result_cache.not_nil!.size
@@ -992,6 +1061,34 @@ module Marten
           qs = clone
           qs.query.add_query_node(query_node)
           qs
+        end
+
+        private def perform_batched_insert(objects : Array(M), batch_size : Int32? = nil)
+          max_batch_size = @query.connection.bulk_batch_size(objects.size, M.local_fields.count(&.db_column?))
+          effective_batch_size = batch_size.nil? ? max_batch_size : [batch_size, max_batch_size].min
+
+          inserted_pks = Array(::DB::Any).new
+
+          pk_column_to_fetch = M.auto_increment_pk_field? ? M.pk_field.db_column! : nil
+
+          objects.each_slice(effective_batch_size) do |sliced_objects|
+            # Ensure all objects' fields are prepared for save before inserting them. This is necessary to ensure that
+            # fields like creation timestamp are properly set.
+            sliced_objects.each(&.prepare_fields_for_save)
+            values_to_insert = sliced_objects.map do |o|
+              values = o.local_field_db_values
+              values.delete(pk_column_to_fetch) if !pk_column_to_fetch.nil?
+              values
+            end
+
+            result = @query.connection.bulk_insert(M.db_table, values_to_insert, pk_column_to_fetch)
+
+            if result.is_a?(Array(::DB::Any))
+              inserted_pks += result
+            end
+          end
+
+          inserted_pks
         end
 
         private def raise_negative_indexes_not_supported

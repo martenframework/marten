@@ -270,6 +270,57 @@ The value passed to `#using` must be a valid database alias that was used to con
 
 Query sets also provide a set of methods that will usually result in specific SQL queries to be executed in order to return values that don't correspond to new query sets.
 
+### `bulk_create`
+
+Bulk inserts the passed model instances into the database.
+
+This method allows to insert multiple model instances into the database in a single query. This can be useful when dealing with large amounts of data that need to be inserted into the database. For example:
+
+```crystal
+query_set = Post.all
+query_set.bulk_create(
+  [
+    Post.new(title: "First post"),
+    Post.new(title: "Second post"),
+    Post.new(title: "Third post"),
+  ]
+)
+```
+
+An optional `batch_size` argument can be passed to this method in order to specify the number of records that should be inserted in a single query. By default, all records are inserted in a single query (except for SQLite databases where the limit of variables in a single query is 999). For example:
+
+```crystal
+query_set = Post.all
+query_set.bulk_create(
+  [
+    Post.new(title: "First post"),
+    Post.new(title: "Second post"),
+    Post.new(title: "Third post"),
+  ],
+  batch_size: 2
+)
+```
+
+:::tip
+The `#bulk_create` model can also be called directly on model classes:
+
+```crystal
+Post.bulk_create(
+  [
+    Post.new(title: "First post"),
+    Post.new(title: "Second post"),
+    Post.new(title: "Third post"),
+  ]
+)
+```
+:::
+
+It is worth mentioning that this method has a few caveats:
+
+* The specified records are assumed to be valid and no [callbacks](../callbacks.md) will be called on them.
+* Bulk-creating records making use of multi-table inheritance is not supported.
+* If the model's primary key field is auto-incremented at the database level, the newly inserted primary keys will only be assigned to records on certain databases that support retrieving bulk-inserted rows (namely PostgreSQL and SQLite).
+
 ### `count`
 
 Returns the number of records that are targeted by the current query set.

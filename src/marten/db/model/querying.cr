@@ -57,6 +57,39 @@ module Marten
           def average(field : String | Symbol)
             default_queryset.average(field)
           end
+  
+          # Bulk inserts the passed model instances into the database.
+          #
+          # This method allows to insert multiple model instances into the database in a single query. This can be
+          # useful when dealing with large amounts of data that need to be inserted into the database. For example:
+          #
+          # ```
+          # Post.bulk_create(
+          #   [
+          #     Post.new(title: "First post"),
+          #     Post.new(title: "Second post"),
+          #     Post.new(title: "Third post"),
+          #   ]
+          # )
+          # ```
+          #
+          # An optional `batch_size` argument can be passed to this method in order to specify the number of records
+          # that should be inserted in a single query. By default, all records are inserted in a single query (except
+          # for SQLite databases where the limit of variables in a single query is 999). For example:
+          #
+          # ```
+          # Post.bulk_create(
+          #   [
+          #     Post.new(title: "First post"),
+          #     Post.new(title: "Second post"),
+          #     Post.new(title: "Third post"),
+          #   ],
+          #   batch_size: 2
+          # )
+          # ```
+          def bulk_create(objects : Array(self), batch_size : Int32? = nil)
+            default_queryset.bulk_create(objects, batch_size)
+          end
 
           # Returns the total count of records for the considered model.
           #

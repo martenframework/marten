@@ -2,12 +2,63 @@ module Marten
   module DB
     module Connection
       class SQLite < Base
+        def bulk_batch_size(records_count : Int32, values_count : Int32) : Int32
+          if values_count == 1
+            500
+          elsif values_count > 1
+            999 // values_count
+          else
+            records_count
+          end
+        end
+
+        def bulk_insert(
+          table_name : String,
+          values : Array(Hash(String, ::DB::Any)),
+          pk_column_to_fetch : String? = nil
+        ) : Array(::DB::Any)?
+          column_names = values[0].keys.join(", ") { |column_name| "#{quote(column_name)}" }
+
+          index = 0
+          numbered_values = values.map do |raw_values|
+            raw_values.keys.map do |_c|
+              index += 1
+              parameter_id_for_ordered_argument(index)
+            end.join(", ")
+          end
+
+          statement = "INSERT INTO #{quote(table_name)} (#{column_names}) " \
+                      "VALUES #{numbered_values.map { |v| "(#{v})" }.join(", ")}"
+          statement += " RETURNING #{quote(pk_column_to_fetch)}" unless pk_column_to_fetch.nil?
+
+          new_record_ids = nil
+
+          open do |db|
+            if pk_column_to_fetch
+              new_record_ids = [] of ::DB::Any
+              db.query(statement, args: values.flat_map(&.values)) do |result_set|
+                result_set.each do
+                  new_record_ids << result_set.read(::DB::Any)
+                end
+              end
+            else
+              db.exec(statement, args: values.flat_map(&.values))
+            end
+          end
+
+          new_record_ids
+        end
+
         def distinct_clause_for(columns : Array(String)) : String
           return DISTINCT_CLAUSE if columns.empty?
           raise NotImplementedError.new("DISTINCT ON columns is not supported by this connection implementation")
         end
 
-        def insert(table_name : String, values : Hash(String, ::DB::Any), pk_field_to_fetch : String? = nil) : ::DB::Any
+        def insert(
+          table_name : String,
+          values : Hash(String, ::DB::Any),
+          pk_column_to_fetch : String? = nil
+        ) : ::DB::Any
           column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
           statement = "INSERT INTO #{quote(table_name)} (#{column_names}) VALUES (#{numbered_values})"
@@ -16,7 +67,7 @@ module Marten
 
           open do |db|
             db.exec(statement, args: values.values)
-            new_record_id = unless pk_field_to_fetch.nil?
+            new_record_id = unless pk_column_to_fetch.nil?
               db.scalar("SELECT LAST_INSERT_ROWID()").as(::DB::Any)
             end
           end

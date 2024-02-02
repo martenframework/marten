@@ -12,6 +12,7 @@ describe Marten::Handlers::RequestForgeryProtection do
     Marten.settings.allowed_hosts = original_allowed_hosts
     Marten.settings.csrf.cookie_domain = original_csrf_cookie_domain
     Marten.settings.csrf.protection_enabled = original_csrf_protection_enabled
+    Marten.settings.csrf.use_session = false
     Marten.settings.use_x_forwarded_proto = original_use_x_forwarded_proto
   end
 
@@ -169,6 +170,30 @@ describe Marten::Handlers::RequestForgeryProtection do
       )
       raw_request.cookies["csrftoken"] = token
       request = Marten::HTTP::Request.new(raw_request)
+
+      handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
+      response = handler.process_dispatch
+
+      response.content.should eq "OK_POST"
+      response.status.should eq 200
+    end
+
+    it "allows unsafe requests if the csrftoken POST parameter is specified and matches the CSRF token cookie" do
+      session_store = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
+      Marten.settings.csrf.use_session = true
+
+      token = Marten::Handlers::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
+
+      session_store["csrftoken"] = token
+
+      raw_request = ::HTTP::Request.new(
+        method: "POST",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+        body: "foo=bar&csrftoken=#{token}"
+      )
+      request = Marten::HTTP::Request.new(raw_request)
+      request.session = session_store
 
       handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
       response = handler.process_dispatch
@@ -774,6 +799,25 @@ describe Marten::Handlers::RequestForgeryProtection do
       response = handler.process_dispatch
 
       response.cookies["csrftoken"]?.should_not be_nil
+    end
+
+    it "generates a new token if no one was already set and forces it to be persisted inside the current session" do
+      session_store = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
+      Marten.settings.csrf.use_session = true
+
+      raw_request = ::HTTP::Request.new(
+        method: "GET",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+      request = Marten::HTTP::Request.new(raw_request)
+      request.session = session_store
+
+      handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandlerWithTokenAccess.new(request)
+      response = handler.process_dispatch
+
+      response.cookies["csrftoken"]?.should be_nil
+      request.session["csrftoken"]?.should_not be_nil
     end
 
     it "refreshes the masked version of the original token" do

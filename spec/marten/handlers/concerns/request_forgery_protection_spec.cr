@@ -178,7 +178,7 @@ describe Marten::Handlers::RequestForgeryProtection do
       response.status.should eq 200
     end
 
-    it "allows unsafe requests if the csrftoken POST parameter is specified and matches the CSRF token cookie" do
+    it "allows unsafe requests if the csrftoken POST parameter is specified and matches the CSRF token stored in the session" do
       session_store = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
       Marten.settings.csrf.use_session = true
 

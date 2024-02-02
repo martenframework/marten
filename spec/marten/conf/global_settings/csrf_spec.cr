@@ -154,6 +154,33 @@ describe Marten::Conf::GlobalSettings::CSRF do
     end
   end
 
+  describe "#session_name" do
+    it "returns csrftoken by default" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.session_name.should eq "csrftoken"
+    end
+
+    it "returns the configured value if applicable" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.session_name = "custom_name"
+      csrf_conf.session_name.should eq "custom_name"
+    end
+  end
+
+  describe "#session_name=" do
+    it "allows to configure the session name from a string" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.session_name = "custom_name"
+      csrf_conf.session_name.should eq "custom_name"
+    end
+
+    it "allows to configure the session name from a symbol" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.session_name = :custom_name
+      csrf_conf.session_name.should eq "custom_name"
+    end
+  end
+
   describe "#trusted_origins" do
     it "returns an empty array by default" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
@@ -172,6 +199,27 @@ describe Marten::Conf::GlobalSettings::CSRF do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
       csrf_conf.trusted_origins = ["https://*.example.com"]
       csrf_conf.trusted_origins.should eq ["https://*.example.com"]
+    end
+  end
+
+  describe "#use_session" do
+    it "returns false by default" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.use_session.should be_false
+    end
+
+    it "returns the configured value if applicable" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.use_session = true
+      csrf_conf.use_session.should be_true
+    end
+  end
+
+  describe "#use_session=" do
+    it "allows to store the CSRF token inside a session" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.use_session = true
+      csrf_conf.use_session.should be_true
     end
   end
 end

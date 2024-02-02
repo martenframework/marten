@@ -301,6 +301,16 @@ Default: `true`
 
 A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf.md) for more details.
 
+### `session_name`
+
+Default: `"csrftoken"`
+
+The name of the session key to use for the CSRF token. This session key should be different than any other session key created by your application.
+
+:::info
+This value is only relevant if `use_session` is set to `true`.
+:::
+
 ### `trusted_origins`
 
 Default: `[] of String`
@@ -317,6 +327,13 @@ config.csrf.trusted_origins = [
   "https://other.example.org",
 ]
 ```
+
+### `use_session`
+
+Default: `false`
+
+A boolean indicating whether the CSRF token should be stored inside a session.
+If set to `true`, the CSRF token will be stored [in a session](../../handlers-and-http/sessions.md) rather than in a cookie.
 
 ## Content-Security-Policy settings
 

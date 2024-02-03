@@ -43,6 +43,16 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::average" do
+    it "properly calculates the average" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 5.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Post.average(:score).not_nil!.should be_close(5.0, 0.00001)
+    end
+  end
+
   describe "::bulk_create" do
     it "allows to insert an array of records without specifying a batch size" do
       objects = (1..100).map do |i|

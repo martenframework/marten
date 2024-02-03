@@ -82,6 +82,20 @@ qset = Article.all # returns a query set matching "all" the records of the Artic
 qset2 = qset.all   # returns a copy of the initial query set
 ```
 
+### `average`
+
+Allows calculating the average of a numeric field within the records of a specific model. The `#average` method can be used as a class method from any model class, or it can be used as an instance method from any query set object. When used on a query set, it calculates the average of the specified field for the records in that query set.
+
+For example:
+
+```crystal
+average_price = Product.average(:price) # Calculate the average price of all products
+
+# Calculate the average rating for a specific category of products
+electronic_products = Product.filter(category: "Electronics")
+average_rating = electronic_products.average(:rating)
+```
+
 ### `distinct`
 
 Returns a new query set that will use `SELECT DISTINCT` or `SELECT DISTINCT ON` in its SQL query.

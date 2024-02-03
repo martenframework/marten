@@ -74,6 +74,16 @@ module Marten
             ensure_join_for_field_path(field_path, selected: true)
           end
 
+          def average(raw_field : String)
+            column_name = solve_field_and_column(raw_field).last
+
+            sql, parameters = build_average_query(column_name)
+            connection.open do |db|
+              result = db.scalar(sql, args: parameters)
+              result ? result.to_s.to_f : nil
+            end
+          end
+
           def clone
             self.class.new(
               default_ordering: @default_ordering,
@@ -276,6 +286,29 @@ module Marten
             end
 
             rows_affected.not_nil!
+          end
+
+          private def build_average_query(column_name : String)
+            where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
+
+            sql = build_sql do |s|
+              s << "SELECT AVG(#{column_name.split(".")[-1]})"
+              s << "FROM ("
+              s << "SELECT"
+
+              s << connection.distinct_clause_for(distinct_columns) if distinct
+
+              s << column_name
+              s << "FROM #{table_name}"
+              s << build_joins
+              s << where
+              s << "LIMIT #{limit}" unless limit.nil?
+              s << "OFFSET #{@offset}" unless @offset.nil?
+              s << ") subquery"
+            end
+
+            {sql, parameters}
           end
 
           private def build_count_query(column_name : String?)

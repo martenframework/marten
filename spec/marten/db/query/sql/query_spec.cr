@@ -879,6 +879,72 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#average" do
+    it "properly calculates the average" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.average("price").not_nil!.should be_close(600.0, 0.00001)
+      query.average("rating").not_nil!.should be_close(3.25, 0.00001)
+    end
+
+    it "properly calculates the average on a filtered set" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "Awesome"))
+      query.average("price").not_nil!.should be_close(1000.0, 0.00001)
+      query.average("rating").not_nil!.should be_close(5.0, 0.00001)
+    end
+
+    it "properly handles zero rows" do
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.average("price").should be_nil
+    end
+
+    it "properly handles null values" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Necessary Product",
+        price: 200,
+        rating: 1.5,
+      )
+
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Ratingless Product",
+        price: 200,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.average("rating").not_nil!.should be_close(3.25, 0.00001)
+    end
+  end
+
   describe "#clone" do
     it "results in a new object" do
       query = Marten::DB::Query::SQL::Query(Tag).new

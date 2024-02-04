@@ -839,6 +839,24 @@ describe Marten::Handlers::Base do
       response.content.strip.should eq HTML.escape(handler.to_s)
     end
 
+    it "includes the request in the context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response = handler.render("specs/handlers/base/request.html")
+
+      handler.context[:request].should eq request
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq HTML.escape(request.to_s)
+    end
+
     it "allows to specify a specific status code" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

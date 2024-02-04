@@ -119,6 +119,24 @@ describe Marten::Handlers::Rendering do
       response.content.strip.should eq HTML.escape(handler.to_s)
     end
 
+    it "includes the request in the context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithRequestTemplate.new(request)
+      response = handler.render_to_response(nil)
+
+      handler.context[:request].should eq request
+      response.status.should eq 200
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq HTML.escape(request.to_s)
+    end
+
     it "runs before_render callbacks as expected" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
@@ -224,6 +242,12 @@ module Marten::Handlers::RenderingSpec
     include Marten::Handlers::Rendering
 
     template_name "specs/handlers/concerns/rendering/handler.html"
+  end
+
+  class TestHandlerWithRequestTemplate < Marten::Handler
+    include Marten::Handlers::Rendering
+
+    template_name "specs/handlers/concerns/rendering/request.html"
   end
 
   class TestHandlerWithCallback < Marten::Handler

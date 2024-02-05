@@ -97,7 +97,7 @@ module Marten
 
         token = begin
           if Marten.settings.csrf.use_session
-            request.session[Marten.settings.csrf.session_name]
+            request.session[Marten.settings.csrf.session_key]
           else
             request.cookies[Marten.settings.csrf.cookie_name]
           end
@@ -147,7 +147,7 @@ module Marten
         return unless csrf_token && csrf_token_update_required
 
         if Marten.settings.csrf.use_session
-          request.session[Marten.settings.csrf.session_name] = csrf_token.not_nil!
+          request.session[Marten.settings.csrf.session_key] = csrf_token.to_s
         else
           response!.cookies.set(
             name: Marten.settings.csrf.cookie_name,

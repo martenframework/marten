@@ -154,30 +154,30 @@ describe Marten::Conf::GlobalSettings::CSRF do
     end
   end
 
-  describe "#session_name" do
+  describe "#session_key" do
     it "returns csrftoken by default" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
-      csrf_conf.session_name.should eq "csrftoken"
+      csrf_conf.session_key.should eq "csrftoken"
     end
 
     it "returns the configured value if applicable" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
-      csrf_conf.session_name = "custom_name"
-      csrf_conf.session_name.should eq "custom_name"
+      csrf_conf.session_key = "custom_name"
+      csrf_conf.session_key.should eq "custom_name"
     end
   end
 
-  describe "#session_name=" do
+  describe "#session_key=" do
     it "allows to configure the session name from a string" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
-      csrf_conf.session_name = "custom_name"
-      csrf_conf.session_name.should eq "custom_name"
+      csrf_conf.session_key = "custom_name"
+      csrf_conf.session_key.should eq "custom_name"
     end
 
     it "allows to configure the session name from a symbol" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
-      csrf_conf.session_name = :custom_name
-      csrf_conf.session_name.should eq "custom_name"
+      csrf_conf.session_key = :custom_name
+      csrf_conf.session_key.should eq "custom_name"
     end
   end
 

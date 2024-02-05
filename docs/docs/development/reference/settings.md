@@ -301,7 +301,7 @@ Default: `true`
 
 A boolean indicating if the CSRF protection is enabled globally. When set to `true`, handlers will automatically perform a CSRF check to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). Regardless of the value of this setting, it is always possible to explicitly enable or disable CSRF protection on a per-handler basis. See [Cross-Site Request Forgery protection](../../security/csrf.md) for more details.
 
-### `session_name`
+### `session_key`
 
 Default: `"csrftoken"`
 

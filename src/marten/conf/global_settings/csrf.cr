@@ -11,7 +11,7 @@ module Marten
         @cookie_secure : Bool = false
         @protection_enabled : Bool = true
         @exactly_defined_trusted_origins : Array(String)? = nil
-        @session_name : String = "csrftoken"
+        @session_key : String = "csrftoken"
         @trusted_origins : Array(String) = [] of String
         @trusted_origins_hosts : Array(String)? = nil
         @trusted_origin_subdomains_per_scheme : Hash(String, Array(String))? = nil
@@ -65,14 +65,14 @@ module Marten
         setter protection_enabled
 
         # Returns the name of the session to use for the CSRF token (defaults to `"csrftoken"`).
-        getter session_name
+        getter session_key
 
         # Allows to set whether or not the CSRF token should be stored inside the session.
         setter use_session
 
         # Allows to set the name of the session to use for the CSRF token.
-        def session_name=(name : String | Symbol)
-          @session_name = name.to_s
+        def session_key=(name : String | Symbol)
+          @session_key = name.to_s
         end
 
         # Allows to set the name of the cookie to use for the CSRF token.

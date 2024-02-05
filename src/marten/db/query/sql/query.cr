@@ -166,8 +166,6 @@ module Marten
           end
 
           def setup_distinct_clause(fields : Array(String) | Nil = nil) : Nil
-            self.distinct = true
-
             distinct_columns = [] of String
 
             if !fields.nil?

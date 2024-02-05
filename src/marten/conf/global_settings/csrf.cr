@@ -64,13 +64,13 @@ module Marten
         # Allows to set whether or not CSRF protection is enabled globally.
         setter protection_enabled
 
-        # Returns the name of the session to use for the CSRF token (defaults to `"csrftoken"`).
+        # Returns the session key to use for the CSRF token (defaults to `"csrftoken"`).
         getter session_key
 
         # Allows to set whether or not the CSRF token should be stored inside the session.
         setter use_session
 
-        # Allows to set the name of the session to use for the CSRF token.
+        # Allows to set session key to use for the CSRF token.
         def session_key=(name : String | Symbol)
           @session_key = name.to_s
         end

@@ -16,7 +16,7 @@ For example:
 
 ```crystal
 Marten.configure do |config|
-  config.cache_store = Marten::Cache::Store::Memory.new.new(expires_in: 24.hours)
+  config.cache_store = Marten::Cache::Store::Memory.new(expires_in: 24.hours)
 end
 ```
 
@@ -30,7 +30,7 @@ For example:
 
 ```crystal
 Marten.configure do |config|
-  config.cache_store = Marten::Cache::Store::Null.new.new(expires_in: 24.hours)
+  config.cache_store = Marten::Cache::Store::Null.new(expires_in: 24.hours)
 end
 ```
 

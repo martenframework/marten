@@ -23,7 +23,7 @@ module Marten
                   column_name = rs.read(String)
                   type = rs.read(String)
                   is_nullable = (rs.read(String) == "YES")
-                  column_default = rs.read(::DB::Any)
+                  column_default = parse_default_value(rs.read(::DB::Any))
                   character_maximum_length = rs.read(Int32 | Int64 | Nil)
                   results << ColumnInfo.new(
                     name: column_name,
@@ -136,6 +136,18 @@ module Marten
 
           private def list_table_names_statement
             "SHOW TABLES"
+          end
+
+          private def parse_default_value(value : ::DB::Any) : ::DB::Any
+            return value unless value.is_a?(String)
+
+            if value.starts_with?("'") && value.ends_with?("'")
+              value[1..-2]
+            elsif value == "NULL"
+              nil
+            else
+              value
+            end
           end
         end
       end

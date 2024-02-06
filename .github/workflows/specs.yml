@@ -13,6 +13,49 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
+  mariadb:
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:${{ matrix.db_version }}
+        env:
+          MARIADB_ROOT_PASSWORD: "mariadb"
+          MARIADB_DATABASE: marten_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+    continue-on-error: ${{ matrix.crystal == 'nightly' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        db_version: ['10.11.6', '11.2.2']
+        crystal: [
+          '1.9.2',
+          '1.10.0',
+          '1.11.1',
+          'nightly',
+        ]
+    container:
+      image: crystallang/crystal:${{ matrix.crystal }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for MySQL
+      run: |
+        apt-get update
+        apt-get -yqq install mysql-client libmysqlclient-dev
+    - name: Create additional DB for MySQL
+      run: |
+        mysql -u root -h mariadb --password=mariadb -e 'create database marten_other_test;'
+      env:
+        PGPASSWORD: mysql
+    - name: Install shards
+      run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Setup env JSON file
+      run: cp .spec.env.json.ci .spec.env.json
+    - name: Run tests
+      run: scripts/run_batched_specs
+      env:
+        MARTEN_SPEC_DB_CONNECTION: mariadb
   mysql:
     runs-on: ubuntu-latest
     services:

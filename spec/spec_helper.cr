@@ -6,7 +6,7 @@ require "timecop"
 
 {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
   require "pg"
-{% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
+{% elsif env("MARTEN_SPEC_DB_CONNECTION").id == "mariadb" || env("MARTEN_SPEC_DB_CONNECTION").id == "mysql" %}
   require "mysql"
 {% else %}
   require "sqlite3"
@@ -23,6 +23,18 @@ require "./test_project"
 Spec.after_suite { Dir["spec/media/*"].each { |d| FileUtils.rm_rf(d) } }
 
 def for_mysql(&)
+  for_db_backends(:mysql, :mariadb) do
+    yield
+  end
+end
+
+def for_mariadb_only(&)
+  for_db_backends(:mariadb) do
+    yield
+  end
+end
+
+def for_mysql_only(&)
   for_db_backends(:mysql) do
     yield
   end

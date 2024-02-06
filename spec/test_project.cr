@@ -16,7 +16,25 @@ Marten.configure :test do |config|
     TestApp,
   ]
 
-  for_mysql do
+  for_mariadb_only do
+    config.database do |db|
+      db.backend = :mysql
+      db.name = env_settings["MARIADB_DEFAULT_DB_NAME"].as(String)
+      db.user = env_settings["MARIADB_DB_USER"].as(String)
+      db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
+      db.host = env_settings["MARIADB_DB_HOST"].as(String)
+    end
+
+    config.database :other do |db|
+      db.backend = :mysql
+      db.name = env_settings["MARIADB_OTHER_DB_NAME"].as(String)
+      db.user = env_settings["MARIADB_DB_USER"].as(String)
+      db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
+      db.host = env_settings["MARIADB_DB_HOST"].as(String)
+    end
+  end
+
+  for_mysql_only do
     config.database do |db|
       db.backend = :mysql
       db.name = env_settings["MYSQL_DEFAULT_DB_NAME"].as(String)

@@ -308,7 +308,7 @@ Default: `"csrftoken"`
 The name of the session key to use for the CSRF token. This session key should be different than any other session key created by your application.
 
 :::info
-This value is only relevant if `use_session` is set to `true`.
+This value is only relevant if [`use_session`](#use_session) is set to `true`.
 :::
 
 ### `trusted_origins`

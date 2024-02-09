@@ -48,6 +48,35 @@ make
 
 This will install a bunch of Crystal shards and some Node.js dependencies (which are required to work on the [Docusaurus](https://docusaurus.io/)-powered documentation).
 
+### Setting up a test project with Marten
+
+This section dives into creating and configuring a test project using the Marten development environment. This allows you to experiment and develop features in isolation, ensuring everything works smoothly before committing changes to the main codebase.
+
+#### Creating a new test project
+
+Start by creating a new test project using the Marten CLI tool:
+
+```bash
+./path/to/development/marten new project test-project [options]
+```
+
+Replace `test-project` with your desired project name. After installation change to the project directory.
+
+#### Configuring the Test Environment
+
+To use the development marten project instead of the one provided by `shard.yml`, you need to create a `shard.override.yml'.
+
+```yaml
+name: test-project
+version: 0.1.0
+
+dependencies:
+  marten:
+    path: /path/to/development/marten
+```
+
+Run `shards install`. Now, your test project is configured to use your local Marten development environment.
+
 ### Coding style
 
 Overall, Marten tries to comply with Crystal's [style guide](https://crystal-lang.org/reference/conventions/coding_style.html) and you should ensure that your changes comply with it as well if you are contributing code to the project.

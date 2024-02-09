@@ -64,7 +64,7 @@ Replace `test-project` with your desired project name. After installation change
 
 #### Configuring the Test Environment
 
-To use the development marten project instead of the one provided by `shard.yml`, you need to create a `shard.override.yml'.
+To use the development marten project instead of the one provided by `shard.yml`, you need to create a `shard.override.yml`.
 
 ```yaml
 name: test-project

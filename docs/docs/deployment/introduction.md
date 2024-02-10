@@ -120,3 +120,12 @@ Marten.configure do |config|
   # [...]
 end
 ```
+
+:::tip
+It is possible to generate a new secret key using the tools available.
+Marten provides a secret key generator which can be used to generate a random key which can then be stored in an environment variable.
+
+```bash
+bin/manage gen secretkey
+```
+:::

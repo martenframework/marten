@@ -517,7 +517,7 @@ describe Marten::DB::Query::Set do
       inserted_objects.all?(&.persisted?).should be_true
     end
 
-    for_db_backends :postgresql, :sqlite do
+    for_db_backends :mariadb, :postgresql, :sqlite do
       it "#properly assigns the returned objects' pks when they don't have one already" do
         objects = (1..10).map do |i|
           TestUser.new(username: "jd#{i}", email: "jd#{i}@example.com", first_name: "John", last_name: "Doe")
@@ -528,6 +528,7 @@ describe Marten::DB::Query::Set do
         inserted_objects.size.should eq objects.size
         TestUser.filter(username__in: objects.map(&.username)).count.should eq objects.size
         inserted_objects.all?(&.pk?).should be_true
+        puts "O"
       end
     end
 

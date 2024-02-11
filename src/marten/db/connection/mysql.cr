@@ -2,6 +2,8 @@ module Marten
   module DB
     module Connection
       class MySQL < Base
+        @raw_version : String?
+
         def bulk_batch_size(records_count : Int32, values_count : Int32) : Int32
           records_count
         end
@@ -23,12 +25,24 @@ module Marten
 
           statement = "INSERT INTO #{quote(table_name)} (#{column_names}) " \
                       "VALUES #{numbered_values.map { |v| "(#{v})" }.join(", ")}"
+          statement += " RETURNING #{quote(pk_column_to_fetch)}" if !pk_column_to_fetch.nil? && mariadb?
+
+          new_record_ids = nil
 
           open do |db|
-            db.exec(statement, args: values.flat_map(&.values))
+            if pk_column_to_fetch && mariadb?
+              new_record_ids = [] of ::DB::Any
+              db.query(statement, args: values.flat_map(&.values)) do |result_set|
+                result_set.each do
+                  new_record_ids << result_set.read(::DB::Any)
+                end
+              end
+            else
+              db.exec(statement, args: values.flat_map(&.values))
+            end
           end
 
-          nil
+          new_record_ids
         end
 
         def distinct_clause_for(columns : Array(String)) : String
@@ -69,6 +83,11 @@ module Marten
           end
         end
 
+        # :nodoc:
+        def mariadb? : Bool
+          raw_version.downcase.includes?("mariadb")
+        end
+
         def max_name_size : Int32
           64
         end
@@ -104,6 +123,12 @@ module Marten
 
           open do |db|
             db.exec(statement, args: values.values + [pk_value])
+          end
+        end
+
+        protected def raw_version : String
+          @raw_version ||= open do |db|
+            db.scalar("SELECT VERSION()").to_s
           end
         end
 

@@ -399,7 +399,7 @@ config.database :other do |db|
 db
 ```
 
-Configuring other database backends such as MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). For example:
+Configuring other database backends such as MariaDB, MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). For example:
 
 ```crystal
 config.database do |db|

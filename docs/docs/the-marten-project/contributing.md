@@ -109,6 +109,11 @@ By default, specs will be executed using an in-memory SQLite database. If you wi
 
 ```json title=.spec.env.json
 {
+  "MARIADB_DEFAULT_DB_NAME": "example",
+  "MARIADB_OTHER_DB_NAME": "other_example",
+  "MARIADB_DB_USER": "example",
+  "MARIADB_DB_PASSWORD": "",
+  "MARIADB_DB_HOST": "",
   "MYSQL_DEFAULT_DB_NAME": "example",
   "MYSQL_OTHER_DB_NAME": "other_example",
   "MYSQL_DB_USER": "example",
@@ -122,11 +127,12 @@ By default, specs will be executed using an in-memory SQLite database. If you wi
 }
 ```
 
-As you can see, you have to specify two databases for each database backend (MySQL and PostgreSQL). This is mandatory because Marten's specs are also testing cases where multiple databases are configured and used simultaneously for the same project.
+As you can see, you have to specify two databases for each database backend (MariaDB, MySQL, and PostgreSQL). This is mandatory because Marten's specs are also testing cases where multiple databases are configured and used simultaneously for the same project.
 
 Specs are always executed using a _single_ database backend. As mentioned previously this database backend is the SQLite one by default, but you can specify the one to use when running specs by setting the `MARTEN_SPEC_DB_CONNECTION` environment variable. For example:
 
 ```bash
+MARTEN_SPEC_DB_CONNECTION=mariadb make tests    # Will run specs using the MariaDB DB backend
 MARTEN_SPEC_DB_CONNECTION=mysql make tests      # Will run specs using the MySQL DB backend
 MARTEN_SPEC_DB_CONNECTION=postgresql make tests # Will run specs using the PostgreSQL DB backend
 ```

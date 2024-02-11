@@ -19,7 +19,7 @@ Marten gives developers the ability to contribute extra functionalities to the f
 
 ## DB-Neutral
 
-The framework's ORM is and should remain usable with multiple database backends (including MySQL, PostgreSQL, and SQLite).
+The framework's ORM is and should remain usable with multiple database backends (including MariaDB, MySQL, PostgreSQL, and SQLite).
 
 ## App-oriented
 

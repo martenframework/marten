@@ -319,7 +319,7 @@ It is worth mentioning that this method has a few caveats:
 
 * The specified records are assumed to be valid and no [callbacks](../callbacks.md) will be called on them.
 * Bulk-creating records making use of multi-table inheritance is not supported.
-* If the model's primary key field is auto-incremented at the database level, the newly inserted primary keys will only be assigned to records on certain databases that support retrieving bulk-inserted rows (namely PostgreSQL and SQLite).
+* If the model's primary key field is auto-incremented at the database level, the newly inserted primary keys will only be assigned to records on certain databases that support retrieving bulk-inserted rows (namely MariaDB, PostgreSQL, and SQLite).
 
 ### `count`
 

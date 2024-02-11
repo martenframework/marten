@@ -35,15 +35,16 @@ sudo pacman -S crystal shards
 
 ## Install a database
 
-Marten officially supports **MySQL**, **PostgreSQL**, and **SQLite3** databases. New Marten projects will use a SQLite database by default: this lightweight serverless database application is usually already pre-installed on most of the existing operating systems, which makes it an ideal candidate for a development or a testing database. As such, if you choose to use SQLite for your new Marten project, you can very probably skip this section.
+Marten officially supports **MariaDB**, **MySQL**, **PostgreSQL**, and **SQLite3** databases. New Marten projects will use a SQLite database by default: this lightweight serverless database application is usually already pre-installed on most of the existing operating systems, which makes it an ideal candidate for a development or a testing database. As such, if you choose to use SQLite for your new Marten project, you can very probably skip this section.
 
-Marten also has built-in support for PostgreSQL and MySQL. Please refer to the applicable official documentation to install your database of choice:
+Marten also has built-in support for PostgreSQL, MariaDB, and MySQL. Please refer to the applicable official documentation to install your database of choice:
 
 * [PostgreSQL Installation Guide](https://wiki.postgresql.org/wiki/Detailed_installation_guides)
+* [MariaDB Installation Guide](https://mariadb.com/kb/en/getting-installing-and-upgrading-mariadb)
 * [MySQL Installation Guide](https://dev.mysql.com/doc/refman/8.0/en/installing.html)
 * [SQLite Installation Guide](https://www.tutorialspoint.com/sqlite/sqlite_installation.htm)
 
-Each database necessitates the use of a dedicated shard (a package of Crystal code). If you're just beginning with the framework or planning to follow the [tutorial](./tutorial.md), there's no immediate need to install these shards. However, if you intend to employ other databases like MySQL or PostgreSQL, you may need to install database-specific shards. You can find instructions on how to do this in the [Configure database backends](../development/how-to/configure-database-backends.md) section.
+Each database necessitates the use of a dedicated shard (a package of Crystal code). If you're just beginning with the framework or planning to follow the [tutorial](./tutorial.md), there's no immediate need to install these shards. However, if you intend to employ other databases like MariaDB, MySQL, or PostgreSQL, you may need to install database-specific shards. You can find instructions on how to do this in the [Configure database backends](../development/how-to/configure-database-backends.md) section.
 
 ## Install Marten
 

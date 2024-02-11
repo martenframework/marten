@@ -232,7 +232,7 @@ config.database do |db|
 end
 ```
 
-An SQLite database is a good choice in order to try Marten and experiment with it (since SQLite is already pre-installed on most systems). That being said, if you need to use another database backend (for example, PostgreSQL or MySQL), feel free to have a look at the [databases configuration reference](../development/reference/settings.md#database-settings).
+An SQLite database is a good choice in order to try Marten and experiment with it (since SQLite is already pre-installed on most systems). That being said, if you need to use another database backend (for example, PostgreSQL, MariaDB, or MySQL), feel free to have a look at the [databases configuration reference](../development/reference/settings.md#database-settings).
 :::
 
 ## Interacting with model records

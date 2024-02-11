@@ -93,8 +93,6 @@ module Marten
       end
 
       private def get_expected_token(request)
-        # TODO: add support for session-based CSRF tokens.
-
         token = begin
           if Marten.settings.csrf.use_session
             request.session[Marten.settings.csrf.session_key]

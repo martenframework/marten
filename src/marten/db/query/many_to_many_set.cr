@@ -52,13 +52,16 @@ module Marten
               .pluck([m2m_through_to_field.id]).flatten
 
             # Add each object that was not already in the relationship.
-            # TODO: bulk insert those objects instead of insert them one by one.
-            objs.each do |obj|
+            through_objs_to_add = objs.compact_map do |obj|
               next if existing_object_ids.includes?(obj.id)
               through_obj = m2m_field.as(Field::ManyToMany).through.new
               through_obj.set_field_value(m2m_through_from_field.id, @instance.pk)
               through_obj.set_field_value(m2m_through_to_field.id, obj.pk)
-              through_obj.save!(using: query.using)
+              through_obj
+            end
+
+            if !through_objs_to_add.empty?
+              m2m_field.as(Field::ManyToMany).through.all.using(query.using).unsafe_bulk_create(through_objs_to_add)
             end
 
             reset_result_cache

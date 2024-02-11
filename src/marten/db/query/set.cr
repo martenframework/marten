@@ -1054,6 +1054,13 @@ module Marten
           @result_cache = @query.execute
         end
 
+        protected def unsafe_bulk_create(objects : Array(DB::Model), batch_size : Int32? = nil)
+          prepared_objects = [] of M
+          objects.each { |o| prepared_objects << o if o.is_a?(M) }
+
+          bulk_create(prepared_objects.as(Array(M)), batch_size)
+        end
+
         private INSPECT_RESULTS_LIMIT = 20
         private GET_RESULTS_LIMIT     = 20
 

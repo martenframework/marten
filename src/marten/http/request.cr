@@ -207,7 +207,10 @@ module Marten
       private CONTENT_TYPE_APPLICATION_JSON = "application/json"
       private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"
       private CONTENT_TYPE_URL_ENCODED_FORM = "application/x-www-form-urlencoded"
+      private DEFAULT_DEBUG_ALLOWED_HOSTS   = [".localhost", "127.0.0.1", "[::1]"]
+      private HOST_DOT                      = '.'
       private HOST_VALIDATION_RE            = /^([a-z0-9.-]+|\[[a-f0-9]*:[a-f0-9\.:]+\])(:\d+)?$/
+      private HOST_WILDCARD                 = "*"
       private METHOD_DELETE                 = "DELETE"
       private METHOD_GET                    = "GET"
       private METHOD_HEAD                   = "HEAD"
@@ -216,6 +219,8 @@ module Marten
       private METHOD_POST                   = "POST"
       private METHOD_PUT                    = "PUT"
       private METHOD_TRACE                  = "TRACE"
+      private PORT_HTTP                     = "80"
+      private PORT_HTTPS                    = "443"
       private SCHEME_HTTP                   = "http"
       private SCHEME_HTTPS                  = "https"
 
@@ -223,8 +228,8 @@ module Marten
         allowed_hosts.find do |host_pattern|
           next if host_pattern.empty?
           host_pattern = host_pattern.downcase
-          found = (host_pattern == "*")
-          found ||= (host_pattern[0] == '.' && (domain.ends_with?(host_pattern) || domain == host_pattern[1...]))
+          found = (host_pattern == HOST_WILDCARD)
+          found ||= (host_pattern[0] == HOST_DOT && (domain.ends_with?(host_pattern) || domain == host_pattern[1...]))
           found ||= (host_pattern == domain)
           found
         end
@@ -233,7 +238,7 @@ module Marten
       private def allowed_hosts
         allowed_hosts = Marten.settings.allowed_hosts
         if Marten.settings.debug && Marten.settings.allowed_hosts.empty?
-          allowed_hosts = [".localhost", "127.0.0.1", "[::1]"]
+          allowed_hosts = DEFAULT_DEBUG_ALLOWED_HOSTS
         end
 
         allowed_hosts
@@ -263,7 +268,7 @@ module Marten
         end
 
         if port.empty?
-          port = secure? ? "443" : "80"
+          port = secure? ? PORT_HTTPS : PORT_HTTP
         end
 
         return {host: host, port: port} if domain && allowed_host?(domain)
@@ -292,7 +297,7 @@ module Marten
         end
 
         # Remove any trailing dot (if the domains ends with a dot).
-        domain = domain[...-1] if domain.ends_with?('.')
+        domain = domain[...-1] if domain.ends_with?(HOST_DOT)
 
         return {domain, port}
       end

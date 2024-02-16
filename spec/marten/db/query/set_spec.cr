@@ -528,7 +528,6 @@ describe Marten::DB::Query::Set do
         inserted_objects.size.should eq objects.size
         TestUser.filter(username__in: objects.map(&.username)).count.should eq objects.size
         inserted_objects.all?(&.pk?).should be_true
-        puts "O"
       end
     end
 

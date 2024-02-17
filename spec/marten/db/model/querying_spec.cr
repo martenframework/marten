@@ -531,6 +531,26 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::maximum" do
+    it "retrieves the post with the highest score" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 20.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Post.maximum(:score).should eq 20.0
+    end
+  end
+
+  describe "::minimum" do
+    it "retrieves the post with the lowest score" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 20.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Post.minimum(:score).should eq 5.0
+    end
+  end
+
   describe "::last" do
     before_each do
       TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

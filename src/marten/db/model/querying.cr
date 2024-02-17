@@ -428,6 +428,32 @@ module Marten
             last.not_nil!
           end
 
+          # Returns the maximum value of a field for the current model.
+          #
+          # Finds the largest value within the specified field for the records targeted by the model. For example:
+          #
+          # ```
+          # Product.maximum(:price) # => 250.0
+          # ```
+          #
+          # This would identify the highest-priced product.
+          def maximum(field : String | Sym)
+            default_queryset.maximum(field)
+          end
+
+          # Returns the minimum value of a field for the current model.
+          #
+          # Finds the smallest value within the specified field for the records targeted by the model. For example:
+          #
+          # ```
+          # Product.minimum(:price) # => 250.0
+          # ```
+          #
+          # This would identify the lowest-priced product.
+          def minimum(field : String | Sym)
+            default_queryset.minimum(field)
+          end
+
           # Returns a queryset targetting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:

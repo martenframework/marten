@@ -721,6 +721,34 @@ module Marten
           last.not_nil!
         end
 
+        # Returns the maximum value of a field for the current query set.
+        #
+        # Finds the smallest value within the specified field for the records targeted by the query set. For example:
+        #
+        # ```
+        # products = Product.where(category: "Electronics")
+        # lowest_price = products.maximum(:price)
+        # ```
+        #
+        # This would identify the highest-priced product within the "Electronics" category.
+        def maximum(field : String | Symbol)
+          @query.maximum(field.try(&.to_s))
+        end
+
+        # Returns the minimum value of a field for the current query set.
+        #
+        # Finds the smallest value within the specified field for the records targeted by the query set. For example:
+        #
+        # ```
+        # products = Product.where(category: "Electronics")
+        # lowest_price = products.minimum(:price)
+        # ```
+        #
+        # This would identify the lowest-priced product within the "Electronics" category.
+        def minimum(field : String | Symbol)
+          @query.minimum(field.try(&.to_s))
+        end
+
         # Returns the model class associated with the query set.
         def model
           M

@@ -437,7 +437,7 @@ module Marten
           # ```
           #
           # This would identify the highest-priced product.
-          def maximum(field : String | Sym)
+          def maximum(field : String | Symbol)
             default_queryset.maximum(field)
           end
 
@@ -450,7 +450,7 @@ module Marten
           # ```
           #
           # This would identify the lowest-priced product.
-          def minimum(field : String | Sym)
+          def minimum(field : String | Symbol)
             default_queryset.minimum(field)
           end
 

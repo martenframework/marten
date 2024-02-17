@@ -565,6 +565,17 @@ module Marten
             default_queryset.raw(query, params)
           end
 
+          # Returns the sum of a field for the current model
+          #
+          # This method calculates the total sum of the specified field's values for the considered model. For example:
+          #
+          # ```
+          # Product.sum(:price) # => 2500  (Assuming there are 100 products with prices averaging to 25)
+          # ```
+          def sum(field : String | Symbol)
+            default_queryset.sum(field)
+          end
+
           # Returns a queryset that will be evaluated using the specified database.
           #
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the

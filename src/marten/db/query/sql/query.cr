@@ -206,6 +206,59 @@ module Marten
             !(@limit.nil? && @offset.nil?)
           end
 
+          def sum(raw_field : String)
+            column_name = if !raw_field.nil?
+                            field_path = verify_field(raw_field.to_s)
+                            relation_field_path = field_path.select { |field, _r| field.relation? }
+
+                            if relation_field_path.empty? || field_path.size == 1
+                              "#{Model.db_table}.#{field_path.first[0].db_column!}"
+                            else
+                              join = ensure_join_for_field_path(relation_field_path)
+                              join.not_nil!.column_name(field_path.last[0].db_column!)
+                            end
+                          end
+
+            sql, parameters = build_sum_query(column_name)
+
+            connection.open do |db|
+              result = db.scalar(sql, args: parameters)
+              sum = result.to_s
+
+              return 0 if sum.empty?
+
+              number = sum.to_i?
+              number ? number : sum.to_f
+            end
+          end
+
+          private def build_sum_query(column_name)
+            where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
+
+            sql = build_sql do |s|
+              s << "SELECT SUM(#{column_name ? column_name.split(".")[-1] : '*'})"
+              s << "FROM ("
+              s << "SELECT"
+
+              if distinct
+                s << connection.distinct_clause_for(distinct_columns)
+                s << columns
+              end
+
+              s << column_name
+
+              s << "FROM #{table_name}"
+              s << build_joins
+              s << where
+              s << "LIMIT #{limit}" unless limit.nil?
+              s << "OFFSET #{@offset}" unless @offset.nil?
+              s << ") subquery"
+            end
+
+            {sql, parameters}
+          end
+
           def to_empty
             EmptyQuery(Model).new(
               default_ordering: @default_ordering,

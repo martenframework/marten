@@ -1913,6 +1913,37 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#sum" do
+    it "returns 0 if no orders are available" do
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+
+      query.sum("price").should eq 0
+    end
+
+    it "calculates the correct sum" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Normal Product",
+        price: 500,
+        rating: 2.5,
+      )
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Boring Product",
+        price: 100,
+        rating: 1.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+
+      query.sum("price").should eq 1600
+      query.sum("rating").should eq 8.5
+    end
+  end
+
   describe "#to_empty" do
     it "results in a new EmptyQuery object" do
       query = Marten::DB::Query::SQL::Query(Tag).new

@@ -788,6 +788,16 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::sum" do
+    it "properly calculates the sum" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 5.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Post.sum(:score).should eq 10.00
+    end
+  end
+
   describe "::using" do
     before_each do
       TestUser.using(:other).create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

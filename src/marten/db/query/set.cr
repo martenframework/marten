@@ -978,7 +978,8 @@ module Marten
 
         # Returns the sum of a field for the current query set.
         #
-        # Calculates the total sum of values within the specified field for the records included in the query set. For example:
+        # Calculates the total sum of values within the specified field for the records
+        # included in the query set. For example:
         #
         # ```
         # order_items = OrderItem.filter(order_id: 123)

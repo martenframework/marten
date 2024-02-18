@@ -1914,7 +1914,7 @@ describe Marten::DB::Query::SQL::Query do
   end
 
   describe "#sum" do
-    it "returns 0 if no orders are available" do
+    it "returns 0 if no records are available" do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
 
       query.sum("price").should eq 0

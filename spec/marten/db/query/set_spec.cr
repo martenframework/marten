@@ -406,6 +406,24 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#average" do
+    it "properly calculates the average value when specifying a field expressed as a string" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 5.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.average("score").not_nil!.should be_close(5.0, 0.00001)
+    end
+
+    it "properly calculates the average value when specifying a field expressed as a symbol" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 5.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.average(:score).not_nil!.should be_close(5.0, 0.00001)
+    end
+  end
+
   describe "#bulk_create" do
     it "allows to insert a small array of records without specifying a batch size" do
       objects = (1..100).map do |i|
@@ -2439,6 +2457,24 @@ describe Marten::DB::Query::Set do
   describe "#sum" do
     it "raises NotImplementedError" do
       expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.sum }
+    end
+  end
+
+  describe "#sum(field)" do
+    it "properly calculates the sum when specifying a field expressed as a string" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 5.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.sum("score").should eq 10.00
+    end
+
+    it "properly calculates the sum when specifying a field expressed as a symbol" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 5.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.sum(:score).should eq 10.00
     end
   end
 

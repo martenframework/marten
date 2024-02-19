@@ -180,6 +180,24 @@ query_set.join(:author__profile)
 The `#join` method also supports targeting the reverse relation of a [`one_to_one`](./fields.md#one_to_one) field (such reverse relation can be defined through the use of the [`related`](./fields.md#related-2) field option). That way, you can traverse a [`one_to_one`](./fields.md#one_to_one) field back to the model record on which the field is specified.
 :::
 
+### `maximum`
+
+Retrieves the maximum value in a specific field across all records within a query set.
+
+```crystal
+Product.all.maximum(:price)  # Retrieves the highest price across all products
+# => 125.25
+```
+
+### `minimum`
+
+Retrieves the minimum value in a specific field across all records within a query set.
+
+```crystal
+Product.all.minimum(:price)  # Retrieves the lowest price across all products
+# => 15.99
+```
+
 ### `none`
 
 Returns a query set that will always return an empty array of records, without querying the database.

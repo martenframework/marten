@@ -131,6 +131,36 @@ module Marten
             !@joins.empty?
           end
 
+          def maximum(raw_field : String)
+            column_name = solve_field_and_column(raw_field).last
+
+            sql, parameters = build_maximum_query(column_name)
+            connection.open do |db|
+              result = db.scalar(sql, args: parameters)
+              return result unless result
+              string_result = result.to_s
+
+              number = string_result.to_i?
+
+              number ? number : string_result.to_f
+            end
+          end
+
+          def minimum(raw_field : String)
+            column_name = solve_field_and_column(raw_field).last
+
+            sql, parameters = build_minimum_query(column_name)
+            connection.open do |db|
+              result = db.scalar(sql, args: parameters)
+              return result unless result
+              string_result = result.to_s
+
+              number = string_result.to_i?
+
+              number ? number : string_result.to_f
+            end
+          end
+
           def order(*fields : String) : Nil
             order(fields.to_a)
           end
@@ -406,6 +436,52 @@ module Marten
               # and before any other additional joins.
               s << (parent_model_joins + @joins).join(" ", &.to_sql)
             end
+          end
+
+          private def build_maximum_query(column_name : String)
+            where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
+
+            sql = build_sql do |s|
+              s << "SELECT MAX(#{column_name.split(".")[-1]})"
+              s << "FROM ("
+              s << "SELECT"
+
+              s << connection.distinct_clause_for(distinct_columns) if distinct
+
+              s << column_name
+              s << "FROM #{table_name}"
+              s << build_joins
+              s << where
+              s << "LIMIT #{limit}" unless limit.nil?
+              s << "OFFSET #{@offset}" unless @offset.nil?
+              s << ") subquery"
+            end
+
+            {sql, parameters}
+          end
+
+          private def build_minimum_query(column_name : String)
+            where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
+
+            sql = build_sql do |s|
+              s << "SELECT MIN(#{column_name.split(".")[-1]})"
+              s << "FROM ("
+              s << "SELECT"
+
+              s << connection.distinct_clause_for(distinct_columns) if distinct
+
+              s << column_name
+              s << "FROM #{table_name}"
+              s << build_joins
+              s << where
+              s << "LIMIT #{limit}" unless limit.nil?
+              s << "OFFSET #{@offset}" unless @offset.nil?
+              s << ") subquery"
+            end
+
+            {sql, parameters}
           end
 
           private def build_pluck_query(plucked_columns)

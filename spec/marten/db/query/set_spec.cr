@@ -2013,6 +2013,42 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#maximum" do
+    it "properly returns the maximum value when specifying a field expressed as a string" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 15.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.maximum("score").not_nil!.should eq 15.0
+    end
+
+    it "properly returns the maximum value when specifying a field expressed as a symbol" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 15.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.maximum(:score).not_nil!.should eq 15.0
+    end
+  end
+
+  describe "#minimum" do
+    it "properly returns the minimum value when specifying a field expressed as a string" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 15.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.minimum("score").not_nil!.should eq 5.0
+    end
+
+    it "properly returns the minimum value when specifying a field expressed as a symbol" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Example post 1", score: 15.0)
+      Post.create!(author: user, title: "Example post 2", score: 5.0)
+
+      Marten::DB::Query::Set(Post).new.minimum(:score).not_nil!.should eq 5.0
+    end
+  end
+
   describe "#model" do
     it "returns the associated model" do
       Marten::DB::Query::Set(Tag).new.model.should eq Tag

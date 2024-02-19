@@ -1414,6 +1414,68 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#maximum" do
+    it "returns nil if there are no records available" do
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+
+      query.maximum("price").should eq nil
+    end
+
+    it "returns the expected maximum value" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Normal Product",
+        price: 500,
+        rating: 2.5,
+      )
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Boring Product",
+        price: 100,
+        rating: 1.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+
+      query.maximum("price").should eq 1000
+      query.maximum("rating").should eq 5.0
+    end
+  end
+
+  describe "#minimum" do
+    it "returns nil if there are no records available" do
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+
+      query.minimum("price").should eq nil
+    end
+
+    it "returns the expected minimum value" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Normal Product",
+        price: 500,
+        rating: 2.5,
+      )
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Boring Product",
+        price: 100,
+        rating: 1.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+
+      query.minimum("price").should eq 100
+      query.minimum("rating").should eq 1.0
+    end
+  end
+
   describe "#order" do
     it "can configure a query to be ordered by a single field" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

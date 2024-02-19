@@ -1415,13 +1415,13 @@ describe Marten::DB::Query::SQL::Query do
   end
 
   describe "#maximum" do
-    it "returns the maximum price and rating for all products" do
+    it "returns nil if there are no records available" do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
 
       query.maximum("price").should eq nil
     end
 
-    it "calculates the correct sum" do
+    it "returns the expected maximum value" do
       Marten::DB::Query::SQL::QuerySpec::Product.create!(
         name: "Awesome Product",
         price: 1000,
@@ -1446,13 +1446,13 @@ describe Marten::DB::Query::SQL::Query do
   end
 
   describe "#minimum" do
-    it "returns the minimum price and rating for all products" do
+    it "returns nil if there are no records available" do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
 
       query.minimum("price").should eq nil
     end
 
-    it "calculates the correct sum" do
+    it "returns the expected minimum value" do
       Marten::DB::Query::SQL::QuerySpec::Product.create!(
         name: "Awesome Product",
         price: 1000,

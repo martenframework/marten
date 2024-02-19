@@ -206,6 +206,20 @@ module Marten
             !(@limit.nil? && @offset.nil?)
           end
 
+          def sum(raw_field : String)
+            sql, parameters = build_sum_query(solve_field_and_column(raw_field).last)
+
+            connection.open do |db|
+              result = db.scalar(sql, args: parameters)
+              sum = result.to_s
+
+              return 0 if sum.empty?
+
+              number = sum.to_i?
+              number ? number : sum.to_f
+            end
+          end
+
           def to_empty
             EmptyQuery(Model).new(
               default_ordering: @default_ordering,
@@ -427,6 +441,33 @@ module Marten
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
+            end
+
+            {sql, parameters}
+          end
+
+          private def build_sum_query(column_name)
+            where, parameters = where_clause_and_parameters
+            limit = connection.limit_value(@limit)
+
+            sql = build_sql do |s|
+              s << "SELECT SUM(#{column_name ? column_name.split(".")[-1] : '*'})"
+              s << "FROM ("
+              s << "SELECT"
+
+              if distinct
+                s << connection.distinct_clause_for(distinct_columns)
+                s << columns
+              end
+
+              s << column_name
+
+              s << "FROM #{table_name}"
+              s << build_joins
+              s << where
+              s << "LIMIT #{limit}" unless limit.nil?
+              s << "OFFSET #{@offset}" unless @offset.nil?
+              s << ") subquery"
             end
 
             {sql, parameters}

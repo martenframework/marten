@@ -976,6 +976,21 @@ module Marten
           raise NotImplementedError.new("#sum is not supported for query sets")
         end
 
+        # Returns the sum of a field for the current query set.
+        #
+        # Calculates the total sum of values within the specified field for the records
+        # included in the query set. For example:
+        #
+        # ```
+        # order_items = OrderItem.filter(order_id: 123)
+        # total_price = order_items.sum(:price)
+        # ```
+        #
+        # This would calculate the total cost of all items within order number 123.
+        def sum(field : String | Symbol)
+          @query.sum(field.to_s)
+        end
+
         # :nodoc:
         def to_h
           raise NotImplementedError.new("#to_h is not supported for query sets")

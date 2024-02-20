@@ -99,6 +99,38 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.to_set.should eq [post_1, post_3].to_set
     end
 
+    it "is able to process query nodes with a direct filter on an array of relation model instances" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "test", email: "test@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__in: [user_1, user_3]))
+      query.count.should eq 2
+      query.execute.to_set.should eq [post_1, post_3].to_set
+    end
+
+    it "is able to process query nodes with a direct filter on a query set of relation model instances" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "Bob", last_name: "Doe")
+      user_3 = TestUser.create!(username: "test", email: "test@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(
+        Marten::DB::Query::Node.new(author__in: TestUser.filter(first_name: "John").order(:username))
+      )
+      query.count.should eq 2
+      query.execute.to_set.should eq [post_1, post_3].to_set
+    end
+
     it "is able to process query nodes with filters on reverse relations" do
       user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")

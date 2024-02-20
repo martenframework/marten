@@ -2,7 +2,7 @@ module Marten
   module DB
     module Query
       class Node
-        alias FilterHash = Hash(String, Field::Any | Array(Field::Any) | DB::Model)
+        alias FilterHash = Hash(String, Field::Any | Array(Field::Any) | DB::Model | Array(DB::Model))
 
         getter children
         getter connector
@@ -87,22 +87,27 @@ module Marten
         private def fill_filters(filters)
           filters.each do |key, value|
             @filters[key.to_s] = case value
+                                 when DB::Model, Field::Any
+                                   value
                                  when Array
-                                   arr = Array(Field::Any).new
-                                   value.each { |v| arr << prepare_filter_value(v) }
-                                   arr
+                                   prepare_filter_array(value)
+                                 when Set
+                                   prepare_filter_array(value.to_a)
                                  else
-                                   prepare_filter_value(value)
+                                   value.to_s
                                  end
           end
         end
 
-        private def prepare_filter_value(value)
-          case value
-          when DB::Model, Field::Any
-            value
+        private def prepare_filter_array(value : Array)
+          if value.all?(DB::Model)
+            value.each_with_object(Array(DB::Model).new) do |v, arr|
+              arr << v if v.is_a?(DB::Model)
+            end
           else
-            value.to_s
+            value.each_with_object(Array(Field::Any).new) do |v, arr|
+              arr << (v.is_a?(Field::Any) ? v : v.to_s)
+            end
           end
         end
       end

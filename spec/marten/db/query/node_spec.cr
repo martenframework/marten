@@ -135,6 +135,50 @@ describe Marten::DB::Query::Node do
         }
       )
     end
+
+    it "initializes a node from a filter consisting of an array of model records" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      node = Marten::DB::Query::Node.new(tag: [tag_1, tag_2, tag_3])
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+      node.filters.should eq(
+        Marten::DB::Query::Node::FilterHash{
+          "tag" => [tag_1, tag_2, tag_3] of Marten::DB::Model,
+        }
+      )
+    end
+
+    it "initializes a node from a filter consisting of a query set" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      node = Marten::DB::Query::Node.new(tag: Tag.all.order(:name))
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+      node.filters.should eq(
+        Marten::DB::Query::Node::FilterHash{
+          "tag" => [tag_3, tag_2, tag_1] of Marten::DB::Model,
+        }
+      )
+    end
+
+    it "initializes a node from a filter consisting of an array of unsupported and supported filter values" do
+      node = Marten::DB::Query::Node.new(test: [Path["foo/bar"], 42, "foo"])
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+      node.filters.should eq(
+        Marten::DB::Query::Node::FilterHash{
+          "test" => ["foo/bar", 42, "foo"] of Marten::DB::Field::Any,
+        }
+      )
+    end
   end
 
   describe "#==" do

@@ -901,12 +901,16 @@ module Marten
 
             field = field_path.last[0]
 
-            value = case raw_value
-                    when Field::Any, Array(Field::Any)
-                      raw_value
-                    when DB::Model
-                      raw_value.pk
-                    end
+            value : Field::Any | Array(Field::Any) = case raw_value
+            when Field::Any, Array(Field::Any)
+              raw_value
+            when DB::Model
+              raw_value.pk
+            when Array(DB::Model)
+              raw_value.each_with_object(Array(Field::Any).new) do |v, values|
+                values << v.pk
+              end
+            end
 
             if raw_predicate.nil? && value.nil?
               predicate_klass = Predicate::IsNull

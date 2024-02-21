@@ -750,6 +750,13 @@ Allows filtering records based on field values that are contained in a specific 
 Tag.all.filter(slug__in=["foo", "bar", "xyz"])
 ```
 
+Note that this predicate can also be used for filtering relation fields (such as [`many_to_one`](./fields.md#many_to_one) or [`one_to_one`](./fields.md#one_to_one) fields) using arrays of model records. For example:
+
+```crystal
+authors = Author.filter(first_name: "John")
+articles = Article.filter(author__in: authors)
+```
+
 ### `isnull`
 
 Allows filtering records based on field values that should be null or not null.

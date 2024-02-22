@@ -759,7 +759,7 @@ We can also add a link somewhere in the home page of the application to be able 
 
 ## Refactoring: using template partials
 
-The templates used for creating and updating an article look the same: they both make use of the same schema in order to create or update articles. It would be interesting to be able to reuse this form for both templates. This is where template "partials" cames in handy: these are template snippets that can be easily "included" into other templates to avoid duplications of code.
+The templates used for creating and updating an article look the same: they both make use of the same schema in order to create or update articles. It would be interesting to be able to reuse this form for both templates. This is where template "partials" came in handy: these are template snippets that can be easily "included" into other templates to avoid duplications of code.
 
 Let's create a `src/templates/partials/article_form.html` partial with the following content:
 
@@ -781,7 +781,7 @@ Let's create a `src/templates/partials/article_form.html` partial with the follo
 
 This partial template contains the exact same form that we used in the creation and update templates.
 
-Let's now make use of this partial in the `src/templates/article_create.html` and `src/templates/article_update.html` templates:
+Let's now make use of this partial in the `src/templates/article_create.html` and `src/templates/article_update.html` templates by leveraging the [`include`](../templates/reference/tags.md#include) template tag:
 
 ```html title="src/templates/article_create.html"
 {% extend "base.html" %}
@@ -802,6 +802,10 @@ Let's now make use of this partial in the `src/templates/article_create.html` an
 ```
 
 As you can see, the creation and update templates are now much more simple.
+
+:::tip
+The `include` template tag provides additional options like the ability to assign variables that are specific to the included template. Please refer to the [`include` template tag reference](../templates/reference/tags.md#include) to learn more about this mechanism.
+:::
 
 ## Refactoring: using generic handlers
 

@@ -99,7 +99,7 @@ describe Marten::Handlers::RecordUpdate do
       response = handler.post
 
       response.should be_a Marten::HTTP::Response
-      response.status.should eq 200
+      response.status.should eq 422
       response.content.includes?("Schema is invalid").should be_true
       tag.reload.name.should eq "oldtag"
     end

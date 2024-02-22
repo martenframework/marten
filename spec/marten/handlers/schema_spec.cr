@@ -109,7 +109,7 @@ describe Marten::Handlers::Schema do
       response = handler.post
 
       response.should be_a Marten::HTTP::Response
-      response.status.should eq 200
+      response.status.should eq 422
       response.content.includes?("Schema is invalid").should be_true
     end
   end
@@ -130,7 +130,7 @@ describe Marten::Handlers::Schema do
       response = handler.process_invalid_schema
 
       response.should be_a Marten::HTTP::Response
-      response.status.should eq 200
+      response.status.should eq 422
       response.content.includes?("Schema is invalid").should be_true
     end
   end
@@ -187,7 +187,7 @@ describe Marten::Handlers::Schema do
       response = handler.put
 
       response.should be_a Marten::HTTP::Response
-      response.status.should eq 200
+      response.status.should eq 422
       response.content.includes?("Schema is invalid").should be_true
     end
   end

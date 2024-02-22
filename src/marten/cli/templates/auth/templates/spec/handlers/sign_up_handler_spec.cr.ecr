@@ -28,7 +28,7 @@ describe <%= context.module_name %>::SignUpHandler do
       url = Marten.routes.reverse("<%= context.label %>:sign_up")
       response = Marten::Spec.client.post(url, data: {"email": "", "password1": "", "password2": ""})
 
-      response.status.should eq 200
+      response.status.should eq 422
       response.content.includes?("Sign up").should be_true
     end
 

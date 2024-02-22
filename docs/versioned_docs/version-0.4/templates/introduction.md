@@ -178,6 +178,35 @@ For example, with the following snippet the output of the `title` block would be
 
 It's important to remember that the `super` template tag can only be used within `block` tags.
 
+## Template inclusion
+
+Templates can "include" other templates easily through the use of the [`include`](./reference/tags.md#include) template tag. Such templates are usually referred to as "partials": these are template snippets that can be easily "included" into other templates to avoid duplications of code.
+
+Included templates are rendered using the context of the including template. This means that all the variables that are provided to the including template can also be used as part of the included template. In addition to that, other specific variables can also be defined when including a specific template.
+
+For example, let's assume that a project defines the following partial template:
+
+```html name="src/templates/partials/button.html
+<button class="{{ type }}">
+  {{ text | default: "Default text" }}
+</button>
+```
+
+This partial could be included as follows in the following template:
+
+```html
+{% include "partials/button.html" with type="primary" %}
+{% include "partials/button.html" with type="primary", text="Custom text" %}
+```
+
+Note the use of the `with` keyword to specify comma-separated variables that should be used to populate the included template's context.
+
+Obviously, it is also possible to include partials that don't require any variables. In that case, the use of the `with` keyword is not necessary:
+
+```html
+{% include "partials/other_snippet.html" %}
+```
+
 ## Template loading
 
 Templates can be loaded from specific locations within your codebase and from application folders. This is controlled by two main settings:

@@ -14,7 +14,7 @@ describe Marten::Handlers::Defaults::PermissionDenied do
       handler = Marten::Handlers::Defaults::PermissionDenied.new(request)
 
       response = handler.dispatch
-      response.should be_a Marten::HTTP::Response::Forbidden
+      response.status.should eq 403
       response.content.should eq "403 Forbidden"
       response.content_type.should eq "text/plain"
     end
@@ -45,7 +45,7 @@ describe Marten::Handlers::Defaults::PermissionDenied do
         handler = Marten::Handlers::Defaults::PermissionDenied.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::Forbidden
+        response.status.should eq 403
         response.content.strip.should eq "PERMISSION DENIED"
         response.content_type.should eq "text/html"
       end
@@ -62,7 +62,7 @@ describe Marten::Handlers::Defaults::PermissionDenied do
         handler = Marten::Handlers::Defaults::PermissionDeniedSpec::TestHandler.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::Forbidden
+        response.status.should eq 403
         response.content.strip.should eq "CUSTOM PERMISSION DENIED"
         response.content_type.should eq "text/html"
       end

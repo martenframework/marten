@@ -5,14 +5,10 @@ module Marten
         template_name DEFAULT_TEMPLATE_NAME
 
         def dispatch
-          super
+          render_to_response(status: 404)
         rescue ex : Marten::Template::Errors::TemplateNotFound
           raise ex if self.class.template_name != DEFAULT_TEMPLATE_NAME
           HTTP::Response::NotFound.new(content: "The requested resource was not found.", content_type: "text/plain")
-        end
-
-        def get_response(content)
-          HTTP::Response::NotFound.new(content)
         end
 
         private DEFAULT_TEMPLATE_NAME = "404.html"

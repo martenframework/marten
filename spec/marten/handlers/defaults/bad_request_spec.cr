@@ -14,7 +14,7 @@ describe Marten::Handlers::Defaults::BadRequest do
       handler = Marten::Handlers::Defaults::BadRequest.new(request)
 
       response = handler.dispatch
-      response.should be_a Marten::HTTP::Response::BadRequest
+      response.status.should eq 400
       response.content.should eq "Bad Request"
       response.content_type.should eq "text/plain"
     end
@@ -43,7 +43,7 @@ describe Marten::Handlers::Defaults::BadRequest do
         handler = Marten::Handlers::Defaults::BadRequest.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::BadRequest
+        response.status.should eq 400
         response.content.strip.should eq "BAD REQUEST"
         response.content_type.should eq "text/html"
       end
@@ -60,7 +60,7 @@ describe Marten::Handlers::Defaults::BadRequest do
         handler = Marten::Handlers::Defaults::BadRequestSpec::TestHandler.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::BadRequest
+        response.status.should eq 400
         response.content.strip.should eq "CUSTOM BAD REQUEST"
         response.content_type.should eq "text/html"
       end

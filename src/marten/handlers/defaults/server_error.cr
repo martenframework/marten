@@ -5,14 +5,10 @@ module Marten
         template_name DEFAULT_TEMPLATE_NAME
 
         def dispatch
-          super
+          render_to_response(status: 500)
         rescue ex : Marten::Template::Errors::TemplateNotFound
           raise ex if self.class.template_name != DEFAULT_TEMPLATE_NAME
           HTTP::Response::InternalServerError.new(content: "Internal Server Error", content_type: "text/plain")
-        end
-
-        def get_response(content)
-          HTTP::Response::InternalServerError.new(content)
         end
 
         private DEFAULT_TEMPLATE_NAME = "500.html"

@@ -194,6 +194,23 @@ describe Marten::Handlers::Rendering do
       response.content_type.should eq "text/html"
       response.content.strip.should eq "Hello World, John Doe!"
     end
+
+    it "returns the rendered template associated with a custom response status expressed as an integer" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      response = Marten::Handlers::RenderingSpec::TestHandler.new(request)
+        .render_to_response({name: "John Doe"}, status: 422)
+
+      response.status.should eq 422
+      response.content_type.should eq "text/html"
+      response.content.strip.should eq "Hello World, John Doe!"
+    end
   end
 
   describe "#template_name" do

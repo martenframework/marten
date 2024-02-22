@@ -105,7 +105,7 @@ module Marten
       #
       # By default, this will render the configured template and return a corresponding HTTP response.
       def process_invalid_schema
-        render(template_name, context: context, status: 422)
+        render_to_response(status: 422)
       end
 
       # Produces the response when the processed schema is valid.

@@ -14,7 +14,7 @@ describe Marten::Handlers::Defaults::ServerError do
       handler = Marten::Handlers::Defaults::ServerError.new(request)
 
       response = handler.dispatch
-      response.should be_a Marten::HTTP::Response::InternalServerError
+      response.status.should eq 500
       response.content.should eq "Internal Server Error"
       response.content_type.should eq "text/plain"
     end
@@ -43,7 +43,7 @@ describe Marten::Handlers::Defaults::ServerError do
         handler = Marten::Handlers::Defaults::ServerError.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::InternalServerError
+        response.status.should eq 500
         response.content.strip.should eq "SERVER ERROR"
         response.content_type.should eq "text/html"
       end
@@ -60,7 +60,7 @@ describe Marten::Handlers::Defaults::ServerError do
         handler = Marten::Handlers::Defaults::ServerErrorSpec::TestHandler.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::InternalServerError
+        response.status.should eq 500
         response.content.strip.should eq "CUSTOM SERVER ERROR"
         response.content_type.should eq "text/html"
       end

@@ -14,7 +14,7 @@ describe Marten::Handlers::Defaults::PageNotFound do
       handler = Marten::Handlers::Defaults::PageNotFound.new(request)
 
       response = handler.dispatch
-      response.should be_a Marten::HTTP::Response::NotFound
+      response.status.should eq 404
       response.content.should eq "The requested resource was not found."
       response.content_type.should eq "text/plain"
     end
@@ -43,7 +43,7 @@ describe Marten::Handlers::Defaults::PageNotFound do
         handler = Marten::Handlers::Defaults::PageNotFound.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::NotFound
+        response.status.should eq 404
         response.content.strip.should eq "PAGE NOT FOUND"
         response.content_type.should eq "text/html"
       end
@@ -60,7 +60,7 @@ describe Marten::Handlers::Defaults::PageNotFound do
         handler = Marten::Handlers::Defaults::PageNotFoundSpec::TestHandler.new(request)
 
         response = handler.dispatch
-        response.should be_a Marten::HTTP::Response::NotFound
+        response.status.should eq 404
         response.content.strip.should eq "CUSTOM PAGE NOT FOUND"
         response.content_type.should eq "text/html"
       end

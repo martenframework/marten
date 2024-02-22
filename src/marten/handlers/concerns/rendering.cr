@@ -16,29 +16,12 @@ module Marten
         end
       end
 
-      # Returns the expected HTTP response for a rendered template content.
-      def get_response(content)
-        HTTP::Response.new(content)
-      end
-
-      # Renders the configured template for a specific `context` object.
-      def render_template(context : Hash | NamedTuple | Nil | Marten::Template::Context)
-        self.context.merge(context) unless context.nil?
-        self.context[:handler] = self
-        self.context[:request] = request
-
-        Marten.templates.get_template(template_name).render(self.context)
-      end
-
       # Renders the configured template for a specific `context` object and produces an HTTP response.
-      def render_to_response(context : Hash | NamedTuple | Nil | Marten::Template::Context = nil)
-        before_render_response = run_before_render_callbacks
-
-        if before_render_response.is_a?(HTTP::Response)
-          before_render_response
-        else
-          get_response(render_template(context))
-        end
+      def render_to_response(
+        context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
+        status : ::HTTP::Status | Int32 = 200
+      )
+        render(template_name, context: context, status: status)
       end
 
       # Returns the template name that should be rendered by the handler.

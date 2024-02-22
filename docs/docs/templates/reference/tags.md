@@ -153,6 +153,12 @@ Finally, it should be noted that additional variables that are specific to the i
 {% include "path/to/my_snippet.html" with new_var="hello" %}
 ```
 
+Multiple variables can also be specified if necessary. In that case, variable assignments must be separated by commas. For example:
+
+```html
+{% include "path/to/my_snippet.html" with var1="foo", var2="bar" %}
+```
+
 :::caution
 Templates that are included using the `include` template are parsed and rendered _when_ the including template is rendered as well. Included templates are not parsed when the including template is parsed itself. This means that the including template and the included template are always rendered _separately_.
 :::

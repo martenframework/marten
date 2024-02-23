@@ -820,6 +820,156 @@ describe Marten::DB::Management::SchemaEditor::Base do
         end
       end
     end
+
+    it "adds a unique constraint to a table with column names matching reserved keywords and with existing records" do
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("cast"),
+        ] of Marten::DB::Management::Column::Base,
+        unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+      )
+
+      schema_editor.create_table(table_state)
+
+      Marten::DB::Connection.default.open do |db|
+        db.exec(
+          "INSERT INTO schema_editor_test_table " \
+          "(foo, #{Marten::DB::Connection.default.quote("cast")}) VALUES (42, 123)"
+        )
+      end
+
+      schema_editor.add_unique_constraint(
+        table_state,
+        Marten::DB::Management::Constraint::Unique.new("test_constraint_to_add", ["foo", "cast"])
+      )
+
+      Marten::DB::Connection.default.open do |db|
+        for_mysql do
+          db.query(
+            <<-SQL
+              SELECT
+                CONSTRAINT_NAME,
+                CONSTRAINT_TYPE
+              FROM information_schema.TABLE_CONSTRAINTS
+              WHERE TABLE_NAME = 'schema_editor_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_name = rs.read(String)
+              next unless constraint_name == "test_constraint_to_add"
+              constraint_type = rs.read(String)
+              constraint_type.should eq "UNIQUE"
+            end
+          end
+
+          constraint_columns = [] of String
+
+          db.query(
+            <<-SQL
+              SELECT COLUMN_NAME, CONSTRAINT_NAME
+              FROM information_schema.KEY_COLUMN_USAGE
+              WHERE TABLE_NAME = 'schema_editor_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              column_name = rs.read(String)
+              constraint_name = rs.read(String)
+              next unless constraint_name == "test_constraint_to_add"
+              constraint_columns << column_name
+            end
+          end
+
+          constraint_columns.to_set.should eq ["foo", "cast"].to_set
+        end
+
+        for_postgresql do
+          db.query(
+            <<-SQL
+              SELECT con.conname, con.contype
+              FROM pg_catalog.pg_constraint con
+              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+              WHERE rel.relname = 'schema_editor_test_table';
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_name = rs.read(String)
+              next unless constraint_name == "test_constraint_to_add"
+              constraint_type = rs.read(Char)
+              constraint_type.should eq 'u'
+            end
+          end
+
+          constraint_columns = [] of String
+
+          db.query(
+            <<-SQL
+              SELECT
+                pgc.conname AS constraint_name,
+                ccu.column_name
+              FROM pg_constraint pgc
+              JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
+              JOIN pg_class cls ON pgc.conrelid = cls.oid
+              LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
+                AND nsp.nspname = ccu.constraint_schema
+              WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              constraint_name = rs.read(String)
+              column_name = rs.read(String)
+              next unless constraint_name == "test_constraint_to_add"
+              constraint_columns << column_name
+            end
+          end
+
+          constraint_columns.to_set.should eq ["foo", "cast"].to_set
+        end
+
+        for_sqlite do
+          db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              rs.read(String)
+              unique = rs.read(Int32 | Int64)
+              unique.should eq 1
+            end
+          end
+
+          constraint_columns = [] of String
+
+          db.query(
+            <<-SQL
+              SELECT
+                il.name AS constraint_name,
+                ii.name AS column_name
+              FROM
+                sqlite_master AS m,
+                pragma_index_list(m.name) AS il,
+                pragma_index_info(il.name) AS ii
+              WHERE
+                m.type = 'table' AND
+                il.origin = 'u' AND
+                m.tbl_name = 'schema_editor_test_table'
+            SQL
+          ) do |rs|
+            rs.each do
+              rs.read(String)
+              column_name = rs.read(String)
+              constraint_columns << column_name
+            end
+          end
+
+          constraint_columns.to_set.should eq ["foo", "cast"].to_set
+        end
+      end
+    end
   end
 
   describe "#create_table" do

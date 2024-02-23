@@ -245,7 +245,7 @@ module Marten
             # Set up a mapping that will hold the link between columns from the original table to the columns of the
             # new table.
             column_names_mapping = {} of String => String
-            table.columns.each { |c| column_names_mapping[c.name] = c.name }
+            table.columns.each { |c| column_names_mapping[c.name] = quote(c.name) }
 
             remade_table = table.clone
             remade_table.name = "new_#{remade_table.name}"

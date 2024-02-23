@@ -66,35 +66,6 @@ Let's break it down a bit more:
 * when the incoming request is a `GET`, the handler will simply render the `article_create.html` template, and initialize the schema (instance of `ArticleSchema`) with any data currently present in the request object (which is returned by the `#request` method). This schema object is made available to the template context
 * when the incoming request is a `POST`, it will initialize the schema and try to see if it is valid considering the incoming data (using the [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) method). If it's valid, then a new `Article` record will be created using the schema's validated data ([`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method)), and the user will be redirect to a home page. Otherwise, the `article_create.html` template will be rendered again with the invalid schema in the associated context
 
-It should be noted that templates can easily interact with schema objects in order to introspect them and render a corresponding HTML form. In the above example, the schema could be used as follows to render an equivalent form in the `article_create.html` template:
-
-```html
-<form method="post" action="" novalidate>
-  <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
-
-  <fieldset>
-    <div><label>Title</label></div>
-    <input type="text" name="{{ schema.title.id }}" value="{{ schema.title.value }}"/>
-    {% for error in schema.title.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
-
-  <fieldset>
-    <div><label>Content</label></div>
-    <textarea name="{{ schema.content.id }}" value="{{ schema.content.value }}">{{ schema.content.value }}</textarea>
-    {% for error in schema.content.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
-
-  <fieldset>
-    <div><label>Published at</label></div>
-    <input type="text" name="{{ schema.published_at.id }}" value="{{ schema.published_at.value }}"/>
-    {% for error in schema.published_at.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
-  </fieldset>
-
-  <fieldset>
-    <button>Submit</button>
-  </fieldset>
-</form>
-```
 
 :::tip
 Some [generic handlers](../handlers-and-http/generic-handlers.md) allow to conveniently process schemas in handlers. This is the case for the [`Marten::Handlers::Schema`](../handlers-and-http/reference/generic-handlers.md#processing-a-schema), the [`Marten::Handlers::RecordCreate`](../handlers-and-http/reference/generic-handlers.md#creating-a-record), and the [`Marten::Handlers::RecordUpdate`](../handlers-and-http/reference/generic-handlers.md#updating-a-record) generic handlers for example.
@@ -106,7 +77,7 @@ Note that schemas can be used for other things than processing form data. For ex
 class API::ArticleCreateHandler < Marten::Handler
   def post
     schema = ArticleCreateHandler.new(request.data)
-    
+
     if schema.valid?
       article = Article.new(schema.validated_data)
       article.save!
@@ -124,6 +95,56 @@ end
 :::info
 The `#data` method of an HTTP request object returns a hash-like object containing the request data: this object is automatically initialized from any form data or JSON data contained in the request body.
 :::
+
+### Rendering schema errors within forms
+
+It should be noted that templates can easily interact with schema objects in order to introspect them and render a corresponding HTML form.
+
+In the above example, the schema could be used as follows to render an equivalent form in the `article_create.html` template:
+
+```html
+<form method="post" action="" novalidate>
+  <input type="hidden" name="csrftoken" value="{% csrf_token %}" />
+
+  {% if schema.errors.global %}
+    <div class="error-messages">
+      {% for error in schema.errors.global %}
+        <p>{{ error.message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <fieldset class="field {% if schema.title.errored? %} field-error{% endif %}">
+    <div><label>Title</label></div>
+    <input type="text" name="{{ schema.title.id }}" value="{{ schema.title.value }}"/>
+    {% for error in schema.title.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
+  </fieldset>
+
+  <fieldset class="field {% if schema.content.errored? %} field-error{% endif %}">
+    <div><label>Content</label></div>
+    <textarea name="{{ schema.content.id }}" value="{{ schema.content.value }}">{{ schema.content.value }}</textarea>
+    {% for error in schema.content.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
+  </fieldset>
+
+  <fieldset class="field {% if schema.published_at.errored? %} field-error{% endif %}">
+    <div><label>Published at</label></div>
+    <input type="text" name="{{ schema.published_at.id }}" value="{{ schema.published_at.value }}"/>
+    {% for error in schema.published_at.errors %}<p><small>{{ error.message }}</small></p>{% endfor %}
+  </fieldset>
+
+  <fieldset>
+    <button>Submit</button>
+  </fieldset>
+</form>
+```
+
+The provided code demonstrates effective error handling within your templates. Here's a breakdown of the main principles:
+
+* Begin by checking for any `schema.errors.global` errors.
+  These are form-wide issues, and displaying them prominently alerts the user to broader problems with their input.
+* If `schema.field_name.errored?` returns true, it signals errors within that particular input field.
+* Display each individual `schema.field_name.errors` message directly below the associated input field.
+  This provides the user with clear guidance on how to correct specific issues.
 
 ## Schema fields
 

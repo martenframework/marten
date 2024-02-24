@@ -96,11 +96,11 @@ end
 The `#data` method of an HTTP request object returns a hash-like object containing the request data: this object is automatically initialized from any form data or JSON data contained in the request body.
 :::
 
-### Rendering schema errors within forms
+### Rendering schemas as forms
 
 It should be noted that templates can easily interact with schema objects in order to introspect them and render a corresponding HTML form.
 
-In the above example, the schema could be used as follows to render an equivalent form in the `article_create.html` template:
+In the previous example, the schema could be used as follows to render an equivalent form in the `article_create.html` template:
 
 ```html
 <form method="post" action="" novalidate>
@@ -138,13 +138,13 @@ In the above example, the schema could be used as follows to render an equivalen
 </form>
 ```
 
-The provided code demonstrates effective error handling within your templates. Here's a breakdown of the main principles:
+The provided code also demonstrates how to efficiently handle errors within your templates. Here's a breakdown of the main guidelines to follow when dealing with schema errors in templates:
 
 * Begin by checking for any `schema.errors.global` errors.
   These are form-wide issues, and displaying them prominently alerts the user to broader problems with their input.
 * If `schema.field_name.errored?` returns true, it signals errors within that particular input field.
 * Display each individual `schema.field_name.errors` message directly below the associated input field.
-  This provides the user with clear guidance on how to correct specific issues.
+  This provides the user with clear guidance on how to correct specific validation issues.
 
 ## Schema fields
 

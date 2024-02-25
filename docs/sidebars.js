@@ -60,6 +60,7 @@ module.exports = {
           type: 'category',
           label: "How-To's",
           items: [
+            'handlers-and-http/how-to/customize-handler-template-contexts',
             'handlers-and-http/how-to/create-custom-route-parameters',
           ],
         },

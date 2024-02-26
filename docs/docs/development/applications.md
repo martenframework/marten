@@ -130,3 +130,36 @@ Another very important file is the `cli.cr` one: this file is there to define al
 require "./cli/**"
 require "./migrations/**"
 ```
+
+### Defining settings for applications
+
+Applications that you create as part of your projects or third-party libraries can have their own associated settings, configurable through the use of regular [settings files](./settings.md).
+
+In order to define settings for your applications, the simplest way is to create a `settings.cr` file containing a subclass of [`Marten::Conf::Settings`](pathname:///api/dev/Marten/Conf/Settings.html) in your application's folder. This subclass must make use of the [`#namespace`](pathname:///api/dev/Marten/Conf/Settings.html#namespace(ns)-macro) macro in order to define the setting "namespace" under which your application's settings will be accessible.
+
+For example:
+
+```crystal
+module Blog
+  class Settings < Marten::Conf::Settings
+    namespace :blog
+
+    @my_setting : String = "foo"
+
+    getter my_setting
+    setter my_setting
+  end
+end
+```
+
+With the above example, it will be possible to configure the `blog.my_setting` setting as follows in a project's settings file:
+
+```crystal
+Marten.configure do |config|
+  config.blog.my_setting = "bar"
+end
+```
+
+As you can see, the application's settings are configurable like any other built-in settings, but they are namespaced to the namespace value that was defined in the `Blog::Settings` class through the use of the [`#namespace`](pathname:///api/dev/Marten/Conf/Settings.html#namespace(ns)-macro) macro.
+
+It's important to note that [`Marten::Conf::Settings`](pathname:///api/dev/Marten/Conf/Settings.html) subclasses have the flexibility to define any necessary methods to facilitate user configuration for the considered application. While basic settings typically necessitate only getters and setters for configuration, more intricate scenarios may demand additional methods, the utilization of blocks, or other complexities.

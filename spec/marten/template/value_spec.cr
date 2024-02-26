@@ -133,6 +133,18 @@ describe Marten::Template::Value do
       value.raw.as(Marten::DB::Query::Set(Tag)).to_a.should eq [tag_1, tag_2, tag_3]
     end
 
+    it "is able to initialize a new value value from an enum" do
+      value = Marten::Template::Value.from(Marten::Template::ValueSpec::Color::Blue)
+
+      value.raw.should be_a Marten::Template::Object::Enum
+      raw = value.raw.as(Marten::Template::Object::Enum)
+
+      raw.enum_class_name.should eq Marten::Template::ValueSpec::Color.name
+      raw.enum_value_names.should eq Marten::Template::ValueSpec::Color.values.map(&.to_s)
+      raw.name.should eq Marten::Template::ValueSpec::Color::Blue.to_s
+      raw.value.should eq Marten::Template::ValueSpec::Color::Blue.to_i64
+    end
+
     it "raises an unsupported value error if the passed value is not supported" do
       expect_raises(
         Marten::Template::Errors::UnsupportedValue,
@@ -333,5 +345,11 @@ module Marten::Template::ValueSpec
     def test_attr
       "hello"
     end
+  end
+
+  enum Color
+    Red
+    Green
+    Blue
   end
 end

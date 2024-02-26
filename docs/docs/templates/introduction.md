@@ -237,6 +237,36 @@ template.render({"foo" => "bar"})
 template.render({ foo: "bar" })
 ```
 
+## Using enums in contexts
+
+[Enum](https://crystal-lang.org/api/Enum.html) classes cannot be part of union types in Crystal. Because of this limitation, enum values are replaced by special objects in Marten templates. These objects always resolve to the integer value of the corresponding enum value.
+
+For example, let's consider the following enum:
+
+```crystal
+enum Color
+  Red
+  Green
+  Blue
+end
+```
+
+If a `color` variable is set to `Color::Red`, then the following template will output `0`:
+
+```html
+{{ color }}
+```
+
+It's important to note that enum values within Marten templates can be compared with each other, yielding the same results as comparing enum values in Crystal.
+
+Additionally, `<name>?` helper properties can be invoked on enum values within templates, simplifying the process of determining the type of the enum value being considered. For instance:
+
+```html
+{% if color.red? %}
+  This is the red color.
+{% endif %}
+```
+
 ## Using custom objects in contexts
 
 Most objects that are provided by Marten (such as Model records, query sets, schemas, etc) can automatically be used as part of templates. If your project involves other custom classes, and if you would like to interact with such objects in your templates, then you will need to explicitly ensure that they include the [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) module.

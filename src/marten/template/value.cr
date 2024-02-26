@@ -23,6 +23,15 @@ module Marten
           from(raw.to_a)
         when Char
           new(raw.to_s)
+        when Enum
+          new(
+            Marten::Template::Object::Enum.new(
+              enum_class_name: raw.class.name,
+              enum_value_names: raw.class.values.map(&.to_s),
+              name: raw.to_s,
+              value: raw.to_i64
+            )
+          )
         when Raw
           new(raw)
         when Value

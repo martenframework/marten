@@ -25,6 +25,12 @@ module Marten
       # Allows to overridde the response's content.
       setter content
 
+      # Override the content type associated with the HTTP response.
+      setter content_type
+
+      # Override the status code of the HTTP response.
+      getter status
+
       def initialize(
         @content : String = "",
         @content_type : String = DEFAULT_CONTENT_TYPE,

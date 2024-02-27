@@ -56,6 +56,14 @@ describe Marten::HTTP::Response do
     end
   end
 
+  describe "#content_type=" do
+    it "allows to override the response content type" do
+      response = Marten::HTTP::Response.new(content_type: "text/plain")
+      response.content_type = "text/html"
+      response.content_type.should eq "text/html"
+    end
+  end
+
   describe "#cookies" do
     it "returns the response cookies" do
       response = Marten::HTTP::Response.new
@@ -67,6 +75,14 @@ describe Marten::HTTP::Response do
     it "returns the response status" do
       response = Marten::HTTP::Response.new(status: 404)
       response.status.should eq 404
+    end
+  end
+
+  describe "#status=" do
+    it "allows to set the response status" do
+      response = Marten::HTTP::Response.new(status: 404)
+      response.status = 422
+      response.status.should eq 422
     end
   end
 

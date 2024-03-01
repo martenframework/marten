@@ -5,35 +5,44 @@ module Marten
     # A template variable's value access such as "foo.bar". It can also correspond to a literal value such as '42' or
     # '"hello"'.
     class Variable
-      @literal : Float32 | Float64 | Int32 | Int64 | Nil | String = nil
+      @literal : Bool | Float32 | Float64 | Int32 | Int64 | Nil | String = nil
+      @literal_set : Bool = false
       @lookups : Array(String)? = nil
 
       def initialize(raw : String)
-        # First try to see if the raw variable is a literal integer.
-        begin
-          @literal = raw.to_i
-        rescue ArgumentError
+        if STATIC_LITERAL_MAPPING.has_key?(raw.strip)
+          set_literal(STATIC_LITERAL_MAPPING[raw])
         end
 
-        # Then try to see uf the raw variable is a literal float.
-        if @literal.nil?
+        # First try to see if the raw variable is a literal integer.
+        if !literal_set?
           begin
-            @literal = raw.to_f
+            set_literal(raw.to_i)
+          rescue ArgumentError
+          end
+        end
+
+        # Then try to see if the raw variable is a literal float.
+        if !literal_set?
+          begin
+            set_literal(raw.to_f)
           rescue ArgumentError
           end
         end
 
         # Then, try to see if it is a literal string (single-quoted or double-quoted) and otherwise consider that it is
         # a standard variable access.
-        if @literal.nil? && ['\'', '"'].includes?((quote_char = raw[0])) && quote_char == raw[-1]
-          @literal = raw[1..-2].gsub(%{\\#{quote_char}}, quote_char)
-        else
+        if !literal_set? && ['\'', '"'].includes?((quote_char = raw[0])) && quote_char == raw[-1]
+          set_literal(raw[1..-2].gsub(%{\\#{quote_char}}, quote_char))
+        end
+
+        if !literal_set?
           @lookups = raw.split(ATTRIBUTE_SEPARATOR)
         end
       end
 
       def resolve(context : Context) : Value
-        return Value.from(@literal.not_nil!) unless @literal.nil?
+        return Value.from(@literal) if literal_set?
 
         current = nil
 
@@ -59,7 +68,15 @@ module Marten
         current.not_nil!
       end
 
-      private ATTRIBUTE_SEPARATOR = '.'
+      private ATTRIBUTE_SEPARATOR    = '.'
+      private STATIC_LITERAL_MAPPING = {"nil" => nil, "true" => true, "false" => false}
+
+      private getter? literal_set
+
+      private def set_literal(value)
+        @literal = value
+        @literal_set = true
+      end
     end
   end
 end

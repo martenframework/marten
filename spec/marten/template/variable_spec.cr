@@ -2,6 +2,21 @@ require "./spec_helper"
 
 describe Marten::Template::Variable do
   describe "::new" do
+    it "can process the nil literal" do
+      variable = Marten::Template::Variable.new("nil")
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_nil
+    end
+
+    it "can process the true literal" do
+      variable = Marten::Template::Variable.new("true")
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_true
+    end
+
+    it "can process the false literal" do
+      variable = Marten::Template::Variable.new("false")
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_false
+    end
+
     it "can process a number literal" do
       variable_1 = Marten::Template::Variable.new("42")
       variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).should eq 42

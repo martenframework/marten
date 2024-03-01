@@ -70,7 +70,7 @@ For example, the following snippet will apply the [`default`](./reference/filter
 Hello, {{ name|default:"Stranger" }}!
 ```
 
-It should be noted that the fact that an argument is supported or not, and mandatory or not, varies based on the considered filter. In all cases, filters can support up to **one** argument only.
+It should be noted that the fact that an argument is supported or not, and mandatory or not, varies based on the considered filter. In all cases, filters can support up to **one** argument only. Moreover, a filter argument can either correspond to a regular [variable](#variables) or a [literal](#literal-values).
 
 Please head over to the [filters reference](./reference/filters.md) to see a list of all the available filters. Implementing custom filters is also a possibility that is documented in [Create custom filters](./how-to/create-custom-filters.md).
 
@@ -92,7 +92,7 @@ As mentioned above, some tags allow to perform control flows and require a "clos
 {% endfor %}
 ```
 
-Some tags also require arguments. For example, the [`url`](./reference/tags.md#url) template tag requires at least the name of the route for which the URL resolution should be performed:
+Some tags also require arguments. Similarly to filters, these arguments can either correspond to regular [variables](#variables) or [literals](#literal-values). For example, the [`url`](./reference/tags.md#url) template tag requires at least the name of the route for which the URL resolution should be performed:
 
 ```html
 {% url "my_route" %}
@@ -107,6 +107,20 @@ Comments can be inserted in any templates and must be surrounded by **`{#`** and
 ```html
 {# This will not be evaluated #}
 ```
+
+### Literal values
+
+The Marten templating language supports making use of literal values as part of [variables](#variables), [filter](#filters) arguments, or [tag](#tags) arguments. These literals are essentially a representation of the corresponding objects in Crystal. Each supported type of literal is listed below:
+
+| Type | Example |
+| ----------- | ----------- |
+| Nil | `{{ nil }}` |
+| True | `{{ true }}` |
+| False | `{{ false }}` |
+| Integer | `{{ 42 }}` |
+| Float | `{{ 42.45 }}` |
+| Single-quoted string | `{{ 'Hello World' }}` |
+| Double-quoted string | `{{ "Hello World" }}` |
 
 ## Template inheritance
 

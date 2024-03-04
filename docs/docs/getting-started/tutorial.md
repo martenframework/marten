@@ -471,7 +471,7 @@ class ArticleCreateHandler < Marten::Handler
 
       redirect(reverse("home"))
     else
-      render("article_create.html", context: { schema: schema })
+      render("article_create.html", context: { schema: schema }, status: 422)
     end
   end
 
@@ -580,7 +580,7 @@ class ArticleUpdateHandler < Marten::Handler
       article.update!(schema.validated_data)
       redirect(reverse("home"))
     else
-      render("article_update.html", context: { article: article, schema: schema })
+      render("article_update.html", context: { article: article, schema: schema }, status: 422)
     end
   end
 

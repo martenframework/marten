@@ -28,6 +28,7 @@ describe Marten::Asset::Finder::FileSystem do
           {"test.css", File.join(__DIR__, "assets/test.css")},
           {"css/other.css", File.join(__DIR__, "assets/css/other.css")},
           {"css/test.css", File.join(__DIR__, "assets/css/test.css")},
+          {".hidden/hidden.css", File.join(__DIR__, "assets/.hidden/hidden.css")},
         ].to_set
       )
     end

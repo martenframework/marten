@@ -15,9 +15,12 @@ module Marten
         end
 
         def list : Array({String, String})
-          Dir.glob(File.join(root, "/**/*")).reject { |fn| File.directory?(fn) }.map do |path|
-            {Path[path].relative_to(root_path).to_s, path}
-          end
+          Dir
+            .glob(File.join(root, "/**/*"), match: File::MatchOptions.glob_default | File::MatchOptions::DotFiles)
+            .reject { |fn| File.directory?(fn) }
+            .map do |path|
+              {Path[path].relative_to(root_path).to_s, path}
+            end
         end
 
         private def root_path

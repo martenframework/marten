@@ -31,6 +31,10 @@ module Marten
             {% end %}
             end
 
+            if value.nil? && responds_to?(:[]?)
+              value = self[key]?
+            end
+
             value
           {% end %}
         end

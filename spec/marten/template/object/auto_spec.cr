@@ -7,6 +7,16 @@ describe Marten::Template::Object::Auto do
       obj.resolve_template_attribute("attr").should eq "hello"
     end
 
+    it "allows to resolve a key using the #[]? method as a fallback" do
+      obj = Marten::Template::Object::AutoSpec::Test.new({"foo" => "bar"})
+      obj.resolve_template_attribute("foo").should eq "bar"
+    end
+
+    it "does not resolve the value using the #[]? method if a public method is resolved first" do
+      obj = Marten::Template::Object::AutoSpec::Test.new({"attr" => "bar"})
+      obj.resolve_template_attribute("attr").should eq "hello"
+    end
+
     it "does not allow to resolve a method that takes arguments" do
       obj = Marten::Template::Object::AutoSpec::Test.new
       obj.resolve_template_attribute("with_args").should be_nil
@@ -32,6 +42,13 @@ end
 module Marten::Template::Object::AutoSpec
   class Test
     include Marten::Template::Object::Auto
+
+    def initialize(@data = {} of String => String)
+    end
+
+    def []?(key : String)
+      @data[key]?
+    end
 
     def attr
       "hello"

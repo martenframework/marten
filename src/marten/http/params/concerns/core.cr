@@ -16,6 +16,11 @@ module Marten
           nil
         end
 
+        # :nodoc:
+        def accumulate
+          raise NotImplementedError.new("#accumulate is not supported for request params")
+        end
+
         # Returns `true` if the parameter with the provided name exists.
         def has_key?(name : String | Symbol)
           @params.has_key?(name.to_s)
@@ -37,9 +42,19 @@ module Marten
           @params.fetch(name.to_s, default)
         end
 
+        # :nodoc:
+        def product
+          raise NotImplementedError.new("#product is not supported for query params")
+        end
+
         # Returns the number of parameters.
         def size
           @params.reduce(0) { |acc, (_, v)| acc + (v.size > 0 ? v.size : 1) }
+        end
+
+        # :nodoc:
+        def sum
+          raise NotImplementedError.new("#sum is not supported for query params")
         end
 
         delegate :[]=, to: @params

@@ -15,22 +15,22 @@ For example, let's consider the following model:
 ```crystal
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, blank: false, null: false
+  field :uploaded_file, :file, blank: false, null: false
 end
 ```
 
-Any `Attachment` model record will have a `file` attribute allowing interacting with the attached file:
+Any `Attachment` model record will have an `uploaded_file` attribute allowing interacting with the attached file:
 
 ```crystal
 attachment = Attachment.first!
-attachment.file           # => #<Marten::DB::Field::File::File:0x102dd0ac0 ...>
-attachment.file.attached? # => true
-attachment.file.name      # => "test.txt"
-attachment.file.size      # => 5796929
-attachment.file.url       # => "/media/test.txt"
+attachment.uploaded_file           # => #<Marten::DB::Field::File::File:0x102dd0ac0 ...>
+attachment.uploaded_file.attached? # => true
+attachment.uploaded_file.name      # => "test.txt"
+attachment.uploaded_file.size      # => 5796929
+attachment.uploaded_file.url       # => "/media/test.txt"
 ```
 
-The object returned by the `Attachment#file` method is a "file object": an instance of [`Marten::DB::Field::File::File`](pathname:///api/0.4/Marten/DB/Field/File/File.html). These objects and their associated capabilities are described below in [File objects](#file-objects).
+The object returned by the `Attachment#uploaded_file` method is a "file object": an instance of [`Marten::DB::Field::File::File`](pathname:///api/0.4/Marten/DB/Field/File/File.html). These objects and their associated capabilities are described below in [File objects](#file-objects).
 
 :::tip Under which path are files persisted?
 Files are stored at the root of the media [storage](#file-storages) by default. It should be noted that the path used to persist files in storages can be configured by setting the `upload_to` [`file`](../models-and-databases/reference/fields.md#file) field option.
@@ -40,7 +40,7 @@ For example, the previous `Attachment` model could be rewritten as follows to en
 ```crystal
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, blank: false, null: false, upload_to: "foo/bar"
+  field :uploaded_file, :file, blank: false, null: false, upload_to: "foo/bar"
 end
 ```
 
@@ -49,7 +49,7 @@ It should also be noted that `upload_to` can correspond to a proc that takes the
 ```crystal
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, blank: false, null: false, upload_to: ->(name : String) { File.join("files/uploads", name) }
+  field :uploaded_file, :file, blank: false, null: false, upload_to: ->(name : String) { File.join("files/uploads", name) }
 end
 ```
 :::
@@ -60,7 +60,7 @@ It should be noted that saving a model record will automatically result in any a
 attachment = Attachment.new
 
 File.open("test.txt") do |file|
-  attachment.file = file
+  attachment.uploaded_file = file
   attachment.save!
 end
 ```
@@ -84,8 +84,8 @@ For example:
 
 ```crystal
 attachment = Attachment.last!
-attachment.file.attached?  # => true
-attachment.file.committed? # => true
+attachment.uploaded_file.attached?  # => true
+attachment.uploaded_file.committed? # => true
 ```
 
 ### Accessing file properties
@@ -107,7 +107,7 @@ For example:
 
 ```crystal
 attachment = Attachment.last!
-file_io = attachment.file.open
+file_io = attachment.uploaded_file.open
 puts file_io.gets_to_end
 ```
 
@@ -121,11 +121,11 @@ For example:
 attachment = Attachment.new
 
 File.open("test.txt") do |file|
-  attachment.file.save("path/to/test.txt", file)
+  attachment.uploaded_file.save("path/to/test.txt", file)
   attachment.save!
 end
 
-attachment.file.url # => "/media/path/to/test.txt"
+attachment.uploaded_file.url # => "/media/path/to/test.txt"
 ```
 
 ### Deleting the attached file
@@ -136,9 +136,9 @@ For example:
 
 ```crystal
 attachment = Attachment.last!
-attachment.file.delete
-attachment.file.attached?  # => false
-attachment.file.committed? # => false
+attachment.uploaded_file.delete
+attachment.uploaded_file.attached?  # => false
+attachment.uploaded_file.committed? # => false
 ```
 
 ## File storages
@@ -199,7 +199,7 @@ custom_storage = Marten::Core::Storage::FileSystem.new(root: "/tmp", base_url: "
 
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, blank: false, null: false, storage: custom_storage
+  field :uploaded_file, :file, blank: false, null: false, storage: custom_storage
 end
 ```
 

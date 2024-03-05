@@ -10,12 +10,12 @@ Marten gives you the ability to interact with uploaded files. These files are ma
 
 Uploaded files are made available in the [`#data`](pathname:///api/dev/Marten/HTTP/Request.html#data%3AParams%3A%3AData-instance-method) hash-like object of any HTTP request object (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html)). These file objects are instances of the [`Marten::HTTP::UploadedFile`](pathname:///api/dev/Marten/HTTP/UploadedFile.html) class.
 
-For example, you could access and process a `file` file originating from an HTML form using a handler like this:
+For example, you could access and process an `uploaded_file` file originating from an HTML form using a handler like this:
 
 ```crystal
 class ProcessUploadedFileHandler < Marten::Handler
   def post
-    file = request.data["file"].as(Marten::HTTP::UploadedFile)
+    file = request.data["uploaded_file"].as(Marten::HTTP::UploadedFile)
     respond "Processed file: #{file.filename}"
   end
 end
@@ -39,7 +39,7 @@ For example, you could define the following schema:
 
 ```crystal
 class UploadFileSchema < Marten::Schema
-  field :file, :file
+  field :uploaded_file, :file
 end
 ```
 
@@ -52,7 +52,7 @@ class UploadFileHandler < Marten::Handlers::Schema
   success_url "/"
 
   def process_valid_schema
-    file = schema.validated_data["file"]
+    file = schema.validated_data["uploaded_file"]
     # Do something with the uploaded file...
 
     super
@@ -75,9 +75,9 @@ class UploadFileHandler < Marten::Handlers::Schema
   success_url "/"
 
   def process_valid_schema
-    file = schema.validated_data["file"]
+    file = schema.validated_data["uploaded_file"]
     // highlight-next-line
-    Attachment.create!(file: file)
+    Attachment.create!(uploaded_file: file)
 
     super
   end

@@ -113,7 +113,7 @@ my_storage = Marten::Core::Storage::FileSystem.new(root: "files", base_url: "/fi
 
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, storage: my_storage
+  field :uploaded_file, :file, storage: my_storage
 end
 ```
 
@@ -128,7 +128,7 @@ If set to a string, it allows to define in which directory of the underlying sto
 ```crystal
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, upload_to: "foo/bar"
+  field :uploaded_file, :file, upload_to: "foo/bar"
 end
 ```
 
@@ -137,7 +137,7 @@ If set to a proc, it allows to customize the logic allowing to generate the resu
 ```crystal
 class Attachment < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
-  field :file, :file, upload_to: ->(filename : String) { File.join("files/uploads", filename) }
+  field :uploaded_file, :file, upload_to: ->(filename : String) { File.join("files/uploads", filename) }
 end
 ```
 

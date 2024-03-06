@@ -44,7 +44,7 @@ jobs:
     - name: Generate an app
       run: |
         mkdir tmp
-        bin/marten new app test-app --dir=./tmp/test-app
+        bin/marten new app test --dir=./tmp/test-app
     - name: Install generated app dependencies
       run: |
         cd tmp/test-app
@@ -52,7 +52,10 @@ jobs:
         shards install --ignore-crystal-version
         cd lib && rm -rf marten && ln -s ../../.. marten
     - name: Run ameba on the generated app
-      run: cd tmp/test-app && bin/ameba
+      run: |
+        cd tmp/test-app
+        echo -e "Globs:\n  - \"**/*.cr\"\n  - \"!lib\"" >> .ameba.yml
+        bin/ameba
   generated-project:
     runs-on: ubuntu-latest
     strategy:
@@ -74,7 +77,7 @@ jobs:
     - name: Generate a project
       run: |
         mkdir tmp
-        bin/marten new project test-project --dir=./tmp/test-project
+        bin/marten new project test --dir=./tmp/test-project
     - name: Install generated project dependencies
       run: |
         cd tmp/test-project
@@ -82,7 +85,10 @@ jobs:
         shards install --ignore-crystal-version
         cd lib && rm -rf marten && ln -s ../../.. marten
     - name: Run ameba on the generated project
-      run: cd tmp/test-project && bin/ameba
+      run: |
+        cd tmp/test-project
+        echo -e "Globs:\n  - \"**/*.cr\"\n  - \"!lib\"" >> .ameba.yml
+        bin/ameba
   generated-auth-project:
     runs-on: ubuntu-latest
     strategy:
@@ -104,7 +110,7 @@ jobs:
     - name: Generate a project with authentication
       run: |
         mkdir tmp
-        bin/marten new project test-auth-project --with-auth --dir=./tmp/test-auth-project
+        bin/marten new project test --with-auth --dir=./tmp/test-auth-project
     - name: Install generated project dependencies
       run: |
         cd tmp/test-auth-project
@@ -112,7 +118,10 @@ jobs:
         shards install --ignore-crystal-version
         cd lib && rm -rf marten && ln -s ../../.. marten
     - name: Run ameba on the generated project
-      run: cd tmp/test-auth-project && bin/ameba
+      run: |
+        cd tmp/test-auth-project
+        echo -e "Globs:\n  - \"**/*.cr\"\n  - \"!lib\"" >> .ameba.yml
+        bin/ameba
   docs:
     runs-on: ubuntu-latest
     container:

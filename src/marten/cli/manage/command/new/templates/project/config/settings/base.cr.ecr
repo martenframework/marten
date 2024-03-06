@@ -27,12 +27,12 @@ Marten.configure do |config|
   # Databases
   # https://martenframework.com/docs/development/reference/settings#database-settings
   <%- if context.database == "sqlite3" -%>
-  config.database do |db|
+  config.database do |db| # ameba:disable Naming/BlockParameterName
     db.backend = :sqlite
     db.name = Path["<%= context.name %>.db"].expand
   end
   <%- elsif context.database == "mysql" -%>
-  config.database do |db|
+  config.database do |db| # ameba:disable Naming/BlockParameterName
     db.backend = :mysql
     db.host = "localhost"
     db.name = "<%= context.name %>_db"
@@ -40,7 +40,7 @@ Marten.configure do |config|
     # db.password = "my_password"
   end
   <%- elsif context.database == "postgresql" -%>
-  config.database do |db|
+  config.database do |db| # ameba:disable Naming/BlockParameterName
     db.backend = :postgresql
     db.host = "localhost"
     db.name = "<%= context.name %>_db"

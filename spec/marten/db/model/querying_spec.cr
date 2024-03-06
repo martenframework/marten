@@ -725,7 +725,7 @@ describe Marten::DB::Model::Querying do
       Tag.using(:other).create!(name: "crystal", is_active: false)
     end
 
-    it "returns a default queryset using the specified database" do
+    it "returns a default queryset using the specified database when the connection is expressed as a symbol" do
       qs1 = TestUser.using(:other)
       results1 = qs1.to_a
       results1.size.should eq 2
@@ -736,6 +736,26 @@ describe Marten::DB::Model::Querying do
       results2 = qs2.to_a
       results2.size.should eq 1
       results2.includes?(Tag.using(:other).get(name: "coding")).should be_true
+    end
+
+    it "returns a default queryset using the specified database when the connection is expressed as a string" do
+      qs1 = TestUser.using(:other)
+      results1 = qs1.to_a
+      results1.size.should eq 2
+      results1.includes?(TestUser.using("other").get!(username: "jd1")).should be_true
+      results1.includes?(TestUser.using("other").get!(username: "jd1")).should be_true
+
+      qs2 = Tag.using("other")
+      results2 = qs2.to_a
+      results2.size.should eq 1
+      results2.includes?(Tag.using("other").get(name: "coding")).should be_true
+    end
+
+    it "does not have any effect when called with a nil value" do
+      qs = TestUser.using(nil)
+      results = qs.to_a
+      results.size.should eq 1
+      results.includes?(TestUser.get!(username: "foo")).should be_true
     end
   end
 end

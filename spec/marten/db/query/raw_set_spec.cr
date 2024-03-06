@@ -772,7 +772,7 @@ describe Marten::DB::Query::RawSet do
   end
 
   describe "#using" do
-    it "allows to switch to another DB connection" do
+    it "allows to switch to another DB connection expressed as a symbol" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.using(:other).create!(name: "coding", is_active: true)
       tag_3 = Tag.using(:other).create!(name: "crystal", is_active: true)
@@ -785,6 +785,36 @@ describe Marten::DB::Query::RawSet do
 
       qset.to_a.should eq [tag_1]
       qset.using(:other).to_a.should eq [tag_2, tag_3]
+    end
+
+    it "allows to switch to another DB connection expressed as a string" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.using(:other).create!(name: "coding", is_active: true)
+      tag_3 = Tag.using(:other).create!(name: "crystal", is_active: true)
+
+      qset = Marten::DB::Query::RawSet(Tag).new(
+        query: "select * from app_tag order by id",
+        params: [] of DB::Any,
+        using: nil
+      )
+
+      qset.to_a.should eq [tag_1]
+      qset.using("other").to_a.should eq [tag_2, tag_3]
+    end
+
+    it "does not have any effect when called with a nil value" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.using(:other).create!(name: "coding", is_active: true)
+      Tag.using(:other).create!(name: "crystal", is_active: true)
+
+      qset = Marten::DB::Query::RawSet(Tag).new(
+        query: "select * from app_tag order by id",
+        params: [] of DB::Any,
+        using: nil
+      )
+
+      qset.to_a.should eq [tag_1]
+      qset.using(nil).to_a.should eq [tag_1]
     end
   end
 end

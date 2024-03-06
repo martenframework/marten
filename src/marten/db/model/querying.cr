@@ -500,7 +500,7 @@ module Marten
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the
           # project settings). If the passed database alias doesn't correspond to any defined connections, a
           # `Marten::DB::Errors::UnknownConnection` error will be raised.
-          def using(db : String | Symbol)
+          def using(db : Nil | String | Symbol)
             all.using(db)
           end
         end

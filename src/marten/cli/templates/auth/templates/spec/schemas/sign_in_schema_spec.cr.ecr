@@ -3,7 +3,7 @@ require "./spec_helper"
 describe <%= context.module_name %>::SignInSchema do
   describe "#valid?" do
     it "returns true if the email and password are provided and the authentication is successful" do
-      user = create_user(email: "test@example.com", password: "insecure")
+      create_user(email: "test@example.com", password: "insecure")
 
       schema = <%= context.module_name %>::SignInSchema.new(
         Marten::HTTP::Params::Data{"email" => ["test@example.com"], "password" => ["insecure"]}
@@ -27,7 +27,7 @@ describe <%= context.module_name %>::SignInSchema do
     end
 
     it "returns false if the email matches an existing user but the password is invalid" do
-      user = create_user(email: "test@example.com", password: "insecure")
+      create_user(email: "test@example.com", password: "insecure")
 
       schema = <%= context.module_name %>::SignInSchema.new(
         Marten::HTTP::Params::Data{"email" => ["test@example.com"], "password" => ["bad"]}

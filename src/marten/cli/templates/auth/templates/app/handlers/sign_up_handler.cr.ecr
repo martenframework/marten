@@ -14,7 +14,7 @@ module <%= context.module_name %>
       new_record.save!
 
       user = MartenAuth.authenticate(schema.email!, schema.password1!)
-      MartenAuth.sign_in(request, user.not_nil!)
+      MartenAuth.sign_in(request, user.not_nil!) # ameba:disable Lint/NotNil
     end
   end
 end

@@ -17,7 +17,7 @@ describe <%= context.module_name %>::RequireAnonymousUser do
     end
 
     it "does not redirect if the user is anonymous" do
-      user = create_user(email: "test@example.com", password: "insecure")
+      create_user(email: "test@example.com", password: "insecure")
 
       request = Marten::HTTP::Request.new(method: "GET", resource: "/test/xyz")
 

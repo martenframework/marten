@@ -9,7 +9,7 @@ module <%= context.module_name %>
     after_successful_schema_validation :sign_in_user
 
     private def sign_in_user
-      MartenAuth.sign_in(request, schema.user.not_nil!)
+      MartenAuth.sign_in(request, schema.user.not_nil!) # ameba:disable Lint/NotNil
     end
   end
 end

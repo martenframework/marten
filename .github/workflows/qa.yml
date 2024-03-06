@@ -23,6 +23,96 @@ jobs:
         run: shards install --ignore-crystal-version
       - name: QA checks
         run: make qa
+  generated-app:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    container:
+      image: crystallang/crystal:1.11.2
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for SQLite
+      run: |
+        apt-get update
+        apt-get -yqq install libsqlite3-dev
+    - name: Install shards
+      run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Build the Marten CLI
+      run: |
+        mkdir bin
+        crystal build src/marten_cli.cr -o bin/marten
+    - name: Generate an app
+      run: |
+        mkdir tmp
+        bin/marten new app test-app --dir=./tmp/test-app
+    - name: Install generated app dependencies
+      run: |
+        cd tmp/test-app
+        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba }}" >> shard.yml
+        shards install --ignore-crystal-version
+        cd lib && rm -rf marten && ln -s ../../.. marten
+    - name: Run ameba on the generated app
+      run: cd tmp/test-app && bin/ameba
+  generated-project:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    container:
+      image: crystallang/crystal:1.11.2
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for SQLite
+      run: |
+        apt-get update
+        apt-get -yqq install libsqlite3-dev
+    - name: Install shards
+      run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Build the Marten CLI
+      run: |
+        mkdir bin
+        crystal build src/marten_cli.cr -o bin/marten
+    - name: Generate a project
+      run: |
+        mkdir tmp
+        bin/marten new project test-project --dir=./tmp/test-project
+    - name: Install generated project dependencies
+      run: |
+        cd tmp/test-project
+        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba }}" >> shard.yml
+        shards install --ignore-crystal-version
+        cd lib && rm -rf marten && ln -s ../../.. marten
+    - name: Run ameba on the generated project
+      run: cd tmp/test-project && bin/ameba
+  generated-auth-project:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+    container:
+      image: crystallang/crystal:1.11.2
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install packages required for SQLite
+      run: |
+        apt-get update
+        apt-get -yqq install libsqlite3-dev
+    - name: Install shards
+      run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
+    - name: Build the Marten CLI
+      run: |
+        mkdir bin
+        crystal build src/marten_cli.cr -o bin/marten
+    - name: Generate a project with authentication
+      run: |
+        mkdir tmp
+        bin/marten new project test-auth-project --with-auth --dir=./tmp/test-auth-project
+    - name: Install generated project dependencies
+      run: |
+        cd tmp/test-auth-project
+        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba }}" >> shard.yml
+        shards install --ignore-crystal-version
+        cd lib && rm -rf marten && ln -s ../../.. marten
+    - name: Run ameba on the generated project
+      run: cd tmp/test-auth-project && bin/ameba
   docs:
     runs-on: ubuntu-latest
     container:

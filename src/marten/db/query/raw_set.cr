@@ -107,9 +107,9 @@ module Marten
         end
 
         # Allows to define which database alias should be used when evaluating the raw query set.
-        def using(db : String | Symbol)
+        def using(db : Nil | String | Symbol)
           qs = clone
-          qs.query.using = db.to_s
+          qs.query.using = db.try(&.to_s)
           qs
         end
 

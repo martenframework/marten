@@ -3,7 +3,13 @@ require "marten"
 <%- if context.targets_auth? -%>
 require "marten_auth"
 <%- end -%>
+<%- if context.database == "sqlite3" -%>
 require "sqlite3"
+<%- elsif context.database == "mysql" -%>
+require "mysql"
+<%- elsif context.database == "postgresql" -%>
+require "pg"
+<%- end -%>
 
 # Configuration requirements.
 require "../config/settings/base"

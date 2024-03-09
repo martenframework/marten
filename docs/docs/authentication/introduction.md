@@ -123,6 +123,20 @@ end
 user.save!
 ```
 
+:::tip
+In certain scenarios where passwords aren't required, such as with email magic link authentication or multi-provider OAuth authentication, it may be desirable to create user accounts without passwords. To achieve this, you can utilize the `#set_unusable_password` method on your user model instances. This method ensures that no password can be used for these accounts.
+
+For example:
+
+```crystal
+user = Auth::User.new(email: "test@example.com") do |user|
+  user.set_unusable_password
+end
+
+user.save!
+```
+:::
+
 ### Authenticating users
 
 Authentication is the act of verifying a user's credentials. This capability is provided by the [`marten-auth`](https://github.com/martenframework/marten-auth) shard through the use of the `MartenAuth#authenticate` method: this method tries to authenticate the user associated identified by a natural key (typically, an email address) and check that the given raw password is valid. The method returns the corresponding user record if the authentication is successful. Otherwise, it returns `nil` if the credentials can't be verified because the user does not exist or because the password is invalid.

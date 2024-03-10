@@ -216,7 +216,7 @@ config.assets.dirs = [
 
 Default: `[] of String`
 
-An array of paths to manifest JSON files to use to resolve assets URLs. Manifest files will be used to return the right fingerprinted asset path for a generic path, which can be useful if your asset bundling strategy support this.
+An array of paths to manifest JSON files to use to resolve assets URLs. Manifest files will be used to return the right fingerprinted asset path for a generic path, which can be useful if your asset bundling strategy support this. You can read more about this capability in [Asset manifests and fingerprinting](../../assets/introduction.md#asset-manifests-and-fingerprinting).
 
 ### `root`
 

@@ -64,6 +64,35 @@ config.assets.dirs = [
 ]
 ```
 
+### Asset manifests and fingerprinting
+
+Fingerprinting involves adding a unique string of characters to the filename of each asset. This enables the browser to cache the file securely. When an asset is modified, its fingerprint changes, prompting the browser to retrieve and use the updated version.
+
+Modern asset bundling tools often provide the capability to generate manifest files. These manifest files typically contain mappings between the original asset filenames and their corresponding fingerprinted versions. Marten supports configuring paths to these manifest files so that [resolving assets](#resolving-asset-urls) produces URLs that automatically include the correct fingerprinted version of each asset.
+
+This can be achieved by adding manifest paths to the [`assets.manifests`](../development/reference/settings.md#manifests) setting. For example:
+
+```crystal
+config.assets.manifests = [
+  "src/assets/build/manifest.json",
+]
+```
+
+It is assumed that the files whose paths are referenced in this setting are regular JSON manifests, containing mappings between original asset file names and their fingerprinted versions. For example:
+
+```json
+{
+  "app/home.css": "app/home.9495841be78cdf06c45d.css",
+  "app/home.js": "app/home.9495841be78cdf06c45d.js"
+}
+```
+
+Considering the above manifest example, trying to resolve `app/home.css` would produce a URL ending with `app/home.9495841be78cdf06c45d.css`:
+
+```crystal
+Marten.assets.url("app/home.css") # => "/assets/app/home.9495841be78cdf06c45d.css"
+```
+
 ## Resolving asset URLs
 
 As mentioned previously, assets are collected and persisted in a specific storage. When building HTML [templates](../templates/introduction.md), you will usually need to "resolve" the URL of assets to generate the absolute URLs that should be inserted into stylesheet or script tags (for example).

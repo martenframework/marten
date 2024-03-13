@@ -28,6 +28,14 @@ The model class used to create the new record can be configured through the use 
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
+For example if your application logic requires a success route that includes an identifier (such as a record's primary key), you can customize the success URL by overriding the `#success_url` method like this:
+
+```crystal
+def success_url
+  reverse("article", pk: record.pk!) # record is an instance of the model you defined for your handler
+end
+```
+
 :::tip
 Handlers making use of the [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks.md#schema-handler-callbacks) to learn more about those.
 :::

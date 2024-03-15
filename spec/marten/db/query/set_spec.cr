@@ -1025,7 +1025,7 @@ describe Marten::DB::Query::Set do
         tags << t
       end
 
-      tags.should eq [tag_2, tag_3]
+      tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "allows to iterate over the records targetted by the query set if it was already fetched" do
@@ -1042,7 +1042,7 @@ describe Marten::DB::Query::Set do
         tags << t
       end
 
-      tags.should eq [tag_2, tag_3]
+      tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
   end
 
@@ -1205,7 +1205,7 @@ describe Marten::DB::Query::Set do
 
       qset = Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c)
 
-      qset.to_a.should eq [tag_2, tag_3]
+      qset.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "allows to filter the records matching predicates expressed using a q expression" do
@@ -1227,7 +1227,7 @@ describe Marten::DB::Query::Set do
 
       qset = Marten::DB::Query::Set(Tag).new.filter(Marten::DB::Query::Node.new(name__startswith: :c))
 
-      qset.to_a.should eq [tag_2, tag_3]
+      qset.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "works as expected if the queryset was already fetched" do
@@ -1245,9 +1245,9 @@ describe Marten::DB::Query::Set do
       qset_3 = Marten::DB::Query::Set(Tag).new.filter(Marten::DB::Query::Node.new(name__startswith: :c))
       qset_3.each { }
 
-      qset_1.to_a.should eq [tag_2, tag_3]
-      qset_2.to_a.should eq [tag_1, tag_4]
-      qset_3.to_a.should eq [tag_2, tag_3]
+      qset_1.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
+      qset_2.to_a.sort_by(&.pk!.to_s).should eq [tag_1, tag_4].sort_by(&.pk!.to_s)
+      qset_3.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
   end
 

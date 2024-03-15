@@ -343,10 +343,10 @@ puts posts_1[0].tags.to_a
 
 posts_2 = Post.all.prefetch(:tags).to_a
 # doesn't hit the database since the related "tags" relation was already prefetched
-puts posts_2[0].tags
+puts posts_2[0].tags.to_a
 ```
 
-The double underscores notations can also be used when pre-fetching relations. In this situations, the records targeted by the original query set will be decorated with the prefetched records, and those records will be decorated with the following prefetched records. For example:
+The double underscores notations can also be used when pre-fetching relations. In this situation, the records targeted by the original query set will be decorated with the prefetched records, and those records will be decorated with the following prefetched records. For example:
 
 ```crystal
 # The associated Book and BookGenres records will be pre-fetched and fully initialized 

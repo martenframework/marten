@@ -252,7 +252,7 @@ Author.all.prefetch(:books__genres, :publisher)
 ```
 
 :::tip
-The `#prefetch` model can also be called directly on model classes:
+The `#prefetch` method can also be called directly on model classes:
 
 ```crystal
 Author.prefetch(:books__genres, :publisher)
@@ -357,7 +357,7 @@ query_set.bulk_create(
 ```
 
 :::tip
-The `#bulk_create` model can also be called directly on model classes:
+The `#bulk_create` method can also be called directly on model classes:
 
 ```crystal
 Post.bulk_create(

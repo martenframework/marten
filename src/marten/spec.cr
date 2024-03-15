@@ -81,3 +81,4 @@ Spec.before_suite &->Marten::Spec.setup_databases
 Spec.after_each &->Marten::Spec.flush_databases
 Spec.after_each &->Marten::Spec.clear_collected_emails
 Spec.after_each &->Marten::Spec.clear_client
+Spec.after_each &->DB::Statement.reset_query_count

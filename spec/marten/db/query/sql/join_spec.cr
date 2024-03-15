@@ -109,11 +109,11 @@ describe Marten::DB::Query::SQL::Join do
         selected: true,
       )
 
-      join.columns.should eq(
+      join.columns.sort.should eq(
         TestUser.fields.compact_map do |f|
           next unless f.db_column?
           join.column_name(f.db_column)
-        end
+        end.sort!
       )
     end
   end

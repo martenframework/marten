@@ -15,11 +15,21 @@ module Marten
         include Enumerable(M)
 
         @result_cache : Array(M)?
+        @prefetched_relations = [] of String
 
         # :nodoc:
         getter query
 
-        def initialize(@query = SQL::Query(M).new)
+        # :nodoc:
+        getter prefetched_relations
+
+        # :nodoc:
+        getter result_cache
+
+        # :nodoc:
+        setter prefetched_relations
+
+        def initialize(@query = SQL::Query(M).new, @prefetched_relations = [] of String)
         end
 
         # Returns the record at the given index.
@@ -792,6 +802,41 @@ module Marten
           qs
         end
 
+        # Returns a queryset that will automatically prefetch in a single batch the records for the specified relations.
+        #
+        # When using `#prefetch`, the records corresponding to the specified relationships will be prefetched in single
+        # batches and each record returned by the queryset will have the corresponding related objects already selected
+        # and populated. Using `#prefetch` can result in performance improvements since it can help reduce the number of
+        # SQL queries, as illustrated by the following example:
+        #
+        # ```
+        # posts_1 = Post.all.to_a
+        # puts posts_1[0].tags.to_a # hits the database to retrieve the related "tags" (many-to-many relation)
+        #
+        # posts_2 = Post.all.prefetch(:tags).to_a
+        # puts posts_2[0].tags # doesn't hit the database since the related "tags" relation was already prefetched
+        # ```
+        #
+        # It should be noted that it is also possible to follow relations and reverse relations too by using the double
+        # underscores notation(`__`). For example the following query will prefetch the "author" relation and then the
+        # "favorite tags" relation of the author records:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.prefetch(:author__favorite_tags)
+        # ```
+        #
+        # Finally, it is worth mentioning that multiple relations can be specified to `#prefetch`. For example:
+        #
+        # ```
+        # Author.all.prefetch(:books__genres, :publisher)
+        # ```
+        def prefetch(*relations : String | Symbol)
+          qs = clone
+          qs.prefetched_relations += relations.map(&.to_s).to_a
+          qs
+        end
+
         # :nodoc:
         def product
           raise NotImplementedError.new("#product is not supported for query sets")
@@ -1087,14 +1132,25 @@ module Marten
           {% end %}
         end
 
-        protected getter result_cache
-
         protected def clone(other_query = nil)
-          Set(M).new(query: other_query.nil? ? @query.clone : other_query.not_nil!)
+          Set(M).new(
+            query: other_query.nil? ? @query.clone : other_query.not_nil!,
+            prefetched_relations: prefetched_relations,
+          )
         end
 
         protected def fetch
           @result_cache = @query.execute
+          prefetch_relations if !prefetched_relations.empty?
+        end
+
+        protected def assign_cached_records(records : Array(Model)) : Nil
+          @result_cache = Array(M).new
+
+          records.each do |record|
+            next unless record.is_a?(M)
+            @result_cache.not_nil! << record
+          end
         end
 
         protected def unsafe_bulk_create(objects : Array(DB::Model), batch_size : Int32? = nil)
@@ -1139,6 +1195,17 @@ module Marten
           end
 
           inserted_pks
+        end
+
+        private def prefetch_relations : Nil
+          return if @result_cache.nil? || @result_cache.try(&.empty?)
+
+          prefetcher = Prefetcher.new(
+            records: Array(Model).new.concat(@result_cache.not_nil!),
+            relations: prefetched_relations,
+            using: @query.using,
+          )
+          prefetcher.execute
         end
 
         private def raise_negative_indexes_not_supported

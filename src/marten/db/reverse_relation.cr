@@ -43,7 +43,7 @@ module Marten
         one_to_one? && field.as(Field::OneToOne).parent_link?
       end
 
-      private def field
+      protected def field
         @field ||= model.get_local_field(@field_id)
       end
     end

@@ -222,6 +222,43 @@ query_set.order("-published_at", "title")
 
 In the above example, records would be ordered by descending publication date (because of the `-` prefix), and then by title (ascending).
 
+### `prefetch`
+
+Returns a query set that will automatically prefetch in a single batch the records for the specified relations (see [Queries](../queries.md#pre-fetching-relations) for an introduction about this capability).
+
+When using `#prefetch`, the records corresponding to the specified relationships will be prefetched in single batches and each record returned by the query set will have the corresponding related objects already selected and populated. Using `#prefetch` can result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
+
+```crystal
+posts_1 = Post.all.to_a
+# hits the database to retrieve the related "tags" (many-to-many relation)
+puts posts_1[0].tags.to_a
+
+posts_2 = Post.all.prefetch(:tags).to_a
+# doesn't hit the database since the related "tags" relation was already prefetched
+puts posts_2[0].tags
+```
+
+It should be noted that it is also possible to follow relations and reverse relations too by using the double underscores notation(`__`). For example, the following query will prefetch the "author" relation and then the "favorite tags" relation of the author records:
+
+```crystal
+query_set = Post.all
+query_set.prefetch(:author__favorite_tags)
+```
+
+Finally, it is worth mentioning that multiple relations can be specified to `#prefetch`. For example:
+
+```crystal
+Author.all.prefetch(:books__genres, :publisher)
+```
+
+:::tip
+The `#prefetch` model can also be called directly on model classes:
+
+```crystal
+Author.prefetch(:books__genres, :publisher)
+```
+:::
+
 ### `raw`
 
 Returns a raw query set for the passed SQL query and optional parameters.

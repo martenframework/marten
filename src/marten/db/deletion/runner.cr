@@ -80,7 +80,7 @@ module Marten
             @dependencies[parent_field.related_model] << model
 
             add(
-              records.compact_map { |r| r.get_relation(parent_field.as(Field::OneToOne).relation_name) },
+              records.compact_map { |r| r.get_related_object(parent_field.as(Field::OneToOne).relation_name) },
               reverse_relations: false
             )
           end

@@ -116,9 +116,10 @@ describe Marten::CLI::Manage::Command::CollectAssets do
       stdout = IO::Memory.new
 
       original_css_asset_path = "spec/test_project/assets/css/test.css"
+      manifest_path = File.expand_path "spec/src/manifest.json"
 
       command = Marten::CLI::Manage::Command::CollectAssets.new(
-        options: ["--no-color", "--no-input", "--fingerprint"],
+        options: ["--no-color", "--no-input", "--fingerprint", "--manifest-path", manifest_path],
         stdin: stdin,
         stdout: stdout
       )
@@ -130,13 +131,13 @@ describe Marten::CLI::Manage::Command::CollectAssets do
       command.handle
 
       output = stdout.rewind.gets_to_end
-      output.includes?("Copying css/test.#{file_digest}.css...").should be_true
-      output.includes?("Creating manifest.json...").should be_true
+      output.includes?("Copying css/test.css (#{file_digest})...").should be_true
+      output.includes?("Creating #{manifest_path}...").should be_true
 
       File.exists?("spec/assets/css/test.#{file_digest}.css").should be_true
-      File.exists?("spec/assets/manifest.json").should be_true
+      File.exists?("spec/src/manifest.json").should be_true
 
-      json = File.open("spec/assets/manifest.json") do |file|
+      json = File.open("spec/src/manifest.json") do |file|
         JSON.parse(file)
       end
 

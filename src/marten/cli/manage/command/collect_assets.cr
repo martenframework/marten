@@ -11,10 +11,18 @@ module Marten
           @fingerprint : Bool = false
           @fingerprint_mapping = Hash(String, String).new
           @no_input : Bool = false
+          @manifest_path : String = File.join Marten.apps.main.class._marten_app_location, "manifest.json"
 
           def setup
             on_option("fingerprint", "Add a fingerprint to the collected assets") { @fingerprint = true }
             on_option("no-input", "Do not show prompts to the user") { @no_input = true }
+            on_option_with_arg(
+              "manifest-path",
+              arg: "Filepath",
+              description: "Specify where the manifest file should be stored."
+            ) do |v|
+              @manifest_path = v
+            end
           end
 
           def run
@@ -37,16 +45,18 @@ module Marten
           private def calculate_fingerprint(relative_path, io)
             last_dot_index = relative_path.rindex(".")
             old_path = relative_path
+            fingerprint = nil
 
             if last_dot_index != -1
               sha = Digest::SHA256.new
               sha.update io
               io.rewind
-              relative_path = relative_path[0...last_dot_index] + ".#{sha.hexfinal}" + relative_path[last_dot_index..]
+              fingerprint = sha.hexfinal
+              relative_path = relative_path[0...last_dot_index] + ".#{fingerprint}" + relative_path[last_dot_index..]
               @fingerprint_mapping[old_path] = relative_path
             end
 
-            relative_path
+            return relative_path, fingerprint
           end
 
           private def collect
@@ -64,22 +74,25 @@ module Marten
             end
 
             if fingerprint? && collected_count > 0
-              manifest_file_name = "manifest.json"
+              FileUtils.mkdir_p(Path[@manifest_path].dirname) # Ensure path exists
 
-              print("  › Creating #{style(manifest_file_name, mode: :dim)}...", ending: "")
-
-              io = IO::Memory.new(@fingerprint_mapping.to_json.to_s)
-              Marten.assets.storage.write(manifest_file_name, io)
-
+              print("  › Creating #{style(@manifest_path, mode: :dim)}...", ending: "")
+              File.open(@manifest_path, "w") do |file|
+                file.print @fingerprint_mapping.to_json
+              end
               print(style(" DONE", fore: :light_green, mode: :bold))
             end
           end
 
           private def copy_asset_file(relative_path, absolute_path)
             File.open(absolute_path) do |io|
-              relative_path = calculate_fingerprint(relative_path, io) if fingerprint?
+              original_relative_path = relative_path
+              relative_path, fingerprint = calculate_fingerprint(relative_path, io) if fingerprint?
 
-              print("  › Copying #{style(relative_path, mode: :dim)}...", ending: "")
+              print("  › Copying #{style(original_relative_path, mode: :dim)}", ending: "")
+              print(style(" (#{fingerprint})", mode: :dim), ending: "") if fingerprint
+              print("...", ending: "")
+
               Marten.assets.storage.write(relative_path.not_nil!, io)
               print(style(" DONE", fore: :light_green, mode: :bold))
             end

@@ -1,4 +1,4 @@
-require "digest/sha256"
+require "digest/md5"
 
 module Marten
   module CLI
@@ -14,12 +14,17 @@ module Marten
           @manifest_path : String = File.join Marten.apps.main.class._marten_app_location, "manifest.json"
 
           def setup
-            on_option("fingerprint", "Add a fingerprint to the collected assets") { @fingerprint = true }
+            on_option(
+              "fingerprint",
+              "Fingerprint the collected assets and generate a corresponding manifest file"
+            ) do
+              @fingerprint = true
+            end
             on_option("no-input", "Do not show prompts to the user") { @no_input = true }
             on_option_with_arg(
               "manifest-path",
               arg: "Filepath",
-              description: "Specify where the manifest file should be stored."
+              description: "Specify where the manifest file should be stored (defaults to  \"src/manifest.json\")."
             ) do |v|
               @manifest_path = v
             end
@@ -47,11 +52,11 @@ module Marten
             old_path = relative_path
             fingerprint = nil
 
-            if last_dot_index != -1
-              sha = Digest::SHA256.new
+            if last_dot_index
+              sha = Digest::MD5.new
               sha.update io
               io.rewind
-              fingerprint = sha.hexfinal
+              fingerprint = sha.hexfinal[...12]
               relative_path = relative_path[0...last_dot_index] + ".#{fingerprint}" + relative_path[last_dot_index..]
               @fingerprint_mapping[old_path] = relative_path
             end

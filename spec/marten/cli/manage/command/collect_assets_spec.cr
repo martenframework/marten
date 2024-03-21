@@ -1,6 +1,5 @@
 require "./spec_helper"
-require "digest/sha256"
-require "json"
+require "digest/md5"
 
 describe Marten::CLI::Manage::Command::CollectAssets do
   describe "#run" do
@@ -124,9 +123,9 @@ describe Marten::CLI::Manage::Command::CollectAssets do
         stdout: stdout
       )
 
-      sha = Digest::SHA256.new
+      sha = Digest::MD5.new
       sha.file original_css_asset_path
-      file_digest = sha.hexfinal
+      file_digest = sha.hexfinal[...12]
 
       command.handle
 

@@ -94,9 +94,9 @@ Marten.assets.url("app/home.css") # => "/assets/app/home.9495841be78cdf06c45d.c
 ```
 
 :::info
-Additionally, the collectassets command provides a `--fingerprint` option. Using this option automatically fingerprints the collected assets and generates a `manifest.json` file, which maps the original file paths to their fingerprinted versions.
+Additionally, the [`collectassets`](../development/reference/management-commands.md#collectassets) command provides a `--fingerprint` option. Using this option automatically fingerprints the collected assets and generates a `manifest.json` file, which maps the original file paths to their fingerprinted versions.
 
-When the `--fingerprint` option is used, it's important to include the path to the generated "manifest.json" in the appropriate environment.config file, otherwise the collected assets can't be found when the URL is resolved.
+When the `--fingerprint` option is used, it's important to include the path to the generated "manifest.json" in the appropriate [`assets.manifests`](../development/reference/settings#manifests) environment config file, otherwise the collected assets can't be found when the URL is resolved.
 :::
 
 ## Resolving asset URLs

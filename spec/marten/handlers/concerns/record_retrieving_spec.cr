@@ -61,6 +61,29 @@ describe Marten::Handlers::RecordRetrieving do
 
       handler.queryset.to_a.should eq [user_1, user_2]
     end
+
+    it "returns only the records for the configured model where is_admin is true" do
+      user_1 = TestUser.create!(
+        username: "jd1",
+        email: "jd1@example.com",
+        first_name: "John",
+        last_name: "Doe",
+        is_admin: true
+      )
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RecordRetrievingSpec::TestQuerysetHandler.new(request)
+
+      handler.queryset.to_a.should eq [user_1]
+    end
   end
 
   describe "#record" do
@@ -126,6 +149,15 @@ module Marten::Handlers::RecordRetrievingSpec
     lookup_field "id"
     lookup_param "identifier"
     model TestUser
+  end
+
+  class TestQuerysetHandler < Marten::Handler
+    include Marten::Handlers::RecordRetrieving
+
+    lookup_field "id"
+    lookup_param "identifier"
+    model TestUser
+    queryset TestUser.filter(is_admin__exact: true)
   end
 
   class TestHandlerWithoutConfiguration < Marten::Handler

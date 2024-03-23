@@ -94,7 +94,6 @@ For example, it would be possible to render an `articles/detail.html` template s
 ```crystal
 class ArticleDetailHandler < Marten::Handlers::RecordDetail
   model Article
-  queryset Article.all.filter(published__exact: true)
   template_name "articles/detail.html"
 end
 ```

@@ -1,6 +1,9 @@
 module Marten
   module DB
     module Errors
+      # Represents an error raised when a specific predicate will return an empty result set.
+      class EmptyResults < Exception; end
+
       # Represents an error raised when a problem is detected with a specific model field.
       class InvalidField < Exception; end
 

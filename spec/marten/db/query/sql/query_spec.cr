@@ -1072,6 +1072,16 @@ describe Marten::DB::Query::SQL::Query do
       Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Person).new.count("person_profile").should eq 1
     end
 
+    it "returns 0 if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.count.should eq 0
+    end
+
     it "raises if non existing field is counted" do
       expect_raises(
         Marten::DB::Errors::InvalidField,
@@ -1244,6 +1254,14 @@ describe Marten::DB::Query::SQL::Query do
       query_3.order("-name")
       query_3.execute.should eq [tag_1, tag_2, tag_3]
     end
+
+    it "returns an empty array if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.execute.should be_empty
+    end
   end
 
   describe "#exists?" do
@@ -1331,6 +1349,16 @@ describe Marten::DB::Query::SQL::Query do
 
       query_2 = Marten::DB::Query::SQL::Query(Tag).new
       query_2.exists?.should be_false
+    end
+
+    it "returns false if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.exists?.should be_false
     end
   end
 
@@ -1556,6 +1584,16 @@ describe Marten::DB::Query::SQL::Query do
 
       Marten::DB::Query::SQL::Query(Post).new.execute.to_set.should eq(Set{post_2, post_3})
     end
+
+    it "returns 0 if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.raw_delete.should eq 0
+    end
   end
 
   describe "#pluck" do
@@ -1632,6 +1670,14 @@ describe Marten::DB::Query::SQL::Query do
       query.pluck(["username", "profile"]).to_set.should eq(
         [["jd1", profile_1.id], ["jd2", profile_2.id], ["jd3", profile_3.id]].to_set
       )
+    end
+
+    it "returns an empty array if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.pluck(["name"]).should be_empty
     end
   end
 
@@ -2022,6 +2068,17 @@ describe Marten::DB::Query::SQL::Query do
 
       post_3.reload
       post_3.title.should eq "Updated"
+    end
+
+    it "returns 0 if the predicates will raise an empty results exception" do
+      tag = Tag.create!(name: "crystal", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.update_with({:is_active => false}).should eq 0
+
+      tag.reload
+      tag.is_active.should be_true
     end
 
     context "with multi table inheritance" do

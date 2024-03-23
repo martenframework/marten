@@ -6,6 +6,16 @@ module Marten
           class In < Base
             predicate_name "in"
 
+            def to_sql(connection : Connection::Base)
+              if !@right_operand.is_a?(Array(Field::Any))
+                raise Errors::UnmetQuerySetCondition.new("In predicate requires an array of values")
+              end
+
+              raise Errors::EmptyResults.new if @right_operand.as?(Array(Field::Any)).try(&.empty?)
+
+              super
+            end
+
             private def sql_right_operand(_connection)
               String.build do |s|
                 s << "IN ( "

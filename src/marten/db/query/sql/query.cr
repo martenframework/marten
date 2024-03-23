@@ -103,10 +103,14 @@ module Marten
               result = db.scalar(sql, args: parameters)
               result.to_s.to_i
             end
+          rescue Errors::EmptyResults
+            0
           end
 
           def execute : Array(Model)
             execute_query(*build_query)
+          rescue Errors::EmptyResults
+            [] of Model
           end
 
           def exists? : Bool
@@ -115,6 +119,8 @@ module Marten
               result = db.scalar(sql, args: parameters)
               ["1", "t", "true"].includes?(result.to_s)
             end
+          rescue Errors::EmptyResults
+            false
           end
 
           def joins?
@@ -145,6 +151,8 @@ module Marten
           def pluck(fields : Array(String)) : Array(Array(Field::Any))
             plucked_columns = solve_plucked_fields_and_columns(fields)
             execute_pluck_query(*build_pluck_query(plucked_columns), plucked_columns)
+          rescue Errors::EmptyResults
+            [] of Array(Field::Any)
           end
 
           def raw_delete
@@ -153,6 +161,8 @@ module Marten
               result = db.exec(sql, args: parameters)
               result.rows_affected
             end
+          rescue Errors::EmptyResults
+            0.to_i64
           end
 
           def setup_distinct_clause(fields : Array(String) | Nil = nil) : Nil
@@ -238,10 +248,6 @@ module Marten
               end
             end
 
-            sql, parameters = build_update_query(values_to_update)
-
-            rows_affected = nil
-
             # If related model values also need to be updated (which can be the case when attempting to update records
             # making use of multi table inheritance), then we have to fetch the IDs of the targeted records in order to
             # be able to update the related models as well.
@@ -253,12 +259,19 @@ module Marten
               ).flatten
             end
 
+            rows_affected = nil
+
             connection.transaction do
               # First attempts to update the current model (only if local values need to be updated).
               rows_affected = if !values_to_update.empty?
-                                connection.open do |db|
-                                  result = db.exec(sql, args: parameters)
-                                  result.rows_affected
+                                begin
+                                  sql, parameters = build_update_query(values_to_update)
+                                  connection.open do |db|
+                                    result = db.exec(sql, args: parameters)
+                                    result.rows_affected
+                                  end
+                                rescue Errors::EmptyResults
+                                  0
                                 end
                               end
 

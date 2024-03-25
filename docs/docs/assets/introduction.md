@@ -93,6 +93,12 @@ Considering the above manifest example, trying to resolve `app/home.css` would p
 Marten.assets.url("app/home.css") # => "/assets/app/home.9495841be78cdf06c45d.css"
 ```
 
+:::info
+Additionally, the [`collectassets`](../development/reference/management-commands.md#collectassets) command provides a `--fingerprint` option. Using this option automatically fingerprints the collected assets and generates a `manifest.json` file, which maps the original file paths to their fingerprinted versions.
+
+When the `--fingerprint` option is used, it's important to include the path to the generated "manifest.json" in the appropriate [`assets.manifests`](../development/reference/settings#manifests) environment config file, otherwise the collected assets can't be found when the URL is resolved.
+:::
+
 ## Resolving asset URLs
 
 As mentioned previously, assets are collected and persisted in a specific storage. When building HTML [templates](../templates/introduction.md), you will usually need to "resolve" the URL of assets to generate the absolute URLs that should be inserted into stylesheet or script tags (for example).

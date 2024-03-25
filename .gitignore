@@ -32,3 +32,5 @@
 /spec/marten/cli/generator/model_spec/main_app/*
 /spec/marten/cli/generator/schema_spec/main_app/*
 /spec/marten/cli/manage/command/new_spec
+/spec/test_project/manifest.json
+/spec/test_project/collect/manifest.json

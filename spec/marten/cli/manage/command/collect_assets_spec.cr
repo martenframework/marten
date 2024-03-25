@@ -138,7 +138,7 @@ describe Marten::CLI::Manage::Command::CollectAssets do
       File.exists?("spec/assets/css/test.#{file_digest}.css").should be_true
       File.exists?("spec/test_project/manifest.json").should be_true
 
-      json = File.open("spec/src/manifest.json") do |file|
+      json = File.open("spec/test_project/manifest.json") do |file|
         JSON.parse(file)
       end
 
@@ -172,9 +172,9 @@ describe Marten::CLI::Manage::Command::CollectAssets do
       output.includes?("Creating #{manifest_path}...").should be_true
 
       File.exists?("spec/assets/css/test.#{file_digest}.css").should be_true
-      File.exists?("spec/src/manifest.json").should be_true
+      File.exists?(manifest_path).should be_true
 
-      json = File.open("spec/src/manifest.json") do |file|
+      json = File.open(manifest_path) do |file|
         JSON.parse(file)
       end
 

@@ -193,11 +193,16 @@ module Marten
   def self.setup_templates : Nil
     @@templates = Template::Engine.new
 
-    loaders = [] of Marten::Template::Loader::Base
-    loaders << Template::Loader::AppDirs.new if settings.templates.app_dirs
-    loaders += settings.templates.dirs.map { |d| Template::Loader::FileSystem.new(d) }
+    loaders = if setting_loaders = settings.templates.loaders
+                setting_loaders
+              else
+                default_loaders = [] of Marten::Template::Loader::Base
+                default_loaders << Template::Loader::AppDirs.new if settings.templates.app_dirs
+                default_loaders += settings.templates.dirs.map { |d| Template::Loader::FileSystem.new(d) }
+              end
 
-    templates.loaders = if settings.templates.cached
+    # Only cache templates if setting is true and no custom loaders are defined
+    templates.loaders = if settings.templates.cached && !settings.templates.loaders
                           [Template::Loader::Cached.new(loaders)] of Marten::Template::Loader::Base
                         else
                           loaders

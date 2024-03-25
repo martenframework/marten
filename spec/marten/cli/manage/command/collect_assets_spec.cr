@@ -1,5 +1,4 @@
 require "./spec_helper"
-require "digest/md5"
 
 describe Marten::CLI::Manage::Command::CollectAssets do
   describe "#run" do
@@ -109,13 +108,52 @@ describe Marten::CLI::Manage::Command::CollectAssets do
 
       File.exists?("spec/assets/css/test.css").should be_true
     end
+  end
+
+  describe "#create_manifest_file" do
+    with_main_app_location "#{__DIR__}/../../../../test_project"
 
     it "copies the assets as expected, adds a fingerprint and creates the correct mapping inside a manifest.json" do
       stdin = IO::Memory.new("yes")
       stdout = IO::Memory.new
 
       original_css_asset_path = "spec/test_project/assets/css/test.css"
-      manifest_path = File.expand_path "spec/src/manifest.json"
+
+      command = Marten::CLI::Manage::Command::CollectAssets.new(
+        options: ["--no-color", "--no-input", "--fingerprint"],
+        stdin: stdin,
+        stdout: stdout
+      )
+
+      sha = Digest::MD5.new
+      sha.file original_css_asset_path
+      file_digest = sha.hexfinal[...12]
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("Copying css/test.css (#{file_digest})...").should be_true
+      output.includes?("Creating spec/test_project/manifest.json...").should be_true
+
+      File.exists?("spec/assets/css/test.#{file_digest}.css").should be_true
+      File.exists?("spec/test_project/manifest.json").should be_true
+
+      json = File.open("spec/src/manifest.json") do |file|
+        JSON.parse(file)
+      end
+
+      manifest = json.as_h
+
+      manifest.has_key?("css/test.css").should be_true
+      manifest["css/test.css"].to_s.should eq "css/test.#{file_digest}.css"
+    end
+
+    it "copies the assets as expected, adds a fingerprint and creates the correct mapping inside a specified file" do
+      stdin = IO::Memory.new("yes")
+      stdout = IO::Memory.new
+
+      original_css_asset_path = "spec/test_project/assets/css/test.css"
+      manifest_path = "spec/test_project/collect/manifest.json"
 
       command = Marten::CLI::Manage::Command::CollectAssets.new(
         options: ["--no-color", "--no-input", "--fingerprint", "--manifest-path", manifest_path],

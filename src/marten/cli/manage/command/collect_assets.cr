@@ -1,5 +1,3 @@
-require "digest/md5"
-
 module Marten
   module CLI
     class Manage
@@ -11,7 +9,7 @@ module Marten
           @fingerprint : Bool = false
           @fingerprint_mapping = Hash(String, String).new
           @no_input : Bool = false
-          @manifest_path : String = File.join Marten.apps.main.class._marten_app_location, "manifest.json"
+          @manifest_path : String = File.join(Marten.apps.main.class._marten_app_location, "manifest.json")
 
           def setup
             on_option(
@@ -79,13 +77,7 @@ module Marten
             end
 
             if fingerprint? && collected_count > 0
-              FileUtils.mkdir_p(Path[@manifest_path].dirname) # Ensure path exists
-
-              print("  › Creating #{style(@manifest_path, mode: :dim)}...", ending: "")
-              File.open(@manifest_path, "w") do |file|
-                file.print @fingerprint_mapping.to_json
-              end
-              print(style(" DONE", fore: :light_green, mode: :bold))
+              create_manifest_file
             end
           end
 
@@ -101,6 +93,17 @@ module Marten
               Marten.assets.storage.write(relative_path.not_nil!, io)
               print(style(" DONE", fore: :light_green, mode: :bold))
             end
+          end
+
+          private def create_manifest_file
+            FileUtils.mkdir_p(Path[@manifest_path].dirname) # Ensure path exists
+
+            relative_manifest_path = Path[@manifest_path].relative_to(Marten::Apps::Config.compilation_root_path)
+            print("  › Creating #{style(relative_manifest_path, mode: :dim)}...", ending: "")
+            File.open(@manifest_path, "w") do |file|
+              file.print @fingerprint_mapping.to_json
+            end
+            print(style(" DONE", fore: :light_green, mode: :bold))
           end
 
           private def fingerprint?

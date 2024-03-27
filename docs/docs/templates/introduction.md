@@ -241,7 +241,7 @@ This will return a compiled [`Template`](pathname:///api/dev/Marten/Template/Tem
 ### Customizing Template Loaders
 
 The [`templates.loaders`](../development/reference/settings.md#loaders) setting provides fine-grained control over how Marten discovers and loads templates. This setting expects an array of template loader classes, which must inherit from `Marten::Template::Loader::Base`. This setting will overwrite the default template loaders
-configured by Marten. This gives you the option to configure custom loaders to load templates from different sources, such as databases or in-memory data structures.
+configured by Marten. This gives you the option to configure [custom loaders](./how-to/create-custom-template-loaders.md) to load templates from different sources, such as databases or in-memory data structures.
 
 Example: Configuring a File System Loader
 

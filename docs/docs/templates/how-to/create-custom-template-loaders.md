@@ -4,7 +4,7 @@ sidebar_label: Create custom loaders
 description: How to create custom template loaders.
 ---
 
-Marten has built-in support for common [template loaders](../reference/loaders.md), but the framework also allows you to write your own template loader that you can leverage as part of your project's templates.
+Marten has built-in support for common template loaders, but the framework also allows you to write your own template loader that you can leverage as part of your project's templates.
 
 ## Defining a template loaders
 
@@ -14,7 +14,7 @@ For example, rendering the template `content.html` with a file system loader ini
 
 Let's say we want to write a `DatabaseTemplate` template loader: we first have to define a new class which inherits from `Marten::Template::Loader::Base`. This new class needs to define a `#get_template_source` method which takes a template_name string argument and also returns a string.
 
-For simplicity we assume that there is a model `HtmlTemplate` with a `name` and `content` field:
+For simplicity we assume that there already exists a model `HtmlTemplate` with a `name` and `content` field:
 
 ```crystal
 class DatabaseTemplate < Marten::Template::Loader::Base

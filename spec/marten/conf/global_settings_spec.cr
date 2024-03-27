@@ -259,7 +259,11 @@ describe Marten::Conf::GlobalSettings do
 
     it "setup templates uses configured loaders" do
       file_system_loader = Marten::Template::Loader::FileSystem.new("/root/templates")
-      with_overridden_setting("templates.loaders", [file_system_loader] of Marten::Template::Loader::Base, nilable: true) do
+      with_overridden_setting(
+        "templates.loaders",
+        [file_system_loader] of Marten::Template::Loader::Base,
+        nilable: true
+      ) do
         Marten.setup_templates
         Marten.templates.loaders.size.should eq 1
         Marten.templates.loaders[0].should eq file_system_loader
@@ -267,7 +271,6 @@ describe Marten::Conf::GlobalSettings do
     end
 
     it "setup templates uses default loaders when setting is nil" do
-      file_system_loader = Marten::Template::Loader::FileSystem.new("/root/templates")
       with_overridden_setting("templates.loaders", nil, nilable: true) do
         Marten.setup_templates
         Marten.templates.loaders.size.should eq 2

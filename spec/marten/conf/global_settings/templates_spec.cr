@@ -163,7 +163,7 @@ describe Marten::Conf::GlobalSettings::Templates do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new
       loaders = [
         Marten::Template::Loader::AppDirs.new,
-        Marten::Template::Loader::FileSystem.new("/dummy/dir")
+        Marten::Template::Loader::FileSystem.new("/dummy/dir"),
       ]
       templates_conf.loaders = loaders
       templates_conf.loaders.should eq loaders
@@ -174,7 +174,7 @@ describe Marten::Conf::GlobalSettings::Templates do
     it "allows to configure the array of configured context producers" do
       loaders = [
         Marten::Template::Loader::AppDirs.new,
-        Marten::Template::Loader::FileSystem.new("/dummy/dir")
+        Marten::Template::Loader::FileSystem.new("/dummy/dir"),
       ]
 
       templates_conf = Marten::Conf::GlobalSettings::Templates.new

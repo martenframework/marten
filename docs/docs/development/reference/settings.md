@@ -763,7 +763,7 @@ config.templates.dirs = [
 ]
 ```
 
-### loaders
+### `loaders`
 
 Default: nil
 

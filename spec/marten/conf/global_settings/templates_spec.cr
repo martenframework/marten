@@ -159,16 +159,14 @@ describe Marten::Conf::GlobalSettings::Templates do
       templates_conf.loaders.should eq nil
     end
 
-    it "returns the array configured context producers" do
-      context_producers = [
-        Marten::Template::ContextProducer::Debug,
-        Marten::Template::ContextProducer::I18n,
-      ]
-
+    it "returns the configured array of loaders" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new
-      templates_conf.context_producers = context_producers
-
-      templates_conf.context_producers.should eq context_producers
+      loaders = [
+        Marten::Template::Loader::AppDirs.new,
+        Marten::Template::Loader::FileSystem.new("/dummy/dir")
+      ]
+      templates_conf.loaders = loaders
+      templates_conf.loaders.should eq loaders
     end
   end
 

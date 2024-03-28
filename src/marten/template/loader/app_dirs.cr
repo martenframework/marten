@@ -6,11 +6,9 @@ module Marten
     module Loader
       # Represents a template loader allowing to load templates from the installed application directories.
       class AppDirs < Base
-        @app_loaders : Array(Loader::FileSystem)
+        @app_loaders : Array(Loader::FileSystem)? = nil
 
         def initialize
-          @app_loaders = [] of Loader::FileSystem
-          @app_loaders += Marten.apps.app_configs.compact_map(&.templates_loader)
         end
 
         def get_template(template_name) : Template
@@ -26,7 +24,13 @@ module Marten
           raise NotImplementedError.new("The app dirs loader does not load template sources directly")
         end
 
-        private getter app_loaders
+        private def app_loaders : Array(Loader::FileSystem)
+          @app_loaders ||= begin
+            app_loaders = [] of Loader::FileSystem
+            app_loaders += Marten.apps.app_configs.compact_map(&.templates_loader)
+            app_loaders
+          end
+        end
       end
     end
   end

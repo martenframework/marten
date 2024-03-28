@@ -29,6 +29,14 @@ For example:
 {% assign my_var = "Hello World!" %}
 ```
 
+By default, variables assigned using this template tag will overwrite any existing variables with the same name in the template context. To prevent overwriting existing variables, you can append `unless assigned` after the assignment to ensure that new variables are only assigned if there isn't already one with the same name present.
+
+For example:
+
+```html
+{% assign my_var = "Hello World!" unless defined %}
+```
+
 ## `block`
 
 The `block` template tag allows to define that some specific portions of a template can be overridden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.

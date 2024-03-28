@@ -84,6 +84,11 @@ module Marten
         @values.empty? || @values.all?(&.empty?)
       end
 
+      # Returns `true` if the context contains the specified key.
+      def has_key?(key : String | Symbol)
+        @values.any?(&.has_key?(key.to_s))
+      end
+
       # Merges another context into the current one.
       def merge(other_context : self)
         other_context.values.each do |values|

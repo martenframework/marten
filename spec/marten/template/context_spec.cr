@@ -265,6 +265,30 @@ describe Marten::Template::Context do
     end
   end
 
+  describe "#has_key?" do
+    it "returns true if the specified key is present in the context" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.has_key?(:foo).should be_true
+      ctx.has_key?("foo").should be_true
+    end
+
+    it "returns true if the specified key is present in the context in a nested hash" do
+      ctx = Marten::Template::Context{"foo" => "bar", "john" => "doe"}
+      ctx.merge(Marten::Template::Context{"xyz" => "test", "foo" => "updated"})
+
+      ctx.has_key?(:foo).should be_true
+      ctx.has_key?("foo").should be_true
+      ctx.has_key?(:xyz).should be_true
+      ctx.has_key?("xyz").should be_true
+    end
+
+    it "returns false if the specified key is not present in the context" do
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.has_key?(:xyz).should be_false
+      ctx.has_key?("xyz").should be_false
+    end
+  end
+
   describe "#merge" do
     it "merges another context object into the current one" do
       context = Marten::Template::Context{"foo" => "bar", "john" => "doe"}

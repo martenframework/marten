@@ -770,7 +770,7 @@ Default: nil
 Overwrites the loading mechanism of templates. Takes an array of classes inheriting from `Marten::Template::Loader::Base`. Customize this to load templates from various sources like databases or in-memory structures. For example, to load templates from a file system:
 
 ```crystal
-config.templates.loaders = [Marten::Template::Loader::FileSystem.new("/path/to/templates")]
+config.templates.loaders = [Marten::Template::Loader::FileSystem.new("/path/to/templates")] of Marten::Template::Loader::Base
 ```
 
 ### `strict_variables`

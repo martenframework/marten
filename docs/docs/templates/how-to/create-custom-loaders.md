@@ -4,7 +4,7 @@ sidebar_label: Create custom loaders
 description: How to create custom template loaders.
 ---
 
-Marten has built-in support for common template loaders, but the framework also allows you to write your own template loader that you can leverage as part of your project's templates.
+Marten has built-in support for [common template loaders](../reference/loaders.md), but the framework also allows you to write your own template loader that you can leverage as part of your project's templates.
 
 ## Defining a template loaders
 

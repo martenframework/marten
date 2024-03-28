@@ -198,8 +198,7 @@ module Marten
               else
                 default_loaders = [] of Marten::Template::Loader::Base
                 default_loaders << Template::Loader::AppDirs.new if settings.templates.app_dirs
-                default_loaders += settings.templates.dirs.map { |d| Template::Loader::FileSystem.new(d) }
-                default_loaders
+                default_loaders + settings.templates.dirs.map { |d| Template::Loader::FileSystem.new(d) }
               end
 
     # Only cache templates if setting is true and no custom loaders are defined

@@ -87,7 +87,7 @@ module.exports = {
             'templates/how-to/create-custom-filters',
             'templates/how-to/create-custom-tags',
             'templates/how-to/create-custom-context-producers',
-            'templates/how-to/create-custom-template-loaders',
+            'templates/how-to/create-custom-loaders',
           ],
         },
         {
@@ -97,6 +97,7 @@ module.exports = {
             'templates/reference/filters',
             'templates/reference/tags',
             'templates/reference/context-producers',
+            'templates/reference/loaders',
           ],
         },
       ],

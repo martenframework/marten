@@ -82,20 +82,6 @@ qset = Article.all # returns a query set matching "all" the records of the Artic
 qset2 = qset.all   # returns a copy of the initial query set
 ```
 
-### `average`
-
-Allows calculating the average of a numeric field within the records of a specific model. The `#average` method can be used as a class method from any model class, or it can be used as an instance method from any query set object. When used on a query set, it calculates the average of the specified field for the records in that query set.
-
-For example:
-
-```crystal
-average_price = Product.average(:price) # Calculate the average price of all products
-
-# Calculate the average rating for a specific category of products
-electronic_products = Product.filter(category: "Electronics")
-average_rating = electronic_products.average(:rating)
-```
-
 ### `distinct`
 
 Returns a new query set that will use `SELECT DISTINCT` or `SELECT DISTINCT ON` in its SQL query.
@@ -179,24 +165,6 @@ query_set.join(:author__profile)
 :::info
 The `#join` method also supports targeting the reverse relation of a [`one_to_one`](./fields.md#one_to_one) field (such reverse relation can be defined through the use of the [`related`](./fields.md#related-2) field option). That way, you can traverse a [`one_to_one`](./fields.md#one_to_one) field back to the model record on which the field is specified.
 :::
-
-### `maximum`
-
-Retrieves the maximum value in a specific field across all records within a query set.
-
-```crystal
-Product.all.maximum(:price)  # Retrieves the highest price across all products
-# => 125.25
-```
-
-### `minimum`
-
-Retrieves the minimum value in a specific field across all records within a query set.
-
-```crystal
-Product.all.minimum(:price)  # Retrieves the lowest price across all products
-# => 15.99
-```
 
 ### `none`
 
@@ -324,6 +292,20 @@ The value passed to `#using` must be a valid database alias that was used to con
 ## Methods that do not return new query sets
 
 Query sets also provide a set of methods that will usually result in specific SQL queries to be executed in order to return values that don't correspond to new query sets.
+
+### `average`
+
+Allows calculating the average of a numeric field within the records of a specific model. The `#average` method can be used as a class method from any model class, or it can be used as an instance method from any query set object. When used on a query set, it calculates the average of the specified field for the records in that query set.
+
+For example:
+
+```crystal
+average_price = Product.average(:price) # Calculate the average price of all products
+
+# Calculate the average rating for a specific category of products
+electronic_products = Product.filter(category: "Electronics")
+average_rating = electronic_products.average(:rating)
+```
 
 ### `bulk_create`
 
@@ -605,6 +587,24 @@ Returns the last record that is matched by the query set, or raises a `NilAssert
 ```crystal
 Article.last!
 Article.filter(title__startswith: "Top").last!
+```
+
+### `maximum`
+
+Retrieves the maximum value in a specific field across all records within a query set.
+
+```crystal
+Product.all.maximum(:price)  # Retrieves the highest price across all products
+# => 125.25
+```
+
+### `minimum`
+
+Retrieves the minimum value in a specific field across all records within a query set.
+
+```crystal
+Product.all.minimum(:price)  # Retrieves the lowest price across all products
+# => 15.99
 ```
 
 ### `paginator`

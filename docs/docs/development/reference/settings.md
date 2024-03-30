@@ -763,6 +763,12 @@ config.templates.dirs = [
 ]
 ```
 
+### `isolated_inclusions`
+
+Default: `false`
+
+A boolean option enabling or disabling isolated inclusions of templates when using the [`include`](../../templates/reference/tags.md#include) template tag. When set to `true`, included templates won't have access to variables from the outer context by default, unless the `contextual` modifier is used with the `include` template tag. Conversely, when set to `false`, included templates will have access to the outer context's variables by default, unless explicitly disabled with the `isolated` modifier of the `include` template tag.
+
 ### `strict_variables`
 
 Default: `false`

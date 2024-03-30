@@ -6,6 +6,7 @@ module Marten
         @app_dirs : Bool = true
         @cached : Bool = false
         @context_producers = [] of Template::ContextProducer.class
+        @isolated_inclusions : Bool = false
         @dirs : Array(String) = [] of String
         @strict_variables : Bool = false
 
@@ -23,6 +24,12 @@ module Marten
         # The order of these directories is important as it defines the order in which templates are searched for.
         getter dirs
 
+        # Returns a boolean indicating whether included templates should be isolated from the outer context by default.
+        getter isolated_inclusions
+
+        # :ditto:
+        getter? isolated_inclusions
+
         # Returns `true` if the strict variables mode is enabled.
         getter strict_variables
 
@@ -38,6 +45,9 @@ module Marten
         # setting this configuration option to `true`, compiled templates will be kept in memory and further renderings
         # of the same templates will result in previous compiled templates to be reused.
         setter cached
+
+        # Allows to define whether included templates should be isolated from the outer context by default.
+        setter isolated_inclusions
 
         # Alows to enable or disable the strict variables mode.
         #

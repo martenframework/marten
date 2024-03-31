@@ -13,7 +13,7 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Tag).new
       query.add_query_node(Marten::DB::Query::Node.new(name__startswith: :c))
       query.count.should eq 2
-      query.execute.should eq [tag_2, tag_3]
+      query.execute.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "can add a new filter to an already filtered query" do
@@ -954,6 +954,18 @@ describe Marten::DB::Query::SQL::Query do
       query.average("price").should be_nil
     end
 
+    it "returns nil if the predicates will raise an empty results exception" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.average("price").should be_nil
+    end
+
     it "properly handles null values" do
       Marten::DB::Query::SQL::QuerySpec::Product.create!(
         name: "Awesome Product",
@@ -1170,6 +1182,16 @@ describe Marten::DB::Query::SQL::Query do
       Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Person).new.count("person_profile").should eq 1
     end
 
+    it "returns 0 if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.count.should eq 0
+    end
+
     it "raises if non existing field is counted" do
       expect_raises(
         Marten::DB::Errors::InvalidField,
@@ -1342,6 +1364,18 @@ describe Marten::DB::Query::SQL::Query do
       query_3.order("-name")
       query_3.execute.should eq [tag_1, tag_2, tag_3]
     end
+
+    it "returns an empty array if the predicates will raise an empty results exception" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.execute.should be_empty
+    end
   end
 
   describe "#exists?" do
@@ -1420,6 +1454,16 @@ describe Marten::DB::Query::SQL::Query do
       query_5.exists?.should be_false
     end
 
+    it "returns false if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.exists?.should be_false
+    end
+
     it "makes use of the specified DB connection" do
       Tag.using(:other).create!(name: "coding", is_active: true)
 
@@ -1453,6 +1497,18 @@ describe Marten::DB::Query::SQL::Query do
       query.maximum("price").should eq nil
     end
 
+    it "returns nil if the predicates will raise an empty results exception" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.maximum("price").should be_nil
+    end
+
     it "returns the expected maximum value" do
       Marten::DB::Query::SQL::QuerySpec::Product.create!(
         name: "Awesome Product",
@@ -1482,6 +1538,18 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
 
       query.minimum("price").should eq nil
+    end
+
+    it "returns nil if the predicates will raise an empty results exception" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.minimum("price").should be_nil
     end
 
     it "returns the expected minimum value" do
@@ -1686,6 +1754,16 @@ describe Marten::DB::Query::SQL::Query do
       Marten::DB::Query::SQL::Query(Tag).new.execute.to_set.should eq(Set{tag_1, tag_2, tag_3})
     end
 
+    it "returns 0 if the predicates will raise an empty results exception" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.raw_delete.should eq 0
+    end
+
     it "makes use of the specified DB connection" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
@@ -1792,6 +1870,18 @@ describe Marten::DB::Query::SQL::Query do
       query.pluck(["username", "profile"]).to_set.should eq(
         [["jd1", profile_1.id], ["jd2", profile_2.id], ["jd3", profile_3.id]].to_set
       )
+    end
+
+    it "returns an empty array if the predicates will raise an empty results exception" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.pluck(["name"]).should be_empty
     end
   end
 
@@ -2014,6 +2104,18 @@ describe Marten::DB::Query::SQL::Query do
       query.sum("price").should eq 0
     end
 
+    it "returns 0 if the predicates will raise an empty results exception" do
+      Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.sum("price").should eq 0
+    end
+
     it "calculates the correct sum" do
       Marten::DB::Query::SQL::QuerySpec::Product.create!(
         name: "Awesome Product",
@@ -2190,6 +2292,21 @@ describe Marten::DB::Query::SQL::Query do
       user_3.first_name.should eq "Bob"
       user_3.last_name.should eq "Abc"
       user_3.is_admin.should be_falsey
+    end
+
+    it "returns 0 if the predicates will raise an empty results exception" do
+      product = Marten::DB::Query::SQL::QuerySpec::Product.create!(
+        name: "Awesome Product",
+        price: 1000,
+        rating: 5.0,
+      )
+
+      query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
+      query.update_with({:price => 42}).should eq 0
+
+      product.reload
+      product.price.should eq 1000
     end
 
     it "allows to update records as expected when a query involves joins" do

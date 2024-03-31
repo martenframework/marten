@@ -343,7 +343,7 @@ module Marten
         # If no record is associated with the specified relation (eg. if the corresponding field is nullable), then
         # `nil` is returned. If the specified relation name is not defined on the model, then a
         # `Marten::DB::Errors::UnknownField` exception is raised.
-        def get_relation(relation_name : String | Symbol)
+        def get_related_object(relation_name : String | Symbol)
           {% begin %}
           case relation_name.to_s
           {% for field_var in @type.instance_vars
@@ -356,6 +356,78 @@ module Marten
           {% end %}
           else
             raise Errors::UnknownField.new("Unknown relation '#{relation_name.to_s}'")
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def get_related_object_variable(relation_name : String | Symbol)
+          {% begin %}
+          case relation_name.to_s
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && ann[:relation_name] && !ann[:reverse] && !ann[:many] %}
+          when {{ ann[:relation_name].stringify }}
+            @{{ relation_var.name }}
+          {% end %}
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown relation '#{relation_name.to_s}'")
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def get_related_queryset(relation_name : String | Symbol)
+          {% begin %}
+          case relation_name.to_s
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && ann[:many] && !ann[:reverse] && ann[:relation_name] %}
+          when {{ ann[:relation_name].stringify }}
+            {{ ann[:relation_name] }}
+          {% end %}
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown reverse relation '#{relation_name.to_s}'")
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def get_reverse_related_object_variable(relation_name : String | Symbol)
+          {% begin %}
+          case relation_name.to_s
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && !ann[:many] && ann[:reverse] %}
+          when {{ ann[:relation_name].stringify }}
+            @{{ relation_var.name }}
+          {% end %}
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown reverse relation '#{relation_name.to_s}'")
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def get_reverse_related_queryset(relation_name : String | Symbol)
+          {% begin %}
+          case relation_name.to_s
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && ann[:many] && ann[:reverse] && ann[:relation_name] %}
+          when {{ ann[:relation_name].stringify }}
+            {{ ann[:relation_name] }}
+          {% end %}
+          {% end %}
+          else
+            raise Errors::UnknownField.new("Unknown reverse relation '#{relation_name.to_s}'")
           end
           {% end %}
         end
@@ -424,6 +496,89 @@ module Marten
           set_field_value(self.class.pk_field.id, val)
         end
 
+        # :nodoc:
+        def assign_related_object(related_object, relation_field_id)
+          {% begin %}
+          case relation_field_id
+          {% for field_var in @type.instance_vars
+                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% if ann && ann[:relation_name] %}
+          when {{ field_var.name.stringify }}
+            if !related_object.nil? && !related_object.is_a?({{ ann[:related_model] }})
+              raise Errors::UnexpectedFieldValue.new(
+                "Value for relation {{ ann[:relation_name] }} should be of type {{ ann[:related_model] }}, " \
+                "not #{typeof(related_object)}"
+              )
+            end
+            self.{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }}?)
+          {% end %}
+          {% end %}
+          else
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def assign_reverse_related_object(related_object, relation_field_id)
+          {% begin %}
+          case relation_field_id
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && !ann[:many] && ann[:reverse] && ann[:relation_name] %}
+          when {{ ann[:relation_name].stringify }}
+            if !related_object.nil? && !related_object.is_a?({{ ann[:related_model] }})
+              raise Errors::UnexpectedFieldValue.new(
+                "Value for relation {{ ann[:relation_name] }} should be of type {{ ann[:related_model] }}, " \
+                "not #{typeof(related_object)}"
+              )
+            end
+            @{{ relation_var.name }} = related_object.as({{ ann[:related_model] }}?)
+          {% end %}
+          {% end %}
+
+          else
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def related_object_assigned?(relation_field_id)
+          {% begin %}
+          case relation_field_id
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && ann[:relation_name] && !ann[:reverse] && !ann[:many] %}
+          when {{ relation_var.name.stringify }}
+            !@{{ relation_var.name }}.nil?
+          {% end %}
+          {% end %}
+          else
+            false
+          end
+          {% end %}
+        end
+
+        # :nodoc:
+        def reverse_related_object_assigned?(relation_field_id)
+          {% begin %}
+          case relation_field_id
+          {% for relation_var in @type.instance_vars
+                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
+          {% if ann && !ann[:many] && ann[:reverse] && ann[:relation_name] %}
+          when {{ relation_var.name.stringify }}
+            !@{{ relation_var.name }}.nil?
+          {% end %}
+          {% end %}
+          else
+            false
+          end
+          {% end %}
+        end
+
         # Allows to set the value of a specific field.
         #
         # If the passed `field_name` doesn't match any existing field, a `Marten::DB::Errors::UnknownField` exception
@@ -484,51 +639,6 @@ module Marten
           when {{ field_var.name.stringify }}
           self.{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
           {% end %}
-          else
-          end
-          {% end %}
-        end
-
-        protected def assign_related_object(related_object, relation_field_id)
-          {% begin %}
-          case relation_field_id
-          {% for field_var in @type.instance_vars
-                                .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
-          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
-          {% if ann && ann[:relation_name] %}
-          when {{ field_var.name.stringify }}
-            if !related_object.nil? && !related_object.is_a?({{ ann[:related_model] }})
-              raise Errors::UnexpectedFieldValue.new(
-                "Value for relation {{ ann[:relation_name] }} should be of type {{ ann[:related_model] }}, " \
-                "not #{typeof(related_object)}"
-              )
-            end
-            self.{{ ann[:relation_name] }} = related_object.as({{ ann[:related_model] }}?)
-          {% end %}
-          {% end %}
-          else
-          end
-          {% end %}
-        end
-
-        protected def assign_reverse_related_object(related_object, relation_field_id)
-          {% begin %}
-          case relation_field_id
-          {% for relation_var in @type.instance_vars
-                                   .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
-          {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
-          {% if ann && ann[:relation_name] %}
-          when {{ ann[:relation_name].stringify }}
-            if !related_object.nil? && !related_object.is_a?({{ ann[:related_model] }})
-              raise Errors::UnexpectedFieldValue.new(
-                "Value for relation {{ ann[:relation_name] }} should be of type {{ ann[:related_model] }}, " \
-                "not #{typeof(related_object)}"
-              )
-            end
-            @{{ relation_var.name }} = related_object.as({{ ann[:related_model] }}?)
-          {% end %}
-          {% end %}
-
           else
           end
           {% end %}
@@ -643,8 +753,8 @@ module Marten
         end
 
         private def reset_relation_instance_variables : Nil
-          {% for field_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
-            @{{ field_var.id }} = nil
+          {% for relation_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+            @{{ relation_var.id }} = nil
           {% end %}
         end
 

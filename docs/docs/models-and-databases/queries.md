@@ -297,7 +297,7 @@ Article.filter(tags__label: "crystal")
 
 ### Pre-selecting relations with joins
 
-It is also possible to explicitly define that a specific query set must "join" a set of relations. This can result in nice performance improvements since this can help reduce the number of SQL queries performed for a given codebase. This is achieved through the use of the `#join` method:
+It is also possible to explicitly define that a specific query set must "join" a set of relations. This can result in nice performance improvements since this can help reduce the number of SQL queries performed for a given codebase. This is achieved through the use of the [`#join`](./reference/query-set.md#join) method:
 
 ```crystal
 author_1 = Author.filter(first_name: "John")
@@ -315,9 +315,50 @@ The double underscores notations can also be used in the context of joins. For e
 Article.join(:author__hometown).get(id: 42)
 ```
 
+Finally, it is worth mentioning that many relations can be specified to [`#join`](./reference/query-set.md#join). For example:
+
+```crystal
+Article.join(:author__hometown, :edited_by)
+```
+
 :::info
-Please note that the [`#join`](./reference/query-set.md#join) query set method can only be used on [many-to-one](./relationships.md#many-to-one-relationships) relationships, [one-to-one](./relationships.md#one-to-one-relationships) relationships, and reverse one-to-one relations.
+Please note that the [`#join`](./reference/query-set.md#join) query set method can only be used on [many-to-one](./relationships.md#many-to-one-relationships) relationships, [one-to-one](./relationships.md#one-to-one-relationships) relationships, and reverse one-to-one relations. For multi-valued relations, please consider [pre-fetching records](#pre-fetching-relations).
 :::
+
+### Pre-fetching relations
+
+While [pre-selecting relations with joins](#pre-selecting-relations-with-joins) can result in performance improvements (and help in reducing the number of SQL queries) by performing joins at the SQL level, is also possible to _pre-fetch relations_ using the [`#prefetch`](./reference/query-set.md#prefetch) method.
+
+Both methods serve a common purpose, aiming to alleviate N+1 issues commonly encountered when accessing related objects. However, their strategies diverge in approach:
+
+* When using [`#join`](./reference/query-set.md#join), the specified relationships are followed and each record returned by the considered query set has the corresponding related objects already selected and populated. The performance improvements are achieved by reducing the number of SQL queries since related records are retrieved by creating an SQL join and by including their fields in the main SELECT statement. Because of this, [`#join`](./reference/query-set.md#join) can only be used on single-valued relationships: [many-to-one](./relationships.md#many-to-one-relationships) relationships, [one-to-one](./relationships.md#one-to-one-relationships) relationships, and reverse one-to-one relations.
+* When using [`#prefetch`](./reference/query-set.md#prefetch), the records corresponding to the specified relationships will be prefetched in single batches and each record returned by the original query set will have the corresponding related objects already selected and populated. As such, [`#prefetch`](./reference/query-set.md#prefetch) can be used with any kind of relationship: [many-to-one](./relationships.md#many-to-one-relationships) relationships, [one-to-one](./relationships.md#one-to-one-relationships) relationships, [many-to-many](./relationships.md#many-to-many-relationships) relationships, and all types of reverse relations.
+
+For example, assuming that a `Post` model defines a `tags` many-to-many field:
+
+```crystal
+posts_1 = Post.all.to_a
+# hits the database to retrieve the related "tags" (many-to-many relation)
+puts posts_1[0].tags.to_a
+
+posts_2 = Post.all.prefetch(:tags).to_a
+# doesn't hit the database since the related "tags" relation was already prefetched
+puts posts_2[0].tags.to_a
+```
+
+The double underscores notations can also be used when pre-fetching relations. In this situation, the records targeted by the original query set will be decorated with the prefetched records, and those records will be decorated with the following prefetched records. For example:
+
+```crystal
+# The associated Book and BookGenres records will be pre-fetched and fully initialized 
+# at the Author and Book records levels.
+Author.prefetch(:books__genres)
+```
+
+Finally, it is worth mentioning that multiple relations can be specified to [`#prefetch`](./reference/query-set.md#prefetch). For example:
+
+```crystal
+Author.prefetch(:books__genres, :publisher)
+```
 
 ### Pagination
 

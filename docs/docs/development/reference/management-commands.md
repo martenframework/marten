@@ -36,6 +36,8 @@ Please refer to [Asset handling](../../assets/introduction.md) to learn more abo
 ### Options
 
 * `--no-input` - Does not show prompts to the user
+* `--fingerprint` - Attaches a fingerprint to the collected assets
+* `--manifest-path` - Configures where the manifest.json is stored. Only relevant if `--fingerprint` is activated. (default to  `src/manifest.json`)
 
 ### Examples
 

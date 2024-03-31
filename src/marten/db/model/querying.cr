@@ -521,6 +521,38 @@ module Marten
             default_queryset.pluck(fields)
           end
 
+          # Returns a queryset that will prefetch in a single batch the records for the specified relations.
+          #
+          # When using `#prefetch`, the records corresponding to the specified relationships will be prefetched in
+          # single batches and each record returned by the queryset will have the corresponding related objects already
+          # selected and populated. Using `#prefetch` can result in performance improvements since it can help reduce
+          # the number of SQL queries, as illustrated by the following example:
+          #
+          # ```
+          # posts_1 = Post.all.to_a
+          # puts posts_1[0].tags.to_a # hits the database to retrieve the related "tags" (many-to-many relation)
+          #
+          # posts_2 = Post.prefetch(:tags).to_a
+          # puts posts_2[0].tags # doesn't hit the database since the related "tags" relation was already prefetched
+          # ```
+          #
+          # It should be noted that it is also possible to follow relations and reverse relations too by using the
+          # double underscores notation(`__`). For example the following query will prefetch the "author" relation and
+          # then the "favorite tags" relation of the author records:
+          #
+          # ```
+          # Post.prefetch(:author__favorite_tags)
+          # ```
+          #
+          # Finally, it is worth mentioning that multiple relations can be specified to `#prefetch`. For example:
+          #
+          # ```
+          # Author.prefetch(:books__genres, :publisher)
+          # ```
+          def prefetch(*relations : String | Symbol)
+            all.prefetch(*relations)
+          end
+
           # Returns a raw query set for the passed SQL query and optional positional parameters.
           #
           # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records
@@ -610,6 +642,21 @@ module Marten
           def using(db : Nil | String | Symbol)
             all.using(db)
           end
+        end
+
+        # :nodoc:
+        @prefetched_records_cache : Hash(String, Array(Model))?
+
+        protected def initialize_prefetched_records_cache
+          @prefetched_records_cache = {} of String => Array(Model)
+        end
+
+        protected def prefetched_records_cache
+          @prefetched_records_cache.not_nil!
+        end
+
+        protected def prefetched_records_cache_initialized?
+          !@prefetched_records_cache.nil?
         end
       end
     end

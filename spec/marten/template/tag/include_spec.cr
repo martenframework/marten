@@ -8,6 +8,71 @@ describe Marten::Template::Tag::Include do
       tag.render(Marten::Template::Context{"name" => "John Doe"}).includes?("Hello World, John Doe!").should be_true
     end
 
+    it "can initialize a regular include tag with a single variable assignment" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(parser, %{include "partials/hello_world.html" with name="FooBar"})
+      tag.render(Marten::Template::Context{"name" => "John Doe"}).includes?("Hello World, FooBar!").should be_true
+    end
+
+    it "can initialize a regular include tag with multiple variable assignments" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(
+        parser,
+        %{include "partials/hello_world.html" with name="FooBar", source="test"}
+      )
+
+      output = tag.render(Marten::Template::Context{"name" => "John Doe", "source" => "other"})
+
+      output.includes?("Hello World, FooBar!").should be_true
+      output.includes?("From test!").should be_true
+    end
+
+    it "can initialize an include tag without assignments in isolated mode" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(parser, %{include "partials/hello_world.html" isolated})
+      tag.render(Marten::Template::Context{"name" => "John Doe"}).includes?("Hello World, !").should be_true
+    end
+
+    it "can initialize an include tag with assignments in isolated mode" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(
+        parser,
+        %{include "partials/hello_world.html" with name="FooBar", other="test" isolated}
+      )
+
+      output = tag.render(Marten::Template::Context{"name" => "John Doe", "source" => "default source"})
+
+      output.includes?("Hello World, FooBar!").should be_true
+      output.includes?("From !").should be_true
+    end
+
+    it "can initialize an include tag without assignments in contextual mode" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(parser, %{include "partials/hello_world.html" contextual})
+      tag.render(Marten::Template::Context{"name" => "John Doe"}).includes?("Hello World, John Doe!").should be_true
+    end
+
+    it "can initialize an include tag with assignments in contextual mode" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(
+        parser,
+        %{include "partials/hello_world.html" with source="test" contextual}
+      )
+
+      output = tag.render(Marten::Template::Context{"name" => "John Doe", "source" => "other"})
+
+      output.includes?("Hello World, John Doe!").should be_true
+      output.includes?("From test!").should be_true
+    end
+
+    it "respects the templates.isolated_inclusions setting value" do
+      with_overridden_setting("templates.isolated_inclusions", true) do
+        parser = Marten::Template::Parser.new("")
+        tag = Marten::Template::Tag::Include.new(parser, %{include "partials/hello_world.html"})
+        tag.render(Marten::Template::Context{"name" => "John Doe"}).includes?("Hello World, !").should be_true
+      end
+    end
+
     it "raises if not enough parameters are specified" do
       parser = Marten::Template::Parser.new("")
 
@@ -78,6 +143,34 @@ describe Marten::Template::Tag::Include do
       tag = Marten::Template::Tag::Include.new(parser, %{include include_tpl_name})
       tag.render(Marten::Template::Context{"include_tpl_name" => "partials/hello_world.html", "name" => "John Doe"})
         .includes?("Hello World, John Doe!").should be_true
+    end
+
+    it "does not give access to the outer context in isolated mode" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(
+        parser,
+        %{include "partials/hello_world.html" with name="FooBar", other="test" isolated}
+      )
+
+      output = tag.render(Marten::Template::Context{"name" => "John Doe", "source" => "default source"})
+
+      output.includes?("Hello World, FooBar!").should be_true
+      output.includes?("From !").should be_true
+    end
+
+    it "gives access to the outer context in contextual mode" do
+      with_overridden_setting("templates.isolated_inclusions", true) do
+        parser = Marten::Template::Parser.new("")
+        tag = Marten::Template::Tag::Include.new(
+          parser,
+          %{include "partials/hello_world.html" with val1=42, source="test" contextual}
+        )
+
+        output = tag.render(Marten::Template::Context{"name" => "John Doe", "source" => "other"})
+
+        output.includes?("Hello World, John Doe!").should be_true
+        output.includes?("From test!").should be_true
+      end
     end
 
     it "does not leak include variables in the outer context" do

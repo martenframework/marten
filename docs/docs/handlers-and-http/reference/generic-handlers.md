@@ -28,7 +28,7 @@ The model class used to create the new record can be configured through the use 
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the schema while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/Schema.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the schema has been validated. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/Schema.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/Schema.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
 
-For example if your application logic requires a success route that includes an identifier (such as a record's primary key), you can customize the success URL by overriding the `#success_url` method like this:
+For example, if your application logic requires a success route that includes an identifier (such as a record's primary key), you can customize the success URL by overriding the `#success_url` method like this:
 
 ```crystal
 def success_url
@@ -58,7 +58,33 @@ end
 
 It should be noted that the redirect response issued will be a 302 (found).
 
-The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render a deletion confirmation page while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/RecordDelete.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the deletion is complete. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/RecordDelete.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/RecordDelete.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to.
+The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render a deletion confirmation page while the [`#success_route_name`](pathname:///api/dev/Marten/Handlers/RecordDelete.html#success_route_name(success_route_name%3AString%3F)-class-method) method can be used to specify the name of a route to redirect to once the deletion is complete. Alternatively, the [`#sucess_url`](pathname:///api/dev/Marten/Handlers/RecordDelete.html#success_url(success_url%3AString%3F)-class-method) class method can be used to provide a raw URL to redirect to. The [same method](pathname:///api/dev/Marten/Handlers/RecordDelete.html#success_url-instance-method) can also be overridden at the instance level to rely on a custom logic to generate the success URL to redirect to. It's also possible to pre-filter the queryset before deleting the record by using the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro.
+
+:::tip How to customize the query set?
+By default, handlers that inherit from [`Marten::Handlers::RecordDelete`](pathname:///api/dev/Marten/Handlers/RecordDelete.html) will use a query set targetting _all_ the records in order to retrieve the record that should be deleted. It should be noted that you can customize this behavior easily by leveraging the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro instead of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. For example:
+
+```crystal
+class ArticleDeleteHandler < Marten::Handlers::RecordDelete
+  queryset MyModel.filter(user: request.user)
+  template_name "article_delete.html"
+  success_route_name "article_delete_success"
+end
+```
+
+Alternatively, it is also possible to override the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset-instance-method) method and apply additional filters to the default query set:
+
+```crystal
+class ArticleDeleteHandler < Marten::Handlers::RecordDelete
+  model MyModel
+  template_name "article_delete.html"
+  success_route_name "article_delete_success"
+
+  def queryset
+    super.filter(user: request.user)
+  end
+end
+```
+:::
 
 ## Displaying a record
 
@@ -75,9 +101,33 @@ class ArticleDetailHandler < Marten::Handlers::RecordDetail
 end
 ```
 
-The model class used to retrieve the record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. By default, a [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) subclass will always retrieve model records by looking for a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be rendered. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
+The model class used to retrieve the record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. It's also possible to pre-filter the queryset before retrieving the record by using the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro. By default, a [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) subclass will always retrieve model records by looking for a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be rendered. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
 
 The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#template_name(template_name%3AString%3F)-instance-method) class method allows defining the name of the template to use to render the considered model record. By default, the model record is associated with a `record` key in the template context, but this can also be configured by using the [`record_context_name`](pathname:///api/dev/Marten/Handlers/RecordDetail.html#record_context_name(name%3AString|Symbol)-class-method) class method.
+
+:::tip How to customize the query set?
+By default, handlers that inherit from [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) will use a query set targetting _all_ the records in order to retrieve the record that should be displayed. It should be noted that you can customize this behavior easily by leveraging the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro instead of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. For example:
+
+```crystal
+class ArticleDetailHandler < Marten::Handlers::RecordDetail
+  queryset Article.filter(user: request.user)
+  template_name "articles/detail.html"
+end
+```
+
+Alternatively, it is also possible to override the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset-instance-method) method and apply additional filters to the default query set:
+
+```crystal
+class ArticleDetailHandler < Marten::Handlers::RecordDetail
+  model Article
+  template_name "articles/detail.html"
+
+  def queryset
+    super.filter(user: request.user)
+  end
+end
+```
+:::
 
 ## Listing records
 
@@ -143,9 +193,9 @@ Handler allowing to update a model record by processing a schema.
 This handler can be used to process a form, validate its data through the use of a [schema](../../schemas.mdx), and update an existing record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the model record that was retrieved is updated and the handler returns an HTTP redirect to a configured success URL.
 
 ```crystal
-class MyFormHandler < Marten::Handlers::RecordUpdate
+class MyUpdateHandler < Marten::Handlers::RecordUpdate
   model MyModel
-  schema MyFormSchema
+  schema MyUpdateSchema
   template_name "my_form.html"
   success_route_name "my_form_success"
 end
@@ -153,7 +203,7 @@ end
 
 It should be noted that the redirect response issued will be a 302 (found).
 
-The model class used to update the new record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. By default, the record to update is retrieved by expecting a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be updated. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
+The model class used to update the new record can be configured through the use of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. It's also possible to pre-filter the queryset before updating the record by using the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro. By default, the record to update is retrieved by expecting a `pk` route parameter: this parameter is assumed to contain the value of the primary key field associated with the record that should be updated. If you need to use a different route parameter name, you can also specify a different one through the use of the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method. Finally, the model field that is used to get the model record (defaulting to `pk`) can also be configured by leveraging the [`#lookup_param`](pathname:///api/dev/Marten/Handlers/RecordRetrieving/ClassMethods.html#lookup_param(lookup_param%3AString|Symbol)-instance-method) class method.
 
 The schema used to perform the validation can be defined through the use of the [`#schema`](pathname:///api/dev/Marten/Handlers/Schema.html#schema(schema_klass)-macro) macro. Alternatively, the [`#schema_class`](pathname:///api/dev/Marten/Handlers/Schema.html#schema_class-instance-method) method can also be overridden to dynamically define the schema class as part of the request handler handling.
 
@@ -162,6 +212,35 @@ The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethod
 :::tip
 Handlers making use of the [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](../callbacks.md#schema-handler-callbacks) to learn more about those.
 :::
+
+:::tip How to customize the query set?
+By default, handlers that inherit from [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) will use a query set targetting _all_ the records in order to retrieve the record that should be updated. It should be noted that you can customize this behavior easily by leveraging the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro instead of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. For example:
+
+```crystal
+class MyUpdateHandler < Marten::Handlers::RecordUpdate
+  queryset MyModel.filter(user: request.user)
+  schema MyUpdateSchema
+  template_name "my_form.html"
+  success_route_name "my_form_success"
+end
+```
+
+Alternatively, it is also possible to override the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset-instance-method) method and apply additional filters to the default query set:
+
+```crystal
+class MyUpdateHandler < Marten::Handlers::RecordUpdate
+  model MyModel
+  schema MyUpdateSchema
+  template_name "my_form.html"
+  success_route_name "my_form_success"
+
+  def queryset
+    super.filter(user: request.user)
+  end
+end
+```
+:::
+
 
 ## Performing a redirect
 

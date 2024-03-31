@@ -8,11 +8,22 @@ module Marten
         include CanExtractAssignments
         include CanSplitSmartly
 
-        @template_name_expression : FilterExpression
         @assignments : Hash(String, FilterExpression)
+        @isolated : Bool
+        @template_name_expression : FilterExpression
 
         def initialize(parser : Parser, source : String)
           parts = split_smartly(source)
+
+          if parts.last == CONTEXTUAL
+            @isolated = false
+            parts.pop
+          elsif parts.last == ISOLATED
+            @isolated = true
+            parts.pop
+          else
+            @isolated = Marten.settings.templates.isolated_inclusions?
+          end
 
           # Ensures that the include tag is not malformed and defines a template name at least.
           if parts.size < 2
@@ -54,7 +65,8 @@ module Marten
 
           rendered = ""
 
-          context.stack do |include_context|
+          outer_context = isolated? ? Context.new : context
+          outer_context.stack do |include_context|
             @assignments.each do |name, expression|
               include_context[name] = expression.resolve(include_context)
             end
@@ -64,6 +76,11 @@ module Marten
 
           rendered
         end
+
+        private CONTEXTUAL = "contextual"
+        private ISOLATED   = "isolated"
+
+        private getter? isolated
       end
     end
   end

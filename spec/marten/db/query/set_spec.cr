@@ -1025,7 +1025,7 @@ describe Marten::DB::Query::Set do
         tags << t
       end
 
-      tags.should eq [tag_2, tag_3]
+      tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "allows to iterate over the records targetted by the query set if it was already fetched" do
@@ -1042,7 +1042,7 @@ describe Marten::DB::Query::Set do
         tags << t
       end
 
-      tags.should eq [tag_2, tag_3]
+      tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
   end
 
@@ -1205,7 +1205,7 @@ describe Marten::DB::Query::Set do
 
       qset = Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c)
 
-      qset.to_a.should eq [tag_2, tag_3]
+      qset.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "allows to filter the records matching predicates expressed using a q expression" do
@@ -1227,7 +1227,7 @@ describe Marten::DB::Query::Set do
 
       qset = Marten::DB::Query::Set(Tag).new.filter(Marten::DB::Query::Node.new(name__startswith: :c))
 
-      qset.to_a.should eq [tag_2, tag_3]
+      qset.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
     it "works as expected if the queryset was already fetched" do
@@ -1245,9 +1245,9 @@ describe Marten::DB::Query::Set do
       qset_3 = Marten::DB::Query::Set(Tag).new.filter(Marten::DB::Query::Node.new(name__startswith: :c))
       qset_3.each { }
 
-      qset_1.to_a.should eq [tag_2, tag_3]
-      qset_2.to_a.should eq [tag_1, tag_4]
-      qset_3.to_a.should eq [tag_2, tag_3]
+      qset_1.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
+      qset_2.to_a.sort_by(&.pk!.to_s).should eq [tag_1, tag_4].sort_by(&.pk!.to_s)
+      qset_3.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
   end
 
@@ -2365,6 +2365,165 @@ describe Marten::DB::Query::Set do
           [["Post 1", "John"], ["Post 2", "John"], ["Post 3", "John"], ["Post 4", "John"], ["Post 5", "Bob"]].to_set
         )
       end
+    end
+  end
+
+  describe "#prefetch" do
+    it "allows to prefetch a single one-to-one relation" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      user_profile_1 = TestUserProfile.create!(user: user_1, bio: "Test 1")
+      user_profile_2 = TestUserProfile.create!(user: user_2, bio: "Test 2")
+
+      qset = Marten::DB::Query::Set(TestUserProfile).new.order(:bio).prefetch(:user)
+
+      qset.to_a.should eq [user_profile_1, user_profile_2]
+      qset[0].get_related_object_variable(:user).should eq user_1
+      qset[1].get_related_object_variable(:user).should eq user_2
+    end
+
+    it "allows to prefetch a single many-to-one relation" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+
+      qset = Marten::DB::Query::Set(Post).new.order(:title).prefetch(:author)
+
+      qset.to_a.should eq [post_1, post_2]
+      qset[0].get_related_object_variable(:author).should eq user_1
+      qset[1].get_related_object_variable(:author).should eq user_2
+    end
+
+    it "allows to prefetch a single many-to-many relation" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+      tag_5 = Tag.create!(name: "typing", is_active: true)
+      Tag.create!(name: "debugging", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      user_1.tags.add(tag_1, tag_3)
+      user_2.tags.add(tag_2, tag_3)
+      user_3.tags.add(tag_4, tag_5)
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:tags)
+
+      qset.to_a.should eq [user_1, user_2, user_3]
+      qset[0].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_1, tag_3]
+      qset[1].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_2, tag_3]
+      qset[2].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_4, tag_5]
+    end
+
+    it "allows to prefetch a single reverse one-to-one relation" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      user_profile_1 = TestUserProfile.create!(user: user_1, bio: "Test 1")
+      user_profile_2 = TestUserProfile.create!(user: user_2, bio: "Test 2")
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:profile)
+
+      qset.to_a.should eq [user_1, user_2]
+      qset[0].get_reverse_related_object_variable(:profile).should eq user_profile_1
+      qset[1].get_reverse_related_object_variable(:profile).should eq user_profile_2
+    end
+
+    it "allows to prefetch a single reverse many-to-one relation" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_2, title: "Post 4")
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:posts)
+
+      qset.to_a.should eq [user_1, user_2]
+      qset[0].posts.result_cache.try(&.sort_by(&.pk!)).should eq [post_1, post_3]
+      qset[1].posts.result_cache.try(&.sort_by(&.pk!)).should eq [post_2, post_4]
+    end
+
+    it "allows to prefetch a single reverse many-to-many relation" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+      tag_5 = Tag.create!(name: "typing", is_active: true)
+      tag_6 = Tag.create!(name: "debugging", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      user_1.tags.add(tag_1, tag_2, tag_3)
+      user_2.tags.add(tag_2, tag_3)
+      user_3.tags.add(tag_3, tag_4, tag_5)
+
+      qset = Marten::DB::Query::Set(Tag).new.order(:pk).prefetch(:test_users)
+
+      qset.to_a.should eq [tag_1, tag_2, tag_3, tag_4, tag_5, tag_6]
+      qset[0].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_1]
+      qset[1].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_1, user_2]
+      qset[2].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_1, user_2, user_3]
+      qset[3].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_3]
+      qset[4].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_3]
+      qset[5].test_users.result_cache.try(&.empty?).should be_true
+    end
+
+    it "can prefetch many relations" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+      tag_5 = Tag.create!(name: "typing", is_active: true)
+      Tag.create!(name: "debugging", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      user_1.tags.add(tag_1, tag_3)
+      user_2.tags.add(tag_2, tag_3)
+      user_3.tags.add(tag_4, tag_5)
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_2, title: "Post 4")
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:tags, :posts)
+
+      qset.to_a.should eq [user_1, user_2, user_3]
+
+      qset[0].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_1, tag_3]
+      qset[1].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_2, tag_3]
+      qset[2].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_4, tag_5]
+
+      qset[0].posts.result_cache.try(&.sort_by(&.pk!)).should eq [post_1, post_3]
+      qset[1].posts.result_cache.try(&.sort_by(&.pk!)).should eq [post_2, post_4]
+      qset[2].posts.result_cache.try(&.empty?).should be_true
+    end
+
+    it "works with relations expressed as strings" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      user_profile_1 = TestUserProfile.create!(user: user_1, bio: "Test 1")
+      user_profile_2 = TestUserProfile.create!(user: user_2, bio: "Test 2")
+
+      qset = Marten::DB::Query::Set(TestUserProfile).new.order(:bio).prefetch("user")
+
+      qset.to_a.should eq [user_profile_1, user_profile_2]
+      qset[0].get_related_object_variable(:user).should eq user_1
+      qset[1].get_related_object_variable(:user).should eq user_2
     end
   end
 

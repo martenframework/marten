@@ -122,6 +122,11 @@ module Marten
               )]
               @{{ field_id }} : {{ field_ann[:exposed_type] }}?
 
+              @[Marten::DB::Model::Table::RelationInstanceVariable(
+                many: false,
+                reverse: false,
+                relation_name: {{ relation_attribute_name }},
+              )]
               @{{ relation_attribute_name }} : {{ related_model_klass }}?
 
               def {{ field_id }} : {{ field_ann[:exposed_type] }}?
@@ -142,9 +147,7 @@ module Marten
               end
 
               def {{ relation_attribute_name }} : {{ related_model_klass }}?
-                @{{ relation_attribute_name }} ||= begin
-                  {{ related_model_klass }}.get(pk: @{{ field_id }})
-                end
+                @{{ relation_attribute_name }} ||= {{ related_model_klass }}.get(pk: @{{ field_id }})
               end
 
               def {{ relation_attribute_name }}! : {{ related_model_klass }}
@@ -190,7 +193,11 @@ module Marten
               class ::{{ model_klass }}
                 macro finished
                   class ::{{ related_model_klass }}
-                    @[Marten::DB::Model::Table::RelationInstanceVariable]
+                    @[Marten::DB::Model::Table::RelationInstanceVariable(
+                      many: true,
+                      reverse: true,
+                      relation_name: {{ related_field_name.id }}
+                    )]
                     @_reverse_m2o_{{ related_field_name.id }} : Marten::DB::Query::RelatedSet({{ model_klass }})?
 
                     def {{ related_field_name.id }}

@@ -153,6 +153,36 @@ describe Marten::Conf::GlobalSettings::Templates do
     end
   end
 
+  describe "#isolated_inclusions" do
+    it "returns false by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.isolated_inclusions.should be_false
+    end
+
+    it "returns true if the isolated inclusions mode is enabled" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.isolated_inclusions = true
+
+      templates_conf.isolated_inclusions.should be_true
+    end
+  end
+
+  describe "#isolated_inclusions?" do
+    it "returns false by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.isolated_inclusions?.should be_false
+    end
+
+    it "returns true if the isolated inclusions mode is enabled" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.isolated_inclusions = true
+
+      templates_conf.isolated_inclusions?.should be_true
+    end
+  end
+
   describe "#loaders" do
     it "returns nil by default" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new
@@ -181,6 +211,16 @@ describe Marten::Conf::GlobalSettings::Templates do
       templates_conf.loaders = loaders
 
       templates_conf.loaders.should eq loaders
+    end
+  end
+
+  describe "#isolated_inclusions=" do
+    it "enables the isolated inclusions mode" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+
+      templates_conf.isolated_inclusions = true
+
+      templates_conf.isolated_inclusions?.should be_true
     end
   end
 

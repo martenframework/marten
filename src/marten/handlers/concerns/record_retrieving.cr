@@ -56,6 +56,16 @@ module Marten
         raise_improperly_configured_model
       end
 
+      # Allows to configure the query set that should be used to retrieve the record.
+      #
+      # This macro should only be used in situations where the `model` macro is not used.
+      macro queryset(queryset)
+        # Returns the queryset used to retrieve the record displayed by the handler.
+        def queryset
+          {{ queryset }}
+        end
+      end
+
       # Returns the queryset used to retrieve the record displayed by the handler.
       def queryset
         model.all

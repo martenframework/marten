@@ -468,7 +468,7 @@ describe Marten::DB::Model::Table do
     end
   end
 
-  describe "#get_relation" do
+  describe "#get_related_object" do
     it "returns the relation record corresponding to the passed string" do
       address = Marten::DB::Model::TableSpec::Address.create!(street: "Street 1")
       student = Marten::DB::Model::TableSpec::Student.create!(
@@ -478,7 +478,7 @@ describe Marten::DB::Model::Table do
         grade: "10"
       )
 
-      student.get_relation("address").should eq address
+      student.get_related_object("address").should eq address
     end
 
     it "returns the relation record corresponding to the passed symbol" do
@@ -490,7 +490,7 @@ describe Marten::DB::Model::Table do
         grade: "10"
       )
 
-      student.get_relation(:address).should eq address
+      student.get_related_object(:address).should eq address
     end
 
     it "returns nil if the corresponding field has no value yet" do
@@ -500,7 +500,7 @@ describe Marten::DB::Model::Table do
         grade: "10"
       )
 
-      student.get_relation(:address).should be_nil
+      student.get_related_object(:address).should be_nil
     end
 
     it "raises if the relation name does not correspond to any model relation" do
@@ -513,7 +513,7 @@ describe Marten::DB::Model::Table do
       )
 
       expect_raises(Marten::DB::Errors::UnknownField) do
-        student.get_relation(:unknown)
+        student.get_related_object(:unknown)
       end
     end
   end

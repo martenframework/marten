@@ -29,6 +29,14 @@ For example:
 {% assign my_var = "Hello World!" %}
 ```
 
+By default, variables assigned using this template tag will overwrite any existing variables with the same name in the template context. To prevent overwriting existing variables, you can append `unless assigned` after the assignment to ensure that new variables are only assigned if there isn't already one with the same name present.
+
+For example:
+
+```html
+{% assign my_var = "Hello World!" unless defined %}
+```
+
 ## `block`
 
 The `block` template tag allows to define that some specific portions of a template can be overridden by child templates. This tag is only useful when used in conjunction with the [`extend`](#extend) tag. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.
@@ -147,7 +155,7 @@ How are you {{ name }}?
 
 If `name` is "John", then the output will be "Hello, John! How are you John?".
 
-Finally, it should be noted that additional variables that are specific to the included template only can be specified using the `with` keyword:
+It should be noted that additional variables that are specific to the included template only can be specified using the `with` keyword:
 
 ```html
 {% include "path/to/my_snippet.html" with new_var="hello" %}
@@ -157,6 +165,16 @@ Multiple variables can also be specified if necessary. In that case, variable as
 
 ```html
 {% include "path/to/my_snippet.html" with var1="foo", var2="bar" %}
+```
+
+Additionally, it is important to note that the accessibility of outer context variables for included templates depends on the value of the [`templates.isolated_inclusions`](../../development/reference/settings.md#isolated_inclusions) setting. By default, this setting is set to `false`, which means that included templates have access to the outer context variables. However, it is important to note that this behavior can be modified for each inclusion, regardless of the value of the [`templates.isolated_inclusions`](../../development/reference/settings.md#isolated_inclusions) setting. This can be achieved by appending the `isolated` modifier to specify that the included template must not access the outer context, or using the `contextual` modifier to indicate that it should have access. For example:
+
+```html
+<!-- The included snippet does not have access to the outer context. -->
+{% include "path/to/my_snippet.html" with new_var="hello" isolated %}
+
+<!-- The included snippet has access to the outer context. -->
+{% include "path/to/my_snippet.html" with new_var="hello" contextual %}
 ```
 
 :::caution

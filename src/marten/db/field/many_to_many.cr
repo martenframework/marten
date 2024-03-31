@@ -111,7 +111,10 @@ module Marten
             {% end %}
 
             class ::{{ model_klass }}
-              @[Marten::DB::Model::Table::RelationInstanceVariable]
+              @[Marten::DB::Model::Table::RelationInstanceVariable(
+                many: true,
+                relation_name: {{ field_id }}
+              )]
               @_m2m_{{ field_id }} : Marten::DB::Query::ManyToManySet({{ related_model_klass }})?
 
               register_field(
@@ -173,7 +176,11 @@ module Marten
               class ::{{ model_klass }}
                 macro finished
                   class ::{{ related_model_klass }}
-                    @[Marten::DB::Model::Table::RelationInstanceVariable]
+                    @[Marten::DB::Model::Table::RelationInstanceVariable(
+                      many: true,
+                      reverse: true,
+                      relation_name: {{ related_field_name.id }}
+                    )]
                     @_reverse_m2m_{{ related_field_name.id }} : Marten::DB::Query::Set({{ model_klass }})?
 
 

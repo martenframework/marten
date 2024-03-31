@@ -82,20 +82,6 @@ qset = Article.all # returns a query set matching "all" the records of the Artic
 qset2 = qset.all   # returns a copy of the initial query set
 ```
 
-### `average`
-
-Allows calculating the average of a numeric field within the records of a specific model. The `#average` method can be used as a class method from any model class, or it can be used as an instance method from any query set object. When used on a query set, it calculates the average of the specified field for the records in that query set.
-
-For example:
-
-```crystal
-average_price = Product.average(:price) # Calculate the average price of all products
-
-# Calculate the average rating for a specific category of products
-electronic_products = Product.filter(category: "Electronics")
-average_rating = electronic_products.average(:rating)
-```
-
 ### `distinct`
 
 Returns a new query set that will use `SELECT DISTINCT` or `SELECT DISTINCT ON` in its SQL query.
@@ -180,24 +166,6 @@ query_set.join(:author__profile)
 The `#join` method also supports targeting the reverse relation of a [`one_to_one`](./fields.md#one_to_one) field (such reverse relation can be defined through the use of the [`related`](./fields.md#related-2) field option). That way, you can traverse a [`one_to_one`](./fields.md#one_to_one) field back to the model record on which the field is specified.
 :::
 
-### `maximum`
-
-Retrieves the maximum value in a specific field across all records within a query set.
-
-```crystal
-Product.all.maximum(:price)  # Retrieves the highest price across all products
-# => 125.25
-```
-
-### `minimum`
-
-Retrieves the minimum value in a specific field across all records within a query set.
-
-```crystal
-Product.all.minimum(:price)  # Retrieves the lowest price across all products
-# => 15.99
-```
-
 ### `none`
 
 Returns a query set that will always return an empty array of records, without querying the database.
@@ -221,6 +189,43 @@ query_set.order("-published_at", "title")
 ```
 
 In the above example, records would be ordered by descending publication date (because of the `-` prefix), and then by title (ascending).
+
+### `prefetch`
+
+Returns a query set that will automatically prefetch in a single batch the records for the specified relations (see [Queries](../queries.md#pre-fetching-relations) for an introduction about this capability).
+
+When using `#prefetch`, the records corresponding to the specified relationships will be prefetched in single batches and each record returned by the query set will have the corresponding related objects already selected and populated. Using `#prefetch` can result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
+
+```crystal
+posts_1 = Post.all.to_a
+# hits the database to retrieve the related "tags" (many-to-many relation)
+puts posts_1[0].tags.to_a
+
+posts_2 = Post.all.prefetch(:tags).to_a
+# doesn't hit the database since the related "tags" relation was already prefetched
+puts posts_2[0].tags
+```
+
+It should be noted that it is also possible to follow relations and reverse relations too by using the double underscores notation(`__`). For example, the following query will prefetch the "author" relation and then the "favorite tags" relation of the author records:
+
+```crystal
+query_set = Post.all
+query_set.prefetch(:author__favorite_tags)
+```
+
+Finally, it is worth mentioning that multiple relations can be specified to `#prefetch`. For example:
+
+```crystal
+Author.all.prefetch(:books__genres, :publisher)
+```
+
+:::tip
+The `#prefetch` method can also be called directly on model classes:
+
+```crystal
+Author.prefetch(:books__genres, :publisher)
+```
+:::
 
 ### `raw`
 
@@ -288,6 +293,20 @@ The value passed to `#using` must be a valid database alias that was used to con
 
 Query sets also provide a set of methods that will usually result in specific SQL queries to be executed in order to return values that don't correspond to new query sets.
 
+### `average`
+
+Allows calculating the average of a numeric field within the records of a specific model. The `#average` method can be used as a class method from any model class, or it can be used as an instance method from any query set object. When used on a query set, it calculates the average of the specified field for the records in that query set.
+
+For example:
+
+```crystal
+average_price = Product.average(:price) # Calculate the average price of all products
+
+# Calculate the average rating for a specific category of products
+electronic_products = Product.filter(category: "Electronics")
+average_rating = electronic_products.average(:rating)
+```
+
 ### `bulk_create`
 
 Bulk inserts the passed model instances into the database.
@@ -320,7 +339,7 @@ query_set.bulk_create(
 ```
 
 :::tip
-The `#bulk_create` model can also be called directly on model classes:
+The `#bulk_create` method can also be called directly on model classes:
 
 ```crystal
 Post.bulk_create(
@@ -568,6 +587,24 @@ Returns the last record that is matched by the query set, or raises a `NilAssert
 ```crystal
 Article.last!
 Article.filter(title__startswith: "Top").last!
+```
+
+### `maximum`
+
+Retrieves the maximum value in a specific field across all records within a query set.
+
+```crystal
+Product.all.maximum(:price)  # Retrieves the highest price across all products
+# => 125.25
+```
+
+### `minimum`
+
+Retrieves the minimum value in a specific field across all records within a query set.
+
+```crystal
+Product.all.minimum(:price)  # Retrieves the lowest price across all products
+# => 15.99
 ```
 
 ### `paginator`

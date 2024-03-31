@@ -11,11 +11,23 @@ This page provides a reference for all the available template loaders that can b
 
 Loads templates directly from the file system.
 
+Initialization example:
+
+```crystal
+loader = Marten::Template::Loader::FileSystem.new("/path/to/templates")
+```
+
 ## AppDirs Loader
 
 **Class**: [`Marten::Template::Loader::AppDirs`](pathname:///api/dev/Marten/Template/Loader/AppDirs.html)
 
 Coordinates template loading from application directories. Relies on instances of FileSystem.
+
+Initialization example:
+
+```crystal
+loader = Marten::Template::Loader::AppDirs.new
+```
 
 ## Cached Loader
 
@@ -23,3 +35,9 @@ Coordinates template loading from application directories. Relies on instances o
 
 Provides a caching layer for compiled templates. Can wrap other loaders to optimize retrieval.
 
+Initialization example:
+
+```crystal
+file_loader = Marten::Template::Loader::FileSystem.new("/path/to/templates")
+loader = Marten::Template::Loader::Cached.new([file_loader] of Marten::Template::Loader::Base)
+```

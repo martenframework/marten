@@ -12,15 +12,15 @@ Template loaders are subclasses of the [`Marten::Template::Loader::Base`](pathna
 
 For example, rendering the template `content.html` with a file system loader initialised with `Marten::Template::Loader::FileSystem.new("/app/custom_dir/templates")` would return the content defined in `/app/custom_dir/templates/content.html`.
 
-Let's say we want to write a `DatabaseTemplate` template loader: we first have to define a new class which inherits from `Marten::Template::Loader::Base`. This new class needs to define a `#get_template_source` method which takes a template_name string argument and also returns a string.
+Let's say we want to write a `DatabaseTemplate` template loader: we first have to define a new class which inherits from `Marten::Template::Loader::Base`. This new class needs to define a `#get_template_source` method which takes a `template_name` string argument and also returns a string.
 
-For simplicity we assume that there already exists a model `HtmlTemplate` with a `name` and `content` field:
+For simplicity we assume that there already exists an `HtmlTemplate` model, featuring a `name` field and `content` field:
 
 ```crystal
 class DatabaseTemplate < Marten::Template::Loader::Base
   def get_template_source(template_name) : String
     begin
-      return HtmlTemplate.get!(name: template_name).content.not_nil!
+      return HtmlTemplate.get!(name: template_name).content!
     rescue e : Marten::DB::Errors::RecordNotFound
       raise Marten::Template::Errors::TemplateNotFound.new("Template #{template_name} could not be found ; #{e.message}", e)
     end

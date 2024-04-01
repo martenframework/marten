@@ -36,14 +36,14 @@ describe Marten do
       Marten.setup_templates
     end
 
-    it "setup templates uses no loaders when `templates.loaders` setting is empty array" do
+    it "uses no loaders when `templates.loaders` setting is empty array" do
       with_overridden_setting("templates.loaders", [] of Marten::Template::Loader::Base, nilable: true) do
         Marten.setup_templates
         Marten.templates.loaders.size.should eq 0
       end
     end
 
-    it "setup templates uses configured loaders" do
+    it "uses the configured loaders" do
       file_system_loader = Marten::Template::Loader::FileSystem.new("/root/templates")
       with_overridden_setting(
         "templates.loaders",
@@ -56,7 +56,7 @@ describe Marten do
       end
     end
 
-    it "setup templates uses default loaders when setting is nil" do
+    it "uses default loaders when the `templates.loaders` setting is set to nil" do
       with_overridden_setting("templates.loaders", nil, nilable: true) do
         Marten.setup_templates
         Marten.templates.loaders.size.should eq 2

@@ -34,6 +34,7 @@ module Marten
       register "if", If
       register "include", Include
       register "local_time", LocalTime
+      register "method_input", MethodInput
       register "spaceless", Spaceless
       register "super", Super
       register "translate", Translate

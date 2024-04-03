@@ -198,6 +198,23 @@ Optionally, the output of this tag can be assigned to a specific variable using 
 {% local_time "%Y" as current_year %}
 ```
 
+## `method_input`
+
+The `method_input` template helper tag creates a hidden input tag. This input tag has the name `_method` and gets the value assigned provided by the first tag argument
+
+For example:
+
+```html
+<form action="/articles/create" method="post">
+  {% method_input "DELETE" %}
+</form>
+<!--
+<form action="/articles/create" method="post">
+  <input type="hidden" name="_method" value="DELETE">
+</form>
+-->
+```
+
 ## `spaceless`
 
 The `spaceless` template tag allows to remove whitespaces, tabs, and new lines between HTML tags. Whitespaces inside tags are left untouched. It should be noted that the `spaceless` template tag requires a closing `endspaceless` tag.

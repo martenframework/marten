@@ -734,7 +734,7 @@ describe Marten::HTTP::Request do
   end
 
   describe "#method=" do
-    it "returns the request method" do
+    it "allows to assign a new method request" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",

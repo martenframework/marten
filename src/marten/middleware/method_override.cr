@@ -1,9 +1,8 @@
 module Marten
   abstract class Middleware
-    # Middleware to convert POST requests containing a "_method" field with the value "DELETE" into DELETE requests.
+    # Middleware to override the request method
     class MethodOverride < Middleware
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
-        # Check if it's the method is allowed request and the override param key is present in the request body
         if allowed?(request)
           if method = extract_override_method(request)
             if allowed_override_method?(method)

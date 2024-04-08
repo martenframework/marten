@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::Conf::GlobalSettings::MethodOverride do
   describe "#allowed_methods" do
-    it "allows `DELETE`, `PATCH`, `PUT`" do
+    it "allows `DELETE`, `PATCH`, `PUT` by default" do
       method_override_conf = Marten::Conf::GlobalSettings::MethodOverride.new
 
       method_override_conf.allowed_methods.should_not be_empty

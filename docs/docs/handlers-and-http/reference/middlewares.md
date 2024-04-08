@@ -69,13 +69,16 @@ This middleware will activate the right locale based on the Accept-Language head
 
 **Class:** [`Marten::Middleware::MethodOverride`](pathname:///api/dev/Marten/Middleware/MethodOverride.html)
 
-This middleware enables support for overriding HTTP methods in HTML forms that natively only support GET and POST. It does this by inspecting requests and looking for a `_method` parameter, allowing to simulate methods like  PUT, DELETE, and others.
+This middleware enables support for overriding HTTP methods in HTML forms that natively only support GET and POST. It does this by inspecting requests and looking for a `_method` parameter, allowing to simulate methods like  PUT, DELETE, and others. It's also possible to change the parameter name and the allowed override methods in the [method override configuration](../../development/reference/settings.md#method-overriding-settings).
 
 For example:
 
 ```html
-<form action="/articles/create" method="post">
+<form action="{% url 'articles:delete' %}" method="post">
   <input type="hidden" name="_method" value="DELETE">
+  <button type="submit" value="submit">
+    Delete Article
+  </button>
 </form>
 ```
 

@@ -611,6 +611,27 @@ The base URL to use when exposing media files URLs. This base URL will be used b
 This setting is only used if `media_files.storage` is `nil`.
 :::
 
+## Method Overriding Settings
+
+Method overriding settings allow configuring how the [`MethodOverride`](../../handlers-and-http/reference/middlewares#method-override-middleware) Middleware should handle HTTP method overrides in forms. These settings are all available under the `method_override` namespace:
+
+```crystal
+config.method_override.input_name = "_method"
+config.method_override.allowed_methods = ["DELETE", "PATCH", "PUT"]
+```
+
+### `allowed_methods`
+
+Default: `["DELETE", "PATCH", "PUT"]`
+
+An array of HTTP methods that are allowed to be overridden using the `input_name` mechanism. This provides a layer of control, preventing the usage of arbitrary HTTP methods in overrides.
+
+### `input_name`
+
+Default: `_method`
+
+The name of the form input field (or query parameter) used to signal a method override.  HTML forms natively only support GET and POST methods. This setting determines the name of the field that can contain alternative methods like DELETE or PUT.
+
 ## Sessions settings
 
 Sessions settings allow configuring how Marten should handle [sessions](../../handlers-and-http/introduction.md#using-sessions). These settings are all available under the `sessions` namespace:

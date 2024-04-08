@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Marten::Template::Tag do
   describe "::get" do
     it "returns the right built-in tag classes for the expected tag names" do
-      Marten::Template::Tag.registry.size.should eq 19
+      Marten::Template::Tag.registry.size.should eq 20
       Marten::Template::Tag.get("asset").should eq Marten::Template::Tag::Asset
       Marten::Template::Tag.get("assign").should eq Marten::Template::Tag::Assign
       Marten::Template::Tag.get("block").should eq Marten::Template::Tag::Block

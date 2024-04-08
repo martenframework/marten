@@ -238,6 +238,17 @@ Marten.templates.get_template("foo/bar.html")
 
 This will return a compiled [`Template`](pathname:///api/dev/Marten/Template/Template.html) object that you can then render by using a specific context.
 
+:::tip Customizing template loaders
+The [`templates.loaders`](../development/reference/settings.md#loaders) setting provides fine-grained control over how Marten discovers and loads templates. This setting expects an array of template loader classes, which must inherit from `Marten::Template::Loader::Base`. This setting will overwrite the default template loaders
+configured by Marten. This gives you the option to configure [custom loaders](./how-to/create-custom-loaders.md) to load templates from different sources, such as databases or in-memory data structures.
+
+Example: Configuring a File System Loader
+
+```crystal
+config.templates.loaders = [Marten::Template::Loader::FileSystem.new("/path/to/templates")] of Marten::Template::Loader::Base
+```
+:::
+
 ## Rendering a template
 
 You won't usually need to interact with the "low-level" API of the Marten template engine in order to render templates: most of the time you will render templates as part of [handlers](../handlers-and-http.mdx), which means that you will likely end up using the [`#render`](../handlers-and-http/introduction.md#render) shortcut or [generic handlers](../handlers-and-http/generic-handlers.md) that automatically render templates for you.

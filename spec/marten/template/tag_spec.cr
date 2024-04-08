@@ -8,6 +8,7 @@ describe Marten::Template::Tag do
       Marten::Template::Tag.get("assign").should eq Marten::Template::Tag::Assign
       Marten::Template::Tag.get("block").should eq Marten::Template::Tag::Block
       Marten::Template::Tag.get("cache").should eq Marten::Template::Tag::Cache
+      Marten::Template::Tag.get("capture").should eq Marten::Template::Tag::Capture
       Marten::Template::Tag.get("csrf_token").should eq Marten::Template::Tag::CsrfToken
       Marten::Template::Tag.get("extend").should eq Marten::Template::Tag::Extend
       Marten::Template::Tag.get("for").should eq Marten::Template::Tag::For

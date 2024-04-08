@@ -8,6 +8,7 @@ module Marten
         @context_producers = [] of Template::ContextProducer.class
         @isolated_inclusions : Bool = false
         @dirs : Array(String) = [] of String
+        @loaders : Array(Marten::Template::Loader::Base) | Nil = nil
         @strict_variables : Bool = false
 
         # Returns a boolean indicating whether templates should be looked for inside installed applications.
@@ -26,6 +27,9 @@ module Marten
 
         # Returns a boolean indicating whether included templates should be isolated from the outer context by default.
         getter isolated_inclusions
+
+        # Returns the list of template loaders or nil
+        getter loaders
 
         # :ditto:
         getter? isolated_inclusions
@@ -71,6 +75,11 @@ module Marten
               dir.to_s
             end
           end
+        end
+
+        # Allows to set the template loaders that are used. Overwrites all other options.
+        def loaders=(loaders)
+          @loaders = loaders
         end
       end
     end

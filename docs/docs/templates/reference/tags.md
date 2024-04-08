@@ -61,6 +61,30 @@ It should be noted that the `cache` template tag also supports specifying additi
 {% endcache %}
 ```
 
+## `capture`
+
+The `capture` template tag allows to define that the output of a block of code should be stored in a new variable.
+
+For example:
+
+```html
+{% capture my_var %}
+  Hello World, {{ name }}!
+{% endcapture %}
+```
+
+Assuming the variable `name` is assigned the value "John Doe" upon rendering this snippet, the variable `my_var` will hold the string "Hello World, John Doe!".
+
+By default, variables assigned using this template tag will overwrite any existing variables with the same name in the template context. To prevent overwriting existing variables, you can append `unless assigned` after the variable name to ensure that new variables are only assigned if there isn't already one with the same name present.
+
+For example:
+
+```html
+{% capture my_var unless defined %}
+  Hello World, {{ name }}!
+{% endcapture %}
+```
+
 ## `csrf_token`
 
 The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used for templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction.md#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers.md) involving rendered templates).

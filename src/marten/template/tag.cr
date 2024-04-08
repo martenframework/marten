@@ -28,6 +28,7 @@ module Marten
       register "assign", Assign
       register "block", Block
       register "cache", Cache
+      register "capture", Capture
       register "csrf_token", CsrfToken
       register "extend", Extend
       register "for", For

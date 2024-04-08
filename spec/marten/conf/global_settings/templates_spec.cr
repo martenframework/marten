@@ -183,6 +183,37 @@ describe Marten::Conf::GlobalSettings::Templates do
     end
   end
 
+  describe "#loaders" do
+    it "returns nil by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.loaders.should eq nil
+    end
+
+    it "returns the configured array of loaders" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      loaders = [
+        Marten::Template::Loader::AppDirs.new,
+        Marten::Template::Loader::FileSystem.new("/dummy/dir"),
+      ]
+      templates_conf.loaders = loaders
+      templates_conf.loaders.should eq loaders
+    end
+  end
+
+  describe "#loaders=" do
+    it "allows to configure the array of configured context producers" do
+      loaders = [
+        Marten::Template::Loader::AppDirs.new,
+        Marten::Template::Loader::FileSystem.new("/dummy/dir"),
+      ]
+
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.loaders = loaders
+
+      templates_conf.loaders.should eq loaders
+    end
+  end
+
   describe "#isolated_inclusions=" do
     it "enables the isolated inclusions mode" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new

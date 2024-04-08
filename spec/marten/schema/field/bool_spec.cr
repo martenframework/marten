@@ -80,9 +80,22 @@ describe Marten::Schema::Field::Bool do
   end
 
   describe "#perform_validation" do
-    it "adds an error to the schema object if the field is required and the deserialized value is false" do
+    it "adds an error to the schema object if the field is required and no value is specified" do
       schema = Marten::Schema::Field::BoolSpec::TestSchema.new(
         Marten::HTTP::Params::Data.new
+      )
+
+      field = Marten::Schema::Field::Bool.new("test_field")
+      field.perform_validation(schema)
+
+      schema.errors.size.should eq 1
+      schema.errors.first.field.should eq "test_field"
+      schema.errors.first.type.should eq "required"
+    end
+
+    it "adds an error to the schema object if the field is required and the specified value is falsey" do
+      schema = Marten::Schema::Field::BoolSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"test_field" => ["false"]}
       )
 
       field = Marten::Schema::Field::Bool.new("test_field")

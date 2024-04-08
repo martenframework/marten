@@ -17,7 +17,15 @@ module Marten
 
         # Sets the array of HTTP methods that are allowed for override.
         def allowed_methods=(methods)
-          @allowed_methods = methods.map(&.upcase)
+          @allowed_methods = methods.map do |method|
+            upcase_method = method.upcase
+
+            unless Marten::HTTP::Constants::METHODS.includes?(upcase_method)
+              raise Errors::InvalidConfiguration.new("Invalid HTTP method '#{method}'")
+            end
+
+            upcase_method
+          end
         end
       end
     end

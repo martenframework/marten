@@ -28,6 +28,17 @@ describe Marten::Conf::GlobalSettings::MethodOverride do
 
       method_override_conf.allowed_methods.should eq ["POST"]
     end
+
+    it "raises if an invalid HTTP method is specified" do
+      method_override_conf = Marten::Conf::GlobalSettings::MethodOverride.new
+
+      expect_raises(
+        Marten::Conf::Errors::InvalidConfiguration,
+        "Invalid HTTP method 'invalid'"
+      ) do
+        method_override_conf.allowed_methods = ["invalid"]
+      end
+    end
   end
 
   describe "#input_name" do

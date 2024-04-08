@@ -3,11 +3,10 @@ require "./concerns/*"
 module Marten
   module Template
     module Tag
-      # The `csrf_token` template tag.
+      # The `method_input` template tag.
       #
-      # The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This
-      # tag requires the presence of a handler object in the template context (under the `"handler"` key), otherwise an
-      # empty token is returned.
+      # The `method_input` template tag generates a hidden HTML input field for simulating HTTP methods in forms.
+      # This tag takes a single argument specifying the desired HTTP method (e.g., "DELETE", "PUT").
       class MethodInput < Base
         include CanSplitSmartly
 

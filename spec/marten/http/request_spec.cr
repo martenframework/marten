@@ -733,21 +733,6 @@ describe Marten::HTTP::Request do
     end
   end
 
-  describe "#method=" do
-    it "allows to assign a new method request" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-
-      request.method = Marten::HTTP::Request::Method::DELETE
-      request.method.should eq "DELETE"
-    end
-  end
-
   describe "#options?" do
     it "returns true if the request is an OPTIONS" do
       request = Marten::HTTP::Request.new(

@@ -200,7 +200,7 @@ Optionally, the output of this tag can be assigned to a specific variable using 
 
 ## `method_input`
 
-The `method_input` template helper tag creates a hidden input tag. This input tag has the name `_method` and gets the value assigned provided by the first tag argument
+The `method_input` template tag creates a hidden form input tag. This input tag has the name `_method` and gets the value assigned provided by the first tag argument
 
 For example:
 

@@ -1,37 +1,41 @@
 module Marten
   abstract class Middleware
-    # Middleware to override the request method
+    # Overrides the HTTP method of a request.
+    #
+    # This middleware overrides the HTTP method of a incoming request that include a `_method` field
+    # (in form data or URL-encoded data) or a `X-Http-Method-Override` header,
+    # enabling the use of HTTP methods beyond `GET` and `POST` in HTML forms.
+    #
+    # For example a `POST` request with `_method=DELETE` in its body would be treated as a DELETE request.
     class MethodOverride < Middleware
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         if allowed?(request)
           if method = extract_override_method(request)
-            if allowed_override_method?(method)
-              request.method = method
-            end
+            request.method = method if allowed_override_method?(method)
           end
         end
 
         get_response.call
       end
 
-      def allowed?(request)
+      private def allowed?(request)
         request.post?
       end
 
-      def allowed_override_method?(method)
-        Marten::HTTP::Request::Method.valid?(method)
+      private def allowed_override_method?(method)
+        Marten.settings.method_override.allowed_methods.includes?(method.upcase)
       end
 
-      def extract_override_method(request)
+      private def extract_override_method(request)
         value = request.data[override_param_key]? if (request.urlencoded? || request.form_data?)
 
-        return Marten::HTTP::Request::Method.parse?(value) if value.is_a?(String)
+        return value if value.is_a?(String)
 
         nil
       end
 
-      def override_param_key
-        "_method"
+      private def override_param_key
+        Marten.settings.method_override.input_name
       end
     end
   end

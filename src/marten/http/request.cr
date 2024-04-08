@@ -14,17 +14,6 @@ module Marten
       @scheme : String?
       @session : Session::Store::Base?
 
-      enum Method
-        GET
-        POST
-        PUT
-        PATCH
-        DELETE
-        HEAD
-        OPTIONS
-        TRACE
-      end
-
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
         @request.body = IO::Memory.new((request.body || IO::Memory.new).gets_to_end)
@@ -77,7 +66,7 @@ module Marten
 
       # Returns `true` if the request is a DELETE.
       def delete?
-        Method.parse(method).delete?
+        method == METHOD_DELETE
       end
 
       # Returns the flash store for the considered request.
@@ -112,12 +101,12 @@ module Marten
 
       # Returns `true` if the request is a GET.
       def get?
-        Method.parse(method).get?
+        method == METHOD_GET
       end
 
       # Returns `true` if the request is a HEAD.
       def head?
-        Method.parse(method).head?
+        method == METHOD_HEAD
       end
 
       # Returns the HTTP headers embedded in the request.
@@ -137,18 +126,18 @@ module Marten
         @request.method.upcase
       end
 
-      def method=(method : Method)
-        @request.method = method.to_s
+      protected def method=(method)
+        @request.method = method
       end
 
       # Returns `true` if the request is an OPTIONS.
       def options?
-        Method.parse(method).options?
+        method == METHOD_OPTIONS
       end
 
       # Returns `true` if the request is a PATCH.
       def patch?
-        Method.parse(method).patch?
+        method == METHOD_PATCH
       end
 
       # Returns the request path as a string.
@@ -165,12 +154,12 @@ module Marten
 
       # Returns `true` if the request is a POST.
       def post?
-        Method.parse(method).post?
+        method == METHOD_POST
       end
 
       # Returns `true` if the request is a PUT.
       def put?
-        Method.parse(method).put?
+        method == METHOD_PUT
       end
 
       # Returns the HTTP GET parameters embedded in the request.
@@ -216,9 +205,10 @@ module Marten
 
       # Returns `true` if the request is a TRACE.
       def trace?
-        Method.parse(method).trace?
+        method == METHOD_TRACE
       end
 
+      # Returns `true` if the content type "application/x-www-form-urlencoded"
       def urlencoded?
         content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
       end

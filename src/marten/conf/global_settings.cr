@@ -255,7 +255,7 @@ module Marten
         @media_files ||= GlobalSettings::MediaFiles.new
       end
 
-      # Provides access to SSL redirect settings.
+      # Provides access to method overriding settings.
       def method_override
         @method_override ||= GlobalSettings::MethodOverride.new
       end

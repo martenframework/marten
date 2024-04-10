@@ -126,10 +126,6 @@ module Marten
         @request.method.upcase
       end
 
-      protected def method=(method)
-        @request.method = method
-      end
-
       # Returns `true` if the request is an OPTIONS.
       def options?
         method == METHOD_OPTIONS
@@ -217,6 +213,10 @@ module Marten
 
       protected setter disable_request_forgery_protection
       protected setter scheme
+
+      protected def method=(method)
+        @request.method = method
+      end
 
       private CONTENT_TYPE_APPLICATION_JSON = "application/json"
       private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"

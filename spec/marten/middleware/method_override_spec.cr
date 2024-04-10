@@ -39,6 +39,52 @@ describe Marten::Middleware::MethodOverride do
       request.delete?.should be_true
     end
 
+    it "overrides a POST request according to a X-Http-Method-Override header" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"                   => "example.com",
+            "Content-Type"           => "application/x-www-form-urlencoded",
+            "X-Http-Method-Override" => "DELETE",
+          },
+          body: "foo=bar"
+        )
+      )
+
+      middleware = Marten::Middleware::MethodOverride.new
+      middleware.call(
+        request,
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      request.delete?.should be_true
+    end
+
+    it "overrides a POST request with PUT using form input, even when a X-Http-Method-Override header is present" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"                   => "example.com",
+            "Content-Type"           => "application/x-www-form-urlencoded",
+            "X-Http-Method-Override" => "DELETE",
+          },
+          body: "_method=put"
+        )
+      )
+
+      middleware = Marten::Middleware::MethodOverride.new
+      middleware.call(
+        request,
+        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      request.put?.should be_true
+    end
+
     it "does not override non-POST requests" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

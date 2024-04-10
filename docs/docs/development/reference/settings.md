@@ -613,7 +613,7 @@ This setting is only used if `media_files.storage` is `nil`.
 
 ## Method overriding settings
 
-Method overriding settings allow configuring how the [`MethodOverride`](../../handlers-and-http/reference/middlewares.md#method-override-middleware) Middleware should handle HTTP method overrides in forms. These settings are all available under the `method_override` namespace:
+Method overriding settings allow configuring how the [`MethodOverride`](../../handlers-and-http/reference/middlewares.md#method-override-middleware) middleware should handle HTTP method overrides in forms. These settings are all available under the `method_override` namespace:
 
 ```crystal
 config.method_override.allowed_methods = ["DELETE", "PATCH", "PUT"]

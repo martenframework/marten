@@ -37,11 +37,7 @@ module Marten
 
         return value if value.is_a?(String)
 
-        request.headers[header_name]?
-      end
-
-      private def header_name
-        Marten.settings.method_override.http_header_name
+        request.headers[Marten.settings.method_override.http_header_name]?
       end
 
       private def override_param_key

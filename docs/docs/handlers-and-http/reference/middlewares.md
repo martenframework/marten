@@ -65,6 +65,29 @@ Activates the right I18n locale based on incoming requests.
 
 This middleware will activate the right locale based on the Accept-Language header or the value provided by the [locale cookie](../../development/reference/settings.md#locale_cookie_name). Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../../development/reference/settings.md#available_locales) and [`i18n.default_locale`](../../development/reference/settings.md#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead.
 
+## Method Override middleware
+
+**Class:** [`Marten::Middleware::MethodOverride`](pathname:///api/dev/Marten/Middleware/MethodOverride.html)
+
+This middleware enables support for overriding HTTP methods in HTML forms that natively only support GET and POST. It does this by inspecting requests and looking for a `_method` parameter, allowing to simulate methods like  PUT, DELETE, and others. It's also possible to change the parameter name and the allowed override methods in the [method override configuration](../../development/reference/settings.md#method-overriding-settings).
+
+For example:
+
+```html
+<form action="{% url 'articles:delete' %}" method="post">
+  <input type="hidden" name="_method" value="DELETE">
+  <button type="submit" value="submit">
+    Delete Article
+  </button>
+</form>
+```
+
+With the `MethodOverride` middleware, the form submission would effectively be treated as a `DELETE` request instead of `POST`.
+
+:::info
+The middleware should be placed as far as possible at the beginning of the array of the [`middlewares`](../../development/reference/settings.md#middleware) setting so that other middlewares already recognise the overridden method.
+:::
+
 ## Session middleware
 
 **Class:** [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html)

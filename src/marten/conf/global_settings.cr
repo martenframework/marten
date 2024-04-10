@@ -255,6 +255,11 @@ module Marten
         @media_files ||= GlobalSettings::MediaFiles.new
       end
 
+      # Provides access to method overriding settings.
+      def method_override
+        @method_override ||= GlobalSettings::MethodOverride.new
+      end
+
       # Allows to define the list of middlewares used by the application.
       def middleware=(v)
         @middleware = Array(Marten::Middleware.class).new

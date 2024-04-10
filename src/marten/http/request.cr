@@ -89,6 +89,11 @@ module Marten
         @flash = flash_store
       end
 
+      # Return `true` if the content type is `multipart/form-data`
+      def form_data?
+        content_type?(CONTENT_TYPE_MULTIPART_FORM)
+      end
+
       # Returns the path including the GET parameters if applicable.
       def full_path : String
         @full_path ||= (path + (query_params.empty? ? "" : "?#{@request.query_params}")).as(String)
@@ -199,10 +204,19 @@ module Marten
         method == METHOD_TRACE
       end
 
+      # Returns `true` if the content type "application/x-www-form-urlencoded"
+      def urlencoded?
+        content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
+      end
+
       protected getter? disable_request_forgery_protection
 
       protected setter disable_request_forgery_protection
       protected setter scheme
+
+      protected def method=(method)
+        @request.method = method
+      end
 
       private CONTENT_TYPE_APPLICATION_JSON = "application/json"
       private CONTENT_TYPE_MULTIPART_FORM   = "multipart/form-data"

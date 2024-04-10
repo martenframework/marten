@@ -68,7 +68,7 @@ module Marten
           outer_context = isolated? ? Context.new : context
           outer_context.stack do |include_context|
             @assignments.each do |name, expression|
-              include_context[name] = expression.resolve(include_context)
+              include_context[name] = expression.resolve(context)
             end
 
             rendered = template.render(include_context)

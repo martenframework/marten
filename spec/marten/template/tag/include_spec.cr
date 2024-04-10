@@ -158,6 +158,19 @@ describe Marten::Template::Tag::Include do
       output.includes?("From !").should be_true
     end
 
+    it "properly resolves variables that are set with the 'with' keyword in isolated mode" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Include.new(
+        parser,
+        %{include "partials/hello_world.html" with name=existing_var, other="test" isolated}
+      )
+
+      output = tag.render(Marten::Template::Context{"existing_var" => "John Doe", "source" => "default source"})
+
+      output.includes?("Hello World, John Doe!").should be_true
+      output.includes?("From !").should be_true
+    end
+
     it "gives access to the outer context in contextual mode" do
       with_overridden_setting("templates.isolated_inclusions", true) do
         parser = Marten::Template::Parser.new("")

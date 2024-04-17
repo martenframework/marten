@@ -4,7 +4,9 @@ module <%= context.module_name %>
   class SignOutHandler < Marten::Handler
     include RequireSignedInUser
 
-    def dispatch
+    http_method_names :post, :options
+
+    def post
       MartenAuth.sign_out(request)
       redirect reverse("<%= context.label %>:sign_in")
     end

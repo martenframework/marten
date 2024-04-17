@@ -5,7 +5,7 @@ describe <%= context.module_name %>::SignOutHandler do
     it "redirects to the sign in page if the user is not authenticated" do
       url = Marten.routes.reverse("<%= context.label %>:sign_out")
 
-      response = Marten::Spec.client.get(url)
+      response = Marten::Spec.client.post(url)
 
       response.status.should eq 302
       response.headers["Location"].should eq Marten.routes.reverse("<%= context.label %>:sign_in")
@@ -17,11 +17,11 @@ describe <%= context.module_name %>::SignOutHandler do
       url = Marten.routes.reverse("<%= context.label %>:sign_out")
 
       Marten::Spec.client.sign_in(user)
-      response = Marten::Spec.client.get(url)
+      response = Marten::Spec.client.post(url)
 
       response.status.should eq 302
       response.headers["Location"].should eq Marten.routes.reverse("<%= context.label %>:sign_in")
-      Marten::Spec.client.get(Marten.routes.reverse("<%= context.label %>:profile")).status.should eq 302
+      Marten::Spec.client.post(Marten.routes.reverse("<%= context.label %>:profile")).status.should eq 302
     end
   end
 
@@ -36,7 +36,7 @@ describe <%= context.module_name %>::SignOutHandler do
 
       response.status.should eq 302
       response.headers["Location"].should eq Marten.routes.reverse("<%= context.label %>:sign_in")
-      Marten::Spec.client.get(Marten.routes.reverse("<%= context.label %>:profile")).status.should eq 302
+      Marten::Spec.client.post(Marten.routes.reverse("<%= context.label %>:profile")).status.should eq 302
     end
   end
 end

@@ -2,9 +2,9 @@
 
 {% block content %}
 <h1>Profile</h1>
-<p>
+<div>
     <strong>Email:</strong> {{ request.user.email }}
     &bull;&nbsp;<a href="{% url '<%= context.label %>:password_update' %}">Update password</a>
-    &bull;&nbsp;<a href="{% url '<%= context.label %>:sign_out' %}">Sign out</a>
-</p>
+    &bull;&nbsp;<form method="post" action="{% url '<%= context.label %>:sign_out' %}" enctype="multipart/form-data" style="display:inline;" novalidate><input type="hidden" name="csrftoken" value="{% csrf_token %}" /><button type="submit" class="link-button">Sign out</button></form>
+</div>
 {% endblock content %}

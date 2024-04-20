@@ -90,7 +90,7 @@ module Marten
         # :nodoc:
         macro check_definition(field_id, kwargs)
           {% if kwargs.is_a?(NilLiteral) || kwargs[:max_size].is_a?(NilLiteral) %}
-            {% raise "String fields must define 'max_size' property" %}
+            {% raise "String fields must define a 'max_size' property" %}
           {% end %}
         end
       end

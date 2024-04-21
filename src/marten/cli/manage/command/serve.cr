@@ -39,6 +39,7 @@ module Marten
           private FILES_TO_WATCH = [
             "./src/**/*.cr",
             "./src/**/*.ecr",
+            "./src/**/locales/*",
             "./config/**/*.cr",
             "./config/**/*.ecr",
             "./shard.lock",

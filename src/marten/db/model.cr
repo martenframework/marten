@@ -50,7 +50,14 @@ module Marten
       private def initialize_field_values(kwargs)
         values = Hash(String, Field::Any | Model).new
 
-        kwargs.each { |key, value| values[key.to_s] = value }
+        kwargs.each do |key, value|
+          case value
+          when Field::Any, Model
+            values[key.to_s] = value
+          else
+            values[key.to_s] = value.to_s
+          end
+        end
 
         self.class.fields.each do |field|
           next if values.has_key?(field.id)

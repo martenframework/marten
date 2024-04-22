@@ -5,6 +5,7 @@ require "./field/date"
 require "./field/date_time"
 require "./field/duration"
 require "./field/email"
+require "./field/enum"
 require "./field/file"
 require "./field/float"
 require "./field/int"
@@ -107,6 +108,7 @@ module Marten
       register "date_time", DateTime
       register "duration", Duration
       register "email", Email
+      register "enum", Enum
       register "file", File
       register "float", Float
       register "int", Int

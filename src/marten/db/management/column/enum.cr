@@ -2,14 +2,14 @@ module Marten
   module DB
     module Management
       module Column
-        class String < Base
+        class Enum < Base
           include IsBuiltInColumn
 
-          getter max_size
+          getter values
 
           def initialize(
             @name : ::String,
-            @max_size : ::Int32,
+            @values : Array(::String),
             @primary_key = false,
             @null = false,
             @unique = false,
@@ -19,12 +19,12 @@ module Marten
           end
 
           def clone
-            self.class.new(@name, @max_size, @primary_key, @null, @unique, @index, @default)
+            self.class.new(@name, @values, @primary_key, @null, @unique, @index, @default)
           end
 
           def same_config?(other : Base)
-            other.is_a?(String) &&
-              max_size == other.max_size &&
+            other.is_a?(Enum) &&
+              values == other.values &&
               primary_key? == other.primary_key? &&
               null? == other.null? &&
               unique? == other.unique? &&
@@ -34,7 +34,7 @@ module Marten
 
           def serialize_args : ::String
             args = [%{#{format_string_or_symbol(name)}}, %{#{format_string_or_symbol(type)}}]
-            args << %{max_size: #{max_size}}
+            args << %{values: #{values.inspect}}
             args << %{primary_key: #{@primary_key}} if primary_key?
             args << %{null: #{@null}} if null?
             args << %{unique: #{@unique}} if unique?
@@ -44,7 +44,10 @@ module Marten
           end
 
           private def db_type_parameters(connection)
-            {max_size: @max_size}
+            {
+              name:   @name,
+              values: @values.map { |v| "'#{v}'" }.join(", "),
+            }
           end
         end
       end

@@ -3,11 +3,12 @@ require "./spec_helper"
 describe Marten::DB::Management::Column do
   describe "#registry" do
     it "returns the expected column abstractions" do
-      Marten::DB::Management::Column.registry.size.should eq 11
+      Marten::DB::Management::Column.registry.size.should eq 12
       Marten::DB::Management::Column.registry["big_int"].should eq Marten::DB::Management::Column::BigInt
       Marten::DB::Management::Column.registry["bool"].should eq Marten::DB::Management::Column::Bool
       Marten::DB::Management::Column.registry["date"].should eq Marten::DB::Management::Column::Date
       Marten::DB::Management::Column.registry["date_time"].should eq Marten::DB::Management::Column::DateTime
+      Marten::DB::Management::Column.registry["enum"].should eq Marten::DB::Management::Column::Enum
       Marten::DB::Management::Column.registry["float"].should eq Marten::DB::Management::Column::Float
       Marten::DB::Management::Column.registry["reference"].should eq Marten::DB::Management::Column::Reference
       Marten::DB::Management::Column.registry["int"].should eq Marten::DB::Management::Column::Int

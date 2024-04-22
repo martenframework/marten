@@ -45,6 +45,7 @@ module Marten
             "Marten::DB::Management::Column::Bool"     => "bool",
             "Marten::DB::Management::Column::Date"     => "date",
             "Marten::DB::Management::Column::DateTime" => "datetime(6)",
+            "Marten::DB::Management::Column::Enum"     => "enum(%{values})",
             "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",
             "Marten::DB::Management::Column::JSON"     => "text",

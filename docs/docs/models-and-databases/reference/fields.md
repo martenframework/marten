@@ -94,7 +94,34 @@ An `email` field allows to persist _valid_ email addresses. In addition to the [
 
 #### `max_size`
 
-The `max_size` argument is optional and defaults to 254 characters (in accordance with RFCs 3696 and 5321). It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validate field values.
+The `max_size` argument is optional and defaults to 254 characters (in accordance with RFCs 3696 and 5321). It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validating field values.
+
+### `enum`
+
+An `enum` field allows persisting the value of an [`Enum`](https://crystal-lang.org/api/Enum.html). When defining `enum` fields, it's necessary to specify a values argument that matches the actual enum:
+
+```crystal
+enum Category
+  NEWS
+  BLOG
+end
+
+class Article < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :category, :enum, values: Category
+end
+
+article = Article.last!
+article.category # => Category::BLOG
+```
+
+:::info
+The way enums are handled at the database level depends on the database backend being used. Indeed, an ENUM type is used for MySQL databases while column checks are used for SQLite and PostgreSQL databases.
+:::
+
+#### `values`
+
+The `values` argument **is required** and allows to specify the actual enum class that should be used for the field. It is worth mentioning that the configured enum will impact the values allowed for the corresponding column at the database level.
 
 ### `file`
 

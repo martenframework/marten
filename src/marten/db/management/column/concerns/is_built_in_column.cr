@@ -11,14 +11,14 @@ module Marten
             end
 
             def sql_type(connection : Connection::Base) : ::String
-              SchemaEditor.for(connection).column_type_for_built_in_column(self) % db_type_parameters
+              SchemaEditor.for(connection).column_type_for_built_in_column(self) % db_type_parameters(connection)
             end
 
             def sql_type_suffix(connection : Connection::Base) : ::String?
               SchemaEditor.for(connection).column_type_suffix_for_built_in_column(self)
             end
 
-            private def db_type_parameters
+            private def db_type_parameters(connection)
               nil
             end
           end

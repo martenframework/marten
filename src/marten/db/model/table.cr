@@ -329,8 +329,9 @@ module Marten
           case field_name.to_s
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+          {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           when {{ field_var.name.stringify }}
-            {{ field_var.id }}
+            {{ ann[:accessor] || field_var.id }}
           {% end %}
           else
             raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
@@ -440,7 +441,7 @@ module Marten
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           {% unless ann[:field_kwargs] && ann[:field_kwargs][:primary_key] %}
           io << ", "
-          io << {{ field_var.name.stringify }} + ": #{{{ field_var.id }}.inspect}"
+          io << {{ field_var.name.stringify }} + ": #{{{ ann[:accessor] || field_var.id }}.inspect}"
           {% end %}
           {% end %}
           io << ">"
@@ -459,8 +460,9 @@ module Marten
           %}
 
           {% for field_var in local_field_vars %}
+            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
             field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
+            values[field.db_column!] = field.to_db({{ ann[:accessor] || field_var.id }}) if field.db_column?
           {% end %}
 
           values
@@ -617,7 +619,7 @@ module Marten
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           when {{ field_var.name.stringify }}
-          self.{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          self.{{ ann[:accessor] || field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
           {% end %}
           else
           end
@@ -637,7 +639,7 @@ module Marten
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
           when {{ field_var.name.stringify }}
-          self.{{ field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
+          self.{{ ann[:accessor] || field_var.id }} = field.as({{ ann[:field_klass] }}).from_db_result_set(result_set)
           {% end %}
           else
           end
@@ -648,8 +650,9 @@ module Marten
           values = {} of String => Field::Any
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
+            {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
             field = self.class.get_field({{ field_var.name.stringify }})
-            values[field.db_column!] = {{ field_var.id }} if field.db_column?
+            values[field.db_column!] = {{ ann[:accessor] || field_var.id }} if field.db_column?
           {% end %}
           values
         end
@@ -696,7 +699,7 @@ module Marten
                   "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
                 )
               end
-              self.{{ field_var.id }} = value
+              self.{{ ann[:accessor] || field_var.id }} = value
               values.delete({{field_var.name.stringify}})
             end
 
@@ -744,7 +747,7 @@ module Marten
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
             if model_klass.name == {{ ann[:model_klass].id.stringify }}
               field = {{ ann[:model_klass].id }}.get_field({{ field_var.name.stringify }})
-              values[field.db_column!] = field.to_db({{ field_var.id }}) if field.db_column?
+              values[field.db_column!] = field.to_db({{ ann[:accessor] || field_var.id }}) if field.db_column?
             end
           {% end %}
 

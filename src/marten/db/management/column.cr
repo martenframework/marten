@@ -5,6 +5,7 @@ require "./column/big_int"
 require "./column/bool"
 require "./column/date"
 require "./column/date_time"
+require "./column/enum"
 require "./column/float"
 require "./column/int"
 require "./column/json"
@@ -39,6 +40,7 @@ module Marten
         register "bool", Bool
         register "date", Date
         register "date_time", DateTime
+        register "enum", Enum
         register "float", Float
         register "reference", Reference
         register "int", Int

@@ -98,7 +98,7 @@ The `max_size` argument is optional and defaults to 254 characters (in accordanc
 
 ### `enum`
 
-An `enum` field allows persisting the value of an [`Enum`](https://crystal-lang.org/api/Enum.html). When defining `enum` fields, it's necessary to specify a values argument that matches the actual enum:
+An `enum` field allows persisting the value of an [`Enum`](https://crystal-lang.org/api/Enum.html). When defining `enum` fields, it's necessary to specify a `values` argument that matches the actual enum:
 
 ```crystal
 enum Category

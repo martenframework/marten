@@ -69,6 +69,12 @@ html[data-theme='dark'] {
     margin-block-start: 5rem;
   }
 
+  h4 {
+    code {
+      font-weight: normal;
+    }
+  }
+
   h2 + h3,
   h3 + h4,
   h4 + h5,

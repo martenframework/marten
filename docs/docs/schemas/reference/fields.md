@@ -70,6 +70,8 @@ schema.valid?   # => true
 schema.category # => Category::BLOG
 ```
 
+In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
 #### `values`
 
 The `values` argument **is required** and allows to specify the actual enum class that should be used for the field. Only string values matching the values of the enum will be validated by the field.

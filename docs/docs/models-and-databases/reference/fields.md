@@ -119,6 +119,8 @@ article.category # => Category::BLOG
 The way enums are handled at the database level depends on the database backend being used. Indeed, an ENUM type is used for MySQL databases while column checks are used for SQLite and PostgreSQL databases.
 :::
 
+In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
 #### `values`
 
 The `values` argument **is required** and allows to specify the actual enum class that should be used for the field. It is worth mentioning that the configured enum will impact the values allowed for the corresponding column at the database level.

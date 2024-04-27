@@ -9,9 +9,6 @@ module Marten
     include Core::Validation
 
     # :nodoc:
-    annotation FieldInstanceVariable; end
-
-    # :nodoc:
     alias DataHash = Hash(String, Field::Any | Nil | HTTP::UploadedFile | Routing::Parameter::Types)
 
     # :nodoc:

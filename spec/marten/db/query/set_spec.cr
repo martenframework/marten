@@ -2709,6 +2709,14 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#to_sql" do
+    it "produces the output of the query SQL representation" do
+      qs = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
+
+      qs.to_sql.should eq qs.query.to_sql
+    end
+  end
+
   describe "#update" do
     it "allows to update the records matching a given queryset with values specified as keyword arguments" do
       user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")

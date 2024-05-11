@@ -1074,6 +1074,11 @@ module Marten
           inspect(io)
         end
 
+        # Returns the SQL representation of the current query set.
+        def to_sql : String
+          @query.to_sql
+        end
+
         # Updates all the records matched by the current query set with the passed values.
         #
         # This method allows to update all the records that are matched by the current query set with a hash or a named

@@ -2198,6 +2198,33 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#to_sql" do
+    it "produces the expected output" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+
+      for_mysql do
+        query.to_sql.should eq(
+          "SELECT app_tag.id, app_tag.name, app_tag.is_active " \
+          "FROM `app_tag` WHERE app_tag.name LIKE BINARY ? LIMIT 18446744073709551615"
+        )
+      end
+
+      for_postgresql do
+        query.to_sql.should eq(
+          "SELECT app_tag.id, app_tag.name, app_tag.is_active FROM \"app_tag\" WHERE app_tag.name LIKE $1"
+        )
+      end
+
+      for_sqlite do
+        query.to_sql.should eq(
+          "SELECT app_tag.id, app_tag.name, app_tag.is_active " \
+          "FROM \"app_tag\" WHERE app_tag.name LIKE ? ESCAPE '\\' LIMIT -1"
+        )
+      end
+    end
+  end
+
   describe "#update_with" do
     it "allows to update the records matching a given query and returns the number of affected rows" do
       user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")

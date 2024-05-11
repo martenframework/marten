@@ -687,6 +687,25 @@ Order.all.sum(:amount)  # Calculates the total amount across all orders
 # => 7
 ```
 
+### `to_s`
+
+Returns a string representation of the considered query set.
+
+### `to_sql`
+
+Returns the SQL representation of the considered query set.
+
+For example:
+
+```crystal
+Tag.filter(name__startswith: "r").to_sql
+# => "SELECT app_tag.id, app_tag.name, app_tag.is_active FROM \"app_tag\" WHERE app_tag.name LIKE $1"
+```
+
+:::note
+The outputted SQL will vary depending on the database backend in use.
+:::
+
 ### `update`
 
 Updates all the records matched by the current query set with the passed values.

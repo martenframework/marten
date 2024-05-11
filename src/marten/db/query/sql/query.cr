@@ -283,6 +283,10 @@ module Marten
             )
           end
 
+          def to_sql : String
+            build_query.first
+          end
+
           def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))
             values_to_update = Hash(String, ::DB::Any).new
             related_values_to_update = Hash(DB::Model.class, Hash(String | Symbol, Field::Any | DB::Model)).new

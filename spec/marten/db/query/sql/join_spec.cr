@@ -47,6 +47,49 @@ describe Marten::DB::Query::SQL::Join do
     end
   end
 
+  describe "#clone" do
+    it "returns a deep copy of the join node and its children" do
+      parent_join = Marten::DB::Query::SQL::Join.new(
+        id: 1,
+        type: Marten::DB::Query::SQL::JoinType::INNER,
+        from_model: ShowcasedPost,
+        from_common_field: ShowcasedPost.get_field("post_id"),
+        reverse_relation: nil,
+        to_model: Post,
+        to_common_field: Post.get_field("id"),
+        selected: true,
+      )
+      child_join = Marten::DB::Query::SQL::Join.new(
+        id: 2,
+        type: Marten::DB::Query::SQL::JoinType::INNER,
+        from_model: Post,
+        from_common_field: Post.get_field("author_id"),
+        reverse_relation: nil,
+        to_model: TestUser,
+        to_common_field: TestUser.get_field("id"),
+        selected: true,
+      )
+
+      parent_join.add_child(child_join)
+
+      clone = parent_join.clone
+
+      clone.should_not eq parent_join
+      clone.from_model.should eq parent_join.from_model
+      clone.from_common_field.should eq parent_join.from_common_field
+      clone.to_model.should eq parent_join.to_model
+      clone.to_common_field.should eq parent_join.to_common_field
+      clone.selected?.should eq parent_join.selected?
+      clone.children.should_not eq parent_join.children
+      clone.children.first.should_not eq parent_join.children.first
+      clone.children.first.from_model.should eq parent_join.children.first.from_model
+      clone.children.first.from_common_field.should eq parent_join.children.first.from_common_field
+      clone.children.first.to_model.should eq parent_join.children.first.to_model
+      clone.children.first.to_common_field.should eq parent_join.children.first.to_common_field
+      clone.children.first.selected?.should eq parent_join.children.first.selected?
+    end
+  end
+
   describe "#column_name" do
     it "returns a valid column name with the table prefix" do
       join = Marten::DB::Query::SQL::Join.new(
@@ -115,6 +158,41 @@ describe Marten::DB::Query::SQL::Join do
           join.column_name(f.db_column)
         end.sort!
       )
+    end
+  end
+
+  describe "#replace_table_alias_prefix" do
+    it "replaces the table alias prefix of the join and its children and returns a hash of the old and new aliases" do
+      parent_join = Marten::DB::Query::SQL::Join.new(
+        id: 1,
+        type: Marten::DB::Query::SQL::JoinType::INNER,
+        from_model: ShowcasedPost,
+        from_common_field: ShowcasedPost.get_field("post_id"),
+        reverse_relation: nil,
+        to_model: Post,
+        to_common_field: Post.get_field("id"),
+        selected: true,
+        table_alias_prefix: "p",
+      )
+      child_join = Marten::DB::Query::SQL::Join.new(
+        id: 2,
+        type: Marten::DB::Query::SQL::JoinType::INNER,
+        from_model: Post,
+        from_common_field: Post.get_field("author_id"),
+        reverse_relation: nil,
+        to_model: TestUser,
+        to_common_field: TestUser.get_field("id"),
+        selected: true,
+        table_alias_prefix: "p",
+      )
+
+      parent_join.add_child(child_join)
+
+      old_aliases = parent_join.replace_table_alias_prefix("t")
+
+      parent_join.table_alias.should eq "t1"
+      child_join.table_alias.should eq "t2"
+      old_aliases.should eq({"p1" => "t1", "p2" => "t2"})
     end
   end
 

@@ -16,6 +16,7 @@ module Marten
           getter from_model
           getter parent
           getter reverse_relation
+          getter table_alias_prefix
           getter to_common_field
           getter to_model
           getter type
@@ -29,14 +30,29 @@ module Marten
             @to_model : Model.class,
             @to_common_field : Field::Base,
             @selected : Bool,
-            @table_alias_prefix = "t"
-          )
+            @table_alias_prefix = "t",
             @children = [] of self
+          )
           end
 
           def add_child(child : self) : Nil
             child.parent = self
             @children << child
+          end
+
+          def clone : self
+            self.class.new(
+              id: @id,
+              type: @type,
+              from_model: @from_model,
+              from_common_field: @from_common_field,
+              reverse_relation: @reverse_relation,
+              to_model: @to_model,
+              to_common_field: @to_common_field,
+              selected: @selected,
+              table_alias_prefix: @table_alias_prefix,
+              children: @children.map(&.clone)
+            )
           end
 
           def column_name(name) : String
@@ -48,6 +64,23 @@ module Marten
               next unless f.db_column?
               column_name(f.db_column)
             end + children.flat_map(&.columns)
+          end
+
+          def replace_table_alias_prefix(new_table_alias_prefix : String) : Hash(String, String)
+            old_vs_new_table_aliases = {} of String => String
+
+            old_table_alias = table_alias
+            @table_alias_prefix = new_table_alias_prefix
+            new_table_alias = table_alias
+
+            old_vs_new_table_aliases[old_table_alias] = new_table_alias
+
+            children.each do |child|
+              child_hash = child.replace_table_alias_prefix(new_table_alias_prefix)
+              old_vs_new_table_aliases.merge!(child_hash)
+            end
+
+            old_vs_new_table_aliases
           end
 
           def selected?

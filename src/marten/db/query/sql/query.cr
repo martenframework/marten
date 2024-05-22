@@ -101,6 +101,70 @@ module Marten
             )
           end
 
+          def combine(other : Query(Model), connector : PredicateConnector) : Nil
+            if sliced? || other.sliced?
+              raise Errors::UnmetQuerySetCondition.new("Cannot combine queries that are sliced")
+            end
+
+            if distinct != other.distinct
+              raise Errors::UnmetQuerySetCondition.new("Cannot combine a distinct query with a non-distinct query")
+            end
+
+            if distinct_columns != other.distinct_columns
+              raise Errors::UnmetQuerySetCondition.new("Cannot combine queries with different distinct columns")
+            end
+
+            if using != other.using
+              raise Errors::UnmetQuerySetCondition.new("Cannot combine queries that target different databases")
+            end
+
+            # STEP 1: Change the table alias prefixes of the joins in the other query to avoid conflicts with the
+            # current query.
+
+            old_vs_new_table_aliases = {} of String => String
+
+            other_joins = other.joins.clone
+            other_joins.each do |other_join|
+              old_vs_new_table_aliases.merge!(
+                other_join.replace_table_alias_prefix(other_join.table_alias_prefix + "combined")
+              )
+            end
+            @joins = joins + other_joins
+
+            # STEP 2: Clone the predicate node of the other query if we have one and if we have a predicate node for the
+            # current query too. If that's not the case, we only need to duplicate the predicate node of the other query
+            # if the connector is AND (an OR connector would not make sense in this case since one of the queries is
+            # targeting all the records while the other one is targeting a subset of them).
+
+            new_predicate_node = nil
+            if !other.predicate_node.nil? && !predicate_node.nil?
+              new_predicate_node = other.predicate_node.not_nil!.clone
+            elsif connector == PredicateConnector::AND
+              new_predicate_node = if other.predicate_node.nil?
+                                     predicate_node.nil? ? nil : PredicateNode.new
+                                   else
+                                     other.predicate_node.not_nil!.clone
+                                   end
+            end
+
+            if !(n = new_predicate_node).nil?
+              # Ensure that the predicates of the other query are correctly adjusted to the new table alias prefixes.
+              n.replace_table_alias_prefix(old_vs_new_table_aliases)
+
+              # Add the predicate node of the other query to the current query (only if we have two predicate nodes or
+              # if we are considering an AND operator).
+              @predicate_node ||= PredicateNode.new
+              @predicate_node.not_nil!.add(n, connector)
+            elsif connector == PredicateConnector::OR
+              # Reset the predicate node if the other query has no predicate node and the connector is OR.
+              @predicate_node = nil
+            end
+
+            # Order using the order clauses of the other query if it has any. Otherwise, keep the order clauses of the
+            # current query.
+            @order_clauses = other.order_clauses.empty? ? @order_clauses : other.order_clauses
+          end
+
           def connection
             @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
           end
@@ -192,6 +256,35 @@ module Marten
 
           def ordered?
             !@order_clauses.empty?
+          end
+
+          def parent_model_joins
+            @parent_model_joins ||= begin
+              flat_joins = Model.parent_models.map_with_index do |parent_model, i|
+                previous_model = (i == 0) ? Model : Model.parent_models[i - 1]
+                Join.new(
+                  id: i + 1,
+                  type: JoinType::INNER,
+                  from_model: previous_model,
+                  from_common_field: previous_model.pk_field,
+                  reverse_relation: nil,
+                  to_model: parent_model,
+                  to_common_field: parent_model.pk_field,
+                  selected: true,
+                  table_alias_prefix: "p"
+                )
+              end
+
+              if flat_joins.empty?
+                flat_joins
+              else
+                flat_joins[1..].each do |join|
+                  flat_joins[0].add_child(join)
+                end
+
+                [flat_joins.first]
+              end
+            end
           end
 
           def pluck(fields : Array(String)) : Array(Array(Field::Any))
@@ -811,35 +904,6 @@ module Marten
               reversed ^ @default_ordering ? "#{field} ASC" : "#{field} DESC"
             end
             "ORDER BY #{clauses.join(", ")}"
-          end
-
-          private def parent_model_joins
-            @parent_model_joins ||= begin
-              flat_joins = Model.parent_models.map_with_index do |parent_model, i|
-                previous_model = (i == 0) ? Model : Model.parent_models[i - 1]
-                Join.new(
-                  id: i + 1,
-                  type: JoinType::INNER,
-                  from_model: previous_model,
-                  from_common_field: previous_model.pk_field,
-                  reverse_relation: nil,
-                  to_model: parent_model,
-                  to_common_field: parent_model.pk_field,
-                  selected: true,
-                  table_alias_prefix: "p"
-                )
-              end
-
-              if flat_joins.empty?
-                flat_joins
-              else
-                flat_joins[1..].each do |join|
-                  flat_joins[0].add_child(join)
-                end
-
-                [flat_joins.first]
-              end
-            end
           end
 
           private def process_query_node(query_node)

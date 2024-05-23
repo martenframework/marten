@@ -1301,7 +1301,7 @@ describe Marten::DB::Query::Set do
     it "filters records using a raw SQL equality condition", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
 
       qset = Marten::DB::Query::Set(Tag).new.filter("name='crystal'")
@@ -1323,7 +1323,7 @@ describe Marten::DB::Query::Set do
     it "filters records using a raw SQL condition with one named parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
 
       qset = Marten::DB::Query::Set(Tag).new.filter("name=:name", name: "crystal")
@@ -1332,7 +1332,7 @@ describe Marten::DB::Query::Set do
     end
 
     it "raises an error when filtering with a misspelled column in a raw SQL condition", tags: "raw" do
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(
         SQLite3::Exception,
@@ -1355,8 +1355,8 @@ describe Marten::DB::Query::Set do
 
     it "filters records using a raw SQL condition with one invalid named parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
 
       expect_raises(
@@ -1370,7 +1370,7 @@ describe Marten::DB::Query::Set do
     it "filters records using a raw SQL condition with two named parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
       tag_4 = Tag.create!(name: "programming", is_active: false)
 
       qset = Marten::DB::Query::Set(Tag).new.filter("name=:name OR is_active=:active", name: "crystal", active: false)
@@ -1381,7 +1381,7 @@ describe Marten::DB::Query::Set do
     it "filters records using a raw SQL condition with one positional parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
 
       qset = Marten::DB::Query::Set(Tag).new.filter("name=?", "crystal")
@@ -1392,7 +1392,7 @@ describe Marten::DB::Query::Set do
     it "filters records using a raw SQL condition with two positional parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
       tag_4 = Tag.create!(name: "programming", is_active: false)
 
       qset = Marten::DB::Query::Set(Tag).new.filter("name=? or is_active=?", "crystal", false)
@@ -1402,9 +1402,9 @@ describe Marten::DB::Query::Set do
 
     it "filters records using a raw SQL condition with too few positional parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
-      tag_4 = Tag.create!(name: "programming", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: false)
 
       expect_raises(
         Marten::DB::Errors::UnmetQuerySetCondition,
@@ -1416,9 +1416,9 @@ describe Marten::DB::Query::Set do
 
     it "filters records using a raw SQL condition with too many positional parameters", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
-      tag_4 = Tag.create!(name: "programming", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "programming", is_active: false)
 
       expect_raises(
         Marten::DB::Errors::UnmetQuerySetCondition,
@@ -1430,9 +1430,9 @@ describe Marten::DB::Query::Set do
 
     it "filters records using a raw SQL condition combined with a predicate expression", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: false)
-      tag_4 = Tag.create!(name: "programming", is_active: false)
+      Tag.create!(name: "programming", is_active: false)
 
       qset = Marten::DB::Query::Set(Tag).new.filter(name__startswith: "c").filter("is_active=?", false)
 
@@ -1441,9 +1441,9 @@ describe Marten::DB::Query::Set do
 
     it "filters records using a predicate expression combined with a raw SQL condition", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: false)
-      tag_4 = Tag.create!(name: "programming", is_active: false)
+      Tag.create!(name: "programming", is_active: false)
 
       qset = Marten::DB::Query::Set(Tag).new.filter("is_active=?", false).filter(name__startswith: "c")
 
@@ -1451,7 +1451,7 @@ describe Marten::DB::Query::Set do
     end
 
     it "filters records using a raw SQL subquery to calculate average price", tags: "raw" do
-      product_1 = Marten::DB::Query::SetSpec::Product.create!(
+      Marten::DB::Query::SetSpec::Product.create!(
         name: "Awesome Product",
         price: 1000,
         rating: 5.0,
@@ -1463,7 +1463,10 @@ describe Marten::DB::Query::Set do
         rating: 5.0,
       )
 
-      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product).new.filter("price < (SELECT AVG(price) FROM db_query_set_spec_app_product)")
+      qset =
+        Marten::DB::Query::Set(Marten::DB::Query::SetSpec::Product)
+          .new
+          .filter("price < (SELECT AVG(price) FROM db_query_set_spec_app_product)")
 
       qset.to_a.should eq [product_2]
     end
@@ -1501,10 +1504,11 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2, tag_3]
     end
 
-    it "filters records using raw SQL with a named parameter and a q expression, combined with AND logic", tags: "raw" do
+    it "filters records using raw SQL with a named parameter and a q expression, combined with AND logic",
+      tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: false)
-      tag_3 = Tag.create!(name: "coding", is_active: false)
+      Tag.create!(name: "coding", is_active: false)
       Tag.create!(name: "programming", is_active: true)
 
       qset = Marten::DB::Query::Set(Tag).new.filter { q("name=:name", name: "crystal") & q(is_active: false) }
@@ -1512,8 +1516,8 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2]
     end
 
-
-    it "filters records using a q expression and raw SQL with a named parameter, combined with reversed OR logic", tags: "raw" do
+    it "filters records using a q expression and raw SQL with a named parameter, combined with reversed OR logic",
+      tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: false)
@@ -1524,10 +1528,11 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2, tag_3]
     end
 
-    it "filters records using a q expression and raw SQL with a named parameter, combined with reversed AND logic", tags: "raw" do
+    it "filters records using a q expression and raw SQL with a named parameter, combined with reversed AND logic",
+      tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: false)
-      tag_3 = Tag.create!(name: "coding", is_active: false)
+      Tag.create!(name: "coding", is_active: false)
       Tag.create!(name: "programming", is_active: true)
 
       qset = Marten::DB::Query::Set(Tag).new.filter { q(is_active: false) & q("name=:name", name: "crystal") }

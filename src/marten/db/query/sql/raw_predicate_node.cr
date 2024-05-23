@@ -11,7 +11,6 @@ module Marten
             @params = [] of ::DB::Any,
             @children = [] of PredicateNode,
             @connector = SQL::PredicateConnector::AND, @negated = false, *args
-
           )
             @predicates = [] of Predicate::Base
             @predicates.concat(args.to_a)
@@ -30,7 +29,7 @@ module Marten
           def ==(other : RawPredicateNode)
             (
               (other.statement == statement) &&
-              (other.predicates == predicates) &&
+                (other.predicates == predicates) &&
                 (other.children == children) &&
                 (other.connector == connector) &&
                 (other.negated == negated)
@@ -41,7 +40,7 @@ module Marten
             RawPredicateNode.new(
               statement: @statement,
               params: params,
-              children: @children.map { |c| c.clone },
+              children: @children.map(&.clone),
               connector: @connector,
               negated: @negated,
               predicates: @predicates.dup
@@ -49,36 +48,15 @@ module Marten
           end
 
           def to_sql(connection : Connection::Base)
-            sql_parts = [] of String
-            sql_params = [] of ::DB::Any
-
-            return case params
-              when Array(::DB::Any)
-                sanitize_positional_parameters(connection)
-              else
-                sanitize_named_parameters(connection)
-              end
-
-            # sanitized_query, sanitized_params = case params
-            # when Array(::DB::Any)
-            #   sanitize_positional_parameters
-            # else
-            #   sanitize_named_parameters
-            # end
-
-            # sanitized_query, sanitized_params = sanitize_named_parameters
-
-            sql_string = sql_parts.join(" #{@connector} ")
-
-            unless sql_string.empty?
-              sql_string = "NOT (#{sql_string})" if @negated
-              sql_string = "(#{sql_string})" if sql_parts.size > 1
+            case params
+            when Array(::DB::Any)
+              sanitize_positional_parameters(connection)
+            else
+              sanitize_named_parameters(connection)
             end
-
-            {@statement, sql_params}
           end
 
-          private NAMED_PARAMETER_RE = /(:?):([a-zA-Z]\w*)/
+          private NAMED_PARAMETER_RE        = /(:?):([a-zA-Z]\w*)/
           private POSITIONAL_PARAMETER_CHAR = '?'
           private POSITIONAL_PARAMETER_RE   = /#{"\\" + POSITIONAL_PARAMETER_CHAR}/
 
@@ -106,7 +84,9 @@ module Marten
 
               parameter_match = $2.to_s
               if !params.as(Hash).has_key?(parameter_match)
-                raise Errors::UnmetQuerySetCondition.new("Missing parameter '#{parameter_match}' for query: #{@statement}")
+                raise Errors::UnmetQuerySetCondition.new(
+                  "Missing parameter '#{parameter_match}' for query: #{@statement}"
+                )
               end
 
               parameter_offset += 1

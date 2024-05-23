@@ -299,7 +299,6 @@ describe Marten::Middleware::AssetServing do
           ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
-        uncompressed_content = File.read(File.join(__DIR__, "asset_serving/assets/#{path}"))
         response.headers[:"Cache-Control"].should eq "private, max-age=7200"
       end
     end

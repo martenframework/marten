@@ -173,6 +173,21 @@ describe Marten::CLI::Manage::Command::New do
       end
     end
 
+    it "creates a new project structure from edge" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["--edge", "project", "dummy_project"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES_WITH_EDGE.each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
     it "creates a new app structure" do
       stdout = IO::Memory.new
 
@@ -483,5 +498,30 @@ module Marten::CLI::Manage::Command::NewSpec
     ".gitignore",
     "manage.cr",
     "shard.yml",
+  ]
+
+  PROJECT_FILES_WITH_EDGE = [
+    "config/initializers/.gitkeep",
+    "config/settings/base.cr",
+    "config/settings/development.cr",
+    "config/settings/production.cr",
+    "config/settings/test.cr",
+    "config/routes.cr",
+    "spec/spec_helper.cr",
+    "src/cli.cr",
+    "src/project.cr",
+    "src/server.cr",
+    "src/assets/css/app.css",
+    "src/emails/.gitkeep",
+    "src/handlers/.gitkeep",
+    "src/migrations/.gitkeep",
+    "src/models/.gitkeep",
+    "src/schemas/.gitkeep",
+    "src/templates/base.html",
+    ".editorconfig",
+    ".gitignore",
+    "manage.cr",
+    "shard.yml",
+    "shard.override.yml",
   ]
 end

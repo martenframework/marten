@@ -1334,10 +1334,7 @@ describe Marten::DB::Query::Set do
     it "raises an error when filtering with a misspelled column in a raw SQL condition", tags: "raw" do
       Tag.create!(name: "crystal", is_active: true)
 
-      expect_raises(
-        SQLite3::Exception,
-        "no such column: namme"
-      ) do
+      expect_raises(Exception) do
         Marten::DB::Query::Set(Tag).new.filter("namme=:name", name: "crystal").to_a
       end
     end

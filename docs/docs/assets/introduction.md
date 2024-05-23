@@ -119,6 +119,12 @@ It is also possible to resolve asset URLs programmatically in Crystal. To do so,
 Marten.assets.url("app/app.css") # => "/assets/app/app.css"
 ```
 
+## Cache Control
+
+```crystal
+config.assets.max_age = 7200
+```
+
 ## Serving assets in development
 
 Marten provides a handler that you can use to serve assets in development environments only. This handler ([`Marten::Handlers::Defaults::Development::ServeAsset`](pathname:///api/dev/Marten/Handlers/Defaults/Development/ServeAsset.html)) is automatically mapped to a route when creating new projects through the use of the [`new`](../development/reference/management-commands.md#new) management command:

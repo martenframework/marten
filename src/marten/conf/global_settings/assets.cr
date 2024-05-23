@@ -9,6 +9,7 @@ module Marten
         @root : String = "assets"
         @storage : Core::Storage::Base? = nil
         @url : String = "/assets/"
+        @max_age : Int64 = 3600
 
         # Returns a boolean indicating whether assets should be looked for inside installed applications.
         getter app_dirs
@@ -35,6 +36,12 @@ module Marten
 
         # Allows to set the base URL to use when exposing asset URLs.
         setter url
+
+        # Allows to set the Cache-Control max-age.
+        setter max_age
+
+        # Returns the Cache-Control max-age value
+        getter max_age
 
         # Allows to set the directories where assets should be looked for.
         def dirs=(dirs : Array(Path | String | Symbol))

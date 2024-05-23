@@ -7,7 +7,7 @@ module Marten
             property name : String
             property targets : Array(String)
             property database : String
-            property edge : Bool = false
+            property edge : Bool? = false
 
             TARGET_AUTH    = "auth"
             TARGET_GENERAL = "general"

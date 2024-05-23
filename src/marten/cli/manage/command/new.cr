@@ -26,7 +26,7 @@ module Marten
               description: "Configure default database (options: mysql/postgresql/sqlite3)") do |db|
               @database = db
             end
-            on_option(:edge, "Use latest version from main branch") { |v| @edge = true }
+            on_option(:e, :edge, description: "Use latest version from main branch") { @edge = true }
           end
 
           def run

@@ -23,7 +23,13 @@ jobs:
           MARIADB_DATABASE: marten_test
         ports:
           - 3306:3306
-        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: >-
+          --health-cmd="healthcheck.sh
+          --connect
+          --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
     continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false
@@ -60,13 +66,18 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:8
+        image: bitnami/mysql:8.3.0
         env:
           MYSQL_ROOT_PASSWORD: "mysql"
           MYSQL_DATABASE: marten_test
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
         ports:
           - 3307:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5 -e MYSQL_ROOT_PASSWORD=mysql -e MYSQL_USER=marten_test -e MYSQL_PASSWORD=marten_test -e MYSQL_DATABASE=marten_test --entrypoint sh mysql:8 -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
     continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false
@@ -109,7 +120,11 @@ jobs:
           POSTGRES_DB: marten_test
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false

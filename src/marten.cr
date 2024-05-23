@@ -40,7 +40,7 @@ require "./marten/server/**"
 require "./marten/template/**"
 
 module Marten
-  VERSION = "0.4.4"
+  VERSION = "0.4.5"
 
   Log = ::Log.for("marten")
 
@@ -168,8 +168,8 @@ module Marten
     )
 
     finders = [] of Asset::Finder::Base
-    finders << Asset::Finder::AppDirs.new if settings.assets.app_dirs
     finders += settings.assets.dirs.map { |d| Asset::Finder::FileSystem.new(d) }
+    finders << Asset::Finder::AppDirs.new if settings.assets.app_dirs
 
     assets.manifests = settings.assets.manifests
 

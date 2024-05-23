@@ -47,6 +47,35 @@ The `min_size` argument allows defining the minimum size allowed for the email a
 
 The `strip` argument allows defining whether the string value should be stripped of leading and trailing whitespaces. The default is `true`.
 
+### `enum`
+
+An `enum` field allows validating string values against the values of a specific [`Enum`](https://crystal-lang.org/api/Enum.html). When defining `enum` fields, it's necessary to specify a `values` argument that matches the actual enum:
+
+```crystal
+enum Category
+  NEWS
+  BLOG
+end
+
+class ArticleSchema < Marten::Schema
+  field :title, :string
+  field :category, :enum, values: Category
+end
+
+schema = ArticleSchema.new(
+  Marten::HTTP::Params::Data{"title" => ["Test"], "category" => ["blog"]}
+)
+
+schema.valid?   # => true
+schema.category # => Category::BLOG
+```
+
+In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `values`
+
+The `values` argument **is required** and allows to specify the actual enum class that should be used for the field. Only string values matching the values of the enum will be validated by the field.
+
 ### `file`
 
 A `file` field allows validating uploaded files. In addition to the [common field options](#common-field-options), such fields support the following arguments:

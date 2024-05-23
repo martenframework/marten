@@ -71,6 +71,36 @@ qset_2 = Article.all
 qset_2[2..6]? # returns a "sliced" query set
 ```
 
+### `&` (AND)
+
+Combines the current query set with another one using the **AND** operator.
+
+This method returns a new query set that is the result of combining the current query set with another one using the AND SQL operator. 
+
+For example:
+
+```crystal
+query_set_1 = Post.all.filter(title: "Test")
+query_set_2 = Post.all.filter(is_published: true)
+
+combined_query_set = query_set_1 & query_set_2
+```
+
+### `|` (OR)
+
+Combines the current query set with another one using the **OR** operator.
+
+This method returns a new query set that is the result of combining the current query set with another one using the OR SQL operator. 
+
+For example:
+
+```crystal
+query_set_1 = Post.all.filter(title: "Test")
+query_set_2 = Post.all.filter(is_published: true)
+
+combined_query_set = query_set_1 | query_set_2
+```
+
 ### `all`
 
 Allows retrieving all the records of a specific model. `#all` can be used as a class method from any model class, or it can be used as an instance method from any query set object. In this last case, calling `#all` returns a copy of the current query set.
@@ -686,6 +716,25 @@ Example:
 Order.all.sum(:amount)  # Calculates the total amount across all orders
 # => 7
 ```
+
+### `to_s`
+
+Returns a string representation of the considered query set.
+
+### `to_sql`
+
+Returns the SQL representation of the considered query set.
+
+For example:
+
+```crystal
+Tag.filter(name__startswith: "r").to_sql
+# => "SELECT app_tag.id, app_tag.name, app_tag.is_active FROM \"app_tag\" WHERE app_tag.name LIKE $1"
+```
+
+:::note
+The outputted SQL will vary depending on the database backend in use.
+:::
 
 ### `update`
 

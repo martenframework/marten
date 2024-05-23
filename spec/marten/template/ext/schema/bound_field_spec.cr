@@ -31,6 +31,13 @@ describe Marten::Schema::BoundField do
       bound_field_2.resolve_template_attribute("errors").should eq bound_field_2.errors
     end
 
+    it "is able to return the result of #field" do
+      schema = Marten::Schema::BoundFieldExtSpec::TestSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      bound_field = Marten::Schema::BoundField.new(schema, schema.class.get_field("foo"))
+      bound_field.resolve_template_attribute("field").should eq schema.class.get_field("foo")
+    end
+
     it "is able to return the result of #value" do
       schema = Marten::Schema::BoundFieldExtSpec::TestSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
 

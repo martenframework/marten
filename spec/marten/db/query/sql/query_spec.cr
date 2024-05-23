@@ -1063,6 +1063,331 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#combine" do
+    it "produces the expected result when combining queries filtering the local table with an AND connector" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "rust", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(is_active: true))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query_1.count.should eq 1
+      query_1.execute.should eq [tag_1]
+    end
+
+    it "produces the expected result when combining queries filtering the local table with an OR connector" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "go", is_active: false)
+      tag_3 = Tag.create!(name: "crystal", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(name__startswith: "c"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::OR)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [tag_1, tag_3].to_set
+    end
+
+    it "produces the expected result when combining queries filtering on related tables with an AND connector" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Top Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_1, title: "Top Post 2")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(author__username: "jd1"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John", title__startswith: "Top"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [post_1, post_4].to_set
+    end
+
+    it "produces the expected result when combining queries filtering on related tables with an OR connector" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+      post_4 = Post.create!(author: user_1, title: "Post 4")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(author__username: "jd1"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(author__username: "jd3"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::OR)
+      query_1.count.should eq 3
+      query_1.execute.to_set.should eq [post_1, post_3, post_4].to_set
+    end
+
+    it "produces the expected result when combining queries filtering on different related tables" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      TestUserProfile.create!(user: user_1, bio: "Bio 1")
+      TestUserProfile.create!(user: user_2, bio: "Other bio")
+
+      Post.create!(author: user_1, title: "Top Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      Post.create!(author: user_1, title: "Post 3")
+      Post.create!(author: user_1, title: "Post 4")
+
+      query_1 = Marten::DB::Query::SQL::Query(TestUser).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(profile__bio__istartswith: "bio"))
+
+      query_2 = Marten::DB::Query::SQL::Query(TestUser).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(posts__title__istartswith: "top"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query_1.count.should eq 1
+      query_1.execute.should eq [user_1]
+    end
+
+    it "produces the expected result when the combining query targets all the records and the AND connector is used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Top Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_1, title: "Top Post 2")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John", title__startswith: "Top"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [post_1, post_4].to_set
+    end
+
+    it "produces the expected result when the other query targets all the records and the AND connector is used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Top Post 1")
+      Post.create!(author: user_2, title: "Post 2")
+      Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_1, title: "Top Post 2")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John", title__startswith: "Top"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [post_1, post_4].to_set
+    end
+
+    it "produces the expected result when the combining query targets all the records and the OR connector is used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Top Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_1, title: "Top Post 2")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John", title__startswith: "Top"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::OR)
+      query_1.count.should eq 4
+      query_1.execute.to_set.should eq [post_1, post_2, post_3, post_4].to_set
+    end
+
+    it "produces the expected result when the other query targets all the records and the OR connector is used" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Top Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_1, title: "Top Post 2")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John", title__startswith: "Top"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::OR)
+      query_1.count.should eq 4
+      query_1.execute.to_set.should eq [post_1, post_2, post_3, post_4].to_set
+    end
+
+    it "does not raise if the distinct parameter matches between the combining query and the other query" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.distinct = true
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.distinct = true
+
+      query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query.count.should eq 0
+    end
+
+    it "does not raise if the distinct columns match between the combining query and the other query" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.distinct = true
+      query.setup_distinct_clause(["title"])
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.distinct = true
+      other_query.setup_distinct_clause(["title"])
+
+      query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+
+      for_postgresql do
+        query.count.should eq 0
+      end
+    end
+
+    it "does not raises if the two queries are targeting the same specific database" do
+      tag_1 = Tag.all.using(:other).create!(name: "ruby", is_active: true)
+      Tag.all.using(:other).create!(name: "rust", is_active: false)
+      Tag.all.using(:other).create!(name: "crystal", is_active: true)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.using = "other"
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.using = "other"
+      query_2.add_query_node(Marten::DB::Query::Node.new(is_active: true))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::AND)
+      query_1.count.should eq 1
+      query_1.execute.should eq [tag_1]
+    end
+
+    it "can combine queries that involve multi-table-inheritance" do
+      address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
+      student_1 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+        name: "Student 1",
+        email: "student-1@example.com",
+        address: address,
+        grade: "10",
+        alt_grade: "20"
+      )
+      student_2 = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+        name: "Student 2",
+        email: "student-2@example.com",
+        address: address,
+        grade: "11",
+        alt_grade: "21"
+      )
+      Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+        name: "Other Student",
+        email: "other-student@example.com",
+        address: address,
+        grade: "12",
+        alt_grade: "22"
+      )
+
+      query_1 = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(alt_grade: "21"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::AltStudent).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(alt_grade: "20"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::OR)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [student_1, student_2].to_set
+    end
+
+    it "raises if the combining query is sliced" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.slice(1, 2)
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries that are sliced",
+      ) do
+        query.combine(Marten::DB::Query::SQL::Query(Post).new, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if the other query is sliced" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.slice(1, 2)
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries that are sliced",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if the distinct parameter does not match between the combining query and the other query" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.distinct = true
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine a distinct query with a non-distinct query",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if the distinct columns do not match between the combining query and the other query" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.distinct = true
+      query.setup_distinct_clause(["title"])
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.distinct = true
+      other_query.setup_distinct_clause(["author_id"])
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries with different distinct columns",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if the two queries are not targeting the same database" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.using = "other"
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries that target different databases",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+  end
+
   describe "#connection" do
     it "returns the model connection by default" do
       Marten::DB::Query::SQL::Query(Tag).new.connection.should eq Tag.connection
@@ -2195,6 +2520,33 @@ describe Marten::DB::Query::SQL::Query do
       query.using = "other"
 
       query.to_empty.using.should eq query.using
+    end
+  end
+
+  describe "#to_sql" do
+    it "produces the expected output" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
+
+      for_mysql do
+        query.to_sql.should eq(
+          "SELECT app_tag.id, app_tag.name, app_tag.is_active " \
+          "FROM `app_tag` WHERE app_tag.name LIKE BINARY ? LIMIT 18446744073709551615"
+        )
+      end
+
+      for_postgresql do
+        query.to_sql.should eq(
+          "SELECT app_tag.id, app_tag.name, app_tag.is_active FROM \"app_tag\" WHERE app_tag.name LIKE $1"
+        )
+      end
+
+      for_sqlite do
+        query.to_sql.should eq(
+          "SELECT app_tag.id, app_tag.name, app_tag.is_active " \
+          "FROM \"app_tag\" WHERE app_tag.name LIKE ? ESCAPE '\\' LIMIT -1"
+        )
+      end
     end
   end
 

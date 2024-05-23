@@ -33,6 +33,20 @@ describe Marten::DB::Connection::Base do
 
       sql.should eq "SELECT * FROM my_table WHERE id = 1"
     end
+
+    it "rejects empty strings" do
+      conn = Marten::DB::Connection::SQLite.new(Marten::Conf::GlobalSettings::Database.new("default"))
+
+      sql = conn.build_sql do |s|
+        s << "SELECT *"
+        s << ""
+        s << "FROM my_table"
+        s << ""
+        s << "WHERE id = 1"
+      end
+
+      sql.should eq "SELECT * FROM my_table WHERE id = 1"
+    end
   end
 
   describe "#id" do

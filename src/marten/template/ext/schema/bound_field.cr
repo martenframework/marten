@@ -4,12 +4,14 @@ class Marten::Schema::BoundField
   # :nodoc:
   def resolve_template_attribute(key : ::String)
     case key
-    when "id"
-      id
     when "errored?"
       errored?
     when "errors"
       errors
+    when "field"
+      field
+    when "id"
+      id
     when "value"
       value
     end

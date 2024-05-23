@@ -333,6 +333,96 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#&" do
+    it "combines two query sets using the AND operator" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "rust", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.filter(name__startswith: "r")
+      qset_2 = Tag.all.filter(is_active: true)
+
+      combined = qset_1 & qset_2
+
+      combined.count.should eq 1
+      combined.to_a.should eq [tag_1]
+    end
+
+    it "returns the other query set if it is empty" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "rust", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.filter(name__startswith: "r")
+      qset_2 = Tag.all.none
+
+      combined = qset_1 & qset_2
+
+      combined.should be qset_2
+      combined.exists?.should be_false
+    end
+
+    it "returns the current query set if it is empty" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "rust", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.none
+      qset_2 = Tag.all.filter(name__startswith: "r")
+
+      combined = qset_1 & qset_2
+
+      combined.should be qset_1
+      combined.exists?.should be_false
+    end
+  end
+
+  describe "#|" do
+    it "combines two query sets using the AND operator" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "go", is_active: false)
+      tag_3 = Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.filter(name__startswith: "r")
+      qset_2 = Tag.all.filter(name__startswith: "c")
+
+      combined = qset_1 | qset_2
+
+      combined.count.should eq 2
+      combined.to_set.should eq [tag_1, tag_3].to_set
+    end
+
+    it "returns the current query set if the other one is empty" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "rust", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.filter(name__startswith: "r")
+      qset_2 = Tag.all.none
+
+      combined = qset_1 | qset_2
+
+      combined.should be qset_1
+      combined.count.should eq 2
+      combined.to_set.should eq [tag_1, tag_2].to_set
+    end
+
+    it "returns the other query set if the current one is empty" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "rust", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.none
+      qset_2 = Tag.all.filter(name__startswith: "r")
+
+      combined = qset_1 | qset_2
+
+      combined.should be qset_2
+      combined.count.should eq 2
+      combined.to_set.should eq [tag_1, tag_2].to_set
+    end
+  end
+
   describe "#accumulate" do
     it "raises NotImplementedError" do
       expect_raises(NotImplementedError) { Marten::DB::Query::Set(Tag).new.accumulate }
@@ -2943,6 +3033,14 @@ describe Marten::DB::Query::Set do
 
       qset = Marten::DB::Query::Set(Tag).new
       qset.to_s.ends_with?(", ...(remaining truncated)...]>").should be_true
+    end
+  end
+
+  describe "#to_sql" do
+    it "produces the output of the query SQL representation" do
+      qs = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
+
+      qs.to_sql.should eq qs.query.to_sql
     end
   end
 

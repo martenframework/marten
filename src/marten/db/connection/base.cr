@@ -83,7 +83,7 @@ module Marten
         # Allows to conveniently build a SQL statement by yielding an array of nillable strings.
         def build_sql(&)
           yield (clauses = [] of String?)
-          clauses.compact!.join " "
+          clauses.compact!.reject(&.try(&.empty?)).join " "
         end
 
         # Returns the identifier of the connection.

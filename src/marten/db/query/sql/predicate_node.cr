@@ -56,6 +56,14 @@ module Marten
             )
           end
 
+          def replace_table_alias_prefix(old_vs_new_table_aliases : Hash(String, String)) : Nil
+            @predicates.each { |p|
+              next unless old_vs_new_table_aliases.has_key?(p.alias_prefix)
+              p.alias_prefix = old_vs_new_table_aliases[p.alias_prefix]
+            }
+            @children.each { |c| c.replace_table_alias_prefix(old_vs_new_table_aliases) }
+          end
+
           def to_sql(connection : Connection::Base)
             sql_parts = [] of String
             sql_params = [] of ::DB::Any

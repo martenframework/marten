@@ -98,7 +98,7 @@ The `max_size` argument is optional and defaults to 254 characters (in accordanc
 
 ### `enum`
 
-An `enum` field allows persisting the value of an [`Enum`](https://crystal-lang.org/api/Enum.html). When defining `enum` fields, it's necessary to specify a values argument that matches the actual enum:
+An `enum` field allows persisting the value of an [`Enum`](https://crystal-lang.org/api/Enum.html). When defining `enum` fields, it's necessary to specify a `values` argument that matches the actual enum:
 
 ```crystal
 enum Category
@@ -118,6 +118,8 @@ article.category # => Category::BLOG
 :::info
 The way enums are handled at the database level depends on the database backend being used. Indeed, an ENUM type is used for MySQL databases while column checks are used for SQLite and PostgreSQL databases.
 :::
+
+In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `values`
 

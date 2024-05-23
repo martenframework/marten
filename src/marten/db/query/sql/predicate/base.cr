@@ -6,6 +6,10 @@ module Marten
           abstract class Base
             class_getter predicate_name : String = ""
 
+            getter alias_prefix
+
+            setter alias_prefix
+
             def self.predicate_name(name : String?)
               @@predicate_name = name
             end

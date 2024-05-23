@@ -331,6 +331,34 @@ describe Marten::DB::Query::SQL::PredicateNode do
     end
   end
 
+  describe "#replace_table_alias_prefix" do
+    it "properly replaces the table alias prefix in the predicate node, its children, and predicates" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        children: Array(Marten::DB::Query::SQL::PredicateNode).new,
+        connector: Marten::DB::Query::SQL::PredicateConnector::AND,
+        negated: false,
+        predicates: [predicate_1, predicate_2] of Marten::DB::Query::SQL::Predicate::Base
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        children: [node_1],
+        connector: Marten::DB::Query::SQL::PredicateConnector::OR,
+        negated: true,
+        predicates: [predicate_1] of Marten::DB::Query::SQL::Predicate::Base
+      )
+
+      node_1.replace_table_alias_prefix({"t1" => "p1", "t2" => "p2"})
+
+      node_1.predicates[0].alias_prefix.should eq "p1"
+      node_1.predicates[1].alias_prefix.should eq "p2"
+
+      node_2.children[0].predicates[0].alias_prefix.should eq "p1"
+    end
+  end
+
   describe "#to_sql" do
     it "properly generates the expected SQL for a simple predicate with an AND connector" do
       predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")

@@ -101,6 +101,12 @@ This can be used to insert the CSRF token into a hidden form input so that it ge
 
 See [Cross-Site Request Forgery protection](../../security/csrf.md) to learn more about this.
 
+Optionally, the output of the `csrf_token` template tag can be assigned to a specific variable using the `as` keyword:
+
+```html
+{% csrf_token as my_var %}
+```
+
 ## `extend`
 
 The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overridden or extended by the child template. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.

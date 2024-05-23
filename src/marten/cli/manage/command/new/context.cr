@@ -7,6 +7,7 @@ module Marten
             property name : String
             property targets : Array(String)
             property database : String
+            property edge : Bool = false
 
             TARGET_AUTH    = "auth"
             TARGET_GENERAL = "general"
@@ -14,7 +15,8 @@ module Marten
             def initialize(
               @name = "example",
               @database = "sqlite3",
-              @targets = [TARGET_GENERAL]
+              @targets = [TARGET_GENERAL],
+              @edge = false,
             )
             end
 

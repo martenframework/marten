@@ -218,4 +218,19 @@ describe Marten::Conf::GlobalSettings::Assets do
       assets_conf.url.should eq "/assets/url/"
     end
   end
+
+  describe "#max_age" do
+    it "returns the expected default value" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.max_age.should eq 3600
+    end
+  end
+
+  describe "#max_age=" do
+    it "allows to set max_age value" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.max_age = 7200
+      assets_conf.max_age.should eq 7200
+    end
+  end
 end

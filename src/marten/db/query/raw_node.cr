@@ -1,16 +1,14 @@
 module Marten
   module DB
     module Query
-      class Node
-        alias FilterHash = Hash(String, Field::Any | Array(Field::Any) | DB::Model | Array(DB::Model))
-
-        getter children
-        getter connector
-        getter filters
-        getter negated
+      class RawNode < Node
+        getter statement
+        getter params
 
         def initialize(
-          @children = [] of self,
+          @statement : String,
+          @params = [] of ::DB::Any,
+          @children = [] of Node,
           @connector = SQL::PredicateConnector::AND,
           @negated = false,
           **kwargs
@@ -20,8 +18,9 @@ module Marten
         end
 
         def initialize(
-          filters : Hash | NamedTuple,
-          @children = [] of self,
+          @statement : String,
+          @params = [] of ::DB::Any,
+          @children = [] of Node,
           @connector = SQL::PredicateConnector::AND,
           @negated = false
         )
@@ -30,38 +29,16 @@ module Marten
         end
 
         def initialize(
-          @children : Array(self),
+          @statement : String,
+          @params : Array(::DB::Any) | Hash(String, ::DB::Any),
+          @children : Array(Node),
           @connector : SQL::PredicateConnector,
           @negated : Bool,
           @filters : FilterHash
         )
         end
 
-        def ==(other : self)
-          (
-            (other.filters == @filters) &&
-              (other.children == @children) &&
-              (other.connector == @connector) &&
-              (other.negated == @negated)
-          )
-        end
-
-        def &(other : Node)
-          combine(other, SQL::PredicateConnector::AND)
-        end
-
-        def |(other : Node)
-          combine(other, SQL::PredicateConnector::OR)
-        end
-
-        def - : self
-          negated_parent = self.class.new
-          negated_parent.add(self, SQL::PredicateConnector::AND)
-          negated_parent.negate
-          negated_parent
-        end
-
-        protected def add(other : Node, conn : SQL::PredicateConnector)
+        protected def add(other : self, conn : SQL::PredicateConnector)
           return if @children.includes?(other)
 
           if @connector == conn
@@ -78,7 +55,7 @@ module Marten
         end
 
         private def combine(other, conn)
-          combined = self.class.new(connector: conn)
+          combined = Node.new(connector: conn)
           combined.add(self, conn)
           combined.add(other, conn)
           combined

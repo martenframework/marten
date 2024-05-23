@@ -467,6 +467,35 @@ module Marten
         end
 
         # Returns a query set whose records match the given query node object.
+        def filter(query_string : String)
+          return clone if query_string.empty?
+
+          add_query_node(RawNode.new(query_string))
+        end
+
+        def filter(query_string : String, *args)
+          filter(query_string, args.to_a)
+        end
+
+        def filter(query_string : String, **kwargs)
+          filter(query_string, kwargs.to_h)
+        end
+
+        def filter(query_string : String, params : Array)
+          raw_params = [] of ::DB::Any
+          raw_params += params
+
+          add_query_node(RawNode.new(query_string, raw_params))
+        end
+
+        def filter(query_string : String, params : Hash | NamedTuple)
+          raw_params = {} of String => ::DB::Any
+          params.each { |k, v| raw_params[k.to_s] = v }
+
+          add_query_node(RawNode.new(query_string, raw_params))
+        end
+
+        # Returns a query set whose records match the given query node object.
         def filter(query_node : Node)
           add_query_node(query_node)
         end

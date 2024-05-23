@@ -101,4 +101,32 @@ describe Marten::Template::Tag::For::Loop do
       loop.revindex0.should eq 8
     end
   end
+
+  describe "#odd?" do
+    it "returns true if the index is odd" do
+      loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
+      loop.index = 1
+      loop.odd?.should eq true
+
+      loop.index = 2
+      loop.odd?.should eq false
+
+      loop.index = 3
+      loop.odd?.should eq true
+    end
+  end
+
+  describe "#even?" do
+    it "returns true if the index is even" do
+      loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
+      loop.index = 0
+      loop.even?.should eq true
+
+      loop.index = 1
+      loop.even?.should eq false
+
+      loop.index = 2
+      loop.even?.should eq true
+    end
+  end
 end

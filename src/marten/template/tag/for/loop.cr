@@ -36,6 +36,14 @@ module Marten
           def revindex0
             @items_size - @index - 1
           end
+
+          def odd?
+            @index.odd?
+          end
+
+          def even?
+            @index.even?
+          end
         end
       end
     end

@@ -143,6 +143,8 @@ Finally, loops give access to a special `loop` variable _inside_ the loop in ord
 | `loop.revindex0` | The index of the current iteration counting from the end of the loop (0-indexed) |
 | `loop.first?` | A boolean indicating if this is the first iteration of the loop |
 | `loop.last?` | A boolean indicating if this is the last iteration of the loop |
+| `loop.even?` | A boolean indicating if the index of the current iteration (0-indexed) is even |
+| `loop.odd?` | A boolean indicating if the index of the current iteration (0-indexed) is odd |
 | `loop.parent` | The parent's `loop` variable (only for nested for loops) |
 
 ## `if`

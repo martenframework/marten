@@ -38,11 +38,11 @@ module Marten
           end
 
           def odd?
-            !even?
+            @index.odd?
           end
 
           def even?
-            @index % 2 == 0
+            @index.even?
           end
         end
       end

@@ -281,7 +281,7 @@ describe Marten::Middleware::AssetServing do
       end
     end
 
-    it "properly sets the custom Cache-Control header based on the assets.max_age setting" do
+    it "properly sets the custom Cache-Control header based on the assets.max_age setting value" do
       with_overridden_setting("assets.max_age", 7200) do
         middleware = Marten::Middleware::AssetServing.new
 

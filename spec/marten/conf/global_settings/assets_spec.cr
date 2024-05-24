@@ -227,7 +227,7 @@ describe Marten::Conf::GlobalSettings::Assets do
   end
 
   describe "#max_age=" do
-    it "allows to set max_age value" do
+    it "allows to set the max_age value" do
       assets_conf = Marten::Conf::GlobalSettings::Assets.new
       assets_conf.max_age = 7200
       assets_conf.max_age.should eq 7200

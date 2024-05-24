@@ -65,19 +65,12 @@ module Marten
               raise Errors::UnmetQuerySetCondition.new("Wrong number of parameters provided for query: #{@statement}")
             end
 
-            parameter_offset = 0
-            sanitized_query = @statement.gsub(POSITIONAL_PARAMETER_RE) do
-              parameter_offset += 1
-              connection.parameter_id_for_ordered_argument(parameter_offset)
-            end
-
-            {sanitized_query, params.as(Array(::DB::Any))}
+            {@statement.gsub(POSITIONAL_PARAMETER_RE, "%s"), params.as(Array(::DB::Any))}
           end
 
           private def sanitize_named_parameters(connection)
             sanitized_params = [] of ::DB::Any
 
-            parameter_offset = 0
             sanitized_query = @statement.gsub(NAMED_PARAMETER_RE) do |match|
               # Specifically handle PostgreSQL's cast syntax (::).
               next match if $1 == ":"
@@ -89,9 +82,8 @@ module Marten
                 )
               end
 
-              parameter_offset += 1
               sanitized_params << params.as(Hash(String, ::DB::Any))[parameter_match]
-              connection.parameter_id_for_ordered_argument(parameter_offset)
+              "%s"
             end
 
             {sanitized_query, sanitized_params}

@@ -1345,7 +1345,7 @@ describe Marten::DB::Query::Set do
       tag_3 = Tag.create!(name: "coding", is_active: true)
       tag_4 = Tag.create!(name: "programming", is_active: true)
 
-      qset = Marten::DB::Query::Set(Tag).new.filter("name!=:name", name: "crystal")
+      qset = Marten::DB::Query::Set(Tag).new.filter("name!=:name", name: "crystal").order(:id)
 
       qset.to_a.should eq [tag_1, tag_3, tag_4]
     end

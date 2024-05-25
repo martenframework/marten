@@ -20,7 +20,7 @@ describe Marten::Template::Tag::CsrfToken do
       handler.process_dispatch
 
       context = Marten::Template::Context.new
-      context["handler"] = handler
+      context.handler = handler
 
       tag.render(context).should_not be_empty
     end
@@ -43,7 +43,7 @@ describe Marten::Template::Tag::CsrfToken do
       handler.process_dispatch
 
       context = Marten::Template::Context.new
-      context["handler"] = handler
+      context.handler = handler
 
       tag.render(context).should be_empty
       context["my_var"].should_not be_empty
@@ -84,7 +84,7 @@ describe Marten::Template::Tag::CsrfToken do
       parser = Marten::Template::Parser.new("")
 
       context = Marten::Template::Context.new
-      context["handler"] = handler
+      context.handler = handler
 
       tag = Marten::Template::Tag::CsrfToken.new(parser, "csrf_token")
       rendered = tag.render(context)
@@ -92,7 +92,7 @@ describe Marten::Template::Tag::CsrfToken do
       rendered.should_not be_empty
     end
 
-    it "returns an empty string if no handler is in the context" do
+    it "returns an empty string if no handler is associated with the context" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
@@ -128,31 +128,10 @@ describe Marten::Template::Tag::CsrfToken do
       handler.process_dispatch
 
       context = Marten::Template::Context.new
-      context["handler"] = handler
+      context.handler = handler
 
       tag.render(context).should be_empty
       context["my_var"].should_not be_empty
-    end
-
-    it "returns if the handler context key is not an actual handler" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "/test/xyz",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-
-      handler = Marten::Template::Tag::CsrfTokenSpec::TestHandler.new(request)
-      handler.process_dispatch
-
-      parser = Marten::Template::Parser.new("")
-
-      context = Marten::Template::Context.new
-      context["handler"] = 42
-
-      tag = Marten::Template::Tag::CsrfToken.new(parser, "csrf_token")
-      tag.render(context).should be_empty
     end
   end
 end

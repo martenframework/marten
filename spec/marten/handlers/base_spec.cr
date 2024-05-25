@@ -832,11 +832,12 @@ describe Marten::Handlers::Base do
       )
 
       handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
-      response = handler.render("specs/handlers/base/handler.html")
+      response = handler.render("specs/handlers/base/test.html")
+
+      handler.context.handler.should eq handler
 
       response.status.should eq 200
       response.content_type.should eq "text/html"
-      response.content.strip.should eq HTML.escape(handler.to_s)
     end
 
     it "includes the request in the context" do

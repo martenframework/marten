@@ -206,7 +206,7 @@ module Marten
         status : ::HTTP::Status | Int32 = 200
       )
         self.context.merge(context) unless context.nil?
-        self.context[:handler] = self
+        self.context.handler = self
         self.context[:request] = request
 
         before_render_response = run_before_render_callbacks

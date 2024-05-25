@@ -2,10 +2,17 @@ module Marten
   module Template
     # A template context.
     class Context
+      @handler : Handlers::Base?
       @values : Deque(Hash(String, Value)) = Deque{Hash(String, Value).new}
 
       # Returns the blocks stack associated with the context.
       getter blocks
+
+      # Returns the handler instance associated with the context if any.
+      getter handler
+
+      # Allows to set the handler instance associated with the context.
+      setter handler
 
       # Initializes a context from a hash or a named tuple.
       def self.from(values : Context | Hash | NamedTuple | Nil)
@@ -113,6 +120,13 @@ module Marten
         yield self
       ensure
         @values.pop
+      end
+
+      # Returns a new empty context that retains the associated handler.
+      def to_empty
+        self.class.new.tap do |context|
+          context.handler = handler
+        end
       end
 
       protected getter values

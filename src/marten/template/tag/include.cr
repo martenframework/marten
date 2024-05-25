@@ -65,7 +65,7 @@ module Marten
 
           rendered = ""
 
-          outer_context = isolated? ? Context.new : context
+          outer_context = isolated? ? context.to_empty : context
           outer_context.stack do |include_context|
             @assignments.each do |name, expression|
               include_context[name] = expression.resolve(context)

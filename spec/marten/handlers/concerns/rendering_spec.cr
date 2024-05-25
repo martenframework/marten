@@ -114,9 +114,10 @@ describe Marten::Handlers::Rendering do
       handler = Marten::Handlers::RenderingSpec::TestHandlerWithHandlerTemplate.new(request)
       response = handler.render_to_response(nil)
 
+      handler.context.handler.should eq handler
+
       response.status.should eq 200
       response.content_type.should eq "text/html"
-      response.content.strip.should eq HTML.escape(handler.to_s)
     end
 
     it "includes the request in the context" do
@@ -156,7 +157,6 @@ describe Marten::Handlers::Rendering do
 
       response.status.should eq 200
       response.content_type.should eq "text/html"
-      response.content.strip.should eq HTML.escape(handler.to_s)
     end
 
     it "returns the expected response if the before_render callback returns a custom responses" do
@@ -258,7 +258,7 @@ module Marten::Handlers::RenderingSpec
   class TestHandlerWithHandlerTemplate < Marten::Handler
     include Marten::Handlers::Rendering
 
-    template_name "specs/handlers/concerns/rendering/handler.html"
+    template_name "specs/handlers/concerns/rendering/test.html"
   end
 
   class TestHandlerWithRequestTemplate < Marten::Handler
@@ -272,7 +272,7 @@ module Marten::Handlers::RenderingSpec
 
     property xyz : String? = nil
 
-    template_name "specs/handlers/concerns/rendering/handler.html"
+    template_name "specs/handlers/concerns/rendering/test.html"
 
     before_render :set_xyz
 
@@ -284,7 +284,7 @@ module Marten::Handlers::RenderingSpec
   class TestHandlerWithBeforeRenderResponse < Marten::Handler
     include Marten::Handlers::Rendering
 
-    template_name "specs/handlers/concerns/rendering/handler.html"
+    template_name "specs/handlers/concerns/rendering/test.html"
 
     before_render :return_before_render_response
 

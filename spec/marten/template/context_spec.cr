@@ -265,6 +265,41 @@ describe Marten::Template::Context do
     end
   end
 
+  describe "#handler" do
+    it "returns nil by default" do
+      ctx = Marten::Template::Context.new
+      ctx.handler.should be_nil
+    end
+
+    it "returns the associated handler if one is set" do
+      handler = Marten::Handler.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      ctx = Marten::Template::Context.new
+      ctx.handler = handler
+      ctx.handler.should eq handler
+    end
+  end
+
+  describe "#handler=" do
+    it "allows to set the associated handler" do
+      handler = Marten::Handler.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      ctx = Marten::Template::Context.new
+      ctx.handler = handler
+      ctx.handler.should eq handler
+    end
+  end
+
   describe "#has_key?" do
     it "returns true if the specified key is present in the context" do
       ctx = Marten::Template::Context{"foo" => "bar"}
@@ -481,6 +516,25 @@ describe Marten::Template::Context do
       ctx["depth_2_foo"]?.should be_nil
 
       result.should eq 42
+    end
+  end
+
+  describe "#to_empty" do
+    it "returns an empty context that retains the handler" do
+      handler = Marten::Handler.new(
+        Marten::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      ctx = Marten::Template::Context{"foo" => "bar"}
+      ctx.handler = handler
+
+      empty_ctx = ctx.to_empty
+      empty_ctx.empty?.should be_true
+      empty_ctx.handler.should eq handler
     end
   end
 end

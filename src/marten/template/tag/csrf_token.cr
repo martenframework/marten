@@ -34,8 +34,7 @@ module Marten
         end
 
         def render(context : Context) : String
-          handler = context["handler"]?.try(&.raw).as?(Handlers::Base)
-          return "" if handler.nil?
+          return "" if (handler = context.handler).nil?
 
           if @assigned_to.nil?
             handler.get_csrf_token

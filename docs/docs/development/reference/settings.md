@@ -218,6 +218,12 @@ Default: `[] of String`
 
 An array of paths to manifest JSON files to use to resolve assets URLs. Manifest files will be used to return the right fingerprinted asset path for a generic path, which can be useful if your asset bundling strategy support this. You can read more about this capability in [Asset manifests and fingerprinting](../../assets/introduction.md#asset-manifests-and-fingerprinting).
 
+### `max_age`
+
+Defaults: `3600`
+
+Allows to set the max-age directive value used as part of the Cache-Control header that is set by the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares.md#asset-serving-middleware) middleware.
+
 ### `root`
 
 Default: `"assets"`

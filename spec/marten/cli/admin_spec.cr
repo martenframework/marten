@@ -115,6 +115,13 @@ describe Marten::CLI::Admin do
         output.includes?(Marten::CLI::Manage::Command::Serve.help).should be_true
       end
 
+      it "supports running the Crystal playground by using the \"play\" management command" do
+        output = Marten::CLI::AdminSpec.run_inside_command(["play", "-h"])
+
+        output.includes?("Usage: marten play [options]").should be_true
+        output.includes?(Marten::CLI::Manage::Command::Play.help).should be_true
+      end
+
       it "builds and runs the manage.cr CLI for other commands" do
         output = Marten::CLI::AdminSpec.run_inside_command(["other"])
 

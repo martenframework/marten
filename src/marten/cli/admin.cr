@@ -69,6 +69,8 @@ module Marten
           Manage::Command::New.new(options: options[1..], stdout: stdout, stderr: stderr).handle!
         elsif command_invoked?(command, Manage::Command::Serve)
           Manage::Command::Serve.new(options: options[1..], stdout: stdout, stderr: stderr).handle!
+        elsif command_invoked?(command, Manage::Command::Play)
+          Manage::Command::Play.new(options: options[1..], stdout: stdout, stderr: stderr).handle!
         else
           build_and_run_manage_command
         end

@@ -186,6 +186,25 @@ marten new project myblog --dir=./projects/myblog # Creates a "myblog" project i
 marten new app auth                               # Creates an "auth" application repository structure
 ```
 
+## `play`
+
+**Usage:** `marten play [options]`
+
+Start a Crystal playground server initialized for the current project and open it in the default browser.
+
+### Options
+
+* `-b HOST, --bind=HOST` - Binds the playground to the specified IP
+* `-p PORT, --port=PORT` - Runs the playground on the specified port
+* `--no-open` - Do not open the playground in the default browser
+
+### Examples
+
+```bash
+marten play           # Starts the Crystal playground using the default host/port and opens it in the browser
+marten play --no-open # Starts the Crystal playground using the default host/port without opening it
+```
+
 ## `resetmigrations`
 
 **Usage:** `marten resetmigrations [options] [app_label]`

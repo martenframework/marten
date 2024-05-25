@@ -22,6 +22,9 @@ module Marten
         # Returns the configured paths to manifest JSON files to use to resolve assets URLs.
         getter manifests
 
+        # Returns the Cache-Control header max-age directive value (defaults to 3600 seconds).
+        getter max_age
+
         # Returns the absolute path where collected assets will be persisted.
         getter root
 
@@ -34,14 +37,11 @@ module Marten
         # Allows to set whether assets should be looked for inside installed applications.
         setter app_dirs
 
-        # Allows to set the base URL to use when exposing asset URLs.
-        setter url
-
-        # Allows to set the Cache-Control max-age.
+        # Allows to set the Cache-Control header max-age directive value.
         setter max_age
 
-        # Returns the Cache-Control max-age value
-        getter max_age
+        # Allows to set the base URL to use when exposing asset URLs.
+        setter url
 
         # Allows to set the directories where assets should be looked for.
         def dirs=(dirs : Array(Path | String | Symbol))

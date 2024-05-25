@@ -255,7 +255,7 @@ describe Marten::Middleware::AssetServing do
       end
     end
 
-    it "properly sets the Cache-Control header" do
+    it "properly sets the default Cache-Control header" do
       middleware = Marten::Middleware::AssetServing.new
 
       ["BigApp.js", "css/BigApp.css"].each do |path|
@@ -278,6 +278,30 @@ describe Marten::Middleware::AssetServing do
         uncompressed_content = File.read(File.join(__DIR__, "asset_serving/assets/#{path}"))
         response.content.should_not eq uncompressed_content
         response.headers[:"Cache-Control"].should eq "private, max-age=3600"
+      end
+    end
+
+    it "properly sets the custom Cache-Control header based on the assets.max_age setting value" do
+      with_overridden_setting("assets.max_age", 7200) do
+        middleware = Marten::Middleware::AssetServing.new
+
+        ["BigApp.js", "css/BigApp.css"].each do |path|
+          response = middleware.call(
+            Marten::HTTP::Request.new(
+              ::HTTP::Request.new(
+                method: "GET",
+                resource: "/assets/#{path}",
+                headers: HTTP::Headers{
+                  "Host"            => "example.com",
+                  "Accept-Encoding" => "gzip, deflate, br",
+                }
+              )
+            ),
+            ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          )
+
+          response.headers[:"Cache-Control"].should eq "private, max-age=7200"
+        end
       end
     end
   end

@@ -9,7 +9,7 @@ module Marten
     #
     # It should also be noted that this middleware will automatically compress served assets using GZip or deflate based
     # on the incoming Accept-Encoding header. The middleware also sets the Cache-Control header and specifies a max-age
-    # of 3600s.
+    # of 3600s as default and can be configured in the `config.assets.max_age` setting.
     class AssetServing < Middleware
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         return get_response.call if !request.path.starts_with?(Marten.settings.assets.url)
@@ -89,7 +89,7 @@ module Marten
         response.headers[:"Content-Length"] = response.content.bytesize
         response.headers[:"ETag"] = %{W/"#{File.info(asset_file_path).modification_time.to_unix}"}
         response.headers[:"Content-Encoding"] = content_encoding if !content_encoding.nil?
-        response.headers[:"Cache-Control"] = "private, max-age=3600"
+        response.headers[:"Cache-Control"] = "private, max-age=#{Marten.settings.assets.max_age}"
 
         response
       end

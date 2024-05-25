@@ -24,7 +24,7 @@ module Marten
               files << {"shard.yml", ECR.render("#{__DIR__}/templates/app/shard.yml.ecr")}
 
               if context.edge
-                files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/app/shard.override.yml.ecr")}
+                files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/shared/shard.override.yml.ecr")}
               end
 
               files << {"spec/spec_helper.cr", ECR.render("#{__DIR__}/templates/app/spec/spec_helper.cr.ecr")}
@@ -79,7 +79,7 @@ module Marten
               files << {"manage.cr", ECR.render("#{__DIR__}/templates/project/manage.cr.ecr")}
               files << {"shard.yml", ECR.render("#{__DIR__}/templates/project/shard.yml.ecr")}
               if context.edge
-                files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/project/shard.override.yml.ecr")}
+                files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/shared/shard.override.yml.ecr")}
               end
 
               # Add authentification files if needed.

@@ -3,7 +3,7 @@ require "./set"
 module Marten
   module DB
     module Query
-      # Represents a query set resulting from a many-to-one or one-to-one relation.
+      # Represents a query set resulting from a many-to-one relation.
       class RelatedSet(M) < Set(M)
         def initialize(@instance : Marten::DB::Model, @related_field_id : String, query : SQL::Query(M)? = nil)
           @query = if query.nil?

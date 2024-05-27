@@ -16,6 +16,17 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
+    it "can add a new raw filter to an unfiltered query" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::RawNode.new("name LIKE 'c%'"))
+      query.count.should eq 2
+      query.execute.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
+    end
+
     it "can add a new filter to an already filtered query" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
@@ -24,6 +35,18 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Tag).new
       query.add_query_node(Marten::DB::Query::Node.new(name__startswith: :c))
       query.add_query_node(Marten::DB::Query::Node.new(name__endswith: :l))
+      query.count.should eq 1
+      query.execute.should eq [tag_2]
+    end
+
+    it "can add a new raw filter to an already filtered query" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new(name__endswith: :l))
+      query.add_query_node(Marten::DB::Query::RawNode.new("name LIKE 'c%'"))
       query.count.should eq 1
       query.execute.should eq [tag_2]
     end

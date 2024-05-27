@@ -1156,17 +1156,17 @@ module Marten
           end
 
           private def where_clause_and_parameters(offset = 0)
-            if @predicate_node.nil?
-              where = nil
-              parameters = nil
-            else
-              where, parameters = @predicate_node.not_nil!.to_sql(connection)
+            if predicate_node = @predicate_node
+              where, parameters = predicate_node.to_sql(connection)
               parameters.each_with_index do |_p, i|
                 where = where % (
                   [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
                 )
               end
               where = "WHERE #{where}"
+            else
+              where = nil
+              parameters = nil
             end
 
             {where, parameters}

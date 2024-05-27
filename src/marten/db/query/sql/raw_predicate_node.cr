@@ -48,6 +48,10 @@ module Marten
           end
 
           def to_sql(connection : Connection::Base)
+            # Escape % characters to be not be considered
+            # during formatting process
+            @statement = @statement.gsub("%", "%%")
+
             case params
             when Array(::DB::Any)
               sanitize_positional_parameters(connection)

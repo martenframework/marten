@@ -13,6 +13,7 @@ module Marten
           @type : String?
           @with_auth : Bool = false
           @database : String = "sqlite3"
+          @edge : Bool = false
 
           def setup
             on_argument(:type, "Type of structure to initialize: 'project' or 'app'") { |v| @type = v }
@@ -25,6 +26,7 @@ module Marten
               description: "Configure default database (options: mysql/postgresql/sqlite3)") do |db|
               @database = db
             end
+            on_option(:e, :edge, description: "Use the development version of Marten") { @edge = true }
           end
 
           def run
@@ -60,6 +62,7 @@ module Marten
             context.name = name.not_nil!
             context.targets << Context::TARGET_AUTH if with_auth?
             context.database = database
+            context.edge = edge?
 
             create_files(
               project? ? Templates.project_files(context) : Templates.app_files(context),
@@ -79,6 +82,7 @@ module Marten
 
           private getter? interactive_mode
           private getter? with_auth
+          private getter? edge
 
           private def app? : Bool
             type == TYPE_APP

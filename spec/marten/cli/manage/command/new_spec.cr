@@ -173,6 +173,21 @@ describe Marten::CLI::Manage::Command::New do
       end
     end
 
+    it "creates the expected project structure when using the --edge option" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["--edge", "project", "dummy_project"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      (Marten::CLI::Manage::Command::NewSpec::PROJECT_FILES + ["shard.override.yml"]).each do |path|
+        File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
     it "creates a new app structure" do
       stdout = IO::Memory.new
 
@@ -184,6 +199,21 @@ describe Marten::CLI::Manage::Command::New do
       command.handle
 
       Marten::CLI::Manage::Command::NewSpec::APP_FILES.each do |path|
+        File.exists?(File.join(".", "dummy_app", path)).should be_true, "File #{path} does not exist"
+      end
+    end
+
+    it "creates the expected app structure when using the --edge option" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["--edge", "app", "dummy_app"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      (Marten::CLI::Manage::Command::NewSpec::APP_FILES + ["shard.override.yml"]).each do |path|
         File.exists?(File.join(".", "dummy_app", path)).should be_true, "File #{path} does not exist"
       end
     end

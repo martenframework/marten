@@ -23,6 +23,10 @@ module Marten
               files << {".gitignore", gitignore}
               files << {"shard.yml", ECR.render("#{__DIR__}/templates/app/shard.yml.ecr")}
 
+              if context.edge
+                files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/shared/shard.override.yml.ecr")}
+              end
+
               files << {"spec/spec_helper.cr", ECR.render("#{__DIR__}/templates/app/spec/spec_helper.cr.ecr")}
 
               files
@@ -74,6 +78,9 @@ module Marten
               files << {".gitignore", gitignore}
               files << {"manage.cr", ECR.render("#{__DIR__}/templates/project/manage.cr.ecr")}
               files << {"shard.yml", ECR.render("#{__DIR__}/templates/project/shard.yml.ecr")}
+              if context.edge
+                files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/shared/shard.override.yml.ecr")}
+              end
 
               # Add authentification files if needed.
               if context.targets_auth?

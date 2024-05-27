@@ -7,13 +7,13 @@ module Marten
         class New < Base
           help "Initialize a new Marten project or application repository."
 
+          @database : String = "sqlite3"
           @dir : String?
+          @edge : Bool = false
           @interactive_mode : Bool = false
           @name : String?
           @type : String?
           @with_auth : Bool = false
-          @database : String = "sqlite3"
-          @edge : Bool = false
 
           def setup
             on_argument(:type, "Type of structure to initialize: 'project' or 'app'") { |v| @type = v }
@@ -80,9 +80,9 @@ module Marten
           private getter name
           private getter type
 
+          private getter? edge
           private getter? interactive_mode
           private getter? with_auth
-          private getter? edge
 
           private def app? : Bool
             type == TYPE_APP

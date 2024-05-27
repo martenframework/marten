@@ -4,10 +4,10 @@ module Marten
       module Command
         class New < Base
           class Context
-            property name : String
-            property targets : Array(String)
             property database : String
             property edge : Bool? = false
+            property name : String
+            property targets : Array(String)
 
             TARGET_AUTH    = "auth"
             TARGET_GENERAL = "general"

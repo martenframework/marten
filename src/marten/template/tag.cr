@@ -29,8 +29,8 @@ module Marten
       register "block", Block
       register "cache", Cache
       register "capture", Capture
-      register "csrf_token", CsrfToken
       register "csrf_input", CsrfInput
+      register "csrf_token", CsrfToken
       register "extend", Extend
       register "for", For
       register "if", If

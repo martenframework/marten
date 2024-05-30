@@ -246,6 +246,34 @@ describe Marten::Handlers::Rendering do
       end
     end
   end
+
+  describe "#content_type" do
+    it "returns the default content_type if not configured" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithDefaultContentType.new(request)
+
+      handler.content_type.should eq "text/html"
+    end
+
+    it "returns the custom content_type if configured" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithCustomContentType.new(request)
+
+      handler.content_type.should eq "text/plain"
+    end
+  end
 end
 
 module Marten::Handlers::RenderingSpec
@@ -308,5 +336,17 @@ module Marten::Handlers::RenderingSpec
 
   class TestHandlerWithoutTemplate < Marten::Handler
     include Marten::Handlers::Rendering
+  end
+
+  class TestHandlerWithDefaultContentType < Marten::Handler
+    include Marten::Handlers::Rendering
+    template_name "specs/handlers/concerns/rendering/handler.html"
+  end
+
+  class TestHandlerWithCustomContentType < Marten::Handler
+    include Marten::Handlers::Rendering
+
+    template_name "specs/handlers/concerns/rendering/handler.html"
+    content_type "text/plain"
   end
 end

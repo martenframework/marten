@@ -13,15 +13,20 @@ module Marten
       end
 
       module ClassMethods
+        # Allows to configure the content type of the response.
+        def content_type(content_type : String?)
+          @@content_type = content_type
+        end
+
         # Allows to configure the template that should be rendered by the handler.
         def template_name(template_name : String?)
           @@template_name = template_name
         end
+      end
 
-        # Allows to configure the content type of the response
-        def content_type(content_type : String)
-          @@content_type = content_type
-        end
+      # Returns the content type of the response.
+      def content_type : String
+        self.class.content_type || Marten::HTTP::Response::DEFAULT_CONTENT_TYPE
       end
 
       # Renders the configured template for a specific `context` object and produces an HTTP response.
@@ -38,10 +43,6 @@ module Marten
           "'#{self.class.name}' must define a template name via the '::template_name' class method method or by " \
           "overriding the '#template_name' method"
         )
-      end
-
-      def content_type : String
-        self.class.content_type || Marten::HTTP::Response::DEFAULT_CONTENT_TYPE
       end
     end
   end

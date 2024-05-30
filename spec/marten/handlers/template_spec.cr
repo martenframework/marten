@@ -18,24 +18,24 @@ describe Marten::Handlers::Template do
       response.content_type.should eq "text/html"
       response.content.strip.should eq "Hello World, John Doe!"
     end
-  end
 
-  describe "with content_type" do
-    it "returns a HTTP response with configured content_type" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
+    context "with content_type" do
+      it "returns a HTTP response with configured content_type" do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
         )
-      )
 
-      handler = Marten::Handlers::TemplateSpec::TestHandlerWithContentType.new(request)
-      response = handler.get
+        handler = Marten::Handlers::TemplateSpec::TestHandlerWithContentType.new(request)
+        response = handler.get
 
-      response.status.should eq 200
-      response.content_type.should eq "text/plain"
-      response.content.strip.should eq "Hello World, John Doe!"
+        response.status.should eq 200
+        response.content_type.should eq "text/plain"
+        response.content.strip.should eq "Hello World, John Doe!"
+      end
     end
   end
 end

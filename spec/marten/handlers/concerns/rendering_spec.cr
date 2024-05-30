@@ -1,6 +1,34 @@
 require "./spec_helper"
 
 describe Marten::Handlers::Rendering do
+  describe "::content_type" do
+    it "returns the default content_type if not configured" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithDefaultContentType.new(request)
+
+      handler.content_type.should eq "text/html"
+    end
+
+    it "returns the custom content_type if configured" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::RenderingSpec::TestHandlerWithCustomContentType.new(request)
+
+      handler.content_type.should eq "text/plain"
+    end
+  end
+
   describe "::template_name(template)" do
     it "allows to configure the template associated with the considered handler" do
       Marten::Handlers::RenderingSpec::TestHandler.template_name.should eq "specs/handlers/concerns/rendering/test.html"
@@ -244,34 +272,6 @@ describe Marten::Handlers::Rendering do
       ) do
         handler.template_name
       end
-    end
-  end
-
-  describe "#content_type" do
-    it "returns the default content_type if not configured" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      handler = Marten::Handlers::RenderingSpec::TestHandlerWithDefaultContentType.new(request)
-
-      handler.content_type.should eq "text/html"
-    end
-
-    it "returns the custom content_type if configured" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-      handler = Marten::Handlers::RenderingSpec::TestHandlerWithCustomContentType.new(request)
-
-      handler.content_type.should eq "text/plain"
     end
   end
 end

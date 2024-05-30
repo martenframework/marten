@@ -317,7 +317,7 @@ end
 Variables that are added to the global template context will automatically be available to the configured template's runtime.
 
 :::tip
-The default content type of the response generated when rendering templates is `text/html`, but this can be customized using the [`#content_type`](pathname:///api/dev/Marten/Handlers/Template.html#content_type%3AString|Nil-class-method) class method. For example:
+The default content type of the response generated when rendering templates is `text/html`, but this can be customized using the [`#content_type`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethods.html#content_type(content_type%3AString|Nil)-instance-method) class method. For example:
 
 ```crystal
 class MyHandler < Marten::Handlers::Template

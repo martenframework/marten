@@ -473,6 +473,43 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#trailing_slash" do
+    it "returns :do_nothing by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.trailing_slash.do_nothing?.should be_true
+    end
+
+    it "returns the configured trailing slash behavior if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.trailing_slash = :remove
+
+      global_settings.trailing_slash.remove?.should be_true
+    end
+  end
+
+  describe "#trailing_slash=" do
+    it "allows to configure the trailing slash behavior to :do_nothing" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.trailing_slash = :do_nothing
+
+      global_settings.trailing_slash.do_nothing?.should be_true
+    end
+
+    it "allows to configure the trailing slash behavior to :add" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.trailing_slash = :add
+
+      global_settings.trailing_slash.add?.should be_true
+    end
+
+    it "allows to configure the trailing slash behavior to :remove" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.trailing_slash = :remove
+
+      global_settings.trailing_slash.remove?.should be_true
+    end
+  end
+
   describe "#use_x_forwarded_host" do
     it "returns false by default" do
       global_settings = Marten::Conf::GlobalSettings.new

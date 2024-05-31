@@ -134,6 +134,18 @@ Default: `Time::Location.load("UTC")`
 
 The default time zone used by the application when it comes to storing date times in the database and displaying them. Any [`Time::Location`](https://crystal-lang.org/api/Time/Location.html) object can be used.
 
+### `trailing_slash`
+
+Default: `:do_nothing`
+
+The trailing slash behavior applied in case an incoming request URL does not match any of the configured routes.
+
+This setting allows you to configure whether an HTTP permanent redirect (301) should be issued when an incoming URL that does not match any of the configured routes either ends with a slash or does not. Three values are supported:
+
+* `:do_nothing` - No redirect is issued (this is the default behavior).
+* `:add` - If the incoming URL does not end with a slash and does not match any routes, a redirect is issued to the same URL with a trailing slash appended.
+* `:remove` - If the incoming URL ends with a slash and does not match any routes, a redirect is issued to the same URL with the trailing slash removed.
+
 ### `use_x_forwarded_host`
 
 Default: `false`

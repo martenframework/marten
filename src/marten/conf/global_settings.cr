@@ -5,14 +5,15 @@ module Marten
       @@registered_settings_namespaces = [] of String
 
       @cache_store : Cache::Store::Base
-      @log_backend : ::Log::Backend
-      @request_max_parameters : Nil | Int32
-      @root_path : String?
-      @target_env : String?
       @handler400 : Handlers::Base.class
       @handler403 : Handlers::Base.class
       @handler404 : Handlers::Base.class
       @handler500 : Handlers::Base.class
+      @log_backend : ::Log::Backend
+      @request_max_parameters : Nil | Int32
+      @root_path : String?
+      @target_env : String?
+      @trailing_slash : TrailingSlash
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -25,6 +26,18 @@ module Marten
 
       # Returns a boolean indicating whether the application runs in debug mode.
       getter debug
+
+      # Returns the configured handler class that should generate responses for Bad Request responses (HTTP 400).
+      getter handler400
+
+      # Returns the configured handler class that should generate responses for Permission Denied responses (HTTP 403).
+      getter handler403
+
+      # Returns the configured handler class that should generate responses for Not Found responses (HTTP 404).
+      getter handler404
+
+      # Returns the configured handler class that should generate responses for Internal Error responses (HTTP 500).
+      getter handler500
 
       # Returns the host the HTTP server running the application will be listening on.
       getter host
@@ -59,6 +72,9 @@ module Marten
       # Returns the default time zone used by the application when it comes to display date times.
       getter time_zone
 
+      # Returns the trailing slash strategy.
+      getter trailing_slash
+
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
 
@@ -67,18 +83,6 @@ module Marten
 
       # Returns a boolean indicating if the X-Forwarded-Proto header is used to determine whether a request is secure.
       getter use_x_forwarded_proto
-
-      # Returns the configured handler class that should generate responses for Bad Request responses (HTTP 400).
-      getter handler400
-
-      # Returns the configured handler class that should generate responses for Permission Denied responses (HTTP 403).
-      getter handler403
-
-      # Returns the configured handler class that should generate responses for Not Found responses (HTTP 404).
-      getter handler404
-
-      # Returns the configured handler class that should generate responses for Internal Error responses (HTTP 500).
-      getter handler500
 
       # Returns the value to use for the X-Frame-Options header when the associated middleware is used.
       #
@@ -97,6 +101,18 @@ module Marten
 
       # Allows to activate or deactive debug mode.
       setter debug
+
+      # Allows to set the handler class that should generate responses for Bad Request responses (HTTP 400).
+      setter handler400
+
+      # Allows to set the handler class that should generate responses for Permission Denied responses (HTTP 403).
+      setter handler403
+
+      # Allows to set the handler class that should generate responses for Not Found responses (HTTP 404).
+      setter handler404
+
+      # Allows to set the handler class that should generate responses for Internal Error responses (HTTP 500).
+      setter handler500
 
       # Allows to set the host the HTTP server running the application will be listening on.
       setter host
@@ -124,6 +140,14 @@ module Marten
       # Allows to set the default time zone used by the application when it comes to display date times.
       setter time_zone
 
+      # Allows to configure the trailing slash strategy.
+      #
+      # The trailing slash strategy is used to determine how the application should handle trailing slashes in URLs. The
+      # default strategy is `:do_nothing`, which means that the application will not enforce any trailing slash policy.
+      # The other available strategies are `:add` and `:remove`, which will respectively add or remove trailing slashes
+      # from URLs if they can't be found.
+      setter trailing_slash
+
       # Allows to set whether the X-Forwarded-Host header is used to look for the host.
       setter use_x_forwarded_host
 
@@ -132,18 +156,6 @@ module Marten
 
       # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
       setter use_x_forwarded_proto
-
-      # Allows to set the handler class that should generate responses for Bad Request responses (HTTP 400).
-      setter handler400
-
-      # Allows to set the handler class that should generate responses for Permission Denied responses (HTTP 403).
-      setter handler403
-
-      # Allows to set the handler class that should generate responses for Not Found responses (HTTP 404).
-      setter handler404
-
-      # Allows to set the handler class that should generate responses for Internal Error responses (HTTP 500).
-      setter handler500
 
       # :nodoc:
       def self.register_settings_namespace(ns : String)
@@ -162,22 +174,26 @@ module Marten
       def initialize
         @allowed_hosts = [] of String
         @cache_store = Cache::Store::Memory.new
-        # @cache_store = Cache::MemoryStore(String, String).new(expires_in: 15.minutes)
         @databases = [] of Database
         @debug = false
+        @handler400 = Handlers::Defaults::BadRequest
+        @handler403 = Handlers::Defaults::PermissionDenied
+        @handler404 = Handlers::Defaults::PageNotFound
+        @handler500 = Handlers::Defaults::ServerError
         @host = "127.0.0.1"
         @installed_apps = Array(Marten::Apps::Config.class).new
-        log_formatter = ::Log::Formatter.new do |entry, io|
-          io << "[#{entry.severity.to_s[0]}] "
-          io << "[#{entry.timestamp.to_utc}] "
-          io << "[Server] "
-          io << entry.message
+        @log_backend = ::Log::IOBackend.new(
+          formatter: ::Log::Formatter.new do |entry, io|
+            io << "[#{entry.severity.to_s[0]}] "
+            io << "[#{entry.timestamp.to_utc}] "
+            io << "[Server] "
+            io << entry.message
 
-          entry.data.each do |k, v|
-            io << "\n  #{k}: #{v}"
+            entry.data.each do |k, v|
+              io << "\n  #{k}: #{v}"
+            end
           end
-        end
-        @log_backend = ::Log::IOBackend.new(formatter: log_formatter)
+        )
         @log_level = ::Log::Severity::Info
         @middleware = Array(Marten::Middleware.class).new
         @port = 8000
@@ -185,13 +201,10 @@ module Marten
         @request_max_parameters = 1000
         @secret_key = ""
         @time_zone = Time::Location.load("UTC")
+        @trailing_slash = :do_nothing
         @use_x_forwarded_host = false
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
-        @handler400 = Handlers::Defaults::BadRequest
-        @handler403 = Handlers::Defaults::PermissionDenied
-        @handler404 = Handlers::Defaults::PageNotFound
-        @handler500 = Handlers::Defaults::ServerError
         @x_frame_options = "DENY"
       end
 

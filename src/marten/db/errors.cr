@@ -8,7 +8,15 @@ module Marten
       class InvalidField < Exception; end
 
       # Represents an error raised when a create / save operation fails because of an invalid record.
-      class InvalidRecord < Exception; end
+      class InvalidRecord < Exception
+        getter record
+
+        def initialize(@record : Model)
+          @record = record
+          @message = "Invalid #{record.class.name} record: " +
+                     record.errors.map { |e| "#{e.field} (#{e.message})" }.join("; ")
+        end
+      end
 
       # Represents an error raised when a get query returned more than one result.
       class MultipleRecordsFound < Exception; end

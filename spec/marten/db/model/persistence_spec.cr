@@ -135,7 +135,10 @@ describe Marten::DB::Model::Persistence do
 
   describe "::create!" do
     it "raises InvalidRecord if the model instance is invalid" do
-      expect_raises(Marten::DB::Errors::InvalidRecord) { TestUser.create!(username: nil) }
+      error = expect_raises(Marten::DB::Errors::InvalidRecord) { TestUser.create!(username: nil) }
+
+      error.record.should be_a(TestUser)
+      error.message.try(&.empty?).should be_false
     end
 
     it "returns the persisted model instance if it is valid" do
@@ -736,7 +739,11 @@ describe Marten::DB::Model::Persistence do
 
     it "raises if the new object is invalid" do
       object = TestUser.new(last_name: "Doe")
-      expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
+
+      error = expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
+      error.record.should eq object
+      error.message.try(&.empty?).should be_false
+
       object.persisted?.should be_false
     end
 
@@ -755,7 +762,10 @@ describe Marten::DB::Model::Persistence do
     it "raises if an existing object is invalid" do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.email = nil
-      expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
+
+      error = expect_raises(Marten::DB::Errors::InvalidRecord) { object.save! }
+      error.record.should eq object
+      error.message.try(&.empty?).should be_false
     end
 
     it "runs before_create and after_create callbacks as expected" do
@@ -1264,7 +1274,11 @@ describe Marten::DB::Model::Persistence do
 
     it "raises if the new object is invalid" do
       object = TestUser.new(last_name: "Doe")
-      expect_raises(Marten::DB::Errors::InvalidRecord) { object.update!(username: nil) }
+
+      error = expect_raises(Marten::DB::Errors::InvalidRecord) { object.update!(username: nil) }
+      error.record.should eq object
+      error.message.try(&.empty?).should be_false
+
       object.persisted?.should be_false
     end
 
@@ -1297,7 +1311,11 @@ describe Marten::DB::Model::Persistence do
 
     it "raises if an existing object is invalid" do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
-      expect_raises(Marten::DB::Errors::InvalidRecord) { object.update!(username: nil) }
+
+      error = expect_raises(Marten::DB::Errors::InvalidRecord) { object.update!(username: nil) }
+      error.record.should eq object
+      error.message.try(&.empty?).should be_false
+
       object.reload.username.should eq "jd"
     end
 

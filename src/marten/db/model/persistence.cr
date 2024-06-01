@@ -169,7 +169,7 @@ module Marten
         # Otherwise it will raise a `Marten::DB::Errors::InvalidRecord` exception if the model instance validation
         # failed.
         def save!(using : Nil | String | Symbol = nil, validate : Bool = true) : Bool
-          save(using: using, validate: validate) || (raise Errors::InvalidRecord.new("Record is invalid"))
+          save(using: using, validate: validate) || (raise Errors::InvalidRecord.new(self))
         end
 
         # Updates the model instance.

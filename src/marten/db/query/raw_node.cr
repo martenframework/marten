@@ -10,10 +10,9 @@ module Marten
           @params = [] of ::DB::Any,
           @children = [] of Node,
           @connector = SQL::PredicateConnector::AND,
-          @negated = false
-        )
+          @negated = false,
           @filters = FilterHash.new
-          fill_filters(kwargs)
+        )
         end
 
         def initialize(
@@ -57,42 +56,11 @@ module Marten
           end
         end
 
-        protected def negate
-          @negated = !@negated
-        end
-
         private def combine(other, conn)
           combined = Node.new(connector: conn)
           combined.add(self, conn)
           combined.add(other, conn)
           combined
-        end
-
-        private def fill_filters(filters)
-          filters.each do |key, value|
-            @filters[key.to_s] = case value
-                                 when DB::Model, Field::Any
-                                   value
-                                 when Array
-                                   prepare_filter_array(value)
-                                 when Set
-                                   prepare_filter_array(value.to_a)
-                                 else
-                                   value.to_s
-                                 end
-          end
-        end
-
-        private def prepare_filter_array(value : Array)
-          if value.all?(DB::Model)
-            value.each_with_object(Array(DB::Model).new) do |v, arr|
-              arr << v if v.is_a?(DB::Model)
-            end
-          else
-            value.each_with_object(Array(Field::Any).new) do |v, arr|
-              arr << (v.is_a?(Field::Any) ? v : v.to_s)
-            end
-          end
         end
       end
     end

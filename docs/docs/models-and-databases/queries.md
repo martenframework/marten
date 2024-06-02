@@ -126,9 +126,17 @@ By default, filters involving multiple parameters like in the above examples alw
 ```crystal
 # Get Author records with either "Bob" or "Alice" as first name
 Author.filter { q(first_name: "Bob") | q(first_name: "Alice") }
- 
+
 # Get Author records whose first names are not "John"
 Author.filter { -q(first_name: "Alice") }
+```
+
+Marten also has the option to filter query sets using raw SQL statements. This is useful when you want to leverage the flexibility of SQL for specific conditions, but still want Marten to handle the column selection and query building for the rest of the query.
+
+```crystal
+Author.filter("first_name = :first_name", first_name: "John")
+Author.filter("first_name = ?", "John")
+Author.filter { q("first_name = :first_name", first_name: "John") }
 ```
 
 ### Excluding specific records
@@ -252,7 +260,7 @@ Article.filter { q(title__startswith: "Top") | q(title__startswith: "10") }
 Using this approach, it is possible to produce complex conditions by combining `q()` expressions with the `&`, `|`, and `-` operators. Parentheses can also be used to group statements:
 
 ```crystal
-Article.filter { 
+Article.filter {
   (q(title__startswith: "Top") | q(title__startswith: "10")) & -q(author__first_name: "John")
 }
 ```
@@ -260,7 +268,7 @@ Article.filter {
 Finally it should be noted that you can define many field predicates _inside_ `q()` expressions. When doing so, the field predicates will be "AND"ed together:
 
 ```crystal
-Article.filter { 
+Article.filter {
   q(title__startswith: "Top") & -q(author__first_name: "John", author__last_name: "Doe")
 }
 ```
@@ -302,7 +310,7 @@ It is also possible to explicitly define that a specific query set must "join" a
 ```crystal
 author_1 = Author.filter(first_name: "John")
 puts author_1.hometown # DB hit to retrieve the associated City record
- 
+
 author_2 = Author.join(:hometown).filter(first_name: "John")
 puts author_2.hometown # No additional DB hit
 ```
@@ -310,7 +318,7 @@ puts author_2.hometown # No additional DB hit
 The double underscores notations can also be used in the context of joins. For example:
 
 ```crystal
-# The associated Author and City records will be selected and fully initialized 
+# The associated Author and City records will be selected and fully initialized
 # with the selected Article record.
 Article.join(:author__hometown).get(id: 42)
 ```
@@ -349,7 +357,7 @@ puts posts_2[0].tags.to_a
 The double underscores notations can also be used when pre-fetching relations. In this situation, the records targeted by the original query set will be decorated with the prefetched records, and those records will be decorated with the following prefetched records. For example:
 
 ```crystal
-# The associated Book and BookGenres records will be pre-fetched and fully initialized 
+# The associated Book and BookGenres records will be pre-fetched and fully initialized
 # at the Author and Book records levels.
 Author.prefetch(:books__genres)
 ```

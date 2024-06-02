@@ -29,7 +29,7 @@ module Marten
           def ==(other : RawStatementNode)
             (
               (other.statement == statement) &&
-                (other.predicates == predicates) &&
+                (other.params == params) &&
                 (other.children == children) &&
                 (other.connector == connector) &&
                 (other.negated == negated)

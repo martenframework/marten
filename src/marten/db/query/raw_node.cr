@@ -10,8 +10,7 @@ module Marten
           @params = [] of ::DB::Any,
           @children = [] of Node,
           @connector = SQL::PredicateConnector::AND,
-          @negated = false,
-          **kwargs
+          @negated = false
         )
           @filters = FilterHash.new
           fill_filters(kwargs)
@@ -22,26 +21,25 @@ module Marten
           @params = [] of ::DB::Any,
           @children = [] of Node,
           @connector = SQL::PredicateConnector::AND,
-          @negated = false
-        )
+          @negated = false,
           @filters = FilterHash.new
-          fill_filters(filters)
+        )
         end
 
         def initialize(
           @statement : String,
           @params : Array(::DB::Any) | Hash(String, ::DB::Any),
-          @children : Array(Node),
-          @connector : SQL::PredicateConnector,
-          @negated : Bool,
-          @filters : FilterHash
+          @children = [] of Node,
+          @connector = SQL::PredicateConnector::AND,
+          @negated = false,
+          @filters = FilterHash.new
         )
         end
 
         def ==(other : self)
           (
             (other.statement == @statement) &&
-            (other.params == @params) &&
+              (other.params == @params) &&
               (other.connector == @connector) &&
               (other.negated == @negated)
           )

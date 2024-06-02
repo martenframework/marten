@@ -2,7 +2,7 @@ module Marten
   module DB
     module Query
       module SQL
-        class RawPredicateNode < PredicateNode
+        class RawStatementNode < PredicateNode
           getter statement
           getter params
 
@@ -26,7 +26,7 @@ module Marten
           )
           end
 
-          def ==(other : RawPredicateNode)
+          def ==(other : RawStatementNode)
             (
               (other.statement == statement) &&
                 (other.predicates == predicates) &&
@@ -37,7 +37,7 @@ module Marten
           end
 
           def clone
-            RawPredicateNode.new(
+            RawStatementNode.new(
               statement: @statement,
               params: params,
               children: @children.map(&.clone),

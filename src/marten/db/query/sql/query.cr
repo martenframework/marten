@@ -56,7 +56,7 @@ module Marten
           end
 
           def add_query_node(query_node : RawNode)
-            predicate_node = RawPredicateNode.new(
+            predicate_node = RawStatementNode.new(
               query_node.statement,
               query_node.params,
               connector: query_node.connector,
@@ -965,7 +965,7 @@ module Marten
           end
 
           private def process_query_node(query_node : RawNode)
-            RawPredicateNode.new(
+            RawStatementNode.new(
               query_node.statement,
               query_node.params,
               connector: query_node.connector,

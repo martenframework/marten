@@ -1,6 +1,6 @@
 require "./spec_helper"
 
-describe Marten::DB::Query::SQL::RawPredicateNode do
+describe Marten::DB::Query::SQL::RawStatementNode do
   describe "::new" do
     it "allows to initialize a predicate node from positional arguments" do
       predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")

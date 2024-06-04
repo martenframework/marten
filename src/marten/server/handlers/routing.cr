@@ -8,6 +8,9 @@ module Marten
           process(context)
         end
 
+        private SLASH_CHAR   = '/'
+        private SLASH_STRING = "/"
+
         private def location_with_slash(context)
           "#{context.marten.request.scheme}://#{context.marten.request.host}#{context.marten.request.path}/"
         end
@@ -38,11 +41,12 @@ module Marten
         end
 
         private def should_redirect_with_slash?(context)
-          Marten.settings.trailing_slash.add? && !context.request.path.ends_with?('/')
+          Marten.settings.trailing_slash.add? && !context.request.path.ends_with?(SLASH_CHAR)
         end
 
         private def should_redirect_without_slash?(context)
-          Marten.settings.trailing_slash.remove? && context.request.path.ends_with?('/')
+          Marten.settings.trailing_slash.remove? && context.request.path.ends_with?(SLASH_CHAR) &&
+            context.request.path != SLASH_STRING
         end
       end
     end

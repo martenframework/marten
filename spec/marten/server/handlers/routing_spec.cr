@@ -81,6 +81,23 @@ describe Marten::Server::Handlers::Routing do
         end
       end
 
+      it "raises if the request route is the root" do
+        handler = Marten::Server::Handlers::Routing.new
+
+        context = HTTP::Server::Context.new(
+          request: ::HTTP::Request.new(
+            method: "GET",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
+          ),
+          response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+        )
+
+        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
+          handler.call(context)
+        end
+      end
+
       it "returns a permanent redirect if the requested route cannot be resolved and does not end with a slash" do
         handler = Marten::Server::Handlers::Routing.new
 
@@ -116,6 +133,23 @@ describe Marten::Server::Handlers::Routing do
           request: ::HTTP::Request.new(
             method: "GET",
             resource: "/unknown/42",
+            headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
+          ),
+          response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+        )
+
+        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
+          handler.call(context)
+        end
+      end
+
+      it "raises if the requested route is the root" do
+        handler = Marten::Server::Handlers::Routing.new
+
+        context = HTTP::Server::Context.new(
+          request: ::HTTP::Request.new(
+            method: "GET",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           ),
           response: ::HTTP::Server::Response.new(io: IO::Memory.new)

@@ -2,6 +2,7 @@ module Marten
   module Template
     # A template context.
     class Context
+      @escape : Bool = true
       @handler : Handlers::Base?
       @values : Deque(Hash(String, Value)) = Deque{Hash(String, Value).new}
 
@@ -10,6 +11,9 @@ module Marten
 
       # Returns the handler instance associated with the context if any.
       getter handler
+
+      # Returns `true` if the context is marked for escaping.
+      getter? escape
 
       # Allows to set the handler instance associated with the context.
       setter handler
@@ -127,6 +131,15 @@ module Marten
         self.class.new.tap do |context|
           context.handler = handler
         end
+      end
+
+      # Returns a new context for which the escape flag is set to `true` or `false`.
+      def with_escape(new_escape : Bool, &)
+        previous_escape = escape?
+        @escape = new_escape
+        yield self
+      ensure
+        @escape = previous_escape.not_nil!
       end
 
       protected getter values

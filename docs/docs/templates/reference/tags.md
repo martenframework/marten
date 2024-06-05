@@ -142,6 +142,18 @@ Optionally, the output of the `csrf_token` template tag can be assigned to a spe
 {% csrf_token as my_var %}
 ```
 
+## `escape`
+
+The `escape` tag is used to enable or disable [auto-escaping](../introduction.md#auto-escaping) for a block of code. It takes one argument, either `on` or `off`, to enable or disable auto-escaping, respectively.
+
+For example:
+
+```html
+{% escape off %}
+  <div>{{ article.html_body }}</div>
+{% endescape %}
+```
+
 ## `extend`
 
 The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overridden or extended by the child template. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.

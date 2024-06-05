@@ -41,5 +41,13 @@ describe Marten::Template::Node::Variable do
       node = Marten::Template::Node::Variable.new("body")
       node.render(ctx).should eq "<div>Hello</div>"
     end
+
+    it "does not escape values if auto-escaping is disabled" do
+      ctx = Marten::Template::Context{"body" => "<div>Hello</div>"}
+      ctx.with_escape(false) do
+        node = Marten::Template::Node::Variable.new("body")
+        node.render(ctx).should eq "<div>Hello</div>"
+      end
+    end
   end
 end

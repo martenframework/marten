@@ -26,6 +26,7 @@ module Marten
 
       register "asset", Asset
       register "assign", Assign
+      register "escape", Escape
       register "block", Block
       register "cache", Cache
       register "capture", Capture

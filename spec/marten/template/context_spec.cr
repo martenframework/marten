@@ -265,6 +265,21 @@ describe Marten::Template::Context do
     end
   end
 
+  describe "#escape?" do
+    it "returns true by default" do
+      ctx = Marten::Template::Context.new
+      ctx.escape?.should be_true
+    end
+
+    it "returns false when auto-escaping is disabled" do
+      ctx = Marten::Template::Context.new
+
+      ctx.with_escape(false) do
+        ctx.escape?.should be_false
+      end
+    end
+  end
+
   describe "#handler" do
     it "returns nil by default" do
       ctx = Marten::Template::Context.new
@@ -535,6 +550,32 @@ describe Marten::Template::Context do
       empty_ctx = ctx.to_empty
       empty_ctx.empty?.should be_true
       empty_ctx.handler.should eq handler
+    end
+  end
+
+  describe "#with_escape" do
+    it "allows to disable auto-escaping" do
+      ctx = Marten::Template::Context.new
+
+      ctx.with_escape(false) do
+        ctx.escape?.should be_false
+      end
+    end
+
+    it "is consistent with nested invocations" do
+      ctx = Marten::Template::Context.new
+
+      ctx.with_escape(false) do
+        ctx.escape?.should be_false
+
+        ctx.with_escape(true) do
+          ctx.escape?.should be_true
+        end
+
+        ctx.escape?.should be_false
+      end
+
+      ctx.escape?.should be_true
     end
   end
 end

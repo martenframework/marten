@@ -917,35 +917,6 @@ module Marten
             "ORDER BY #{clauses.join(", ")}"
           end
 
-          private def parent_model_joins
-            @parent_model_joins ||= begin
-              flat_joins = Model.parent_models.map_with_index do |parent_model, i|
-                previous_model = (i == 0) ? Model : Model.parent_models[i - 1]
-                Join.new(
-                  id: i + 1,
-                  type: JoinType::INNER,
-                  from_model: previous_model,
-                  from_common_field: previous_model.pk_field,
-                  reverse_relation: nil,
-                  to_model: parent_model,
-                  to_common_field: parent_model.pk_field,
-                  selected: true,
-                  table_alias_prefix: "p"
-                )
-              end
-
-              if flat_joins.empty?
-                flat_joins
-              else
-                flat_joins[1..].each do |join|
-                  flat_joins[0].add_child(join)
-                end
-
-                [flat_joins.first]
-              end
-            end
-          end
-
           private def process_query_node(query_node : Node)
             connector = query_node.connector
             predicate_node = PredicateNode.new(connector: connector, negated: query_node.negated)

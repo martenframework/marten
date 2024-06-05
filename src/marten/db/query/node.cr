@@ -78,7 +78,7 @@ module Marten
         end
 
         private def combine(other, conn)
-          combined = self.class.new(connector: conn)
+          combined = Node.new(connector: conn)
           combined.add(self, conn)
           combined.add(other, conn)
           combined

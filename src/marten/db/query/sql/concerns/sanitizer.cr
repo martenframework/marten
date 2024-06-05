@@ -50,7 +50,7 @@ module Marten
               sanitized_params << params[parameter_match]
 
               # Conditional placeholder generation
-              if connection && connection.responds_to?(:parameter_id_for_ordered_argument)
+              if connection
                 parameter_offset += 1
                 connection.parameter_id_for_ordered_argument(parameter_offset)
               else

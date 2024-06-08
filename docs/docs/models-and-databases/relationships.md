@@ -95,6 +95,10 @@ article_3 = Article.create!(title: "Third article", author: author_1)
 # List the first author's articles
 author_1.articles.to_a # [#<Article:0x1036e3ee0 id: 1, title: "First article", author_id: 1>,
                        #  #<Article:0x1036e3e70 id: 3, title: "Third article", author_id: 1>]
+
+# Create an article associated with the first author
+article_4 = author_1.articles.create!(title: "Fourth article")
+article_4.author # => #<Author:0x101590c40 id: 1, full_name: "Foo Bar">
 ```
 
 :::tip

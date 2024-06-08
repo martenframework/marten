@@ -248,7 +248,7 @@ module Marten
         # query_set.create(title: "My blog post")
         # ```
         def create(**kwargs)
-          object = M.new(**kwargs)
+          object = build_record(**kwargs)
           object.save(using: @query.using)
           object
         end
@@ -266,7 +266,7 @@ module Marten
         # end
         # ```
         def create(**kwargs, &)
-          object = M.new(**kwargs)
+          object = build_record(**kwargs)
           yield object
           object.save(using: @query.using)
           object
@@ -283,7 +283,7 @@ module Marten
         # query_set.create!(title: "My blog post")
         # ```
         def create!(**kwargs)
-          object = M.new(**kwargs)
+          object = build_record(**kwargs)
           object.save!(using: @query.using)
           object
         end
@@ -301,7 +301,7 @@ module Marten
         # end
         # ```
         def create!(**kwargs, &)
-          object = M.new(**kwargs)
+          object = build_record(**kwargs)
           yield object
           object.save!(using: @query.using)
           object
@@ -1177,6 +1177,10 @@ module Marten
           {% else %}
             alias Any = Nil
           {% end %}
+        end
+
+        protected def build_record(**kwargs)
+          M.new(**kwargs)
         end
 
         protected def clone(other_query = nil)

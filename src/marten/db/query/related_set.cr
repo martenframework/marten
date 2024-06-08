@@ -15,6 +15,12 @@ module Marten
                    end
         end
 
+        protected def build_record(**kwargs)
+          record = M.new(**kwargs)
+          record.assign_related_object(@instance, @related_field_id)
+          record
+        end
+
         protected def clone(other_query = nil)
           RelatedSet(M).new(
             instance: @instance,

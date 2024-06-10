@@ -16,6 +16,34 @@ describe Marten::DB::Query::RelatedSet do
     end
   end
 
+  describe "#build" do
+    it "initializes a new record with the related field set" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      qset = Marten::DB::Query::RelatedSet(Post).new(user, "author_id")
+
+      new_post = qset.build(title: "Post")
+
+      new_post.persisted?.should be_false
+      new_post.author.should eq user
+      new_post.title.should eq "Post"
+    end
+
+    it "initializes a new record with the related field set when a block is used" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      qset = Marten::DB::Query::RelatedSet(Post).new(user, "author_id")
+
+      new_post = qset.build do |p|
+        p.title = "Post"
+      end
+
+      new_post.persisted?.should be_false
+      new_post.author.should eq user
+      new_post.title.should eq "Post"
+    end
+  end
+
   describe "#create" do
     it "creates a new record with the related field set" do
       user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

@@ -337,6 +337,24 @@ electronic_products = Product.filter(category: "Electronics")
 average_rating = electronic_products.average(:rating)
 ```
 
+### `build`
+
+Initializes a new model instance.
+
+This method allows initializing a new model instance using the arguments defined in the passed double splat argument.
+
+```crystal
+new_post = Post.all.build(title: "My blog post")
+```
+
+This method can also be called with a block that is executed for the new object:
+
+```crystal
+new_post = Post.all.build(title: "My blog post") do |p|
+  p.complex_attribute = compute_complex_attribute
+end
+```
+
 ### `bulk_create`
 
 Bulk inserts the passed model instances into the database.

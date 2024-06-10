@@ -163,6 +163,33 @@ module Marten
           @query.average(field.try(&.to_s))
         end
 
+        # Initializes a new model instance.
+        #
+        # The new model instance is initialized by using the attributes defined in the `kwargs` double splat argument.
+        #
+        # ```
+        # new_post = Post.all.build(title: "My blog post")
+        # ```
+        def build(**kwargs)
+          build_record(**kwargs)
+        end
+
+        # Initializes a new model instance.
+        #
+        # This method provides the exact same behaviour as `#build` with the ability to define a block that is executed
+        # for the new object. This block can be used to directly initialize the new model instance.
+        #
+        # ```
+        # new_post = Post.all.build(title: "My blog post") do |p|
+        #   p.complex_attribute = compute_complex_attribute
+        # end
+        # ```
+        def build(**kwargs, &)
+          object = build_record(**kwargs)
+          yield object
+          object
+        end
+
         # Bulk inserts the passed model instances into the database.
         #
         # This method allows to insert multiple model instances into the database in a single query. This can be useful

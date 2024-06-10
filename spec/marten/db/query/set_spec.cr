@@ -767,6 +767,25 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#build" do
+    it "returns the non-persisted model instance initialized from the specified parameters" do
+      tag = Marten::DB::Query::Set(Tag).new.build(name: "New tag")
+
+      tag.persisted?.should be_false
+      tag.name.should eq "New tag"
+    end
+
+    it "returns the non-persisted model instance initialized from the specified parameters and block" do
+      tag = Marten::DB::Query::Set(Tag).new.build(is_active: true) do |o|
+        o.name = "New tag"
+      end
+
+      tag.persisted?.should be_false
+      tag.is_active.should be_true
+      tag.name.should eq "New tag"
+    end
+  end
+
   describe "#create" do
     it "returns the non-persisted model instance if it is invalid" do
       tag = Marten::DB::Query::Set(Tag).new.create(name: nil)

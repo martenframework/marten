@@ -7,6 +7,7 @@ module Marten
       module SQL
         class RawQuery(Model)
           include Sanitizer
+
           getter query
           getter params
           getter using

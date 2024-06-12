@@ -84,7 +84,7 @@ Post.all.filter("published = :is_published", is_published: true)
 
 ### Q expression
 
-For even more flexibility, you can combine raw SQL subqueries with the q expression syntax within a block:
+For even more flexibility, you can combine raw SQL subqueries with the [q expression](./queries#complex-filters-with-q-expressions) syntax within a block:
 
 ```crystal
 Post.all.filter { q(category: "news") & q("created_at > ?", Time.local - 7.days) }

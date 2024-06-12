@@ -508,7 +508,7 @@ module Marten
           filter(query)
         end
 
-        # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -525,7 +525,7 @@ module Marten
           add_query_node(RawNode.new(query_string))
         end
 
-        # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -540,7 +540,7 @@ module Marten
           filter(query_string, args.to_a)
         end
 
-        # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -555,7 +555,7 @@ module Marten
           filter(query_string, kwargs.to_h)
         end
 
-        # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -573,7 +573,7 @@ module Marten
           add_query_node(RawNode.new(query_string, raw_params))
         end
 
-        # # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -591,7 +591,7 @@ module Marten
           add_query_node(RawNode.new(query_string, raw_params))
         end
 
-        # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
         def filter(query_node : Node)
           add_query_node(query_node)
         end

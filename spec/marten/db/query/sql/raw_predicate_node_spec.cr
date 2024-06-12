@@ -1,9 +1,9 @@
 require "./spec_helper"
 
-describe Marten::DB::Query::SQL::RawStatementNode do
+describe Marten::DB::Query::SQL::RawPredicateNode do
   describe "::new" do
     it "allows to initialize a raw statement node with no arguments" do
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = 'Example title'",
       )
       node.children.should be_empty
@@ -17,7 +17,7 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = [] of ::DB::Any
       raw_params += ["Example title"]
 
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params
       )
@@ -32,7 +32,7 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = {} of String => ::DB::Any
       raw_params["title"] = "Example title"
 
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = :title",
         raw_params
       )
@@ -46,11 +46,11 @@ describe Marten::DB::Query::SQL::RawStatementNode do
 
   describe "#==" do
     it "returns true if two nodes are the same" do
-      node_1 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_1 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = 'Example title'",
       )
 
-      node_2 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_2 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = 'Example title'",
       )
 
@@ -64,12 +64,12 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params_2 = [] of ::DB::Any
       raw_params_2 += ["Second Example title"]
 
-      node_1 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_1 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params_1
       )
 
-      node_2 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_2 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params_2
       )
@@ -81,13 +81,13 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = [] of ::DB::Any
       raw_params += ["Example title"]
 
-      node_1 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_1 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params,
         connector: Marten::DB::Query::SQL::PredicateConnector::AND
       )
 
-      node_2 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_2 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params,
         connector: Marten::DB::Query::SQL::PredicateConnector::OR
@@ -100,13 +100,13 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = [] of ::DB::Any
       raw_params += ["Example title"]
 
-      node_1 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_1 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params,
         negated: false
       )
 
-      node_2 = Marten::DB::Query::SQL::RawStatementNode.new(
+      node_2 = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params,
         negated: true
@@ -121,7 +121,7 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = [] of ::DB::Any
       raw_params += ["Example title"]
 
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params
       )
@@ -143,7 +143,7 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = [] of ::DB::Any
       raw_params += ["Example title"]
 
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = ?",
         raw_params
       )
@@ -157,7 +157,7 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = [] of ::DB::Any
       raw_params += ["Example title"]
 
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title LIKE '?%'",
         raw_params
       )
@@ -171,7 +171,7 @@ describe Marten::DB::Query::SQL::RawStatementNode do
       raw_params = {} of String => ::DB::Any
       raw_params["title"] = "Example title"
 
-      node = Marten::DB::Query::SQL::RawStatementNode.new(
+      node = Marten::DB::Query::SQL::RawPredicateNode.new(
         "title = :title",
         raw_params
       )

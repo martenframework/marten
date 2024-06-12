@@ -4,7 +4,7 @@ module Marten
   module DB
     module Query
       module SQL
-        class RawStatementNode < PredicateNode
+        class RawPredicateNode < PredicateNode
           include Sanitizer
 
           getter statement
@@ -30,7 +30,7 @@ module Marten
           )
           end
 
-          def ==(other : RawStatementNode)
+          def ==(other : RawPredicateNode)
             (
               (other.statement == statement) &&
                 (other.params == params) &&
@@ -41,7 +41,7 @@ module Marten
           end
 
           def clone
-            RawStatementNode.new(
+            RawPredicateNode.new(
               statement: @statement,
               params: params,
               children: @children.map(&.clone),

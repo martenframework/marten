@@ -55,7 +55,7 @@ module Marten
         end
 
         def - : self
-          negated_parent = self.class.new
+          negated_parent = Node.new
           negated_parent.add(self, SQL::PredicateConnector::AND)
           negated_parent.negate
           negated_parent

@@ -95,25 +95,6 @@ describe Marten::DB::Query::SQL::RawPredicateNode do
 
       node_1.should_not eq node_2
     end
-
-    it "returns false if the negated flags are not the same" do
-      raw_params = [] of ::DB::Any
-      raw_params += ["Example title"]
-
-      node_1 = Marten::DB::Query::SQL::RawPredicateNode.new(
-        "title = ?",
-        raw_params,
-        negated: false
-      )
-
-      node_2 = Marten::DB::Query::SQL::RawPredicateNode.new(
-        "title = ?",
-        raw_params,
-        negated: true
-      )
-
-      node_1.should_not eq node_2
-    end
   end
 
   describe "#clone" do
@@ -164,20 +145,6 @@ describe Marten::DB::Query::SQL::RawPredicateNode do
 
       node.to_sql(Marten::DB::Connection.default).should eq(
         {"title LIKE '%s%%'", ["Example title"]}
-      )
-    end
-
-    it "properly generates the expected SQL for a simple negated predicate" do
-      raw_params = {} of String => ::DB::Any
-      raw_params["title"] = "Example title"
-
-      node = Marten::DB::Query::SQL::RawPredicateNode.new(
-        "title = :title",
-        raw_params
-      )
-
-      node.to_sql(Marten::DB::Connection.default).should eq(
-        {"title = %s", ["Example title"]}
       )
     end
   end

@@ -60,7 +60,6 @@ module Marten
               query_node.statement,
               query_node.params,
               connector: query_node.connector,
-              negated: query_node.negated
             )
             @predicate_node ||= PredicateNode.new
             @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
@@ -940,7 +939,6 @@ module Marten
               query_node.statement,
               query_node.params,
               connector: query_node.connector,
-              negated: query_node.negated
             )
           end
 

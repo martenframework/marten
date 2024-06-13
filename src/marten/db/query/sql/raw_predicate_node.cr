@@ -14,10 +14,10 @@ module Marten
             @statement : String,
             @params = [] of ::DB::Any,
             @children = [] of PredicateNode,
-            @connector = SQL::PredicateConnector::AND,
-            @negated = false
+            @connector = SQL::PredicateConnector::AND
           )
             @predicates = [] of Predicate::Base
+            @negated = false
           end
 
           def initialize(
@@ -25,9 +25,9 @@ module Marten
             @params : Array(::DB::Any) | Hash(String, ::DB::Any),
             @children : Array(PredicateNode),
             @connector : PredicateConnector,
-            @negated : Bool,
             @predicates : Array(Predicate::Base)
           )
+            @negated = false
           end
 
           def ==(other : RawPredicateNode)
@@ -46,7 +46,6 @@ module Marten
               params: params,
               children: @children.map(&.clone),
               connector: @connector,
-              negated: @negated,
               predicates: @predicates.dup
             )
           end

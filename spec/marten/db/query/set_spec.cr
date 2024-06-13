@@ -1310,14 +1310,9 @@ describe Marten::DB::Query::Set do
     end
 
     it "does not filter records using a empty raw SQL equality condition", tags: "raw" do
-      tag_1 = Tag.create!(name: "ruby", is_active: true)
-      tag_2 = Tag.create!(name: "crystal", is_active: true)
-      tag_3 = Tag.create!(name: "coding", is_active: true)
-      tag_4 = Tag.create!(name: "programming", is_active: true)
-
-      qset = Marten::DB::Query::Set(Tag).new.filter("")
-
-      qset.to_a.should eq [tag_1, tag_2, tag_3, tag_4]
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Query string cannot be empty") do
+        Marten::DB::Query::Set(Tag).new.filter("").to_a
+      end
     end
 
     it "filters records using a raw SQL condition with one named parameters", tags: "raw" do
@@ -1375,7 +1370,7 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2, tag_4]
     end
 
-    it "filters records using a raw SQL condition with one positional parameters", tags: "raw" do
+    it "filters records using a raw SQL condition with one positional parameter", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
@@ -2916,7 +2911,7 @@ describe Marten::DB::Query::Set do
       )
     end
 
-    it "returns the expected records for queries involving named parameters expressed as a hash" do
+    it "returns the expected records for queries involving named parameters expressed as a hash1318" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)

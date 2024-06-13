@@ -9,20 +9,20 @@ module Marten
           @statement : String,
           @params = [] of ::DB::Any,
           @children = [] of Node,
-          @connector = SQL::PredicateConnector::AND,
-          @negated = false
+          @connector = SQL::PredicateConnector::AND
         )
           @filters = FilterHash.new
+          @negated = false
         end
 
         def initialize(
           @statement : String,
           @params : Array(::DB::Any) | Hash(String, ::DB::Any),
           @children = [] of Node,
-          @connector = SQL::PredicateConnector::AND,
-          @negated = false
+          @connector = SQL::PredicateConnector::AND
         )
           @filters = FilterHash.new
+          @negated = false
         end
 
         def ==(other : self)

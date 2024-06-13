@@ -8,6 +8,8 @@ module Marten
           end
 
           def q(query_string : String)
+            raise Errors::UnmetQuerySetCondition.new("Query string cannot be empty") if query_string.empty?
+
             RawNode.new(query_string)
           end
 

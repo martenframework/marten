@@ -520,7 +520,7 @@ module Marten
         # query_set.filter("is_published = true")
         # ```
         def filter(query_string : String)
-          return clone if query_string.empty?
+          raise Errors::UnmetQuerySetCondition.new("Query string cannot be empty") if query_string.empty?
 
           add_query_node(RawNode.new(query_string))
         end
@@ -582,7 +582,7 @@ module Marten
         #
         # ```
         # query_set = Post.all
-        # query_set.filter("is_published = ?", {published: true})
+        # query_set.filter("is_published = :published", {published: true})
         # ```
         def filter(query_string : String, params : Hash | NamedTuple)
           raw_params = {} of String => ::DB::Any
@@ -591,7 +591,7 @@ module Marten
           add_query_node(RawNode.new(query_string, raw_params))
         end
 
-        # Returns a query set whose records match the given subquery and named parameters.
+        # Returns a query set whose records match the given query node.
         def filter(query_node : Node)
           add_query_node(query_node)
         end

@@ -56,7 +56,7 @@ module Marten
           private setter server_process
 
           private def build_server
-            FileUtils.mkdir_p("tmp")
+            FileUtils.mkdir_p(Path[SERVER_BUILD_PATH].dirname)
 
             command = String.build do |s|
               s << "crystal build src/server.cr -o #{SERVER_BUILD_PATH}"

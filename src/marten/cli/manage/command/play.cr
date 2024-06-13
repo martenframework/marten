@@ -84,6 +84,7 @@ module Marten
           end
 
           private def write_playground_source
+            FileUtils.mkdir_p(Path[PLAYGROUND_SOURCE_PATH].dirname)
             File.write(PLAYGROUND_SOURCE_PATH, PLAYGROUND_SOURCE_CONTENT)
           end
         end

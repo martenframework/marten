@@ -239,17 +239,21 @@ An SQLite database is a good choice in order to try Marten and experiment with i
 
 Now that our `Article` model table has been created at the database level, let's try to make use of the Marten ORM to create and query article records.
 
-To do so, we can launch the [Crystal playground](https://crystal-lang.org/reference/master/using_the_compiler/index.html#crystal-play) as follows:
+To do so, we can launch an instance of the [Crystal playground](https://crystal-lang.org/reference/master/using_the_compiler/index.html#crystal-play) as follows:
 
 ```shell
-crystal play
+marten play
 ```
 
-You should be able to navigate to [http://localhost:8080](http://localhost:8080) and see a Crystal editor. Once you are there, replace the content of the live editor with the following:
+You should be able to navigate to [http://localhost:8080](http://localhost:8080) and see a Crystal editor containing the following snippet:
 
 ```crystal
 require "./src/project"
+
+# Setup the project.
 Marten.setup
+
+# Write your code here.
 ```
 
 These lines basically require your project dependencies and ensure that Marten is properly set up. You should keep those in the editor when playing with the following examples. Each of the following snippets is assumed to be copied/pasted below the previous one. The output of these examples is highlighted next to the `# =>` comment line.

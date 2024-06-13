@@ -4,7 +4,7 @@ module Marten
       module Command
         class Play < Base
           @host : String?
-          @open : Bool = true
+          @open : Bool = false
           @playground_process : Process?
           @port : Int32?
 
@@ -18,7 +18,7 @@ module Marten
               :b,
               :bind,
               arg: "host",
-              description: "Binds the playground to the specified IP"
+              description: "Bind the playground to the specified IP"
             ) do |v|
               @host = v
             end
@@ -27,13 +27,13 @@ module Marten
               :p,
               :port,
               arg: "port",
-              description: "Runs the playground on the specified port"
+              description: "Run the playground on the specified port"
             ) do |v|
               @port = v.to_i
             end
 
-            on_option(:"no-open", description: "Do not open the playground in the default browser") do
-              @open = false
+            on_option(:"open", description: "Open the playground in the default browser automatically") do
+              @open = true
             end
           end
 

@@ -191,19 +191,19 @@ marten new app auth                               # Creates an "auth" applicatio
 
 **Usage:** `marten play [options]`
 
-Start a Crystal playground server initialized for the current project and open it in the default browser.
+Start a Crystal playground server initialized for the current project.
 
 ### Options
 
 * `-b HOST, --bind=HOST` - Binds the playground to the specified IP
 * `-p PORT, --port=PORT` - Runs the playground on the specified port
-* `--no-open` - Do not open the playground in the default browser
+* `--open` - Open the playground in the default browser automatically
 
 ### Examples
 
 ```bash
-marten play           # Starts the Crystal playground using the default host/port and opens it in the browser
-marten play --no-open # Starts the Crystal playground using the default host/port without opening it
+marten play        # Starts the Crystal playground using the default host/port
+marten play --open # Starts the Crystal playground using the default host/port and opens it in the browser
 ```
 
 ## `resetmigrations`

@@ -7,7 +7,7 @@ describe Marten::CLI::Manage::Command::Play do
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::Play.new(
-        options: ["--no-open"],
+        options: [] of String,
         stdout: stdout,
         stderr: stderr
       )
@@ -26,7 +26,7 @@ describe Marten::CLI::Manage::Command::Play do
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::Play.new(
-        options: ["--no-open", "--bind", "localhost"],
+        options: ["--bind", "localhost"],
         stdout: stdout,
         stderr: stderr
       )
@@ -45,7 +45,7 @@ describe Marten::CLI::Manage::Command::Play do
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::Play.new(
-        options: ["--no-open", "--port", "3000"],
+        options: ["--port", "3000"],
         stdout: stdout,
         stderr: stderr
       )
@@ -64,7 +64,7 @@ describe Marten::CLI::Manage::Command::Play do
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::Play.new(
-        options: ["--no-open", "--bind", "localhost", "--port", "3000"],
+        options: ["--bind", "localhost", "--port", "3000"],
         stdout: stdout,
         stderr: stderr
       )

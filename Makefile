@@ -53,7 +53,7 @@ format:
 .PHONY: format_checks
 ## Trigger crystal formatting checks.
 format_checks:
-	crystal tool format --check
+	crystal tool format --check -e tmp
 
 .PHONY: lint
 ## Trigger code quality checks.

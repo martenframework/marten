@@ -2911,7 +2911,7 @@ describe Marten::DB::Query::Set do
       )
     end
 
-    it "returns the expected records for queries involving named parameters expressed as a hash1318" do
+    it "returns the expected records for queries involving named parameters expressed as a hash" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)

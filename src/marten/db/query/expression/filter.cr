@@ -8,8 +8,7 @@ module Marten
           end
 
           def q(query_string : String)
-            raise Errors::UnmetQuerySetCondition.new("Query string cannot be empty") if query_string.empty?
-
+            raise_empty_raw_subquery if query_string.empty?
             RawNode.new(query_string)
           end
 
@@ -22,6 +21,8 @@ module Marten
           end
 
           def q(query_string : String, params : Array)
+            raise_empty_raw_subquery if query_string.empty?
+
             raw_params = [] of ::DB::Any
             raw_params += params
 
@@ -29,10 +30,16 @@ module Marten
           end
 
           def q(query_string : String, params : Hash | NamedTuple)
+            raise_empty_raw_subquery if query_string.empty?
+
             raw_params = {} of String => ::DB::Any
             params.each { |k, v| raw_params[k.to_s] = v }
 
             RawNode.new(query_string, raw_params)
+          end
+
+          private def raise_empty_raw_subquery
+            raise Errors::UnmetQuerySetCondition.new("Raw sub queries cannot be empty")
           end
         end
       end

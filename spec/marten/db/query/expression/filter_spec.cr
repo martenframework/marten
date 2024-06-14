@@ -43,12 +43,27 @@ describe Marten::DB::Query::Expression::Filter do
       filter_expression.q("foo = ?", ["bar"]).should eq Marten::DB::Query::RawNode.new("foo = ?", raw_params)
     end
 
-    it "raises UnmetQuerySetCondition if query string is empty", tags: "raw" do
-      expect_raises(
-        Marten::DB::Errors::UnmetQuerySetCondition,
-        "Query string cannot be empty"
-      ) do
+    it "raises UnmetQuerySetCondition if the raw subquery is empty", tags: "raw" do
+      expected_message = "Raw sub queries cannot be empty"
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
         Marten::DB::Query::Expression::Filter.new.q("")
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Expression::Filter.new.q("", "foo")
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Expression::Filter.new.q("", foo: "bar")
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Expression::Filter.new.q("", ["foo"])
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Expression::Filter.new.q("", {foo: "bar"})
       end
     end
   end

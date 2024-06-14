@@ -1328,9 +1328,27 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2]
     end
 
-    it "does not filter records using a empty raw SQL equality condition", tags: "raw" do
-      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Query string cannot be empty") do
+    it "does not allow filtering records using an empty raw SQL sub query", tags: "raw" do
+      expected_message = "Raw sub queries cannot be empty"
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
         Marten::DB::Query::Set(Tag).new.filter("").to_a
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Set(Tag).new.filter("", "foo").to_a
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Set(Tag).new.filter("", foo: "bar").to_a
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Set(Tag).new.filter("", ["foo"]).to_a
+      end
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
+        Marten::DB::Query::Set(Tag).new.filter("", {foo: "bar"}).to_a
       end
     end
 

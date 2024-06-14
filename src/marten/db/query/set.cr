@@ -535,7 +535,90 @@ module Marten
           filter(query)
         end
 
-        # Returns a query set whose records match the given query node object.
+        # Returns a query set whose records match the given subquery and named parameters.
+        #
+        # This method enables filtering based on raw SQL conditions, offering greater
+        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        #
+        # Example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter("is_published = true")
+        # ```
+        def filter(query_string : String)
+          raise Errors::UnmetQuerySetCondition.new("Query string cannot be empty") if query_string.empty?
+
+          add_query_node(RawNode.new(query_string))
+        end
+
+        # Returns a query set whose records match the given subquery and named parameters.
+        #
+        # This method enables filtering based on raw SQL conditions, offering greater
+        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        #
+        # Example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter("is_published = ?", true)
+        # ```
+        def filter(query_string : String, *args)
+          filter(query_string, args.to_a)
+        end
+
+        # Returns a query set whose records match the given subquery and named parameters.
+        #
+        # This method enables filtering based on raw SQL conditions, offering greater
+        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        #
+        # Example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter("is_published = :published", published: true)
+        # ```
+        def filter(query_string : String, **kwargs)
+          filter(query_string, kwargs.to_h)
+        end
+
+        # Returns a query set whose records match the given subquery and named parameters.
+        #
+        # This method enables filtering based on raw SQL conditions, offering greater
+        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        #
+        # Example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter("is_published = ?", [true])
+        # ```
+        def filter(query_string : String, params : Array)
+          raw_params = [] of ::DB::Any
+          raw_params += params
+
+          add_query_node(RawNode.new(query_string, raw_params))
+        end
+
+        # Returns a query set whose records match the given subquery and named parameters.
+        #
+        # This method enables filtering based on raw SQL conditions, offering greater
+        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        #
+        # Example:
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.filter("is_published = :published", {published: true})
+        # ```
+        def filter(query_string : String, params : Hash | NamedTuple)
+          raw_params = {} of String => ::DB::Any
+          params.each { |k, v| raw_params[k.to_s] = v }
+
+          add_query_node(RawNode.new(query_string, raw_params))
+        end
+
+        # Returns a query set whose records match the given query node.
         def filter(query_node : Node)
           add_query_node(query_node)
         end

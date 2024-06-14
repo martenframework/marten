@@ -1,3 +1,4 @@
+require "./concerns/sanitizer"
 require "./query"
 
 module Marten
@@ -5,6 +6,8 @@ module Marten
     module Query
       module SQL
         class RawQuery(Model)
+          include Sanitizer
+
           getter query
           getter params
           getter using
@@ -26,16 +29,20 @@ module Marten
             execute_query(*build_query)
           end
 
-          private NAMED_PARAMETER_RE        = /(:?):([a-zA-Z]\w*)/
-          private POSITIONAL_PARAMETER_CHAR = '?'
-          private POSITIONAL_PARAMETER_RE   = /#{"\\" + POSITIONAL_PARAMETER_CHAR}/
-
           private def build_query
             sanitized_query, sanitized_params = case params
                                                 when Array(::DB::Any)
-                                                  sanitize_positional_parameters
+                                                  sanitize_positional_parameters(
+                                                    query,
+                                                    params.as(Array(::DB::Any)),
+                                                    connection
+                                                  )
                                                 else
-                                                  sanitize_named_parameters
+                                                  sanitize_named_parameters(
+                                                    query,
+                                                    params.as(Hash(String, ::DB::Any)),
+                                                    connection
+                                                  )
                                                 end
 
             {sanitized_query, sanitized_params}
@@ -53,41 +60,6 @@ module Marten
             end
 
             results
-          end
-
-          private def sanitize_named_parameters
-            sanitized_params = [] of ::DB::Any
-
-            parameter_offset = 0
-            sanitized_query = query.gsub(NAMED_PARAMETER_RE) do |match|
-              # Specifically handle PostgreSQL's cast syntax (::).
-              next match if $1 == ":"
-
-              parameter_match = $2.to_s
-              if !params.as(Hash).has_key?(parameter_match)
-                raise Errors::UnmetQuerySetCondition.new("Missing parameter '#{parameter_match}' for query: #{query}")
-              end
-
-              parameter_offset += 1
-              sanitized_params << params.as(Hash(String, ::DB::Any))[parameter_match]
-              connection.parameter_id_for_ordered_argument(parameter_offset)
-            end
-
-            {sanitized_query, sanitized_params}
-          end
-
-          private def sanitize_positional_parameters
-            if query.count(POSITIONAL_PARAMETER_CHAR) != params.size
-              raise Errors::UnmetQuerySetCondition.new("Wrong number of parameters provided for query: #{@query}")
-            end
-
-            parameter_offset = 0
-            sanitized_query = query.gsub(POSITIONAL_PARAMETER_RE) do
-              parameter_offset += 1
-              connection.parameter_id_for_ordered_argument(parameter_offset)
-            end
-
-            {sanitized_query, params.as(Array(::DB::Any))}
           end
         end
       end

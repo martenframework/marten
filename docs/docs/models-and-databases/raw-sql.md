@@ -34,13 +34,13 @@ And the following one uses named parameters:
 
 ```crystal
 Article.raw(
-  "SELECT * FROM articles WHERE title = :title and created_at > :created_at", 
-  title: "Hello World!", 
+  "SELECT * FROM articles WHERE title = :title and created_at > :created_at",
+  title: "Hello World!",
   created_at: "2022-10-30"
 )
 ```
 
-:::caution 
+:::caution
 **Do not use string interpolations in your SQL queries!**
 
 You should never use string interpolations in your raw SQL queries as this would expose your code to SQL injection attacks (where attackers can inject and execute arbitrary SQL into your database).
@@ -61,6 +61,42 @@ Also, note that the parameters are left **unquoted** in the raw SQL queries: thi
 :::
 
 Finally, it should be noted that Marten does not validate the SQL queries you specify to the [`#raw`](./reference/query-set.md#raw) query set method. It is the developer's responsibility to ensure that these queries are (i) valid and (ii) that they return records that correspond to the considered model.
+
+## Filtering with Raw SQL subqueries
+
+Marten also provides a feature to filter query sets using raw SQL subqueries within the `#filter` method. This is useful when you need more complex filtering logic than simple field comparisons but still want to leverage Marten's query building capabilities.
+
+### Positional arguments
+
+You can pass a raw SQL subquery fragment along with its parameters directly to the `#filter` method:
+
+```crystal
+Post.all.filter("published = ?", true)
+```
+
+### Named arguments
+
+To make your queries more readable, use named parameters:
+
+```crystal
+Post.all.filter("published = :is_published", is_published: true)
+```
+
+### Q expression
+
+For even more flexibility, you can combine raw SQL subqueries with the [q expression](./queries#complex-filters-with-q-expressions) syntax within a block:
+
+```crystal
+Post.all.filter { q(category: "news") & q("created_at > ?", Time.local - 7.days) }
+```
+
+### Advanced queries
+
+A subquery can also be used inside the `#filter` method:
+
+```crystal
+Product.all.filter("price < (SELECT AVG(price) FROM main_product)")
+```
 
 ## Executing other SQL statements
 

@@ -55,6 +55,16 @@ module Marten
             @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
           end
 
+          def add_query_node(query_node : RawNode)
+            predicate_node = RawPredicateNode.new(
+              query_node.statement,
+              query_node.params,
+              connector: query_node.connector,
+            )
+            @predicate_node ||= PredicateNode.new
+            @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+          end
+
           def add_selected_join(relation : String) : Nil
             field_path = verify_field(relation, only_relations: true, allow_many: false)
 
@@ -906,7 +916,7 @@ module Marten
             "ORDER BY #{clauses.join(", ")}"
           end
 
-          private def process_query_node(query_node)
+          private def process_query_node(query_node : Node)
             connector = query_node.connector
             predicate_node = PredicateNode.new(connector: connector, negated: query_node.negated)
 
@@ -922,6 +932,14 @@ module Marten
             end
 
             predicate_node
+          end
+
+          private def process_query_node(query_node : RawNode)
+            RawPredicateNode.new(
+              query_node.statement,
+              query_node.params,
+              connector: query_node.connector,
+            )
           end
 
           private def raise_invalid_field_error_with_valid_choices(
@@ -1107,17 +1125,17 @@ module Marten
           end
 
           private def where_clause_and_parameters(offset = 0)
-            if @predicate_node.nil?
-              where = nil
-              parameters = nil
-            else
-              where, parameters = @predicate_node.not_nil!.to_sql(connection)
+            if predicate_node = @predicate_node
+              where, parameters = predicate_node.to_sql(connection)
               parameters.each_with_index do |_p, i|
                 where = where % (
                   [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
                 )
               end
               where = "WHERE #{where}"
+            else
+              where = nil
+              parameters = nil
             end
 
             {where, parameters}

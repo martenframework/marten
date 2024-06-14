@@ -36,7 +36,7 @@ module Marten
             if @connector == conn
               @children << other
             else
-              new_child = self.class.new(
+              new_child = PredicateNode.new(
                 children: @children,
                 connector: @connector,
                 negated: @negated,
@@ -48,7 +48,7 @@ module Marten
           end
 
           def clone
-            self.class.new(
+            PredicateNode.new(
               children: @children.map { |c| c.clone.as(self) },
               connector: @connector,
               negated: @negated,

@@ -1,9 +1,15 @@
+require "./concerns/*"
+
 module Marten
   module CLI
     class Manage
       module Command
         class Serve < Base
+          include CanGenerateOpenBrowserCommand
+
+          @already_opened : Bool = false
           @host : String?
+          @open : Bool = false
           @port : Int32?
 
           command_aliases :s
@@ -26,6 +32,10 @@ module Marten
               description: "Custom port to listen for connections"
             ) do |v|
               @port = v.to_i
+            end
+
+            on_option(:"open", description: "Open the server in the default browser automatically") do
+              @open = true
             end
           end
 
@@ -52,6 +62,10 @@ module Marten
           private getter server_build_success : Bool = false
           private getter server_process : Process? = nil
 
+          private getter? already_opened
+          private getter? open
+
+          private setter already_opened
           private setter server_build_success
           private setter server_process
 
@@ -83,6 +97,17 @@ module Marten
             @file_modification_timestamps ||= {} of String => String
           end
 
+          private def open_server
+            sleep 0.5
+
+            Process.run(
+              generate_open_command("http://#{host || Marten.settings.host}:#{port || Marten.settings.port}"),
+              shell: true,
+            )
+
+            self.already_opened = true
+          end
+
           private def scan_server_files
             file_changed = false
 
@@ -102,7 +127,12 @@ module Marten
               stop_server_process
               build_server
               start_server_process if self.server_build_success
+              open_server if should_open?
             end
+          end
+
+          private def should_open?
+            open? && !already_opened?
           end
 
           private def start_server_process

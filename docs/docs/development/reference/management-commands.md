@@ -203,7 +203,7 @@ Start a Crystal playground server initialized for the current project.
 
 ```bash
 marten play        # Starts the Crystal playground using the default host/port
-marten play --open # Starts the Crystal playground using the default host/port and opens it in the browser
+marten play --open # Starts the Crystal playground using the default host/port and opens it in the default browser
 ```
 
 ## `resetmigrations`
@@ -238,12 +238,14 @@ Starts a development server that is automatically recompiled when source files c
 
 * `-b HOST, --bind=HOST` - Allows specifying a custom host to bind
 * `-p PORT, --port=PORT` - Allows specifying a custom port to listen for connections
+* `--open` - Open the server in the default browser automatically
 
 ### Examples
 
 ```bash
 marten serve         # Starts a development server using the configured host and port
 marten serve -p 3000 # Starts a development server by overriding the port
+marten serve --open  # Starts a development server and opens it in the default browser
 ```
 
 :::tip

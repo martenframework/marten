@@ -1,8 +1,12 @@
+require "./concerns/*"
+
 module Marten
   module CLI
     class Manage
       module Command
         class Play < Base
+          include CanGenerateOpenBrowserCommand
+
           @host : String?
           @open : Bool = false
           @playground_process : Process?
@@ -61,21 +65,11 @@ module Marten
           private getter? open
 
           private def open_command
-            # Identify which 'open' command to use based on the OS based on flags
-            url = "http://#{host || "localhost"}:#{port || 8080}"
-
-            open_command = ""
-            {% if flag?(:linux) %}
-              open_command = "xdg-open #{url}" # Linux
-            {% elsif flag?(:win32) || flag?(:win64) %}
-              open_command = "start #{url}" # Windows
-            {% else %}
-              open_command = "open #{url}" # macOS
-            {% end %}
+            generate_open_command("http://#{host || "localhost"}:#{port || 8080}")
           end
 
           private def play_command
-            command = String.build do |s|
+            String.build do |s|
               s << "crystal play"
               s << " --binding #{host}" if host
               s << " --port #{port}" if port

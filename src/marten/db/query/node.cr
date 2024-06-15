@@ -2,11 +2,12 @@ module Marten
   module DB
     module Query
       class Node
-        alias FilterHash = Hash(String, Field::Any | Array(Field::Any) | DB::Model | Array(DB::Model))
+        alias Filters = Hash(String, Field::Any | Array(Field::Any) | DB::Model | Array(DB::Model))
+        alias RawPredicate = NamedTuple(predicate: String, params: Array(::DB::Any) | Hash(String, ::DB::Any))
 
         getter children
         getter connector
-        getter filters
+        getter expression
         getter negated
 
         def initialize(
@@ -15,7 +16,7 @@ module Marten
           @negated = false,
           **kwargs
         )
-          @filters = FilterHash.new
+          @expression = Filters.new
           fill_filters(kwargs)
         end
 
@@ -25,21 +26,31 @@ module Marten
           @connector = SQL::PredicateConnector::AND,
           @negated = false
         )
-          @filters = FilterHash.new
+          @expression = Filters.new
           fill_filters(filters)
+        end
+
+        def initialize(
+          raw_predicate : String,
+          params : Array(::DB::Any) | Hash(String, ::DB::Any) = [] of ::DB::Any,
+          @children = [] of self,
+          @connector = SQL::PredicateConnector::AND,
+          @negated = false
+        )
+          @expression = RawPredicate.new(predicate: raw_predicate, params: params)
         end
 
         def initialize(
           @children : Array(self),
           @connector : SQL::PredicateConnector,
           @negated : Bool,
-          @filters : FilterHash
+          @expression : Filters | RawPredicate
         )
         end
 
         def ==(other : self)
           (
-            (other.filters == @filters) &&
+            (other.expression == @expression) &&
               (other.children == @children) &&
               (other.connector == @connector) &&
               (other.negated == @negated)
@@ -55,10 +66,26 @@ module Marten
         end
 
         def - : self
-          negated_parent = Node.new
+          negated_parent = self.class.new
           negated_parent.add(self, SQL::PredicateConnector::AND)
           negated_parent.negate
           negated_parent
+        end
+
+        def filters : Filters
+          @expression.as(Filters)
+        end
+
+        def filters? : Bool
+          @expression.is_a?(Filters)
+        end
+
+        def raw_predicate : RawPredicate
+          @expression.as(RawPredicate)
+        end
+
+        def raw_predicate? : Bool
+          @expression.is_a?(RawPredicate)
         end
 
         protected def add(other : Node, conn : SQL::PredicateConnector)
@@ -67,7 +94,12 @@ module Marten
           if @connector == conn
             @children << other
           else
-            new_child = self.class.new(children: @children, connector: @connector, negated: @negated, filters: @filters)
+            new_child = self.class.new(
+              children: @children,
+              connector: @connector,
+              negated: @negated,
+              expression: @expression
+            )
             @connector = conn
             @children = [new_child, other]
           end
@@ -78,24 +110,24 @@ module Marten
         end
 
         private def combine(other, conn)
-          combined = Node.new(connector: conn)
+          combined = self.class.new(connector: conn)
           combined.add(self, conn)
           combined.add(other, conn)
           combined
         end
 
-        private def fill_filters(filters)
-          filters.each do |key, value|
-            @filters[key.to_s] = case value
-                                 when DB::Model, Field::Any
-                                   value
-                                 when Array
-                                   prepare_filter_array(value)
-                                 when Set
-                                   prepare_filter_array(value.to_a)
-                                 else
-                                   value.to_s
-                                 end
+        private def fill_filters(new_filters)
+          new_filters.each do |key, value|
+            filters[key.to_s] = case value
+                                when DB::Model, Field::Any
+                                  value
+                                when Array
+                                  prepare_filter_array(value)
+                                when Set
+                                  prepare_filter_array(value.to_a)
+                                else
+                                  value.to_s
+                                end
           end
         end
 

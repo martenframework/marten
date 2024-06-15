@@ -22,7 +22,7 @@ describe Marten::DB::Query::SQL::Query do
       tag_3 = Tag.create!(name: "coding", is_active: true)
 
       query = Marten::DB::Query::SQL::Query(Tag).new
-      query.add_query_node(Marten::DB::Query::RawNode.new("name LIKE 'c%'"))
+      query.add_query_node(Marten::DB::Query::Node.new("name LIKE 'c%'"))
       query.count.should eq 2
       query.execute.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
@@ -46,7 +46,7 @@ describe Marten::DB::Query::SQL::Query do
 
       query = Marten::DB::Query::SQL::Query(Tag).new
       query.add_query_node(Marten::DB::Query::Node.new(name__endswith: :l))
-      query.add_query_node(Marten::DB::Query::RawNode.new("name LIKE 'c%'"))
+      query.add_query_node(Marten::DB::Query::Node.new("name LIKE 'c%'"))
       query.count.should eq 1
       query.execute.should eq [tag_2]
     end

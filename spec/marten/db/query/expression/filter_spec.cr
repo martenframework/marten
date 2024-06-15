@@ -13,7 +13,7 @@ describe Marten::DB::Query::Expression::Filter do
       raw_params = {} of String => ::DB::Any
       raw_params["foo"] = "bar"
 
-      filter_expression.q("foo = :foo", foo: "bar").should eq Marten::DB::Query::RawNode.new("foo = :foo", raw_params)
+      filter_expression.q("foo = :foo", foo: "bar").should eq Marten::DB::Query::Node.new("foo = :foo", raw_params)
     end
 
     it "provides a shortcut to generate raw query node in the context of a Q expression with a hash" do
@@ -24,7 +24,7 @@ describe Marten::DB::Query::Expression::Filter do
 
       filter_expression.q(
         "foo = :foo", {"foo" => "bar"}
-      ).should eq Marten::DB::Query::RawNode.new("foo = :foo", raw_params)
+      ).should eq Marten::DB::Query::Node.new("foo = :foo", raw_params)
     end
 
     it "provides a shortcut to generate raw query node in the context of a Q expression with positional arguments" do
@@ -32,7 +32,7 @@ describe Marten::DB::Query::Expression::Filter do
 
       raw_params = ["bar"] of ::DB::Any
 
-      filter_expression.q("foo = ?", "bar").should eq Marten::DB::Query::RawNode.new("foo = ?", raw_params)
+      filter_expression.q("foo = ?", "bar").should eq Marten::DB::Query::Node.new("foo = ?", raw_params)
     end
 
     it "provides a shortcut to generate raw query node in the context of a Q expression with an array argument" do
@@ -40,11 +40,11 @@ describe Marten::DB::Query::Expression::Filter do
 
       raw_params = ["bar"] of ::DB::Any
 
-      filter_expression.q("foo = ?", ["bar"]).should eq Marten::DB::Query::RawNode.new("foo = ?", raw_params)
+      filter_expression.q("foo = ?", ["bar"]).should eq Marten::DB::Query::Node.new("foo = ?", raw_params)
     end
 
     it "raises UnmetQuerySetCondition if the raw subquery is empty", tags: "raw" do
-      expected_message = "Raw sub queries cannot be empty"
+      expected_message = "Raw predicates cannot be empty"
 
       expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
         Marten::DB::Query::Expression::Filter.new.q("")

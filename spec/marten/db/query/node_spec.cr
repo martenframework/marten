@@ -8,7 +8,7 @@ describe Marten::DB::Query::Node do
       node_1.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node_1.negated.should be_false
       node_1.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "foo"  => "bar",
           "test" => 42,
         }
@@ -25,7 +25,7 @@ describe Marten::DB::Query::Node do
       node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
       node_2.negated.should be_true
       node_2.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "abc" => true,
           "xyz" => "test",
         }
@@ -38,7 +38,7 @@ describe Marten::DB::Query::Node do
       node_1.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node_1.negated.should be_false
       node_1.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "foo"  => "bar",
           "test" => 42,
         }
@@ -54,7 +54,7 @@ describe Marten::DB::Query::Node do
       node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
       node_2.negated.should be_true
       node_2.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "abc" => true,
           "xyz" => "test",
         }
@@ -67,7 +67,7 @@ describe Marten::DB::Query::Node do
       node_1.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node_1.negated.should be_false
       node_1.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "foo"  => "bar",
           "test" => 42,
         }
@@ -83,7 +83,7 @@ describe Marten::DB::Query::Node do
       node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
       node_2.negated.should be_true
       node_2.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "abc" => true,
           "xyz" => "test",
         }
@@ -95,13 +95,13 @@ describe Marten::DB::Query::Node do
         children: [] of Marten::DB::Query::Node,
         connector: Marten::DB::Query::SQL::PredicateConnector::AND,
         negated: false,
-        filters: Marten::DB::Query::Node::FilterHash{"foo" => "bar", "test" => 42}
+        filters: Marten::DB::Query::Node::Filters{"foo" => "bar", "test" => 42}
       )
       node_1.children.should be_empty
       node_1.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node_1.negated.should be_false
       node_1.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "foo"  => "bar",
           "test" => 42,
         }
@@ -111,13 +111,13 @@ describe Marten::DB::Query::Node do
         children: [node_1],
         connector: Marten::DB::Query::SQL::PredicateConnector::OR,
         negated: true,
-        filters: Marten::DB::Query::Node::FilterHash{"abc" => true, "xyz" => "test"},
+        filters: Marten::DB::Query::Node::Filters{"abc" => true, "xyz" => "test"},
       )
       node_2.children.should eq [node_1]
       node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
       node_2.negated.should be_true
       node_2.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "abc" => true,
           "xyz" => "test",
         }
@@ -130,7 +130,7 @@ describe Marten::DB::Query::Node do
       node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node.negated.should be_false
       node.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "path" => "foo/bar",
         }
       )
@@ -146,7 +146,7 @@ describe Marten::DB::Query::Node do
       node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node.negated.should be_false
       node.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "tag" => [tag_1, tag_2, tag_3] of Marten::DB::Model,
         }
       )
@@ -162,7 +162,7 @@ describe Marten::DB::Query::Node do
       node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node.negated.should be_false
       node.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "tag" => [tag_3, tag_2, tag_1] of Marten::DB::Model,
         }
       )
@@ -174,15 +174,42 @@ describe Marten::DB::Query::Node do
       node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       node.negated.should be_false
       node.filters.should eq(
-        Marten::DB::Query::Node::FilterHash{
+        Marten::DB::Query::Node::Filters{
           "test" => ["foo/bar", 42, "foo"] of Marten::DB::Field::Any,
         }
       )
     end
+
+    it "allows to initialize a query node from a raw predicate without params" do
+      node = Marten::DB::Query::Node.new("field IS NOT NULL")
+
+      node.raw_predicate?.should be_true
+      node.raw_predicate[:predicate].should eq "field IS NOT NULL"
+      node.raw_predicate[:params].should be_empty
+    end
+
+    it "allows to initialize a query node from a raw predicate with an array of params" do
+      node = Marten::DB::Query::Node.new(raw_predicate: "field = ?", params: ["foo"] of ::DB::Any)
+
+      node.raw_predicate?.should be_true
+      node.raw_predicate[:predicate].should eq "field = ?"
+      node.raw_predicate[:params].should eq ["foo"]
+    end
+
+    it "allows to initialize a query node from a raw predicate with a hash of params" do
+      node = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any
+      )
+
+      node.raw_predicate?.should be_true
+      node.raw_predicate[:predicate].should eq "field = :param"
+      node.raw_predicate[:params].should eq({"param" => "foo"})
+    end
   end
 
   describe "#==" do
-    it "returns true if two nodes are the same" do
+    it "returns true if two nodes with filters are the same" do
       other_node = Marten::DB::Query::Node.new(foo: "bar", test: 42)
 
       node_1 = Marten::DB::Query::Node.new(
@@ -198,6 +225,28 @@ describe Marten::DB::Query::Node do
         negated: true,
         abc: true,
         xyz: "test"
+      )
+
+      node_1.should eq node_2
+    end
+
+    it "returns true if two nodes with raw predicates are the same" do
+      other_node = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+
+      node_1 = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any,
+        children: [other_node],
+        connector: Marten::DB::Query::SQL::PredicateConnector::OR,
+        negated: true
+      )
+
+      node_2 = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any,
+        children: [other_node],
+        connector: Marten::DB::Query::SQL::PredicateConnector::OR,
+        negated: true
       )
 
       node_1.should eq node_2
@@ -347,6 +396,88 @@ describe Marten::DB::Query::Node do
       negated_node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
       negated_node.negated.should be_true
       negated_node.children.should eq [node]
+    end
+  end
+
+  describe "#filters" do
+    it "returns the filters of the node" do
+      node = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+
+      node.filters.should eq(
+        Marten::DB::Query::Node::Filters{
+          "foo"  => "bar",
+          "test" => 42,
+        }
+      )
+    end
+
+    it "raises if the node is associated with a raw predicate" do
+      node = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any
+      )
+
+      expect_raises(TypeCastError) do
+        node.filters
+      end
+    end
+  end
+
+  describe "#filters?" do
+    it "returns true if the node has filters" do
+      node = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+
+      node.filters?.should be_true
+    end
+
+    it "returns false if the node has a raw predicate" do
+      node = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any
+      )
+
+      node.filters?.should be_false
+    end
+  end
+
+  describe "#raw_predicate" do
+    it "returns the raw predicate of the node" do
+      node = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any
+      )
+
+      node.raw_predicate.should eq(
+        {
+          predicate: "field = :param",
+          params:    {"param" => "foo"},
+        }
+      )
+    end
+
+    it "raises if the node is associated with filters" do
+      node = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+
+      expect_raises(TypeCastError) do
+        node.raw_predicate
+      end
+    end
+  end
+
+  describe "#raw_predicate?" do
+    it "returns true if the node has a raw predicate" do
+      node = Marten::DB::Query::Node.new(
+        raw_predicate: "field = :param",
+        params: {"param" => "foo"} of String => ::DB::Any
+      )
+
+      node.raw_predicate?.should be_true
+    end
+
+    it "returns false if the node has filters" do
+      node = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+
+      node.raw_predicate?.should be_false
     end
   end
 end

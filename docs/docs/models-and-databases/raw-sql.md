@@ -62,13 +62,13 @@ Also, note that the parameters are left **unquoted** in the raw SQL queries: thi
 
 Finally, it should be noted that Marten does not validate the SQL queries you specify to the [`#raw`](./reference/query-set.md#raw) query set method. It is the developer's responsibility to ensure that these queries are (i) valid and (ii) that they return records that correspond to the considered model.
 
-## Filtering with Raw SQL subqueries
+## Filtering with raw SQL predicates
 
-Marten also provides a feature to filter query sets using raw SQL subqueries within the `#filter` method. This is useful when you need more complex filtering logic than simple field comparisons but still want to leverage Marten's query building capabilities.
+Marten also provides a feature to filter query sets using raw SQL predicates within the `#filter` method. This is useful when you need more complex filtering logic than simple field comparisons but still want to leverage Marten's query building capabilities.
 
 ### Positional arguments
 
-You can pass a raw SQL subquery fragment along with its parameters directly to the `#filter` method:
+You can pass a raw SQL predicate fragment along with its parameters directly to the `#filter` method:
 
 ```crystal
 Post.all.filter("published = ?", true)
@@ -84,7 +84,7 @@ Post.all.filter("published = :is_published", is_published: true)
 
 ### Q expression
 
-For even more flexibility, you can combine raw SQL subqueries with the [q expression](./queries#complex-filters-with-q-expressions) syntax within a block:
+For even more flexibility, you can combine raw SQL predicates with the [q expression](./queries#complex-filters-with-q-expressions) syntax within a block:
 
 ```crystal
 Post.all.filter { q(category: "news") & q("created_at > ?", Time.local - 7.days) }

@@ -546,9 +546,9 @@ module Marten
         # query_set = Post.all
         # query_set.filter("is_published = true")
         # ```
-        def filter(query_string : String)
-          raise_empty_raw_subquery if query_string.empty?
-          add_query_node(RawNode.new(query_string))
+        def filter(raw_predicate : String)
+          raise_empty_raw_predicate if raw_predicate.empty?
+          add_query_node(Node.new(raw_predicate))
         end
 
         # Returns a query set whose records match the given subquery and named parameters.
@@ -562,8 +562,8 @@ module Marten
         # query_set = Post.all
         # query_set.filter("is_published = ?", true)
         # ```
-        def filter(query_string : String, *args)
-          filter(query_string, args.to_a)
+        def filter(raw_predicate : String, *args)
+          filter(raw_predicate, args.to_a)
         end
 
         # Returns a query set whose records match the given subquery and named parameters.
@@ -577,8 +577,8 @@ module Marten
         # query_set = Post.all
         # query_set.filter("is_published = :published", published: true)
         # ```
-        def filter(query_string : String, **kwargs)
-          filter(query_string, kwargs.to_h)
+        def filter(raw_predicate : String, **kwargs)
+          filter(raw_predicate, kwargs.to_h)
         end
 
         # Returns a query set whose records match the given subquery and named parameters.
@@ -592,13 +592,13 @@ module Marten
         # query_set = Post.all
         # query_set.filter("is_published = ?", [true])
         # ```
-        def filter(query_string : String, params : Array)
-          raise_empty_raw_subquery if query_string.empty?
+        def filter(raw_predicate : String, params : Array)
+          raise_empty_raw_predicate if raw_predicate.empty?
 
           raw_params = [] of ::DB::Any
           raw_params += params
 
-          add_query_node(RawNode.new(query_string, raw_params))
+          add_query_node(Node.new(raw_predicate: raw_predicate, params: raw_params))
         end
 
         # Returns a query set whose records match the given subquery and named parameters.
@@ -612,13 +612,13 @@ module Marten
         # query_set = Post.all
         # query_set.filter("is_published = :published", {published: true})
         # ```
-        def filter(query_string : String, params : Hash | NamedTuple)
-          raise_empty_raw_subquery if query_string.empty?
+        def filter(raw_predicate : String, params : Hash | NamedTuple)
+          raise_empty_raw_predicate if raw_predicate.empty?
 
           raw_params = {} of String => ::DB::Any
           params.each { |k, v| raw_params[k.to_s] = v }
 
-          add_query_node(RawNode.new(query_string, raw_params))
+          add_query_node(Node.new(raw_predicate: raw_predicate, params: raw_params))
         end
 
         # Returns a query set whose records match the given query node.
@@ -1372,8 +1372,8 @@ module Marten
           prefetcher.execute
         end
 
-        private def raise_empty_raw_subquery
-          raise Errors::UnmetQuerySetCondition.new("Raw sub queries cannot be empty")
+        private def raise_empty_raw_predicate
+          raise Errors::UnmetQuerySetCondition.new("Raw predicates cannot be empty")
         end
 
         private def raise_negative_indexes_not_supported

@@ -49,18 +49,8 @@ module Marten
           )
           end
 
-          def add_query_node(query_node : Node)
+          def add_query_node(query_node)
             predicate_node = process_query_node(query_node)
-            @predicate_node ||= PredicateNode.new
-            @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
-          end
-
-          def add_query_node(query_node : RawNode)
-            predicate_node = RawPredicateNode.new(
-              query_node.statement,
-              query_node.params,
-              connector: query_node.connector,
-            )
             @predicate_node ||= PredicateNode.new
             @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
           end
@@ -916,14 +906,22 @@ module Marten
             "ORDER BY #{clauses.join(", ")}"
           end
 
-          private def process_query_node(query_node : Node)
+          private def process_query_node(query_node)
+            if query_node.filters?
+              process_filters_query_node(query_node)
+            else
+              process_raw_predicate_query_node(query_node)
+            end
+          end
+
+          private def process_filters_query_node(query_node)
             connector = query_node.connector
             predicate_node = PredicateNode.new(connector: connector, negated: query_node.negated)
 
             query_node.filters.each do |raw_query, raw_value|
               raw_query = raw_query.to_s
               predicate = solve_field_and_predicate(raw_query, raw_value)
-              predicate_node.predicates << predicate
+              predicate_node.filter_predicates << predicate
             end
 
             query_node.children.each do |child_node|
@@ -934,10 +932,10 @@ module Marten
             predicate_node
           end
 
-          private def process_query_node(query_node : RawNode)
-            RawPredicateNode.new(
-              query_node.statement,
-              query_node.params,
+          private def process_raw_predicate_query_node(query_node)
+            PredicateNode.new(
+              raw_predicate: query_node.raw_predicate[:predicate],
+              params: query_node.raw_predicate[:params],
               connector: query_node.connector,
             )
           end

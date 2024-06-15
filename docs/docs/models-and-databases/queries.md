@@ -131,7 +131,7 @@ Author.filter { q(first_name: "Bob") | q(first_name: "Alice") }
 Author.filter { -q(first_name: "Alice") }
 ```
 
-Marten also has the option to filter query sets using [raw SQL statements](./raw-sql#filtering-with-raw-sql-subqueries). This is useful when you want to leverage the flexibility of SQL for specific conditions, but still want Marten to handle the column selection and query building for the rest of the query.
+Marten also has the option to filter query sets using [raw SQL predicates](./raw-sql#filtering-with-raw-sql-predicates). This is useful when you want to leverage the flexibility of SQL for specific conditions, but still want Marten to handle the column selection and query building for the rest of the query.
 
 ```crystal
 Author.filter("first_name = :first_name", first_name: "John")

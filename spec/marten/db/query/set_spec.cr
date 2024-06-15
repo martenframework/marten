@@ -1329,7 +1329,7 @@ describe Marten::DB::Query::Set do
     end
 
     it "does not allow filtering records using an empty raw SQL sub query", tags: "raw" do
-      expected_message = "Raw sub queries cannot be empty"
+      expected_message = "Raw predicates cannot be empty"
 
       expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, expected_message) do
         Marten::DB::Query::Set(Tag).new.filter("").to_a

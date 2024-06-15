@@ -56,10 +56,45 @@ describe Marten::DB::Query::SQL::PredicateNode do
       node_2.negated.should be_true
       node_2.predicates.should eq [predicate_1]
     end
+
+    it "allows to initialize a predicate node with a raw predicate without params" do
+      node = Marten::DB::Query::SQL::PredicateNode.new(
+        "title = 'Example title'",
+      )
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+
+      node.raw_predicate.should eq({predicate: "title = 'Example title'", params: [] of ::DB::Any})
+    end
+
+    it "allows to initialize a predicate node with a raw predicate with an array of params" do
+      node = Marten::DB::Query::SQL::PredicateNode.new(
+        raw_predicate: "title = ?",
+        params: ["foo"] of ::DB::Any
+      )
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+
+      node.raw_predicate.should eq({predicate: "title = ?", params: ["foo"] of ::DB::Any})
+    end
+
+    it "allows to initialize a predicate node with a raw predicate with a hash of params" do
+      node = Marten::DB::Query::SQL::PredicateNode.new(
+        raw_predicate: "title = :title",
+        params: {"title" => "foo"} of String => ::DB::Any
+      )
+      node.children.should be_empty
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node.negated.should be_false
+
+      node.raw_predicate.should eq({predicate: "title = :title", params: {"title" => "foo"} of String => ::DB::Any})
+    end
   end
 
   describe "#==" do
-    it "returns true if two nodes are the same" do
+    it "returns true if two nodes with filter predicates are the same" do
       predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
       predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
 
@@ -82,6 +117,22 @@ describe Marten::DB::Query::SQL::PredicateNode do
       node_1.should eq node_2
     end
 
+    it "returns true if two nodes with raw predicates are the same" do
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        raw_predicate: "title = ?",
+        params: ["foo"] of ::DB::Any,
+        negated: false,
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        raw_predicate: "title = ?",
+        params: ["foo"] of ::DB::Any,
+        negated: false,
+      )
+
+      node_1.should eq node_2
+    end
+
     it "returns false if the predicates are not the same" do
       predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
       predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
@@ -99,6 +150,22 @@ describe Marten::DB::Query::SQL::PredicateNode do
         Marten::DB::Query::SQL::PredicateConnector::AND,
         false,
         predicate_1
+      )
+
+      node_1.should_not eq node_2
+    end
+
+    it "returns false if the raw predicates are not the same" do
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        raw_predicate: "title = ?",
+        params: ["foo"] of ::DB::Any,
+        negated: false,
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        raw_predicate: "subtitle = ?",
+        params: ["foo"] of ::DB::Any,
+        negated: false,
       )
 
       node_1.should_not eq node_2
@@ -352,10 +419,10 @@ describe Marten::DB::Query::SQL::PredicateNode do
 
       node_1.replace_table_alias_prefix({"t1" => "p1", "t2" => "p2"})
 
-      node_1.predicates[0].alias_prefix.should eq "p1"
-      node_1.predicates[1].alias_prefix.should eq "p2"
+      node_1.filter_predicates[0].alias_prefix.should eq "p1"
+      node_1.filter_predicates[1].alias_prefix.should eq "p2"
 
-      node_2.children[0].predicates[0].alias_prefix.should eq "p1"
+      node_2.children[0].filter_predicates[0].alias_prefix.should eq "p1"
     end
   end
 
@@ -431,6 +498,34 @@ describe Marten::DB::Query::SQL::PredicateNode do
 
       node_2.to_sql(Marten::DB::Connection.default).should eq(
         {"(NOT (t1.title = %s OR (t1.title = %s AND t2.title = %s)))", ["Foo", "Foo", "Bar"]}
+      )
+    end
+
+    it "properly generates the expected SQL from the raw predicate" do
+      raw_params = [] of ::DB::Any
+      raw_params += ["Example title"]
+
+      node = Marten::DB::Query::SQL::PredicateNode.new(
+        "title = ?",
+        raw_params
+      )
+
+      node.to_sql(Marten::DB::Connection.default).should eq(
+        {"title = %s", ["Example title"]}
+      )
+    end
+
+    it "properly generates the expected SQL from the raw predicate if it contains the '%'' character" do
+      raw_params = [] of ::DB::Any
+      raw_params += ["Example title"]
+
+      node = Marten::DB::Query::SQL::PredicateNode.new(
+        "title LIKE '?%'",
+        raw_params
+      )
+
+      node.to_sql(Marten::DB::Connection.default).should eq(
+        {"title LIKE '%s%%'", ["Example title"]}
       )
     end
   end

@@ -1,8 +1,15 @@
+require "./concerns/sanitizer"
+
 module Marten
   module DB
     module Query
       module SQL
         class PredicateNode
+          include Sanitizer
+
+          alias RawPredicate = NamedTuple(predicate: String, params: Array(::DB::Any) | Hash(String, ::DB::Any))
+          alias FilterPredicates = Array(Predicate::Base)
+
           getter children
           getter connector
           getter negated
@@ -10,14 +17,24 @@ module Marten
 
           def initialize(@children = [] of self, @connector = SQL::PredicateConnector::AND, @negated = false, *args)
             @predicates = [] of Predicate::Base
-            @predicates.concat(args.to_a)
+            filter_predicates.concat(args.to_a)
+          end
+
+          def initialize(
+            raw_predicate : String,
+            params : Array(::DB::Any) | Hash(String, ::DB::Any) = [] of ::DB::Any,
+            @children = [] of self,
+            @connector = SQL::PredicateConnector::AND,
+            @negated = false
+          )
+            @predicates = RawPredicate.new(predicate: raw_predicate, params: params)
           end
 
           def initialize(
             @children : Array(self),
             @connector : PredicateConnector,
             @negated : Bool,
-            @predicates : Array(Predicate::Base)
+            @predicates : RawPredicate | FilterPredicates
           )
           end
 
@@ -36,7 +53,7 @@ module Marten
             if @connector == conn
               @children << other
             else
-              new_child = PredicateNode.new(
+              new_child = self.class.new(
                 children: @children,
                 connector: @connector,
                 negated: @negated,
@@ -48,7 +65,7 @@ module Marten
           end
 
           def clone
-            PredicateNode.new(
+            self.class.new(
               children: @children.map { |c| c.clone.as(self) },
               connector: @connector,
               negated: @negated,
@@ -56,8 +73,26 @@ module Marten
             )
           end
 
+          def filter_predicates : FilterPredicates
+            @predicates.as(FilterPredicates)
+          end
+
+          def filter_predicates? : Bool
+            @predicates.is_a?(FilterPredicates)
+          end
+
+          def raw_predicate : RawPredicate
+            @predicates.as(RawPredicate)
+          end
+
+          def raw_predicate? : Bool
+            @predicates.is_a?(RawPredicate)
+          end
+
           def replace_table_alias_prefix(old_vs_new_table_aliases : Hash(String, String)) : Nil
-            @predicates.each { |p|
+            return unless filter_predicates?
+
+            filter_predicates.each { |p|
               next unless old_vs_new_table_aliases.has_key?(p.alias_prefix)
               p.alias_prefix = old_vs_new_table_aliases[p.alias_prefix]
             }
@@ -65,10 +100,18 @@ module Marten
           end
 
           def to_sql(connection : Connection::Base)
+            if filter_predicates?
+              filter_predicates_to_sql(connection)
+            else
+              raw_predicate_to_sql(connection)
+            end
+          end
+
+          private def filter_predicates_to_sql(connection : Connection::Base)
             sql_parts = [] of String
             sql_params = [] of ::DB::Any
 
-            @predicates.each do |predicate|
+            filter_predicates.each do |predicate|
               predicate_sql, predicate_params = predicate.to_sql(connection)
               next if predicate_sql.empty?
               sql_parts << predicate_sql
@@ -90,6 +133,19 @@ module Marten
             end
 
             {sql_string, sql_params}
+          end
+
+          private def raw_predicate_to_sql(connection : Connection::Base)
+            # Escape % characters to be not be considered
+            # during formatting process
+            prepared_predicate = raw_predicate[:predicate].gsub("%", "%%")
+
+            case (params = raw_predicate[:params])
+            when Array(::DB::Any)
+              sanitize_positional_parameters(prepared_predicate, params.as(Array(::DB::Any)))
+            else
+              sanitize_named_parameters(prepared_predicate, params.as(Hash(String, ::DB::Any)))
+            end
           end
         end
       end

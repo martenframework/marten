@@ -7,39 +7,39 @@ module Marten
             Node.new(**kwargs)
           end
 
-          def q(query_string : String)
-            raise_empty_raw_subquery if query_string.empty?
-            RawNode.new(query_string)
+          def q(raw_predicate : String)
+            raise_empty_raw_predicate if raw_predicate.empty?
+            Node.new(raw_predicate: raw_predicate)
           end
 
-          def q(query_string : String, *args)
-            q(query_string, args.to_a)
+          def q(raw_predicate : String, *args)
+            q(raw_predicate, args.to_a)
           end
 
-          def q(query_string : String, **kwargs)
-            q(query_string, kwargs.to_h)
+          def q(raw_predicate : String, **kwargs)
+            q(raw_predicate, kwargs.to_h)
           end
 
-          def q(query_string : String, params : Array)
-            raise_empty_raw_subquery if query_string.empty?
+          def q(raw_predicate : String, params : Array)
+            raise_empty_raw_predicate if raw_predicate.empty?
 
             raw_params = [] of ::DB::Any
             raw_params += params
 
-            RawNode.new(query_string, raw_params)
+            Node.new(raw_predicate: raw_predicate, params: raw_params)
           end
 
-          def q(query_string : String, params : Hash | NamedTuple)
-            raise_empty_raw_subquery if query_string.empty?
+          def q(raw_predicate : String, params : Hash | NamedTuple)
+            raise_empty_raw_predicate if raw_predicate.empty?
 
             raw_params = {} of String => ::DB::Any
             params.each { |k, v| raw_params[k.to_s] = v }
 
-            RawNode.new(query_string, raw_params)
+            Node.new(raw_predicate: raw_predicate, params: raw_params)
           end
 
-          private def raise_empty_raw_subquery
-            raise Errors::UnmetQuerySetCondition.new("Raw sub queries cannot be empty")
+          private def raise_empty_raw_predicate
+            raise Errors::UnmetQuerySetCondition.new("Raw predicates cannot be empty")
           end
         end
       end

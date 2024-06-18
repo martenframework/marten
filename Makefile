@@ -48,7 +48,7 @@ qa: format_checks lint
 .PHONY: format
 ## Perform and apply crystal formatting.
 format:
-	crystal tool format
+	crystal tool format -e tmp
 
 .PHONY: format_checks
 ## Trigger crystal formatting checks.

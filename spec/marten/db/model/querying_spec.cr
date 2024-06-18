@@ -263,6 +263,30 @@ describe Marten::DB::Model::Querying do
       results.size.should eq 1
       results[0].should eq Tag.get!(name: "crystal")
     end
+
+    it "allows filtering records by providing a single raw predicate" do
+      TestUser.filter("username = 'jd1'").to_a.should eq [TestUser.get!(username: "jd1")]
+    end
+
+    it "allows filtering records by providing a raw predicate and positional parameters" do
+      TestUser.filter("username = ?", "jd1").to_a.should eq [TestUser.get!(username: "jd1")]
+    end
+
+    it "allows filtering records by providing a raw predicate and named parameters" do
+      TestUser.filter("username = :username", username: "jd1").to_a.should eq [TestUser.get!(username: "jd1")]
+    end
+
+    it "allows filtering records by providing a raw predicate and an array of positional parameters" do
+      TestUser.filter("username = ?", ["jd1"]).to_a.should eq [TestUser.get!(username: "jd1")]
+    end
+
+    it "allows filtering records by providing a raw predicate and a hash of named parameters" do
+      TestUser.filter("username = :username", {"username" => "jd1"}).to_a.should eq [TestUser.get!(username: "jd1")]
+    end
+
+    it "allows filtering records by providing a raw predicate and a named tuple of named parameters" do
+      TestUser.filter("username = :username", {username: "jd1"}).to_a.should eq [TestUser.get!(username: "jd1")]
+    end
   end
 
   describe "::first" do

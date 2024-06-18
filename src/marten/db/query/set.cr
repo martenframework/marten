@@ -535,7 +535,7 @@ module Marten
           filter(query)
         end
 
-        # Returns a query set whose records match the given subquery and named parameters.
+        # Returns a query set whose records match the given raw predicate and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -551,7 +551,7 @@ module Marten
           add_query_node(Node.new(raw_predicate))
         end
 
-        # Returns a query set whose records match the given subquery and named parameters.
+        # Returns a query set whose records match the given raw predicate and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -566,7 +566,7 @@ module Marten
           filter(raw_predicate, args.to_a)
         end
 
-        # Returns a query set whose records match the given subquery and named parameters.
+        # Returns a query set whose records match the given raw predicate and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -581,7 +581,7 @@ module Marten
           filter(raw_predicate, kwargs.to_h)
         end
 
-        # Returns a query set whose records match the given subquery and named parameters.
+        # Returns a query set whose records match the given raw predicate and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
@@ -601,7 +601,7 @@ module Marten
           add_query_node(Node.new(raw_predicate: raw_predicate, params: raw_params))
         end
 
-        # Returns a query set whose records match the given subquery and named parameters.
+        # Returns a query set whose records match the given raw predicate and named parameters.
         #
         # This method enables filtering based on raw SQL conditions, offering greater
         # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.

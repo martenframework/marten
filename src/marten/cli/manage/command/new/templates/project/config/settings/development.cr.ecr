@@ -6,4 +6,8 @@ Marten.configure :development do |config|
   # Print sent emails to the standard output in development.
   # https://martenframework.com/docs/development/reference/settings#emailing-settings
   config.emailing.backend = Marten::Emailing::Backend::Development.new(print_emails: true)
+
+  # More verbose log level in development.
+  # https://martenframework.com/docs/development/reference/settings#log_level
+  config.log_level = Log::Severity::Debug
 end

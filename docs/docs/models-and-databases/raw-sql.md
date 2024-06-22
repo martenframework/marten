@@ -64,38 +64,61 @@ Finally, it should be noted that Marten does not validate the SQL queries you sp
 
 ## Filtering with raw SQL predicates
 
-Marten also provides a feature to filter query sets using raw SQL predicates within the `#filter` method. This is useful when you need more complex filtering logic than simple field comparisons but still want to leverage Marten's query building capabilities.
+Marten provides a feature to filter query sets using raw SQL predicates within the `#filter` method. This is useful when you need more complex filtering logic than simple field comparisons but still want to leverage Marten's query building capabilities.
 
-### Positional arguments
-
-You can pass a raw SQL predicate fragment along with its parameters directly to the `#filter` method:
+Using raw SQL predicates involves specifying a string containing the actual predicate and optional parameters to the `#filter` query set method. For example:
 
 ```crystal
-Post.all.filter("published = ?", true)
+Author.filter("author_id IS NOT NULL")
+Author.filter("first_name = ?", "John")
 ```
 
-### Named arguments
+### Specifying parameters
 
-To make your queries more readable, use named parameters:
+You can "inject" parameters into your SQL raw predicates when using the `#filter` method. To do so you have two options: either you specify these parameters as positional arguments, or you specify them as named arguments. Positional parameters must be specified using the `?` syntax while named parameters must be specified using the `:param` format.
+
+For example, the following query uses positional parameters:
 
 ```crystal
-Post.all.filter("published = :is_published", is_published: true)
+Article.filter("title = ? and created_at > ?", "Hello World!", "2022-10-30"
 ```
 
-### Q expression
+And the following one uses named parameters:
 
-For even more flexibility, you can combine raw SQL predicates with the [q expression](./queries#complex-filters-with-q-expressions) syntax within a block:
+```crystal
+Article.filter(
+  "title = :title and created_at > :created_at",
+  title: "Hello World!",
+  created_at: "2022-10-30"
+)
+```
+
+:::caution
+**Do not use string interpolations in your SQL predicates!**
+
+You should never use string interpolations in your raw SQL predicates as this would expose your code to SQL injection attacks (where attackers can inject and execute arbitrary SQL into your database).
+
+As such, never - ever - do something like that:
+
+```crystal
+Article.filter("title = '#{title}'")
+```
+
+And instead, do something like that:
+
+```crystal
+Article.filter("title = ?", title)
+```
+
+Also, note that the parameters are left **unquoted** in the raw SQL queries: this is very important as not doing it would expose your code to SQL injection vulnerabilities as well. Parameters are quoted automatically by the underlying database backend.
+:::
+
+### Using `q` expressions
+
+For even more flexibility, you can combine raw SQL predicates with the [`q` expression](./queries#complex-filters-with-q-expressions) syntax within a block:
 
 ```crystal
 Post.all.filter { q(category: "news") & q("created_at > ?", Time.local - 7.days) }
-```
-
-### Advanced queries
-
-A subquery can also be used inside the `#filter` method:
-
-```crystal
-Product.all.filter("price < (SELECT AVG(price) FROM main_product)")
 ```
 
 ## Executing other SQL statements

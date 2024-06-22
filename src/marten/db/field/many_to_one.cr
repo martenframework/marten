@@ -198,11 +198,11 @@ module Marten
                       reverse: true,
                       relation_name: {{ related_field_name.id }}
                     )]
-                    @_reverse_m2o_{{ related_field_name.id }} : Marten::DB::Query::RelatedSet({{ model_klass }})?
+                    @_reverse_m2o_{{ related_field_name.id }} : {{ model_klass }}::RelatedQuerySet?
 
                     def {{ related_field_name.id }}
                       @_reverse_m2o_{{ related_field_name.id }} ||=
-                        Marten::DB::Query::RelatedSet({{ model_klass }}).new(self, {{ field_id.stringify }})
+                        {{ model_klass }}::RelatedQuerySet.new(self, {{ field_id.stringify }})
                     end
                   end
                 end

@@ -292,10 +292,10 @@ Now we can try to retrieve all the `Article` records that we currently have in 
 
 ```crystal
 Article.all
-# => <Marten::DB::Query::Set(Article) [#<Article:0x1039296e0 id: 1, title: "My article", content: "This is my article.">]>
+# => <Article::QuerySet [#<Article:0x1039296e0 id: 1, title: "My article", content: "This is my article.">]>
 ```
 
-This method returns a `Marten::DB::Query::Set` object, which is commonly referred to as a "query set". A query set is a representation of records collections from the database that can be filtered, and iterated over.
+This method returns an `Article::QuerySet` object, which is commonly referred to as a "query set". A query set is a representation of records collections from the database that can be filtered, and iterated over. The `Article::QuerySet` class, automatically generated for the `Article` model, is a subclass of `Marten::DB::Query::Set`.
 
 :::info
 Please refer to [Queries](../models-and-databases/queries.md) to learn more about Marten's querying capabilities.

@@ -115,7 +115,7 @@ module Marten
                 many: true,
                 relation_name: {{ field_id }}
               )]
-              @_m2m_{{ field_id }} : Marten::DB::Query::ManyToManySet({{ related_model_klass }})?
+              @_m2m_{{ field_id }} : {{ related_model_klass }}::ManyToManyQuerySet?
 
               register_field(
                 {{ @type }}.new(
@@ -128,7 +128,7 @@ module Marten
               )
 
               def {{ field_id }}
-                @_m2m_{{ field_id }} ||= Marten::DB::Query::ManyToManySet({{ related_model_klass }}).new(
+                @_m2m_{{ field_id }} ||= {{ related_model_klass }}::ManyToManyQuerySet.new(
                   self,
                   {{ field_id.stringify }},
                   {{ through_to_related_name }},
@@ -181,11 +181,11 @@ module Marten
                       reverse: true,
                       relation_name: {{ related_field_name.id }}
                     )]
-                    @_reverse_m2m_{{ related_field_name.id }} : Marten::DB::Query::Set({{ model_klass }})?
+                    @_reverse_m2m_{{ related_field_name.id }} : {{ model_klass }}::QuerySet?
 
 
                     def {{ related_field_name.id }}
-                      @_reverse_m2m_{{ related_field_name.id }} ||= Marten::DB::Query::Set({{ model_klass }}).new
+                      @_reverse_m2m_{{ related_field_name.id }} ||= {{ model_klass }}::QuerySet.new
                         .filter(
                           Marten::DB::Query::Node.new(
                             {"{{ through_from_related_name.id }}__{{ through_model_to_field_id.id }}" => self}

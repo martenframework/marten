@@ -1,4 +1,5 @@
 require "./spec_helper"
+require "./querying_spec/app"
 
 describe Marten::DB::Model::Querying do
   describe "::all" do
@@ -119,6 +120,70 @@ describe Marten::DB::Model::Querying do
       results.size.should eq 2
       results.includes?(TestUser.get!(username: "jd1")).should be_true
       results.includes?(TestUser.get!(username: "foo")).should be_true
+    end
+  end
+
+  describe "::default_scope" do
+    with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+    it "allows to define a default scope for a model" do
+      post_1 = Marten::DB::Model::QueryingSpec::PostWithDefaultScope.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      Marten::DB::Model::QueryingSpec::PostWithDefaultScope.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::PostWithDefaultScope.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::PostWithDefaultScope.all.to_a.should eq [post_1, post_3]
+    end
+
+    it "allows to define a default scope for a model through the use of an abstract parent model" do
+      post_1 = Marten::DB::Model::QueryingSpec::NonAbstractPostWithDefaultScope.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      Marten::DB::Model::QueryingSpec::NonAbstractPostWithDefaultScope.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::NonAbstractPostWithDefaultScope.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::NonAbstractPostWithDefaultScope.all.to_a.should eq [post_1, post_3]
+    end
+
+    it "allows to define a default scope for a model through the use of a non-abstract parent model" do
+      post_1 = Marten::DB::Model::QueryingSpec::ChildPostWithDefaultScope.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      Marten::DB::Model::QueryingSpec::ChildPostWithDefaultScope.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::ChildPostWithDefaultScope.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::ChildPostWithDefaultScope.all.to_a.should eq [post_1, post_3]
     end
   end
 
@@ -991,6 +1056,217 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::scope" do
+    with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+    it "allows to define a scope for a model" do
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::Post.all.to_a.should eq [post_1, post_2, post_3]
+      Marten::DB::Model::QueryingSpec::Post.published.to_a.should eq [post_1, post_3]
+    end
+
+    it "allows to define a scope that requires arguments for a model" do
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Top Post 1",
+        content: "Content 1",
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Top Post 2",
+        content: "Content 3",
+      )
+
+      Marten::DB::Model::QueryingSpec::Post.all.to_a.should eq [post_1, post_2, post_3]
+      Marten::DB::Model::QueryingSpec::Post.prefixed("Top").to_a.should eq [post_1, post_3]
+    end
+
+    it "defines scopes on a model query set" do
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::Post.all.to_a.should eq [post_1, post_2, post_3]
+      Marten::DB::Model::QueryingSpec::Post.all.published.to_a.should eq [post_1, post_3]
+    end
+
+    it "defines scopes that require arguments on a model query set" do
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Top Post 1",
+        content: "Content 1",
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Top Post 2",
+        content: "Content 3",
+      )
+
+      Marten::DB::Model::QueryingSpec::Post.all.to_a.should eq [post_1, post_2, post_3]
+      Marten::DB::Model::QueryingSpec::Post.all.prefixed("Top").to_a.should eq [post_1, post_3]
+    end
+
+    it "defines custom scopes on related sets" do
+      author_1 = Marten::DB::Model::QueryingSpec::Author.create!(name: "Author 1", is_admin: true)
+      author_2 = Marten::DB::Model::QueryingSpec::Author.create!(name: "Author 2", is_admin: false)
+
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 1",
+        content: "Content 1",
+        author: author_1,
+        published: true
+      )
+      Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+        author: author_2,
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 3",
+        content: "Content 3",
+        author: author_1,
+        published: false
+      )
+
+      author_1.posts.to_a.should eq [post_1, post_3]
+      author_1.posts.published.to_a.should eq [post_1]
+    end
+
+    it "defines custom scopes on many-to-many sets" do
+      tag_1 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 1", is_active: true)
+      tag_2 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 2", is_active: false)
+      tag_3 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 3", is_active: true)
+      tag_4 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 4", is_active: true)
+
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      post_1.tags.add(tag_1, tag_2, tag_3)
+
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_2.tags.add(tag_2, tag_3, tag_4)
+
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+      post_3.tags.add(tag_1, tag_3, tag_4)
+
+      post_1.tags.to_a.should eq [tag_1, tag_2, tag_3]
+      post_1.tags.active.to_a.should eq [tag_1, tag_3]
+    end
+
+    it "configures scopes that can be chained" do
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true,
+        published_at: 2.years.ago,
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true,
+        published_at: 1.day.ago,
+      )
+      post_4 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 4",
+        content: "Content 4",
+        published: true,
+        published_at: 1.week.ago,
+      )
+
+      Marten::DB::Model::QueryingSpec::Post.all.to_a.should eq [post_1, post_2, post_3, post_4]
+      Marten::DB::Model::QueryingSpec::Post.published.recent.to_a.should eq [post_3, post_4]
+    end
+
+    it "allows to define a scope for a model through the use of an abstract parent model" do
+      post_1 = Marten::DB::Model::QueryingSpec::NonAbstractPost.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::NonAbstractPost.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::NonAbstractPost.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::NonAbstractPost.all.to_a.should eq [post_1, post_2, post_3]
+      Marten::DB::Model::QueryingSpec::NonAbstractPost.published.to_a.should eq [post_1, post_3]
+    end
+
+    it "allows to define a scope for a model through the use of a non-abstract parent model" do
+      post_1 = Marten::DB::Model::QueryingSpec::ChildPost.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::ChildPost.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::ChildPost.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::ChildPost.all.to_a.should eq [post_1, post_2, post_3]
+      Marten::DB::Model::QueryingSpec::ChildPost.published.to_a.should eq [post_1, post_3]
+    end
+  end
+
   describe "::sum" do
     it "properly calculates the sum" do
       user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
@@ -998,6 +1274,31 @@ describe Marten::DB::Model::Querying do
       Post.create!(author: user, title: "Example post 2", score: 5.0)
 
       Post.sum(:score).should eq 10.00
+    end
+  end
+
+  describe "::unscoped" do
+    with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+    it "ignores the default scope" do
+      post_1 = Marten::DB::Model::QueryingSpec::PostWithDefaultScope.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::PostWithDefaultScope.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: false
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::PostWithDefaultScope.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true
+      )
+
+      Marten::DB::Model::QueryingSpec::PostWithDefaultScope.all.to_a.should eq [post_1, post_3]
+      Marten::DB::Model::QueryingSpec::PostWithDefaultScope.unscoped.to_a.should eq [post_1, post_2, post_3]
     end
   end
 

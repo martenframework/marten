@@ -427,3 +427,118 @@ Article.filter(title: "My article").delete
 ```
 
 By default, related objects that are associated with the deleted records will also be deleted by following the deletion strategy defined in each relation field (`on_delete` option, see the [reference](./reference/fields.md#on_delete) for more details). The method always returns the number of deleted records.
+
+## Scopes
+
+Scopes allow for the pre-definition of specific filtered query sets, which can be easily applied to model classes and model query sets. When defining such scopes, all the query set capabilities that were covered previously (such as [filtering records](#filtering-specific-records), [excluding records](#excluding-specific-records), etc) can be leveraged.
+
+### Defining scopes
+
+Scopes can be defined through the use of the [`#scope`](pathname:///api/dev/Marten/DB/Model/Querying.html#scope(name%2C%26block)-macro) macro. This macro expects a scope name (string literal or symbol) as first argument and requires a block where the query set filtering logic is defined.
+
+For example:
+
+```crystal
+class Post < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 255
+  field :is_published, :bool, default: false
+  field :created_at, :date_time
+
+  // highlight-next-line
+  scope :published { filter(is_published: true) }
+  // highlight-next-line
+  scope :unpublished { filter(is_published: false) }
+  // highlight-next-line
+  scope :recent { filter(created_at__gt: 1.year.ago) }
+end
+```
+
+Considering the above model definition, it is possible to get published posts by using the following method call:
+
+```crystal
+Post.published # => Post::QuerySet [...]>
+```
+
+Similarly, retrieving all published posts from a query set object can be accomplished by calling the `#published` method on the query set object:
+
+```crystal
+query_set = Post.all
+query_set.published # => Post::QuerySet [...]>
+```
+
+Because of this capability, it is important to note that scopes can technically be chained. For example, the following snippet will return all the published posts that were created less than one year ago:
+
+```crystal
+Post.published.recent # => Post::QuerySet [...]>
+```
+
+### Defining scopes with arguments
+
+If needed, you can define scopes that require arguments. To accomplish this, simply include the required arguments within the scope block.
+
+For example:
+
+```crystal
+class Post < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 255
+  field :author, :many_to_one, to: Author
+
+  // highlight-next-line
+  scope :by_author_id { |author_id| filter(author_id: author_id) }
+end
+```
+
+Scopes that require arguments can be used in the same way as argument-free scopes; they can be called on model classes or model query sets:
+
+```crystal
+Post.by_author_id(42)      # => Post::QuerySet [...]>
+
+query_set = Post.all
+query_set.by_author_id(42) # => Post::QuerySet [...]>
+```
+
+### Defining default scopes
+
+By default, querying all model records returns unfiltered query sets. However, you can define a default scope to automatically apply a specific filter to all queries for that model. This ensures that certain criteria are consistently enforced without the need to explicitly include a specific filter in every query.
+
+Default scopes can be defined through the use of the [`#default_scope`](pathname:///api/dev/Marten/DB/Model/Querying.html#default_scope-macro) macro. This macro requires a block where the query set filtering logic is defined.
+
+For example:
+
+```crystal
+class Post < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 255
+  field :is_published, :bool, default: false
+  field :created_at, :date_time
+
+  // highlight-next-line
+  default_scope { filter(published: true) }
+end
+```
+
+### Disabling scoping
+
+It is worth mentioning that unscoped model records are always accessible through the use of the [`#unscoped`](pathname:///api/dev/Marten/DB/Model/Querying/ClassMethods.html#unscoped-instance-method) class method. This is especially useful if your model defines a default scope and you need to override it for certain queries.
+
+For example:
+
+```crystal
+class Post < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 255
+  field :is_published, :bool, default: false
+  field :created_at, :date_time
+
+  // highlight-next-line
+  default_scope { filter(published: true) }
+end
+```
+
+Considering, the above model definition, you can retrieve all the `Post` records by bypassing the default scope with:
+
+```crystal
+Post.unscoped # => Post::QuerySet [...]>
+```

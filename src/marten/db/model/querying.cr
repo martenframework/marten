@@ -4,6 +4,21 @@ module Marten
       module Querying
         macro included
           extend Marten::DB::Model::Querying::ClassMethods
+
+          _begin_scoped_querysets_setup
+
+          macro inherited
+            _begin_scoped_querysets_setup
+            _inherit_scoped_querysets
+
+            macro finished
+              _finish_scoped_querysets_setup
+            end
+          end
+
+          macro finished
+            _finish_scoped_querysets_setup
+          end
         end
 
         module ClassMethods
@@ -106,13 +121,7 @@ module Marten
 
           # Returns the default queryset to use when creating "unfiltered" querysets for the model at hand.
           def default_queryset
-            {% begin %}
-            {% if @type.abstract? %}
-            raise "Records can only be queried from non-abstract model classes"
-            {% else %}
-            Query::Set({{ @type }}).new
-            {% end %}
-            {% end %}
+            unscoped
           end
 
           # Returns a queryset whose records do not match the given set of filters.
@@ -709,6 +718,17 @@ module Marten
             default_queryset.sum(field)
           end
 
+          # Returns an unscoped queryset for the considered model.
+          def unscoped
+            {% begin %}
+            {% if @type.abstract? %}
+            raise "Records can only be queried from non-abstract model classes"
+            {% else %}
+            {{ @type }}::QuerySet.new
+            {% end %}
+            {% end %}
+          end
+
           # Returns a queryset that will be evaluated using the specified database.
           #
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the
@@ -717,6 +737,188 @@ module Marten
           def using(db : Nil | String | Symbol)
             all.using(db)
           end
+        end
+
+        # Allows to define a default scope for the model query set.
+        #
+        # The default scope is a set of filters that will be applied to all the queries performed on the model. For
+        # example:
+        #
+        # ```
+        # class Post < Marten::Model
+        #   field :id, :big_int, primary_key: true, auto: true
+        #   field :title, :string, max_size: 255
+        #   field :is_published, :bool, default: false
+        #
+        #   default_scope { filter(is_published: true) }
+        # end
+        # ```
+        macro default_scope
+          {% MODEL_SCOPES[:default] = yield %}
+        end
+
+        # Allows to define a custom scope for the model query set.
+        #
+        # Custom scopes allow to define reusable query sets that can be used to filter records in a specific way. For
+        # example:
+        #
+        # ```
+        # class Post < Marten::Model
+        #   field :id, :big_int, primary_key: true, auto: true
+        #   field :title, :string, max_size: 255
+        #   field :is_published, :bool, default: false
+        #
+        #   scope :published { filter(is_published: true) }
+        #   scope :unpublished { filter(is_published: false) }
+        # end
+        #
+        # published_posts = Post.published
+        # unpublished_posts = Post.unpublished
+        #
+        # query_set = Post.all
+        # published_posts = query_set.published
+        # ```
+        #
+        # Custom scopes can also receive arguments. To do so, required arguments must be defined within the scope block.
+        # For example:
+        #
+        # ```
+        # class Post < Marten::Model
+        #   field :id, :big_int, primary_key: true, auto: true
+        #   field :title, :string, max_size: 255
+        #   field :author, :many_to_one, to: Author
+        #
+        #   scope :by_author_id { |author_id| filter(author_id: author_id) }
+        # end
+        #
+        # posts_by_author = Post.by_author_id(123)
+        # ```
+        macro scope(name, &block)
+          {% MODEL_SCOPES[:custom][name] = block %}
+        end
+
+        # :nodoc:
+        macro _begin_scoped_querysets_setup
+          # :nodoc:
+          MODEL_SCOPES = {
+            default: nil,
+            custom:  {} of Nil => Nil,
+          }
+        end
+
+        # :nodoc:
+        macro _inherit_scoped_querysets
+          {% ancestor_model = @type.ancestors.first %}
+
+          {% if ancestor_model.has_constant?("MODEL_SCOPES") %}
+            {% for key, value in ancestor_model.constant("MODEL_SCOPES") %}
+              {% MODEL_SCOPES[key] = value %}
+            {% end %}
+          {% end %}
+        end
+
+        # :nodoc:
+        macro _finish_scoped_querysets_setup
+          {% verbatim do %}
+            {% if !@type.abstract? %}
+              class ::{{ @type }}
+                {% if !MODEL_SCOPES[:default].is_a?(NilLiteral) %}
+                  def self.default_queryset
+                    {{ @type }}::QuerySet.new.{{ MODEL_SCOPES[:default] }}
+                  end
+                {% end %}
+
+                {% for queryset_id, block in MODEL_SCOPES[:custom] %}
+                  def self.{{ queryset_id.id }}{% if !block.args.empty? %}({{ block.args.join(", ").id }}){% end %}
+                    default_queryset.{{ block.body }}
+                  end
+                {% end %}
+              end
+
+              class ::{{ @type }}::QuerySet < Marten::DB::Query::Set({{ @type }})
+                def initialize(
+                  @query = Marten::DB::Query::SQL::Query({{ @type }}).new,
+                  @prefetched_relations = [] of ::String
+                )
+                  super(@query, @prefetched_relations)
+                end
+
+                {% for queryset_id, block in MODEL_SCOPES[:custom] %}
+                  def {{ queryset_id.id }}{% if !block.args.empty? %}({{ block.args.join(", ").id }}){% end %}
+                    {{ block.body }}
+                  end
+                {% end %}
+
+                protected def clone(other_query = nil)
+                  ::{{ @type }}::QuerySet.new(
+                    other_query.nil? ? @query.clone : other_query.not_nil!,
+                    prefetched_relations,
+                  )
+                end
+              end
+
+              class ::{{ @type }}::RelatedQuerySet < Marten::DB::Query::RelatedSet({{ @type }})
+                def initialize(
+                  @instance : Marten::DB::Model,
+                  @related_field_id : ::String,
+                  query : Marten::DB::Query::SQL::Query({{ @type }})? = nil
+                )
+                  super(@instance, @related_field_id, query)
+                end
+
+                {% for queryset_id, block in MODEL_SCOPES[:custom] %}
+                  def {{ queryset_id.id }}{% if !block.args.empty? %}({{ block.args.join(", ").id }}){% end %}
+                    {{ block.body }}
+                  end
+                {% end %}
+
+                protected def clone(other_query = nil)
+                  ::{{ @type }}::RelatedQuerySet.new(
+                    instance: @instance,
+                    related_field_id: @related_field_id,
+                    query: other_query.nil? ? @query.clone : other_query.not_nil!
+                  )
+                end
+              end
+
+              class ::{{ @type }}::ManyToManyQuerySet < Marten::DB::Query::ManyToManySet({{ @type }})
+                def initialize(
+                  @instance : Marten::DB::Model,
+                  @field_id : ::String,
+                  @through_related_name : ::String,
+                  @through_model_from_field_id : ::String,
+                  @through_model_to_field_id : ::String,
+                  query : Marten::DB::Query::SQL::Query({{ @type }})? = nil
+                )
+                  super(
+                    @instance,
+                    @field_id,
+                    @through_related_name,
+                    @through_model_from_field_id,
+                    @through_model_to_field_id,
+                    query
+                  )
+                end
+
+                {% for queryset_id, block in MODEL_SCOPES[:custom] %}
+                  def {{ queryset_id.id }}{% if !block.args.empty? %}({{ block.args.join(", ").id }}){% end %}
+                    {{ block.body }}
+                  end
+                {% end %}
+
+                protected def clone(other_query = nil)
+                  ::{{ @type }}::ManyToManyQuerySet.new(
+                    instance: @instance,
+                    field_id: @field_id,
+                    through_related_name: @through_related_name,
+                    through_model_from_field_id: @through_model_from_field_id,
+                    through_model_to_field_id: @through_model_to_field_id,
+                    query: other_query.nil? ? @query.clone : other_query.not_nil!
+                  )
+                end
+              end
+            {% end %}
+          {% end %}
         end
 
         # :nodoc:

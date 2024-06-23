@@ -8,15 +8,17 @@ module Marten
 
     # Returns the global HTTP server instance.
     def self.instance : ::HTTP::Server
-      @@instance ||= ::HTTP::Server.new(
-        [
-          ::HTTP::ErrorHandler.new,
-          Handlers::Logger.new,
-          Handlers::Error.new,
-          Handlers::Middleware.new,
-          Handlers::Routing.new,
-        ]
-      )
+      @@instance ||= ::HTTP::Server.new(handlers)
+    end
+
+    def self.handlers
+      [
+        ::HTTP::ErrorHandler.new,
+        Handlers::Logger.new,
+        Handlers::Error.new,
+        Handlers::Middleware.new,
+        Handlers::Routing.new,
+      ]
     end
 
     # Setups the server (TCP binding).

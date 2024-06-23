@@ -80,7 +80,7 @@ You can "inject" parameters into your SQL raw predicates when using the `#filter
 For example, the following query uses positional parameters:
 
 ```crystal
-Article.filter("title = ? and created_at > ?", "Hello World!", "2022-10-30"
+Article.filter("title = ? and created_at > ?", "Hello World!", "2022-10-30")
 ```
 
 And the following one uses named parameters:

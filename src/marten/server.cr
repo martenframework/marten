@@ -6,11 +6,7 @@ module Marten
       instance.addresses.map { |address| "http://#{address}" }
     end
 
-    # Returns the global HTTP server instance.
-    def self.instance : ::HTTP::Server
-      @@instance ||= ::HTTP::Server.new(handlers)
-    end
-
+    # Returns the handlers of the server.
     def self.handlers
       [
         ::HTTP::ErrorHandler.new,
@@ -19,6 +15,11 @@ module Marten
         Handlers::Middleware.new,
         Handlers::Routing.new,
       ]
+    end
+
+    # Returns the global HTTP server instance.
+    def self.instance : ::HTTP::Server
+      @@instance ||= ::HTTP::Server.new(handlers)
     end
 
     # Setups the server (TCP binding).

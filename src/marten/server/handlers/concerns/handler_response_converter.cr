@@ -5,11 +5,16 @@ module Marten
       module HandlerResponseConverter
         def convert_handler_response(context : ::HTTP::Server::Context, response : HTTP::Response)
           context.response.status_code = response.status
-          context.response.headers.merge!(response.headers.to_stdlib)
+          context.response.headers.merge!(response.headers.to_stdlib) if !response.headers.empty?
           context.response.content_type = response.content_type.to_s
 
-          context.marten.request.cookies.set_cookies.each { |cookie| context.response.cookies << cookie }
-          response.cookies.set_cookies.each { |cookie| context.response.cookies << cookie }
+          if !context.marten.request.cookies.set_cookies.empty?
+            context.marten.request.cookies.set_cookies.each { |cookie| context.response.cookies << cookie }
+          end
+
+          if !response.cookies.set_cookies.empty?
+            response.cookies.set_cookies.each { |cookie| context.response.cookies << cookie }
+          end
 
           if response.is_a?(HTTP::Response::Streaming)
             # We iterate over the streamed content iterator: at every iteration we write the obtained content to the

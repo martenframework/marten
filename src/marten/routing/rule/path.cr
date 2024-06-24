@@ -15,7 +15,24 @@ module Marten
           @regex, @path_for_interpolation, @parameters = path_to_regex(@path)
         end
 
-        def resolve(path : String) : Nil | Match
+        def resolve(path : String) : Match?
+          if @parameters.size == 0
+            resolve_without_parameters(path)
+          else
+            resolve_with_parameters(path)
+          end
+        end
+
+        protected def reversers : Array(Reverser)
+          @reversers ||= [Reverser.new(@name, @path_for_interpolation, @parameters)]
+        end
+
+        private def path_to_regex(_path)
+          regex, path_for_interpolation, parameters = super
+          {Regex.new("#{regex.source}$"), path_for_interpolation, parameters}
+        end
+
+        private def resolve_with_parameters(path : String) : Match?
           match = @regex.match(path)
           return if match.nil?
 
@@ -28,13 +45,8 @@ module Marten
           Match.new(@handler, kwargs)
         end
 
-        protected def reversers : Array(Reverser)
-          @reversers ||= [Reverser.new(@name, @path_for_interpolation, @parameters)]
-        end
-
-        private def path_to_regex(_path)
-          regex, path_for_interpolation, parameters = super
-          {Regex.new("#{regex.source}$"), path_for_interpolation, parameters}
+        private def resolve_without_parameters(path : String) : Match?
+          Match.new(@handler, MatchParameters.new) if @path
         end
       end
     end

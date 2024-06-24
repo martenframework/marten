@@ -24,7 +24,12 @@ describe Marten::Routing::Rule::Path do
       match.kwargs.should eq({"sid" => "my-slug", "number" => 42})
     end
 
-    it "returns nil if the path does not match the considered rule" do
+    it "returns nil if the path does not match a rule that does not require parameters" do
+      rule = Marten::Routing::Rule::Path.new("/home/xyz", Marten::Handlers::Base, name: "home_xyz")
+      rule.resolve("/bad/unknown").should be_nil
+    end
+
+    it "returns nil if the path does not match a rule that requires parameters" do
       rule = Marten::Routing::Rule::Path.new(
         "/home/xyz/<sid:slug>/count/<number:int>/display",
         Marten::Handlers::Base,

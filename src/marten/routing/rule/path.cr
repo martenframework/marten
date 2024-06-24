@@ -46,7 +46,7 @@ module Marten
         end
 
         private def resolve_without_parameters(path : String) : Match?
-          Match.new(@handler, MatchParameters.new) if @path
+          Match.new(@handler, MatchParameters.new) if @path == path
         end
       end
     end

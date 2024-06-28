@@ -22,27 +22,27 @@ module Marten
 
           # First step: if condition.
           condition = Condition.new(parts).parse
-          inner_nodes = parser.parse(up_to: {"elsif", "else", "endif"})
+          inner_nodes = parser.parse(up_to: {ELSIF_PART, ELSE_PART, ENDIF_PART})
           @conditions_and_nodes << {condition, inner_nodes}
 
           # Next step: optional elsif conditions.
           token = parser.shift_token
-          while token.content.starts_with?("elsif")
+          while token.content.starts_with?(ELSIF_PART)
             parts = split_smartly(token.content)[1..]
             condition = Condition.new(parts).parse
-            inner_nodes = parser.parse(up_to: {"elsif", "else", "endif"})
+            inner_nodes = parser.parse(up_to: {ELSIF_PART, ELSE_PART, ENDIF_PART})
             @conditions_and_nodes << {condition, inner_nodes}
             token = parser.shift_token
           end
 
           # Final step: optional else condition.
-          if token.content.starts_with?("else")
-            inner_nodes = parser.parse(up_to: {"endif"})
+          if token.content.starts_with?(ELSE_PART)
+            inner_nodes = parser.parse(up_to: {ENDIF_PART})
             @conditions_and_nodes << {nil, inner_nodes}
             token = parser.shift_token
           end
 
-          if token.content != "endif"
+          if token.content != ENDIF_PART
             raise Errors::InvalidSyntax.new("Unclosed if block")
           end
         end
@@ -55,6 +55,10 @@ module Marten
 
           ""
         end
+
+        private ELSIF_PART = "elsif"
+        private ELSE_PART  = "else"
+        private ENDIF_PART = "endif"
       end
     end
   end

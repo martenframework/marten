@@ -13,8 +13,8 @@ module Marten
       @current_token : Token::Base
 
       def initialize(parts : Array(String))
-        # Convert each condition part string to a corresponding condition token.
-        @tokens = parts.map { |part| token_for(part) }
+        # Convert each condition part string to corresponding condition tokens (operator and/or value).
+        @tokens = parts.flat_map { |part| tokens_for(part) }
         @current_token = shift_token
       end
 
@@ -58,14 +58,32 @@ module Marten
         result
       end
 
+      private NEGATION_RE = /^!+/
+
       private def shift_token
         return Token::End.new if @tokens.empty?
         @tokens.shift
       end
 
-      private def token_for(part)
-        operator_token_klass = Condition::Token::Operator.for(part)
-        operator_token_klass.nil? ? Condition::Token::Value.new(part) : operator_token_klass.new
+      private def tokens_for(part)
+        if !(operator_token_klass = Condition::Token::Operator.for(part)).nil?
+          [operator_token_klass.new]
+        else
+          tokens_for_value(part)
+        end
+      end
+
+      private def tokens_for_value(part)
+        # Remove possible "not" sign (!) from the beginning of the part if present and infer if the value is negated.
+        leading_exclamations_scan = part.scan(NEGATION_RE)
+        sanitized_part = leading_exclamations_scan.empty? ? part : leading_exclamations_scan.first.post_match
+        negated = (leading_exclamations_scan.first?.try(&.[0].size) || 0).odd?
+
+        if negated
+          [Condition::Token::Operator::Not.new, Condition::Token::Value.new(sanitized_part)] of Condition::Token::Base
+        else
+          [Condition::Token::Value.new(sanitized_part)] of Condition::Token::Base
+        end
       end
     end
   end

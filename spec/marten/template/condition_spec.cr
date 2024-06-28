@@ -38,6 +38,36 @@ describe Marten::Template::Condition do
       token.eval(Marten::Template::Context{"var1" => false}).truthy?.should be_true
     end
 
+    it "is able to process an expression containing a negated value" do
+      condition = Marten::Template::Condition.new(["!var1"])
+      token = condition.parse
+
+      token.eval(Marten::Template::Context{"var1" => true}).truthy?.should be_false
+      token.eval(Marten::Template::Context{"var1" => false}).truthy?.should be_true
+    end
+
+    it "is able to process an expression containing a value that is negated multiple times" do
+      condition_1 = Marten::Template::Condition.new(["!!var1"])
+      token_1 = condition_1.parse
+      token_1.eval(Marten::Template::Context{"var1" => true}).truthy?.should be_true
+      token_1.eval(Marten::Template::Context{"var1" => false}).truthy?.should be_false
+
+      condition_2 = Marten::Template::Condition.new(["!!!var1"])
+      token_2 = condition_2.parse
+      token_2.eval(Marten::Template::Context{"var1" => true}).truthy?.should be_false
+      token_2.eval(Marten::Template::Context{"var1" => false}).truthy?.should be_true
+    end
+
+    it "is able to process an or expression containing negated variables" do
+      condition = Marten::Template::Condition.new(["var1", "||", "!var2"])
+      token = condition.parse
+
+      token.eval(Marten::Template::Context{"var1" => false, "var2" => false}).truthy?.should be_true
+      token.eval(Marten::Template::Context{"var1" => false, "var2" => true}).truthy?.should be_false
+      token.eval(Marten::Template::Context{"var1" => true, "var2" => false}).truthy?.should be_true
+      token.eval(Marten::Template::Context{"var1" => true, "var2" => true}).truthy?.should be_true
+    end
+
     it "is able to process an equal expression" do
       condition = Marten::Template::Condition.new(["var1", "==", "var2"])
       token = condition.parse

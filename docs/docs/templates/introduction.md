@@ -88,7 +88,7 @@ As mentioned above, some tags allow to perform control flows and require a "clos
 
 ```html
 {% for article in articles %}
-  {{ article.title }} is {% if not article.published? %}not {% endif %}published
+  {{ article.title }} is {% if !article.published? %}not {% endif %}published
 {% endfor %}
 ```
 

@@ -196,19 +196,40 @@ Finally, loops give access to a special `loop` variable _inside_ the loop in ord
 
 ## `if`
 
-The `if` template tags allows to define conditions allowing to control which blocks should be executed. An `if` tag must always start with an `if` condition, followed by any number of intermediate `elsif` conditions and an optional (and final) `else` block. It also requires a closing `endif` tag.
+The `if` template tags makes it possible to define conditions allowing to control which blocks should be executed. An `if` tag must always start with an `if` condition, followed by any number of intermediate `elsif` conditions and an optional (and final) `else` block. It also requires a closing `endif` tag.
 
 For example:
 
 ```html
 {% if my_var == 0 %}
   Zero!
-{% elsif my_var == 1 %}
+{% elsif my_var == 1 && other_var == "foobar" %}
   One!
+{% elsif !additional_var %}
+  Something else!
 {% else %}
   Other!
 {% endif %}
 ```
+
+The following equality and comparison operators can be used as part of `if` conditions:
+
+| Operator | Description |
+| -------- | ----------- |
+| `==` | Equals |
+| `!=` | Not equals |
+| `>` | Greater than |
+| `>=` | Greater than or equals |
+| `<` | Less than |
+| `<=` | Greater than or equals |
+
+Additionally, the following logical operators can be used as part of `if` conditions:
+
+| Operator | Description |
+| -------- | ----------- |
+| `&&` | Logical AND |
+| `\|\|` | Logical OR |
+| `!` or `not` | Logical negation |
 
 ## `include`
 

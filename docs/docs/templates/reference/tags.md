@@ -196,7 +196,7 @@ Finally, loops give access to a special `loop` variable _inside_ the loop in ord
 
 ## `if`
 
-The `if` template tags makes it possible to define conditions allowing to control which blocks should be executed. An `if` tag must always start with an `if` condition, followed by any number of intermediate `elsif` conditions and an optional (and final) `else` block. It also requires a closing `endif` tag.
+The `if` template tag makes it possible to define conditions allowing to control which blocks should be executed. An `if` tag must always start with an `if` condition, followed by any number of intermediate `elsif` conditions and an optional (and final) `else` block. It also requires a closing `endif` tag.
 
 For example:
 
@@ -365,6 +365,22 @@ Alias for [`translate`](#translate).
 ## `t`
 
 Alias for [`translate`](#translate).
+
+## `unless`
+
+The `unless` template tag makes it possible to define conditions allowing to control which blocks should be executed. An `unless` tag must always start with an `unless` condition, followed by an optional (and final) `else` block. It also requires a closing `endunless` tag.
+
+For example:
+
+```html
+{% unless my_var == 0 %}
+  Other value!
+{% else %}
+  Zero!
+{% endunless %}
+```
+
+The `unless` template tag supports the same equality, comparison, and logical operators as the ones supported by the [`if`](#if) template tag.
 
 ## `url`
 

@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Marten::Template::Tag do
   describe "::get" do
     it "returns the right built-in tag classes for the expected tag names" do
-      Marten::Template::Tag.registry.size.should eq 22
+      Marten::Template::Tag.registry.size.should eq 23
       Marten::Template::Tag.get("asset").should eq Marten::Template::Tag::Asset
       Marten::Template::Tag.get("assign").should eq Marten::Template::Tag::Assign
       Marten::Template::Tag.get("block").should eq Marten::Template::Tag::Block
@@ -23,6 +23,7 @@ describe Marten::Template::Tag do
       Marten::Template::Tag.get("translate").should eq Marten::Template::Tag::Translate
       Marten::Template::Tag.get("trans").should eq Marten::Template::Tag::Translate
       Marten::Template::Tag.get("t").should eq Marten::Template::Tag::Translate
+      Marten::Template::Tag.get("unless").should eq Marten::Template::Tag::Unless
       Marten::Template::Tag.get("url").should eq Marten::Template::Tag::Url
       Marten::Template::Tag.get("verbatim").should eq Marten::Template::Tag::Verbatim
       Marten::Template::Tag.get("with").should eq Marten::Template::Tag::With

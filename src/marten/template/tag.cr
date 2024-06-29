@@ -43,6 +43,7 @@ module Marten
       register "translate", Translate
       register "trans", Translate
       register "t", Translate
+      register "unless", Unless
       register "url", Url
       register "verbatim", Verbatim
       register "with", With

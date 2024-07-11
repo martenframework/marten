@@ -515,7 +515,7 @@ class Post < Marten::Model
   field :created_at, :date_time
 
   // highlight-next-line
-  default_scope { filter(published: true) }
+  default_scope { filter(is_published: true) }
 end
 ```
 
@@ -533,7 +533,7 @@ class Post < Marten::Model
   field :created_at, :date_time
 
   // highlight-next-line
-  default_scope { filter(published: true) }
+  default_scope { filter(is_published: true) }
 end
 ```
 

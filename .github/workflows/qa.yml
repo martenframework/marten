@@ -16,7 +16,7 @@ jobs:
   crystal:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.12.0
+      image: crystallang/crystal:1.13.0
     steps:
       - uses: actions/checkout@v1
       - name: Install shards
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.12.0
+      image: crystallang/crystal:1.13.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite
@@ -61,7 +61,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.12.0
+      image: crystallang/crystal:1.13.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite
@@ -94,7 +94,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.12.0
+      image: crystallang/crystal:1.13.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite
@@ -125,7 +125,7 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     container:
-      image: crystallang/crystal:1.12.0
+      image: crystallang/crystal:1.13.0
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js 18.x

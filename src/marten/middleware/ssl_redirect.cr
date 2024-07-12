@@ -17,13 +17,11 @@ module Marten
         get_response.call
       end
 
-      private def exempted_path?(request : HTTP::Request, exempted_path : Regex)
-        Bool
+      private def exempted_path?(request : HTTP::Request, exempted_path : Regex) : Bool
         request.path.matches?(exempted_path)
       end
 
-      private def exempted_path?(request : HTTP::Request, exempted_path : String)
-        Bool
+      private def exempted_path?(request : HTTP::Request, exempted_path : String) : Bool
         request.path == exempted_path
       end
 

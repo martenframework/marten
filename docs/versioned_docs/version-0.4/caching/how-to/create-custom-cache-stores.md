@@ -138,7 +138,7 @@ end
 
 ## Enabling the use of custom cache stores
 
-Custom cache store can be used by assigning an instance of the corresponding class to the [`cache_store`](../../development/reference/settings.md#cache-store1) setting.
+Custom cache store can be used by assigning an instance of the corresponding class to the [`cache_store`](../../development/reference/settings.md#cache_store) setting.
 
 For example:
 

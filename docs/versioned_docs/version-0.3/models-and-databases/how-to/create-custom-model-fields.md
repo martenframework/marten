@@ -137,7 +137,7 @@ def from_db_result_set(result_set : ::DB::ResultSet) : ::UUID?
 end
 ```
 
-The `#from_db_result_set` method is supposed to return the read value into the right "representation", that is the final object representing the field value that users will interact with when manipulating model records (for example a `UUID` object created from a string). As such, you will usually want to call [`#from_db`](#fromdb) once you get the value from the database result set in order to return the final value.
+The `#from_db_result_set` method is supposed to return the read value into the right "representation", that is the final object representing the field value that users will interact with when manipulating model records (for example a `UUID` object created from a string). As such, you will usually want to call [`#from_db`](#from_db) once you get the value from the database result set in order to return the final value.
 
 #### `to_column`
 
@@ -163,7 +163,7 @@ If for some reason your custom field does not contribute any columns to the data
 
 #### `to_db`
 
-The `#to_db` method converts a field value from the "Crystal" representation to the database representation. As such, this method performs the reverse operation of the [`#from_db`](#fromdb) method.
+The `#to_db` method converts a field value from the "Crystal" representation to the database representation. As such, this method performs the reverse operation of the [`#from_db`](#from_db) method.
 
 For example, this method could return the string representation of a `UUID` object:
 

@@ -53,7 +53,7 @@ const darkTheme = themes.dracula;
             dropdownActiveClassDisabled: true,
           },
           {
-            href: 'https://martenframework.com/docs/api/0.4/index.html',
+            href: 'https://martenframework.com/docs/api/0.5/index.html',
             label: 'API',
             position: 'right',
           },

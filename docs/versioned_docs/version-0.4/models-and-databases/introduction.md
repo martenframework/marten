@@ -405,7 +405,7 @@ Please head over to the [Model validations](./validations.md) guide in order to 
 
 Model classes can inherit from each other. This allows you to easily reuse the field definitions and table attributes of a parent model within a child model.
 
-Presently, the Marten web framework allows [abstract model inheritance](#inheriting-from-abstract-models) (which is useful in order to reuse shared model fields and patterns over multiple child models without having a database table created for the parent model) and [multi-table inheritance](#multi-table-inheritance).
+Presently, the Marten web framework allows [abstract model inheritance](#abstract-model-inheritance) (which is useful in order to reuse shared model fields and patterns over multiple child models without having a database table created for the parent model) and [multi-table inheritance](#multi-table-inheritance).
 
 ### Abstract model inheritance
 

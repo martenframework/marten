@@ -212,7 +212,7 @@ Obviously, it is also possible to include partials that don't require any variab
 Templates can be loaded from specific locations within your codebase and from application folders. This is controlled by two main settings:
 
 * [`templates.app_dirs`](../development/reference/settings.md#app_dirs-1) is a boolean that indicates whether or not it should be possible to load templates that are provided by [installed applications](../development/reference/settings.md#installed_apps). Indeed, applications can define a `templates` folder at their root, and these templates will be discoverable by Marten if this setting is set to `true`
-* [`templates.dirs`](../development/reference/settings.md#dirs1) is an array of additional directories where templates should be looked for
+* [`templates.dirs`](../development/reference/settings.md#dirs-1) is an array of additional directories where templates should be looked for
 
 Application templates are always enabled by default (`templates.app_dirs = true`) for new Marten projects.
 
@@ -332,7 +332,7 @@ Context producers are helpers that ensure that common variables are automaticall
 
 For example, they can be used to insert the current HTTP request object in every template context being rendered in the context of a handler and HTTP request. This makes sense considering that the HTTP request object is a common object that is likely to be used by multiple templates in your project: that way there is no need to explicitly "insert" it in the context every time you render a template. This specific capability is provided by the [`Marten::Template::ContextProducer::Request`](pathname:///api/0.4/Marten/Template/ContextProducer/Request.html) context producer, which inserts a `request` object into every template context.
 
-Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings.md#contextproducers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
+Template context producers can be configured through the use of the [`templates.context_producers`](../development/reference/settings.md#context_producers) setting. When generating a new project by using the `marten new` command, the following context producers will be automatically configured:
 
 ```crystal
 config.templates.context_producers = [

@@ -123,7 +123,7 @@ query_set_1 = Post.all.distinct
 query_set_2 = Post.all.distinct(:title)
 ```
 
-It should be noted that it is also possible to follow associations of direct related models too by using the [double underscores notation](../queries.md#joins-and-filtering-relations) (`__`). For example the following query will select distinct records based on a joined "author" attribute:
+It should be noted that it is also possible to follow associations of direct related models too by using the [double underscores notation](../queries.md#filtering-relations) (`__`). For example the following query will select distinct records based on a joined "author" attribute:
 
 ```
 query_set = Post.all.distinct(:author__name)
@@ -171,7 +171,7 @@ query_set.filter { (q(name: "Foo") | q(name: "Bar")) & q(is_published: True) }
 
 ### `join`
 
-Returns a queryset whose specified `relations` are "followed" and joined to each result (see [Queries](../queries.md#joins-and-filtering-relations) for an introduction about this capability).
+Returns a queryset whose specified `relations` are "followed" and joined to each result (see [Queries](../queries.md#filtering-relations) for an introduction about this capability).
 
 When using `#join`, the specified relationships will be followed and each record returned by the queryset will have the corresponding related objects already selected and populated. Using `#join` can result in performance improvements since it can help reduce the number of SQL queries, as illustrated by the following example:
 

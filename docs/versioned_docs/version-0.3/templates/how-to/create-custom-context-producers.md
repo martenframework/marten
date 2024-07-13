@@ -25,4 +25,4 @@ end
 
 ## Activating context producers
 
-As mentioned in [Using context producers](../introduction.md#using-context-producers), context producers classes must be added to the [`templates.context_producers`](../../development/reference/settings.md#contextproducers) setting in order to be used by the Marten templates engine when initializing new context objects.
+As mentioned in [Using context producers](../introduction.md#using-context-producers), context producers classes must be added to the [`templates.context_producers`](../../development/reference/settings.md#context_producers) setting in order to be used by the Marten templates engine when initializing new context objects.

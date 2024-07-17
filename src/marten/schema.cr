@@ -3,7 +3,7 @@ require "./schema/**"
 module Marten
   # Abstract base schema class.
   #
-  # Schemas allows to define how a data set should be validated and what fields are expected. Schemas can be used to
+  # Schemas allow to define how a data set should be validated and what fields are expected. Schemas can be used to
   # validate query parameters, forms data, files, or JSON objects.
   abstract class Schema
     include Core::Validation

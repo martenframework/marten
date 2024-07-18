@@ -66,8 +66,6 @@ Default: `Log::Severity::Info`
 
 The default log level used by the application. Any severity defined in the [`Log::Severity`](https://crystal-lang.org/api/Log/Severity.html) enum can be used.
 
-The [development environment](../settings#environments) in new Marten projects is configured with the more verbose `Log::Severity::Debug` log level, as it provides valuable debugging information during development of the project.
-
 ### `middleware`
 
 Default: `[] of Marten::Middleware.class`

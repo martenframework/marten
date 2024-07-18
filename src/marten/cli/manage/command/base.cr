@@ -411,9 +411,45 @@ module Marten
             setup
 
             setup_shared_options
+            setup_banner
+            setup_unknown_args_handlers
+            setup_invalid_option_handler
 
+            parser.parse(options)
+
+            run
+          end
+
+          private def setup_banner : Nil
             parser.banner = banner
+          end
 
+          private def setup_invalid_option_handler : Nil
+            parser.invalid_option do |flag|
+              if invalid_option_proc.nil?
+                print_error_and_exit("Unrecognized option: #{flag}")
+              else
+                invalid_option_proc.not_nil!.call(flag)
+              end
+            end
+          end
+
+          private def setup_shared_options : Nil
+            parser.on("--error-trace", "Show full error trace (if a compilation is involved)") do
+              @show_error_trace = true
+            end
+
+            parser.on("--no-color", "Disable colored output") do
+              @color = false
+            end
+
+            parser.on("-h", "--help", "Show this help") do
+              show_usage
+              do_exit(0)
+            end
+          end
+
+          private def setup_unknown_args_handlers : Nil
             parser.unknown_args do |args, _args_after_two_dashes|
               args.each_with_index do |arg, i|
                 handler = argument_handlers[i]?
@@ -426,33 +462,6 @@ module Marten
                   handler.block.call(arg)
                 end
               end
-            end
-
-            parser.invalid_option do |flag|
-              if invalid_option_proc.nil?
-                print_error_and_exit("Unrecognized option: #{flag}")
-              else
-                invalid_option_proc.not_nil!.call(flag)
-              end
-            end
-
-            parser.parse(options)
-
-            run
-          end
-
-          private def setup_shared_options
-            parser.on("--error-trace", "Show full error trace (if a compilation is involved)") do
-              @show_error_trace = true
-            end
-
-            parser.on("--no-color", "Disable colored output") do
-              @color = false
-            end
-
-            parser.on("-h", "--help", "Show this help") do
-              show_usage
-              do_exit(0)
             end
           end
 

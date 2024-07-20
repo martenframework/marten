@@ -213,6 +213,21 @@ describe Marten::Template::Value do
       value["test_attr"].should eq Marten::Template::Value.from("hello")
     end
 
+    it "raises an unknown variable error if the attribute does not exist" do
+      value = Marten::Template::Value.from({"foo" => "bar", "test" => 42})
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["unknown"] }
+    end
+
+    it "raises an unknown variable error if the index does not exist for an array" do
+      value = Marten::Template::Value.from(["foo", "bar"])
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["4"] }
+    end
+
+    it "raises an unknown variable error if the index is not a number for an array" do
+      value = Marten::Template::Value.from(["foo", "bar"])
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["bad"] }
+    end
+
     it "raises an unknown variable error if the raw object does not allow attribute lookups" do
       value = Marten::Template::Value.from(42)
       expect_raises(Marten::Template::Errors::UnknownVariable) { value["unknown"] }

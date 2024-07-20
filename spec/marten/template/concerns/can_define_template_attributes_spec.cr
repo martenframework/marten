@@ -1,9 +1,9 @@
 require "./spec_helper"
 
-describe Marten::Template::Object do
+describe Marten::Template::CanDefineTemplateAttributes do
   describe "#template_attributes" do
     it "allows to generate a #resolve_template_attribute method returning method return values" do
-      test = Marten::Template::ObjectSpec::Test.new
+      test = Marten::Template::CanDefineTemplateAttributesSpec::Test.new
       test.resolve_template_attribute("foo").should eq "foo"
       test.resolve_template_attribute("bar").should eq "bar"
       test.resolve_template_attribute("xyz").should be_nil
@@ -11,9 +11,9 @@ describe Marten::Template::Object do
   end
 end
 
-module Marten::Template::ObjectSpec
+module Marten::Template::CanDefineTemplateAttributesSpec
   class Test
-    include Marten::Template::Object
+    include Marten::Template::CanDefineTemplateAttributes
 
     template_attributes :foo, "bar"
 

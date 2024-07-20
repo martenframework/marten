@@ -93,21 +93,28 @@ module Marten
       private def resolve_attribute(key)
         object = raw
 
+        attempt_attribute_resolution_after_failed_collection_lookup = false
+
         if object.responds_to?(:[]) && !object.is_a?(Array) && !object.is_a?(String) &&
            !object.is_a?(Marten::Template::Object)
           begin
             return object[key.to_s]
           rescue KeyError
+            attempt_attribute_resolution_after_failed_collection_lookup = true
           end
         elsif object.is_a?(Indexable) && !object.is_a?(Marten::Template::Object) && key.responds_to?(:to_i)
           begin
             return object[key.to_i]
           rescue ArgumentError | IndexError
+            attempt_attribute_resolution_after_failed_collection_lookup = true
           end
+        elsif object.responds_to?(:resolve_template_attribute)
+          return object.resolve_template_attribute(key.to_s)
         end
 
-        if object.responds_to?(:resolve_template_attribute)
-          return object.resolve_template_attribute(key.to_s)
+        if attempt_attribute_resolution_after_failed_collection_lookup
+          res = object.responds_to?(:resolve_template_attribute) ? object.resolve_template_attribute(key.to_s) : nil
+          return res if !res.nil?
         end
 
         raise Errors::UnknownVariable.new

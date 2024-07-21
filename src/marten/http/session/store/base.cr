@@ -9,10 +9,25 @@ module Marten
           @accessed : Bool = false
           @modified : Bool = false
           @session_hash : SessionHash? = nil
+          @expires : Int32? = nil
 
           getter session_key
 
           def initialize(@session_key : String?)
+          end
+
+          def expires=(value : Int32)
+            @expires = value
+            @modified = true
+          end
+
+          def expires
+            @expires ||= Marten.settings.sessions.cookie_max_age
+          end
+
+          def expires_at
+            return nil if expires == 0
+            Time.local + Time::Span.new(seconds: expires)
           end
 
           # Returns the value associated with the passed key or raises a `KeyError` exception if not found.

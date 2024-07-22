@@ -25,7 +25,10 @@ module Marten
 
           def save : Nil
             @modified = true
-            @session_key = encryptor.encrypt(session_hash.to_json)
+            @session_key = encryptor.encrypt(
+              value: session_hash.to_json,
+              expires: Time.local + Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age),
+            )
           end
 
           def clear_expired_entries : Nil

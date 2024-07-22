@@ -35,7 +35,7 @@ describe Marten::DB::Field::Slug do
       article.slug.not_nil!.starts_with?("my-first-article-").should be_true
     end
 
-    it "automatically generating a slug does not raise an error", tags: "What" do
+    it "automatically generating a slug does not raise an error" do
       article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article")
 
       article.save
@@ -43,7 +43,7 @@ describe Marten::DB::Field::Slug do
       article.errors.size.should eq(0)
     end
 
-    it "automatically generating a slug does not raise an error", tags: "What" do
+    it "automatically generating a slug with a blank slug value does not raise an error" do
       article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article", slug: "")
 
       article.save

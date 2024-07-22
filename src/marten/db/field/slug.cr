@@ -56,8 +56,7 @@ module Marten
 
           slug = value.gsub(NON_ALPHANUMERIC_RE, "").downcase
           slug = slug.gsub(WHITESPACE_HYPHEN_RE, "-").strip("-_")
-          slug = slug.unicode_normalize(:nfkc)
-          slug = ::String.new(slug.encode("ascii", :skip))
+          slug = slug.gsub(/[^\x00-\x7F]/, "")
 
           slug[...(max_size - suffix.size)] + suffix
         end

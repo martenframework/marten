@@ -1,4 +1,5 @@
 require "./spec_helper"
+require "./slug_spec/**"
 
 describe Marten::DB::Field::Slug do
   describe "#max_size" do
@@ -20,6 +21,95 @@ describe Marten::DB::Field::Slug do
       column.index?.should be_true
       column.max_size.should eq 50
       column.default.should be_nil
+    end
+  end
+
+  describe "slugify" do
+    with_installed_apps Marten::DB::Field::SlugSpec::App
+
+    it "automatically generates a slug from the title field and assigns it to the slug field if no slug is given" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article")
+
+      article.save
+
+      article.slug.not_nil!.starts_with?("my-first-article-").should be_true
+    end
+
+    it "automatically generating a slug does not raise an error", tags: "What" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article")
+
+      article.save
+
+      article.errors.size.should eq(0)
+    end
+
+    it "automatically generating a slug does not raise an error", tags: "What" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article", slug: "")
+
+      article.save
+
+      article.errors.size.should eq(0)
+    end
+
+    it "truncates the slug to fit the max size of 50 and appends a random suffix" do
+      article = Marten::DB::Field::SlugSpec::Article.new(
+        title: "My First Article: Exploring the Intricacies of Quantum Mechanics"
+      )
+
+      article.save
+
+      article.slug.not_nil!.includes?("quantum").should_not be_true
+      article.slug.not_nil!.size.should eq(50)
+    end
+
+    it "does not truncate the slug if max size is greater than the string length" do
+      article = Marten::DB::Field::SlugSpec::ArticleLongSlug.new(
+        title: "My First Article: Exploring the Intricacies of Quantum Mechanics"
+      )
+
+      article.save
+
+      article.slug.not_nil!.includes?("quantum").should be_true
+    end
+
+    it "removes non-ASCII characters and slugifies the title" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "Überraschungsmoment")
+
+      article.save
+
+      article.slug.not_nil!.starts_with?("berraschungsmoment").should be_true
+    end
+
+    it "removes emoji and special characters and slugifies the title" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "🚀 TRAVEL & PLACES")
+
+      article.save
+
+      article.slug.not_nil!.starts_with?("travel-places").should be_true
+    end
+
+    it "trims leading and trailing whitespace and slugifies the title" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "   Test   Article   ")
+
+      article.save
+
+      article.slug.not_nil!.starts_with?("test-article").should be_true
+    end
+
+    it "retains a custom slug if provided" do
+      article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article", slug: "custom-slug")
+
+      article.save
+
+      article.slug.not_nil!.should eq("custom-slug")
+    end
+
+    it "uses a custom slug generator function when provided" do
+      article = Marten::DB::Field::SlugSpec::ArticleWithCustomSlugGenerator.new(title: "My First Article")
+
+      article.save
+
+      article.slug.not_nil!.should eq("MY_FIRST_ARTICLE")
     end
   end
 

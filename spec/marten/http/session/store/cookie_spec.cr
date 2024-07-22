@@ -52,6 +52,28 @@ describe Marten::HTTP::Session::Store::Cookie do
       store = Marten::HTTP::Session::Store::Cookie.new("bad")
       store.load.should be_empty
     end
+
+    it "returns the expected hash if the session key is not expired yes" do
+      store = Marten::HTTP::Session::Store::Cookie.new(nil)
+      store["foo"] = "bar"
+      store.save
+
+      Timecop.freeze(Time.local + Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age - 10)) do
+        new_store = Marten::HTTP::Session::Store::Cookie.new(store.session_key.not_nil!)
+        new_store.load.should eq({"foo" => "bar"})
+      end
+    end
+
+    it "returns an empty session data hash if the session key cannot be decrypted because it is expired" do
+      store = Marten::HTTP::Session::Store::Cookie.new(nil)
+      store["foo"] = "bar"
+      store.save
+
+      Timecop.freeze(Time.local + Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age + 10)) do
+        new_store = Marten::HTTP::Session::Store::Cookie.new(store.session_key.not_nil!)
+        new_store.load.should be_empty
+      end
+    end
   end
 
   describe "#save" do

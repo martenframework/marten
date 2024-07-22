@@ -17,10 +17,12 @@ describe Marten::Schema do
       errors.should eq schema.errors
     end
 
-    it "returns nil if the passed attribute name is not found" do
+    it "raises as expected if the passed attribute name is not found" do
       schema = Marten::SchemaExtSpec::SimpleSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
 
-      schema.resolve_template_attribute("unknown").should be_nil
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        schema.resolve_template_attribute("unknown")
+      end
     end
   end
 end

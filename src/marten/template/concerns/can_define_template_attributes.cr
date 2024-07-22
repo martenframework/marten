@@ -12,6 +12,8 @@ module Marten
           when {% if name.is_a?(StringLiteral) %}{{ name }}{% else %}{{ name.id.stringify }}{% end %}
             {{ name.id }}
           {% end %}
+          else
+            raise Marten::Template::Errors::UnknownVariable.new
           end
         end
       end

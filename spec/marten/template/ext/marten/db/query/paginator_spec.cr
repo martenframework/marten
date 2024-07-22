@@ -15,5 +15,13 @@ describe Marten::DB::Query::Paginator do
 
       paginator.resolve_template_attribute("pages_count").should eq 3
     end
+
+    it "raises as expected if the specified attribute is not supported" do
+      paginator = Tag.all.order(:name).paginator(2)
+
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        paginator.resolve_template_attribute("unknown_attribute")
+      end
+    end
   end
 end

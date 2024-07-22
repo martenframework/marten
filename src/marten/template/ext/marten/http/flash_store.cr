@@ -9,7 +9,9 @@ class Marten::HTTP::FlashStore
     when "size"
       size
     else
-      self[key]?
+      self[key]
     end
+  rescue KeyError
+    raise Marten::Template::Errors::UnknownVariable.new
   end
 end

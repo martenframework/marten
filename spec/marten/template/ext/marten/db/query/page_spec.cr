@@ -145,5 +145,14 @@ describe Marten::DB::Query::Page do
       Marten::DB::Query::Page(Tag).new([tag], 2, paginator).resolve_template_attribute("size").should eq 1
       Marten::DB::Query::Page(Tag).new([] of Tag, 2, paginator).resolve_template_attribute("size").should eq 0
     end
+
+    it "raises as expected if the specified attribute is not supported" do
+      tag = Tag.create!(name: "a_tag", is_active: true)
+      paginator = Tag.all.order(:name).paginator(2)
+
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        Marten::DB::Query::Page(Tag).new([tag], 2, paginator).resolve_template_attribute("unknown")
+      end
+    end
   end
 end

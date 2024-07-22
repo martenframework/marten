@@ -14,6 +14,8 @@ class Marten::Schema::BoundField
       id
     when "value"
       value
+    else
+      raise Marten::Template::Errors::UnknownVariable.new
     end
   end
 end

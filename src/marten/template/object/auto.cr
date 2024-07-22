@@ -12,27 +12,39 @@ module Marten
         # :nodoc:
         def resolve_template_attribute(key : String)
           {% begin %}
-            value = case key
-            {% if !@type.abstract? && !@type.type_vars.any?(&.abstract?) %}
-              {% already_processed = [] of String %}
-              {% for type in [@type] + @type.ancestors %}
-                {% if type.name != "Object" && type.name != "Reference" %}
-                  {% for method in type.methods %}
-                    {% if !already_processed.includes?(method.name.id.stringify) %}
-                      {% if method.visibility == :public && !method.accepts_block? && method.args.empty? %}
-                        when {{ method.name.id.stringify }}
-                          self.{{ method.name.id }}
-                        {% already_processed << method.name.id.stringify %}
+            value = nil
+            looked_up_value = false
+
+            if responds_to?(:[])
+              begin
+                value = self[key]
+                looked_up_value = true
+              rescue KeyError
+                # Do nothing
+              end
+            end
+
+            if !looked_up_value
+              value = case key
+              {% if !@type.abstract? && !@type.type_vars.any?(&.abstract?) %}
+                {% already_processed = [] of String %}
+                {% for type in [@type] + @type.ancestors %}
+                  {% if type.name != "Object" && type.name != "Reference" %}
+                    {% for method in type.methods %}
+                      {% if !already_processed.includes?(method.name.id.stringify) %}
+                        {% if method.visibility == :public && !method.accepts_block? && method.args.empty? %}
+                          when {{ method.name.id.stringify }}
+                            self.{{ method.name.id }}
+                          {% already_processed << method.name.id.stringify %}
+                        {% end %}
                       {% end %}
                     {% end %}
                   {% end %}
                 {% end %}
               {% end %}
-            {% end %}
-            end
-
-            if value.nil? && responds_to?(:[]?)
-              value = self[key]?
+                        else
+                          raise Marten::Template::Errors::UnknownVariable.new
+              end
             end
 
             value

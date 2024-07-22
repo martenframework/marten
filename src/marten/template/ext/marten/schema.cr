@@ -7,7 +7,9 @@ abstract class Marten::Schema
     when "errors"
       errors
     else
-      self[key]?
+      self[key]
     end
+  rescue Marten::Schema::Errors::UnknownField
+    raise Marten::Template::Errors::UnknownVariable.new
   end
 end

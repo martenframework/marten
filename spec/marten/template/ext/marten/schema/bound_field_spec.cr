@@ -48,11 +48,13 @@ describe Marten::Schema::BoundField do
       bound_field_2.resolve_template_attribute("value").should be_nil
     end
 
-    it "returns nil if the passed attribute name is not found" do
+    it "raises as expected if the passed attribute is not supported" do
       schema = Marten::Schema::BoundFieldExtSpec::TestSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
       bound_field = Marten::Schema::BoundField.new(schema, schema.class.get_field("foo"))
 
-      bound_field.resolve_template_attribute("unknown").should be_nil
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        bound_field.resolve_template_attribute("unknown")
+      end
     end
   end
 end

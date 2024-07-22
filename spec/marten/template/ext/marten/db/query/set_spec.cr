@@ -145,5 +145,11 @@ describe Marten::DB::Query::Set do
 
       Tag.all.resolve_template_attribute("size").should eq 2
     end
+
+    it "raises as expected if the specified attribute is not supported" do
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        Tag.all.resolve_template_attribute("unknown")
+      end
+    end
   end
 end

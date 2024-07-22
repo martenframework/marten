@@ -39,5 +39,14 @@ describe Marten::DB::Field::File::File do
 
       file.resolve_template_attribute("url").should eq field.storage.url("css/app.css")
     end
+
+    it "raises as expected if the specified attribute is not supported" do
+      field = Marten::DB::Field::File.new("my_field")
+      file = Marten::DB::Field::File::File.new(field, "path/to/file.txt")
+
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        file.resolve_template_attribute("unknown_attribute")
+      end
+    end
   end
 end

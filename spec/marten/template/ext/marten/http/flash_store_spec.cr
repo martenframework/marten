@@ -27,10 +27,12 @@ describe Marten::HTTP::FlashStore do
       flash_store.resolve_template_attribute("alert").should eq "bad"
     end
 
-    it "returns nil if the flash message is not found" do
+    it "raises as expected if the specified attribute is not supported" do
       flash_store = Marten::HTTP::FlashStore.new(flashes: {"foo" => "bar", "alert" => "bad"}, discard: [] of String)
 
-      flash_store.resolve_template_attribute("unknown").should be_nil
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        flash_store.resolve_template_attribute("unknown")
+      end
     end
   end
 end

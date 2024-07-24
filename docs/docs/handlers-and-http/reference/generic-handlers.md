@@ -14,10 +14,10 @@ Handler allowing to create a new model record by processing a schema.
 This handler can be used to process a form, validate its data through the use of a [schema](../../schemas.mdx), and create a record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context in order to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the corresponding model record is created and the handler returns an HTTP redirect to a configured success URL.
 
 ```crystal
-class MyFormHandler < Marten::Handlers::RecordCreate
-  model MyModel
-  schema MyFormSchema
-  template_name "my_form.html"
+class ArticleCreateHandler < Marten::Handlers::RecordCreate
+  model Article
+  schema ArticleCreateSchema
+  template_name "articles/create.html"
   success_route_name "my_form_success"
 end
 ```
@@ -32,7 +32,7 @@ For example, if your application logic requires a success route that includes an
 
 ```crystal
 def success_url
-  reverse("article", pk: record.pk!) # record is an instance of the model you defined for your handler
+  reverse("articles:detail", pk: record.pk!) # record is an instance of the model you defined for your handler
 end
 ```
 
@@ -50,8 +50,8 @@ This handler can be used to delete an existing model record by issuing a POST re
 
 ```crystal
 class ArticleDeleteHandler < Marten::Handlers::RecordDelete
-  model MyModel
-  template_name "article_delete.html"
+  model Article
+  template_name "articles/delete.html"
   success_route_name "article_delete_success"
 end
 ```
@@ -65,8 +65,8 @@ By default, handlers that inherit from [`Marten::Handlers::RecordDelete`](pathna
 
 ```crystal
 class ArticleDeleteHandler < Marten::Handlers::RecordDelete
-  queryset MyModel.filter(user: request.user)
-  template_name "article_delete.html"
+  queryset Article.filter(user: request.user)
+  template_name "articles/delete.html"
   success_route_name "article_delete_success"
 end
 ```
@@ -75,8 +75,8 @@ Alternatively, it is also possible to override the [`#queryset`](pathname:///api
 
 ```crystal
 class ArticleDeleteHandler < Marten::Handlers::RecordDelete
-  model MyModel
-  template_name "article_delete.html"
+  model Article
+  template_name "articles/delete.html"
   success_route_name "article_delete_success"
 
   def queryset
@@ -138,9 +138,9 @@ Handler allowing to list model records.
 This base handler can be used to easily expose a list of model records:
 
 ```crystal
-class MyHandler < Marten::Handlers::RecordList
-  template_name "my_template"
-  model Post
+class ArticleListHandler < Marten::Handlers::RecordList
+  model Article
+  template_name "articles/index.html"
 end
 ```
 
@@ -151,9 +151,9 @@ The [`#template_name`](pathname:///api/dev/Marten/Handlers/Rendering/ClassMethod
 Optionally, it is possible to configure that records should be [paginated](../../models-and-databases/reference/query-set.md#paginator) by specifying a page size through the use of the [`page_size`](pathname:///api/dev/Marten/Handlers/RecordListing/ClassMethods.html#page_size(page_size%3AInt32%3F)-instance-method) class method:
 
 ```crystal
-class MyHandler < Marten::Handlers::RecordList
-  template_name "my_template"
-  model Post
+class ArticleListHandler < Marten::Handlers::RecordList
+  model Article
+  template_name "articles/index.html"
   page_size 12
 end
 ```
@@ -164,18 +164,18 @@ When records are paginated, a [`Marten::DB::Query::Page`](pathname:///api/dev/Ma
 By default, handlers that inherit from [`Marten::Handlers::RecordList`](pathname:///api/dev/Marten/Handlers/RecordList.html) will use a query set targetting _all_ the records of the specified model. It should be noted that you can customize this behavior easily by leveraging the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordListing.html#queryset(queryset)-macro) macro instead of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordListing.html#model(model_klass)-macro) macro. For example:
 
 ```crystal
-class MyHandler < Marten::Handlers::RecordList
-  template_name "my_template"
+class ArticleListHandler < Marten::Handlers::RecordList
   queryset Article.filter(user: request.user)
+  template_name "articles/index.html"
 end
 ```
 
 Alternatively, it is also possible to override the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordListing.html#queryset-instance-method) method and apply additional filters to the default query set:
 
 ```crystal
-class MyHandler < Marten::Handlers::RecordList
-  template_name "my_template"
+class ArticleListHandler < Marten::Handlers::RecordList
   model Article
+  template_name "articles/index.html"
 
   def queryset
     super.filter(user: request.user)
@@ -193,10 +193,10 @@ Handler allowing to update a model record by processing a schema.
 This handler can be used to process a form, validate its data through the use of a [schema](../../schemas.mdx), and update an existing record by using the validated data. It is expected that the handler will be accessed through a GET request first: when this happens the configured template is rendered and displayed, and the configured schema which is initialized can be accessed from the template context to render a form for example. When the form is submitted via a POST request, the configured schema is validated using the form data. If the data is valid, the model record that was retrieved is updated and the handler returns an HTTP redirect to a configured success URL.
 
 ```crystal
-class MyUpdateHandler < Marten::Handlers::RecordUpdate
-  model MyModel
-  schema MyUpdateSchema
-  template_name "my_form.html"
+class ArticleUpdateHandler < Marten::Handlers::RecordUpdate
+  model Article
+  schema ArticleUpdateSchema
+  template_name "articles/update.html"
   success_route_name "my_form_success"
 end
 ```
@@ -217,10 +217,10 @@ Handlers making use of the [`Marten::Handlers::RecordUpdate`](pathname:///api/de
 By default, handlers that inherit from [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html) will use a query set targetting _all_ the records in order to retrieve the record that should be updated. It should be noted that you can customize this behavior easily by leveraging the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset(queryset)-macro) macro instead of the [`#model`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#model(model_klass)-macro) macro. For example:
 
 ```crystal
-class MyUpdateHandler < Marten::Handlers::RecordUpdate
-  queryset MyModel.filter(user: request.user)
-  schema MyUpdateSchema
-  template_name "my_form.html"
+class ArticleUpdateHandler < Marten::Handlers::RecordUpdate
+  queryset Article.filter(user: request.user)
+  schema ArticleUpdateSchema
+  template_name "articles/update.html"
   success_route_name "my_form_success"
 end
 ```
@@ -228,10 +228,10 @@ end
 Alternatively, it is also possible to override the [`#queryset`](pathname:///api/dev/Marten/Handlers/RecordRetrieving.html#queryset-instance-method) method and apply additional filters to the default query set:
 
 ```crystal
-class MyUpdateHandler < Marten::Handlers::RecordUpdate
-  model MyModel
-  schema MyUpdateSchema
-  template_name "my_form.html"
+class ArticleUpdateHandler < Marten::Handlers::RecordUpdate
+  model Article
+  schema ArticleUpdateSchema
+  template_name "articles/update.html"
   success_route_name "my_form_success"
 
   def queryset

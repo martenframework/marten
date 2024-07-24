@@ -306,7 +306,7 @@ If you need to, it is possible to customize the context that is used to render t
 class HomeHandler < Marten::Handlers::Template
   template_name "app/home.html"
 
-  before_render add_recent_articles_to_context
+  before_render :add_recent_articles_to_context
 
   private def add_recent_articles_to_context : Nil
     context[:recent_articles] = Article.all.order("-published_at")[:5]

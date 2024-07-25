@@ -38,6 +38,11 @@ module Marten
             @expires_in ||= Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
           end
 
+          def expires_at=(value : Time)
+            @modified = true
+            @expires_in = value - Time.local
+          end
+
           def expires_at
             return nil if expires_at_browser_close
             Time.local + expires_in

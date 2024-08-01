@@ -53,6 +53,7 @@ Available commands:
   › listmigrations   List all database migrations.
   › migrate          Run database migrations.
   › new              Initialize a new Marten project or application repository.
+  › play             Start a Crystal playground server initialized for the current project.
   › resetmigrations  Reset an existing set of migrations into a single one.
   › routes           Display all the routes of the application.
   › serve / s        Start a development server that is automatically recompiled when source files change.

@@ -139,6 +139,7 @@ describe Marten::CLI::Manage::Command::Gen do
 
         Options:
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
 
@@ -174,6 +175,7 @@ describe Marten::CLI::Manage::Command::Gen do
             --parent=PARENT                  Parent class name for the generated model
             --no-timestamps                  Do not include timestamp fields in the generated model
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -199,6 +201,7 @@ describe Marten::CLI::Manage::Command::Gen do
             --parent=PARENT                  Parent class name for the generated model
             --no-timestamps                  Do not include timestamp fields in the generated model
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
 

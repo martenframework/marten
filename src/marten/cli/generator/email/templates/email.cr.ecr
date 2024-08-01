@@ -12,7 +12,7 @@ class <%= context.class_name %> < <% if !context.parent.nil? %><%= context.paren
   to @recipient
   subject "Example email"
   template_name "<%= context.html_template_filepath %>", content_type: :html
-  template_name "<%= context.html_template_filepath %>", content_type: :text
+  template_name "<%= context.text_template_filepath %>", content_type: :text
 
   def initialize(@recipient : String)
   end

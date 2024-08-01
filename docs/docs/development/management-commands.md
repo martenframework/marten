@@ -69,6 +69,7 @@ All the available commands are listed per application: by default, only `marten`
 Each command can accept its own set of arguments and options, but it should be noted that all the available commands always accept the following options:
 
 * `--error-trace` - Allows showing the full error trace (if a compilation is involved)
+* `--log-level=level` - Set the log level (default to "info")
 * `--no-color` - Disables colored outputs
 * `-h, --help` - Displays help information about the considered command
 

@@ -66,6 +66,10 @@ Default: `Log::Severity::Info`
 
 The default log level used by the application. Any severity defined in the [`Log::Severity`](https://crystal-lang.org/api/Log/Severity.html) enum can be used.
 
+:::info
+This setting exclusively controls the log level for the Marten server. To set the log level for [management commands](../management-commands.md), use the `--log-level` command option (see [Shared options](../management-commands.md#shared-options)).
+:::
+
 ### `middleware`
 
 Default: `[] of Marten::Middleware.class`

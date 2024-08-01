@@ -69,6 +69,7 @@ module Marten
           @argument_handlers = [] of ArgumentHandler
           @color = true
           @invalid_option_proc : Proc(String, Nil)?
+          @log_level : String? = nil
           @parser : OptionParser?
           @show_error_trace = false
           @unknown_args_proc : Proc(String, Nil)?
@@ -324,12 +325,22 @@ module Marten
           private getter argument_handlers
           private getter color
           private getter invalid_option_proc
+          private getter log_level
           private getter options
           private getter unknown_args_description
           private getter unknown_args_name
           private getter unknown_args_proc
 
           private getter? exit_raises
+
+          private def apply_log_level : Nil
+            ::Log.setup(
+              log_level ? ::Log::Severity.parse(log_level.to_s) : ::Log::Severity::Info,
+              Marten.settings.log_backend
+            )
+          rescue ArgumentError
+            print_error_and_exit("Invalid log level '#{log_level}'")
+          end
 
           private def banner
             banner_parts = [] of String
@@ -417,6 +428,8 @@ module Marten
 
             parser.parse(options)
 
+            apply_log_level
+
             run
           end
 
@@ -437,6 +450,10 @@ module Marten
           private def setup_shared_options : Nil
             parser.on("--error-trace", "Show full error trace (if a compilation is involved)") do
               @show_error_trace = true
+            end
+
+            parser.on("--log-level=level", "Set the log level (default to \"info\")") do |level|
+              @log_level = level
             end
 
             parser.on("--no-color", "Disable colored output") do

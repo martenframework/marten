@@ -271,11 +271,15 @@ module Marten
     end
   end
 
-  private def self.override_server_host(host : String)
+  private def self.override_log_level(log_level : String) : Nil
+    Marten.settings.log_level = ::Log::Severity.parse(log_level)
+  end
+
+  private def self.override_server_host(host : String) : Nil
     Marten.settings.host = host
   end
 
-  private def self.override_server_port(port : Int32)
+  private def self.override_server_port(port : Int32) : Nil
     Marten.settings.port = port.to_i
   end
 
@@ -290,6 +294,9 @@ module Marten
       opts.on("-h", "--help", "Shows this help") do
         puts opts
         exit 0
+      end
+      opts.on("--log-level PORT", "Custom log level to use") do |log_level|
+        override_log_level(log_level)
       end
     end
   end

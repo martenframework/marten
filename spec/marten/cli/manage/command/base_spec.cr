@@ -50,6 +50,14 @@ describe Marten::CLI::Manage::Command::Base do
   end
 
   describe "#handle" do
+    around_each do |t|
+      current_log_level = Marten::Log.level
+
+      t.run
+    ensure
+      ::Log.setup(current_log_level.not_nil!, Marten.settings.log_backend)
+    end
+
     it "setups the commands and runs it" do
       command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(options: ["value"])
       command.handle
@@ -71,6 +79,45 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle.should eq 1
 
       stderr.rewind.gets_to_end.includes?("This is bad").should be_true
+    end
+
+    it "defaults to using the info log level" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(
+        options: ["value"],
+        stdout: stdout
+      )
+      command.handle
+
+      stdout.rewind.gets_to_end.includes?("Generating debug log").should be_false
+    end
+
+    it "properly applies the specified log level" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(
+        options: ["value", "--log-level=debug"],
+        stdout: stdout
+      )
+      command.handle
+
+      stdout.rewind.gets_to_end.includes?("Generating debug log").should be_true
+    end
+
+    it "generates an error trace in case the specified log level does not exist" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::BaseSpec::TestCommand.new(
+        options: ["value", "--log-level=bad"],
+        stdout: stdout,
+        stderr: stderr,
+        exit_raises: true
+      )
+      command.handle
+
+      stderr.rewind.gets_to_end.includes?("Invalid log level 'bad'").should be_true
     end
   end
 
@@ -318,6 +365,7 @@ describe Marten::CLI::Manage::Command::Base do
 
         Options:
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -344,6 +392,7 @@ describe Marten::CLI::Manage::Command::Base do
 
         Options:
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -372,6 +421,7 @@ describe Marten::CLI::Manage::Command::Base do
 
         Options:
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -402,6 +452,7 @@ describe Marten::CLI::Manage::Command::Base do
         Options:
             --option                         This is an option
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -432,6 +483,7 @@ describe Marten::CLI::Manage::Command::Base do
         Options:
             -o, --option                     This is an option
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -461,6 +513,7 @@ describe Marten::CLI::Manage::Command::Base do
 
         Options:
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -491,6 +544,7 @@ describe Marten::CLI::Manage::Command::Base do
 
         Options:
             --error-trace                    Show full error trace (if a compilation is involved)
+            --log-level=level                Set the log level (default to "info")
             --no-color                       Disable colored output
             -h, --help                       Show this help
         USAGE
@@ -544,6 +598,9 @@ module Marten::CLI::Manage::Command::BaseSpec
 
     def run
       @arg = "Run with arg: #{@arg}"
+      Log.debug do
+        print("Generating debug log")
+      end
     end
   end
 

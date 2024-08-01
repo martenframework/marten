@@ -22,6 +22,9 @@ require "./test_project"
 # Empty media directory after specs execution.
 Spec.after_suite { Dir["spec/media/*"].each { |d| FileUtils.rm_rf(d) } }
 
+# Disable crystal-db logs.
+::DB::Log.level = Log::Severity::None
+
 def for_mysql(&)
   for_db_backends(:mysql, :mariadb) do
     yield

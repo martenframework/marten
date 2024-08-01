@@ -139,6 +139,7 @@ module Marten
             args = [
               host ? "-b #{host}" : nil,
               port ? "-p #{port}" : nil,
+              log_level ? "--log-level=#{log_level}" : nil,
             ].compact
 
             self.server_process = Process.new(

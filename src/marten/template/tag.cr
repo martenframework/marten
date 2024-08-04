@@ -38,6 +38,7 @@ module Marten
       register "include", Include
       register "local_time", LocalTime
       register "method_input", MethodInput
+      register "reverse", Url
       register "spaceless", Spaceless
       register "super", Super
       register "translate", Translate

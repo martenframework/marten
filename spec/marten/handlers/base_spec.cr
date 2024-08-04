@@ -710,28 +710,6 @@ describe Marten::Handlers::Base do
     end
   end
 
-  describe "#reverse" do
-    it "provides a shortcut allowing to perform route lookups" do
-      request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(
-          method: "GET",
-          resource: "",
-          headers: HTTP::Headers{"Host" => "example.com"}
-        )
-      )
-
-      handler_1 = Marten::Handlers::BaseSpec::Test5Handler.new(request)
-      response_1 = handler_1.dispatch
-      response_1.status.should eq 200
-      response_1.content.should eq Marten.routes.reverse("dummy_with_id", id: 42)
-
-      handler_2 = Marten::Handlers::BaseSpec::Test5Handler.new(request)
-      response_2 = handler_2.dispatch
-      response_2.status.should eq 200
-      response_2.content.should eq Marten.routes.reverse("dummy_with_id", {"id" => 42})
-    end
-  end
-
   describe "#render" do
     it "returns an HTTP response containing the template rendered using a specific context" do
       request = Marten::HTTP::Request.new(
@@ -1054,6 +1032,43 @@ describe Marten::Handlers::Base do
       response.streamed_content.to_a.should eq ["foo", "bar"]
       response.content_type.should eq "text/html"
       response.status.should eq 400
+    end
+  end
+
+  describe "#reverse" do
+    it "provides a shortcut allowing to perform route lookups" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler_1 = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response_1 = handler_1.dispatch
+      response_1.status.should eq 200
+      response_1.content.should eq Marten.routes.reverse("dummy_with_id", id: 42)
+
+      handler_2 = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response_2 = handler_2.dispatch
+      response_2.status.should eq 200
+      response_2.content.should eq Marten.routes.reverse("dummy_with_id", {"id" => 42})
+    end
+  end
+
+  describe "#url" do
+    it "acts as an alias for `#reverse`" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      handler.url("dummy_with_id", id: 42).should eq Marten.routes.reverse("dummy_with_id", id: 42)
     end
   end
 end

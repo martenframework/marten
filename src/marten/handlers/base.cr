@@ -253,7 +253,16 @@ module Marten
         response.not_nil!
       end
 
-      # Convenient helper method to resolve a route name.
+      # Alias for the `#reverse` method.
+      def url(name : String | Symbol, **kwargs) : String
+        reverse(name, **kwargs)
+      end
+
+      # Reverses a URL - returns the URL corresponding to a specific route name and parameters.
+      #
+      # This method is a delegate to the `Marten::Routing::Map#reverse` method. It allows to reverse a URL from a route
+      # name and a set of parameters. If no route is found or if the arguments can't be applied to the route, a
+      # `Marten::Routing::Errors::NoReverseMatch` exception is raised.
       delegate reverse, to: Marten.routes
 
       private def call_http_method

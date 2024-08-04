@@ -315,6 +315,10 @@ For example:
 -->
 ```
 
+## `reverse`
+
+Alias for [`url`](#url).
+
 ## `spaceless`
 
 The `spaceless` template tag allows to remove whitespaces, tabs, and new lines between HTML tags. Whitespaces inside tags are left untouched. It should be noted that the `spaceless` template tag requires a closing `endspaceless` tag.

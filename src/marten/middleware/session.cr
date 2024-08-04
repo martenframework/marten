@@ -46,7 +46,7 @@ module Marten
         response.cookies.set(
           Marten.settings.sessions.cookie_name,
           request.session.session_key.not_nil!,
-          expires: Time.local + Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age),
+          expires: request.session.expires_at,
           domain: Marten.settings.sessions.cookie_domain,
           secure: Marten.settings.sessions.cookie_secure,
           http_only: Marten.settings.sessions.cookie_http_only,

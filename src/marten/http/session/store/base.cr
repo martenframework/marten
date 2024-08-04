@@ -9,10 +9,43 @@ module Marten
           @accessed : Bool = false
           @modified : Bool = false
           @session_hash : SessionHash? = nil
+          @expires_in : Time::Span? = nil
+          @expires_at_browser_close : Bool = false
 
           getter session_key
 
+          getter expires_at_browser_close
+
           def initialize(@session_key : String?)
+          end
+
+          def expires_at_browser_close=(value : Bool)
+            @modified = true
+            @expires_at_browser_close = value
+          end
+
+          def expires_in=(value : Time::Span)
+            @modified = true
+            @expires_in = value
+          end
+
+          def expires_in=(value : Int64)
+            @modified = true
+            @expires_in = Time::Span.new(seconds: value)
+          end
+
+          def expires_in
+            @expires_in ||= Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
+          end
+
+          def expires_at=(value : Time)
+            @modified = true
+            @expires_in = value - Time.local
+          end
+
+          def expires_at
+            return nil if expires_at_browser_close
+            Time.local + expires_in
           end
 
           # Returns the value associated with the passed key or raises a `KeyError` exception if not found.

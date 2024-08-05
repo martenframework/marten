@@ -74,7 +74,7 @@ end
 By default, most session stores will expire session entries based on the value of the [`sessions.cookie_max_age`](../development/reference/settings.md#cookie_max_age-1) setting. That being said, it is possible to customize when a specific session is set to expire by using one of the following methods:
 
 * [`#expires_at=`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_at%3D(value%3ATime)-instance-method) allows to set the time when the session should expire by specifying a [`Time`](https://crystal-lang.org/api/Time.html) object or an integer (number of seconds).
-* [`#expires_at_browser_close`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_at_browser_close%3D(value%3ABool)-instance-method) allows to set whether the session should expire when the browser is closed.
+* [`#expires_at_browser_close=`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_at_browser_close%3D(value%3ABool)-instance-method) allows to set whether the session should expire when the browser is closed.
 * [`#expires_in=`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_in%3D(value%3ATime%3A%3ASpan)-instance-method) allows to set the session's expiration duration with [`Time::Span`](https://crystal-lang.org/api/Time/Span.html) object.
 
 For example:

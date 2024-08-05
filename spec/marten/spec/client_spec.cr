@@ -369,23 +369,6 @@ describe Marten::Spec::Client do
       client.cookies[Marten.settings.sessions.cookie_name].should eq client.session.session_key
     end
 
-    it "properly set time of the session expire" do
-      client = Marten::Spec::Client.new
-
-      client.session.expires_in = 2.days
-      client.session.expires_in.should eq 2.days
-      (2.days.from_now - client.session.expires_at.not_nil!).should be <= 1.seconds
-      client.session.expires_at = 3.days.from_now
-      (3.days.from_now - client.session.expires_at.not_nil!).should be <= 1.seconds
-    end
-
-    it "returns the default expiration time for the session" do
-      client = Marten::Spec::Client.new
-
-      default_expires_in = Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
-      client.session.expires_in.should eq default_expires_in
-    end
-
     it "returns nil if session expires when closing the browser" do
       client = Marten::Spec::Client.new
 

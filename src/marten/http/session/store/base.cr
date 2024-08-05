@@ -7,45 +7,16 @@ module Marten
           alias SessionHash = Hash(String, String)
 
           @accessed : Bool = false
+          @expires_at_browser_close : Bool = false
+          @expires_in : Time::Span? = nil
           @modified : Bool = false
           @session_hash : SessionHash? = nil
-          @expires_in : Time::Span? = nil
-          @expires_at_browser_close : Bool = false
 
           getter session_key
 
-          getter expires_at_browser_close
+          getter? expires_at_browser_close
 
           def initialize(@session_key : String?)
-          end
-
-          def expires_at_browser_close=(value : Bool)
-            @modified = true
-            @expires_at_browser_close = value
-          end
-
-          def expires_in=(value : Time::Span)
-            @modified = true
-            @expires_in = value
-          end
-
-          def expires_in=(value : Int64)
-            @modified = true
-            @expires_in = Time::Span.new(seconds: value)
-          end
-
-          def expires_in
-            @expires_in ||= Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
-          end
-
-          def expires_at=(value : Time)
-            @modified = true
-            @expires_in = value - Time.local
-          end
-
-          def expires_at
-            return nil if expires_at_browser_close
-            Time.local + expires_in
           end
 
           # Returns the value associated with the passed key or raises a `KeyError` exception if not found.
@@ -90,6 +61,47 @@ module Marten
           # Returns `true` if the session store is empty.
           def empty? : Bool
             session_key.nil? && session_hash.empty?
+          end
+
+          # Allows to set whether the session should expire when the browser is closed.
+          def expires_at_browser_close=(value : Bool)
+            @modified = true
+            @expires_at_browser_close = value
+          end
+
+          # Returns the time when the session will expire.
+          #
+          # This method will return `nil` if the session is set to expire when the browser is closed.
+          def expires_at
+            return nil if expires_at_browser_close?
+
+            Time.local + expires_in
+          end
+
+          # Allows to set the date time when the session will expire.
+          def expires_at=(value : Time)
+            @modified = true
+            @expires_in = value - Time.local
+          end
+
+          # Returns the session expiration time.
+          #
+          # Unless explicitly set, the default value returned is the one defined by the `sessions.cookie_max_age`
+          # setting.
+          def expires_in
+            @expires_in ||= Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
+          end
+
+          # Allows to set the session expiration time.
+          def expires_in=(value : Time::Span)
+            @modified = true
+            @expires_in = value
+          end
+
+          # Allows to set the session expiration time in seconds.
+          def expires_in=(value : Int64)
+            @modified = true
+            @expires_in = Time::Span.new(seconds: value)
           end
 
           # Returns the value associated with the passed `key`, or the passed `default` if the key is not found.

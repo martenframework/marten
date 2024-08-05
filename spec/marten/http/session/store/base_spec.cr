@@ -152,6 +152,179 @@ describe Marten::HTTP::Session::Store::Base do
     end
   end
 
+  describe "#expires_at_browser_close?" do
+    it "returns false by default" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close?.should be_false
+    end
+
+    it "returns false if the session does not expire at browser close" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close = false
+
+      store.expires_at_browser_close?.should be_false
+    end
+
+    it "returns true if the session expires at browser close" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close = true
+
+      store.expires_at_browser_close?.should be_true
+    end
+  end
+
+  describe "#expires_at_browser_close=" do
+    it "allows to set that the session expires at browser close" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close = true
+
+      store.expires_at_browser_close?.should be_true
+    end
+
+    it "allows to set that the session does not expire at browser close" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close = false
+
+      store.expires_at_browser_close?.should be_false
+    end
+
+    it "marks the store as modified" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close = true
+
+      store.modified?.should be_true
+    end
+  end
+
+  describe "#expires_at" do
+    it "returns the current time plus the sessions cookie max age by default" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      current_time = Time.local
+
+      Timecop.freeze(current_time) do
+        store.expires_at.should eq current_time + Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
+      end
+    end
+
+    it "returns the current time plus the explicitly set expiration time if applicable" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in = Time::Span.new(hours: 10)
+
+      current_time = Time.local
+
+      Timecop.freeze(current_time) do
+        store.expires_at.should eq current_time + Time::Span.new(hours: 10)
+      end
+    end
+
+    it "returns the explicitly defined expiration date time if applicable" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      current_time = Time.local
+
+      Timecop.freeze(current_time) do
+        store.expires_at = current_time + Time::Span.new(hours: 10)
+
+        store.expires_at.should eq current_time + Time::Span.new(hours: 10)
+      end
+    end
+
+    it "returns nil if the session expires at browser close" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_at_browser_close = true
+
+      store.expires_at.should be_nil
+    end
+  end
+
+  describe "#expires_at=" do
+    it "allows to set a specific expiration date time" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      current_time = Time.local
+
+      Timecop.freeze(current_time) do
+        store.expires_at = current_time + Time::Span.new(hours: 10)
+
+        store.expires_at.should eq current_time + Time::Span.new(hours: 10)
+      end
+    end
+
+    it "marks the store as modified" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      current_time = Time.local
+
+      Timecop.freeze(current_time) do
+        store.expires_at = current_time + Time::Span.new(hours: 10)
+
+        store.expires_at.should eq current_time + Time::Span.new(hours: 10)
+        store.modified?.should be_true
+      end
+    end
+  end
+
+  describe "#expires_in" do
+    it "returns the sessions cookie max age by default" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in.should eq Time::Span.new(seconds: Marten.settings.sessions.cookie_max_age)
+    end
+
+    it "returns the explicitly set expiration time" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in = Time::Span.new(hours: 10)
+
+      store.expires_in.should eq Time::Span.new(hours: 10)
+    end
+  end
+
+  describe "#expires_in=" do
+    it "allows to set a specific expiration time" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in = Time::Span.new(hours: 10)
+
+      store.expires_in.should eq Time::Span.new(hours: 10)
+    end
+
+    it "allows to set a specific expiration time in seconds" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in = 3600
+
+      store.expires_in.should eq Time::Span.new(seconds: 3600)
+    end
+
+    it "marks the store as modified when setting a specific expiration time" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in = Time::Span.new(hours: 10)
+
+      store.expires_in.should eq Time::Span.new(hours: 10)
+      store.modified?.should be_true
+    end
+
+    it "marks the store as modified when setting a specific expiration time in seconds" do
+      store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")
+
+      store.expires_in = 3600
+
+      store.expires_in.should eq Time::Span.new(seconds: 3600)
+      store.modified?.should be_true
+    end
+  end
+
   describe "#fetch" do
     it "allows to retrieve a specific value using its key" do
       store = Marten::HTTP::Session::Store::BaseSpec::Test.new("sessionkey")

@@ -35,6 +35,8 @@ Other session stores can be installed as separate shards. For example, the [`mar
 
 ## Using sessions
 
+### Setting and retrieving session values
+
 When the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) middleware is used, each HTTP request object will have a [`#session`](pathname:///api/dev//Marten/HTTP/Request.html#session-instance-method) method returning the session store for the current request. The session store is an instance of [`Marten::HTTP::Session::Store::Base`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html) and provides a hash-like interface:
 
 ```crystal
@@ -54,6 +56,7 @@ request.session.empty?
 
 Both symbol and string keys can be used when trying to interact with the session store, but only **string values** can be stored.
 
+:::tip
 If you are trying to access the session store from within a handler, it should be noted that you can leverage the `#session` method instead of using the request object:
 
 ```crystal
@@ -63,4 +66,28 @@ class MyHandler < Marten::Handler
     respond "Hello World!"
   end
 end
+```
+:::
+
+### Customizing session expiry times
+
+By default, most session stores will expire session entries based on the value of the [`sessions.cookie_max_age`](../development/reference/settings.md#cookie_max_age-1) setting. That being said, it is possible to customize when a specific session is set to expire by using one of the following methods:
+
+* [`#expires_at=`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_at%3D(value%3ATime)-instance-method) allows to set the time when the session should expire by specifying a [`Time`](https://crystal-lang.org/api/Time.html) object or an integer (number of seconds).
+* [`#expires_at_browser_close`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_at_browser_close%3D(value%3ABool)-instance-method) allows to set whether the session should expire when the browser is closed.
+* [`#expires_in=`](pathname:///api/dev/Marten/HTTP/Session/Store/Base.html#expires_in%3D(value%3ATime%3A%3ASpan)-instance-method) allows to set the session's expiration duration with [`Time::Span`](https://crystal-lang.org/api/Time/Span.html) object.
+
+For example:
+
+```crystal
+request.session[:foo] = "bar"
+
+# Set the session to expire on a specific date time:
+request.session.expires_at = 2.days.from_now
+
+# Set the session to expire in a specific duration:
+request.session.expires_in = 2.hours
+
+# Set the session to expire when the browser is closed:
+request.session.expires_at_browser_close = true
 ```

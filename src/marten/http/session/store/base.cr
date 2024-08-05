@@ -63,12 +63,6 @@ module Marten
             session_key.nil? && session_hash.empty?
           end
 
-          # Allows to set whether the session should expire when the browser is closed.
-          def expires_at_browser_close=(value : Bool)
-            @modified = true
-            @expires_at_browser_close = value
-          end
-
           # Returns the time when the session will expire.
           #
           # This method will return `nil` if the session is set to expire when the browser is closed.
@@ -82,6 +76,12 @@ module Marten
           def expires_at=(value : Time)
             @modified = true
             @expires_in = value - Time.local
+          end
+
+          # Allows to set whether the session should expire when the browser is closed.
+          def expires_at_browser_close=(value : Bool)
+            @modified = true
+            @expires_at_browser_close = value
           end
 
           # Returns the session expiration time.

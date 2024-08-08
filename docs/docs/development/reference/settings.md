@@ -98,6 +98,25 @@ Default: `true`
 
 A boolean indicating whether multiple processes can bind to the same HTTP server port.
 
+### `referrer_policy`
+
+Default: `"strict-origin-when-cross-origin"`
+
+The value to use for the Referrer-Policy header when the associated middleware is used. This header controls the amount of referrer information sent along with requests from your site to other origins, enhancing user privacy and security.
+
+Possible values for the Referrer-Policy header include:
+
+- `no-referrer`: The Referer header will be omitted entirely. No referrer information is sent with requests.
+- `no-referrer-when-downgrade`: The Referer header will not be sent to less secure destinations (e.g., from HTTPS to HTTP), but will be sent to same or more secure destinations.
+- `origin`: Only the origin of the document is sent as the referrer.
+- `origin-when-cross-origin`: The full URL is sent as the referrer when performing a same-origin request, but only the origin is sent for cross-origin requests.
+- `same-origin`: The Referer header is sent with same-origin requests, but not with cross-origin requests.
+- `strict-origin`: Only the origin is sent as the referrer, and only for same-origin requests.
+- `strict-origin-when-cross-origin`: The full URL is sent as the referrer when performing a same-origin request, but only the origin is sent for cross-origin requests. No referrer information is sent to less secure destinations.
+- `unsafe-url`: The full URL is always sent as the referrer, regardless of the request's security.
+
+This setting will be used by the [`Marten::Middleware::ReferrerPolicy`](../../handlers-and-http/reference/middlewares.md#referrer-policy-middleware) middleware when inserting the Referrer-Policy header in HTTP responses. By configuring this setting, you can control how much referrer information is included with requests from your site to other origins.
+
 ### `request_max_parameters`
 
 Default: `1000`

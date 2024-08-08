@@ -23,6 +23,7 @@ Marten.configure :test do |config|
       db.user = env_settings["MARIADB_DB_USER"].as(String)
       db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
       db.host = env_settings["MARIADB_DB_HOST"].as(String)
+      db.options = {"encoding" => "utf8mb4"}
     end
 
     config.database :other do |db|
@@ -41,6 +42,7 @@ Marten.configure :test do |config|
       db.user = env_settings["MYSQL_DB_USER"].as(String)
       db.password = env_settings["MYSQL_DB_PASSWORD"].as(String)
       db.host = env_settings["MYSQL_DB_HOST"].as(String)
+      db.options = {"encoding" => "utf8mb4"}
     end
 
     config.database :other do |db|

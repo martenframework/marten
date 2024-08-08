@@ -244,6 +244,40 @@ A `slug` field allows to persist _valid_ slug values (ie. strings that can only 
 
 The `max_size` argument is optional and defaults to 50 characters. It allows to specify the maximum size of the persisted email addresses. This maximum size is used for the corresponding column definition and when it comes to validate field values.
 
+#### `slugify`
+
+The `slugify` argument allows specifying the field from which the slug should be generated. This is useful when you want the slug to be automatically derived from another field.
+
+```crystal
+
+class Article < Marten::Model
+  field :title, :string
+  field :slug, :slug, slugify: :title
+end
+
+article = Article.create!(title: "My Article")
+
+article.slug # => "my-article-48e810f2" - the suffix is a random string
+```
+
+When an Article object is saved, the slug field will automatically generate a slug based on the title field if no custom slug is provided.
+
+#### `slugify_cb`
+
+The `slugify_cb` argument allows you to specify a custom function for generating the slug. This function should accept a string and return a string. It can be used to implement custom slug generation logic. If not provided, the default generate_slug function is used.
+
+```crystal
+class Article < Marten::Model
+  field :title, :string
+  field :slug, :slug, slugify: :title, slugify_cb: ->(value : ::String) { custom_slug_generator(value) }
+end
+
+def custom_slug_generator(value : String) : String
+  # Custom slug generation logic here
+  value.upcase.gsub(" ", "_")
+end
+```
+
 :::info
 As slug fields are usually used to query records, they are indexed by default. You can use the [`index`](#index) option (`index: false`) to disable auto-indexing.
 :::

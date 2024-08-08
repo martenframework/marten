@@ -35,6 +35,14 @@ describe Marten::DB::Field::Slug do
       article.slug.not_nil!.starts_with?("my-first-article-").should be_true
     end
 
+    it "raises an error if an invalid field is targetted" do
+      article = Marten::DB::Field::SlugSpec::ArticleInvalidSlugField.new(title: "My First Article")
+
+      expect_raises(Marten::DB::Errors::UnknownField) do
+        article.save
+      end
+    end
+
     it "automatically generating a slug does not raise an error" do
       article = Marten::DB::Field::SlugSpec::Article.new(title: "My First Article")
 

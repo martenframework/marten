@@ -88,6 +88,14 @@ With the `MethodOverride` middleware, the form submission would effectively be t
 The middleware should be placed as far as possible at the beginning of the array of the [`middlewares`](../../development/reference/settings.md#middleware) setting so that other middlewares already recognise the overridden method.
 :::
 
+## Referrer-Policy middleware
+
+**Class:** [`Marten::Middleware::ReferrerPolicy`](pathname:///api/dev/Marten/Middleware/ReferrerPolicy.html)
+
+Sets the Referrer-Policy header in the response if it wasn't already set.
+
+When this middleware is used, a Referrer-Policy header will be inserted into the HTTP response. The value for this header is configurable via the [`referrer_policy`](../../development/reference/settings.md#referrer_policy) setting. This header controls the amount of referrer information sent along with requests from your site to other origins, enhancing user privacy and security.
+
 ## Session middleware
 
 **Class:** [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html)

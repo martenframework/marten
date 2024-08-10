@@ -141,6 +141,7 @@ describe Marten::CLI::Manage::Command::New do
       command.handle
 
       stderr.rewind.gets_to_end.includes?("--with-auth can only be used when creating new projects").should be_true
+      stdout.rewind.gets_to_end.should be_empty
     end
 
     it "creates a new project structure" do

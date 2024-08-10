@@ -56,6 +56,7 @@ module Marten
 
             if app? && with_auth?
               print_error("--with-auth can only be used when creating new projects")
+              return
             end
 
             context = Context.new

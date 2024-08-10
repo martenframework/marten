@@ -167,7 +167,7 @@ The command allows you to fully define the name of your project or application, 
 
 * `-d DIR, --dir=DIR` - An optional destination directory
 * `--with-auth` - Adds an authentication application to newly created projects. See [Authentication](../../authentication.mdx) to learn more about this capability
-* `--database` - Preconfigures the application database. Currently `mysql`, `postgresq` and `sqlite3` are supported. See [Database settings](../../development/reference/settings.md#database-settings) for more information
+* `--database` - Preconfigures the application database. Currently `mysql`, `postgresql` and `sqlite3` are supported while `none` can be used to generate a project without configured databases. See [Database settings](../../development/reference/settings.md#database-settings) for more information
 * `-e, --edge` - Use the development version of Marten
 
 ### Arguments
@@ -184,6 +184,8 @@ The `type` and `name` arguments are optional: if they are not provided, an inter
 ```bash
 marten new project myblog                         # Creates a "myblog" project repository structure
 marten new project myblog --dir=./projects/myblog # Creates a "myblog" project in the "./projects/myblog" folder
+marten new project myblog --database=postgresql   # Creates a "myblog" project with a PostgreSQL database
+marten new project myblog --database=none         # Creates a "myblog" project without configured database
 marten new app auth                               # Creates an "auth" application repository structure
 ```
 

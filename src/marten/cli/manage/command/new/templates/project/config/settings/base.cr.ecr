@@ -23,6 +23,7 @@ Marten.configure do |config|
     Marten::Middleware::GZip,
     Marten::Middleware::XFrameOptions,
   ]
+  <%- if context.database != "none" -%>
 
   # Databases
   # https://martenframework.com/docs/development/reference/settings#database-settings
@@ -47,6 +48,7 @@ Marten.configure do |config|
     # db.user = "my_user"
     # db.password = "my_password"
   end
+  <%- end -%>
   <%- end -%>
 
   # Templates context producers

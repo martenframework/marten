@@ -12,6 +12,7 @@ module Marten
           @edge : Bool = false
           @interactive_mode : Bool = false
           @name : String?
+          @no_database : Bool = false
           @type : String?
           @with_auth : Bool = false
 
@@ -23,7 +24,7 @@ module Marten
             on_option_with_arg(
               :database,
               arg: "db",
-              description: "Configure default database (options: mysql/postgresql/sqlite3)") do |db|
+              description: "Configure default database (options: mysql/postgresql/sqlite3/none)") do |db|
               @database = db
             end
             on_option(:e, :edge, description: "Use the development version of Marten") { @edge = true }
@@ -59,6 +60,11 @@ module Marten
               return
             end
 
+            if database == SUPPORTED_DATABASES[3] && with_auth?
+              print_error("--with-auth can only be used for projects that use a database")
+              return
+            end
+
             context = Context.new
             context.name = name.not_nil!
             context.targets << Context::TARGET_AUTH if with_auth?
@@ -72,7 +78,7 @@ module Marten
           end
 
           private NAME_RE             = /^[-a-zA-Z0-9_]+$/
-          private SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql"}
+          private SUPPORTED_DATABASES = {"sqlite3", "postgresql", "mysql", "none"}
           private TYPE_APP            = "app"
           private TYPE_PROJECT        = "project"
 

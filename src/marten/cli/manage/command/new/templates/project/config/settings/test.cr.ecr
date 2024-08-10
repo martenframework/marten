@@ -1,4 +1,5 @@
 Marten.configure :test do |config|
+  <%- if context.database != "none" -%>
   # Warning: the database used in the context of specs will be flushed and generated automatically every time the specs
   # suite is executed. Do not set these database names to the same names as the ones used for your development or
   # production environments.
@@ -7,6 +8,7 @@ Marten.configure :test do |config|
     db.name = ":memory:"
   end
 
+  <%- end -%>
   config.allowed_hosts = ["127.0.0.1"]
 
   # Sets the global cache store to a "null store" to disable caching while still going through the caching interface.

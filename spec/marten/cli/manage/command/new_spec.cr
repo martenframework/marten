@@ -403,6 +403,42 @@ describe Marten::CLI::Manage::Command::New do
       File.read("./dummy_project/shard.yml").should contain "github: will/crystal-pg"
       File.read("./dummy_project/config/settings/base.cr").should contain "db.backend = :postgresql"
     end
+
+    it "generates a project without database when --database=none is provided" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--database", "none"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      File.read("./dummy_project/shard.yml").should_not contain "github: will/crystal-pg"
+      File.read("./dummy_project/shard.yml").should_not contain "github: crystal-lang/crystal-mysql"
+      File.read("./dummy_project/shard.yml").should_not contain "github: crystal-lang/crystal-sqlite3"
+
+      File.read("./dummy_project/config/settings/base.cr").should_not contain "config.database"
+      File.read("./dummy_project/config/settings/test.cr").should_not contain "config.database"
+    end
+
+    it "returns an error when generating a project with --database=none and --with-auth" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--database", "none", "--with-auth"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      stderr.rewind.gets_to_end
+        .includes?("--with-auth can only be used for projects that use a database").should be_true
+    end
   end
 end
 

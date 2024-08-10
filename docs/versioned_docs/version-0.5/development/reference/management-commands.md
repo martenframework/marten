@@ -167,7 +167,7 @@ The command allows you to fully define the name of your project or application, 
 
 * `-d DIR, --dir=DIR` - An optional destination directory
 * `--with-auth` - Adds an authentication application to newly created projects. See [Authentication](../../authentication.mdx) to learn more about this capability
-* `--database` - Preconfigures the application database. Currently `mysql`, `postgresq` and `sqlite3` are supported. See [Database settings](../../development/reference/settings.md#database-settings) for more information
+* `--database` - Preconfigures the application database. Currently `mysql`, `postgresql` and `sqlite3` are supported. See [Database settings](../../development/reference/settings.md#database-settings) for more information
 * `-e, --edge` - Use the development version of Marten
 
 ### Arguments

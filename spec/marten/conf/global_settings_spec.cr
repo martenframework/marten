@@ -337,9 +337,9 @@ describe Marten::Conf::GlobalSettings do
   end
 
   describe "#referrer_policy" do
-    it "returns strict-origin-when-cross-origin by default" do
+    it "returns same-origin by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.referrer_policy.should eq "strict-origin-when-cross-origin"
+      global_settings.referrer_policy.should eq "same-origin"
     end
 
     it "returns the specified Referrer-Policy if explicitely set" do

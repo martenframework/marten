@@ -16,7 +16,7 @@ describe Marten::Middleware::ReferrerPolicy do
         request, ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
-      response.headers[:"Referrer-Policy"].should eq "strict-origin-when-cross-origin"
+      response.headers[:"Referrer-Policy"].should eq "same-origin"
     end
 
     it "returns the response early if it already contains the Referrer-Policy header" do

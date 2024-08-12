@@ -14,7 +14,7 @@ module Marten
 
           getter session_key
 
-          getter? expires_at_browser_close
+          getter expires_at_browser_close
 
           def initialize(@session_key : String?)
           end

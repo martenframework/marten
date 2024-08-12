@@ -21,6 +21,7 @@ require "../config/routes"
 <%- if context.targets_auth? -%>
 require "./apps/auth/app"
 <%- end -%>
+require "./emails/**"
 require "./handlers/**"
 require "./models/**"
 require "./schemas/**"

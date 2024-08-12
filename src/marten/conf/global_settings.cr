@@ -60,7 +60,7 @@ module Marten
       # Returns a boolean indicating whether multiple processes can bind to the same HTTP server port.
       getter port_reuse
 
-      # Returns the value to use for the Referrer-Policy header.
+      # Returns the default value to use for the Referrer-Policy header.
       #
       # The value of this setting will be used by the `Marten::Middleware::ReferrerPolicy` middleware when inserting the
       # Referrer-Policy header in HTTP responses.
@@ -132,7 +132,7 @@ module Marten
       # Allows to indicate whether multiple processes can bind to the same HTTP server port.
       setter port_reuse
 
-      # Allows to set the value to use for the Referrer-Policy header.
+      # Allows to set the default value to use for the Referrer-Policy header.
       #
       # This value will be used by the `Marten::Middleware::ReferrerPolicy` middleware when inserting the
       # Referrer-Policy header in HTTP responses.
@@ -210,7 +210,7 @@ module Marten
         @middleware = Array(Marten::Middleware.class).new
         @port = 8000
         @port_reuse = true
-        @referrer_policy = "strict-origin-when-cross-origin"
+        @referrer_policy = "same-origin"
         @request_max_parameters = 1000
         @secret_key = ""
         @time_zone = Time::Location.load("UTC")

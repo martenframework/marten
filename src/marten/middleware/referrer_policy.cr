@@ -21,7 +21,7 @@ module Marten
     #                                    No referrer information is sent to less secure destinations.
     # - unsafe-url: The full URL is always sent as the referrer, regardless of the request's security.
     #
-    # You can configure the desired policy in the `referrer_policy` setting in your application's configuration.
+    # You can configure the desired policy through the use of the `referrer_policy` setting.
     class ReferrerPolicy < Middleware
       def call(request : Marten::HTTP::Request, get_response : Proc(Marten::HTTP::Response)) : Marten::HTTP::Response
         response = get_response.call

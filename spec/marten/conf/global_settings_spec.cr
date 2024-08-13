@@ -336,6 +336,27 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#referrer_policy" do
+    it "returns same-origin by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.referrer_policy.should eq "same-origin"
+    end
+
+    it "returns the specified Referrer-Policy if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.referrer_policy = "origin"
+      global_settings.referrer_policy.should eq "origin"
+    end
+  end
+
+  describe "#referrer_policy=" do
+    it "allows to configure the Referrer-Policy" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.referrer_policy = "origin"
+      global_settings.referrer_policy.should eq "origin"
+    end
+  end
+
   describe "#request_max_parameters" do
     it "returns 1000 by default" do
       global_settings = Marten::Conf::GlobalSettings.new

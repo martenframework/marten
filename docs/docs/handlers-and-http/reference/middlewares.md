@@ -92,7 +92,7 @@ The middleware should be placed as far as possible at the beginning of the array
 
 **Class:** [`Marten::Middleware::ReferrerPolicy`](pathname:///api/dev/Marten/Middleware/ReferrerPolicy.html)
 
-Sets the Referrer-Policy header in the response if it wasn't already set.
+Sets the [Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy) header in the response if it wasn't already set.
 
 When this middleware is used, a Referrer-Policy header will be inserted into the HTTP response. The value for this header is configurable via the [`referrer_policy`](../../development/reference/settings.md#referrer_policy) setting. This header controls the amount of referrer information sent along with requests from your site to other origins, enhancing user privacy and security.
 

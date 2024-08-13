@@ -102,7 +102,7 @@ A boolean indicating whether multiple processes can bind to the same HTTP server
 
 Default: `"same-origin"`
 
-The value to use for the Referrer-Policy header when the associated middleware is used. This header controls the amount of referrer information sent along with requests from your site to other origins, enhancing user privacy and security.
+The value to use for the [Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy) header when the associated middleware is used. This header controls the amount of referrer information sent along with requests from your site to other origins, enhancing user privacy and security.
 
 Possible values for the Referrer-Policy header include:
 

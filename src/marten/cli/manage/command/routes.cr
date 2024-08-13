@@ -15,7 +15,9 @@ module Marten
               when Marten::Routing::Rule::Path
                 print_path(rule, parent_path, parent_name)
               when Marten::Routing::Rule::Map
-                process_routes_map(rule.map, parent_path: rule.path, parent_name: rule.name)
+                rule_name = parent_name ? "#{parent_name}:#{rule.name}" : rule.name
+                rule_path = parent_path + rule.path
+                process_routes_map(rule.map, parent_path: rule_path, parent_name: rule_name)
               end
             end
           end

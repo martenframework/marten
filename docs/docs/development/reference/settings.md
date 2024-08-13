@@ -100,7 +100,7 @@ A boolean indicating whether multiple processes can bind to the same HTTP server
 
 ### `referrer_policy`
 
-Default: `"strict-origin-when-cross-origin"`
+Default: `"same-origin"`
 
 The value to use for the Referrer-Policy header when the associated middleware is used. This header controls the amount of referrer information sent along with requests from your site to other origins, enhancing user privacy and security.
 

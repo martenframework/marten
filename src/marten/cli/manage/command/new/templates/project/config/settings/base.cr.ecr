@@ -22,6 +22,7 @@ Marten.configure do |config|
     <%- end -%>
     Marten::Middleware::GZip,
     Marten::Middleware::XFrameOptions,
+    Marten::Middleware::ReferrerPolicy,
   ]
   <%- if context.database != "none" -%>
 

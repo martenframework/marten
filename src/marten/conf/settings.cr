@@ -9,7 +9,7 @@ module Marten
 
         class ::Marten::Conf::GlobalSettings
           def {{ sanitized_ns }} : ::Marten::Conf::Settings
-            @{{ sanitized_ns }} ||= {{ @type }}.new
+            @{{ sanitized_ns }} ||= ::{{ @type }}.new
           end
         end
       end

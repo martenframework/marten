@@ -5,11 +5,7 @@ module Marten
     module Field
       # Represents a slug field.
       class Slug < String
-        NON_ALPHANUMERIC_RE  = /[^\w\s-]/
-        WHITESPACE_HYPHEN_RE = /[-\s]+/
-
         private getter slugify
-        private getter slugify_cb
 
         def initialize(
           @id : ::String,
@@ -21,13 +17,8 @@ module Marten
           @unique = false,
           @index = true,
           @db_column = nil,
-          @slugify : Symbol? = nil,
-          @slugify_cb : (::String -> ::String) = ->(value : ::String) { generate_slug(value) }
+          @slugify : Symbol? = nil
         )
-          if @slugify
-            @null = true
-            @blank = true
-          end
         end
 
         macro check_definition(field_id, kwargs)
@@ -36,9 +27,8 @@ module Marten
 
         def validate(record, value)
           if slugify?(value)
-            slug = slugify_cb.call(record.get_field_value(slugify.not_nil!).to_s)
+            slug = Core::Sluggable.generate_slug(record.get_field_value(slugify.not_nil!).to_s, max_size)
             record.set_field_value(id, slug)
-            return
           end
 
           return if !value.is_a?(::String)
@@ -51,14 +41,12 @@ module Marten
           end
         end
 
-        private def generate_slug(value)
-          suffix = "-#{Random::Secure.hex(4)}"
+        protected def validate_null(record : Model, value)
+          super if slugify.nil?
+        end
 
-          slug = value.gsub(NON_ALPHANUMERIC_RE, "").downcase
-          slug = slug.gsub(WHITESPACE_HYPHEN_RE, "-").strip("-_")
-          slug = slug.gsub(/[^\x00-\x7F]/, "")
-
-          slug[...(max_size - suffix.size)] + suffix
+        protected def validate_blank(record : Model, value)
+          super if slugify.nil?
         end
 
         private def slugify?(value)

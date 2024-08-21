@@ -111,14 +111,6 @@ describe Marten::DB::Field::Slug do
 
       article.slug.not_nil!.should eq("custom-slug")
     end
-
-    it "uses a custom slug generator function when provided" do
-      article = Marten::DB::Field::SlugSpec::ArticleWithCustomSlugGenerator.new(title: "My First Article")
-
-      article.save
-
-      article.slug.not_nil!.should eq("MY_FIRST_ARTICLE")
-    end
   end
 
   describe "#validate" do

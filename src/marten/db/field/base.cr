@@ -86,11 +86,8 @@ module Marten
         def perform_validation(record : Model)
           value = record.get_field_value(id)
 
-          if value.nil? && !@null
-            record.errors.add(id, null_error_message(record), type: :null)
-          elsif empty_value?(value) && !@blank
-            record.errors.add(id, blank_error_message(record), type: :blank)
-          end
+          validate_null(record, value)
+          validate_blank(record, value)
 
           validate(record, value)
         end
@@ -145,6 +142,18 @@ module Marten
         #
         # This method should be overriden for each field implementation that requires custom validation logic.
         def validate(record, value)
+        end
+
+        protected def validate_null(record : Model, value)
+          if value.nil? && !@null
+            record.errors.add(id, null_error_message(record), type: :null)
+          end
+        end
+
+        protected def validate_blank(record : Model, value)
+          if empty_value?(value) && !@blank
+            record.errors.add(id, blank_error_message(record), type: :blank)
+          end
         end
 
         # :nodoc:

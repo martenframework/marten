@@ -41,11 +41,7 @@ module Marten
           end
         end
 
-        protected def validate_null(record : Model, value)
-          super if slugify.nil?
-        end
-
-        protected def validate_blank(record : Model, value)
+        protected def validate_presence(record : Model, value)
           super if slugify.nil?
         end
 

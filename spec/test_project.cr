@@ -97,6 +97,15 @@ Marten.configure :test do |config|
   config.media_files.root = "spec/media"
 end
 
+NESTED_ROUTES_2 = Marten::Routing::Map.draw do
+  path "/dummy/<id:int>", DummyHandler, name: "dummy_with_id"
+end
+
+NESTED_ROUTES_1 = Marten::Routing::Map.draw do
+  path "/dummy/<id:int>", DummyHandler, name: "dummy_with_id"
+  path "/nested-2", NESTED_ROUTES_2, name: "nested_2"
+end
+
 Marten.routes.draw do
   path "/dummy", DummyHandler, name: "dummy"
   path "/dummy/<id:int>", DummyHandler, name: "dummy_with_id"
@@ -111,4 +120,5 @@ Marten.routes.draw do
   path "/cookie-value-set", CookieValueSetHandler, name: "cookie_value_set"
   path "/simple-schema", SimpleSchemaHandler, name: "simple_schema"
   path "/simple-file-schema", SimpleFileSchemaHandler, name: "simple_file_schema"
+  path "/nested-1", NESTED_ROUTES_1, name: "nested_1"
 end

@@ -136,27 +136,40 @@ module Marten
             # if the connector is AND (an OR connector would not make sense in this case since one of the queries is
             # targeting all the records while the other one is targeting a subset of them).
 
-            new_predicate_node = nil
-            if !other.predicate_node.nil? && !predicate_node.nil?
-              new_predicate_node = other.predicate_node.not_nil!.clone
-            elsif connector == PredicateConnector::AND
-              new_predicate_node = if other.predicate_node.nil?
-                                     predicate_node.nil? ? nil : PredicateNode.new
-                                   else
-                                     other.predicate_node.not_nil!.clone
-                                   end
+            new_predicate_node = if !other.predicate_node.nil? && !predicate_node.nil?
+                                   other.predicate_node.try(&.clone)
+                                 elsif connector.and?
+                                   predicate_node.nil? ? other.predicate_node.try(&.clone) : PredicateNode.new
+                                 elsif connector.xor?
+                                   # If the current query has no predicate node and the connector is XOR, we have to
+                                   # create a dummy predicate node for the other query. This will ensure that the XOR
+                                   # operator works as expected.
+                                   other.predicate_node.try(&.clone) ||
+                                     PredicateNode.new(raw_predicate: MATCH_ALL_PREDICATE)
+                                 else
+                                   nil
+                                 end
+
+            if connector.xor? && predicate_node.nil?
+              # If the current query has no predicate node and the connector is XOR, we have to create a dummy predicate
+              # node for the current query. This will ensure that the XOR operator works as expected.
+              @predicate_node = PredicateNode.new
+              @predicate_node.not_nil!.add(
+                PredicateNode.new(raw_predicate: MATCH_ALL_PREDICATE),
+                PredicateConnector::AND
+              )
             end
 
-            if !(n = new_predicate_node).nil?
+            if new_predicate_node
               # Ensure that the predicates of the other query are correctly adjusted to the new table alias prefixes.
-              n.replace_table_alias_prefix(old_vs_new_table_aliases)
+              new_predicate_node.replace_table_alias_prefix(old_vs_new_table_aliases)
 
               # Add the predicate node of the other query to the current query (only if we have two predicate nodes or
               # if we are considering an AND operator).
-              @predicate_node ||= PredicateNode.new
-              @predicate_node.not_nil!.add(n, connector)
-            elsif connector == PredicateConnector::OR
-              # Reset the predicate node if the other query has no predicate node and the connector is OR.
+              (@predicate_node ||= PredicateNode.new).add(new_predicate_node, connector)
+            elsif connector.or?
+              # Reset the predicate node if the other query has no predicate node and the connector is OR: indeed, this
+              # essentially means that we are targeting all the records.
               @predicate_node = nil
             end
 
@@ -447,6 +460,8 @@ module Marten
 
             rows_affected.not_nil!
           end
+
+          private MATCH_ALL_PREDICATE = "1=1"
 
           private def build_average_query(column_name : String)
             where, parameters = where_clause_and_parameters

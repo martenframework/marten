@@ -1119,6 +1119,63 @@ describe Marten::DB::Query::SQL::Query do
       query_1.execute.to_set.should eq [tag_1, tag_3].to_set
     end
 
+    it "produces the expected result when combining queries filtering the local table with a XOR connector" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "go", is_active: false)
+      tag_3 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: false)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(name__startswith: "c"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(is_active: false))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::XOR)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [tag_2, tag_3].to_set
+    end
+
+    it "produces the expected result when combining an unfiltered query with a filtered one with a XOR connector " do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "go", is_active: false)
+      tag_3 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: false)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(is_active: false))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::XOR)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [tag_1, tag_3].to_set
+
+      query_3 = Marten::DB::Query::SQL::Query(Tag).new
+      query_3.add_query_node(Marten::DB::Query::Node.new(is_active: false))
+
+      query_4 = Marten::DB::Query::SQL::Query(Tag).new
+
+      query_4.combine(query_3, Marten::DB::Query::SQL::PredicateConnector::XOR)
+      query_4.count.should eq 2
+      query_4.execute.to_set.should eq [tag_1, tag_3].to_set
+    end
+
+    it "produces the expected result when combining two unfiltered queries with a XOR connector " do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "go", is_active: false)
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: false)
+
+      query_1 = Marten::DB::Query::SQL::Query(Tag).new
+
+      query_2 = Marten::DB::Query::SQL::Query(Tag).new
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::XOR)
+      query_1.count.should eq 0
+      query_1.execute.should be_empty
+    end
+
     it "produces the expected result when combining queries filtering on related tables with an AND connector" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
@@ -1158,6 +1215,27 @@ describe Marten::DB::Query::SQL::Query do
       query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::OR)
       query_1.count.should eq 3
       query_1.execute.to_set.should eq [post_1, post_3, post_4].to_set
+    end
+
+    it "produces the expected result when combining queries filtering on related tables with a XOR connector" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "user2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "Bob", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+      Post.create!(author: user_1, title: "Post 4")
+
+      query_1 = Marten::DB::Query::SQL::Query(Post).new
+      query_1.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "j"))
+
+      query_2 = Marten::DB::Query::SQL::Query(Post).new
+      query_2.add_query_node(Marten::DB::Query::Node.new(author__first_name: "John"))
+
+      query_1.combine(query_2, Marten::DB::Query::SQL::PredicateConnector::XOR)
+      query_1.count.should eq 2
+      query_1.execute.to_set.should eq [post_2, post_3].to_set
     end
 
     it "produces the expected result when combining queries filtering on different related tables" do

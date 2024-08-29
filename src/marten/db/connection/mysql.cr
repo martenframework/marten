@@ -108,6 +108,10 @@ module Marten
           "mysql"
         end
 
+        def supports_logical_xor? : Bool
+          true
+        end
+
         def update(
           table_name : String,
           values : Hash(String, ::DB::Any),

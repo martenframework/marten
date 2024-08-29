@@ -399,6 +399,28 @@ describe Marten::DB::Query::Node do
     end
   end
 
+  describe "#^" do
+    it "is able to combine a node with another one using a logical OR operation" do
+      node_1 = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+      node_2 = Marten::DB::Query::Node.new(xyz: "ok")
+
+      node = node_1 ^ node_2
+
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::XOR
+      node.children.should eq [node_1, node_2]
+    end
+
+    it "always combine identical nodes" do
+      node_1 = Marten::DB::Query::Node.new(foo: "bar", test: 42)
+      node_2 = Marten::DB::Query::Node.new(xyz: "bar", test: 42)
+
+      node = node_1 ^ node_2
+
+      node.connector.should eq Marten::DB::Query::SQL::PredicateConnector::XOR
+      node.children.should eq [node_1, node_2]
+    end
+  end
+
   describe "#filters" do
     it "returns the filters of the node" do
       node = Marten::DB::Query::Node.new(foo: "bar", test: 42)

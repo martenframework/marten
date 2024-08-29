@@ -134,6 +134,27 @@ module Marten
           combined
         end
 
+        # Combines the current query set with another one using the XOR operator.
+        #
+        # This method returns a new query set that is the result of combining the current query set with another one
+        # using the XOR operator. For example:
+        #
+        # ```
+        # query_set_1 = Post.all.filter(title: "Test")
+        # query_set_2 = Post.all.filter(is_published: true)
+        #
+        # combined_query_set = query_set_1 ^ query_set_2
+        # ```
+        def ^(other : self)
+          return other if query.is_a?(SQL::EmptyQuery)
+          return self if other.query.is_a?(SQL::EmptyQuery)
+
+          combined = clone
+          combined.query.combine(other.query, SQL::PredicateConnector::XOR)
+
+          combined
+        end
+
         # :nodoc:
         def accumulate
           raise NotImplementedError.new("#accumulate is not supported for query sets")

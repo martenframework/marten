@@ -121,7 +121,7 @@ Author.filter(first_name: "John").filter(last_name: "Doe")
 Author.filter(first_name: "John", last_name: "Doe")
 ```
 
-By default, filters involving multiple parameters like in the above examples always produce SQL queries whose parameters are "AND"ed together. More complex queries (eg. using OR, NOT conditions) can be achieved through the use of the `q` DSL (which is described in [Complex filters with `q` expressions](#complex-filters-with-q-expressions)), as outlined by the following examples:
+By default, filters involving multiple parameters like in the above examples always produce SQL queries whose parameters are "AND"ed together. More complex queries (eg. using AND, OR, XOR, or NOT conditions) can be achieved through the use of the `q` DSL (which is described in [Complex filters with `q` expressions](#complex-filters-with-q-expressions)), as outlined by the following examples:
 
 ```crystal
 # Get Author records with either "Bob" or "Alice" as first name
@@ -249,6 +249,7 @@ In order to produce such expressions, methods like `#filter`, `#exclude`, or `#g
 
 * `&` in order to perform a logical "AND"
 * `|` in order to perform a logical "OR"
+* `^` in order to perform a logical "XOR"
 * `-` in order to perform a logical negation
 
 For example, the following snippet will return all the `Article` records whose title starts with "Top" or "10":
@@ -257,7 +258,7 @@ For example, the following snippet will return all the `Article` records whose t
 Article.filter { q(title__startswith: "Top") | q(title__startswith: "10") }
 ```
 
-Using this approach, it is possible to produce complex conditions by combining `q()` expressions with the `&`, `|`, and `-` operators. Parentheses can also be used to group statements:
+Using this approach, it is possible to produce complex conditions by combining `q()` expressions with the `&`, `|`, `^`, and `-` operators. Parentheses can also be used to group statements:
 
 ```crystal
 Article.filter {

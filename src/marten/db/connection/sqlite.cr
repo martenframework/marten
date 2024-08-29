@@ -103,6 +103,10 @@ module Marten
           "sqlite3"
         end
 
+        def supports_logical_xor? : Bool
+          false
+        end
+
         def update(
           table_name : String,
           values : Hash(String, ::DB::Any),

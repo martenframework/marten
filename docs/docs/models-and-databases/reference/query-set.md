@@ -101,6 +101,25 @@ query_set_2 = Post.all.filter(is_published: true)
 combined_query_set = query_set_1 | query_set_2
 ```
 
+### `^` (XOR)
+
+Combines the current query set with another one using the **XOR** operator.
+
+This method returns a new query set that is the result of combining the current query set with another one using the XOR SQL operator. 
+
+For example:
+
+```crystal
+query_set_1 = Post.all.filter(title: "Test")
+query_set_2 = Post.all.filter(is_published: true)
+
+combined_query_set = query_set_1 ^ query_set_2
+```
+
+:::info
+XOR is natively support on MariaDB and MySQL only. Other database backends (PostgreSQL and SQLite) will use `case ... when` statements in order to perform XOR operations at the SQL level.
+:::
+
 ### `all`
 
 Allows retrieving all the records of a specific model. `#all` can be used as a class method from any model class, or it can be used as an instance method from any query set object. In this last case, calling `#all` returns a copy of the current query set.

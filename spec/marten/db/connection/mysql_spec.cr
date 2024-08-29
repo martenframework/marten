@@ -141,5 +141,12 @@ for_mysql do
         conn.scheme.should eq "mysql"
       end
     end
+
+    describe "#supports_logical_xor?" do
+      it "returns true" do
+        conn = Marten::DB::Connection.default
+        conn.supports_logical_xor?.should be_true
+      end
+    end
   end
 end

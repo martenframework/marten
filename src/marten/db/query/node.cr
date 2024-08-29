@@ -65,6 +65,10 @@ module Marten
           combine(other, SQL::PredicateConnector::OR)
         end
 
+        def ^(other : Node)
+          combine(other, SQL::PredicateConnector::XOR, prevent_duplicates: false)
+        end
+
         def - : self
           negated_parent = self.class.new
           negated_parent.add(self, SQL::PredicateConnector::AND)
@@ -88,8 +92,8 @@ module Marten
           @expression.is_a?(RawPredicate)
         end
 
-        protected def add(other : Node, conn : SQL::PredicateConnector)
-          return if @children.includes?(other)
+        protected def add(other : Node, conn : SQL::PredicateConnector, prevent_duplicates = true)
+          return if prevent_duplicates && @children.includes?(other)
 
           if @connector == conn
             @children << other
@@ -109,10 +113,10 @@ module Marten
           @negated = !@negated
         end
 
-        private def combine(other, conn)
+        private def combine(other, conn, prevent_duplicates = true)
           combined = self.class.new(connector: conn)
-          combined.add(self, conn)
-          combined.add(other, conn)
+          combined.add(self, conn, prevent_duplicates)
+          combined.add(other, conn, prevent_duplicates)
           combined
         end
 

@@ -99,6 +99,10 @@ module Marten
           "postgres"
         end
 
+        def supports_logical_xor? : Bool
+          false
+        end
+
         def update(
           table_name : String,
           values : Hash(String, ::DB::Any),

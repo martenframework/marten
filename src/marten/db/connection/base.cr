@@ -67,6 +67,9 @@ module Marten
         # Returns the scheme to consider for the underlying database backend.
         abstract def scheme : String
 
+        # Returns a boolean indicating whether the database supports the logical XOR operator.
+        abstract def supports_logical_xor? : Bool
+
         # Allows to update an existing row in a specific table.
         abstract def update(
           table_name : String,

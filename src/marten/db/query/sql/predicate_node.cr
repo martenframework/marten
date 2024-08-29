@@ -48,7 +48,7 @@ module Marten
           end
 
           def add(other : self, conn : SQL::PredicateConnector)
-            return if @children.includes?(other)
+            return if @children.includes?(other) && !conn.xor?
 
             if @connector == conn
               @children << other
@@ -125,7 +125,7 @@ module Marten
               sql_params.concat(child_params)
             end
 
-            sql_string = sql_parts.join(" #{@connector} ")
+            sql_string = join_sql_parts(connection, sql_parts)
 
             unless sql_string.empty?
               sql_string = "NOT (#{sql_string})" if @negated
@@ -133,6 +133,20 @@ module Marten
             end
 
             {sql_string, sql_params}
+          end
+
+          private def join_sql_parts(connection : Connection::Base, sql_parts : Array(String)) : String
+            if connector.xor? && !connection.supports_logical_xor?
+              # Build the SUM of CASE statements
+              sql = sql_parts.map do |condition|
+                "CASE WHEN #{condition} THEN 1 ELSE 0 END"
+              end.join(" + ")
+
+              # Ensure that exactly one condition is true
+              "(#{sql}) = 1"
+            else
+              sql_parts.join(" #{@connector} ")
+            end
           end
 
           private def raw_predicate_to_sql(connection : Connection::Base)

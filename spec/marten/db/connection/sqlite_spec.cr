@@ -151,5 +151,12 @@ for_sqlite do
         conn.scheme.should eq "sqlite3"
       end
     end
+
+    describe "#supports_logical_xor?" do
+      it "returns false" do
+        conn = Marten::DB::Connection.default
+        conn.supports_logical_xor?.should eq false
+      end
+    end
   end
 end

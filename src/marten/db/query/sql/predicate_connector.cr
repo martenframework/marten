@@ -5,6 +5,7 @@ module Marten
         enum PredicateConnector
           AND
           OR
+          XOR
         end
       end
     end

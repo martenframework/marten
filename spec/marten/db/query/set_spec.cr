@@ -378,7 +378,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#|" do
-    it "combines two query sets using the AND operator" do
+    it "combines two query sets using the OR operator" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "go", is_active: false)
       tag_3 = Tag.create!(name: "crystal", is_active: true)
@@ -416,6 +416,56 @@ describe Marten::DB::Query::Set do
       qset_2 = Tag.all.filter(name__startswith: "r")
 
       combined = qset_1 | qset_2
+
+      combined.should be qset_2
+      combined.count.should eq 2
+      combined.to_set.should eq [tag_1, tag_2].to_set
+    end
+  end
+
+  describe "#^" do
+    it "combines two query sets using the XOR operator" do
+      tag_1 = Tag.create!(name: "coding", is_active: true)
+      Tag.create!(name: "crystal", is_active: false)
+      tag_3 = Tag.create!(name: "programming", is_active: false)
+
+      combined_1 = Tag.unscoped.filter(name__startswith: "c") ^ Tag.unscoped.filter(is_active: false)
+      combined_1.count.should eq 2
+      combined_1.to_a.should eq [tag_1, tag_3]
+
+      combined_2 = Tag.unscoped ^ Tag.unscoped.filter(is_active: false)
+      combined_2.count.should eq 1
+      combined_2.to_a.should eq [tag_1]
+
+      combined_3 = Tag.unscoped.filter(is_active: false) ^ Tag.unscoped
+      combined_3.count.should eq 1
+      combined_3.to_a.should eq [tag_1]
+    end
+
+    it "returns the current query set if the other one is empty" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "rust", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.filter(name__startswith: "r")
+      qset_2 = Tag.all.none
+
+      combined = qset_1 ^ qset_2
+
+      combined.should be qset_1
+      combined.count.should eq 2
+      combined.to_set.should eq [tag_1, tag_2].to_set
+    end
+
+    it "returns the other query set if the current one is empty" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "rust", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      qset_1 = Tag.all.none
+      qset_2 = Tag.all.filter(name__startswith: "r")
+
+      combined = qset_1 ^ qset_2
 
       combined.should be qset_2
       combined.count.should eq 2
@@ -1578,6 +1628,43 @@ describe Marten::DB::Query::Set do
       qset = Marten::DB::Query::Set(Tag).new.filter { q(name__startswith: :r) | q(name: "programming") }
 
       qset.to_a.should eq [tag_1, tag_4]
+    end
+
+    it "filters records using a q expression that involves predicates using XOR" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: false)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+
+      qset_1 = Marten::DB::Query::Set(Tag).new.filter { q(is_active: false) ^ q(name__startswith: "c") }
+      qset_1.to_a.should eq [tag_2]
+
+      qset_2 = Marten::DB::Query::Set(Tag).new.filter do
+        q(is_active: false) ^ q(name__startswith: "c") ^ q(name: "programming")
+      end
+      qset_2.to_a.should eq [tag_2, tag_4]
+    end
+
+    it "filters records using a q expression that involves predicates using XOR" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: false)
+      Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.filter { q(is_active: false) ^ q(name__startswith: "c") }
+
+      qset.to_a.should eq [tag_2]
+    end
+
+    it "filters records using a q expression that involves regular predicates and raw predicats using XOR" do
+      Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: false)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new.filter { q(is_active: false) ^ q("name='programming'") }
+
+      qset.to_a.should eq [tag_3, tag_4]
     end
 
     it "allows to filter the records matching predicates expressed using a query node object" do

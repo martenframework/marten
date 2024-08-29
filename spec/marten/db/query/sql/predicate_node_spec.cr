@@ -356,6 +356,95 @@ describe Marten::DB::Query::SQL::PredicateNode do
       node_2.children.first.children.should eq [node_1]
       node_2.children.last.should eq node_3
     end
+
+    it "adds a new child node to the parent's children containing the passed node if the connector is XOR" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+      node_1.children.should be_empty
+      node_1.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node_1.negated.should be_false
+      node_1.predicates.should eq [predicate_1, predicate_2]
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        [node_1],
+        Marten::DB::Query::SQL::PredicateConnector::OR,
+        true,
+        predicate_1
+      )
+      node_2.children.should eq [node_1]
+      node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
+      node_2.negated.should be_true
+      node_2.predicates.should eq [predicate_1]
+
+      node_3 = Marten::DB::Query::SQL::PredicateNode.new(
+        [node_1],
+        Marten::DB::Query::SQL::PredicateConnector::OR,
+        true,
+        predicate_1
+      )
+
+      node_2.add(node_3, Marten::DB::Query::SQL::PredicateConnector::XOR)
+
+      node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::XOR
+      node_2.children.first.negated.should be_true
+      node_2.children.first.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
+      node_2.children.first.predicates.should eq [predicate_1]
+      node_2.children.first.children.should eq [node_1]
+      node_2.children.last.should eq node_3
+    end
+
+    it "adds the passed node as expected if the connector is XOR and an equivalent node is already in the children" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+      node_1.children.should be_empty
+      node_1.connector.should eq Marten::DB::Query::SQL::PredicateConnector::AND
+      node_1.negated.should be_false
+      node_1.predicates.should eq [predicate_1, predicate_2]
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        [node_1],
+        Marten::DB::Query::SQL::PredicateConnector::OR,
+        true,
+        predicate_1
+      )
+      node_2.children.should eq [node_1]
+      node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
+      node_2.negated.should be_true
+      node_2.predicates.should eq [predicate_1]
+
+      node_3 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2.add(node_3, Marten::DB::Query::SQL::PredicateConnector::XOR)
+
+      node_2.connector.should eq Marten::DB::Query::SQL::PredicateConnector::XOR
+      node_2.children.first.negated.should be_true
+      node_2.children.first.connector.should eq Marten::DB::Query::SQL::PredicateConnector::OR
+      node_2.children.first.predicates.should eq [predicate_1]
+      node_2.children.first.children.should eq [node_1]
+      node_2.children.last.should eq node_3
+    end
   end
 
   describe "#clone" do
@@ -459,6 +548,43 @@ describe Marten::DB::Query::SQL::PredicateNode do
       node.to_sql(Marten::DB::Connection.default).should eq(
         {"(t1.title = %s OR t2.title = %s)", ["Foo", "Bar"]}
       )
+    end
+
+    it "properly generates the expected SQL for a simple predicate with an OR connector" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::XOR,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      for_mysql do
+        node.to_sql(Marten::DB::Connection.default).should eq(
+          {"(t1.title = %s XOR t2.title = %s)", ["Foo", "Bar"]}
+        )
+      end
+
+      for_postgresql do
+        node.to_sql(Marten::DB::Connection.default).should eq(
+          {
+            "((CASE WHEN t1.title = %s THEN 1 ELSE 0 END + CASE WHEN t2.title = %s THEN 1 ELSE 0 END) = 1)",
+            ["Foo", "Bar"],
+          }
+        )
+      end
+
+      for_sqlite do
+        node.to_sql(Marten::DB::Connection.default).should eq(
+          {
+            "((CASE WHEN t1.title = %s THEN 1 ELSE 0 END + CASE WHEN t2.title = %s THEN 1 ELSE 0 END) = 1)",
+            ["Foo", "Bar"],
+          }
+        )
+      end
     end
 
     it "properly generates the expected SQL for a simple negated predicate" do

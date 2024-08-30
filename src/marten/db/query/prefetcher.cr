@@ -179,6 +179,7 @@ module Marten
 
             prefetched_records.concat(
               context.field.related_model
+                .unscoped
                 .using(using)
                 .filter(pk__in: prefetched_records_pks)
                 .query
@@ -219,6 +220,7 @@ module Marten
           if context.reverse_relation.one_to_one?
             prefetched_records.concat(
               context.reverse_relation.model
+                .unscoped
                 .using(using)
                 .filter(Node.new({"#{context.reverse_relation.field.id}__in" => records_to_decorate.map(&.pk)}))
                 .query
@@ -240,6 +242,7 @@ module Marten
           elsif context.reverse_relation.many_to_one?
             prefetched_records.concat(
               context.reverse_relation.model
+                .unscoped
                 .using(using)
                 .filter(Node.new({"#{context.reverse_relation.field.id}__in" => records_to_decorate.map(&.pk)}))
                 .query
@@ -285,7 +288,7 @@ module Marten
           # TODO: Fetch everything in a single query when support for annotations is added.
           m2m_through_from_field = m2m_field.through.get_local_relation_field(m2m_field.through_from_field_id)
           m2m_through_to_field = m2m_field.through.get_local_relation_field(m2m_field.through_to_field_id)
-          through_records = m2m_field.through.using(using).filter(
+          through_records = m2m_field.through.unscoped.using(using).filter(
             if forward
               Node.new({"#{m2m_through_from_field.id}__in" => records_to_decorate.map(&.pk)})
             else
@@ -299,7 +302,9 @@ module Marten
           end.compact
 
           prefetched_records = Array(Model).new
-          prefetched_records.concat(prefetched_model.using(using).filter(pk__in: related_record_ids).query.execute)
+          prefetched_records.concat(
+            prefetched_model.unscoped.using(using).filter(pk__in: related_record_ids).query.execute
+          )
 
           through_record_join_pks = through_records.map do |through_record|
             [

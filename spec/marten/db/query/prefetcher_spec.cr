@@ -26,6 +26,37 @@ describe Marten::DB::Query::Prefetcher do
       records[1].get_related_object_variable(:author).should eq author_2
     end
 
+    it "always uses unscoped queries when prefetching one-to-one relations" do
+      author_1 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Abc Doe")
+      author_2 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Def Doe")
+      author_3 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Ghi Doe")
+      author_4 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Jkl Doe")
+      author_5 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Mno Doe")
+      Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Pqr Doe")
+
+      Marten::DB::Query::PrefetcherSpec::Profile.create!(scoped_author: author_1, name: "Abc")
+      Marten::DB::Query::PrefetcherSpec::Profile.create!(scoped_author: author_2, name: "Def")
+      Marten::DB::Query::PrefetcherSpec::Profile.create!(scoped_author: author_3, name: "Ghi")
+      Marten::DB::Query::PrefetcherSpec::Profile.create!(scoped_author: author_4, name: "Jkl")
+      Marten::DB::Query::PrefetcherSpec::Profile.create!(scoped_author: author_5, name: "Mno")
+
+      records = Marten::DB::Query::PrefetcherSpec::Profile.order(:pk).to_a
+
+      prefetcher = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(records),
+        relations: ["scoped_author"],
+        using: nil
+      )
+
+      expect_db_query_count(1) { prefetcher.execute }
+
+      records[0].get_related_object_variable(:scoped_author).should eq author_1
+      records[1].get_related_object_variable(:scoped_author).should eq author_2
+      records[2].get_related_object_variable(:scoped_author).should eq author_3
+      records[3].get_related_object_variable(:scoped_author).should eq author_4
+      records[4].get_related_object_variable(:scoped_author).should eq author_5
+    end
+
     it "allows to prefetch a single many-to-one relation" do
       publisher_1 = Marten::DB::Query::PrefetcherSpec::Publisher.create!(name: "Abc")
       publisher_2 = Marten::DB::Query::PrefetcherSpec::Publisher.create!(name: "Def")
@@ -45,6 +76,37 @@ describe Marten::DB::Query::Prefetcher do
 
       records[0].get_related_object_variable(:publisher).should eq publisher_1
       records[1].get_related_object_variable(:publisher).should eq publisher_2
+    end
+
+    it "always uses unscoped queries when prefetching many-to-one relations" do
+      author_1 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Abc Doe")
+      author_2 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Def Doe")
+      author_3 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Ghi Doe")
+      author_4 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Jkl Doe")
+      author_5 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Mno Doe")
+      Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Pqr Doe")
+
+      Marten::DB::Query::PrefetcherSpec::Conference.create!(name: "Abc", scoped_author: author_1)
+      Marten::DB::Query::PrefetcherSpec::Conference.create!(name: "Def", scoped_author: author_2)
+      Marten::DB::Query::PrefetcherSpec::Conference.create!(name: "Ghi", scoped_author: author_3)
+      Marten::DB::Query::PrefetcherSpec::Conference.create!(name: "Jkl", scoped_author: author_4)
+      Marten::DB::Query::PrefetcherSpec::Conference.create!(name: "Mno", scoped_author: author_5)
+
+      records = Marten::DB::Query::PrefetcherSpec::Conference.order(:pk).to_a
+
+      prefetcher = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(records),
+        relations: ["scoped_author"],
+        using: nil
+      )
+
+      expect_db_query_count(1) { prefetcher.execute }
+
+      records[0].get_related_object_variable(:scoped_author).should eq author_1
+      records[1].get_related_object_variable(:scoped_author).should eq author_2
+      records[2].get_related_object_variable(:scoped_author).should eq author_3
+      records[3].get_related_object_variable(:scoped_author).should eq author_4
+      records[4].get_related_object_variable(:scoped_author).should eq author_5
     end
 
     it "allows to prefetch a single many-to-many relation" do
@@ -76,6 +138,37 @@ describe Marten::DB::Query::Prefetcher do
       records[0].authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_1, author_3]
       records[1].authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_2, author_3]
       records[2].authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_4, author_5]
+    end
+
+    it "always uses unscoped queries when prefetching many-to-many relations" do
+      author_1 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Abc Doe")
+      author_2 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Def Doe")
+      author_3 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Ghi Doe")
+      author_4 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Jkl Doe")
+      author_5 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Mno Doe")
+      Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Pqr Doe")
+
+      book_1 = Marten::DB::Query::PrefetcherSpec::Book.create!(title: "Abc")
+      book_2 = Marten::DB::Query::PrefetcherSpec::Book.create!(title: "Def")
+      book_3 = Marten::DB::Query::PrefetcherSpec::Book.create!(title: "Ghi")
+
+      book_1.scoped_authors.add(author_1, author_3)
+      book_2.scoped_authors.add(author_2, author_3)
+      book_3.scoped_authors.add(author_4, author_5)
+
+      records = Marten::DB::Query::PrefetcherSpec::Book.order(:pk).to_a
+
+      prefetcher = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(records),
+        relations: ["scoped_authors"],
+        using: nil
+      )
+
+      expect_db_query_count(2) { prefetcher.execute }
+
+      records[0].scoped_authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_1, author_3]
+      records[1].scoped_authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_2, author_3]
+      records[2].scoped_authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_4, author_5]
     end
 
     it "allows to prefetch a single reverse one-to-one relation" do

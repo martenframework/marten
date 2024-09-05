@@ -256,7 +256,7 @@ end
 
 article = Article.create!(title: "My Article")
 
-article.slug # => "my-article-48e810f2" - the suffix is a random string
+article.slug # => "my-article"
 ```
 
 When an Article object is saved, the slug field will automatically generate a slug based on the title field if no custom slug is provided.

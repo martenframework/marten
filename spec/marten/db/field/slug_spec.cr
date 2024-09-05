@@ -32,7 +32,7 @@ describe Marten::DB::Field::Slug do
 
       article.save
 
-      article.slug.not_nil!.starts_with?("my-first-article-").should be_true
+      article.slug.not_nil!.should eq("my-first-article")
     end
 
     it "raises an error if an invalid field is targetted" do
@@ -85,7 +85,7 @@ describe Marten::DB::Field::Slug do
 
       article.save
 
-      article.slug.not_nil!.starts_with?("berraschungsmoment").should be_true
+      article.slug.not_nil!.should eq("berraschungsmoment")
     end
 
     it "removes emoji and special characters and slugifies the title" do
@@ -93,7 +93,7 @@ describe Marten::DB::Field::Slug do
 
       article.save
 
-      article.slug.not_nil!.starts_with?("travel-places").should be_true
+      article.slug.not_nil!.should eq("travel-places")
     end
 
     it "trims leading and trailing whitespace and slugifies the title" do
@@ -101,7 +101,7 @@ describe Marten::DB::Field::Slug do
 
       article.save
 
-      article.slug.not_nil!.starts_with?("test-article").should be_true
+      article.slug.not_nil!.should eq("test-article")
     end
 
     it "retains a custom slug if provided" do

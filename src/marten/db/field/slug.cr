@@ -5,7 +5,7 @@ module Marten
     module Field
       # Represents a slug field.
       class Slug < String
-        private getter slugify
+        include Core::Sluggable
 
         def initialize(
           @id : ::String,
@@ -25,12 +25,14 @@ module Marten
           # No-op max_size automatic checks...
         end
 
-        def validate(record, value)
-          if slugify?(value)
-            slug = Core::Sluggable.generate_slug(record.get_field_value(slugify.not_nil!).to_s, max_size)
+        def prepare_save(record, new_record = false)
+          if slugify?(record.get_field_value(id))
+            slug = generate_slug(record.get_field_value(slugify.not_nil!).to_s, max_size)
             record.set_field_value(id, slug)
           end
+        end
 
+        def validate(record, value)
           return if !value.is_a?(::String)
 
           # Leverage string's built-in validations (max size).
@@ -44,6 +46,8 @@ module Marten
         protected def validate_presence(record : Model, value)
           super if slugify.nil?
         end
+
+        private getter slugify
 
         private def slugify?(value)
           slugify && (value.nil? || (value.is_a?(::String) && value.blank?))

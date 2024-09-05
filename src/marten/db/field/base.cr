@@ -127,7 +127,7 @@ module Marten
           raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
         end
 
-        # Returns `true` if the if the value is considered truthy by the field.
+        # Returns `true` if the value is considered truthy by the field.
         def truthy_value?(value)
           !(value == false || value == 0 || value.nil?)
         end

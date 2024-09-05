@@ -249,7 +249,6 @@ The `max_size` argument is optional and defaults to 50 characters. It allows to 
 The `slugify` argument allows specifying the field from which the slug should be generated. This is useful when you want the slug to be automatically derived from another field.
 
 ```crystal
-
 class Article < Marten::Model
   field :title, :string
   field :slug, :slug, slugify: :title
@@ -261,6 +260,20 @@ article.slug # => "my-article-48e810f2" - the suffix is a random string
 ```
 
 When an Article object is saved, the slug field will automatically generate a slug based on the title field if no custom slug is provided.
+
+:::warning
+The slugification functionality also transforms Unicode characters and symbols. When filtering a model by the query parameter, it may be necessary to decode the slug parameter first, because although the browser may show you the unicode characters, it will send the encoded characters in the HTTP request:
+
+```crystal
+class ArticleDetailsHandler < Marten::Handler
+  def get
+    article = Article.get(slug: URI.decode(params[:slug].to_s))
+
+    # …
+  end
+end
+```
+:::
 
 :::info
 As slug fields are usually used to query records, they are indexed by default. You can use the [`index`](#index) option (`index: false`) to disable auto-indexing.

@@ -85,7 +85,7 @@ describe Marten::DB::Field::Slug do
 
       article.save
 
-      article.slug.not_nil!.should eq("berraschungsmoment")
+      article.slug.not_nil!.should eq("überraschungsmoment")
     end
 
     it "removes emoji and special characters and slugifies the title" do
@@ -93,7 +93,7 @@ describe Marten::DB::Field::Slug do
 
       article.save
 
-      article.slug.not_nil!.should eq("travel-places")
+      article.slug.not_nil!.should eq("🚀-travel-places")
     end
 
     it "trims leading and trailing whitespace and slugifies the title" do

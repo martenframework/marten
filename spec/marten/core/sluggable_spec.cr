@@ -12,6 +12,11 @@ describe Marten::Core::Sluggable do
       slug.should eq("testtitle123")
     end
 
+    it "handles emojis" do
+      value_with_emojis = "🚀 TRAVEL & PLACES"
+      slug = Marten::Core::SluggableSpec::SlugGenerator.new.generate_slug(value_with_emojis, max_size)
+      slug.should eq("🚀-travel-places")
+    end
     it "converts the string to lowercase" do
       g_slug.should eq("test-title-123545434")
     end
@@ -31,7 +36,7 @@ describe Marten::Core::Sluggable do
     it "removes non-ASCII characters" do
       value_with_non_ascii = "Test Títle 123"
       slug = Marten::Core::SluggableSpec::SlugGenerator.new.generate_slug(value_with_non_ascii, max_size)
-      slug.should eq("test-ttle-123")
+      slug.should eq("test-títle-123")
     end
 
     it "limits the slug length to max_size" do

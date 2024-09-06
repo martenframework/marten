@@ -21,7 +21,16 @@ module Marten
       include ContentSecurityPolicy
       include XFrameOptions
 
-      HTTP_METHOD_NAMES = %w(get post put patch delete head options trace)
+      HTTP_METHOD_NAMES = [
+        METHOD_GET,
+        METHOD_POST,
+        METHOD_PUT,
+        METHOD_PATCH,
+        METHOD_DELETE,
+        METHOD_HEAD,
+        METHOD_OPTIONS,
+        METHOD_TRACE,
+      ]
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
 
@@ -45,7 +54,7 @@ module Marten
 
       # Allows to specify the allowed HTTP methods.
       def self.http_method_names(*method_names : String | Symbol)
-        @@http_method_names = method_names.to_a.map(&.to_s)
+        @@http_method_names = method_names.to_a.map(&.to_s.upcase)
       end
 
       def initialize(@request : HTTP::Request, @params : Routing::MatchParameters)
@@ -72,7 +81,7 @@ module Marten
       # response will be returned if the considered HTTP method is not allowed. The `#dispatch` method can also be
       # overridden on a per-handler basis in order to implement any other arbitrary logics if necessary.
       def dispatch : Marten::HTTP::Response
-        if self.class.http_method_names.includes?(request.method.downcase)
+        if self.class.http_method_names.includes?(request.method.upcase)
           call_http_method
         else
           handle_http_method_not_allowed
@@ -256,23 +265,32 @@ module Marten
       # Convenient helper method to resolve a route name.
       delegate reverse, to: Marten.routes
 
+      private METHOD_DELETE  = "DELETE"
+      private METHOD_GET     = "GET"
+      private METHOD_HEAD    = "HEAD"
+      private METHOD_OPTIONS = "OPTIONS"
+      private METHOD_PATCH   = "PATCH"
+      private METHOD_POST    = "POST"
+      private METHOD_PUT     = "PUT"
+      private METHOD_TRACE   = "TRACE"
+
       private def call_http_method
-        case request.method.downcase
-        when "get"
+        case request.method.upcase
+        when METHOD_GET
           get
-        when "post"
+        when METHOD_POST
           post
-        when "put"
+        when METHOD_PUT
           put
-        when "patch"
+        when METHOD_PATCH
           patch
-        when "delete"
+        when METHOD_DELETE
           delete
-        when "head"
+        when METHOD_HEAD
           head
-        when "options"
+        when METHOD_OPTIONS
           options
-        when "trace"
+        when METHOD_TRACE
           trace
         else
           handle_http_method_not_allowed

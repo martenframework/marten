@@ -61,21 +61,21 @@ describe Marten::Handlers::Base do
 
   describe "::http_method_names" do
     it "returns all the HTTP method names unless explicitely set" do
-      Marten::Handlers::Base.http_method_names.should eq %w(get post put patch delete head options trace)
+      Marten::Handlers::Base.http_method_names.should eq %w(GET POST PUT PATCH DELETE HEAD OPTIONS TRACE)
     end
 
     it "returns the configured HTTP method names if explictely set" do
-      Marten::Handlers::BaseSpec::Test1Handler.http_method_names.should eq %w(get post options)
+      Marten::Handlers::BaseSpec::Test1Handler.http_method_names.should eq %w(GET POST OPTIONS)
     end
   end
 
   describe "::http_method_names(*method_names)" do
     it "allows to set the supported HTTP method names using strings" do
-      Marten::Handlers::BaseSpec::Test1Handler.http_method_names.should eq %w(get post options)
+      Marten::Handlers::BaseSpec::Test1Handler.http_method_names.should eq %w(GET POST OPTIONS)
     end
 
     it "allows to set the supported HTTP method names using symbols" do
-      Marten::Handlers::BaseSpec::Test2Handler.http_method_names.should eq %w(post put)
+      Marten::Handlers::BaseSpec::Test2Handler.http_method_names.should eq %w(POST PUT)
     end
   end
 

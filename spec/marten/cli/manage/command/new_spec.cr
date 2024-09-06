@@ -482,6 +482,7 @@ module Marten::CLI::Manage::Command::NewSpec
     "src/templates/base.html",
     ".editorconfig",
     ".gitignore",
+    "seed.cr",
     "manage.cr",
     "shard.yml",
   ]

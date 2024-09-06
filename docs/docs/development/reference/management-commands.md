@@ -230,6 +230,16 @@ marten resetmigrations foo # Resets the migrations of the "foo" application
 
 Displays all the routes of the application.
 
+## `seed`
+
+**Usage:** `marten seed [options]`
+
+Populate the database by running the seed file.
+
+### Options
+
+* `-f PATH, --file=PATH` - Specify a custom path to the seed file
+
 ## `serve`
 
 **Usage:** `marten serve [options]`

@@ -56,6 +56,7 @@ Available commands:
   › play             Start a Crystal playground server initialized for the current project.
   › resetmigrations  Reset an existing set of migrations into a single one.
   › routes           Display all the routes of the application.
+  › seed             Populate the database by running the seed file.
   › serve / s        Start a development server that is automatically recompiled when source files change.
   › version          Show the Marten version.
 

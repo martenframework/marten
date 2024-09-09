@@ -53,7 +53,7 @@ describe Marten::CLI::Manage::Command::Seed do
       stderr.rewind.gets_to_end.empty?.should be_true
     end
 
-    it "generates a default seed file if none exists" do
+    it "prints an error if no seed file was found" do
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -66,10 +66,6 @@ describe Marten::CLI::Manage::Command::Seed do
       command.handle
 
       stdout.rewind.gets_to_end.includes?("Seed file not found at ./seed.cr").should be_true
-      stdout.rewind.gets_to_end.includes?("Default seed file generated at ./seed.cr").should be_true
-
-      # Check that the file was generated
-      File.exists?("./seed.cr").should be_true
     end
 
     it "handles errors if the seed file fails to run" do

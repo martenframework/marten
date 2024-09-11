@@ -57,6 +57,7 @@ myblog/
 ├── .editorconfig
 ├── .gitignore
 ├── manage.cr
+├── seed.cr
 └── shard.yml
 ```
 
@@ -70,6 +71,7 @@ These files and folders are described below:
 | .editorconfig | Regular `.editorconfig` which file defines basic indentation coding styles for Crystal. |
 | .gitignore | Regular `.gitignore` file which tells git the files and directories that should be ignored. |
 | manage.cr | This file defines a CLI that lets you interact with your Marten project in order to perform various actions (e.g. running database migrations, collecting assets, etc). |
+| seed.cr | This file can be used to define logics for populating your project's database with initial or default data. |
 | shard.yml | The standard [shard.yml](https://crystal-lang.org/reference/the_shards_command/index.html) file, that lists the dependencies that are required to build your application. |
 
 Now that the project structure is created, you can change into the `myblog` directory (if you haven't already) in order to install the project dependencies by running the following command:

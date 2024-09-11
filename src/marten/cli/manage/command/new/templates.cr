@@ -76,6 +76,7 @@ module Marten
               # Other files
               files << {".editorconfig", editorconfig}
               files << {".gitignore", gitignore}
+              files << {"seed.cr", ECR.render("#{__DIR__}/templates/project/seed.cr.ecr")}
               files << {"manage.cr", ECR.render("#{__DIR__}/templates/project/manage.cr.ecr")}
               files << {"shard.yml", ECR.render("#{__DIR__}/templates/project/shard.yml.ecr")}
               if context.edge

@@ -65,7 +65,7 @@ describe Marten::CLI::Manage::Command::Seed do
 
       command.handle
 
-      stdout.rewind.gets_to_end.includes?("Seed file not found at ./seed.cr").should be_true
+      stderr.rewind.gets_to_end.includes?("Seed file not found at ./seed.cr").should be_true
     end
 
     it "handles errors if the seed file fails to run" do

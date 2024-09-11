@@ -29,7 +29,7 @@ module Marten
               print "Running seed file at #{seed_path}"
               Process.run("crystal #{seed_path}", shell: true, output: stdout, error: stderr)
             else
-              print "Seed file not found at #{seed_path}."
+              print_error "Seed file not found at #{seed_path}."
             end
           end
         end

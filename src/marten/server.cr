@@ -10,7 +10,7 @@ module Marten
     def self.handlers
       [
         ::HTTP::ErrorHandler.new,
-        Handlers::Logger.new,
+        Marten.settings.debug? ? Handlers::DebugLogger.new : Handlers::Logger.new,
         Handlers::Error.new,
         Handlers::Middleware.new,
         Handlers::Routing.new,

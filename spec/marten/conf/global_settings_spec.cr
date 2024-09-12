@@ -177,6 +177,19 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#debug?" do
+    it "returns false by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.debug?.should be_false
+    end
+
+    it "returns true if debug mode is enabled" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.debug = true
+      global_settings.debug?.should be_true
+    end
+  end
+
   describe "#debug=" do
     it "allows to enable or disable the debug mode" do
       global_settings = Marten::Conf::GlobalSettings.new
@@ -249,6 +262,50 @@ describe Marten::Conf::GlobalSettings do
     it "returns the IOBackend instance by default" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.log_backend.should be_a ::Log::IOBackend
+    end
+
+    it "sets the expected IOBackend formatter in debug mode" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.debug = true
+
+      io = IO::Memory.new
+
+      global_settings.log_backend.as(Log::IOBackend).formatter.format(
+        Log::Entry.new(
+          source: "test",
+          severity: Log::Severity::Info,
+          message: "This is a test",
+          data: Log::Metadata.empty,
+          exception: nil,
+        ),
+        io: io,
+      )
+
+      io.rewind.gets_to_end.should eq "This is a test"
+    end
+
+    it "sets the expected IOBackend formatter in non-debug mode" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.debug = false
+
+      dt = Time.local
+
+      Timecop.freeze(Time.local) do
+        io = IO::Memory.new
+
+        global_settings.log_backend.as(Log::IOBackend).formatter.format(
+          Log::Entry.new(
+            source: "test",
+            severity: Log::Severity::Info,
+            message: "This is a test",
+            data: Log::Metadata.empty,
+            exception: nil,
+          ),
+          io: io,
+        )
+
+        io.rewind.gets_to_end.should eq "[I] [#{dt.to_utc}] [Server] This is a test"
+      end
     end
 
     it "returns the configured log backend if explicitely set" do

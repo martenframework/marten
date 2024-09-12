@@ -3,6 +3,7 @@ module Marten
     module Handlers
       class Routing
         include ::HTTP::Handler
+        include Core::DebugModeLoggable
 
         def call(context : ::HTTP::Server::Context)
           process(context)
@@ -21,6 +22,8 @@ module Marten
 
         private def process(context)
           matched = Marten.routes.resolve(context.request.path)
+
+          debug_mode_info_log("Routed to: #{matched.handler.name}")
 
           handler = matched.handler.new(context.marten.request, matched.kwargs)
           context.marten.response = handler.process_dispatch.as(HTTP::Response)

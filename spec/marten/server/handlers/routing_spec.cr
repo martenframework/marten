@@ -36,6 +36,29 @@ describe Marten::Server::Handlers::Routing do
       context.marten.response.not_nil!.content.should eq "It works!"
     end
 
+    it "logs an entry indicating the matched handler in debug mode" do
+      handler = Marten::Server::Handlers::Routing.new
+
+      context = HTTP::Server::Context.new(
+        request: ::HTTP::Request.new(
+          method: "GET",
+          resource: "/dummy",
+          headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
+        ),
+        response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+      )
+
+      with_overridden_setting("debug", true) do
+        Log.capture do |logs|
+          handler.call(context)
+
+          logs.check(:info, /Routed to: DummyHandler/i)
+        end
+
+        context.marten.response.not_nil!.content.should eq "It works!"
+      end
+    end
+
     context "with the trailing_slash setting set to do_nothing" do
       it "raises Marten::Routing::Errors::NoResolveMatch if the requested route cannot be resolved" do
         handler = Marten::Server::Handlers::Routing.new

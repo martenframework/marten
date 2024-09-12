@@ -13,6 +13,7 @@ module Marten
     # This class defines the behaviour of a handler. A handler is initialized from an HTTP request and it is responsible
     # for processing a request in order to produce an HTTP response (which can be an HTML content, a redirection, etc).
     class Base
+      include Core::DebugModeLoggable
       include Callbacks
       include Cookies
       include Flash
@@ -223,6 +224,8 @@ module Marten
         if before_render_response.is_a?(HTTP::Response)
           before_render_response
         else
+          debug_mode_info_log("Rendering template: #{template_name}")
+
           HTTP::Response.new(
             content: Marten.templates.get_template(template_name).render(self.context),
             content_type: content_type,

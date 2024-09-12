@@ -9,7 +9,7 @@ module Marten
       @handler403 : Handlers::Base.class
       @handler404 : Handlers::Base.class
       @handler500 : Handlers::Base.class
-      @log_backend : ::Log::Backend
+      @log_backend : ::Log::Backend | Nil
       @request_max_parameters : Nil | Int32
       @root_path : String?
       @target_env : String?
@@ -26,6 +26,9 @@ module Marten
 
       # Returns a boolean indicating whether the application runs in debug mode.
       getter debug
+
+      # :ditto:
+      getter? debug
 
       # Returns the configured handler class that should generate responses for Bad Request responses (HTTP 400).
       getter handler400
@@ -44,9 +47,6 @@ module Marten
 
       # Returns the third-party applications used by the project.
       getter installed_apps
-
-      # Returns the log backend used by the application.
-      getter log_backend
 
       # The default log level used by the application.
       getter log_level
@@ -194,18 +194,6 @@ module Marten
         @handler500 = Handlers::Defaults::ServerError
         @host = "127.0.0.1"
         @installed_apps = Array(Marten::Apps::Config.class).new
-        @log_backend = ::Log::IOBackend.new(
-          formatter: ::Log::Formatter.new do |entry, io|
-            io << "[#{entry.severity.to_s[0]}] "
-            io << "[#{entry.timestamp.to_utc}] "
-            io << "[Server] "
-            io << entry.message
-
-            entry.data.each do |k, v|
-              io << "\n  #{k}: #{v}"
-            end
-          end
-        )
         @log_level = ::Log::Severity::Info
         @middleware = Array(Marten::Middleware.class).new
         @port = 8000
@@ -269,6 +257,30 @@ module Marten
       def installed_apps=(v)
         @installed_apps = Array(Marten::Apps::Config.class).new
         @installed_apps.concat(v)
+      end
+
+      # Returns the log backend used by the application.
+      def log_backend
+        @log_backend ||= if debug?
+                           ::Log::IOBackend.new(
+                             formatter: ::Log::Formatter.new do |entry, io|
+                               io << entry.message
+                             end
+                           )
+                         else
+                           ::Log::IOBackend.new(
+                             formatter: ::Log::Formatter.new do |entry, io|
+                               io << "[#{entry.severity.to_s[0]}] "
+                               io << "[#{entry.timestamp.to_utc}] "
+                               io << "[Server] "
+                               io << entry.message
+
+                               entry.data.each do |k, v|
+                                 io << "\n  #{k}: #{v}"
+                               end
+                             end
+                           )
+                         end
       end
 
       # Allows to set the log backend used by the application.

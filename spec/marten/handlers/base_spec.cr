@@ -959,6 +959,29 @@ describe Marten::Handlers::Base do
       response.content_type.should eq "text/plain"
       response.content.strip.should eq "Hello World, John Doe!"
     end
+
+    it "logs an entry indicating the rendered template in debug mode" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+
+      with_overridden_setting("debug", true) do
+        Log.capture do |logs|
+          handler.render(
+            "specs/handlers/base/test.html",
+            context: Marten::Template::Context{"name" => "John Doe"}
+          )
+
+          logs.check(:info, /Rendering template: specs\/handlers\/base\/test.html/)
+        end
+      end
+    end
   end
 
   describe "#respond" do

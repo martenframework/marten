@@ -1,6 +1,7 @@
 ENV["MARTEN_ENV"] = "test"
 
 require "json"
+require "log/spec"
 require "spec"
 require "timecop"
 

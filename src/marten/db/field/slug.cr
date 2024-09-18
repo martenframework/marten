@@ -27,8 +27,10 @@ module Marten
 
         def prepare_save(record, new_record = false)
           if slugify?(record.get_field_value(id))
-            slug = generate_slug(record.get_field_value(slugify.not_nil!).to_s, max_size)
-            record.set_field_value(id, slug)
+            record.set_field_value(
+              id,
+              generate_slug(record.get_field_value(slugify.not_nil!).to_s, max_size)
+            )
           end
         end
 

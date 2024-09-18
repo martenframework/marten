@@ -86,11 +86,7 @@ module Marten
         def perform_validation(record : Model)
           value = record.get_field_value(id)
 
-          if value.nil? && !@null
-            record.errors.add(id, null_error_message(record), type: :null)
-          elsif empty_value?(value) && !@blank
-            record.errors.add(id, blank_error_message(record), type: :blank)
-          end
+          validate_presence(record, value)
 
           validate(record, value)
         end
@@ -131,7 +127,7 @@ module Marten
           raise NotImplementedError.new("#relation_name must be implemented by subclasses if necessary")
         end
 
-        # Returns `true` if the if the value is considered truthy by the field.
+        # Returns `true` if the value is considered truthy by the field.
         def truthy_value?(value)
           !(value == false || value == 0 || value.nil?)
         end
@@ -145,6 +141,14 @@ module Marten
         #
         # This method should be overriden for each field implementation that requires custom validation logic.
         def validate(record, value)
+        end
+
+        protected def validate_presence(record : Model, value)
+          if value.nil? && !@null
+            record.errors.add(id, null_error_message(record), type: :null)
+          elsif empty_value?(value) && !@blank
+            record.errors.add(id, blank_error_message(record), type: :blank)
+          end
         end
 
         # :nodoc:

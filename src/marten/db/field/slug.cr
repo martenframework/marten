@@ -3,8 +3,10 @@ require "./string"
 module Marten
   module DB
     module Field
-      # Represents an slug field.
+      # Represents a slug field.
       class Slug < String
+        include Core::Sluggable
+
         def initialize(
           @id : ::String,
           @max_size : ::Int32 = 50,
@@ -14,8 +16,20 @@ module Marten
           @null = false,
           @unique = false,
           @index = true,
-          @db_column = nil
+          @db_column = nil,
+          @slugify : Symbol? = nil
         )
+        end
+
+        macro check_definition(field_id, kwargs)
+          # No-op max_size automatic checks...
+        end
+
+        def prepare_save(record, new_record = false)
+          if slugify?(record.get_field_value(id))
+            slug = generate_slug(record.get_field_value(slugify.not_nil!).to_s, max_size)
+            record.set_field_value(id, slug)
+          end
         end
 
         def validate(record, value)
@@ -29,8 +43,14 @@ module Marten
           end
         end
 
-        macro check_definition(field_id, kwargs)
-          # No-op max_size automatic checks...
+        protected def validate_presence(record : Model, value)
+          super if slugify.nil?
+        end
+
+        private getter slugify
+
+        private def slugify?(value)
+          slugify && (value.nil? || (value.is_a?(::String) && value.blank?))
         end
       end
     end

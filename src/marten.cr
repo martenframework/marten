@@ -237,7 +237,7 @@ module Marten
 
     Marten::Server.setup
 
-    Log.info { "Marten running on #{Marten::Server.addresses.join ", "} (Press CTRL+C to quit)" }
+    show_server_info
 
     Signal::INT.trap do
       Signal::INT.reset
@@ -298,6 +298,22 @@ module Marten
       opts.on("--log-level PORT", "Custom log level to use") do |log_level|
         override_log_level(log_level)
       end
+    end
+  end
+
+  private def self.show_server_info : Nil
+    base_message = "Marten running on #{Marten::Server.addresses.join ", "} (Press CTRL+C to quit)"
+
+    if Marten.settings.debug?
+      Log.info {
+        String.build do |s|
+          s << "#{"=" * base_message.size}\n"
+          s << base_message
+          s << "\n#{"=" * base_message.size}"
+        end
+      }
+    else
+      Log.info { base_message }
     end
   end
 end

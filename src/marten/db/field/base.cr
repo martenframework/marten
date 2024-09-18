@@ -143,14 +143,6 @@ module Marten
         def validate(record, value)
         end
 
-        protected def validate_presence(record : Model, value)
-          if value.nil? && !@null
-            record.errors.add(id, null_error_message(record), type: :null)
-          elsif empty_value?(value) && !@blank
-            record.errors.add(id, blank_error_message(record), type: :blank)
-          end
-        end
-
         # :nodoc:
         macro check_definition(field_id, kwargs)
         end
@@ -191,6 +183,14 @@ module Marten
 
               def {{ field_id }}=(@{{ field_id }} : {{ field_ann[:exposed_type] }}?); end
             {% end %}
+          end
+        end
+
+        protected def validate_presence(record : Model, value)
+          if value.nil? && !@null
+            record.errors.add(id, null_error_message(record), type: :null)
+          elsif empty_value?(value) && !@blank
+            record.errors.add(id, blank_error_message(record), type: :blank)
           end
         end
 

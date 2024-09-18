@@ -50,7 +50,7 @@ module Marten
         private getter slugify
 
         private def slugify?(value)
-          slugify && (value.nil? || (value.is_a?(::String) && value.blank?))
+          slugify && empty_value?(value)
         end
       end
     end

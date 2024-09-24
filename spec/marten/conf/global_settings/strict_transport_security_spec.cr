@@ -14,6 +14,19 @@ describe Marten::Conf::GlobalSettings::StrictTransportSecurity do
     end
   end
 
+  describe "#include_sub_domains?" do
+    it "returns false by default" do
+      sts_config = Marten::Conf::GlobalSettings::StrictTransportSecurity.new
+      sts_config.include_sub_domains?.should be_false
+    end
+
+    it "returns the customized value if applicable" do
+      sts_config = Marten::Conf::GlobalSettings::StrictTransportSecurity.new
+      sts_config.include_sub_domains = true
+      sts_config.include_sub_domains?.should be_true
+    end
+  end
+
   describe "#include_sub_domains=" do
     it "allows to specify a custom setting value as expected" do
       sts_config = Marten::Conf::GlobalSettings::StrictTransportSecurity.new
@@ -53,6 +66,19 @@ describe Marten::Conf::GlobalSettings::StrictTransportSecurity do
       sts_config = Marten::Conf::GlobalSettings::StrictTransportSecurity.new
       sts_config.preload = true
       sts_config.preload.should be_true
+    end
+  end
+
+  describe "#preload?" do
+    it "returns false by default" do
+      sts_config = Marten::Conf::GlobalSettings::StrictTransportSecurity.new
+      sts_config.preload?.should be_false
+    end
+
+    it "returns the customized value if applicable" do
+      sts_config = Marten::Conf::GlobalSettings::StrictTransportSecurity.new
+      sts_config.preload = true
+      sts_config.preload?.should be_true
     end
   end
 

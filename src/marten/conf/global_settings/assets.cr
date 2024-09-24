@@ -14,6 +14,9 @@ module Marten
         # Returns a boolean indicating whether assets should be looked for inside installed applications.
         getter app_dirs
 
+        # :ditto:
+        getter? app_dirs
+
         # Returns an array of directories where assets should be looked for.
         #
         # The order of these directories is important as it defines the order in which assets are searched for.

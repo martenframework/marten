@@ -385,6 +385,19 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#port_reuse?" do
+    it "returns true by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port_reuse?.should be_true
+    end
+
+    it "returns the specific port reuse configuration if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.port_reuse = false
+      global_settings.port_reuse?.should be_false
+    end
+  end
+
   describe "#port_reuse=" do
     it "allows to configure whether the port_reuse boolean configuration option" do
       global_settings = Marten::Conf::GlobalSettings.new
@@ -601,6 +614,19 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#use_x_forwarded_host?" do
+    it "returns false by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_host?.should be_false
+    end
+
+    it "returns the configured boolean value if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_host = true
+      global_settings.use_x_forwarded_host?.should be_true
+    end
+  end
+
   describe "#use_x_forwarded_host=" do
     it "allows to configure whether the X-Forwarded-Host header should be used" do
       global_settings = Marten::Conf::GlobalSettings.new
@@ -622,6 +648,19 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#use_x_forwarded_port?" do
+    it "returns false by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_port?.should be_false
+    end
+
+    it "returns the configured boolean value if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_port = true
+      global_settings.use_x_forwarded_port?.should be_true
+    end
+  end
+
   describe "#use_x_forwarded_port=" do
     it "allows to configure whether the X-Forwarded-Port header should be used" do
       global_settings = Marten::Conf::GlobalSettings.new
@@ -640,6 +679,19 @@ describe Marten::Conf::GlobalSettings do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_proto = true
       global_settings.use_x_forwarded_proto.should be_true
+    end
+  end
+
+  describe "#use_x_forwarded_proto?" do
+    it "returns false by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_proto?.should be_false
+    end
+
+    it "returns the configured boolean value if explicitely set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.use_x_forwarded_proto = true
+      global_settings.use_x_forwarded_proto?.should be_true
     end
   end
 

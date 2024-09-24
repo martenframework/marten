@@ -20,6 +20,25 @@ describe Marten::Conf::GlobalSettings::Assets do
     end
   end
 
+  describe "#app_dirs?" do
+    it "returns true by default" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.app_dirs?.should be_true
+    end
+
+    it "returns true if configured accordingly" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.app_dirs = true
+      assets_conf.app_dirs?.should be_true
+    end
+
+    it "returns false if configured accordingly" do
+      assets_conf = Marten::Conf::GlobalSettings::Assets.new
+      assets_conf.app_dirs = false
+      assets_conf.app_dirs?.should be_false
+    end
+  end
+
   describe "#app_dirs=" do
     it "allows to change the app_dirs confiuration as expected" do
       assets_conf = Marten::Conf::GlobalSettings::Assets.new

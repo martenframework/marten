@@ -35,6 +35,19 @@ describe Marten::Conf::GlobalSettings::CSRF do
     end
   end
 
+  describe "#cookie_http_only?" do
+    it "returns false by default" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.cookie_http_only?.should be_false
+    end
+
+    it "returns the configured value if applicable" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.cookie_http_only = true
+      csrf_conf.cookie_http_only?.should be_true
+    end
+  end
+
   describe "#cookie_http_only=" do
     it "allows to configure that client-side JS scripts should not have access to the CSRF cookie" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
@@ -125,6 +138,19 @@ describe Marten::Conf::GlobalSettings::CSRF do
     end
   end
 
+  describe "#cookie_secure?" do
+    it "returns false by default" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.cookie_secure?.should be_false
+    end
+
+    it "returns the configured value if applicable" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.cookie_secure = true
+      csrf_conf.cookie_secure?.should be_true
+    end
+  end
+
   describe "#cookie_secure=" do
     it "allows to configure whether a secure cookie should be used" do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
@@ -143,6 +169,19 @@ describe Marten::Conf::GlobalSettings::CSRF do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
       csrf_conf.protection_enabled = false
       csrf_conf.protection_enabled.should be_false
+    end
+  end
+
+  describe "#protection_enabled?" do
+    it "returns true by default" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.protection_enabled?.should be_true
+    end
+
+    it "returns the configured value if applicable" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.protection_enabled = false
+      csrf_conf.protection_enabled?.should be_false
     end
   end
 
@@ -212,6 +251,19 @@ describe Marten::Conf::GlobalSettings::CSRF do
       csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
       csrf_conf.use_session = true
       csrf_conf.use_session.should be_true
+    end
+  end
+
+  describe "#use_session?" do
+    it "returns false by default" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.use_session?.should be_false
+    end
+
+    it "returns the configured value if applicable" do
+      csrf_conf = Marten::Conf::GlobalSettings::CSRF.new
+      csrf_conf.use_session = true
+      csrf_conf.use_session?.should be_true
     end
   end
 

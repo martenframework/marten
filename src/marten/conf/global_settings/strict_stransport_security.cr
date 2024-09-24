@@ -10,6 +10,9 @@ module Marten
         # Indicates if the `includeSubDomains` directive should be set on the Strict-Transport-Security header.
         getter include_sub_domains
 
+        # :ditto:
+        getter? include_sub_domains
+
         # Returns the max age to use for the Strict-Transport-Security header.
         #
         # A `nil` value indicates that the Strict-Transport-Security header will not be set.
@@ -17,6 +20,9 @@ module Marten
 
         # Indicates if the `preload` directive should be set on the Strict-Transport-Security header.
         getter preload
+
+        # :ditto:
+        getter? preload
 
         # Allows to define if the `includeSubDomains` directive should be set on the Strict-Transport-Security header.
         setter include_sub_domains

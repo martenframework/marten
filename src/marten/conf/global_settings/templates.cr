@@ -14,8 +14,14 @@ module Marten
         # Returns a boolean indicating whether templates should be looked for inside installed applications.
         getter app_dirs
 
+        # :ditto:
+        getter? app_dirs
+
         # Returns a boolean indicating whether templates should be kept in a memory cache upon being loaded and parsed.
         getter cached
+
+        # :ditto:
+        getter? cached
 
         # Returns an array of context producers that will be used to populate the context for each template.
         getter context_producers
@@ -28,11 +34,11 @@ module Marten
         # Returns a boolean indicating whether included templates should be isolated from the outer context by default.
         getter isolated_inclusions
 
-        # Returns the list of template loaders or nil
-        getter loaders
-
         # :ditto:
         getter? isolated_inclusions
+
+        # Returns the list of template loaders or nil
+        getter loaders
 
         # Returns `true` if the strict variables mode is enabled.
         getter strict_variables

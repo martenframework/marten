@@ -17,6 +17,9 @@ module Marten
         # Returns a boolean indicating whether client-side scripts should have access to the session cookie.
         getter cookie_http_only
 
+        # :ditto:
+        getter? cookie_http_only
+
         # Returns the max age (in seconds) of the session cookie.
         #
         # By default, the session cookie max age is set to `1209600` (two weeks).
@@ -30,6 +33,9 @@ module Marten
 
         # Returns a boolean indicating whether to use a secure cookie for the session cookie.
         getter cookie_secure
+
+        # :ditto:
+        getter? cookie_secure
 
         # Returns the identifier of the store that should be used to handle sessions.
         getter store

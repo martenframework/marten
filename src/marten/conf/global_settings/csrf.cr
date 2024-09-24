@@ -23,6 +23,9 @@ module Marten
         # Returns a boolean indicating whether client-side scripts should have access to the CSRF token cookie.
         getter cookie_http_only
 
+        # :ditto:
+        getter? cookie_http_only
+
         # Returns the max age (in seconds) of the CSRF cookie.
         #
         # By default, CSRF cookie max age is set to `31556952` (approximatively one year).
@@ -37,11 +40,20 @@ module Marten
         # Returns a boolean indicating whether to use a secure cookie for the CSRF cookie.
         getter cookie_secure
 
+        # :ditto:
+        getter? cookie_secure
+
         # Returns a boolean indicating if CSRF protection is enabled globally (defaults to `true`).
         getter protection_enabled
 
+        # :ditto:
+        getter? protection_enabled
+
         # Returns a boolean indicating if the CSRF token is stored inside the session.
         getter use_session
+
+        # :ditto:
+        getter? use_session
 
         # Returns the array of CSRF-trusted origins.
         getter trusted_origins

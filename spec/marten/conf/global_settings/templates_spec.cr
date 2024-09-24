@@ -20,6 +20,25 @@ describe Marten::Conf::GlobalSettings::Templates do
     end
   end
 
+  describe "#app_dirs?" do
+    it "returns true by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.app_dirs?.should be_true
+    end
+
+    it "returns true if configured accordingly" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.app_dirs = true
+      templates_conf.app_dirs?.should be_true
+    end
+
+    it "returns false if configured accordingly" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.app_dirs = false
+      templates_conf.app_dirs?.should be_false
+    end
+  end
+
   describe "#app_dirs=" do
     it "allows to change the app_dirs confiuration as expected" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new
@@ -48,6 +67,25 @@ describe Marten::Conf::GlobalSettings::Templates do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new
       templates_conf.cached = false
       templates_conf.cached.should be_false
+    end
+  end
+
+  describe "#cached?" do
+    it "returns false by default" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.cached?.should be_false
+    end
+
+    it "returns true if configured accordingly" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.cached = true
+      templates_conf.cached?.should be_true
+    end
+
+    it "returns false if configured accordingly" do
+      templates_conf = Marten::Conf::GlobalSettings::Templates.new
+      templates_conf.cached = false
+      templates_conf.cached?.should be_false
     end
   end
 

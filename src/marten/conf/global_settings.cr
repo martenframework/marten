@@ -60,6 +60,9 @@ module Marten
       # Returns a boolean indicating whether multiple processes can bind to the same HTTP server port.
       getter port_reuse
 
+      # :ditto:
+      getter? port_reuse
+
       # Returns the default value to use for the Referrer-Policy header.
       #
       # The value of this setting will be used by the `Marten::Middleware::ReferrerPolicy` middleware when inserting the
@@ -84,11 +87,20 @@ module Marten
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
 
+      # :ditto:
+      getter? use_x_forwarded_host
+
       # Returns a boolean indicating if the X-Forwarded-Port header is used to determine the port of a request.
       getter use_x_forwarded_port
 
+      # :ditto:
+      getter? use_x_forwarded_port
+
       # Returns a boolean indicating if the X-Forwarded-Proto header is used to determine whether a request is secure.
       getter use_x_forwarded_proto
+
+      # :ditto:
+      getter? use_x_forwarded_proto
 
       # Returns the value to use for the X-Frame-Options header when the associated middleware is used.
       #

@@ -35,6 +35,19 @@ describe Marten::Conf::GlobalSettings::Sessions do
     end
   end
 
+  describe "#cookie_http_only?" do
+    it "returns false by default" do
+      sessions_conf = Marten::Conf::GlobalSettings::Sessions.new
+      sessions_conf.cookie_http_only?.should be_false
+    end
+
+    it "returns the configured value if applicable" do
+      sessions_conf = Marten::Conf::GlobalSettings::Sessions.new
+      sessions_conf.cookie_http_only = true
+      sessions_conf.cookie_http_only?.should be_true
+    end
+  end
+
   describe "#cookie_http_only=" do
     it "allows to configure that client-side JS scripts should not have access to the session cookie" do
       sessions_conf = Marten::Conf::GlobalSettings::Sessions.new
@@ -122,6 +135,19 @@ describe Marten::Conf::GlobalSettings::Sessions do
       sessions_conf = Marten::Conf::GlobalSettings::Sessions.new
       sessions_conf.cookie_secure = true
       sessions_conf.cookie_secure.should be_true
+    end
+  end
+
+  describe "#cookie_secure?" do
+    it "returns false by default" do
+      sessions_conf = Marten::Conf::GlobalSettings::Sessions.new
+      sessions_conf.cookie_secure?.should be_false
+    end
+
+    it "returns the configured value if applicable" do
+      sessions_conf = Marten::Conf::GlobalSettings::Sessions.new
+      sessions_conf.cookie_secure = true
+      sessions_conf.cookie_secure?.should be_true
     end
   end
 

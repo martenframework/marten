@@ -169,6 +169,14 @@ This setting allows you to configure whether an HTTP permanent redirect (301) sh
 * `:add` - If the incoming URL does not end with a slash and does not match any routes, a redirect is issued to the same URL with a trailing slash appended.
 * `:remove` - If the incoming URL ends with a slash and does not match any routes, a redirect is issued to the same URL with the trailing slash removed.
 
+### `unsupported_http_method_strategy`
+
+Default: `:deny`
+
+The strategy to use when an unsupported HTTP method is encountered.
+
+This setting allows you to configure the strategy to use when a handler processes an unsupported HTTP method. The default strategy is `:deny`, which means that the application will return a 405 Method Not Allowed response when an unsupported HTTP method is encountered. The other available strategy is `:hide`, which will results in 404 Not Found responses to be returned instead.
+
 ### `use_x_forwarded_host`
 
 Default: `false`

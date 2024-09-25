@@ -404,7 +404,7 @@ describe Marten::Handlers::Base do
       response.content.should eq "TRACE processed"
     end
 
-    it "returns an HTTP Not Allowed responses for if the method is not handled by the handler" do
+    it "returns an HTTP Not Allowed response if the method is not handled by the handler" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "PATCH",
@@ -415,6 +415,26 @@ describe Marten::Handlers::Base do
       handler = Marten::Handlers::BaseSpec::Test1Handler.new(request)
       response = handler.dispatch
       response.status.should eq 405
+    end
+
+    it "returns an HTTP Not Found response if the method is not handled and the corresponding setting is set to hide" do
+      with_overridden_setting(
+        "unsupported_http_method_strategy",
+        Marten::Conf::GlobalSettings::UnsupportedHttpMethodStrategy::HIDE
+      ) do
+        request = Marten::HTTP::Request.new(
+          ::HTTP::Request.new(
+            method: "PATCH",
+            resource: "",
+            headers: HTTP::Headers{"Host" => "example.com"}
+          )
+        )
+        handler = Marten::Handlers::BaseSpec::Test1Handler.new(request)
+
+        expect_raises(Marten::HTTP::Errors::NotFound) do
+          handler.dispatch
+        end
+      end
     end
   end
 

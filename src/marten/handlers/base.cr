@@ -310,7 +310,11 @@ module Marten
       end
 
       private def handle_http_method_not_allowed
-        HTTP::Response::MethodNotAllowed.new(self.class.http_method_names)
+        if Marten.settings.unsupported_http_method_strategy.deny?
+          HTTP::Response::MethodNotAllowed.new(self.class.http_method_names)
+        else
+          raise Marten::HTTP::Errors::NotFound.new("Method not allowed")
+        end
       end
     end
   end

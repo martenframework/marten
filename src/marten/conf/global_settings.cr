@@ -14,6 +14,7 @@ module Marten
       @root_path : String?
       @target_env : String?
       @trailing_slash : TrailingSlash
+      @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -83,6 +84,9 @@ module Marten
 
       # Returns the trailing slash strategy.
       getter trailing_slash
+
+      # Returns the strategy to use when an unsupported HTTP method is encountered.
+      getter unsupported_http_method_strategy
 
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
@@ -172,6 +176,13 @@ module Marten
       # from URLs if they can't be found.
       setter trailing_slash
 
+      # Allows to set the strategy to use when an unsupported HTTP method is encountered.
+      #
+      # The default strategy is `:deny`, which means that the application will return a 405 Method Not Allowed response
+      # when an unsupported HTTP method is encountered. The other available strategy is `:hide`, which will results in
+      # 404 Not Found responses being returned instead.
+      setter unsupported_http_method_strategy
+
       # Allows to set whether the X-Forwarded-Host header is used to look for the host.
       setter use_x_forwarded_host
 
@@ -215,6 +226,7 @@ module Marten
         @secret_key = ""
         @time_zone = Time::Location.load("UTC")
         @trailing_slash = :do_nothing
+        @unsupported_http_method_strategy = :deny
         @use_x_forwarded_host = false
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false

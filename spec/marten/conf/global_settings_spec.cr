@@ -601,6 +601,29 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#unsupported_http_method_strategy" do
+    it "returns :deny by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.unsupported_http_method_strategy.deny?.should be_true
+    end
+
+    it "returns the configured unsupported HTTP method strategy if explicitly set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.unsupported_http_method_strategy = :hide
+
+      global_settings.unsupported_http_method_strategy.hide?.should be_true
+    end
+  end
+
+  describe "#unsupported_http_method_strategy=" do
+    it "allows to configure the unsupported HTTP method strategy" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.unsupported_http_method_strategy = :hide
+
+      global_settings.unsupported_http_method_strategy.hide?.should be_true
+    end
+  end
+
   describe "#use_x_forwarded_host" do
     it "returns false by default" do
       global_settings = Marten::Conf::GlobalSettings.new

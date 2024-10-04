@@ -208,6 +208,22 @@ describe Marten::Handlers::Schema do
       handler.schema["foo"].value.should eq "123"
       handler.schema["bar"].value.should eq "456"
     end
+
+    it "returns a schema instance that uses the initial data defined by the handlera" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "bar=456"
+        )
+      )
+      handler = Marten::Handlers::SchemaSpec::TestHandlerWithInitialData.new(request)
+
+      handler.schema.should be_a Marten::Handlers::SchemaSpec::TestSchema
+      handler.schema.get_field_value("foo").should eq "initial"
+      handler.schema.get_field_value("bar").should eq "456"
+    end
   end
 
   describe "#schema_class" do
@@ -413,6 +429,16 @@ module Marten::Handlers::SchemaSpec
     schema TestSchema
     success_route_name "dummy"
     template_name "specs/handlers/schema/test.html"
+  end
+
+  class TestHandlerWithInitialData < Marten::Handlers::Schema
+    schema TestSchema
+    success_route_name "dummy"
+    template_name "specs/handlers/schema/test.html"
+
+    def initial_data
+      {"foo" => "initial"}
+    end
   end
 
   class TestHandlerWithSuccessUrl < Marten::Handlers::Schema

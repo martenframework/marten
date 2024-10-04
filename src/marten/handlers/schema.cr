@@ -70,7 +70,19 @@ module Marten
 
         # Returns the schema, initialized using the request data.
         def schema
-          @schema ||= schema_class.new(request.data, initial_data)
+          obtained_initial_data = initial_data
+          prepared_initial_data = case obtained_initial_data
+          when Marten::Schema::AnyDataHash
+            obtained_initial_data
+          else
+            Marten::Schema::DataHash.new.tap do |data|
+              obtained_initial_data.each do |key, value|
+                data[key.to_s] = value
+              end
+            end
+          end
+
+          @schema ||= schema_class.new(request.data, prepared_initial_data)
         end
 
         # Returns the schema class that should be used by the handler.
@@ -79,6 +91,7 @@ module Marten
         end
       end
 
+      # Returns the initial data to use to initialize the schema.
       def initial_data
         Marten::Schema::DataHash.new
       end

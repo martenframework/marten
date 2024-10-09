@@ -99,6 +99,19 @@ describe Marten::DB::Query::Page do
     end
   end
 
+  describe "#pages_count" do
+    it "returns the total number of pages" do
+      Tag.create!(name: "a_tag", is_active: true)
+      Tag.create!(name: "b_tag", is_active: true)
+      Tag.create!(name: "c_tag", is_active: true)
+      Tag.create!(name: "d_tag", is_active: true)
+      Tag.create!(name: "e_tag", is_active: true)
+
+      paginator = Tag.all.order(:name).paginator(2)
+      paginator.page(2).pages_count.should eq 3
+    end
+  end
+
   describe "#previous_page?" do
     it "returns true if there is a previous page number" do
       Tag.create!(name: "a_tag", is_active: true)

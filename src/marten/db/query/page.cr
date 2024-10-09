@@ -31,6 +31,11 @@ module Marten
           (number + 1) if next_page?
         end
 
+        # Returns the total number of pages.
+        def pages_count
+          paginator.pages_count
+        end
+
         # Returns `true` if there is a previous page.
         def previous_page?
           number > 1

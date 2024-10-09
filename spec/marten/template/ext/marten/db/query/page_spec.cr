@@ -102,8 +102,21 @@ describe Marten::DB::Query::Page do
       tag = Tag.create!(name: "a_tag", is_active: true)
       paginator = Tag.all.order(:name).paginator(2)
 
-      Marten::DB::Query::Page(Tag).new([tag], 2, paginator).resolve_template_attribute("any?").should be_true
-      Marten::DB::Query::Page(Tag).new([] of Tag, 2, paginator).resolve_template_attribute("any?").should be_false
+      Marten::DB::Query::Page(Tag).new([tag], 2, paginator).resolve_template_attribute("one?").should be_true
+      Marten::DB::Query::Page(Tag).new([] of Tag, 2, paginator).resolve_template_attribute("one?").should be_false
+    end
+
+    it "returns the expected result when requesting the 'pages_count' attribute" do
+      Tag.create!(name: "a_tag", is_active: true)
+      Tag.create!(name: "b_tag", is_active: true)
+      Tag.create!(name: "c_tag", is_active: true)
+      Tag.create!(name: "d_tag", is_active: true)
+      Tag.create!(name: "e_tag", is_active: true)
+
+      paginator = Tag.all.order(:name).paginator(2)
+      page = paginator.page(2)
+
+      page.resolve_template_attribute("pages_count").should eq 3
     end
 
     it "returns the expected result when requesting the 'previous_page?' attribute" do

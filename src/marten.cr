@@ -15,6 +15,7 @@ require "mime/media_type"
 require "msgpack"
 require "openssl/hmac"
 require "option_parser"
+require "uri"
 require "uuid"
 
 require "./marten/app"

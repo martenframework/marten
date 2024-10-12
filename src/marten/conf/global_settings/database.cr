@@ -92,6 +92,35 @@ module Marten
         def initialize(@id : String)
         end
 
+        def from_url(url : String)
+          # URI.parse cant parse 'sqlite://:memory:'
+          if url.starts_with? "sqlite://:memory:"
+            self.backend = "sqlite"
+            self.name = ":memory:"
+            return
+          end
+
+          uri = URI.parse url
+
+          self.backend = uri.scheme
+          self.host = uri.host
+          self.port = uri.port
+          self.user = uri.user
+          self.password = uri.password
+          self.name = uri.scheme == "sqlite" ? uri.host : uri.path[1..]?
+
+          params_map = uri.query_params.to_h
+          
+          self.checkout_timeout = params_map.delete("checkout_timeout").try &.to_f64 || @checkout_timeout
+          self.initial_pool_size = params_map.delete("initial_pool_size").try &.to_i32 || @initial_pool_size
+          self.max_pool_size = params_map.delete("max_pool_size").try &.to_i32 || @max_pool_size
+          self.max_idle_pool_size = params_map.delete("max_idle_pool_size").try &.to_i32 || @max_idle_pool_size
+          self.retry_attempts = params_map.delete("retry_attempts").try &.to_i32 || @retry_attempts
+          self.retry_delay = params_map.delete("retry_delay").try &.to_f64 || @retry_delay
+
+          self.options = params_map
+        end
+
         # Allows to set the connection backend of the database.
         def backend=(val : Nil | String | Symbol)
           @backend = val.try(&.to_s)

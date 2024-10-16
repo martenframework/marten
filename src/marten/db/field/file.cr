@@ -1,3 +1,5 @@
+require "./file/**"
+
 module Marten
   module DB
     module Field

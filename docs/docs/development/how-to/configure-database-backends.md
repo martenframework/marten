@@ -154,3 +154,26 @@ config.database do |db|
   db.name = "my_db.db"
 end
 ```
+
+### Using URLs
+```crystal
+# Configure db using just a URL
+config.database url: "postgres://my_user:my_db@localhost:1234/db"
+
+# Configure a db other than the default using just a URL
+config.database url: "postgres://my_user:my_db@localhost:1234/db"
+config.database :my_other_db, url: "sqlite://my_other.db?journal_mode=wal&synchronous=normal"
+
+# Configure db with a URL and a block
+config.database url: "postgres://my_user:my_db@localhost:1234/db" do |db|
+  db.retry_delay = 1.0
+end
+
+# Configure a db other than the default with a URL and a block
+config.database :my_other_db, url: "sqlite://my_other.db" do |db|
+  db.options = {
+    "journal_mode" => "wal"
+    "synchronous" => "normal"
+  }
+end
+```

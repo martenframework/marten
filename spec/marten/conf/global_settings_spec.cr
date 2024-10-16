@@ -148,6 +148,36 @@ describe Marten::Conf::GlobalSettings do
       global_settings.databases[0].name.should eq "db.sql"
     end
 
+    it "allows to configure the default DB connection using a URL" do
+      global_settings = Marten::Conf::GlobalSettings.new
+
+      global_settings.database url: "sqlite://db.sql"
+
+      global_settings.databases.size.should eq 1
+
+      global_settings.databases[0].id.should eq Marten::DB::Connection::DEFAULT_CONNECTION_NAME
+      global_settings.databases[0].backend.should eq "sqlite"
+      global_settings.databases[0].name.should eq "db.sql"
+    end
+
+    it "allows to configure the default DB connection using a URL and a block" do
+      global_settings = Marten::Conf::GlobalSettings.new
+
+      global_settings.database url: "sqlite://db.sql" do |db|
+        db.options = {
+          "journal_mode" => "wal",
+        }
+      end
+
+      global_settings.databases.size.should eq 1
+
+      global_settings.databases[0].id.should eq Marten::DB::Connection::DEFAULT_CONNECTION_NAME
+      global_settings.databases[0].backend.should eq "sqlite"
+      global_settings.databases[0].name.should eq "db.sql"
+      global_settings.databases[0].options.size.should eq 1
+      global_settings.databases[0].options["journal_mode"].should eq "wal"
+    end
+
     it "allows to configure a non-default DB connection" do
       global_settings = Marten::Conf::GlobalSettings.new
 
@@ -161,6 +191,35 @@ describe Marten::Conf::GlobalSettings do
       global_settings.databases[0].id.should eq "other"
       global_settings.databases[0].backend.should eq "sqlite"
       global_settings.databases[0].name.should eq "other_db.sql"
+    end
+
+    it "allows to configure a non-default DB connection using a URL" do
+      global_settings = Marten::Conf::GlobalSettings.new
+
+      global_settings.database :other, url: "sqlite://other_db.sql"
+      global_settings.databases.size.should eq 1
+
+      global_settings.databases[0].id.should eq "other"
+      global_settings.databases[0].backend.should eq "sqlite"
+      global_settings.databases[0].name.should eq "other_db.sql"
+    end
+
+    it "allows to configure a non-default DB connection using a URL and a block" do
+      global_settings = Marten::Conf::GlobalSettings.new
+
+      global_settings.database :other, url: "sqlite://other_db.sql" do |db|
+        db.options = {
+          "journal_mode" => "wal",
+        }
+      end
+
+      global_settings.databases.size.should eq 1
+
+      global_settings.databases[0].id.should eq "other"
+      global_settings.databases[0].backend.should eq "sqlite"
+      global_settings.databases[0].name.should eq "other_db.sql"
+      global_settings.databases[0].options.size.should eq 1
+      global_settings.databases[0].options["journal_mode"].should eq "wal"
     end
   end
 

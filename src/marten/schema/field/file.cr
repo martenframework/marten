@@ -19,7 +19,7 @@ module Marten
           @allow_empty_files
         end
 
-        def deserialize(value) : HTTP::UploadedFile?
+        def deserialize(value) : Marten::HTTP::UploadedFile?
           case value
           when HTTP::UploadedFile
             value

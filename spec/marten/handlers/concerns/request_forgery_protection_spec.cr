@@ -110,6 +110,49 @@ describe Marten::Handlers::RequestForgeryProtection do
         response.content.should eq "OK_#{unsafe_method}"
         response.status.should eq 200
       end
+
+      it "allows #{unsafe_method} requests if the csrftoken data parameter is specified and matches the CSRF token cookie" do
+        token = Marten::Handlers::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
+
+        raw_request = ::HTTP::Request.new(
+          method: unsafe_method,
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "foo=bar&csrftoken=#{token}"
+        )
+        raw_request.cookies["csrftoken"] = token
+        request = Marten::HTTP::Request.new(raw_request)
+
+        handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
+        response = handler.process_dispatch
+
+        response.content.should eq "OK_#{unsafe_method}"
+        response.status.should eq 200
+      end
+
+      it "allows #{unsafe_method} requests if the csrftoken data parameter is specified and matches the sessions CSRF token" do
+        session_store = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
+        Marten.settings.csrf.use_session = true
+
+        token = Marten::Handlers::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
+
+        session_store["csrftoken"] = token
+
+        raw_request = ::HTTP::Request.new(
+          method: unsafe_method,
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
+          body: "foo=bar&csrftoken=#{token}"
+        )
+        request = Marten::HTTP::Request.new(raw_request)
+        request.session = session_store
+
+        handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
+        response = handler.process_dispatch
+
+        response.content.should eq "OK_#{unsafe_method}"
+        response.status.should eq 200
+      end
     end
 
     it "allows unsafe requests if CSRF protection is disabled and requests does not contain the CSRF token" do
@@ -157,49 +200,6 @@ describe Marten::Handlers::RequestForgeryProtection do
       csrf_token.should_not be_nil
       csrf_token.should_not eq "bad"
       response.cookies["csrftoken"].should eq csrf_token
-    end
-
-    it "allows unsafe requests if the csrftoken POST parameter is specified and matches the CSRF token cookie" do
-      token = Marten::Handlers::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
-
-      raw_request = ::HTTP::Request.new(
-        method: "POST",
-        resource: "/test/xyz",
-        headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
-        body: "foo=bar&csrftoken=#{token}"
-      )
-      raw_request.cookies["csrftoken"] = token
-      request = Marten::HTTP::Request.new(raw_request)
-
-      handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
-      response = handler.process_dispatch
-
-      response.content.should eq "OK_POST"
-      response.status.should eq 200
-    end
-
-    it "allows unsafe requests if the csrftoken POST parameter is specified and matches the sessions CSRF token" do
-      session_store = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
-      Marten.settings.csrf.use_session = true
-
-      token = Marten::Handlers::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
-
-      session_store["csrftoken"] = token
-
-      raw_request = ::HTTP::Request.new(
-        method: "POST",
-        resource: "/test/xyz",
-        headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
-        body: "foo=bar&csrftoken=#{token}"
-      )
-      request = Marten::HTTP::Request.new(raw_request)
-      request.session = session_store
-
-      handler = Marten::Handlers::RequestForgeryProtectionSpec::TestHandler.new(request)
-      response = handler.process_dispatch
-
-      response.content.should eq "OK_POST"
-      response.status.should eq 200
     end
 
     it "allows unsafe requests if the X-CSRF-Token header is specified and matches the CSRF token cookie" do

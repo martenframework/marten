@@ -11,7 +11,7 @@ module Marten
     # HTTP response if the token value was explicitly requested through the use of the `#get_csrf_token` method
     # (otherwise no cookie is set). For each unsafe HTTP method (ie. methods that are not `GET`, `HEAD`, `OPTIONS` or
     # `TRACE`), the module will verify that the CSRF token cookie is available and that a `csrftoken` field is present
-    # in the `POST` data hash, or that a `X-CSRF-Token` header is defined. These two token will be verified and they
+    # in the request data hash, or that a `X-CSRF-Token` header is defined. These two token will be verified and they
     # must match; otherwise a 403 error is returned to the user. In addition to that, the module will also verify that
     # the HTTP request host is either part of the allowed hosts (`Marten.settins.allowed_hosts` setting) or that the
     # value of the `Origin` header matches the configured trusted origins (`Marten.settings.csrf.trusted_origins`
@@ -70,13 +70,13 @@ module Marten
         returned_csrf_token
       end
 
-      private CSRF_SAFE_HTTP_METHODS      = %w(get head options trace)
-      private CSRF_SECRET_SIZE            = 32
-      private CSRF_TOKEN_ALLOWED_CHARS    = ["-", "_"] + ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
-      private CSRF_TOKEN_HEADER_NAME      = "X-CSRF-Token"
-      private CSRF_TOKEN_INVALID_CHARS_RE = /[^a-zA-Z0-9-_]/
-      private CSRF_TOKEN_POST_DATA_NAME   = "csrftoken"
-      private CSRF_TOKEN_SIZE             = 64
+      private CSRF_SAFE_HTTP_METHODS       = %w(get head options trace)
+      private CSRF_SECRET_SIZE             = 32
+      private CSRF_TOKEN_ALLOWED_CHARS     = ["-", "_"] + ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
+      private CSRF_TOKEN_HEADER_NAME       = "X-CSRF-Token"
+      private CSRF_TOKEN_INVALID_CHARS_RE  = /[^a-zA-Z0-9-_]/
+      private CSRF_TOKEN_REQUEST_DATA_NAME = "csrftoken"
+      private CSRF_TOKEN_SIZE              = 64
 
       private getter csrf_token
       private getter csrf_token_update_required
@@ -195,7 +195,7 @@ module Marten
         end
 
         request_csrf_token = nil
-        request_csrf_token = request.data.fetch(CSRF_TOKEN_POST_DATA_NAME, nil) if request.post?
+        request_csrf_token = request.data.fetch(CSRF_TOKEN_REQUEST_DATA_NAME, nil)
         request_csrf_token = request.headers[CSRF_TOKEN_HEADER_NAME]? if request_csrf_token.nil?
 
         return reject("CSRF token is missing") if request_csrf_token.nil?

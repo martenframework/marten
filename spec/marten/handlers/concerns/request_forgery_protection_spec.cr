@@ -111,7 +111,7 @@ describe Marten::Handlers::RequestForgeryProtection do
         response.status.should eq 200
       end
 
-      it "allows #{unsafe_method} requests if the csrftoken data parameter is specified and matches the CSRF token cookie" do
+      it "allows #{unsafe_method} requests if the csrftoken data parameter matches the CSRF token cookie" do
         token = Marten::Handlers::RequestForgeryProtectionSpec::EXAMPLE_MASKED_SECRET_1
 
         raw_request = ::HTTP::Request.new(
@@ -130,7 +130,7 @@ describe Marten::Handlers::RequestForgeryProtection do
         response.status.should eq 200
       end
 
-      it "allows #{unsafe_method} requests if the csrftoken data parameter is specified and matches the sessions CSRF token" do
+      it "allows #{unsafe_method} requests if the csrftoken data parameter matches the sessions CSRF token" do
         session_store = Marten::HTTP::Session::Store::Cookie.new("sessionkey")
         Marten.settings.csrf.use_session = true
 

@@ -194,7 +194,6 @@ module Marten
           return reject("CSRF token is missing")
         end
 
-        request_csrf_token = nil
         request_csrf_token = request.data.fetch(CSRF_TOKEN_REQUEST_DATA_NAME, nil)
         request_csrf_token = request.headers[CSRF_TOKEN_HEADER_NAME]? if request_csrf_token.nil?
 

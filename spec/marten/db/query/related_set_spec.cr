@@ -99,4 +99,15 @@ describe Marten::DB::Query::RelatedSet do
       new_post.author.should eq user
     end
   end
+
+  describe "#fetch" do
+    it "sets the related object automatically" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Post 1")
+
+      qset = Marten::DB::Query::RelatedSet(Post).new(user, "author_id")
+
+      qset[0].get_related_object_variable(:author).should eq user
+    end
+  end
 end

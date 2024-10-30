@@ -15,6 +15,11 @@ module Marten
                    end
         end
 
+        protected def fetch
+          super
+          @result_cache.not_nil!.each { |r| r.assign_related_object(@instance, @related_field_id) }
+        end
+
         protected def build_record(**kwargs)
           record = M.new(**kwargs)
           record.assign_related_object(@instance, @related_field_id)

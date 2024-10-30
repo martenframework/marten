@@ -9,7 +9,7 @@ module Marten
       # ```
       # {% verbatim %}
       #   This should not be {{ processed }}.
-      # {% endverbaim %}
+      # {% endverbatim  %}
       # ```
       class Verbatim < Base
         @inner_nodes : NodeSet

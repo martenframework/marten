@@ -410,7 +410,7 @@ For example:
 ```
 {% verbatim %}
   This should not be {{ processed }}.
-{% endverbaim %}
+{% endverbatim  %}
 ```
 
 Would output `This should not be {{ processed }}.`.

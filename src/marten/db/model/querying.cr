@@ -862,7 +862,7 @@ module Marten
                   @instance : Marten::DB::Model,
                   @related_field_id : ::String,
                   query : Marten::DB::Query::SQL::Query({{ @type }})? = nil,
-                  @assign_related : Bool = false
+                  @assign_related : ::Bool = false
                 )
                   super(@instance, @related_field_id, query, @assign_related)
                 end

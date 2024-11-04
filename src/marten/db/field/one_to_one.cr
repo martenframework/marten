@@ -210,10 +210,18 @@ module Marten
 
                     def {{ related_field_name.id }}
                       @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}.get({{ field_id }}: pk)
+
+                      if @_reverse_o2o_{{ related_field_name.id }}
+                        @_reverse_o2o_{{ related_field_name.id }}.not_nil!.{{ relation_attribute_name }} ||= self
+                      end
+
+                      @_reverse_o2o_{{ related_field_name.id }}
                     end
 
                     def {{ related_field_name.id }}!
                       @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}.get!({{ field_id }}: pk)
+                      @_reverse_o2o_{{ related_field_name.id }}.not_nil!.{{ relation_attribute_name }} ||= self
+                      @_reverse_o2o_{{ related_field_name.id }}.not_nil!
                     end
                   end
                 end

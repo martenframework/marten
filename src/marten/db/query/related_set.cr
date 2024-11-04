@@ -5,7 +5,12 @@ module Marten
     module Query
       # Represents a query set resulting from a many-to-one relation.
       class RelatedSet(M) < Set(M)
-        def initialize(@instance : Marten::DB::Model, @related_field_id : String, query : SQL::Query(M)? = nil)
+        def initialize(
+          @instance : Marten::DB::Model,
+          @related_field_id : String,
+          query : SQL::Query(M)? = nil,
+          @assign_related : Bool = false
+        )
           @query = if query.nil?
                      q = SQL::Query(M).new
                      q.add_query_node(Node.new({@related_field_id => @instance.pk}))
@@ -17,7 +22,7 @@ module Marten
 
         protected def fetch
           super
-          @result_cache.not_nil!.each { |r| r.assign_related_object(@instance, @related_field_id) }
+          @result_cache.not_nil!.each { |r| r.assign_related_object(@instance, @related_field_id) } if @assign_related
         end
 
         protected def build_record(**kwargs)
@@ -30,7 +35,8 @@ module Marten
           RelatedSet(M).new(
             instance: @instance,
             related_field_id: @related_field_id,
-            query: other_query.nil? ? @query.clone : other_query.not_nil!
+            query: other_query.nil? ? @query.clone : other_query.not_nil!,
+            assign_related: @assign_related
           )
         end
       end

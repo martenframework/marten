@@ -202,7 +202,7 @@ module Marten
 
                     def {{ related_field_name.id }}
                       @_reverse_m2o_{{ related_field_name.id }} ||=
-                        {{ model_klass }}::RelatedQuerySet.new(self, {{ field_id.stringify }})
+                        {{ model_klass }}::RelatedQuerySet.new(self, {{ field_id.stringify }}, assign_related: true)
                     end
                   end
                 end

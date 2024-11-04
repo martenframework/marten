@@ -861,9 +861,10 @@ module Marten
                 def initialize(
                   @instance : Marten::DB::Model,
                   @related_field_id : ::String,
-                  query : Marten::DB::Query::SQL::Query({{ @type }})? = nil
+                  query : Marten::DB::Query::SQL::Query({{ @type }})? = nil,
+                  @assign_related : Bool = false
                 )
-                  super(@instance, @related_field_id, query)
+                  super(@instance, @related_field_id, query, @assign_related)
                 end
 
                 {% for queryset_id, block in MODEL_SCOPES[:custom] %}
@@ -876,7 +877,8 @@ module Marten
                   ::{{ @type }}::RelatedQuerySet.new(
                     instance: @instance,
                     related_field_id: @related_field_id,
-                    query: other_query.nil? ? @query.clone : other_query.not_nil!
+                    query: other_query.nil? ? @query.clone : other_query.not_nil!,
+                    assign_related: @assign_related
                   )
                 end
               end

@@ -95,19 +95,19 @@ module Marten
         def from_url(url : String)
           # URI.parse cant parse 'sqlite://:memory:'
           if url.starts_with? "sqlite://:memory:"
-            self.backend = "sqlite"
+            self.backend = DB::Connection::SQLITE_ID
             self.name = ":memory:"
             return
           end
 
           uri = URI.parse url
 
-          self.backend = uri.scheme
+          self.backend = uri.scheme == "sqlite3" ? DB::Connection::SQLITE_ID : uri.scheme
           self.host = uri.host
           self.port = uri.port
           self.user = uri.user
           self.password = uri.password
-          self.name = uri.scheme == "sqlite" ? uri.host : uri.path[1..]?
+          self.name = @backend == DB::Connection::SQLITE_ID ? uri.host : uri.path[1..]?
 
           params_map = uri.query_params.to_h
 

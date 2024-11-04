@@ -543,6 +543,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq "marten.db"
     end
 
+    it "parses sqlite url that starts with sqlite3" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite3://marten.db"
+      db_config_1.backend.should eq "sqlite"
+      db_config_1.name.should eq "marten.db"
+    end
+
     it "parses a postgres url" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "postgres://username:password@martenframework.com:25/db"

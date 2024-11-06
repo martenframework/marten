@@ -1,7 +1,7 @@
 module Marten::DB::Field::OneToOneSpec
   class Comment < Marten::Model
     field :id, :uuid, primary_key: true
-    field :article, :one_to_one, to: Marten::DB::Field::OneToOneSpec::Article
+    field :article, :one_to_one, to: Marten::DB::Field::OneToOneSpec::Article, related: :comment
     field :text, :text
 
     after_initialize :initialize_id

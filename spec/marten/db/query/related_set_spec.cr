@@ -99,4 +99,33 @@ describe Marten::DB::Query::RelatedSet do
       new_post.author.should eq user
     end
   end
+
+  describe "#fetch" do
+    it "assigns the related object if assign_related is explicitly set to true" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Post 1")
+
+      qset = Marten::DB::Query::RelatedSet(Post).new(user, "author_id", assign_related: true)
+
+      qset[0].get_related_object_variable(:author).should eq user
+    end
+
+    it "does not assign the related object when assign_related is explicitly set to false" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Post 1")
+
+      qset = Marten::DB::Query::RelatedSet(Post).new(user, "author_id", assign_related: false)
+
+      qset[0].get_related_object_variable(:author).should be_nil
+    end
+
+    it "does not assign the related object when assign_related is left as the default value (false)" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      Post.create!(author: user, title: "Post 1")
+
+      qset = Marten::DB::Query::RelatedSet(Post).new(user, "author_id")
+
+      qset[0].get_related_object_variable(:author).should be_nil
+    end
+  end
 end

@@ -212,5 +212,16 @@ describe Marten::DB::Field::ManyToOne do
 
       comment.article_id.should eq article.id!.hexstring
     end
+
+    it "retrieves the related article object for each comment" do
+      article = Marten::DB::Field::ManyToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
+
+      Marten::DB::Field::ManyToOneSpec::Comment.create!(article: article, text: "This article is dope")
+      Marten::DB::Field::ManyToOneSpec::Comment.create!(article: article, text: "This article is not dope")
+
+      comments = Marten::DB::Field::ManyToOneSpec::Comment.all
+
+      comments[0].get_related_object_variable(:article)
+    end
   end
 end

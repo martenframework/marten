@@ -280,5 +280,23 @@ describe Marten::DB::Field::OneToOne do
 
       comment.article_id.should eq article.id!.hexstring
     end
+
+    it "retrieves the related article object for the comment in a one-to-one association without bang operator" do
+      article = Marten::DB::Field::OneToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
+      Marten::DB::Field::OneToOneSpec::Comment.create!(article: article, text: "This article is dope")
+
+      article = Marten::DB::Field::OneToOneSpec::Article.get(id: article.id).not_nil!
+
+      article.comment.not_nil!.get_related_object_variable(:article).should_not be_nil
+    end
+
+    it "retrieves the related article object for the comment in a one-to-one association with bang operator!" do
+      article = Marten::DB::Field::OneToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
+      Marten::DB::Field::OneToOneSpec::Comment.create!(article: article, text: "This article is dope")
+
+      article = Marten::DB::Field::OneToOneSpec::Article.get!(id: article.id)
+
+      article.comment!.get_related_object_variable(:article).should_not be_nil
+    end
   end
 end

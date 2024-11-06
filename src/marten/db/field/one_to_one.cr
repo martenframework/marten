@@ -209,19 +209,21 @@ module Marten
                     @_reverse_o2o_{{ related_field_name.id }} : {{ model_klass }}?
 
                     def {{ related_field_name.id }}
-                      @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}.get({{ field_id }}: pk)
-
-                      if reverse_o2o = @_reverse_o2o_{{ related_field_name.id }}
-                        reverse_o2o.{{ relation_attribute_name }} ||= self
-                      end
-
-                      @_reverse_o2o_{{ related_field_name.id }}
+                      @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}
+                        .get({{ field_id }}: pk)
+                        .tap do |obj|
+                          if !obj.nil?
+                            obj.not_nil!.{{ relation_attribute_name }} ||= self
+                          end
+                        end
                     end
 
                     def {{ related_field_name.id }}!
-                      @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}.get!({{ field_id }}: pk)
-                      @_reverse_o2o_{{ related_field_name.id }}.not_nil!.{{ relation_attribute_name }} ||= self
-                      @_reverse_o2o_{{ related_field_name.id }}.not_nil!
+                      @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}
+                        .get!({{ field_id }}: pk)
+                        .tap do |obj|
+                          obj.{{ relation_attribute_name }} ||= self
+                        end
                     end
                   end
                 end

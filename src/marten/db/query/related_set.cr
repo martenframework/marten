@@ -22,7 +22,8 @@ module Marten
 
         protected def fetch
           super
-          @result_cache.not_nil!.each { |r| r.assign_related_object(@instance, @related_field_id) } if @assign_related
+
+          @result_cache.not_nil!.each { |r| r.assign_related_object(@instance, @related_field_id) } if assign_related?
         end
 
         protected def build_record(**kwargs)
@@ -39,6 +40,8 @@ module Marten
             assign_related: @assign_related
           )
         end
+
+        private getter? assign_related
       end
     end
   end

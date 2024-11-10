@@ -536,6 +536,13 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq ":memory:"
     end
 
+    it "parses sqlite3://:memory:" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite3://:memory:"
+      db_config_1.backend.should eq "sqlite"
+      db_config_1.name.should eq ":memory:"
+    end
+
     it "parses sqlite url" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "sqlite://marten.db"

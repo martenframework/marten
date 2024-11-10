@@ -92,17 +92,23 @@ module Marten
         def initialize(@id : String)
         end
 
+        # Allows to set the connection backend of the database.
+        def backend=(val : Nil | String | Symbol)
+          @backend = val.try(&.to_s)
+        end
+
+        # Allows to set the database configuration from a connection URL.
         def from_url(url : String)
-          # URI.parse cant parse 'sqlite://:memory:'
-          if url.starts_with? "sqlite://:memory:"
+          # URI.parse can't parse 'sqlite://:memory:' or 'sqlite3://:memory:'
+          if SQLITE_SCHEMES.any? { |scheme| url.starts_with?("#{scheme}://#{SQLITE_MEMORY_ID}") }
             self.backend = DB::Connection::SQLITE_ID
-            self.name = ":memory:"
+            self.name = SQLITE_MEMORY_ID
             return
           end
 
-          uri = URI.parse url
+          uri = URI.parse(url)
 
-          self.backend = uri.scheme == "sqlite3" ? DB::Connection::SQLITE_ID : uri.scheme
+          self.backend = SQLITE_SCHEMES.includes?(uri.scheme) ? DB::Connection::SQLITE_ID : uri.scheme
           self.host = uri.host
           self.port = uri.port
           self.user = uri.user
@@ -136,11 +142,6 @@ module Marten
           end
 
           self.options = params_map
-        end
-
-        # Allows to set the connection backend of the database.
-        def backend=(val : Nil | String | Symbol)
-          @backend = val.try(&.to_s)
         end
 
         # Allows to set the database host.
@@ -194,6 +195,9 @@ module Marten
         ensure
           @target_env = current_target_env
         end
+
+        private SQLITE_MEMORY_ID = ":memory:"
+        private SQLITE_SCHEMES   = ["sqlite", "sqlite3"]
 
         private def driver_installed?
           case backend

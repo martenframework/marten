@@ -92,6 +92,52 @@ module Marten
         def initialize(@id : String)
         end
 
+        def from_url(url : String)
+          # URI.parse cant parse 'sqlite://:memory:'
+          if url.starts_with? "sqlite://:memory:"
+            self.backend = DB::Connection::SQLITE_ID
+            self.name = ":memory:"
+            return
+          end
+
+          uri = URI.parse url
+
+          self.backend = uri.scheme == "sqlite3" ? DB::Connection::SQLITE_ID : uri.scheme
+          self.host = uri.host
+          self.port = uri.port
+          self.user = uri.user
+          self.password = uri.password
+          self.name = @backend == DB::Connection::SQLITE_ID ? uri.host : uri.path[1..]?
+
+          params_map = uri.query_params.to_h
+
+          if !(v = params_map.delete("checkout_timeout").try &.to_f64).nil?
+            self.checkout_timeout = v
+          end
+
+          if !(v = params_map.delete("initial_pool_size").try &.to_i32).nil?
+            self.initial_pool_size = v
+          end
+
+          if !(v = params_map.delete("max_pool_size").try &.to_i32).nil?
+            self.max_pool_size = v
+          end
+
+          if !(v = params_map.delete("max_idle_pool_size").try &.to_i32).nil?
+            self.max_idle_pool_size = v
+          end
+
+          if !(v = params_map.delete("retry_attempts").try &.to_i32).nil?
+            self.retry_attempts = v
+          end
+
+          if !(v = params_map.delete("retry_delay").try &.to_f64).nil?
+            self.retry_delay = v
+          end
+
+          self.options = params_map
+        end
+
         # Allows to set the connection backend of the database.
         def backend=(val : Nil | String | Symbol)
           @backend = val.try(&.to_s)

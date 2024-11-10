@@ -527,6 +527,117 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config.name_set_with_env.should eq "test"
     end
   end
+
+  describe "#from_url" do
+    it "parses sqlite://:memory:" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite://:memory:"
+      db_config_1.backend.should eq "sqlite"
+      db_config_1.name.should eq ":memory:"
+    end
+
+    it "parses sqlite url" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite://marten.db"
+      db_config_1.backend.should eq "sqlite"
+      db_config_1.name.should eq "marten.db"
+    end
+
+    it "parses sqlite url that starts with sqlite3" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite3://marten.db"
+      db_config_1.backend.should eq "sqlite"
+      db_config_1.name.should eq "marten.db"
+    end
+
+    it "parses a postgres url" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "postgres://username:password@martenframework.com:25/db"
+      db_config_1.backend.should eq "postgres"
+      db_config_1.user.should eq "username"
+      db_config_1.password.should eq "password"
+      db_config_1.host.should eq "martenframework.com"
+      db_config_1.port.should eq 25
+      db_config_1.name.should eq "db"
+    end
+
+    it "parses a mysql url" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "mysql://username:password@martenframework.com:25/db"
+      db_config_1.backend.should eq "mysql"
+      db_config_1.user.should eq "username"
+      db_config_1.password.should eq "password"
+      db_config_1.host.should eq "martenframework.com"
+      db_config_1.port.should eq 25
+      db_config_1.name.should eq "db"
+    end
+
+    it "parses a url with IPv4 host" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "postgres://username:password@127.0.0.1:25/db"
+      db_config_1.backend.should eq "postgres"
+      db_config_1.user.should eq "username"
+      db_config_1.password.should eq "password"
+      db_config_1.host.should eq "127.0.0.1"
+      db_config_1.port.should eq 25
+      db_config_1.name.should eq "db"
+    end
+
+    it "parses a url with IPv6 host" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "postgres://username:password@[::1]:25/db"
+      db_config_1.backend.should eq "postgres"
+      db_config_1.user.should eq "username"
+      db_config_1.password.should eq "password"
+      db_config_1.host.should eq "[::1]"
+      db_config_1.port.should eq 25
+      db_config_1.name.should eq "db"
+    end
+
+    it "parses a url with no params and defaults are set" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "postgres://username:password@[::1]:25/db"
+      db_config_1.checkout_timeout.should eq 5.0
+      db_config_1.retry_attempts.should eq 1
+      db_config_1.retry_delay.should eq 1.0
+      db_config_1.max_idle_pool_size.should eq 1
+      db_config_1.max_pool_size.should eq 0
+      db_config_1.initial_pool_size.should eq 1
+      db_config_1.options.empty?.should be_true
+    end
+
+    it "parses a postgres socket url" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "postgres://%2Fpath%2Fto%2Fsocket/db"
+      db_config_1.host.should eq "/path/to/socket"
+      db_config_1.name.should eq "db"
+    end
+
+    it "parses url parameters into mapping object properties" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url(
+        "postgres:///" \
+        "?checkout_timeout=2.0" \
+        "&retry_attempts=1&retry_delay=5.5" \
+        "&max_idle_pool_size=1&max_pool_size=10&initial_pool_size=5"
+      )
+      db_config_1.checkout_timeout.should eq 2.0
+      db_config_1.retry_attempts.should eq 1
+      db_config_1.retry_delay.should eq 5.5
+      db_config_1.max_idle_pool_size.should eq 1
+      db_config_1.max_pool_size.should eq 10
+      db_config_1.initial_pool_size.should eq 5
+      db_config_1.options.empty?.should be_true
+    end
+
+    it "parses url parameters that don't map directly into object properties into options" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite:///?journal_mode=wal&busy_timeout=2.5"
+      db_config_1.options.size.should eq 2
+      db_config_1.options["journal_mode"].should eq "wal"
+      db_config_1.options["busy_timeout"].should eq "2.5"
+    end
+  end
 end
 
 module Marten::Conf::GlobalSettings::DatabaseSpec

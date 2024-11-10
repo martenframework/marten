@@ -256,11 +256,13 @@ module Marten
         @csrf ||= GlobalSettings::CSRF.new
       end
 
+      # Allows to configure a specific database connection for the application using a connection URL.
       def database(id = DB::Connection::DEFAULT_CONNECTION_NAME, url : String | Nil = nil)
         self.database id, url do |_|
         end
       end
 
+      # Allows to configure a specific database connection for the application using a connection URL or a block.
       def database(id = DB::Connection::DEFAULT_CONNECTION_NAME, url : String | Nil = nil, &)
         db_config = @databases.find { |d| d.id.to_s == id.to_s }
         not_yet_defined = db_config.nil?

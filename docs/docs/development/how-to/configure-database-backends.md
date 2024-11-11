@@ -125,55 +125,46 @@ The last step involves configuring database settings so that they target the dat
 ### MariaDB or MySQL
 
 ```crystal
+# Using a block:
 config.database do |db|
   db.backend = :mysql
   db.host = "localhost"
+  db.port = 1234
   db.name = "my_db"
   db.user = "my_user"
   db.password = "insecure"
 end
+
+# Using a connection URL:
+config.database url: "mysql://my_user:insecure@localhost:1234/my_db"
 ```
 
 ### PostgreSQL
 
 ```crystal
+# Using a block:
 config.database do |db|
   db.backend = :postgresql
   db.host = "localhost"
+  db.port = 1234
   db.name = "my_db"
   db.user = "my_user"
   db.password = "insecure"
 end
+
+# Using a connection URL:
+config.database url: "postgres://my_user:insecure@localhost:1234/my_db"
 ```
 
 ### SQLite3
 
 ```crystal
+# Using a block:
 config.database do |db|
   db.backend = :sqlite
   db.name = "my_db.db"
 end
-```
 
-### Using URLs
-```crystal
-# Configure db using just a URL
-config.database url: "postgres://my_user:my_db@localhost:1234/db"
-
-# Configure a db other than the default using just a URL
-config.database url: "postgres://my_user:my_db@localhost:1234/db"
-config.database :my_other_db, url: "sqlite://my_other.db?journal_mode=wal&synchronous=normal"
-
-# Configure db with a URL and a block
-config.database url: "postgres://my_user:my_db@localhost:1234/db" do |db|
-  db.retry_delay = 1.0
-end
-
-# Configure a db other than the default with a URL and a block
-config.database :my_other_db, url: "sqlite://my_other.db" do |db|
-  db.options = {
-    "journal_mode" => "wal"
-    "synchronous" => "normal"
-  }
-end
+# Using a connection URL:
+config.database url: "sqlite3://my_db.db"
 ```

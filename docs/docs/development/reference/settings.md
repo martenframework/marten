@@ -448,7 +448,7 @@ config.database :other do |db|
 db
 ```
 
-Configuring other database backends such as MariaDB, MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). For example:
+Configuring other database backends such as MariaDB, MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). As such, you must define a block to configure the appropriate database options when calling the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString|Nil%3Dnil%2C%26)-instance-method) method. For example:
 
 ```crystal
 config.database do |db|
@@ -456,11 +456,32 @@ config.database do |db|
   db.host = "localhost"
   db.name = "my_db"
   db.user = "my_user"
-  db.password = "my_passport"
+  db.password = "my_password"
 end
 ```
 
-The following options are all available when configuring a database configuration object, which is available by opening a block with the `#database` method (like in the above examples).
+It is worth mentioning that some cloud providers only provide a connection string in order to connect to a specific database (usually in a `DATABASE_URL` environment variable). In this situation, it is possible to automatically configure the database backend by providing the connection URL to the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database%28id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString%7CNil%3Dnil%29-instance-method) method as well. This technique can be used for configuring both the default database and additional databases too. For example:
+
+```crystal
+# Default database
+config.database url: "postgres://my_user:my_db@localhost:1234/db"
+
+# Additional database
+config.database :my_other_db, url: "sqlite://other_db.db?journal_mode=wal&synchronous=normal"
+```
+
+:::tip
+You can combine both database configuration techniques mentioned above if needed. Indeed you can configure a database through the use of a connection string and also further customize the database by opening a block and setting additional options:
+
+```crystal
+# Configure db with a URL and a block
+config.database url: "postgres://my_user:my_db@localhost:1234/db" do |db|
+  db.retry_delay = 1.0
+end
+```
+:::
+
+The following sections provide details on all the available database configuration options.
 
 ### `backend`
 
@@ -522,7 +543,7 @@ config.database do |db|
   db.host = "localhost"
   db.name = "my_db"
   db.user = "my_user"
-  db.password = "my_passport"
+  db.password = "my_password"
   // highlight-next-line
   db.options = {"sslmode" => "disable"}
 end

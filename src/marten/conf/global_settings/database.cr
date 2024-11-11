@@ -108,12 +108,23 @@ module Marten
 
           uri = URI.parse(url)
 
-          self.backend = SQLITE_SCHEMES.includes?(uri.scheme) ? DB::Connection::SQLITE_ID : uri.scheme
-          self.host = uri.host
-          self.port = uri.port
-          self.user = uri.user
-          self.password = uri.password
-          self.name = @backend == DB::Connection::SQLITE_ID ? uri.host : uri.path[1..]?
+          self.backend = if SQLITE_SCHEMES.includes?(uri.scheme)
+                           DB::Connection::SQLITE_ID
+                         elsif POSTGRESQL_SCHEMES.includes?(uri.scheme)
+                           DB::Connection::POSTGRESQL_ID
+                         else
+                           uri.scheme
+                         end
+
+          if backend == DB::Connection::SQLITE_ID
+            self.name = [uri.host, uri.path].join
+          else
+            self.host = uri.host
+            self.port = uri.port
+            self.user = uri.user
+            self.password = uri.password
+            self.name = uri.path[1..]?
+          end
 
           params_map = uri.query_params.to_h
 
@@ -196,8 +207,9 @@ module Marten
           @target_env = current_target_env
         end
 
-        private SQLITE_MEMORY_ID = ":memory:"
-        private SQLITE_SCHEMES   = ["sqlite", "sqlite3"]
+        private POSTGRESQL_SCHEMES = ["postgresql", "postgres"]
+        private SQLITE_MEMORY_ID   = ":memory:"
+        private SQLITE_SCHEMES     = ["sqlite", "sqlite3"]
 
         private def driver_installed?
           case backend

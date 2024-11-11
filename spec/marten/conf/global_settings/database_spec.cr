@@ -543,24 +543,31 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq ":memory:"
     end
 
-    it "parses sqlite url" do
+    it "parses a SQLite URL that uses the sqlite scheme" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "sqlite://marten.db"
       db_config_1.backend.should eq "sqlite"
       db_config_1.name.should eq "marten.db"
     end
 
-    it "parses sqlite url that starts with sqlite3" do
+    it "parses a SQLite URL that uses the sqlite3 scheme" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "sqlite3://marten.db"
       db_config_1.backend.should eq "sqlite"
       db_config_1.name.should eq "marten.db"
     end
 
-    it "parses a postgres url" do
+    it "parses a SQLite URL that uses the sqlite3 scheme and a more complex path" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "sqlite3://path/to/my_db.db"
+      db_config_1.backend.should eq "sqlite"
+      db_config_1.name.should eq "path/to/my_db.db"
+    end
+
+    it "parses a PostgreSQL URL that uses the postgres scheme" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "postgres://username:password@martenframework.com:25/db"
-      db_config_1.backend.should eq "postgres"
+      db_config_1.backend.should eq "postgresql"
       db_config_1.user.should eq "username"
       db_config_1.password.should eq "password"
       db_config_1.host.should eq "martenframework.com"
@@ -568,7 +575,18 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq "db"
     end
 
-    it "parses a mysql url" do
+    it "parses a PostgreSQL URL that uses the postgresql scheme" do
+      db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
+      db_config_1.from_url "postgresql://username:password@martenframework.com:25/db"
+      db_config_1.backend.should eq "postgresql"
+      db_config_1.user.should eq "username"
+      db_config_1.password.should eq "password"
+      db_config_1.host.should eq "martenframework.com"
+      db_config_1.port.should eq 25
+      db_config_1.name.should eq "db"
+    end
+
+    it "parses a MySQL URL" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "mysql://username:password@martenframework.com:25/db"
       db_config_1.backend.should eq "mysql"
@@ -579,10 +597,10 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq "db"
     end
 
-    it "parses a url with IPv4 host" do
+    it "parses a URL with an IPv4 host" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "postgres://username:password@127.0.0.1:25/db"
-      db_config_1.backend.should eq "postgres"
+      db_config_1.backend.should eq "postgresql"
       db_config_1.user.should eq "username"
       db_config_1.password.should eq "password"
       db_config_1.host.should eq "127.0.0.1"
@@ -590,10 +608,10 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq "db"
     end
 
-    it "parses a url with IPv6 host" do
+    it "parses a URL with an IPv6 host" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "postgres://username:password@[::1]:25/db"
-      db_config_1.backend.should eq "postgres"
+      db_config_1.backend.should eq "postgresql"
       db_config_1.user.should eq "username"
       db_config_1.password.should eq "password"
       db_config_1.host.should eq "[::1]"
@@ -601,7 +619,7 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.name.should eq "db"
     end
 
-    it "parses a url with no params and defaults are set" do
+    it "parses a URL with no params and defaults are set" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "postgres://username:password@[::1]:25/db"
       db_config_1.checkout_timeout.should eq 5.0
@@ -613,14 +631,14 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.options.empty?.should be_true
     end
 
-    it "parses a postgres socket url" do
+    it "parses a PostgreSQL URL that uses a socket" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "postgres://%2Fpath%2Fto%2Fsocket/db"
       db_config_1.host.should eq "/path/to/socket"
       db_config_1.name.should eq "db"
     end
 
-    it "parses url parameters into mapping object properties" do
+    it "parses URL parameters into mapping object properties" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url(
         "postgres:///" \
@@ -637,7 +655,7 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config_1.options.empty?.should be_true
     end
 
-    it "parses url parameters that don't map directly into object properties into options" do
+    it "parses URL parameters that don't map directly into object properties into options" do
       db_config_1 = Marten::Conf::GlobalSettings::Database.new("default")
       db_config_1.from_url "sqlite:///?journal_mode=wal&busy_timeout=2.5"
       db_config_1.options.size.should eq 2

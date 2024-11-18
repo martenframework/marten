@@ -704,6 +704,82 @@ module Marten
           nil
         end
 
+        # Returns the model instance matching the given raw SQL condition.
+        #
+        # This method allows retrieving a record based on a custom SQL condition without parameters.
+        # It returns `nil` if no record matches the condition.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get("is_active = true")
+        # ```
+        def get(raw_predicate : String)
+          raise_empty_raw_predicate if raw_predicate.empty?
+          get(Node.new(raw_predicate))
+        end
+
+        # Returns the model instance matching the given raw SQL condition with positional arguments.
+        #
+        # This method allows retrieving a record based on a custom SQL condition with positional arguments.
+        # It returns `nil` if no record matches the condition.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get("name=?", "crystal")
+        # ```
+        def get(raw_predicate : String, *args)
+          get(raw_predicate, args.to_a)
+        end
+
+        # Returns the model instance matching the given raw SQL condition with positional parameters.
+        #
+        # This method allows retrieving a record based on a custom SQL condition using an array of parameters.
+        # It returns `nil` if no record matches the condition.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get("name=? AND is_active=?", ["crystal", true])
+        # ```
+        def get(raw_predicate : String, params : Array)
+          raise_empty_raw_predicate if raw_predicate.empty?
+
+          raw_params = [] of ::DB::Any
+          raw_params += params
+
+          get(Node.new(raw_predicate: raw_predicate, params: raw_params))
+        end
+
+        # Returns the model instance matching the given raw SQL condition with named parameters.
+        #
+        # This method allows retrieving a record based on a custom SQL condition using named parameters.
+        # It returns `nil` if no record matches the condition.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get("name=:name AND is_active=:active", name: "crystal", active: true)
+        # ```
+        def get(raw_predicate : String, **kwargs)
+          get(raw_predicate, kwargs.to_h)
+        end
+
+        # Returns the model instance matching the given raw SQL condition with a named parameters hash.
+        #
+        # This method allows retrieving a record based on a custom SQL condition using a hash of named parameters.
+        # It returns `nil` if no record matches the condition.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get("name=:name", {name: "crystal"})
+        # ```
+        def get(raw_predicate : String, params : Hash | NamedTuple)
+          raise_empty_raw_predicate if raw_predicate.empty?
+
+          raw_params = {} of String => ::DB::Any
+          params.each { |k, v| raw_params[k.to_s] = v }
+
+          get(Node.new(raw_predicate: raw_predicate, params: raw_params))
+        end
+
         # Returns the model instance matching the given set of filters.
         #
         # Model fields such as primary keys or fields with a unique constraint should be used here in order to retrieve
@@ -752,6 +828,86 @@ module Marten
           return results.first if results.size == 1
           raise Errors::RecordNotFound.new("#{M.name} query didn't return any results") if results.empty?
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
+        end
+
+        # Returns the model instance matching the given raw SQL condition, raising an error if not found.
+        #
+        # This method allows retrieving a record based on a custom SQL condition without parameters.
+        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get!("is_active = true")
+        # ```
+        def get!(raw_predicate : String)
+          raise_empty_raw_predicate if raw_predicate.empty?
+          get!(Node.new(raw_predicate))
+        end
+
+        # Returns the model instance matching the given raw SQL condition with positional arguments, raising an
+        # error if not found.
+        #
+        # This method allows retrieving a record based on a custom SQL condition with positional arguments.
+        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get!("name=?", "crystal")
+        # ```
+        def get!(raw_predicate : String, *args)
+          get!(raw_predicate, args.to_a)
+        end
+
+        # Returns the model instance matching the given raw SQL condition with positional parameters, raising an
+        # error if not found.
+        #
+        # This method allows retrieving a record based on a custom SQL condition using an array of parameters.
+        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get!("name=? AND is_active=?", ["crystal", true])
+        # ```
+        def get!(raw_predicate : String, params : Array)
+          raise_empty_raw_predicate if raw_predicate.empty?
+
+          raw_params = [] of ::DB::Any
+          raw_params += params
+
+          get!(Node.new(raw_predicate: raw_predicate, params: raw_params))
+        end
+
+        # Returns the model instance matching the given raw SQL condition with named parameters, raising an
+        # error if not found.
+        #
+        # This method allows retrieving a record based on a custom SQL condition using named parameters.
+        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get!("name=:name AND is_active=:active", name: "crystal", active: true)
+        # ```
+        def get!(raw_predicate : String, **kwargs)
+          get!(raw_predicate, kwargs.to_h)
+        end
+
+        # Returns the model instance matching the given raw SQL condition with a named parameters hash, raising an
+        # error if not found.
+        #
+        # This method allows retrieving a record based on a custom SQL condition using a hash of named parameters.
+        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        #
+        # Example:
+        # ```
+        # tag = Tag.all.get!("name=:name", {name: "crystal"})
+        # ```
+        def get!(raw_predicate : String, params : Hash | NamedTuple)
+          raise_empty_raw_predicate if raw_predicate.empty?
+
+          raw_params = {} of String => ::DB::Any
+          params.each { |k, v| raw_params[k.to_s] = v }
+
+          get!(Node.new(raw_predicate: raw_predicate, params: raw_params))
         end
 
         # Returns the model record matching the given set of filters or create a new one if no one is found.

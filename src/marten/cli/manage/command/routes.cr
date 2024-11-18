@@ -16,7 +16,7 @@ module Marten
                 print_path(rule, parent_path, parent_name)
               when Marten::Routing::Rule::Map
                 rule_name = parent_name ? "#{parent_name}:#{rule.name}" : rule.name
-                rule_path = parent_path + rule.path
+                rule_path = parent_path + rule.path.to_s
                 process_routes_map(rule.map, parent_path: rule_path, parent_name: rule_name)
               end
             end
@@ -26,7 +26,7 @@ module Marten
             parts = [] of String
             empty_parent_name = parent_name.nil? || parent_name.empty?
 
-            parts << style(parent_path + rule.path, fore: :light_blue)
+            parts << style(parent_path + rule.path.to_s, fore: :light_blue)
             parts << style("[#{empty_parent_name ? rule.name : "#{parent_name}:#{rule.name}"}]", fore: :light_yellow)
             parts << "›"
             parts << style(rule.handler.name, fore: :light_green)

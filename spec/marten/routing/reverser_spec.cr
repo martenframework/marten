@@ -1,6 +1,98 @@
 require "./spec_helper"
 
 describe Marten::Routing::Reverser do
+  describe "#combine" do
+    it "returns the expected reverser when the current reverser has no name" do
+      reverser = Marten::Routing::Reverser.new(
+        "",
+        {
+          nil  => "/test/%{param1}/xyz/%{param2}",
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}",
+        } of String? => String,
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+        }
+      )
+
+      combined = reverser.combine(
+        Marten::Routing::Reverser.new(
+          "other:name",
+          {
+            nil  => "/other/%{param3}",
+            "en" => "/other/%{param3}",
+            "fr" => "/other/%{param3}",
+          } of String? => String,
+          {
+            "param3" => Marten::Routing::Parameter.registry["slug"],
+          }
+        )
+      )
+
+      combined.name.should eq "other:name"
+      combined.exposed_path_for_interpolations.should eq(
+        {
+          nil  => "/test/%{param1}/xyz/%{param2}/other/%{param3}",
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}/other/%{param3}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}/other/%{param3}",
+        } of String? => String
+      )
+      combined.parameters.should eq(
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+          "param3" => Marten::Routing::Parameter.registry["slug"],
+        }
+      )
+    end
+
+    it "returns the expected reverser when the current reverser has a name" do
+      reverser = Marten::Routing::Reverser.new(
+        "path:name",
+        {
+          nil  => "/test/%{param1}/xyz/%{param2}",
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}",
+        } of String? => String,
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+        }
+      )
+
+      combined = reverser.combine(
+        Marten::Routing::Reverser.new(
+          "other:name",
+          {
+            nil  => "/other/%{param3}",
+            "en" => "/other/%{param3}",
+            "fr" => "/other/%{param3}",
+          } of String? => String,
+          {
+            "param3" => Marten::Routing::Parameter.registry["slug"],
+          }
+        )
+      )
+
+      combined.name.should eq "path:name:other:name"
+      combined.exposed_path_for_interpolations.should eq(
+        {
+          nil  => "/test/%{param1}/xyz/%{param2}/other/%{param3}",
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}/other/%{param3}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}/other/%{param3}",
+        } of String? => String
+      )
+      combined.parameters.should eq(
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+          "param3" => Marten::Routing::Parameter.registry["slug"],
+        }
+      )
+    end
+  end
+
   describe "#name" do
     it "returns the reverser path name" do
       reverser = Marten::Routing::Reverser.new(
@@ -16,7 +108,7 @@ describe Marten::Routing::Reverser do
   end
 
   describe "#path_for_interpolation" do
-    it "returns the reverser path for interpolation" do
+    it "returns the expected path for interpolation when a single path is used" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -26,6 +118,47 @@ describe Marten::Routing::Reverser do
         }
       )
       reverser.path_for_interpolation.should eq "/test/%{param1}/xyz/%{param2}"
+    end
+
+    it "returns the expected path for interpolation per-locale paths are used based on the current locale" do
+      reverser = Marten::Routing::Reverser.new(
+        "path:name",
+        {
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}",
+        } of String? => String,
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+        }
+      )
+
+      I18n.with_locale("en") do
+        reverser.path_for_interpolation.should eq "/this-is-a-test/%{param1}/xyz/%{param2}"
+      end
+
+      I18n.with_locale("fr") do
+        reverser.path_for_interpolation.should eq "/ceci-est-un-test/%{param1}/xyz/%{param2}"
+      end
+    end
+
+    it "fallbacks to the default path if the current locale does not have a specific path for interpolation" do
+      reverser = Marten::Routing::Reverser.new(
+        "path:name",
+        {
+          nil  => "/test/%{param1}/xyz/%{param2}",
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}",
+        } of String? => String,
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+        }
+      )
+
+      I18n.with_locale("es") do
+        reverser.path_for_interpolation.should eq "/test/%{param1}/xyz/%{param2}"
+      end
     end
   end
 

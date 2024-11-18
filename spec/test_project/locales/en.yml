@@ -5,3 +5,6 @@ en:
     pluralization:
       one: "One item"
       other: "%{count} items"
+  routes:
+    foo_bar: "/foo/bar"
+    foo_bar_with_args: "/foo/<param1:int>/bar/<param2:string>"

@@ -52,7 +52,7 @@ module Marten::Routing::Rule::BaseSpec
     getter parameters
 
     def initialize(path : String)
-      @regex, @path_for_interpolation, @parameters = path_to_regex(path)
+      @regex, @path_for_interpolation, @parameters = self.class.path_to_regex(path)
     end
 
     def resolve(path : String) : Nil | Match

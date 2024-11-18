@@ -2,6 +2,13 @@ require "./spec_helper"
 
 describe Marten::Routing::Match do
   describe "#path" do
+    it "can be used with a translated path" do
+      map = Marten::Routing::Map.new
+      map.path(Marten::Routing::TranslatedPath.new("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar")
+
+      map.reverse("foo_bar").should eq "/foo/bar"
+    end
+
     it "raises if the inserted rule is an empty string" do
       map = Marten::Routing::Map.new
       expect_raises(
@@ -27,23 +34,6 @@ describe Marten::Routing::Match do
       map.path("/", Marten::Handlers::Base, name: "home")
       expect_raises(Marten::Routing::Errors::InvalidRuleName) do
         map.path("/bis", Marten::Handlers::Base, name: "home")
-      end
-    end
-
-    it "raises if the inserted rule is a path that contains duplicated parameter names" do
-      map = Marten::Routing::Map.new
-      expect_raises(Marten::Routing::Errors::InvalidRulePath) do
-        map.path("/path/xyz/<id:int>/test<id:slug>/bad", Marten::Handlers::Base, name: "home")
-      end
-    end
-
-    it "raises if the inserted rule is a map that contains duplicated parameter names" do
-      map = Marten::Routing::Map.new
-      expect_raises(Marten::Routing::Errors::InvalidRulePath) do
-        sub_map = Marten::Routing::Map.draw do
-          path("/bad/<id:int>/foobar", Marten::Handlers::Base, name: "home")
-        end
-        map.path("/path/xyz/<id:int>", sub_map, name: "included")
       end
     end
   end
@@ -147,6 +137,27 @@ describe Marten::Routing::Match do
 
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
         map.reverse("home", sid: "hello-world")
+      end
+    end
+
+    it "raises if the inserted rule is a path that contains duplicated parameter names" do
+      map = Marten::Routing::Map.new
+      map.path("/path/xyz/<id:int>/test<id:slug>/bad", Marten::Handlers::Base, name: "home")
+
+      expect_raises(Marten::Routing::Errors::InvalidRulePath) do
+        map.reverse("home", id: 42)
+      end
+    end
+
+    it "raises if the inserted rule is a map that contains duplicated parameter names" do
+      map = Marten::Routing::Map.new
+      sub_map = Marten::Routing::Map.draw do
+        path("/bad/<id:int>/foobar", Marten::Handlers::Base, name: "home")
+      end
+      map.path("/path/xyz/<id:int>", sub_map, name: "included")
+
+      expect_raises(Marten::Routing::Errors::InvalidRulePath) do
+        map.reverse("included:home", id: 42)
       end
     end
   end
@@ -266,6 +277,13 @@ describe Marten::Routing::Match do
       expect_raises(Marten::Routing::Errors::NoReverseMatch) do
         map.reverse("home", {"sid" => "hello-world"})
       end
+    end
+  end
+
+  describe "#t" do
+    it "returns a translated path" do
+      map = Marten::Routing::Map.new
+      map.t("simple.translation").should eq Marten::Routing::TranslatedPath.new("simple.translation")
     end
   end
 end

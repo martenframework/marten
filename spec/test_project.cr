@@ -97,6 +97,9 @@ Marten.configure :test do |config|
 
   config.assets.root = "spec/assets"
   config.media_files.root = "spec/media"
+
+  config.i18n.default_locale = "en"
+  config.i18n.available_locales = ["en", "fr", "es"]
 end
 
 NESTED_ROUTES_2 = Marten::Routing::Map.draw do

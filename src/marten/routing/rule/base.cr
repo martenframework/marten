@@ -6,10 +6,8 @@ module Marten
         abstract def resolve(path : String) : Nil | Match
         protected abstract def reversers : Array(Reverser)
 
-        private PARAMETER_RE      = /<(?P<name>\w+)(?::(?P<type>[^>:]+))?>/
-        private PARAMETER_NAME_RE = /^[a-z_][a-zA-Z_0-9]*$/
-
-        private def path_to_regex(path : String)
+        # :nodoc:
+        def self.path_to_regex(path : String, regex_suffix : String? = nil)
           processed_path = path.dup
           regex_parts = ["^"]
           path_for_interpolation = ""
@@ -49,7 +47,19 @@ module Marten
             path_for_interpolation += "%{#{parameter_name}}"
           end
 
-          {Regex.new(regex_parts.join("")), path_for_interpolation, parameters}
+          {Regex.new(regex_parts.join("") + (regex_suffix || "")), path_for_interpolation, parameters}
+        end
+
+        private PARAMETER_RE      = /<(?P<name>\w+)(?::(?P<type>[^>:]+))?>/
+        private PARAMETER_NAME_RE = /^[a-z_][a-zA-Z_0-9]*$/
+
+        private def path_to_path_info(path : String, regex_suffix : String? = nil)
+          regex, path_for_interpolation, parameters = self.class.path_to_regex(path, regex_suffix)
+          Routing::Path::Spec::Static.new(regex, path_for_interpolation, parameters)
+        end
+
+        private def path_to_path_info(path : TranslatedPath, regex_suffix : String? = nil)
+          Routing::Path::Spec::Translated.new(path, regex_suffix)
         end
       end
     end

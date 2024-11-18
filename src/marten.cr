@@ -150,6 +150,7 @@ module Marten
     setup_media_files
     setup_templates
     setup_i18n
+    setup_routes
   end
 
   # :nodoc:
@@ -183,6 +184,11 @@ module Marten
       settings.media_files.storage ||
       Core::Storage::FileSystem.new(root: settings.media_files.root, base_url: settings.media_files.url)
     )
+  end
+
+  # :nodoc:
+  def self.setup_routes : Nil
+    routes.setup
   end
 
   # :nodoc:

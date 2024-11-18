@@ -1,0 +1,3 @@
+fr:
+  routes:
+    foo_bar: "/foo-french/bar-french"

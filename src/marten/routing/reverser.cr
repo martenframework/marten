@@ -7,16 +7,52 @@ module Marten
     # `Marten::Routing::Map#reverse` method makes use of reverser objects internally in order to perform routes lookups.
     class Reverser
       getter name
-      getter path_for_interpolation
       getter parameters
 
       def initialize(
         @name : String,
-        @path_for_interpolation : String,
+        path_for_interpolation : String,
+        @parameters = {} of String => Parameter::Base
+      )
+        @path_for_interpolations = {} of String? => String
+        @path_for_interpolations[nil] = path_for_interpolation
+      end
+
+      def initialize(
+        @name : String,
+        @path_for_interpolations : Hash(String?, String),
         @parameters = {} of String => Parameter::Base
       )
       end
 
+      # Combines the current reverser with another reverser.
+      #
+      # The new reverser will have a combined name, path, and parameters.
+      def combine(other : Reverser) : Reverser
+        new_name = name.empty? ? other.name : "#{name}:#{other.name}"
+
+        new_path_for_interpolations = Hash(String?, String).new
+        @path_for_interpolations.each do |locale, path_for_interpolation|
+          next if other.path_for_interpolations[locale]?.nil?
+
+          new_path_for_interpolations[locale] = path_for_interpolation + other.path_for_interpolations[locale]
+        end
+
+        Reverser.new(
+          new_name,
+          new_path_for_interpolations,
+          parameters.merge(other.parameters)
+        )
+      end
+
+      # Returns the path for interpolation for the current locale.
+      def path_for_interpolation : String
+        @path_for_interpolations[I18n.locale]? || @path_for_interpolations[nil]
+      end
+
+      # Reverses the route for the given parameters.
+      #
+      # If the parameters do not match the expected parameters for the route, `nil` is returned.
       def reverse(params : Nil | Hash(String | Symbol, Parameter::Types)) : Nil | String
         url_params = {} of String => String
 
@@ -39,8 +75,10 @@ module Marten
         # if not all expected parameters were passed this means that the lookup is not successful.
         return unless url_params.size == @parameters.size
 
-        @path_for_interpolation % url_params
+        path_for_interpolation % url_params
       end
+
+      protected getter path_for_interpolations
     end
   end
 end

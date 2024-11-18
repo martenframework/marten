@@ -2,30 +2,22 @@ module Marten
   module Routing
     module Rule
       class Map < Base
-        @regex : Regex
-        @path_for_interpolation : String
-        @parameters : Hash(String, Parameter::Base)
-        @reversers : Nil | Array(Reverser)
+        @path_info : Routing::Path::Spec::Base
+        @reversers : Array(Reverser)?
 
         getter map
         getter name
         getter path
 
-        def initialize(@path : String, @map : Marten::Routing::Map, @name : String)
-          @regex, @path_for_interpolation, @parameters = path_to_regex(@path)
+        def initialize(@path : String | TranslatedPath, @map : Marten::Routing::Map, @name : String)
+          @path_info = path_to_path_info(path)
         end
 
         def resolve(path : String) : Nil | Match
-          match = @regex.match(path)
+          match = @path_info.resolve(path)
           return if match.nil?
 
-          kwargs = MatchParameters.new
-          match.named_captures.each do |name, value|
-            param_handler = @parameters[name]
-            kwargs[name] = param_handler.loads(value.to_s)
-          end
-
-          new_path = path[match.end..]
+          new_path = path[match.end_index..]
           sub_match = @map.rules.each do |rule|
             matched = rule.resolve(new_path)
             break matched unless matched.nil?
@@ -33,18 +25,12 @@ module Marten
 
           return if sub_match.nil?
 
-          Match.new(sub_match.handler, kwargs.merge!(sub_match.kwargs))
+          Match.new(sub_match.handler, match.parameters.merge(sub_match.kwargs))
         end
 
         protected def reversers : Array(Reverser)
           @reversers ||= @map.reversers.values.map do |reverser|
-            name = @name.empty? ? reverser.name : "#{@name}:#{reverser.name}"
-
-            Reverser.new(
-              name,
-              @path_for_interpolation + reverser.path_for_interpolation,
-              @parameters.merge(reverser.parameters)
-            )
+            @path_info.reverser(@name).combine(reverser)
           end
         end
       end

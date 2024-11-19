@@ -1,0 +1,85 @@
+fr:
+  marten:
+    db:
+      field:
+        base:
+          errors:
+            blank: "Ce champ ne peut pas être vide."
+            nil: "Ce champ ne peut pas contenir la valeur nulle."
+        email:
+          errors:
+            invalid: "Entrez une adresse email valide."
+        slug:
+          errors:
+            invalid: "Entrez un slug valide."
+        string:
+          errors:
+            too_short: "La longueur minimale autorisée est de %{min_size} caractères."
+            too_long: "La longueur maximale autorisée est de %{max_size} caractères."
+        text:
+          errors:
+            too_long: "La longueur maximale autorisée est de %{max_size} caractères."
+        url:
+          errors:
+            invalid: "Entrez une URL valide."
+        uuid:
+          errors:
+            invalid: "Un UUID valide doit être fourni."
+    schema:
+      field:
+        base:
+          errors:
+            invalid: "La valeur fournie est invalide."
+            required: "Ce champ est requis."
+        date:
+          errors:
+            invalid: "Entrez une date valide."
+          input_formats:
+            - "%d/%m/%Y"
+            - "%d/%m/%y"
+        date_time:
+          errors:
+            invalid: "Entrez une date et une heure valides."
+          input_formats:
+            - "%d/%m/%Y %H:%M:%S"
+            - "%d/%m/%Y %H:%M:%S.%f"
+            - "%d/%m/%Y %H:%M"
+        duration:
+          errors:
+            invalid: "Entrez une durée valide."
+        email:
+          errors:
+            invalid: "Entrez une adresse email valide."
+        enum:
+          errors:
+            invalid: "Entrez une valeur valide. %{value} n'est pas une valeur acceptée."
+        slug:
+          errors:
+            invalid: "Entrez un slug valide."
+        file:
+          errors:
+            empty: "Les fichiers vides ne sont pas autorisés."
+            file_name_too_long: "La longueur maximale autorisée pour le nom du fichier est de %{max_name_size} caractères."
+        float:
+          errors:
+            invalid: "Entrez un nombre valide."
+            too_small: "Cette valeur doit être supérieure ou égale à %{min_value}."
+            too_big: "Cette valeur doit être inférieure ou égale à %{max_value}."
+        int:
+          errors:
+            invalid: "Entrez un nombre valide."
+            too_small: "Cette valeur doit être supérieure ou égale à %{min_value}."
+            too_big: "Cette valeur doit être inférieure ou égale à %{max_value}."
+        json:
+          errors:
+            invalid: "Entrez un JSON valide."
+        string:
+          errors:
+            too_short: "La longueur minimale autorisée est de %{min_size} caractères."
+            too_long: "La longueur maximale autorisée est de %{max_size} caractères."
+        url:
+          errors:
+            invalid: "Entrez une URL valide."
+        uuid:
+          errors:
+            invalid: "Entrez un UUID valide."

@@ -37,6 +37,7 @@ module Marten
       register "if", If
       register "include", Include
       register "local_time", LocalTime
+      register "localize", Localize
       register "method_input", MethodInput
       register "reverse", Url
       register "spaceless", Spaceless

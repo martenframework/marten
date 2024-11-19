@@ -1,0 +1,89 @@
+de:
+  marten:
+    db:
+      field:
+        base:
+          errors:
+            blank: "Dieses Feld darf nicht leer sein."
+            nil: "Dieses Feld darf nicht null sein."
+        email:
+          errors:
+            invalid: "Geben Sie eine gültige E-Mail-Adresse ein."
+        slug:
+          errors:
+            invalid: "Geben Sie einen gültigen Slug ein."
+        string:
+          errors:
+            too_short: "Die Mindestlänge beträgt %{min_size} Zeichen."
+            too_long: "Die maximale Länge beträgt %{max_size} Zeichen."
+        text:
+          errors:
+            too_long: "Die maximale Länge beträgt %{max_size} Zeichen."
+        url:
+          errors:
+            invalid: "Geben Sie eine gültige URL ein."
+        uuid:
+          errors:
+            invalid: "Eine gültige UUID muss angegeben werden."
+    schema:
+      field:
+        base:
+          errors:
+            invalid: "Der eingegebene Wert ist ungültig."
+            required: "Dieses Feld ist erforderlich."
+        date:
+          errors:
+            invalid: "Geben Sie ein gültiges Datum ein."
+          input_formats:
+            - "%d.%m.%Y"
+            - "%Y-%m-%d"
+            - "%d/%m/%Y"
+            - "%d %B %Y"
+            - "%d %b %Y"
+        date_time:
+          errors:
+            invalid: "Geben Sie ein gültiges Datum und eine gültige Uhrzeit ein."
+          input_formats:
+            - "%d.%m.%Y %H:%M:%S"
+            - "%Y-%m-%d %H:%M:%S"
+            - "%d.%m.%Y %H:%M"
+            - "%d/%m/%Y %H:%M"
+        duration:
+          errors:
+            invalid: "Geben Sie eine gültige Dauer ein."
+        email:
+          errors:
+            invalid: "Geben Sie eine gültige E-Mail-Adresse ein."
+        enum:
+          errors:
+            invalid: "Geben Sie einen gültigen Wert ein. %{value} ist kein zulässiger Wert."
+        slug:
+          errors:
+            invalid: "Geben Sie einen gültigen Slug ein."
+        file:
+          errors:
+            empty: "Leere Dateien sind nicht zulässig."
+            file_name_too_long: "Die maximale Länge des Dateinamens beträgt %{max_name_size} Zeichen."
+        float:
+          errors:
+            invalid: "Geben Sie eine gültige Zahl ein."
+            too_small: "Der Wert muss größer oder gleich %{min_value} sein."
+            too_big: "Der Wert muss kleiner oder gleich %{max_value} sein."
+        int:
+          errors:
+            invalid: "Geben Sie eine gültige Zahl ein."
+            too_small: "Der Wert muss größer oder gleich %{min_value} sein."
+            too_big: "Der Wert muss kleiner oder gleich %{max_value} sein."
+        json:
+          errors:
+            invalid: "Geben Sie ein gültiges JSON ein."
+        string:
+          errors:
+            too_short: "Die Mindestlänge beträgt %{min_size} Zeichen."
+            too_long: "Die maximale Länge beträgt %{max_size} Zeichen."
+        url:
+          errors:
+            invalid: "Geben Sie eine gültige URL ein."
+        uuid:
+          errors:
+            invalid: "Geben Sie eine gültige UUID ein."

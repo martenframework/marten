@@ -90,7 +90,7 @@ describe Marten::Template::Tag::Localize do
       context["localized_date"].to_s.should eq fixed_date_time_default_format
     end
 
-    it "raises if a invalid date tuple is provided" do
+    it "raises if a invalid date (too many fields) tuple is provided" do
       parser = Marten::Template::Parser.new("")
       tag = Marten::Template::Tag::Localize.new(parser, %{localize unsupported_date})
 
@@ -103,7 +103,7 @@ describe Marten::Template::Tag::Localize do
       end
     end
 
-    it "raises if a invalid date tuple is provided" do
+    it "raises if a invalid date (types) tuple is provided" do
       parser = Marten::Template::Parser.new("")
       tag = Marten::Template::Tag::Localize.new(parser, %{localize unsupported_date})
 

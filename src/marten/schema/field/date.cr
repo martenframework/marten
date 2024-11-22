@@ -31,7 +31,7 @@ module Marten
           end
         end
 
-        private def fetch_date_format(index)
+        private def fetch_localized_date_format(index)
           I18n.t!("marten.schema.field.date.input_formats.#{index}")
         rescue I18n::Errors::MissingTranslation
           nil
@@ -43,17 +43,27 @@ module Marten
 
         private def parse_date(value)
           result = nil
-          attempt = 0
-          format = I18n.t("marten.schema.field.date.input_formats.#{attempt}")
 
-          while result.nil? && (format = fetch_date_format(attempt))
+          localized_format_index = 0
+          fallback_format_index = 0
+          format = I18n.t("marten.schema.field.date.input_formats.#{localized_format_index}")
+
+          while result.nil?
+            format = fetch_localized_date_format(localized_format_index)
+            localized_format_index += 1
+
+            if format.nil?
+              format = Marten.settings.date_input_formats[fallback_format_index]?
+              fallback_format_index += 1
+            end
+
+            break if format.nil?
+
             result = begin
               Time.parse(value, format, Marten.settings.time_zone)
             rescue Time::Format::Error
               nil
             end
-
-            attempt += 1
           end
 
           result

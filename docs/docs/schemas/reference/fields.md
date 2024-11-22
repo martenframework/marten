@@ -19,13 +19,61 @@ The `required` argument can be used to specify whether a schema field is require
 
 A `bool` field allows validating boolean values.
 
+### `date`
+
+A `date` field allows validating date values. Fields using this type are converted to `Time` objects in Crystal.
+
+:::info
+`date` fields automatically attempt to deserialize incoming values using a predefined set of input formats. These formats are localized and configurable through the `marten.schema.field.date.input_formats` translation key. If Marten does not supply translations for the locale you're using, you can define custom localized formats within your project. For detailed instructions, see [Defining Translations](../../i18n/introduction.md#defining-translations). For example:
+
+
+```yaml
+en:
+  marten:
+    schema:
+      field:
+        date:
+          input_formats:
+            - "%Y-%m-%d"
+            - "%m/%d/%Y"
+            - "%b %d %Y"
+            - "%b %d, %Y"
+            - "%d %b %Y"
+            - "%d %b, %Y"
+            - "%B %d %Y"
+            - "%B %d, %Y"
+            - "%d %B %Y"
+            - "%d %B, %Y"
+```
+
+If none of the localized input formats can successfully parse the incoming raw date value, `date` fields will fall back to the formats specified in the [`date_input_formats`](../../development/reference/settings.md#date_input_formats) setting.
+:::
+
 ### `date_time`
 
 A `date_time` field allows validating date time values. Fields using this type are converted to `Time` objects in Crystal.
 
-### `date`
+:::info
+`date_time` fields automatically attempt to deserialize incoming values using a predefined set of input formats. These formats are localized and configurable through the `marten.schema.field.date_time.input_formats` translation key. If Marten does not supply translations for the locale you're using, you can define custom localized formats within your project. For detailed instructions, see [Defining Translations](../../i18n/introduction.md#defining-translations). For example:
 
-A `date` field allows validating date values. Fields using this type are converted to `Time` objects in Crystal.
+
+```yaml
+en:
+  marten:
+    schema:
+      field:
+        date_time:
+          input_formats:
+            - "%Y-%m-%d %H:%M:%S"
+            - "%Y-%m-%d %H:%M:%S.%f"
+            - "%Y-%m-%d %H:%M"
+            - "%m/%d/%Y %H:%M:%S"
+            - "%m/%d/%Y %H:%M:%S.%f"
+            - "%m/%d/%Y %H:%M"
+```
+
+If none of the localized input formats can successfully parse the incoming raw date time value, `date_time` fields will fall back to the formats specified in the [`date_time_input_formats`](../../development/reference/settings.md#date_time_input_formats) setting.
+:::
 
 ### `duration`
 

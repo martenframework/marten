@@ -223,6 +223,71 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#date_input_formats" do
+    it "returns the list of default date input formats by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.date_input_formats.should eq(
+        [
+          "%Y-%m-%d",
+          "%m/%d/%Y",
+          "%m/%d/%y",
+          "%b %d %Y",
+          "%b %d, %Y",
+          "%d %b %Y",
+          "%d %b, %Y",
+          "%B %d %Y",
+          "%B %d, %Y",
+          "%d %B %Y",
+          "%d %B, %Y",
+        ]
+      )
+    end
+
+    it "returns the list of configured date input formats" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.date_input_formats = ["%Y-%m-%d"]
+      global_settings.date_input_formats.should eq ["%Y-%m-%d"]
+    end
+  end
+
+  describe "#date_input_formats=" do
+    it "allows to configure the list of date input formats" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.date_input_formats = ["%Y-%m-%d"]
+      global_settings.date_input_formats.should eq ["%Y-%m-%d"]
+    end
+  end
+
+  describe "#date_time_input_formats" do
+    it "returns the list of default date time input formats by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.date_time_input_formats.should eq(
+        [
+          "%Y-%m-%d %H:%M:%S",
+          "%Y-%m-%d %H:%M:%S.%f",
+          "%Y-%m-%d %H:%M",
+          "%m/%d/%Y %H:%M:%S",
+          "%m/%d/%Y %H:%M:%S.%f",
+          "%m/%d/%Y %H:%M",
+        ]
+      )
+    end
+
+    it "returns the list of configured date time input formats" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.date_time_input_formats = ["%Y-%m-%d %H:%M:%S"]
+      global_settings.date_time_input_formats.should eq ["%Y-%m-%d %H:%M:%S"]
+    end
+  end
+
+  describe "#date_time_input_formats=" do
+    it "allows to configure the list of date time input formats" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.date_time_input_formats = ["%Y-%m-%d %H:%M:%S"]
+      global_settings.date_time_input_formats.should eq ["%Y-%m-%d %H:%M:%S"]
+    end
+  end
+
   describe "#debug" do
     it "returns false by default" do
       global_settings = Marten::Conf::GlobalSettings.new

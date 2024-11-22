@@ -34,6 +34,49 @@ This setting allows to configure the cache store returned by the [`Marten#cache`
 
 By default, the global cache store is set to be an in-memory cache (instance of [`Marten::Cache::Store::Memory`](pathname:///api/dev/Marten/Cache/Store/Memory.html)). In test environments you might want to use the "null store" by assigning an instance of the [`Marten::Cache::Store::Null](pathname:///api/dev/Marten/Cache/Store/Null.html) to this setting. Additional caching store shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your caching requirements. These backends are listed in the [caching stores backend reference](../../caching/reference/stores.md).
 
+### `date_input_formats`
+
+Default:
+
+```crystal
+[
+  "%Y-%m-%d",  # '2024-10-25'
+  "%m/%d/%Y",  # '10/25/2024'
+  "%m/%d/%y",  # '10/25/06'
+  "%b %d %Y",  # 'Oct 25 2024'
+  "%b %d, %Y", # 'Oct 25, 2024'
+  "%d %b %Y",  # '25 Oct 2024'
+  "%d %b, %Y", # '25 Oct, 2024'
+  "%B %d %Y",  # 'October 25 2024'
+  "%B %d, %Y", # 'October 25, 2024'
+  "%d %B %Y",  # '25 October 2024'
+  "%d %B, %Y", # '25 October, 2024'
+]
+```
+
+An array of default date input formats.
+
+This array of default date input formats is used by the [`date` schema field](../../schemas/reference/fields.md#date) to parse date values from strings. Note that the date input formats coming from locales will be used with priority over the formats defined in this array.
+
+### `date_time_input_formats`
+
+Default:
+
+```crystal
+[
+  "%Y-%m-%d %H:%M:%S",    # '2024-10-25 14:30:00'
+  "%Y-%m-%d %H:%M:%S.%f", # '2024-10-25 14:30:00.000000'
+  "%Y-%m-%d %H:%M",       # '2024-10-25 14:30'
+  "%m/%d/%Y %H:%M:%S",    # '10/25/2024 14:30:00'
+  "%m/%d/%Y %H:%M:%S.%f", # '10/25/2024 14:30:00.000000'
+  "%m/%d/%Y %H:%M",       # '10/25/2024 14:30'
+]
+```
+
+An array of default date input formats.
+
+This array of default date input formats is used by the [`date_time` schema field](../../schemas/reference/fields.md#date_time) to parse date time values from strings. Note that the date time input formats coming from locales will be used with priority over the formats defined in this array.
+
 ### `debug`
 
 Default: `false`

@@ -80,6 +80,18 @@ describe Marten::Schema::Field::Date do
       end
     end
 
+    it "falls back to the default input format if the value is not in a localized format" do
+      format = "%Y ~ %m ~ %d"
+
+      with_overridden_setting("date_input_formats", [format]) do
+        time = Time.local(Marten.settings.time_zone)
+
+        field = Marten::Schema::Field::Date.new("test_field")
+        field.deserialize(time.to_s(format)).should eq Time.parse(time.to_s(format), format, Marten.settings.time_zone)
+        field.deserialize(time.to_s(format)).not_nil!.location.should eq Marten.settings.time_zone
+      end
+    end
+
     it "raises if the passed value has an unexpected type" do
       field = Marten::Schema::Field::Date.new("test_field")
       expect_raises(Marten::Schema::Errors::UnexpectedFieldValue) { field.deserialize(true) }

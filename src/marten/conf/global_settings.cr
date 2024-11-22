@@ -25,6 +25,20 @@ module Marten
       # Returns the application database configurations.
       getter databases
 
+      # Returns the list of default date input formats.
+      #
+      # The list of default date input formats is used by the `Marten::Schema::Field::Date` schema field to parse date
+      # values from strings. Note that the date input formats coming from locales will be used with priority over this
+      # default list.
+      getter date_input_formats
+
+      # Returns the list of default date time input formats.
+      #
+      # The list of default date time input formats is used by the `Marten::Schema::Field::DateTime` schema field to
+      # parse date time values from strings. Note that the date time input formats coming from locales will be used with
+      # priority over this default list.
+      getter date_time_input_formats
+
       # Returns a boolean indicating whether the application runs in debug mode.
       getter debug
 
@@ -121,6 +135,12 @@ module Marten
       # Allows to set the global cache store.
       setter cache_store
 
+      # Allows to set the list of default date input formats.
+      setter date_input_formats
+
+      # Allows to set the list of default date time input formats.
+      setter date_time_input_formats
+
       # Allows to activate or deactive debug mode.
       setter debug
 
@@ -210,6 +230,27 @@ module Marten
         @allowed_hosts = [] of String
         @cache_store = Cache::Store::Memory.new
         @databases = [] of Database
+        @date_input_formats = [
+          "%Y-%m-%d",  # '2024-10-25'
+          "%m/%d/%Y",  # '10/25/2024'
+          "%m/%d/%y",  # '10/25/06'
+          "%b %d %Y",  # 'Oct 25 2024'
+          "%b %d, %Y", # 'Oct 25, 2024'
+          "%d %b %Y",  # '25 Oct 2024'
+          "%d %b, %Y", # '25 Oct, 2024'
+          "%B %d %Y",  # 'October 25 2024'
+          "%B %d, %Y", # 'October 25, 2024'
+          "%d %B %Y",  # '25 October 2024'
+          "%d %B, %Y", # '25 October, 2024'
+        ]
+        @date_time_input_formats = [
+          "%Y-%m-%d %H:%M:%S",    # '2024-10-25 14:30:00'
+          "%Y-%m-%d %H:%M:%S.%f", # '2024-10-25 14:30:00.000000'
+          "%Y-%m-%d %H:%M",       # '2024-10-25 14:30'
+          "%m/%d/%Y %H:%M:%S",    # '10/25/2024 14:30:00'
+          "%m/%d/%Y %H:%M:%S.%f", # '10/25/2024 14:30:00.000000'
+          "%m/%d/%Y %H:%M",       # '10/25/2024 14:30'
+        ]
         @debug = false
         @handler400 = Handlers::Defaults::BadRequest
         @handler403 = Handlers::Defaults::PermissionDenied

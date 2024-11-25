@@ -96,7 +96,7 @@ describe Marten::Template::Tag::Localize do
 
       expect_raises(
         Marten::Template::Errors::UnsupportedValue,
-        "Localization requires an Array with exactly 3 elements, but received 4 elements." +
+        "Localization of dates requires an Array with exactly 3 elements, but received 4 elements." +
         " Ensure the Array follows the format [year, month, day]."
       ) do
         tag.render(Marten::Template::Context{"unsupported_date" => {2024, 11, 19, 12}})

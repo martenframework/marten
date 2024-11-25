@@ -15,6 +15,8 @@ module Marten
       # {% localize 100000 format: "short" %}
       # ```
       #
+      # The `format` argument must match a key defined in the locale file.
+      #
       # Optionally, the result of the localization can be assigned to a variable using `as` keyword:
       #
       # ```
@@ -51,7 +53,7 @@ module Marten
         def render(context : Context) : String
           value = @value_expression.resolve(context).raw
 
-          if format_value = @kwargs.delete("format")
+          if format_value = @kwargs["format"]?
             format = format_value.resolve(context).to_s
           end
 
@@ -73,8 +75,8 @@ module Marten
           when Array(Marten::Template::Value)
             if value.size != 3
               raise Errors::UnsupportedValue.new(
-                "Localization requires an Array with exactly 3 elements, but received #{value.size} elements. " +
-                "Ensure the Array follows the format [year, month, day]."
+                "Localization of dates requires an Array with exactly 3 elements, but received #{value.size}" +
+                " elements. Ensure the Array follows the format [year, month, day]."
               )
             end
 

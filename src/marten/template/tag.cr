@@ -38,6 +38,7 @@ module Marten
       register "include", Include
       register "local_time", LocalTime
       register "localize", Localize
+      register "l", Localize
       register "method_input", MethodInput
       register "reverse", Url
       register "spaceless", Spaceless

@@ -281,6 +281,30 @@ Additionally, it is important to note that the accessibility of outer context va
 Templates that are included using the `include` template are parsed and rendered _when_ the including template is rendered as well. Included templates are not parsed when the including template is parsed itself. This means that the including template and the included template are always rendered _separately_.
 :::
 
+## `localize`
+
+The `localize` template tag allows to perform translation lookups by using the  of the project. It must take at least one argument (the translation key) followed by keyword arguments.
+The localize template tag allows performing localization on values such as dates, numbers, and times by using the [I18n gem](https://crystal-i18n.github.io/localization.html) of the project. It must take at least one argument (the value to localize) followed by an optional format keyword argument.
+
+For example, the following lines are valid usages of the localize tag:
+
+```html
+{% localize created_at %}
+{% localize price format: "currency" %}
+```
+
+Values and the format parameter can be resolved as template variables too, but they can also be defined as literal values if necessary. The format argument must match a key defined in the locale file.
+
+Optionally, the result of the localization can be assigned to a specific variable using the `as` keyword:
+
+```html
+{% localize created_at format: "short" as localized_date %}
+```
+
+## `l`
+
+Alias for [`localize`](#localize).
+
 ## `local_time`
 
 The `local_time` template tag allows to output the string representation of the local time. It must take one argument (the [format](https://crystal-lang.org/api/Time/Format.html) used to output the time).

@@ -169,6 +169,13 @@ It is also possible to chain a `#get` call on a query set that was already filte
 Author.filter(first_name: "John").get(id: 42)
 ```
 
+A record can also be retrived with a raw query, for example:
+
+```crystal
+Author.get("id=?", 42)
+Author.get("id=:id", id: 42)
+```
+
 ### Retrieving the first or last record
 
 The `#first` and `#last` methods can be used to retrieve the first or last record for a given query set.

@@ -1891,6 +1891,16 @@ describe Marten::DB::Query::Set do
       end
     end
 
+    it "gets a record using a raw SQL condition", tags: "get_raw" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get("name='crystal'")
+
+      result.should eq tag_2
+    end
+
     it "gets a record using a raw SQL condition with one named parameter", tags: "get_raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
@@ -1916,6 +1926,33 @@ describe Marten::DB::Query::Set do
       result = Marten::DB::Query::Set(Tag).new.get("name!=:name", name: "crystal")
 
       result.should eq tag_1
+    end
+
+    it "gets a record using a raw negated SQL condition with a named tuple", tags: "get_raw" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get("name!=:name", {name: "crystal"})
+
+      result.should eq tag_1
+    end
+
+    it "gets a record using a raw negated SQL condition with a hash", tags: "get_raw" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get("name!=:name", {"name" => "crystal"})
+
+      result.should eq tag_1
+    end
+
+    it "gets a record using a raw SQL condition with an array as parameter", tags: "get_raw" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get("name=?", ["crystal"])
+
+      result.should eq tag_2
     end
 
     it "gets a record using a raw SQL condition with one positional parameter", tags: "get_raw" do
@@ -2121,6 +2158,70 @@ describe Marten::DB::Query::Set do
       expect_raises(Marten::DB::Errors::RecordNotFound) do
         Marten::DB::Query::Set(Tag).new.get!("name = :name", name: "nonexistent")
       end
+    end
+
+    it "gets a record using a raw negated SQL condition with one named parameter", tags: "get_raw" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get("name!=:name", name: "crystal")
+
+      result.should eq tag_1
+    end
+
+    it "gets a record using a raw negated SQL condition with a named tuple", tags: "get_raw" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get!("name!=:name", {name: "crystal"})
+
+      result.should eq tag_1
+    end
+
+    it "gets a record using a raw negated SQL condition with a hash", tags: "get_raw" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get!("name!=:name", {"name" => "crystal"})
+
+      result.should eq tag_1
+    end
+
+    it "gets a record using a raw SQL condition with an array as parameter", tags: "get_raw" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get!("name=?", ["crystal"])
+
+      result.should eq tag_2
+    end
+
+    it "gets a record using a raw SQL condition", tags: "get_raw" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get!("name='crystal'")
+
+      result.should eq tag_2
+    end
+
+    it "gets a record using a raw SQL condition with an array as parameter", tags: "get_raw" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get!("name=?", ["crystal"])
+
+      result.should eq tag_2
+    end
+
+    it "gets a record using a raw SQL condition with one positional parameter", tags: "get_raw" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+
+      result = Marten::DB::Query::Set(Tag).new.get!("name=?", "crystal")
+
+      result.should eq tag_2
     end
 
     it "gets a record using a raw SQL condition combined with a q expression in get!", tags: "get_raw" do

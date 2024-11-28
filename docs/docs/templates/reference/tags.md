@@ -284,7 +284,7 @@ Templates that are included using the `include` template are parsed and rendered
 ## `localize`
 
 The `localize` template tag allows to perform translation lookups by using the  of the project. It must take at least one argument (the translation key) followed by keyword arguments.
-The localize template tag allows performing localization on values such as dates, numbers, and times by using the [I18n gem](https://crystal-i18n.github.io/localization.html) of the project. It must take at least one argument (the value to localize) followed by an optional format keyword argument.
+The `localize` template tag allows performing localization of values such as dates, numbers, and times by using the [I18n gem](https://crystal-i18n.github.io/localization.html), which is leveraged by Marten for its [internationalization features](../../i18n/introduction.md). It must take at least one argument (the value to localize) followed by an optional `format` keyword argument.
 
 For example, the following lines are valid usages of the localize tag:
 

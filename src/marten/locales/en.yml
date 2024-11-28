@@ -1,4 +1,22 @@
 en:
+  i18n:
+    date:
+      abbr_day_names: [Mon, Tue, Wed, Thu, Fri, Sat, Sun]
+      abbr_month_names: [Jan, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec]
+      day_names: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday]
+      month_names: [January, February, March, April, May, June,
+                    July, August, September, October, November, December]
+      formats:
+        default: "%Y-%m-%d"
+        long: "%B %d, %Y"
+        short: "%b %d"
+    time:
+      am: am
+      formats:
+        default: "%a, %d %b %Y %H:%M:%S %z"
+        long: "%B %d, %Y %H:%M"
+        short: "%d %b %H:%M"
+      pm: pm
   marten:
     db:
       field:

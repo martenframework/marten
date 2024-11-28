@@ -292,7 +292,7 @@ For example, the following lines are valid usages of the `localize` tag:
 {% localize price format: "currency" %}
 ```
 
-Values and the format parameter can be resolved as template variables too, but they can also be defined as literal values if necessary. The format argument must match a key defined in the locale file.
+The provided values and the `format` argument can be resolved as template variables too, but they can also be defined as literal values if necessary. The `format` argument must match a key defined in the locale file.
 
 Optionally, the result of the localization can be assigned to a specific variable using the `as` keyword:
 

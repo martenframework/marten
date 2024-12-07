@@ -558,10 +558,10 @@ module Marten
 
         # Returns a query set whose records match the given raw predicate and named parameters.
         #
-        # This method enables filtering based on raw SQL conditions, offering greater
-        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+        # predicates. It returns a modified `Marten::DB::Query::Set`.
         #
-        # Example:
+        # For example:
         #
         # ```
         # query_set = Post.all
@@ -574,10 +574,10 @@ module Marten
 
         # Returns a query set whose records match the given raw predicate and named parameters.
         #
-        # This method enables filtering based on raw SQL conditions, offering greater
-        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+        # predicates. It returns a modified `Marten::DB::Query::Set`.
         #
-        # Example:
+        # For example:
         #
         # ```
         # query_set = Post.all
@@ -589,10 +589,10 @@ module Marten
 
         # Returns a query set whose records match the given raw predicate and named parameters.
         #
-        # This method enables filtering based on raw SQL conditions, offering greater
-        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+        # predicates. It returns a modified `Marten::DB::Query::Set`.
         #
-        # Example:
+        # For example:
         #
         # ```
         # query_set = Post.all
@@ -604,10 +604,10 @@ module Marten
 
         # Returns a query set whose records match the given raw predicate and named parameters.
         #
-        # This method enables filtering based on raw SQL conditions, offering greater
-        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+        # predicates. It returns a modified `Marten::DB::Query::Set`.
         #
-        # Example:
+        # For example:
         #
         # ```
         # query_set = Post.all
@@ -624,10 +624,10 @@ module Marten
 
         # Returns a query set whose records match the given raw predicate and named parameters.
         #
-        # This method enables filtering based on raw SQL conditions, offering greater
-        # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+        # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+        # predicates. It returns a modified `Marten::DB::Query::Set`.
         #
-        # Example:
+        # For example:
         #
         # ```
         # query_set = Post.all
@@ -704,12 +704,13 @@ module Marten
           nil
         end
 
-        # Returns the model instance matching the given raw SQL condition.
+        # Returns the model instance matching the given raw SQL predicate.
         #
-        # This method allows retrieving a record based on a custom SQL condition without parameters.
-        # It returns `nil` if no record matches the condition.
+        # This method allows retrieving a record based on a custom SQL predicate without parameters.
+        # It returns `nil` if no record matches the predicate.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get("is_active = true")
         # ```
@@ -718,12 +719,13 @@ module Marten
           get(Node.new(raw_predicate))
         end
 
-        # Returns the model instance matching the given raw SQL condition with positional arguments.
+        # Returns the model instance matching the given raw SQL predicate with positional arguments.
         #
-        # This method allows retrieving a record based on a custom SQL condition with positional arguments.
-        # It returns `nil` if no record matches the condition.
+        # This method allows retrieving a record based on a custom SQL predicate with positional arguments.
+        # It returns `nil` if no record matches the predicate.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get("name=?", "crystal")
         # ```
@@ -731,12 +733,13 @@ module Marten
           get(raw_predicate, args.to_a)
         end
 
-        # Returns the model instance matching the given raw SQL condition with positional parameters.
+        # Returns the model instance matching the given raw SQL predicate with positional parameters.
         #
-        # This method allows retrieving a record based on a custom SQL condition using an array of parameters.
-        # It returns `nil` if no record matches the condition.
+        # This method allows retrieving a record based on a custom SQL predicate using an array of parameters.
+        # It returns `nil` if no record matches the predicate.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get("name=? AND is_active=?", ["crystal", true])
         # ```
@@ -749,12 +752,13 @@ module Marten
           get(Node.new(raw_predicate: raw_predicate, params: raw_params))
         end
 
-        # Returns the model instance matching the given raw SQL condition with named parameters.
+        # Returns the model instance matching the given raw SQL predicate with named parameters.
         #
-        # This method allows retrieving a record based on a custom SQL condition using named parameters.
-        # It returns `nil` if no record matches the condition.
+        # This method allows retrieving a record based on a custom SQL predicate using named parameters.
+        # It returns `nil` if no record matches the predicate.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get("name=:name AND is_active=:active", name: "crystal", active: true)
         # ```
@@ -762,12 +766,13 @@ module Marten
           get(raw_predicate, kwargs.to_h)
         end
 
-        # Returns the model instance matching the given raw SQL condition with a named parameters hash.
+        # Returns the model instance matching the given raw SQL predicate with a named parameters hash.
         #
-        # This method allows retrieving a record based on a custom SQL condition using a hash of named parameters.
-        # It returns `nil` if no record matches the condition.
+        # This method allows retrieving a record based on a custom SQL predicate using a hash of named parameters.
+        # It returns `nil` if no record matches the predicate.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get("name=:name", {name: "crystal"})
         # ```
@@ -830,12 +835,13 @@ module Marten
           raise Errors::MultipleRecordsFound.new("Multiple records (#{results.size}) found for get query")
         end
 
-        # Returns the model instance matching the given raw SQL condition, raising an error if not found.
+        # Returns the model instance matching the given raw SQL predicate, raising an error if not found.
         #
-        # This method allows retrieving a record based on a custom SQL condition without parameters.
-        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        # This method allows retrieving a record based on a custom SQL predicate without parameters.
+        # If no record matches the predicate, a `RecordNotFound` exception is raised.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get!("is_active = true")
         # ```
@@ -844,13 +850,14 @@ module Marten
           get!(Node.new(raw_predicate))
         end
 
-        # Returns the model instance matching the given raw SQL condition with positional arguments, raising an
+        # Returns the model instance matching the given raw SQL predicate with positional arguments, raising an
         # error if not found.
         #
-        # This method allows retrieving a record based on a custom SQL condition with positional arguments.
-        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        # This method allows retrieving a record based on a custom SQL predicate with positional arguments.
+        # If no record matches the predicate, a `RecordNotFound` exception is raised.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get!("name=?", "crystal")
         # ```
@@ -858,13 +865,14 @@ module Marten
           get!(raw_predicate, args.to_a)
         end
 
-        # Returns the model instance matching the given raw SQL condition with positional parameters, raising an
+        # Returns the model instance matching the given raw SQL predicate with positional parameters, raising an
         # error if not found.
         #
-        # This method allows retrieving a record based on a custom SQL condition using an array of parameters.
-        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        # This method allows retrieving a record based on a custom SQL predicate using an array of parameters.
+        # If no record matches the predicate, a `RecordNotFound` exception is raised.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get!("name=? AND is_active=?", ["crystal", true])
         # ```
@@ -877,13 +885,14 @@ module Marten
           get!(Node.new(raw_predicate: raw_predicate, params: raw_params))
         end
 
-        # Returns the model instance matching the given raw SQL condition with named parameters, raising an
+        # Returns the model instance matching the given raw SQL predicate with named parameters, raising an
         # error if not found.
         #
-        # This method allows retrieving a record based on a custom SQL condition using named parameters.
-        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        # This method allows retrieving a record based on a custom SQL predicate using named parameters.
+        # If no record matches the predicate, a `RecordNotFound` exception is raised.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get!("name=:name AND is_active=:active", name: "crystal", active: true)
         # ```
@@ -891,13 +900,14 @@ module Marten
           get!(raw_predicate, kwargs.to_h)
         end
 
-        # Returns the model instance matching the given raw SQL condition with a named parameters hash, raising an
+        # Returns the model instance matching the given raw SQL predicate with a named parameters hash, raising an
         # error if not found.
         #
-        # This method allows retrieving a record based on a custom SQL condition using a hash of named parameters.
-        # If no record matches the condition, a `RecordNotFound` exception is raised.
+        # This method allows retrieving a record based on a custom SQL predicate using a hash of named parameters.
+        # If no record matches the predicate, a `RecordNotFound` exception is raised.
         #
-        # Example:
+        # For example:
+        #
         # ```
         # tag = Tag.all.get!("name=:name", {name: "crystal"})
         # ```

@@ -206,10 +206,10 @@ module Marten
 
           # Returns a query set whose records match the given raw predicate and named parameters.
           #
-          # This method enables filtering based on raw SQL conditions, offering greater flexibility than standard field
+          # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
           # predicates. It returns a modified `Marten::DB::Query::Set`.
           #
-          # Example:
+          # For example:
           #
           # ```
           # query_set = Post.all
@@ -221,10 +221,10 @@ module Marten
 
           # Returns a query set whose records match the given raw predicate and named parameters.
           #
-          # This method enables filtering based on raw SQL conditions, offering greater flexibility than standard field
+          # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
           # predicates. It returns a modified `Marten::DB::Query::Set`.
           #
-          # Example:
+          # For example:
           #
           # ```
           # query_set = Post.all
@@ -236,10 +236,10 @@ module Marten
 
           # Returns a query set whose records match the given raw predicate and named parameters.
           #
-          # This method enables filtering based on raw SQL conditions, offering greater flexibility than standard field
+          # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
           # predicates. It returns a modified `Marten::DB::Query::Set`.
           #
-          # Example:
+          # For example:
           #
           # ```
           # query_set = Post.all
@@ -251,10 +251,10 @@ module Marten
 
           # Returns a query set whose records match the given raw predicate and named parameters.
           #
-          # This method enables filtering based on raw SQL conditions, offering greater
-          # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+          # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+          # predicates. It returns a modified `Marten::DB::Query::Set`.
           #
-          # Example:
+          # For example:
           #
           # ```
           # query_set = Post.all
@@ -266,10 +266,10 @@ module Marten
 
           # Returns a query set whose records match the given raw predicate and named parameters.
           #
-          # This method enables filtering based on raw SQL conditions, offering greater
-          # flexibility than standard field predicates. It returns a modified `Marten::DB::Query::Set`.
+          # This method enables filtering based on raw SQL predicates, offering greater flexibility than standard field
+          # predicates. It returns a modified `Marten::DB::Query::Set`.
           #
-          # Example:
+          # For example:
           #
           # ```
           # query_set = Post.all
@@ -326,10 +326,12 @@ module Marten
             default_queryset.get(**kwargs)
           end
 
-          # Returns a single model instance matching the given raw SQL condition.
+          # Returns a single model instance matching the given raw SQL predicate.
+          #
           # Returns `nil` if no record matches.
           #
-          # Example:
+          # For example:
+          #
           # ```
           # post = Post.get("is_published = true")
           # ```
@@ -337,10 +339,11 @@ module Marten
             default_queryset.get(raw_predicate)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with positional arguments.
+          # Returns a single model instance matching the given raw SQL predicate with positional arguments.
+          #
           # Returns `nil` if no record matches.
           #
-          # Example:
+          # For example:
           # ```
           # post = Post.get("name = ?", "crystal")
           # ```
@@ -348,10 +351,12 @@ module Marten
             default_queryset.get(raw_predicate, *args)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with positional parameters.
+          # Returns a single model instance matching the given raw SQL predicate with positional parameters.
+          #
           # Returns `nil` if no record matches.
           #
-          # Example:
+          # For example:
+          #
           # ```
           # post = Post.get("name = ? AND is_published = ?", ["crystal", true])
           # ```
@@ -359,10 +364,12 @@ module Marten
             default_queryset.get(raw_predicate, params)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with named parameters.
+          # Returns a single model instance matching the given raw SQL predicate with named parameters.
+          #
           # Returns `nil` if no record matches.
           #
-          # Example:
+          # For example:
+          #
           # ```
           # post = Post.get("name = :name AND is_published = :published", name: "crystal", published: true)
           # ```
@@ -370,10 +377,11 @@ module Marten
             default_queryset.get(raw_predicate, **kwargs)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with a named parameters hash.
+          # Returns a single model instance matching the given raw SQL predicate with a named parameters hash.
           # Returns `nil` if no record matches.
           #
-          # Example:
+          # For example:
+          #
           # ```
           # post = Post.get("name = :name", {name: "crystal"})
           # ```
@@ -420,10 +428,13 @@ module Marten
             default_queryset.get!(**kwargs)
           end
 
-          # Returns a single model instance matching the given raw SQL condition.
-          # Raises a `RecordNotFound` exception if no record matches.
+          # Returns a single model instance matching the given raw SQL predicate.
           #
-          # Example:
+          # If the specified raw SQL predicate doesn't match any records, a `Marten::DB::Errors::RecordNotFound`
+          # exception will be raised.
+          #
+          # For example:
+          #
           # ```
           # post = Post.get!("is_published = true")
           # ```
@@ -431,10 +442,13 @@ module Marten
             default_queryset.get!(raw_predicate)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with positional arguments.
-          # Raises a `RecordNotFound` exception if no record matches.
+          # Returns a single model instance matching the given raw SQL predicate with positional arguments.
           #
-          # Example:
+          # If the specified raw SQL predicate doesn't match any records, a `Marten::DB::Errors::RecordNotFound`
+          # exception will be raised.
+          #
+          # For example:
+          #
           # ```
           # post = Post.get!("name = ?", "crystal")
           # ```
@@ -442,10 +456,13 @@ module Marten
             default_queryset.get!(raw_predicate, *args)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with positional parameters.
-          # Raises a `RecordNotFound` exception if no record matches.
+          # Returns a single model instance matching the given raw SQL predicate with positional parameters.
           #
-          # Example:
+          # If the specified raw SQL predicate doesn't match any records, a `Marten::DB::Errors::RecordNotFound`
+          # exception will be raised.
+          #
+          # For example:
+          #
           # ```
           # post = Post.get!("name = ? AND is_published = ?", ["crystal", true])
           # ```
@@ -453,10 +470,13 @@ module Marten
             default_queryset.get!(raw_predicate, params)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with named parameters.
-          # Raises a `RecordNotFound` exception if no record matches.
+          # Returns a single model instance matching the given raw SQL predicate with named parameters.
           #
-          # Example:
+          # If the specified raw SQL predicate doesn't match any records, a `Marten::DB::Errors::RecordNotFound`
+          # exception will be raised.
+          #
+          # For example:
+          #
           # ```
           # post = Post.get!("name = :name AND is_published = :published", name: "crystal", published: true)
           # ```
@@ -464,10 +484,13 @@ module Marten
             default_queryset.get!(raw_predicate, **kwargs)
           end
 
-          # Returns a single model instance matching the given raw SQL condition with a named parameters hash.
-          # Raises a `RecordNotFound` exception if no record matches.
+          # Returns a single model instance matching the given raw SQL predicate with a named parameters hash.
           #
-          # Example:
+          # If the specified raw SQL predicate doesn't match any records, a `Marten::DB::Errors::RecordNotFound`
+          # exception will be raised.
+          #
+          # For example:
+          #
           # ```
           # post = Post.get!("name = :name", {name: "crystal"})
           # ```

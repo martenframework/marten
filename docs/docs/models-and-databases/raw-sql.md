@@ -62,6 +62,30 @@ Also, note that the parameters are left **unquoted** in the raw SQL queries: thi
 
 Finally, it should be noted that Marten does not validate the SQL queries you specify to the [`#raw`](./reference/query-set.md#raw) query set method. It is the developer's responsibility to ensure that these queries are (i) valid and (ii) that they return records that correspond to the considered model.
 
+## Fetching Single Records with `get` and `get!`
+
+Marten allows you to fetch single records directly using raw SQL conditions with the `get` and `get!` methods. These methods provide an intuitive interface for retrieving individual records while maintaining the safety and flexibility of parameterized queries.
+
+The `get` method retrieves a single record matching the raw SQL condition. It returns `nil` if no record matches the condition.
+
+For example use `get` with positional parameters:
+
+```crystal
+article = Article.get("title = ? AND created_at > ?", "Hello World!", "2022-10-30")
+```
+
+The `get!` method is similar to get but raises an exception if no record is found.
+
+For example use `get!` with named parameters:
+
+```crystal
+article = Article.get!(
+  "title = :title AND created_at > :created_at",
+  title: "Hello World!",
+  created_at: "2022-10-30"
+)
+```
+
 ## Filtering with raw SQL predicates
 
 Marten provides a feature to filter query sets using raw SQL predicates within the `#filter` method. This is useful when you need more complex filtering logic than simple field comparisons but still want to leverage Marten's query building capabilities.

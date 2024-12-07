@@ -326,6 +326,61 @@ module Marten
             default_queryset.get(**kwargs)
           end
 
+          # Returns a single model instance matching the given raw SQL condition.
+          # Returns `nil` if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get("is_published = true")
+          # ```
+          def get(raw_predicate : String)
+            default_queryset.get(raw_predicate)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with positional arguments.
+          # Returns `nil` if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get("name = ?", "crystal")
+          # ```
+          def get(raw_predicate : String, *args)
+            default_queryset.get(raw_predicate, *args)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with positional parameters.
+          # Returns `nil` if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get("name = ? AND is_published = ?", ["crystal", true])
+          # ```
+          def get(raw_predicate : String, params : Array)
+            default_queryset.get(raw_predicate, params)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with named parameters.
+          # Returns `nil` if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get("name = :name AND is_published = :published", name: "crystal", published: true)
+          # ```
+          def get(raw_predicate : String, **kwargs)
+            default_queryset.get(raw_predicate, **kwargs)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with a named parameters hash.
+          # Returns `nil` if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get("name = :name", {name: "crystal"})
+          # ```
+          def get(raw_predicate : String, params : Hash | NamedTuple)
+            default_queryset.get(raw_predicate, params)
+          end
+
           # Returns the model instance matching a specific set of advanced filters.
           #
           # Model fields such as primary keys or fields with a unique constraint should be used here in order to
@@ -363,6 +418,61 @@ module Marten
           # `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
           def get!(**kwargs)
             default_queryset.get!(**kwargs)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition.
+          # Raises a `RecordNotFound` exception if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get!("is_published = true")
+          # ```
+          def get!(raw_predicate : String)
+            default_queryset.get!(raw_predicate)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with positional arguments.
+          # Raises a `RecordNotFound` exception if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get!("name = ?", "crystal")
+          # ```
+          def get!(raw_predicate : String, *args)
+            default_queryset.get!(raw_predicate, *args)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with positional parameters.
+          # Raises a `RecordNotFound` exception if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get!("name = ? AND is_published = ?", ["crystal", true])
+          # ```
+          def get!(raw_predicate : String, params : Array)
+            default_queryset.get!(raw_predicate, params)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with named parameters.
+          # Raises a `RecordNotFound` exception if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get!("name = :name AND is_published = :published", name: "crystal", published: true)
+          # ```
+          def get!(raw_predicate : String, **kwargs)
+            default_queryset.get!(raw_predicate, **kwargs)
+          end
+
+          # Returns a single model instance matching the given raw SQL condition with a named parameters hash.
+          # Raises a `RecordNotFound` exception if no record matches.
+          #
+          # Example:
+          # ```
+          # post = Post.get!("name = :name", {name: "crystal"})
+          # ```
+          def get!(raw_predicate : String, params : Hash | NamedTuple)
+            default_queryset.get!(raw_predicate, params)
           end
 
           # Returns the model instance matching a specific set of advanced filters.

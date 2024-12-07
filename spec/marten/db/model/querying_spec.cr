@@ -437,6 +437,60 @@ describe Marten::DB::Model::Querying do
     it "makes use of the default queryset when using a block defining an advanced predicates expression" do
       Tag.get { q(name: "crystal") }.should be_nil
     end
+
+    it "returns the object corresponding to the raw SQL predicate" do
+      user = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+      TestUser.get("username = 'jd3'").should eq user
+    end
+
+    it "returns the object corresponding to the raw SQL predicate with positional arguments" do
+      user = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+      TestUser.get("username = ?", "jd3").should eq user
+    end
+
+    it "returns nil if no record matches the raw SQL predicate with positional arguments" do
+      TestUser.get("username = ?", "unknown").should be_nil
+    end
+
+    it "returns the object when parameters are passed as an array" do
+      tag = Tag.create!(name: "elixir", is_active: true)
+      Tag.get("name = ? AND is_active = ?", ["elixir", true]).should eq tag
+    end
+
+    it "returns nil when no record matches and parameters are passed as an array" do
+      Tag.get("name = ? AND is_active = ?", ["nonexistent", true]).should be_nil
+    end
+
+    it "raises an error for an invalid SQL column in raw predicate" do
+      expect_raises(Exception) { TestUser.get("invalid_column = ?", "jd1") }
+    end
+
+    it "returns the object using a raw SQL predicate with named parameters" do
+      tag = Tag.create!(name: "custom", is_active: true)
+      Tag.get("name = :name AND is_active = :active", name: "custom", active: true).should eq tag
+    end
+
+    it "returns nil if no record matches the raw SQL predicate with named parameters" do
+      Tag.get("name = :name AND is_active = :active", name: "nonexistent", active: false).should be_nil
+    end
+
+    it "returns the object when parameters are passed as a named tuple" do
+      tag = Tag.create!(name: "rust", is_active: true)
+      Tag.get("name = :name AND is_active = :active", {name: "rust", active: true}).should eq tag
+    end
+
+    it "returns nil when no record matches and parameters are passed as a named tuple" do
+      Tag.get("name = :name AND is_active = :active", {name: "nonexistent", active: false}).should be_nil
+    end
+
+    it "returns the object when parameters are passed as a hash" do
+      tag = Tag.create!(name: "python", is_active: true)
+      Tag.get("name = :name AND is_active = :active", {"name" => "python", "active" => true}).should eq tag
+    end
+
+    it "returns nil when no record matches and parameters are passed as a hash" do
+      Tag.get("name = :name AND is_active = :active", {"name" => "nonexistent", "active" => false}).should be_nil
+    end
   end
 
   describe "::get!" do
@@ -476,6 +530,72 @@ describe Marten::DB::Model::Querying do
 
     it "makes use of the default queryset when using a block defining an advanced predicates expression" do
       expect_raises(Marten::DB::Errors::RecordNotFound) { Tag.get! { q(name: "crystal") } }
+    end
+
+    it "returns the object using a raw SQL predicate" do
+      tag = Tag.create!(name: "elixir", is_active: true)
+      Tag.get!("name = 'elixir' AND is_active = true").should eq tag
+    end
+
+    it "raises RecordNotFound when no record matches" do
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        Tag.get!("name = 'nonexistent' AND is_active = true")
+      end
+    end
+
+    it "returns the object using a raw SQL predicate with positional arguments" do
+      tag = Tag.create!(name: "elixir", is_active: true)
+      Tag.get!("name = ? AND is_active = ?", "elixir", true).should eq tag
+    end
+
+    it "raises RecordNotFound when no record matches with positional arguments" do
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        Tag.get!("name = ? AND is_active = ?", "nonexistent", true)
+      end
+    end
+
+    it "returns the object using a raw SQL predicate with named arguments" do
+      tag = Tag.create!(name: "python", is_active: true)
+      Tag.get!("name = :name AND is_active = :active", name: "python", active: true).should eq tag
+    end
+
+    it "raises RecordNotFound when no record matches with named arguments" do
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        Tag.get!("name = :name AND is_active = :active", name: "nonexistent", active: false)
+      end
+    end
+
+    it "returns the object when parameters are passed as an array" do
+      tag = Tag.create!(name: "elixir", is_active: true)
+      Tag.get!("name = ? AND is_active = ?", ["elixir", true]).should eq tag
+    end
+
+    it "raises RecordNotFound when no record matches and parameters are passed as an array" do
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        Tag.get!("name = ? AND is_active = ?", ["nonexistent", true])
+      end
+    end
+
+    it "returns the object when parameters are passed as a named tuple" do
+      tag = Tag.create!(name: "rust", is_active: true)
+      Tag.get!("name = :name AND is_active = :active", {name: "rust", active: true}).should eq tag
+    end
+
+    it "raises RecordNotFound when no record matches and parameters are passed as a named tuple" do
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        Tag.get!("name = :name AND is_active = :active", {name: "nonexistent", active: false})
+      end
+    end
+
+    it "returns the object when parameters are passed as a hash" do
+      tag = Tag.create!(name: "rust", is_active: true)
+      Tag.get!("name = :name AND is_active = :active", {"name" => "rust", "active" => true}).should eq tag
+    end
+
+    it "raises RecordNotFound when no record matches and parameters are passed as a hash" do
+      expect_raises(Marten::DB::Errors::RecordNotFound) do
+        Tag.get!("name = :name AND is_active = :active", {"name" => "nonexistent", "active" => false})
+      end
     end
   end
 

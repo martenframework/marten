@@ -169,7 +169,7 @@ It is also possible to chain a `#get` call on a query set that was already filte
 Author.filter(first_name: "John").get(id: 42)
 ```
 
-A record can also be retrived with a raw query, for example:
+A record can also be retrieved with a raw SQL predicate. For example:
 
 ```crystal
 Author.get("id=?", 42)

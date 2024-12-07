@@ -560,6 +560,13 @@ post_2 = query_set.get { q(id: 456, is_published: false) }
 
 If the specified set of filters doesn't match any records, the returned value will be `nil`. Moreover, in order to ensure data consistency this method will raise a `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
 
+Note that `#get` can be used to retrieve a record with a raw SQL predicate. For example:
+
+```crystal
+Author.get("id=?", 42)
+Author.get("id=:id", id: 42)
+```
+
 ### `get!`
 
 Returns the model instance matching the given set of filters.
@@ -581,6 +588,13 @@ post_2 = query_set.get! { q(id: 456, is_published: false) }
 ```
 
 If the specified set of filters doesn't match any records, a `Marten::DB::Errors::RecordNotFound` exception will be raised. Moreover, in order to ensure data consistency this method will raise a `Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
+
+Note that `#get` can be used to retrieve a record with a raw SQL predicate. For example:
+
+```crystal
+Author.get!("id=?", 42)
+Author.get!("id=:id", id: 42)
+```
 
 ### `get_or_create`
 

@@ -312,13 +312,13 @@ module Marten
     base_message = "Marten running on #{Marten::Server.addresses.join ", "} (Press CTRL+C to quit)"
 
     if Marten.settings.debug?
-      Log.info {
+      Log.info do
         String.build do |s|
           s << "#{"=" * base_message.size}\n"
           s << base_message
           s << "\n#{"=" * base_message.size}"
         end
-      }
+      end
     else
       Log.info { base_message }
     end

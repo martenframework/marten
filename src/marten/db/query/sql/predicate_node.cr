@@ -92,10 +92,11 @@ module Marten
           def replace_table_alias_prefix(old_vs_new_table_aliases : Hash(String, String)) : Nil
             return unless filter_predicates?
 
-            filter_predicates.each { |p|
+            filter_predicates.each do |p|
               next unless old_vs_new_table_aliases.has_key?(p.alias_prefix)
               p.alias_prefix = old_vs_new_table_aliases[p.alias_prefix]
-            }
+            end
+
             @children.each { |c| c.replace_table_alias_prefix(old_vs_new_table_aliases) }
           end
 

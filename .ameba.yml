@@ -21,6 +21,12 @@ Lint/NotNilAfterNoBang:
 Lint/SpecFilename:
   Enabled: false
 
+Lint/UnusedComparison:
+  Enabled: false
+
+Lint/UnusedLiteral:
+  Enabled: false
+
 Metrics/CyclomaticComplexity:
   Enabled: false
 

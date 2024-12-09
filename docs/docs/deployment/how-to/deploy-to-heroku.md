@@ -24,7 +24,7 @@ You should first ensure that your project defines a [`Procfile`](https://devcent
 Your Procfile should contain the following content at least:
 
 ```procfile title="Procfile"
-web: bin/server --port \$PORT
+web: bin/server --port $PORT
 ```
 
 :::info
@@ -34,7 +34,7 @@ The `PORT` environment variable is automatically defined by Heroku. That's why w
 If your application requires the use of a database, you should also add a [release process](https://devcenter.heroku.com/articles/procfile#the-release-process-type) that runs the [`migrate`](../../development/reference/management-commands.md#migrate) management command to your Procfile:
 
 ```procfile title="Procfile"
-web: bin/server --port \$PORT
+web: bin/server --port $PORT
 release: marten migrate
 ```
 
@@ -77,20 +77,11 @@ end
 
 It should be noted that if your application requires a database, you should also make sure to parse the `DATABASE_URL` environment variable and to configure your [database settings](../../development/reference/settings.md#database-settings) from the parsed database URL properties. The `DATABASE_URL` variable contains a URL-encoded string that specifies the connection details of your database, such as the database type, hostname, port, username, password, and database name.
 
-This can be accomplished as follows for a PostgreSQL database:
+This can be accomplished by providing the `DATABASE_URL` environment variable value to the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database%28id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString%7CNil%3Dnil%29-instance-method) configuration method:
 
 ```crystal title="config/settings/production.cr"
 Marten.configure :production do |config|
-  config.database do |db|
-    database_uri = URI.parse(ENV.fetch("DATABASE_URL"))
-
-    db.backend = :postgresql
-    db.host = database_uri.host
-    db.port = database_uri.port
-    db.user = database_uri.user
-    db.password = database_uri.password
-    db.name = database_uri.path[1..]
-  end
+  config.database url: ENV.fetch("DATABASE_URL")
 
   # Other settings...
 end
@@ -183,11 +174,11 @@ heroku config:set MARTEN_ALLOWED_HOSTS=<yourapp>.herokuapp.com
 You'll need to provision a Heroku PostgreSQL database if your application makes use of models and migrations. To do so, you can make use of the following command:
 
 ```bash
-heroku addons:create heroku-postgresql:mini
+heroku addons:create heroku-postgresql:essential-0
 ```
 
 :::info
-You should replace `mini` in the above command by your desired [Postgres plan](https://devcenter.heroku.com/articles/heroku-postgres-plans).
+You should replace `essential-0` in the above command by your desired [Postgres plan](https://devcenter.heroku.com/articles/heroku-postgres-plans).
 :::
 
 ## Upload the application

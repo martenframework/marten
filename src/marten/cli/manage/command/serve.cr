@@ -42,7 +42,7 @@ module Marten
           def run
             loop do
               scan_server_files
-              sleep 0.2
+              sleep(Time::Span.new(nanoseconds: 200_000_000))
             end
           end
 
@@ -98,7 +98,7 @@ module Marten
           end
 
           private def open_server
-            sleep 0.5
+            sleep(Time::Span.new(nanoseconds: 500_000_000))
 
             Process.run(
               generate_open_command("http://#{host || Marten.settings.host}:#{port || Marten.settings.port}"),

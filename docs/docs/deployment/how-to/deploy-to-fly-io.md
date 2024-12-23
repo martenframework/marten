@@ -111,16 +111,7 @@ This can be accomplished as follows for a PostgreSQL database:
 Marten.configure :production do |config|
   if ENV.has_key?("DATABASE_URL")
     # Note: DATABASE_URL isn't available at build time...
-    config.database do |db|
-      database_uri = URI.parse(ENV.fetch("DATABASE_URL"))
-
-      db.backend = :postgresql
-      db.host = database_uri.host
-      db.port = database_uri.port
-      db.user = database_uri.user
-      db.password = database_uri.password
-      db.name = database_uri.path[1..]
-
+    config.database url: ENV.fetch("DATABASE_URL") do |db|
       # Fly.io's Postgres works over an internal & encrypted network which does not support SSL.
       # Hence, SSL must be disabled.
       db.options = {"sslmode" => "disable"}

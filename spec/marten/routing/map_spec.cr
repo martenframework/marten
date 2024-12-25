@@ -48,23 +48,34 @@ describe Marten::Routing::Match do
       end
     end
 
-    it "is consistent with multiple invocations" do
+    it "raises when defining nested localized rules" do
+      map = Marten::Routing::Map.new
+      map.exposed_root = true
+
+      expect_raises(Marten::Routing::Errors::InvalidRouteMap, "Cannot define nested localized routes") do
+        map.localized do
+          path t("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar"
+
+          map.localized do
+            path t("routes.foo_bar"), Marten::Handlers::Base, name: "other_foo_bar"
+          end
+        end
+      end
+    end
+
+    it "raises when defining multiple localized rules" do
       map = Marten::Routing::Map.new
       map.exposed_root = true
 
       map.localized do
         path t("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar"
-
-        map.exposed_localizing?.should be_true
-
-        map.localized do
-          path t("routes.foo_bar"), Marten::Handlers::Base, name: "other_foo_bar"
-
-          map.exposed_localizing?.should be_true
-        end
       end
 
-      map.exposed_localizing?.should be_false
+      expect_raises(Marten::Routing::Errors::InvalidRouteMap, "Cannot define multiple localized rules") do
+        map.localized do
+          path t("routes.foo_bar"), Marten::Handlers::Base, name: "other_foo_bar"
+        end
+      end
     end
   end
 

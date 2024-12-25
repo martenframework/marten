@@ -4,7 +4,7 @@ require "./rule/**"
 module Marten
   module Routing
     class Map
-      @current_localized_rule : Rule::Localized? = nil
+      @localized_rule : Rule::Localized? = nil
       @localizing : Bool = false
       @reversers : Hash(String, Reverser)? = nil
       @root : Bool = false
@@ -45,19 +45,19 @@ module Marten
       # ```
       def localized(prefix_default_locale = true, &) : Nil
         raise Errors::InvalidRouteMap.new("Cannot define localized routes in a non-root map") if !root?
+        raise Errors::InvalidRouteMap.new("Cannot define nested localized routes") if localizing?
+        raise Errors::InvalidRouteMap.new("Cannot define multiple localized rules") if !localized_rule.nil?
 
         begin
           previous_localizing = localizing?
-          previous_current_localized_rule = @current_localized_rule
 
           self.localizing = true
-          self.current_localized_rule = Rule::Localized.new(prefix_default_locale)
+          self.localized_rule = Rule::Localized.new(prefix_default_locale)
 
           with self yield self
         ensure
-          rules << current_localized_rule.not_nil!
+          self.rules << localized_rule.not_nil!
           self.localizing = (previous_localizing == true)
-          self.current_localized_rule = previous_current_localized_rule
         end
       end
 
@@ -161,11 +161,11 @@ module Marten
 
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
 
-      private getter current_localized_rule
+      private getter localized_rule
 
       private getter? localizing
 
-      private setter current_localized_rule
+      private setter localized_rule
       private setter localizing
 
       private def insert_path(
@@ -185,7 +185,7 @@ module Marten
           end
         end
 
-        rules_to_check = localizing? ? rules + current_localized_rule.not_nil!.rules : rules
+        rules_to_check = localizing? ? rules + localized_rule.not_nil!.rules : rules
         rules_to_check = rules_to_check.flat_map do |rule|
           if rule.is_a?(Rule::Localized)
             rule.rules
@@ -208,7 +208,7 @@ module Marten
         end
 
         if localizing?
-          current_localized_rule.not_nil!.rules << rule
+          localized_rule.not_nil!.rules << rule
         else
           rules << rule
         end

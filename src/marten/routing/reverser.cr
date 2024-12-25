@@ -6,8 +6,17 @@ module Marten
     # parameters and such parameters are handled accordingly when the `#reverse` method is called. The main
     # `Marten::Routing::Map#reverse` method makes use of reverser objects internally in order to perform routes lookups.
     class Reverser
+      @prefix_default_locale : Bool = true
+      @prefix_locales : Bool = false
+
       getter name
       getter parameters
+
+      getter? prefix_default_locale
+      getter? prefix_locales
+
+      setter prefix_default_locale
+      setter prefix_locales
 
       def initialize(
         @name : String,
@@ -75,7 +84,13 @@ module Marten
         # if not all expected parameters were passed this means that the lookup is not successful.
         return unless url_params.size == @parameters.size
 
-        path_for_interpolation % url_params
+        path = path_for_interpolation % url_params
+
+        if prefix_locales? && (prefix_default_locale? || I18n.locale != Marten.settings.i18n.default_locale)
+          "/#{I18n.locale}#{path}"
+        else
+          path
+        end
       end
 
       protected getter path_for_interpolations

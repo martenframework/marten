@@ -13,6 +13,13 @@ describe Marten do
     end
   end
 
+  describe "#routes" do
+    it "returns the main routes map with the root flag set to true" do
+      Marten.routes.should be_a Marten::Routing::Map
+      Marten.routes.exposed_root?.should be_true
+    end
+  end
+
   describe "#setup" do
     context "with root path" do
       around_each do |t|

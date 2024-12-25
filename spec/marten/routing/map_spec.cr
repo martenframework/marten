@@ -1,6 +1,73 @@
 require "./spec_helper"
 
 describe Marten::Routing::Match do
+  describe "#localized" do
+    it "raises if the map is not the root one" do
+      map = Marten::Routing::Map.new
+
+      expect_raises(Marten::Routing::Errors::InvalidRouteMap, "Cannot define localized routes in a non-root map") do
+        map.localized do
+          path t("routes.blog"), Marten::Handlers::Base, name: "blog"
+        end
+      end
+    end
+
+    it "allows to define localized routes" do
+      map = Marten::Routing::Map.new
+      map.exposed_root = true
+
+      map.localized do
+        path t("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar"
+      end
+
+      map.rules.size.should eq 1
+      map.rules.first.should be_a Marten::Routing::Rule::Localized
+
+      map.reverse("foo_bar").should eq "/en/foo/bar"
+
+      I18n.with_locale(:fr) do
+        map.reverse("foo_bar").should eq "/fr/foo-french/bar-french"
+      end
+    end
+
+    it "allows to define localized routes without the default locale prefix" do
+      map = Marten::Routing::Map.new
+      map.exposed_root = true
+
+      map.localized(prefix_default_locale: false) do
+        path t("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar"
+      end
+
+      map.rules.size.should eq 1
+      map.rules.first.should be_a Marten::Routing::Rule::Localized
+
+      map.reverse("foo_bar").should eq "/foo/bar"
+
+      I18n.with_locale(:fr) do
+        map.reverse("foo_bar").should eq "/fr/foo-french/bar-french"
+      end
+    end
+
+    it "is consistent with multiple invocations" do
+      map = Marten::Routing::Map.new
+      map.exposed_root = true
+
+      map.localized do
+        path t("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar"
+
+        map.exposed_localizing?.should be_true
+
+        map.localized do
+          path t("routes.foo_bar"), Marten::Handlers::Base, name: "other_foo_bar"
+
+          map.exposed_localizing?.should be_true
+        end
+      end
+
+      map.exposed_localizing?.should be_false
+    end
+  end
+
   describe "#path" do
     it "can be used with a translated path" do
       map = Marten::Routing::Map.new
@@ -34,6 +101,26 @@ describe Marten::Routing::Match do
       map.path("/", Marten::Handlers::Base, name: "home")
       expect_raises(Marten::Routing::Errors::InvalidRuleName) do
         map.path("/bis", Marten::Handlers::Base, name: "home")
+      end
+    end
+
+    context "while localizing" do
+      it "allows to define localized routes" do
+        map = Marten::Routing::Map.new
+        map.exposed_root = true
+
+        map.localized do
+          path t("routes.foo_bar"), Marten::Handlers::Base, name: "foo_bar"
+          path t("routes.foo_bar_with_args"), Marten::Handlers::Base, name: "foo_bar_with_args"
+        end
+
+        map.reverse("foo_bar").should eq "/en/foo/bar"
+        map.reverse("foo_bar_with_args", param1: 42, param2: "hello-world").should eq "/en/foo/42/bar/hello-world"
+
+        I18n.with_locale(:fr) do
+          map.reverse("foo_bar").should eq "/fr/foo-french/bar-french"
+          map.reverse("foo_bar_with_args", param1: 42, param2: "hello-world").should eq "/fr/foo/42/bar/hello-world"
+        end
       end
     end
   end

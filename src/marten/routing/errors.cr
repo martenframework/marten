@@ -7,6 +7,9 @@ module Marten
       # Represents an error raised when a route cannot be reversed.
       class NoReverseMatch < Exception; end
 
+      # Represents an error raised when an invalid route map is defined.
+      class InvalidRouteMap < Exception; end
+
       # Represents an error raised when an invalid route name is defined.
       class InvalidRuleName < Exception; end
 

@@ -229,5 +229,55 @@ describe Marten::Routing::Reverser do
       )
       reverser.reverse({param1: "hello-world"}.to_h).should be_nil
     end
+
+    it "returns the interpolated path for matching parameters when prefixed and localized paths are used" do
+      reverser = Marten::Routing::Reverser.new(
+        "path:name",
+        {
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}",
+        } of String? => String,
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+        }
+      )
+
+      reverser.prefix_locales = true
+      reverser.prefix_default_locale = true
+
+      I18n.with_locale("en") do
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/en/this-is-a-test/hello-world/xyz/42"
+      end
+
+      I18n.with_locale("fr") do
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
+      end
+    end
+
+    it "does not prefix the path if the locale is the default locale and the prefix_default_locale option is false" do
+      reverser = Marten::Routing::Reverser.new(
+        "path:name",
+        {
+          "en" => "/this-is-a-test/%{param1}/xyz/%{param2}",
+          "fr" => "/ceci-est-un-test/%{param1}/xyz/%{param2}",
+        } of String? => String,
+        {
+          "param1" => Marten::Routing::Parameter.registry["slug"],
+          "param2" => Marten::Routing::Parameter.registry["int"],
+        }
+      )
+
+      reverser.prefix_locales = true
+      reverser.prefix_default_locale = false
+
+      I18n.with_locale("en") do
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/this-is-a-test/hello-world/xyz/42"
+      end
+
+      I18n.with_locale("fr") do
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
+      end
+    end
   end
 end

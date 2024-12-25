@@ -129,7 +129,9 @@ module Marten
   # This method returns the main routes map, initialized according to the routes configuration and allowing to perform
   # reverse URL resolutions.
   def self.routes
-    @@routes ||= Routing::Map.new
+    @@routes ||= Routing::Map.new.tap do |map|
+      map.root = true
+    end
   end
 
   # Returns the settings of the application.

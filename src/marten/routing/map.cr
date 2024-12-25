@@ -4,7 +4,10 @@ require "./rule/**"
 module Marten
   module Routing
     class Map
+      @current_localized_rule : Rule::Localized? = nil
+      @localizing : Bool = false
       @reversers : Hash(String, Reverser)? = nil
+      @root : Bool = false
 
       getter rules
 
@@ -20,6 +23,42 @@ module Marten
 
       def draw(&)
         with self yield self
+      end
+
+      # Allows to define routes that are localized.
+      #
+      # When localized routes are defined, the current locale will be automatically prepended to the path of the
+      # localized routes and the routes map will be able to resolve paths in a locale-aware manner. By default, the
+      # locale prefix will be added to the path of the localized routes for all locales (including the default
+      # locale). It is however possible to customize this behavior by passing `false` to the `prefix_default_locale`
+      # argument (so that the locale prefix is not added for the default locale).
+      #
+      # For example:
+      #
+      # ```
+      # Marten::Routing::Map.draw do
+      #   localized do
+      #     path t("routes.blog"), Blogging::BlogHandler, name: "blog"
+      #     path t("routes.post_detail"), Blogging::PostHandler, name: "post_detail"
+      #   end
+      # end
+      # ```
+      def localized(prefix_default_locale = true, &) : Nil
+        raise Errors::InvalidRouteMap.new("Cannot define localized routes in a non-root map") if !root?
+
+        begin
+          previous_localizing = localizing?
+          previous_current_localized_rule = @current_localized_rule
+
+          self.localizing = true
+          self.current_localized_rule = Rule::Localized.new(prefix_default_locale)
+
+          with self yield self
+        ensure
+          rules << current_localized_rule.not_nil!
+          self.localizing = (previous_localizing == true)
+          self.current_localized_rule = previous_current_localized_rule
+        end
       end
 
       # Inserts a new path into the routes map.
@@ -52,7 +91,7 @@ module Marten
       # `Marten::Routing::Match` object if a match is found. If no match is found a
       # `Marten::Routing::Errors::NoResolveMatch` exception is raised.
       def resolve(path : String) : Match
-        match = @rules.each do |r|
+        match = rules.each do |r|
           matched = r.resolve(path)
           break matched unless matched.nil?
         end
@@ -84,6 +123,10 @@ module Marten
       end
 
       protected getter namespace
+
+      protected getter? root
+
+      protected setter root
 
       protected def reversers : Hash(String, Reverser)
         @reversers ||= begin
@@ -118,6 +161,13 @@ module Marten
 
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
 
+      private getter current_localized_rule
+
+      private getter? localizing
+
+      private setter current_localized_rule
+      private setter localizing
+
       private def insert_path(
         path : String | TranslatedPath,
         target : Marten::Handlers::Base.class | Map,
@@ -135,7 +185,16 @@ module Marten
           end
         end
 
-        unless @rules.find { |r| r.name == name }.nil?
+        rules_to_check = localizing? ? rules + current_localized_rule.not_nil!.rules : rules
+        rules_to_check = rules_to_check.flat_map do |rule|
+          if rule.is_a?(Rule::Localized)
+            rule.rules
+          else
+            rule
+          end
+        end
+
+        unless rules_to_check.reject(Rule::Localized).find { |r| r.name == name }.nil?
           raise Errors::InvalidRuleName.new("A '#{name}' route already exists")
         end
 
@@ -148,7 +207,11 @@ module Marten
           rule = Rule::Map.new(path, target, name)
         end
 
-        @rules << rule
+        if localizing?
+          current_localized_rule.not_nil!.rules << rule
+        else
+          rules << rule
+        end
       end
 
       private def path_with_duplicated_parameters?(path_for_interpolation)

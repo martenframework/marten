@@ -52,5 +52,25 @@ describe Marten::CLI::Manage::Command::Routes do
       output.includes?("/nested-1/nested-2/dummy/<id:int>").should be_true
       output.includes?("[nested_1:nested_2:dummy_with_id]").should be_true
     end
+
+    it "displays localized routes as expected" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Routes.new(
+        options: [] of String,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.run
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("/<locale>/dummy").should be_true
+      output.includes?("/<locale>/dummy/<id:int>").should be_true
+      output.includes?("/<locale>/dummy/<id:int>/and/<scope:slug>").should be_true
+      output.includes?("/<locale>/nested-1/dummy/<id:int>").should be_true
+      output.includes?("/<locale>/nested-1/nested-2/dummy/<id:int>").should be_true
+    end
   end
 end

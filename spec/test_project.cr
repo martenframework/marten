@@ -126,4 +126,11 @@ Marten.routes.draw do
   path "/simple-schema", SimpleSchemaHandler, name: "simple_schema"
   path "/simple-file-schema", SimpleFileSchemaHandler, name: "simple_file_schema"
   path "/nested-1", NESTED_ROUTES_1, name: "nested_1"
+
+  localized do
+    path "/dummy", DummyHandler, name: "localized_dummy"
+    path "/dummy/<id:int>", DummyHandler, name: "localized_dummy_with_id"
+    path "/dummy/<id:int>/and/<scope:slug>", DummyHandler, name: "localized_dummy_with_id_and_scope"
+    path "/nested-1", NESTED_ROUTES_1, name: "localized_nested_1"
+  end
 end

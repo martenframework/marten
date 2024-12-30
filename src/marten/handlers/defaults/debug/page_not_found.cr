@@ -34,7 +34,7 @@ module Marten
             rescue Routing::Errors::NoReverseMatch
             end
 
-            HTTP::Response.new(ECR.render("#{__DIR__}/templates/welcome.html.ecr"))
+            HTTP::Response::NotFound.new(ECR.render("#{__DIR__}/templates/welcome.html.ecr"))
           end
         end
       end

@@ -14,7 +14,7 @@ describe Marten::Handlers::Defaults::Debug::PageNotFound do
       handler = Marten::Handlers::Defaults::Debug::PageNotFound.new(request)
 
       response = handler.dispatch
-      response.status.should eq 200
+      response.status.should eq 404
       response.content_type.should eq "text/html"
       response.content.includes?("Welcome to Marten Framework!").should be_true
     end

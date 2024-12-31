@@ -66,11 +66,11 @@ describe Marten::CLI::Manage::Command::Routes do
       command.run
 
       output = stdout.rewind.gets_to_end
-      output.includes?("/<locale>/dummy").should be_true
-      output.includes?("/<locale>/dummy/<id:int>").should be_true
-      output.includes?("/<locale>/dummy/<id:int>/and/<scope:slug>").should be_true
-      output.includes?("/<locale>/nested-1/dummy/<id:int>").should be_true
-      output.includes?("/<locale>/nested-1/nested-2/dummy/<id:int>").should be_true
+      output.includes?("/<locale>/dummy-localized").should be_true
+      output.includes?("/<locale>/dummy-localized/<id:int>").should be_true
+      output.includes?("/<locale>/dummy-localized/<id:int>/and/<scope:slug>").should be_true
+      output.includes?("/<locale>/nested-1-localized/dummy/<id:int>").should be_true
+      output.includes?("/<locale>/nested-1-localized/nested-2/dummy/<id:int>").should be_true
     end
   end
 end

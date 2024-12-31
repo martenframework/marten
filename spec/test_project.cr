@@ -128,9 +128,9 @@ Marten.routes.draw do
   path "/nested-1", NESTED_ROUTES_1, name: "nested_1"
 
   localized do
-    path "/dummy", DummyHandler, name: "localized_dummy"
-    path "/dummy/<id:int>", DummyHandler, name: "localized_dummy_with_id"
-    path "/dummy/<id:int>/and/<scope:slug>", DummyHandler, name: "localized_dummy_with_id_and_scope"
-    path "/nested-1", NESTED_ROUTES_1, name: "localized_nested_1"
+    path "/dummy-localized", DummyHandler, name: "localized_dummy"
+    path "/dummy-localized/<id:int>", DummyHandler, name: "localized_dummy_with_id"
+    path "/dummy-localized/<id:int>/and/<scope:slug>", DummyHandler, name: "localized_dummy_with_id_and_scope"
+    path "/nested-1-localized", NESTED_ROUTES_1, name: "localized_nested_1"
   end
 end

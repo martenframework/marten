@@ -24,6 +24,8 @@ module Marten
           end
         end
 
+        protected getter? prefix_default_locale
+
         protected def reversers : Array(Reverser)
           @reversers ||= rules.flat_map(&.reversers).tap do |reversers|
             reversers.each do |reverser|
@@ -32,8 +34,6 @@ module Marten
             end
           end
         end
-
-        private getter? prefix_default_locale
 
         private def locale_prefix : String
           if I18n.locale == Marten.settings.i18n.default_locale && !prefix_default_locale?

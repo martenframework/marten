@@ -1,4 +1,8 @@
 class Marten::Routing::Map
+  def exposed_localized_rule
+    @localized_rule
+  end
+
   def exposed_localizing?
     @localizing
   end

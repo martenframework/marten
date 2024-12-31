@@ -122,6 +122,7 @@ module Marten
         perform_reverse(name.to_s, params)
       end
 
+      protected getter localized_rule
       protected getter namespace
 
       protected getter? root
@@ -160,8 +161,6 @@ module Marten
       end
 
       private INTERPOLATION_PARAMETER_RE = /%{([a-zA-Z_0-9]+)}/
-
-      private getter localized_rule
 
       private getter? localizing
 

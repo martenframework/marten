@@ -240,6 +240,11 @@ describe Marten::DB::Field::DateTime do
       end
     end
 
+    it "returns a Time value if the initial value is a Integer" do
+      field = Marten::DB::Field::DateTime.new("my_field")
+      field.to_db(1645672830).should eq Time.utc(2022, 2, 24, 3, 20, 30)
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::DateTime.new("my_field")
 

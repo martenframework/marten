@@ -75,6 +75,8 @@ module Marten
           case value
           when Nil
             nil
+          when Int32
+            Time.unix(value.as(Int32))
           when Time
             value.to_utc
           else

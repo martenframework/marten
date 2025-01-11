@@ -49,6 +49,16 @@ describe Marten::DB::Field::ManyToMany do
     end
   end
 
+  describe "::through" do
+    it "reuse existed class if specified through options" do
+      user = Marten::DB::Field::ManyToManySpec::User.create!(name: "foo")
+      user.roles.should be_empty
+
+      role = Marten::DB::Field::ManyToManySpec::Role.create!(name: "admin")
+      user.roles.add(role)
+    end
+  end
+
   describe "#db_column" do
     it "returns nil" do
       field = Marten::DB::Field::ManyToMany.new(

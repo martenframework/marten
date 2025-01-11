@@ -96,7 +96,9 @@ module Marten
 
             {% field_id_string = field_id.stringify %}
 
-            {% through_model_name = "#{model_klass}#{field_id_string.capitalize.id}" %}
+            {% through_model_name = kwargs[:through] && kwargs[:through].stringify %}
+            {% through_model_name ||= "#{model_klass}#{field_id_string.capitalize.id}" %}
+
             {% through_related_name = "#{from_model_name.downcase.id}_#{field_id_string.downcase.id}" %}
             {% through_from_related_name = through_related_name %}
             {% through_to_related_name = through_related_name %}
@@ -120,8 +122,8 @@ module Marten
               register_field(
                 {{ @type }}.new(
                   {{ field_id.stringify }},
-                  {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
-                  through: {{ through_model_name.id }},
+                  {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }},{% end %}
+                  {% unless kwargs[:through] %}through: {{ through_model_name.id }},{% end %}
                   through_from_field_id: {{ through_model_from_field_id.id.stringify }},
                   through_to_field_id: {{ through_model_to_field_id.id.stringify }}
                 )
@@ -138,23 +140,25 @@ module Marten
               end
             end
 
-            class ::{{ through_model_name.id }} < Marten::DB::Model
-              field :id, :big_int, primary_key: true, auto: true
-              field(
-                :{{ through_model_from_field_id.id }},
-                :many_to_one,
-                to: {{ model_klass }},
-                on_delete: :cascade,
-                related: {{ through_from_related_name }}
-              )
-              field(
-                :{{ through_model_to_field_id.id }},
-                :many_to_one,
-                to: {{ related_model_klass }},
-                on_delete: :cascade,
-                related: {{ through_to_related_name }}
-              )
-            end
+            {% unless kwargs[:through] %}
+              class ::{{ through_model_name.id }} < Marten::DB::Model
+                field :id, :big_int, primary_key: true, auto: true
+                field(
+                  :{{ through_model_from_field_id.id }},
+                  :many_to_one,
+                  to: {{ model_klass }},
+                  on_delete: :cascade,
+                  related: {{ through_from_related_name }}
+                )
+                field(
+                  :{{ through_model_to_field_id.id }},
+                  :many_to_one,
+                  to: {{ related_model_klass }},
+                  on_delete: :cascade,
+                  related: {{ through_to_related_name }}
+                )
+              end
+            {% end %}
 
             {% related_field_name = kwargs[:related] %}
 

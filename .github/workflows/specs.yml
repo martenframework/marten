@@ -36,9 +36,9 @@ jobs:
       matrix:
         db_version: ['10.11.6', '11.2.2']
         crystal: [
-          '1.12.2',
           '1.13.1',
           '1.14.0',
+          '1.15.0',
           'nightly',
         ]
     container:
@@ -83,9 +83,9 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.12.2',
           '1.13.1',
           '1.14.0',
+          '1.15.0',
           'nightly',
         ]
     container:
@@ -131,9 +131,9 @@ jobs:
       matrix:
         db_version: ['14', '15', '16']
         crystal: [
-          '1.12.2',
           '1.13.1',
           '1.14.0',
+          '1.15.0',
           'nightly',
         ]
     container:
@@ -164,9 +164,9 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.12.2',
           '1.13.1',
           '1.14.0',
+          '1.15.0',
           'nightly',
         ]
     container:
@@ -188,7 +188,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.14.0
+      image: crystallang/crystal:1.15.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite
@@ -217,7 +217,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.14.0
+      image: crystallang/crystal:1.15.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite

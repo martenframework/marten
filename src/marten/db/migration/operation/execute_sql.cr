@@ -17,7 +17,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             schema_editor.execute(@backward_sql.not_nil!) unless @backward_sql.nil?
           end
@@ -26,7 +26,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             schema_editor.execute(@forward_sql)
           end

@@ -17,7 +17,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             @backward_proc.not_nil!.call if !@backward_proc.nil?
           end
@@ -26,7 +26,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             @forward_proc.call
           end

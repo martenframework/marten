@@ -14,7 +14,7 @@ module Marten
             @model : Model.class,
             @result_set : ::DB::ResultSet,
             @joins : Array(Join),
-            @cursor : Int32 = 0
+            @cursor : Int32 = 0,
           )
           end
 

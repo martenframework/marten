@@ -28,7 +28,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
 
           # Applies the operation at the database level.
@@ -36,7 +36,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
 
           # Applies the operation at the project state level.

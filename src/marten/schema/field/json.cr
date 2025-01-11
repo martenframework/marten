@@ -8,7 +8,7 @@ module Marten
         def initialize(
           @id : ::String,
           @required : ::Bool = true,
-          serializable : ::JSON::Serializable.class | Nil = nil
+          serializable : ::JSON::Serializable.class | Nil = nil,
         )
           if !serializable.nil?
             @serializable_proc = ->(value : ::String) {

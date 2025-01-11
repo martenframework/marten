@@ -22,7 +22,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, table_name)
             unique_constraint = to_state.get_table(app_label, table_name).get_unique_constraint(unique_constraint_name)
@@ -33,7 +33,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, table_name)
             unique_constraint = table.get_unique_constraint(unique_constraint_name)

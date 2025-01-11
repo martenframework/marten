@@ -16,7 +16,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.headers[:CONTENT_ENCODING]?.should be_nil
@@ -39,7 +39,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
       )
 
       response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -66,7 +66,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{
+        -> {
           r = Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200)
           r.headers["Content-Encoding"] = "test"
           r
@@ -93,7 +93,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
       )
 
       response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -116,7 +116,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
       )
 
       response.headers[:CONTENT_ENCODING]?.should be_nil
@@ -139,7 +139,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{
+        -> {
           r = Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200)
           r.headers["ETag"] = %{"33a64df551425fcc55e4d42a148795d9f25f89d4"}
           r
@@ -166,7 +166,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{
+        -> {
           r = Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200)
           r.headers["ETag"] = %{W/"33a64df551425fcc55e4d42a148795d9f25f89d4"}
           r
@@ -193,7 +193,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
       )
 
       response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -217,7 +217,7 @@ describe Marten::Middleware::GZip do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new(uncompressed_content, content_type: "text/plain", status: 200) }
       )
 
       response.headers[:CONTENT_ENCODING].should eq "gzip"

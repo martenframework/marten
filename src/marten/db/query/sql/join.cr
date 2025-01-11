@@ -31,7 +31,7 @@ module Marten
             @to_common_field : Field::Base,
             @selected : Bool,
             @table_alias_prefix = "t",
-            @children = [] of self
+            @children = [] of self,
           )
           end
 

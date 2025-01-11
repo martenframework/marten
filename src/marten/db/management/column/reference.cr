@@ -20,7 +20,7 @@ module Marten
             @foreign_key = true,
             @null = false,
             @unique = false,
-            @index = true
+            @index = true,
           )
             @to_table = to_table.to_s
             @to_column = to_column.to_s

@@ -19,7 +19,7 @@ module Marten
           @index = false,
           @db_column = nil,
           default : ::Enum? = nil,
-          **kwargs
+          **kwargs,
         )
           @values = enum_values
           @default = default.try(&.to_s)

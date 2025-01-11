@@ -16,7 +16,7 @@ module Marten
               @name = "example",
               @database = "sqlite3",
               @targets = [TARGET_GENERAL],
-              @edge = false
+              @edge = false,
             )
             end
 

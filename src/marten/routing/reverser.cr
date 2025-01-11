@@ -21,7 +21,7 @@ module Marten
       def initialize(
         @name : String,
         path_for_interpolation : String,
-        @parameters = {} of String => Parameter::Base
+        @parameters = {} of String => Parameter::Base,
       )
         @path_for_interpolations = {} of String? => String
         @path_for_interpolations[nil] = path_for_interpolation
@@ -30,7 +30,7 @@ module Marten
       def initialize(
         @name : String,
         @path_for_interpolations : Hash(String?, String),
-        @parameters = {} of String => Parameter::Base
+        @parameters = {} of String => Parameter::Base,
       )
       end
 

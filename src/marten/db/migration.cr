@@ -85,7 +85,7 @@ module Marten
       def apply_backward(
         pre_forward_project_state : Management::ProjectState,
         project_state : Management::ProjectState,
-        schema_editor : Management::SchemaEditor::Base
+        schema_editor : Management::SchemaEditor::Base,
       )
         ops_backward, directed_forward = operations_backward
 
@@ -129,7 +129,7 @@ module Marten
 
       def apply_forward(
         project_state : Management::ProjectState,
-        schema_editor : Management::SchemaEditor::Base
+        schema_editor : Management::SchemaEditor::Base,
       )
         operations_forward[0].not_nil!.each do |operation|
           old_state = project_state.clone

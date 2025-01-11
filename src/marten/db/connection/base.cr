@@ -26,7 +26,7 @@ module Marten
         abstract def bulk_insert(
           table_name : String,
           values : Array(Hash(String, ::DB::Any)),
-          pk_column_to_fetch : String? = nil
+          pk_column_to_fetch : String? = nil,
         ) : Array(::DB::Any)?
 
         # Returns a distinct clause to remove duplicates from a query's results.
@@ -38,7 +38,7 @@ module Marten
         abstract def insert(
           table_name : String,
           values : Hash(String, ::DB::Any),
-          pk_column_to_fetch : String? = nil
+          pk_column_to_fetch : String? = nil,
         ) : ::DB::Any
 
         # Returns the left operand to use for specific query predicate.
@@ -75,7 +75,7 @@ module Marten
           table_name : String,
           values : Hash(String, ::DB::Any),
           pk_column_name : String,
-          pk_value : ::DB::Any
+          pk_value : ::DB::Any,
         ) : Nil
 
         # Returns the DB alias of the considered connection.

@@ -20,7 +20,7 @@ describe Marten::Middleware::Flash do
       middleware = Marten::Middleware::Flash.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.flash.should be_a Marten::HTTP::FlashStore
@@ -46,7 +46,7 @@ describe Marten::Middleware::Flash do
       middleware = Marten::Middleware::Flash.new
       middleware.call(
         request,
-        ->{
+        -> {
           request.flash["newkey"] = "newval"
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }

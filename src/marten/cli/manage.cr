@@ -24,7 +24,7 @@ module Marten
         @options : Array(String),
         @stdout : IO = STDOUT,
         @stderr : IO = STDERR,
-        @name : String = Marten::CLI::DEFAULT_COMMAND_NAME
+        @name : String = Marten::CLI::DEFAULT_COMMAND_NAME,
       )
         @commands_per_name = Hash(String, Command::Base.class).new
 

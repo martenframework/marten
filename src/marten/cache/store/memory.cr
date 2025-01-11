@@ -17,7 +17,7 @@ module Marten
           @expires_in : Time::Span? = nil,
           @version : Int32? = nil,
           @compress = false,
-          @compress_threshold = DEFAULT_COMPRESS_THRESHOLD
+          @compress_threshold = DEFAULT_COMPRESS_THRESHOLD,
         )
           super
         end
@@ -34,7 +34,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         ) : Int
           apply_increment(
             key,
@@ -61,7 +61,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         ) : Int
           apply_increment(
             key,
@@ -83,7 +83,7 @@ module Marten
           key : String,
           value : String,
           expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil
+          race_condition_ttl : Time::Span? = nil,
         )
           data[key] = value
           true
@@ -99,7 +99,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         )
           normalized_key = normalize_key(key.to_s)
           entry = deserialize_entry(read_entry(normalized_key))

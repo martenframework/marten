@@ -38,7 +38,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       ) : Marten::HTTP::Response
         perform_request(
           method: "DELETE",
@@ -57,7 +57,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       ) : Marten::HTTP::Response
         perform_request(
           method: "GET",
@@ -75,7 +75,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       )
         perform_request(
           method: "HEAD",
@@ -93,7 +93,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       )
         perform_request(
           method: "OPTIONS",
@@ -112,7 +112,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       ) : Marten::HTTP::Response
         perform_request(
           method: "PATCH",
@@ -132,7 +132,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       ) : Marten::HTTP::Response
         perform_request(
           method: "POST",
@@ -152,7 +152,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       ) : Marten::HTTP::Response
         perform_request(
           method: "PUT",
@@ -181,7 +181,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       ) : Marten::HTTP::Response
         perform_request(
           method: "TRACE",
@@ -276,7 +276,7 @@ module Marten
         query_params : Hash | NamedTuple | Nil = nil,
         content_type : String? = nil,
         headers : Hash | NamedTuple | Nil = nil,
-        secure = false
+        secure = false,
       )
         request_content_type = content_type || default_content_type || DEFAULT_CONTENT_TYPE_PER_METHOD[method]?
         request_headers = Marten::HTTP::Headers{"Host" => "127.0.0.1"}

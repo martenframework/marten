@@ -21,7 +21,7 @@ describe Marten::Middleware::AssetServing do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
       response_1.content.should eq "It works!"
 
@@ -33,7 +33,7 @@ describe Marten::Middleware::AssetServing do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
       response_2.content.should eq "It works!"
     end
@@ -49,7 +49,7 @@ describe Marten::Middleware::AssetServing do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
       )
       response_1.content.should eq "Unknown!"
 
@@ -61,7 +61,7 @@ describe Marten::Middleware::AssetServing do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
       )
       response_2.content.should eq "Unknown!"
     end
@@ -77,7 +77,7 @@ describe Marten::Middleware::AssetServing do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
       )
       response.content.should eq "Unknown!"
     end
@@ -93,7 +93,7 @@ describe Marten::Middleware::AssetServing do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
       )
       response.content.should eq "Unknown!"
     end
@@ -113,7 +113,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING]?.should be_nil
@@ -135,7 +135,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING]?.should be_nil
@@ -158,7 +158,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -187,7 +187,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING].should eq "deflate"
@@ -216,7 +216,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -242,7 +242,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -270,7 +270,7 @@ describe Marten::Middleware::AssetServing do
               }
             )
           ),
-          ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:CONTENT_ENCODING].should eq "gzip"
@@ -297,7 +297,7 @@ describe Marten::Middleware::AssetServing do
                 }
               )
             ),
-            ->{ Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
+            -> { Marten::HTTP::Response.new("Unknown!", content_type: "text/plain", status: 200) }
           )
 
           response.headers[:"Cache-Control"].should eq "private, max-age=7200"

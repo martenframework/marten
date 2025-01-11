@@ -133,7 +133,7 @@ module Marten
         private def get_records_to_decorate_from_field_context(
           relation_name : String,
           context : Model::Table::FieldContext,
-          records_to_possibly_decorate : Array(Model)
+          records_to_possibly_decorate : Array(Model),
         ) : Array(Model)
           records_to_decorate = Array(Model).new
 
@@ -151,7 +151,7 @@ module Marten
         private def get_records_to_decorate_from_reverse_relation_context(
           relation_name : String,
           context : Model::Table::ReverseRelationContext,
-          records_to_possibly_decorate : Array(Model)
+          records_to_possibly_decorate : Array(Model),
         ) : Array(Model)
           records_to_decorate = Array(Model).new
 
@@ -169,7 +169,7 @@ module Marten
         private def prefetch_relation_records_from_field_context(
           relation_name : String,
           context : Model::Table::FieldContext,
-          records_to_decorate : Array(Model)
+          records_to_decorate : Array(Model),
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
@@ -213,7 +213,7 @@ module Marten
         private def prefetch_relation_records_from_reverse_relation_context(
           relation_name : String,
           context : Model::Table::ReverseRelationContext,
-          records_to_decorate : Array(Model)
+          records_to_decorate : Array(Model),
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
@@ -282,7 +282,7 @@ module Marten
           m2m_field : Field::ManyToMany,
           records_to_decorate : Array(Model),
           prefetched_model : Model.class,
-          forward : Bool
+          forward : Bool,
         ) : Array(Model)
           # Retrieve the through records in order to get the related records.
           # TODO: Fetch everything in a single query when support for annotations is added.

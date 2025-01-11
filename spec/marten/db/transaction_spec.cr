@@ -23,10 +23,10 @@ describe Marten::DB::Transaction do
         conn.transaction do |trx|
           transaction = Marten::DB::Transaction.new(trx)
 
-          transaction.observe_commit(->{ commit_notified_1 = true; nil })
-          transaction.observe_commit(->{ commit_notified_2 = true; nil })
-          transaction.observe_rollback(->{ rollback_notified_1 = true; nil })
-          transaction.observe_rollback(->{ rollback_notified_2 = true; nil })
+          transaction.observe_commit(-> { commit_notified_1 = true; nil })
+          transaction.observe_commit(-> { commit_notified_2 = true; nil })
+          transaction.observe_rollback(-> { rollback_notified_1 = true; nil })
+          transaction.observe_rollback(-> { rollback_notified_2 = true; nil })
 
           transaction.notify_observers
         end
@@ -48,10 +48,10 @@ describe Marten::DB::Transaction do
         conn.transaction do |trx|
           transaction = Marten::DB::Transaction.new(trx)
 
-          transaction.observe_commit(->{ commit_notified_1 = true; nil })
-          transaction.observe_commit(->{ commit_notified_2 = true; nil })
-          transaction.observe_rollback(->{ rollback_notified_1 = true; nil })
-          transaction.observe_rollback(->{ rollback_notified_2 = true; nil })
+          transaction.observe_commit(-> { commit_notified_1 = true; nil })
+          transaction.observe_commit(-> { commit_notified_2 = true; nil })
+          transaction.observe_rollback(-> { rollback_notified_1 = true; nil })
+          transaction.observe_rollback(-> { rollback_notified_2 = true; nil })
 
           transaction.rolled_back = true
 
@@ -73,7 +73,7 @@ describe Marten::DB::Transaction do
       Marten::DB::Connection.default.open do |conn|
         conn.transaction do |trx|
           transaction = Marten::DB::Transaction.new(trx)
-          transaction.observe_commit(->{ commit_notified = true; nil })
+          transaction.observe_commit(-> { commit_notified = true; nil })
           transaction.notify_observers
         end
       end
@@ -89,7 +89,7 @@ describe Marten::DB::Transaction do
       Marten::DB::Connection.default.open do |conn|
         conn.transaction do |trx|
           transaction = Marten::DB::Transaction.new(trx)
-          transaction.observe_rollback(->{ rollback_notified = true; nil })
+          transaction.observe_rollback(-> { rollback_notified = true; nil })
           transaction.rolled_back = true
           transaction.notify_observers
         end

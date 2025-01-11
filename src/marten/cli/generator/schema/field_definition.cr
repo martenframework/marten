@@ -73,7 +73,7 @@ module Marten
           def initialize(
             @name : String,
             @type : String,
-            @modifiers : Array(Modifier)
+            @modifiers : Array(Modifier),
           )
           end
 

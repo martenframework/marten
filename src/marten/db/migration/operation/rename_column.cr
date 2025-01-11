@@ -25,7 +25,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, @table_name)
             column = table.get_column(@new_name)
@@ -36,7 +36,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, @table_name)
             column = table.get_column(@old_name)

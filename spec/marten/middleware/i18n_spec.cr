@@ -33,7 +33,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -57,7 +57,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "en"
@@ -80,7 +80,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.5"}
           )
         ),
-        ->{
+        -> {
           Marten.routes.resolve("/dummy-localized/42/and/foo") # Should raise a NoResolveMatch error
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -107,7 +107,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.5"}
           )
         ),
-        ->{
+        -> {
           Marten.routes.resolve("/dummy-localized/42/and/foo") # Should raise a NoResolveMatch error
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -135,7 +135,7 @@ describe Marten::Middleware::I18n do
               headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.5"}
             )
           ),
-          ->{
+          -> {
             Marten.routes.resolve("/unknown-localized/42/and/foo") # Should raise a NoResolveMatch error
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -162,7 +162,7 @@ describe Marten::Middleware::I18n do
               headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.5"}
             )
           ),
-          ->{
+          -> {
             Marten.routes.resolve("/unknown-localized/42/and/foo") # Should raise a NoResolveMatch error
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -188,7 +188,7 @@ describe Marten::Middleware::I18n do
               headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.5"}
             )
           ),
-          ->{
+          -> {
             Marten.routes.resolve("/fr/unknown-localized/42/and/foo") # Should raise a NoResolveMatch error
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -211,7 +211,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -232,7 +232,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-CA,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -253,7 +253,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-FR,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr-CA"
@@ -274,7 +274,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.2,en;q=0.5,es;q=0.7"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "es"
@@ -295,7 +295,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "it-IT,it;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "en"
@@ -316,7 +316,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -337,7 +337,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "FR"
@@ -358,7 +358,7 @@ describe Marten::Middleware::I18n do
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-FR,en;q=0.5"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "FR-CA"
@@ -380,7 +380,7 @@ describe Marten::Middleware::I18n do
 
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -402,7 +402,7 @@ describe Marten::Middleware::I18n do
 
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -424,7 +424,7 @@ describe Marten::Middleware::I18n do
 
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr-CA"
@@ -446,7 +446,7 @@ describe Marten::Middleware::I18n do
 
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -465,7 +465,7 @@ describe Marten::Middleware::I18n do
           resource: "",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -485,7 +485,7 @@ describe Marten::Middleware::I18n do
           resource: "",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
         ),
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       I18n.locale.should eq "fr"
@@ -505,7 +505,7 @@ describe Marten::Middleware::I18n do
           resource: "",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
         ),
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r.headers["Content-Language"] = "es"
           r

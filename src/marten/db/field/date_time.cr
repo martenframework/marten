@@ -16,7 +16,7 @@ module Marten
           @index = false,
           @db_column = nil,
           @auto_now = false,
-          @auto_now_add = false
+          @auto_now_add = false,
         )
           if @auto_now || @auto_now_add
             @blank = true

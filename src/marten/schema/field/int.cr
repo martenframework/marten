@@ -13,7 +13,7 @@ module Marten
           @id : ::String,
           @required : ::Bool = true,
           @min_value : Int32 | Int64 | Nil = nil,
-          @max_value : Int32 | Int64 | Nil = nil
+          @max_value : Int32 | Int64 | Nil = nil,
         )
         end
 

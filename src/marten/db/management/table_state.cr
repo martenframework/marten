@@ -31,7 +31,7 @@ module Marten
           @name : String,
           @columns : Array(Column::Base),
           @unique_constraints : Array(Management::Constraint::Unique) = [] of Management::Constraint::Unique,
-          @indexes : Array(Management::Index) = [] of Management::Index
+          @indexes : Array(Management::Index) = [] of Management::Index,
         )
         end
 

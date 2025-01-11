@@ -28,7 +28,7 @@ module Marten
           def sanitize_positional_parameters(
             query : String,
             params : Array(::DB::Any),
-            connection : Connection::Base? = nil
+            connection : Connection::Base? = nil,
           )
             if query.count(POSITIONAL_PARAMETER_CHAR) != params.size
               raise Errors::UnmetQuerySetCondition.new("Wrong number of parameters provided for query: #{query}")
@@ -69,7 +69,7 @@ module Marten
           def sanitize_named_parameters(
             query : String,
             params : Hash(String, ::DB::Any),
-            connection : Connection::Base? = nil
+            connection : Connection::Base? = nil,
           )
             sanitized_params = [] of ::DB::Any
 

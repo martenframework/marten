@@ -9,7 +9,7 @@ module Marten
           @instance : Marten::DB::Model,
           @related_field_id : String,
           query : SQL::Query(M)? = nil,
-          @assign_related : ::Bool = false
+          @assign_related : ::Bool = false,
         )
           @query = if query.nil?
                      q = SQL::Query(M).new

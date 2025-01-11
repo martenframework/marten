@@ -14,7 +14,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.post?.should be_true
@@ -33,7 +33,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.delete?.should be_true
@@ -56,7 +56,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.delete?.should be_true
@@ -79,7 +79,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.put?.should be_true
@@ -98,7 +98,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.delete?.should be_false
@@ -117,7 +117,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.post?.should be_true
@@ -136,7 +136,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.post?.should be_true
@@ -155,7 +155,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.post?.should be_true
@@ -184,7 +184,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.delete?.should be_true
@@ -213,7 +213,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.post?.should be_true
@@ -243,7 +243,7 @@ describe Marten::Middleware::MethodOverride do
       middleware = Marten::Middleware::MethodOverride.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.delete?.should_not be_true

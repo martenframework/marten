@@ -33,7 +33,7 @@ class Marten::DB::Migration::Operation::BaseSpec
       app_label : String,
       schema_editor : Management::SchemaEditor::Base,
       from_state : Management::ProjectState,
-      to_state : Management::ProjectState
+      to_state : Management::ProjectState,
     ) : Nil
       # noop
     end
@@ -42,7 +42,7 @@ class Marten::DB::Migration::Operation::BaseSpec
       app_label : String,
       schema_editor : Management::SchemaEditor::Base,
       from_state : Management::ProjectState,
-      to_state : Management::ProjectState
+      to_state : Management::ProjectState,
     ) : Nil
       # noop
     end

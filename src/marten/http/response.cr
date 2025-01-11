@@ -34,7 +34,7 @@ module Marten
       def initialize(
         @content : String = "",
         @content_type : String = DEFAULT_CONTENT_TYPE,
-        @status : Int32 = 200
+        @status : Int32 = 200,
       )
         @cookies = Cookies.new
         @headers = Headers.new

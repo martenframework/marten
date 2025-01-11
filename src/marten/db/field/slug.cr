@@ -17,7 +17,7 @@ module Marten
           @unique = false,
           @index = true,
           @db_column = nil,
-          @slugify : Symbol? = nil
+          @slugify : Symbol? = nil,
         )
         end
 

@@ -87,7 +87,7 @@ module Marten
             @name : String,
             @type : String,
             @qualifier : String?,
-            @modifiers : Array(Modifier)
+            @modifiers : Array(Modifier),
           )
           end
 

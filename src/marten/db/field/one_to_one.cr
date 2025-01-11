@@ -19,7 +19,7 @@ module Marten
           @db_column = nil,
           @related : Nil | ::String | Symbol = nil,
           @parent_link : ::Bool = false,
-          on_delete : ::String | Symbol = :do_nothing
+          on_delete : ::String | Symbol = :do_nothing,
         )
           @related = @related.try(&.to_s)
           @on_delete = Deletion::Strategy.parse(on_delete.to_s)

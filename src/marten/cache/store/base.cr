@@ -24,7 +24,7 @@ module Marten
           @expires_in : Time::Span? = nil,
           @version : Int32? = nil,
           @compress = true,
-          @compress_threshold = DEFAULT_COMPRESS_THRESHOLD
+          @compress_threshold = DEFAULT_COMPRESS_THRESHOLD,
         )
         end
 
@@ -56,7 +56,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         ) : Int
 
         # Deletes an entry from the cache.
@@ -87,7 +87,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         ) : Int
 
         # Reads an entry from the cache.
@@ -98,7 +98,7 @@ module Marten
           key : String,
           value : String,
           expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil
+          race_condition_ttl : Time::Span? = nil,
         )
 
         # Deletes an entry associated with a given `key` from the cache. Returns `true` if an entry was deleted.
@@ -227,7 +227,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         )
           effective_expires_in = if !expires_at.nil?
                                    expires_at.to_utc - Time.utc

@@ -5,7 +5,7 @@ module Marten
         def initialize(
           location : String,
           content : String = "",
-          content_type : String = DEFAULT_CONTENT_TYPE
+          content_type : String = DEFAULT_CONTENT_TYPE,
         )
           super(content: content, content_type: content_type, status: 301)
           self["Location"] = location

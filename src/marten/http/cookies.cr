@@ -54,7 +54,7 @@ module Marten
         name : String | Symbol,
         path : String = "/",
         domain : String? = nil,
-        same_site : Nil | String | Symbol = nil
+        same_site : Nil | String | Symbol = nil,
       ) : String?
         if raw_cookie = cookies.delete(name.to_s)
           deleted_cookie_value = raw_cookie.value
@@ -127,7 +127,7 @@ module Marten
         domain : String? = nil,
         secure : Bool = false,
         http_only : Bool = false,
-        same_site : Nil | String | Symbol = nil
+        same_site : Nil | String | Symbol = nil,
       ) : Nil
         new_cookie = ::HTTP::Cookie.new(
           name: name.to_s,

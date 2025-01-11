@@ -12,7 +12,7 @@ module Marten
         def initialize(
           @streamed_content : Iterator(String),
           @content_type : String = DEFAULT_CONTENT_TYPE,
-          @status : Int32 = 200
+          @status : Int32 = 200,
         )
           super(content: "", content_type: @content_type, status: @status)
         end

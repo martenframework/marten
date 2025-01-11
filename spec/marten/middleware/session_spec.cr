@@ -14,7 +14,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.session.should be_a Marten::HTTP::Session::Store::Cookie
@@ -32,7 +32,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       request.session.should be_a Marten::HTTP::Session::Store::Cookie
@@ -52,7 +52,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         request.session.should be_a Marten::HTTP::Session::Store::Cookie
@@ -75,7 +75,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.cookies.has_key?(Marten.settings.sessions.cookie_name).should be_false
@@ -93,7 +93,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session.flush
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -119,7 +119,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         response.cookies.has_key?("othercookie").should be_false
@@ -141,7 +141,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["foo"]?
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -165,7 +165,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.headers[:VARY]?.should be_nil
@@ -186,7 +186,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.cookies[Marten.settings.sessions.cookie_name]?.should be_nil
@@ -207,7 +207,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["other"] = "test"
           Marten::HTTP::Response.new("It does not work!", content_type: "text/plain", status: 500)
         }
@@ -230,7 +230,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["other"] = "test"
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -255,7 +255,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{
+          -> {
             request.session["other"] = "test"
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -282,7 +282,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{
+          -> {
             request.session["other"] = "test"
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -310,7 +310,7 @@ describe Marten::Middleware::Session do
           middleware = Marten::Middleware::Session.new
           response = middleware.call(
             request,
-            ->{
+            -> {
               request.session["other"] = "test"
               Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
             }
@@ -336,7 +336,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["other"] = "test"
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -361,7 +361,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{
+          -> {
             request.session["other"] = "test"
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -386,7 +386,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["other"] = "test"
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -411,7 +411,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{
+          -> {
             request.session["other"] = "test"
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -436,7 +436,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["other"] = "test"
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -461,7 +461,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{
+          -> {
             request.session["other"] = "test"
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }
@@ -486,7 +486,7 @@ describe Marten::Middleware::Session do
       middleware = Marten::Middleware::Session.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           request.session["other"] = "test"
           Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
         }
@@ -511,7 +511,7 @@ describe Marten::Middleware::Session do
         middleware = Marten::Middleware::Session.new
         response = middleware.call(
           request,
-          ->{
+          -> {
             request.session["other"] = "test"
             Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           }

@@ -629,7 +629,7 @@ module Marten
         protected def assign_parent_model_field_from_db_result_set(
           parent_model : Model.class,
           result_set : ::DB::ResultSet,
-          column_name : String
+          column_name : String,
         )
           {% begin %}
           field = parent_model.local_fields_per_column[column_name]?

@@ -43,7 +43,7 @@ module Marten
             project : ProjectState,
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : Nil
             old_type = old_column.sql_type(@connection)
             new_type = new_column.sql_type(@connection)
@@ -290,7 +290,7 @@ module Marten
           private def change_column_default_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -298,7 +298,7 @@ module Marten
           private def change_column_type_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -306,7 +306,7 @@ module Marten
           private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
-            name : String? = nil
+            name : String? = nil,
           ) : Statement
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -355,7 +355,7 @@ module Marten
           private def drop_column_default_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -367,7 +367,7 @@ module Marten
           private def post_change_column_type_statements(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : Array(String)
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -375,7 +375,7 @@ module Marten
           private def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::Reference,
-            column_definition : String
+            column_definition : String,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -383,7 +383,7 @@ module Marten
           private def prepare_foreign_key_for_new_table(
             table : TableState,
             column : Column::Reference,
-            column_definition : String
+            column_definition : String,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -402,7 +402,7 @@ module Marten
 
           private def remove_unique_constraint_statement(
             table : TableState,
-            unique_constraint : Management::Constraint::Unique
+            unique_constraint : Management::Constraint::Unique,
           ) : String
             remove_unique_constraint_statement(table, unique_constraint.name)
           end
@@ -418,7 +418,7 @@ module Marten
           private def set_up_not_null_column_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -426,7 +426,7 @@ module Marten
           private def set_up_null_column_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -448,7 +448,7 @@ module Marten
           private def update_null_columns_with_default_value_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end

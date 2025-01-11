@@ -106,7 +106,7 @@ describe Marten::DB::Connection::Base do
 
       commit_notified = false
 
-      conn.observe_transaction_commit(->{ commit_notified = true; nil }).should be_nil
+      conn.observe_transaction_commit(-> { commit_notified = true; nil }).should be_nil
 
       conn.transaction do
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
@@ -123,7 +123,7 @@ describe Marten::DB::Connection::Base do
       commit_notified = false
 
       conn.transaction do
-        conn.observe_transaction_commit(->{ commit_notified = true; nil })
+        conn.observe_transaction_commit(-> { commit_notified = true; nil })
 
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
@@ -140,7 +140,7 @@ describe Marten::DB::Connection::Base do
 
       rollback_notified = false
 
-      conn.observe_transaction_rollback(->{ rollback_notified = true; nil }).should be_nil
+      conn.observe_transaction_rollback(-> { rollback_notified = true; nil }).should be_nil
 
       conn.transaction do
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
@@ -157,7 +157,7 @@ describe Marten::DB::Connection::Base do
       rollback_notified = false
 
       conn.transaction do
-        conn.observe_transaction_rollback(->{ rollback_notified = true; nil })
+        conn.observe_transaction_rollback(-> { rollback_notified = true; nil })
 
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
@@ -242,7 +242,7 @@ describe Marten::DB::Connection::Base do
       commit_notified = false
 
       conn.transaction do
-        conn.observe_transaction_commit(->{ commit_notified = true; nil })
+        conn.observe_transaction_commit(-> { commit_notified = true; nil })
 
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
@@ -260,7 +260,7 @@ describe Marten::DB::Connection::Base do
       rollback_notified = false
 
       conn.transaction do
-        conn.observe_transaction_rollback(->{ rollback_notified = true; nil })
+        conn.observe_transaction_rollback(-> { rollback_notified = true; nil })
 
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
@@ -278,7 +278,7 @@ describe Marten::DB::Connection::Base do
       rollback_notified = false
 
       conn.transaction do
-        conn.observe_transaction_rollback(->{ rollback_notified = true; nil })
+        conn.observe_transaction_rollback(-> { rollback_notified = true; nil })
 
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
@@ -298,7 +298,7 @@ describe Marten::DB::Connection::Base do
       commit_notified = false
 
       conn.transaction do
-        conn.observe_transaction_commit(->{ commit_notified = true; nil })
+        conn.observe_transaction_commit(-> { commit_notified = true; nil })
 
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")

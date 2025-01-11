@@ -80,7 +80,7 @@ module Marten
             @stdout : IO = STDOUT,
             @stderr : IO = STDERR,
             @main_command_name = Marten::CLI::DEFAULT_COMMAND_NAME,
-            @exit_raises : Bool = false
+            @exit_raises : Bool = false,
           )
             @parser = OptionParser.new
           end

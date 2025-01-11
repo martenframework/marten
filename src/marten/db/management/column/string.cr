@@ -14,7 +14,7 @@ module Marten
             @null = false,
             @unique = false,
             @index = false,
-            @default : ::DB::Any? = nil
+            @default : ::DB::Any? = nil,
           )
           end
 

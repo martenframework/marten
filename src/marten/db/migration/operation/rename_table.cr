@@ -22,7 +22,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, @new_name)
             schema_editor.rename_table(table, @old_name)
@@ -32,7 +32,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, @old_name)
             schema_editor.rename_table(table, @new_name)

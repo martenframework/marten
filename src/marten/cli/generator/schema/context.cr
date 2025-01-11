@@ -12,7 +12,7 @@ module Marten
             @app_config : Apps::Config,
             @name : String,
             @field_definitions : Array(FieldDefinition),
-            @parent : String? = nil
+            @parent : String? = nil,
           )
           end
 

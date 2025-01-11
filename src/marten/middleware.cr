@@ -17,14 +17,14 @@ module Marten
     # ability to intercept any incoming request and the associated response, and to modify them if applicable.
     abstract def call(
       request : Marten::HTTP::Request,
-      get_response : Proc(Marten::HTTP::Response)
+      get_response : Proc(Marten::HTTP::Response),
     ) : Marten::HTTP::Response
 
     # :nodoc:
     def chain(request : Marten::HTTP::Request, last_get_response : Proc(Marten::HTTP::Response))
       Marten::HTTP::Response
       if next_middleware = @next
-        call(request, ->{ next_middleware.chain(request, last_get_response) })
+        call(request, -> { next_middleware.chain(request, last_get_response) })
       else
         call(request, last_get_response)
       end

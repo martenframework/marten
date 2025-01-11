@@ -170,7 +170,7 @@ module Marten
       private def insert_path(
         path : String | TranslatedPath,
         target : Marten::Handlers::Base.class | Map,
-        rule_name : String | Symbol | Nil
+        rule_name : String | Symbol | Nil,
       ) : Nil
         name = rule_name.to_s
 

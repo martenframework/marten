@@ -18,7 +18,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         ) : Int
           0
         end
@@ -35,7 +35,7 @@ module Marten
           version : Int32? = nil,
           race_condition_ttl : Time::Span? = nil,
           compress : Bool? = nil,
-          compress_threshold : Int32? = nil
+          compress_threshold : Int32? = nil,
         ) : Int
           0
         end
@@ -47,7 +47,7 @@ module Marten
           key : String,
           value : String,
           expires_in : Time::Span? = nil,
-          race_condition_ttl : Time::Span? = nil
+          race_condition_ttl : Time::Span? = nil,
         )
           true
         end

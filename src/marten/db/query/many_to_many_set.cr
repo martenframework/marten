@@ -15,7 +15,7 @@ module Marten
           @through_related_name : String,
           @through_model_from_field_id : String,
           @through_model_to_field_id : String,
-          query : SQL::Query(M)? = nil
+          query : SQL::Query(M)? = nil,
         )
           @query = if query.nil?
                      q = SQL::Query(M).new

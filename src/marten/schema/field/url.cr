@@ -10,7 +10,7 @@ module Marten
           @required : ::Bool = true,
           @max_size : ::Int32? = 200,
           @min_size : ::Int32? = nil,
-          @strip : ::Bool = true
+          @strip : ::Bool = true,
         )
         end
 

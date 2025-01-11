@@ -45,7 +45,7 @@ module Marten
           @unique = false,
           @index = false,
           @db_column = nil,
-          **kwargs
+          **kwargs,
         )
         end
 

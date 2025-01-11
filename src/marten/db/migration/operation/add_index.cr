@@ -20,7 +20,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, table_name)
             schema_editor.remove_index(table, index)
@@ -30,7 +30,7 @@ module Marten
             app_label : String,
             schema_editor : Management::SchemaEditor::Base,
             from_state : Management::ProjectState,
-            to_state : Management::ProjectState
+            to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, table_name)
             schema_editor.add_index(table, index)

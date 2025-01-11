@@ -13,7 +13,7 @@ module Marten
             @type : String,
             @nullable : Bool,
             @default : ::DB::Any?,
-            @character_maximum_length : Int32 | Int64 | Nil = nil
+            @character_maximum_length : Int32 | Int64 | Nil = nil,
           )
           end
 

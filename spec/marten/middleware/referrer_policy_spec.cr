@@ -13,7 +13,7 @@ describe Marten::Middleware::ReferrerPolicy do
 
       middleware = Marten::Middleware::ReferrerPolicy.new
       response = middleware.call(
-        request, ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        request, -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.headers[:"Referrer-Policy"].should eq "same-origin"
@@ -31,7 +31,7 @@ describe Marten::Middleware::ReferrerPolicy do
       middleware = Marten::Middleware::ReferrerPolicy.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r[:"Referrer-Policy"] = "origin"
           r
@@ -55,7 +55,7 @@ describe Marten::Middleware::ReferrerPolicy do
       with_overridden_setting("referrer_policy", "origin") do
         response = middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:"Referrer-Policy"].should eq "origin"

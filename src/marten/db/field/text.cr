@@ -16,7 +16,7 @@ module Marten
           @unique = false,
           @index = false,
           @max_size = nil,
-          @db_column = nil
+          @db_column = nil,
         )
         end
 

@@ -213,7 +213,7 @@ module Marten
         template_name : String,
         context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : ::HTTP::Status | Int32 = 200
+        status : ::HTTP::Status | Int32 = 200,
       )
         self.context.merge(context) unless context.nil?
         self.context.handler = self
@@ -238,7 +238,7 @@ module Marten
       def respond(
         content = "",
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : ::HTTP::Status | Int32 = 200
+        status : ::HTTP::Status | Int32 = 200,
       )
         HTTP::Response.new(
           content: content,
@@ -251,7 +251,7 @@ module Marten
       def respond(
         streamed_content : Iterator(String),
         content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
-        status : ::HTTP::Status | Int32 = 200
+        status : ::HTTP::Status | Int32 = 200,
       )
         HTTP::Response::Streaming.new(
           streamed_content: streamed_content,

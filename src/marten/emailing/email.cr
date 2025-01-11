@@ -32,7 +32,7 @@ module Marten
       # Allows to configure the template that should be rendered when generating the body of the email.
       def self.template_name(
         template_name : String?,
-        content_type : ContentType | String | Symbol = ContentType::HTML
+        content_type : ContentType | String | Symbol = ContentType::HTML,
       ) : Nil
         content_type = content_type.is_a?(ContentType) ? content_type : ContentType.parse(content_type.to_s)
 

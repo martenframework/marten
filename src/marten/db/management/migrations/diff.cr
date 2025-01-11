@@ -674,7 +674,7 @@ module Marten
             app_label,
             operation,
             dependencies = [] of Dependency::Base,
-            beginning = false
+            beginning = false,
           )
             ops = (@detected_operations[app_label] ||= [] of DetectedOperation)
             beginning ? ops.unshift({operation, dependencies}) : ops.push({operation, dependencies})

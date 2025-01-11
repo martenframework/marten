@@ -19,7 +19,7 @@ describe Marten::Middleware::StrictTransportSecurity do
           middleware = Marten::Middleware::StrictTransportSecurity.new
           response = middleware.call(
             request,
-            ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+            -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
           )
 
           response.headers.has_key?(:"Strict-Transport-Security").should be_false
@@ -41,7 +41,7 @@ describe Marten::Middleware::StrictTransportSecurity do
           middleware = Marten::Middleware::StrictTransportSecurity.new
           response = middleware.call(
             request,
-            ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+            -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
           )
 
           response.headers.has_key?(:"Strict-Transport-Security").should be_false
@@ -66,7 +66,7 @@ describe Marten::Middleware::StrictTransportSecurity do
           middleware = Marten::Middleware::StrictTransportSecurity.new
           response = middleware.call(
             request,
-            ->{
+            -> {
               r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
               r[:"Strict-Transport-Security"] = "max-age=3600"
               r
@@ -95,7 +95,7 @@ describe Marten::Middleware::StrictTransportSecurity do
           middleware = Marten::Middleware::StrictTransportSecurity.new
           response = middleware.call(
             request,
-            ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+            -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
           )
 
           response.headers[:"Strict-Transport-Security"].should eq "max-age=31536000"
@@ -121,7 +121,7 @@ describe Marten::Middleware::StrictTransportSecurity do
             middleware = Marten::Middleware::StrictTransportSecurity.new
             response = middleware.call(
               request,
-              ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+              -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
             )
 
             response.headers[:"Strict-Transport-Security"].should eq "max-age=31536000; includeSubDomains"
@@ -148,7 +148,7 @@ describe Marten::Middleware::StrictTransportSecurity do
             middleware = Marten::Middleware::StrictTransportSecurity.new
             response = middleware.call(
               request,
-              ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+              -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
             )
 
             response.headers[:"Strict-Transport-Security"].should eq "max-age=31536000; preload"
@@ -176,7 +176,7 @@ describe Marten::Middleware::StrictTransportSecurity do
               middleware = Marten::Middleware::StrictTransportSecurity.new
               response = middleware.call(
                 request,
-                ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+                -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
               )
 
               response.headers[:"Strict-Transport-Security"].should eq "max-age=31536000; includeSubDomains; preload"

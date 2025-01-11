@@ -45,7 +45,7 @@ module Marten
             @order_clauses : Array({String, Bool}),
             @parent_model_joins : Array(Join)?,
             @predicate_node : PredicateNode?,
-            @using : String?
+            @using : String?,
           )
           end
 
@@ -959,7 +959,7 @@ module Marten
             raw_field,
             model,
             field_type = "field",
-            allow_many = true
+            allow_many = true,
           )
             fields = model.fields
             fields = fields.reject(Field::ManyToMany) if !allow_many

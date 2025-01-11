@@ -19,7 +19,7 @@ module Marten
             project : ProjectState,
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : Nil
             remake_table_with_changed_column(table, old_column, new_column)
 
@@ -106,7 +106,7 @@ module Marten
           private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
-            name : String? = nil
+            name : String? = nil,
           ) : Statement
             Statement.new(
               "CREATE INDEX %{name} ON %{table} (%{columns})",
@@ -146,7 +146,7 @@ module Marten
           private def prepare_foreign_key_for_new_table(
             table : TableState,
             column : Column::Reference,
-            column_definition : String
+            column_definition : String,
           ) : String
             "#{column_definition} " + build_sql do |s|
               s << "REFERENCES #{quote(column.to_table)} (#{quote(column.to_column)})"

@@ -22,7 +22,7 @@ module Marten
           # Adds a unique constraint to a specific table.
           abstract def add_unique_constraint(
             table : TableState,
-            unique_constraint : Management::Constraint::Unique
+            unique_constraint : Management::Constraint::Unique,
           ) : Nil
 
           # Changes a column on a specific table.
@@ -30,7 +30,7 @@ module Marten
             project : ProjectState,
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : Nil
 
           # Returns the database type for a specific built-in column implementation.
@@ -68,7 +68,7 @@ module Marten
           # Removes a unique constraint from a specific table.
           abstract def remove_unique_constraint(
             table : TableState,
-            unique_constraint : Management::Constraint::Unique
+            unique_constraint : Management::Constraint::Unique,
           ) : Nil
 
           # Renames a specific column.

@@ -10,7 +10,7 @@ module Marten
           @id : ::String,
           @required : ::Bool = true,
           @max_name_size : ::Int32? = nil,
-          @allow_empty_files : ::Bool = false
+          @allow_empty_files : ::Bool = false,
         )
         end
 

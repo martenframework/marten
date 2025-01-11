@@ -28,7 +28,7 @@ module Marten
       def initialize(
         @value : String,
         @version : Int32? = nil,
-        expires_in : Time::Span? = nil
+        expires_in : Time::Span? = nil,
       )
         @expires_at = expires_in ? (expires_in.to_f + Time.utc.to_unix_f) : nil
       end
@@ -37,7 +37,7 @@ module Marten
       def initialize(
         @value : String,
         @expires_at : Float64? = nil,
-        @version : Int32? = nil
+        @version : Int32? = nil,
       )
       end
 

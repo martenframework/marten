@@ -13,7 +13,7 @@ module Marten
             @table : String,
             @column : String,
             @to_table : String,
-            @to_column : String
+            @to_column : String,
           )
           end
 

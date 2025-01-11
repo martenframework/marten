@@ -8,7 +8,7 @@ module Marten
 
         def initialize(
           @id : ::String,
-          @required : ::Bool = true
+          @required : ::Bool = true,
         )
         end
 

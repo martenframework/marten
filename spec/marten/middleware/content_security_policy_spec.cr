@@ -12,7 +12,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
       middleware = Marten::Middleware::ContentSecurityPolicy.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 304) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 304) }
       )
 
       response.status.should eq 304
@@ -33,7 +33,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
       middleware = Marten::Middleware::ContentSecurityPolicy.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r.headers["Content-Security-Policy"] = "default-src 'self' example.com *.example.com"
           r
@@ -57,7 +57,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
       middleware = Marten::Middleware::ContentSecurityPolicy.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r.headers["Content-Security-Policy-Report-Only"] = "default-src 'self' example.com *.example.com"
           r
@@ -82,7 +82,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
       middleware = Marten::Middleware::ContentSecurityPolicy.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r.headers["Content-Security-Policy-Exempt"] = "true"
           r
@@ -105,7 +105,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
       middleware = Marten::Middleware::ContentSecurityPolicy.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.status.should eq 200
@@ -124,7 +124,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
         middleware = Marten::Middleware::ContentSecurityPolicy.new
         response = middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         response.status.should eq 200
@@ -150,7 +150,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
       middleware = Marten::Middleware::ContentSecurityPolicy.new
       response = middleware.call(
         request,
-        ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
       )
 
       response.status.should eq 200
@@ -178,7 +178,7 @@ describe Marten::Middleware::ContentSecurityPolicy do
         middleware = Marten::Middleware::ContentSecurityPolicy.new
         response = middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         response.status.should eq 200

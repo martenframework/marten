@@ -18,7 +18,7 @@ module Marten
           @unique = false,
           @index = false,
           @db_column = nil,
-          @related : Nil | ::String | Symbol = nil
+          @related : Nil | ::String | Symbol = nil,
         )
           @related = @related.try(&.to_s)
         end

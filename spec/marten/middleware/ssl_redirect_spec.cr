@@ -21,7 +21,7 @@ describe Marten::Middleware::SSLRedirect do
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         ),
-        ->{ Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
       )
 
       response.should be_a Marten::HTTP::Response::MovedPermanently
@@ -40,7 +40,7 @@ describe Marten::Middleware::SSLRedirect do
               headers: HTTP::Headers{"Host" => "example.com"}
             )
           ),
-          ->{ Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
         )
 
         response.should be_a Marten::HTTP::Response::MovedPermanently
@@ -62,7 +62,7 @@ describe Marten::Middleware::SSLRedirect do
             }
           )
         ),
-        ->{ Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
+        -> { Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
       )
 
       response.status.should eq 200
@@ -81,7 +81,7 @@ describe Marten::Middleware::SSLRedirect do
               headers: HTTP::Headers{"Host" => "example.com"}
             )
           ),
-          ->{ Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
         )
 
         response.status.should eq 200
@@ -101,7 +101,7 @@ describe Marten::Middleware::SSLRedirect do
               headers: HTTP::Headers{"Host" => "example.com"}
             )
           ),
-          ->{ Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("Regular response", content_type: "text/plain", status: 200) }
         )
 
         response.status.should eq 200

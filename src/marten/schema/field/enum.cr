@@ -11,7 +11,7 @@ module Marten
           @id : ::String,
           enum_values : Array(::String),
           @required : ::Bool = true,
-          **kwargs
+          **kwargs,
         )
           @values = enum_values.map(&.downcase)
         end

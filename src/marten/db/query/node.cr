@@ -14,7 +14,7 @@ module Marten
           @children = [] of self,
           @connector = SQL::PredicateConnector::AND,
           @negated = false,
-          **kwargs
+          **kwargs,
         )
           @expression = Filters.new
           fill_filters(kwargs)
@@ -24,7 +24,7 @@ module Marten
           filters : Hash | NamedTuple,
           @children = [] of self,
           @connector = SQL::PredicateConnector::AND,
-          @negated = false
+          @negated = false,
         )
           @expression = Filters.new
           fill_filters(filters)
@@ -35,7 +35,7 @@ module Marten
           params : Array(::DB::Any) | Hash(String, ::DB::Any) = [] of ::DB::Any,
           @children = [] of self,
           @connector = SQL::PredicateConnector::AND,
-          @negated = false
+          @negated = false,
         )
           @expression = RawPredicate.new(predicate: raw_predicate, params: params)
         end
@@ -44,7 +44,7 @@ module Marten
           @children : Array(self),
           @connector : SQL::PredicateConnector,
           @negated : Bool,
-          @expression : Filters | RawPredicate
+          @expression : Filters | RawPredicate,
         )
         end
 

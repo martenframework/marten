@@ -14,7 +14,7 @@ describe Marten::Middleware::XFrameOptions do
       middleware = Marten::Middleware::XFrameOptions.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r[:"X-Frame-Options"] = "SAMEORIGIN"
           r
@@ -36,7 +36,7 @@ describe Marten::Middleware::XFrameOptions do
       middleware = Marten::Middleware::XFrameOptions.new
       response = middleware.call(
         request,
-        ->{
+        -> {
           r = Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
           r[:"X-Frame-Options-Exempt"] = "true"
           r
@@ -60,7 +60,7 @@ describe Marten::Middleware::XFrameOptions do
       with_overridden_setting("x_frame_options", "DENY") do
         response = middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:"X-Frame-Options"].should eq "DENY"
@@ -69,7 +69,7 @@ describe Marten::Middleware::XFrameOptions do
       with_overridden_setting("x_frame_options", "SAMEORIGIN") do
         response = middleware.call(
           request,
-          ->{ Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+          -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
         )
 
         response.headers[:"X-Frame-Options"].should eq "SAMEORIGIN"

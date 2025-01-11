@@ -9,7 +9,7 @@ module Marten
         def bulk_insert(
           table_name : String,
           values : Array(Hash(String, ::DB::Any)),
-          pk_column_to_fetch : String? = nil
+          pk_column_to_fetch : String? = nil,
         ) : Array(::DB::Any)?
           column_names = values[0].keys.join(", ") { |column_name| "#{quote(column_name)}" }
 
@@ -50,7 +50,7 @@ module Marten
         def insert(
           table_name : String,
           values : Hash(String, ::DB::Any),
-          pk_column_to_fetch : String? = nil
+          pk_column_to_fetch : String? = nil,
         ) : ::DB::Any
           column_names = values.keys.join(", ") { |column_name| "#{quote(column_name)}" }
           numbered_values = values.keys.map_with_index { |_c, i| parameter_id_for_ordered_argument(i + 1) }.join(", ")
@@ -107,7 +107,7 @@ module Marten
           table_name : String,
           values : Hash(String, ::DB::Any),
           pk_column_name : String,
-          pk_value : ::DB::Any
+          pk_value : ::DB::Any,
         ) : Nil
           column_names = values.keys.map_with_index do |column_name, i|
             "#{quote(column_name)}=#{parameter_id_for_ordered_argument(i + 1)}"

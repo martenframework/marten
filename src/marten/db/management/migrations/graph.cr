@@ -218,7 +218,7 @@ module Marten
             seen = [] of String,
             chain = [] of String,
             forwards = true,
-            silent = false
+            silent = false,
           )
             nodes_to_process = forwards ? @nodes[node_id].parents : @nodes[node_id].children
 

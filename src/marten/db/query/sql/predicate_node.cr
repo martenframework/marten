@@ -25,7 +25,7 @@ module Marten
             params : Array(::DB::Any) | Hash(String, ::DB::Any) = [] of ::DB::Any,
             @children = [] of self,
             @connector = SQL::PredicateConnector::AND,
-            @negated = false
+            @negated = false,
           )
             @predicates = RawPredicate.new(predicate: raw_predicate, params: params)
           end
@@ -34,7 +34,7 @@ module Marten
             @children : Array(self),
             @connector : PredicateConnector,
             @negated : Bool,
-            @predicates : RawPredicate | FilterPredicates
+            @predicates : RawPredicate | FilterPredicates,
           )
           end
 

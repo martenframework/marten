@@ -16,7 +16,7 @@ module Marten
           def initialize(
             @regex : Regex,
             @path_for_interpolation : String,
-            @parameters : Hash(String, Parameter::Base)
+            @parameters : Hash(String, Parameter::Base),
           )
           end
 

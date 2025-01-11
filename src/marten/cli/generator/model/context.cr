@@ -18,7 +18,7 @@ module Marten
             @name : String,
             @field_definitions : Array(FieldDefinition),
             @no_timestamps : Bool = false,
-            @parent : String? = nil
+            @parent : String? = nil,
           )
             @pk_field_definition = field_definitions.find(&.primary_key?) || default_pk_field_definition
             field_definitions.delete(pk_field_definition)

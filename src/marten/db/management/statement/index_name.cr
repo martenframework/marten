@@ -11,7 +11,7 @@ module Marten
             @index_name_proc : Proc(String, Array(String), String, String),
             @table : String,
             @columns : Array(String),
-            @suffix : String = ""
+            @suffix : String = "",
           )
           end
 

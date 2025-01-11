@@ -23,7 +23,7 @@ module Marten
               @name : String,
               @operations : Array(DB::Migration::Operation::Base),
               @dependencies : Array(Tuple(String, String)),
-              @replacements = Array(Tuple(String, String)).new
+              @replacements = Array(Tuple(String, String)).new,
             )
               @version = @name.dup
 

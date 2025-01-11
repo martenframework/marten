@@ -17,7 +17,7 @@ module Marten
             def initialize(
               @left_operand : Field::Base,
               @right_operand : Field::Any | Array(Field::Any),
-              @alias_prefix : String
+              @alias_prefix : String,
             )
             end
 

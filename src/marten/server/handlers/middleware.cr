@@ -16,7 +16,7 @@ module Marten
           response : HTTP::Response? = if middleware_chain.empty?
             get_final_response(context)
           else
-            middleware_chain.first.chain(context.marten.request, ->{ get_final_response(context) })
+            middleware_chain.first.chain(context.marten.request, -> { get_final_response(context) })
           end
 
           # At this point the final HTTP response has to be written to the server response.

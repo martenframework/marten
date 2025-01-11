@@ -32,7 +32,7 @@ module Marten
       # Renders the configured template for a specific `context` object and produces an HTTP response.
       def render_to_response(
         context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
-        status : ::HTTP::Status | Int32 = 200
+        status : ::HTTP::Status | Int32 = 200,
       )
         render(template_name, context: context, status: status, content_type: content_type)
       end

@@ -26,7 +26,7 @@ module Marten
           @null = false,
           @unique = false,
           @index = false,
-          @db_column = nil
+          @db_column = nil,
         )
           @primary_key = false
         end

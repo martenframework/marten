@@ -81,7 +81,7 @@ module Marten
           private def change_column_default_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             build_sql do |s|
               s << "ALTER TABLE #{quote(table.name)}"
@@ -93,7 +93,7 @@ module Marten
           private def change_column_type_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             old_type = BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING.fetch(old_column.class.name, old_column.sql_type(@connection))
             new_type = BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING.fetch(new_column.class.name, new_column.sql_type(@connection))
@@ -117,7 +117,7 @@ module Marten
           private def create_index_deferred_statement(
             table : TableState,
             columns : Array(Column::Base),
-            name : String? = nil
+            name : String? = nil,
           ) : Statement
             Statement.new(
               "CREATE INDEX %{name} ON %{table} (%{columns})",
@@ -150,7 +150,7 @@ module Marten
           private def drop_column_default_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             build_sql do |s|
               s << "ALTER TABLE #{quote(table.name)}"
@@ -166,7 +166,7 @@ module Marten
           private def prepare_foreign_key_for_new_column(
             table : TableState,
             column : Column::Reference,
-            column_definition : String
+            column_definition : String,
           ) : String
             constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
 
@@ -180,7 +180,7 @@ module Marten
           private def prepare_foreign_key_for_new_table(
             table : TableState,
             column : Column::Reference,
-            column_definition : String
+            column_definition : String,
           ) : String
             @deferred_statements << Statement.new(
               build_sql do |s|
@@ -204,7 +204,7 @@ module Marten
           private def post_change_column_type_statements(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : Array(String)
             statements = [] of String
 
@@ -269,7 +269,7 @@ module Marten
           private def set_up_not_null_column_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             build_sql do |s|
               s << "ALTER TABLE #{quote(table.name)}"
@@ -281,7 +281,7 @@ module Marten
           private def set_up_null_column_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             build_sql do |s|
               s << "ALTER TABLE #{quote(table.name)}"
@@ -293,7 +293,7 @@ module Marten
           private def update_null_columns_with_default_value_statement(
             table : TableState,
             old_column : Column::Base,
-            new_column : Column::Base
+            new_column : Column::Base,
           ) : String
             build_sql do |s|
               s << "UPDATE #{quote(table.name)}"

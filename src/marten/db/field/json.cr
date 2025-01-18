@@ -87,7 +87,7 @@ module Marten
 
         # :nodoc:
         macro contribute_to_model(model_klass, field_id, field_ann, kwargs)
-          {% serializable_klass = kwargs[:serializable] %}
+          {% serializable_klass = kwargs.is_a?(NilLiteral) ? nil : kwargs[:serializable] %}
 
           class ::{{ model_klass }}
             register_field(

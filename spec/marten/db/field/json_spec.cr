@@ -74,7 +74,10 @@ describe Marten::DB::Field::JSON do
     end
 
     it "properly handles JSON pull parser results" do
-      Marten::DB::Field::JSONSpec::Record.create!(metadata: JSON.parse(%{{ "foo": "bar" }}))
+      Marten::DB::Field::JSONSpec::Record.create!(
+        mandatory_metadata: JSON.parse(%{{ "test": "xyz" }}),
+        metadata: JSON.parse(%{{ "foo": "bar" }}),
+      )
 
       Marten::DB::Field::JSONSpec::Record.first!.metadata!.as_h.should eq({"foo" => "bar"})
     end
@@ -132,20 +135,29 @@ describe Marten::DB::Field::JSON do
   describe "::contribute_to_model" do
     it "creates getter methods on the considered model that works as expected with JSON::Any objects" do
       obj = Marten::DB::Field::JSONSpec::Record.create!(
-        metadata: JSON.parse(%{{ "foo": "bar" }})
+        mandatory_metadata: JSON.parse(%{{ "test": "xyz" }}),
+        metadata: JSON.parse(%{{ "foo": "bar" }}),
       )
+
+      obj.mandatory_metadata.should be_a JSON::Any
+      obj.mandatory_metadata.not_nil!.as_h.should eq({"test" => "xyz"})
 
       obj.metadata.should be_a JSON::Any
       obj.metadata.not_nil!.as_h.should eq({"foo" => "bar"})
 
+      obj.mandatory_metadata!.should be_a JSON::Any
+      obj.mandatory_metadata!.as_h.should eq({"test" => "xyz"})
+
       obj.metadata!.should be_a JSON::Any
       obj.metadata!.as_h.should eq({"foo" => "bar"})
 
+      obj.mandatory_metadata?.should be_true
       obj.metadata?.should be_true
     end
 
     it "creates getter methods on the considered model that works as expected with serializable objects" do
       obj = Marten::DB::Field::JSONSpec::Record.create!(
+        mandatory_metadata: JSON.parse(%{{ "test": "xyz" }}),
         serializable_metadata: Marten::DB::Field::JSONSpec::Record::Serializable.from_json(%{{ "a": 42, "b": "foo" }})
       )
 
@@ -174,6 +186,7 @@ describe Marten::DB::Field::JSON do
 
     it "creates setter methods on the considered model that works as expected with JSON::Any objects" do
       obj = Marten::DB::Field::JSONSpec::Record.create!(
+        mandatory_metadata: JSON.parse(%{{ "test": "xyz" }}),
         metadata: JSON.parse(%{{ "foo": "bar" }})
       )
 
@@ -189,6 +202,7 @@ describe Marten::DB::Field::JSON do
 
     it "creates setter methods on the considered model that works as expected with serializable objects" do
       obj = Marten::DB::Field::JSONSpec::Record.create!(
+        mandatory_metadata: JSON.parse(%{{ "test": "xyz" }}),
         serializable_metadata: Marten::DB::Field::JSONSpec::Record::Serializable.from_json(%{{ "a": 42, "b": "foo" }})
       )
 

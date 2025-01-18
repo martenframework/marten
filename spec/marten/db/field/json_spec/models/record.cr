@@ -9,6 +9,7 @@ module Marten::DB::Field::JSONSpec
 
     field :id, :big_int, primary_key: true, auto: true
     field :metadata, :json, blank: true, null: true
+    field :mandatory_metadata, :json
     field :serializable_metadata, :json, serializable: Serializable, blank: true, null: true
   end
 end

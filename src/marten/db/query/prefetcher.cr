@@ -10,7 +10,12 @@ module Marten
       # identifier of the database to use for the prefetching queries. The prefetcher decorates the records with the
       # prefetched records, and also caches the prefetched records for future use.
       class Prefetcher
-        def initialize(@records : Array(Model), @relations : Array(String), @using : String?)
+        def initialize(
+          @records : Array(Model),
+          @relations : Array(String),
+          @using : String?,
+          @custom_query_sets : Hash(String, Set::AnyQuerySet) = {} of String => Set::AnyQuerySet,
+        )
         end
 
         def execute : Nil
@@ -166,6 +171,17 @@ module Marten
           records_to_decorate
         end
 
+        private def prefetch_query_set(relation_name, default_model)
+          if custom_query = @custom_query_sets[relation_name]?
+            raise Errors::MismatchedQuerySetType.new(
+              "Can't prefetch :#{relation_name} using #{custom_query.model} query set."
+            ) if custom_query.model != default_model
+            custom_query
+          else
+            default_model.unscoped
+          end
+        end
+
         private def prefetch_relation_records_from_field_context(
           relation_name : String,
           context : Model::Table::FieldContext,
@@ -173,13 +189,14 @@ module Marten
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
+          query_set = prefetch_query_set(relation_name, context.field.related_model)
+
           if context.field.is_a?(Field::ManyToOne) || context.field.is_a?(Field::OneToOne)
             prefetched_records_pks = records_to_decorate.compact_map(&.get_field_value(context.field.id))
             return prefetched_records if prefetched_records_pks.empty?
 
             prefetched_records.concat(
-              context.field.related_model
-                .unscoped
+              query_set
                 .using(using)
                 .filter(pk__in: prefetched_records_pks)
                 .query
@@ -201,7 +218,7 @@ module Marten
                 relation_name,
                 m2m_field,
                 records_to_decorate,
-                context.field.related_model,
+                query_set,
                 true,
               )
             )
@@ -217,10 +234,11 @@ module Marten
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
+          query_set = prefetch_query_set(relation_name, context.reverse_relation.model)
+
           if context.reverse_relation.one_to_one?
             prefetched_records.concat(
-              context.reverse_relation.model
-                .unscoped
+              query_set
                 .using(using)
                 .filter(Node.new({"#{context.reverse_relation.field.id}__in" => records_to_decorate.map(&.pk)}))
                 .query
@@ -241,8 +259,7 @@ module Marten
             end
           elsif context.reverse_relation.many_to_one?
             prefetched_records.concat(
-              context.reverse_relation.model
-                .unscoped
+              query_set
                 .using(using)
                 .filter(Node.new({"#{context.reverse_relation.field.id}__in" => records_to_decorate.map(&.pk)}))
                 .query
@@ -268,7 +285,7 @@ module Marten
                 relation_name,
                 m2m_field,
                 records_to_decorate,
-                context.reverse_relation.model,
+                query_set,
                 false,
               )
             )
@@ -281,7 +298,7 @@ module Marten
           relation_name : String,
           m2m_field : Field::ManyToMany,
           records_to_decorate : Array(Model),
-          prefetched_model : Model.class,
+          query_set : Set::AnyQuerySet,
           forward : Bool,
         ) : Array(Model)
           # Retrieve the through records in order to get the related records.
@@ -303,7 +320,7 @@ module Marten
 
           prefetched_records = Array(Model).new
           prefetched_records.concat(
-            prefetched_model.unscoped.using(using).filter(pk__in: related_record_ids).query.execute
+            query_set.using(using).filter(pk__in: related_record_ids).query.execute
           )
 
           through_record_join_pks = through_records.map do |through_record|

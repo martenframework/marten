@@ -75,7 +75,7 @@ qset_2[2..6]? # returns a "sliced" query set
 
 Combines the current query set with another one using the **AND** operator.
 
-This method returns a new query set that is the result of combining the current query set with another one using the AND SQL operator. 
+This method returns a new query set that is the result of combining the current query set with another one using the AND SQL operator.
 
 For example:
 
@@ -90,7 +90,7 @@ combined_query_set = query_set_1 & query_set_2
 
 Combines the current query set with another one using the **OR** operator.
 
-This method returns a new query set that is the result of combining the current query set with another one using the OR SQL operator. 
+This method returns a new query set that is the result of combining the current query set with another one using the OR SQL operator.
 
 For example:
 
@@ -105,7 +105,7 @@ combined_query_set = query_set_1 | query_set_2
 
 Combines the current query set with another one using the **XOR** operator.
 
-This method returns a new query set that is the result of combining the current query set with another one using the XOR SQL operator. 
+This method returns a new query set that is the result of combining the current query set with another one using the XOR SQL operator.
 
 For example:
 
@@ -260,6 +260,13 @@ It should be noted that it is also possible to follow relations and reverse rela
 ```crystal
 query_set = Post.all
 query_set.prefetch(:author__favorite_tags)
+```
+
+In some situations it might be necessary to use a custom set for the prefetched records. This is possible by providing a `custom_query` argument:
+
+```crystal
+# Query all lists and order the list items by its position
+query_set = List.prefetch(:items, query_set: Item.order(:position))
 ```
 
 Finally, it is worth mentioning that multiple relations can be specified to `#prefetch`. For example:

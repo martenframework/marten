@@ -1102,6 +1102,40 @@ describe Marten::DB::Model::Querying do
       qset[0].get_related_object_variable(:user).should eq user_1
       qset[1].get_related_object_variable(:user).should eq user_2
     end
+
+    it "allows to prefetch a single reverse many-to-many relation with a custom query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+      tag_5 = Tag.create!(name: "typing", is_active: true)
+      tag_6 = Tag.create!(name: "debugging", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "Jane", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      user_1.tags.add(tag_1, tag_2, tag_3)
+      user_2.tags.add(tag_2, tag_3)
+      user_3.tags.add(tag_3, tag_4, tag_5)
+
+      qset = Tag.prefetch(:test_users, TestUser.filter(first_name: "John")).order(:pk)
+
+      qset.to_a.should eq [tag_1, tag_2, tag_3, tag_4, tag_5, tag_6]
+      qset[0].test_users.result_cache.should eq [user_1]
+      qset[1].test_users.result_cache.should eq [user_1]
+      qset[2].test_users.result_cache.should eq [user_1, user_3]
+      qset[3].test_users.result_cache.should eq [user_3]
+      qset[4].test_users.result_cache.should eq [user_3]
+      qset[5].test_users.result_cache.try(&.empty?).should be_true
+
+      # Other way round
+      qset = TestUser.prefetch(:tags, Tag.filter(name: "crystal")).order(:pk)
+      qset.to_a.should eq [user_1, user_2, user_3]
+      qset[0].tags.result_cache.should eq [tag_2]
+      qset[1].tags.result_cache.should eq [tag_2]
+      qset[2].tags.result_cache.not_nil!.empty?.should be_true
+    end
   end
 
   describe "::raw" do

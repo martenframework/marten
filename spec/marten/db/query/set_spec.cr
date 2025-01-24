@@ -3188,6 +3188,82 @@ describe Marten::DB::Query::Set do
       qset[0].get_related_object_variable(:user).should eq user_1
       qset[1].get_related_object_variable(:user).should eq user_2
     end
+
+    it "allows to prefetch a single reverse many-to-one relation with a custom query" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+      post_4 = Post.create!(author: user_2, title: "Post 4")
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:posts, Post.order("-pk"))
+
+      qset.to_a.should eq [user_1, user_2]
+      qset[0].posts.result_cache.should eq [post_3, post_1]
+      qset[1].posts.result_cache.should eq [post_4, post_2]
+    end
+
+    it "allows to prefetch a single many-to-many relation with a custom query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+      tag_5 = Tag.create!(name: "typing", is_active: true)
+      Tag.create!(name: "debugging", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "Jane", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      user_1.tags.add(tag_1, tag_3)
+      user_2.tags.add(tag_2, tag_3)
+      user_3.tags.add(tag_4, tag_5)
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username)
+        .prefetch(:tags, Tag.filter(name__in: ["crystal", "ruby"]))
+
+      qset.to_a.should eq [user_1, user_2, user_3]
+      qset[0].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_1]
+      qset[1].tags.result_cache.try(&.sort_by(&.pk!)).should eq [tag_2]
+      qset[2].tags.result_cache.not_nil!.empty?.should be_true
+
+      # The other way around
+      qset = Marten::DB::Query::Set(Tag).new.order(:pk).prefetch(:test_users, TestUser.filter(first_name: "John"))
+      qset[0].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_1]
+      qset[1].test_users.result_cache.not_nil!.empty?.should be_true
+      qset[2].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_1]
+      qset[3].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_3]
+      qset[4].test_users.result_cache.try(&.sort_by(&.pk!)).should eq [user_3]
+      qset[5].test_users.result_cache.not_nil!.empty?.should be_true
+    end
+
+    it "raises if an incompatible query set is used for the custom query" do
+      tag_1 = Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      tag_3 = Tag.create!(name: "coding", is_active: true)
+      tag_4 = Tag.create!(name: "programming", is_active: true)
+      tag_5 = Tag.create!(name: "typing", is_active: true)
+      Tag.create!(name: "debugging", is_active: true)
+
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      user_1.tags.add(tag_1, tag_3)
+      user_2.tags.add(tag_2, tag_3)
+      user_3.tags.add(tag_4, tag_5)
+
+      qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:tags, TestUser.filter(username: "jd1"))
+
+      expect_raises(
+        Marten::DB::Errors::MismatchedQuerySetType,
+        "Can't prefetch :tags using TestUser query set."
+      ) do
+        qset.to_a
+      end
+    end
   end
 
   describe "#product" do

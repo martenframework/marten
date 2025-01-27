@@ -65,6 +65,8 @@ Activates the right I18n locale based on incoming requests.
 
 This middleware will activate the right locale based on the Accept-Language header or the value provided by the [locale cookie](../../development/reference/settings.md#locale_cookie_name). Only explicitly-configured locales can be activated by this middleware (that is, locales that are specified in the [`i18n.available_locales`](../../development/reference/settings.md#available_locales) and [`i18n.default_locale`](../../development/reference/settings.md#default_locale) settings). If the incoming locale can't be found in the project configuration, the default locale will be used instead.
 
+Additionally, if (and only if) [localized routes](../../i18n/localized-routes.md) are being used, the middleware will use the locale prefix specified in the incoming paths with priority over the rules mentioned previously in order to identify the locale to activate. For example if the request's path is `/fr/bonjour`, then the activated locale will be the `fr` one.
+
 ## Method Override middleware
 
 **Class:** [`Marten::Middleware::MethodOverride`](pathname:///api/dev/Marten/Middleware/MethodOverride.html)

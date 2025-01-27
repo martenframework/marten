@@ -195,6 +195,7 @@ module.exports = {
       link: {type: 'doc', id: 'i18n'},
       items: [
         'i18n/introduction',
+        'i18n/localized-routes',
       ],
     },
     {

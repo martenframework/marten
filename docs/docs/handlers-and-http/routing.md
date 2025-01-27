@@ -182,3 +182,7 @@ Finally, it should be noted that the namespaces that are created when defining [
 ```crystal
 Marten.routes.reverse("articles:update", pk: 42) # will return "/articles/42/update"
 ```
+
+## Localization
+
+Routes can be localized to accommodate the requirements of multi-locales projects. Please refer to [Localized routes](../i18n/localized-routes.md) to learn more about this capability.

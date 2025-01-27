@@ -770,7 +770,31 @@ module Marten
             all.prefetch(*relations)
           end
 
-          def prefetch(relation_name : String | Symbol, query_set : Query::Set::AnyQuerySet | Nil = nil)
+          # Returns a queryset that will automatically prefetch in a single batch the records for the
+          # specified relation, with a custom queryset to control how the related records are queried.
+          # The prefetched records will be populated on the returned queryset. Using this method can result in
+          # performance improvements by reducing the number of SQL queries, as illustrated by the following example:
+          #
+          # ```
+          # # Prefetching with a custom queryset
+          # posts = Post.all.prefetch(:tags, query_set: Tag.order(:name)).to_a
+          # puts posts[0].tags # Prefetched with custom ordering
+          # ```
+          #
+          # It should be noted that this method enforces type-checking for the custom queryset to ensure its
+          # model matches the relation being prefetched. If a type mismatch is detected, a
+          # `Marten::DB::Errors::MismatchedQuerySetType` exception will be raised. For example:
+          #
+          # ```
+          # # Valid usage
+          # posts = Post.all.prefetch(:tags, query_set: Tag.order(:name))
+          #
+          # # Invalid usage: Type mismatch
+          # posts = Post.all.prefetch(:tags, query_set: Comment.order(:created_at))
+          # # Raises Marten::DB::Errors::MismatchedQuerySetType:
+          # # "Can't prefetch :tags using Comment query set."
+          # ```
+          def prefetch(relation_name : String | Symbol, query_set : Query::Set::AnyQuerySet)
             all.prefetch(relation_name, query_set)
           end
 

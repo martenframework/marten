@@ -61,7 +61,7 @@ The `#localized` method can only be used within your root routes map, defined in
 
 ## Translating route paths
 
-You can translate the paths of your routes, whether or not they are prefixed with locales. To do this, it is possible to use the `#t` method instead of defining route paths as regular strings. This method takes a single argument: the translation key that should be used to to dynamically determine the path of the considered route.
+You can translate the paths of your routes, whether or not they are prefixed with locales. To do this, it is possible to use the `#t` method instead of defining route paths as regular strings. This method takes a single argument: the translation key that should be used to dynamically determine the path of the considered route.
 
 For example, let's consider the following [translation file](./introduction.md#defining-translations):
 

@@ -87,6 +87,17 @@ describe Marten::Routing::Match do
       map.reverse("foo_bar").should eq "/foo/bar"
     end
 
+    it "can be used for an included route with a translated path" do
+      map = Marten::Routing::Map.new
+
+      sub_map = Marten::Routing::Map.draw do
+        path("/baz", Marten::Handlers::Base, name: "baz")
+      end
+      map.path(Marten::Routing::TranslatedPath.new("routes.foo_bar"), sub_map, name: "included")
+
+      map.reverse("included:baz").should eq "/foo/bar/baz"
+    end
+
     it "raises if the inserted rule is an empty string" do
       map = Marten::Routing::Map.new
       expect_raises(

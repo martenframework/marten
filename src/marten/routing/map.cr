@@ -66,7 +66,7 @@ module Marten
       # The target associated with the considered path must be a `Marten::Routing::Map`
       # instance. The <path, target> pair has an optional
       # name that will be prepended to each <path, target> pair inside the `Marten::Routing::Map`.
-      def path(path : String, target : Map, name : String | Symbol | Nil = nil) : Nil
+      def path(path : String | TranslatedPath, target : Map, name : String | Symbol | Nil = nil) : Nil
         insert_path(path, target, name)
       end
 

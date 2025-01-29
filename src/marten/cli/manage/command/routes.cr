@@ -16,7 +16,7 @@ module Marten
                 print_path(rule, parent_path, parent_name)
               when Marten::Routing::Rule::Map
                 rule_name = parent_name ? "#{parent_name}:#{rule.name}" : rule.name
-                rule_path = parent_path + rule.path.to_s
+                rule_path = parent_path + resolve_path(rule.path)
                 process_routes_map(rule.map, parent_path: rule_path, parent_name: rule_name)
               when Marten::Routing::Rule::Localized
                 rule.rules.each do |localized_rule|
@@ -25,7 +25,7 @@ module Marten
                     print_path(localized_rule, "/<locale>", nil)
                   when Marten::Routing::Rule::Map
                     rule_name = parent_name ? "#{parent_name}:#{localized_rule.name}" : localized_rule.name
-                    rule_path = "/<locale>" + parent_path + localized_rule.path.to_s
+                    rule_path = "/<locale>" + parent_path + resolve_path(localized_rule.path)
                     process_routes_map(localized_rule.map, parent_path: rule_path, parent_name: rule_name)
                   end
                 end
@@ -37,7 +37,7 @@ module Marten
             parts = [] of String
             empty_parent_name = parent_name.nil? || parent_name.empty?
 
-            parts << style(parent_path + rule.path.to_s, fore: :light_blue)
+            parts << style(parent_path + resolve_path(rule.path), fore: :light_blue)
             parts << style("[#{empty_parent_name ? rule.name : "#{parent_name}:#{rule.name}"}]", fore: :light_yellow)
             parts << "›"
             parts << style(rule.handler.name, fore: :light_green)
@@ -47,6 +47,15 @@ module Marten
             end
 
             print(parts.join(" "))
+          end
+
+          private def resolve_path(path) : String
+            case path
+            when Routing::TranslatedPath
+              I18n.t(path.key)
+            else
+              path.to_s
+            end
           end
         end
       end

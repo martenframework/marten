@@ -12,7 +12,7 @@ module Marten
       end
 
       def to_s(io)
-        io << I18n.t(key)
+        raise Errors::InvalidRulePath.new("Interpolation of translated paths is not supported")
       end
     end
   end

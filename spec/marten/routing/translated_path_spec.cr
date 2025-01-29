@@ -33,10 +33,16 @@ describe Marten::Routing::TranslatedPath do
   end
 
   describe "#to_s" do
-    it "returns the translated path" do
+    it "raises the expected error to prevent interpolation of translated paths" do
       path = Marten::Routing::TranslatedPath.new("simple.translation")
 
-      path.to_s.should eq "This is a simple translation"
+      expect_raises(Marten::Routing::Errors::InvalidRulePath, "Interpolation of translated paths is not supported") do
+        path.to_s
+      end
+
+      expect_raises(Marten::Routing::Errors::InvalidRulePath, "Interpolation of translated paths is not supported") do
+        "#{path}"
+      end
     end
   end
 end

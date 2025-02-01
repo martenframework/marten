@@ -37,10 +37,19 @@ As stated before, Marten relies on the [crystal-i18n](https://crystal-i18n.githu
 
 ### Defining translations
 
-Translations must be defined in a `locales` folder at the root of an application. For example, if you are using the [main application](../development/applications.md#the-main-application) (which corresponds to the standard `src` folder) you could define a `src/locales` folder containing an `en.yml` file as follows:
+Translations are defined as YML files that must be placed in `locales` folders, which can be located in different parts of a project:
+
+* Within the `config` directory (`config/locales` folder).
+* At the root of the [main application](../development/applications.md#the-main-application)'s directory (`src/locales` folder).
+* At the root of an [application](../development/applications.md#creating-applications)'s directory.
+
+For example, if you are using the standard `config` directory and the [main application](../development/applications.md#the-main-application) (which corresponds to the standard `src` folder) you could define `config/locales` and `src/locales` folders containing `en.yml` files as follows:
 
 ```
 myproject/
+├── config
+│   ├── locales
+│   │   ├── en.yml
 ├── src
 │   ├── locales
 │   │   ├── en.yml

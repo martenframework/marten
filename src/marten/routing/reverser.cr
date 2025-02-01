@@ -62,34 +62,46 @@ module Marten
       # Reverses the route for the given parameters.
       #
       # If the parameters do not match the expected parameters for the route, `nil` is returned.
-      def reverse(params : Nil | Hash(String | Symbol, Parameter::Types)) : Nil | String
+      def reverse(params : Nil | Hash(String | Symbol, Parameter::Types)) : ReverseResult
+        # Convert keys to string
+        provided_param_names = (params || Hash(String | Symbol, Parameter::Types).new).keys.map(&.to_s)
+        expected_param_names = @parameters.keys
+
+        # Determine missing vs. extra right away
+        missing = expected_param_names - provided_param_names
+        extra = provided_param_names - expected_param_names
+
+        # We’ll store invalid typed parameters here
+        invalid = [] of Tuple(String, Parameter::Types)
+
+        # If user has provided any param name that isn't expected, or we are missing any that are expected:
+        if !missing.empty? || !extra.empty?
+          return ReverseResult.new(ReverseResult::Mismatch.new(missing, extra, invalid))
+        end
+
+        # Attempt to dump each provided param into a string, track any that fail
         url_params = {} of String => String
-
-        params.each do |key, value|
+        params.try &.each do |key, value|
           param_name = key.to_s
+          dumped = @parameters[param_name].dumps(value)
 
-          # A parameter that is not present in the set of route parameter handler means that the lookup is not
-          # successful.
-          return if !@parameters.has_key?(param_name)
+          if dumped.nil?
+            invalid << {param_name, value}
+          else
+            url_params[param_name] = dumped
+          end
+        end
 
-          dumped_value = @parameters[param_name].dumps(value)
+        return ReverseResult.new(ReverseResult::Mismatch.new(missing, extra, invalid)) unless invalid.empty?
 
-          # If one of the parameter dumps result is nil, this means that the lookup is not successful because one of the
-          # parameter handlers received a value it could not handle.
-          return if dumped_value.nil?
-
-          url_params[param_name] = dumped_value
-        end unless params.nil?
-
-        # if not all expected parameters were passed this means that the lookup is not successful.
-        return unless url_params.size == @parameters.size
-
+        # Everything is okay so far. We can build the path:
         path = path_for_interpolation % url_params
 
+        # Handle locale prefix if needed
         if prefix_locales? && (prefix_default_locale? || I18n.locale != Marten.settings.i18n.default_locale)
-          "/#{I18n.locale}#{path}"
+          ReverseResult.new("/#{I18n.locale}#{path}")
         else
-          path
+          ReverseResult.new(path)
         end
       end
 

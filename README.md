@@ -4,8 +4,8 @@
 
 [![Version](https://img.shields.io/github/v/tag/martenframework/marten?label=Version)](https://github.com/martenframework/marten/tags)
 [![License](https://img.shields.io/github/license/martenframework/marten?label=License)](https://github.com/martenframework/marten/blob/main/LICENSE)
-[![CI](https://github.com/martenframework/marten/workflows/Specs/badge.svg)](https://github.com/martenframework/marten/actions)
-[![CI](https://github.com/martenframework/marten/workflows/QA/badge.svg)](https://github.com/martenframework/marten/actions)
+[![CI](https://github.com/martenframework/marten/actions/workflows/specs.yml/badge.svg?branch=main)](https://github.com/martenframework/marten/actions)
+[![CI](https://github.com/martenframework/marten/actions/workflows/qa.yml/badge.svg?branch=main)](https://github.com/martenframework/marten/actions)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label)](https://martenframework.com/chat)
 
 ---

@@ -46,7 +46,7 @@ module Marten
 
           # Add the "Handler" suffix if missing, which is a best practice.
           unless handler_name.ends_with?(NAME_SUFFIX)
-            self.handler_name += NAME_SUFFIX
+            self.handler_name += NAME_SUFFIX # ameba:disable Style/RedundantSelf
           end
 
           # Generate the handler.

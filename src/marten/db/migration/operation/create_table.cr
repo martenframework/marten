@@ -91,7 +91,7 @@ module Marten
           def references_column?(other_table_name : String, other_column_name : String) : Bool
             return true if name == other_table_name && columns.any? { |c| c.name == other_column_name }
 
-            self.columns.select(Management::Column::Reference).any? do |column|
+            columns.select(Management::Column::Reference).any? do |column|
               reference_column = column.as(Management::Column::Reference)
               reference_column.to_table == other_table_name && reference_column.to_column == other_column_name
             end
@@ -100,7 +100,7 @@ module Marten
           def references_table?(other_table_name : String) : Bool
             return true if name == other_table_name
 
-            self.columns.select(Management::Column::Reference).any? do |column|
+            columns.select(Management::Column::Reference).any? do |column|
               reference_column = column.as(Management::Column::Reference)
               reference_column.to_table == other_table_name
             end

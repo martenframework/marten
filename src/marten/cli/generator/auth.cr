@@ -43,7 +43,7 @@ module Marten
             command.print(command.style(" DONE", fore: :light_green, mode: :bold))
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add marten-auth dependency (no shard.yml file)"
+            warnings << "Could not add marten-auth dependency (no shard.yml file)"
           end
         end
 
@@ -73,7 +73,7 @@ module Marten
             command.print(command.style(" DONE", fore: :light_green, mode: :bold))
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add marten-auth requirement to project.cr file (file not found)"
+            warnings << "Could not add marten-auth requirement to project.cr file (file not found)"
           end
         end
 
@@ -115,11 +115,11 @@ module Marten
               command.print(command.style(" DONE", fore: :light_green, mode: :bold))
             else
               command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-              self.warnings << "Could not add auth middleware (setting not found)"
+              warnings << "Could not add auth middleware (setting not found)"
             end
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add auth middleware (setting file not found)"
+            warnings << "Could not add auth middleware (setting file not found)"
           end
         end
 
@@ -148,7 +148,7 @@ module Marten
             command.print(command.style(" DONE", fore: :light_green, mode: :bold))
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add user model setting (setting file not found)"
+            warnings << "Could not add user model setting (setting file not found)"
           end
         end
 

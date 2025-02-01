@@ -226,8 +226,8 @@ module Marten::CLI::Manage::Command::GenSpec
     end
 
     def run : Nil
-      self.warnings << "This is a warning"
-      self.warnings << "Foo bar"
+      warnings << "This is a warning"
+      warnings << "Foo bar"
     end
   end
 end

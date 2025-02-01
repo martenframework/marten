@@ -56,7 +56,7 @@ module Marten
 
           with self yield self
         ensure
-          self.rules << localized_rule.not_nil!
+          rules << localized_rule.not_nil!
           self.localizing = (previous_localizing == true)
         end
       end

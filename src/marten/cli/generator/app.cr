@@ -61,7 +61,7 @@ module Marten
             command.print(command.style(" DONE", fore: :light_green, mode: :bold))
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add application requirement to cli.cr file (file not found)"
+            warnings << "Could not add application requirement to cli.cr file (file not found)"
           end
         end
 
@@ -81,7 +81,7 @@ module Marten
             command.print(command.style(" DONE", fore: :light_green, mode: :bold))
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add application requirement to project.cr file (file not found)"
+            warnings << "Could not add application requirement to project.cr file (file not found)"
           end
         end
 
@@ -123,11 +123,11 @@ module Marten
               command.print(command.style(" DONE", fore: :light_green, mode: :bold))
             else
               command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-              self.warnings << "Could not add application to installed_apps setting (setting not found)"
+              warnings << "Could not add application to installed_apps setting (setting not found)"
             end
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add application to installed_apps setting (setting file not found)"
+            warnings << "Could not add application to installed_apps setting (setting file not found)"
           end
         end
 
@@ -160,11 +160,11 @@ module Marten
               command.print(command.style(" DONE", fore: :light_green, mode: :bold))
             else
               command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-              self.warnings << "Could not add app route to main routes map (no routes map block found)"
+              warnings << "Could not add app route to main routes map (no routes map block found)"
             end
           else
             command.print(command.style(" SKIPPED", fore: :yellow, mode: :bold))
-            self.warnings << "Could not add app route to main routes map (no config/routes.cr file)"
+            warnings << "Could not add app route to main routes map (no config/routes.cr file)"
           end
         end
 

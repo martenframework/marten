@@ -59,7 +59,7 @@ module Marten
       # By default, this will create the new record and return a 302 redirect targetting the configured success URL.
       def process_valid_schema
         self.record = model.new(schema.validated_data)
-        self.record.try(&.save!)
+        record.try(&.save!)
 
         super
       end

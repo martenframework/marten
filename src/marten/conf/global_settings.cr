@@ -299,7 +299,7 @@ module Marten
 
       # Allows to configure a specific database connection for the application using a connection URL.
       def database(id = DB::Connection::DEFAULT_CONNECTION_NAME, url : String | Nil = nil)
-        self.database(id, url) do |_|
+        database(id, url) do |_|
         end
       end
 

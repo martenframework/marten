@@ -1173,7 +1173,7 @@ module Marten::HTTP::RequestSpec
     end
 
     def test_disable_request_forgery_protection?
-      self.disable_request_forgery_protection?
+      disable_request_forgery_protection?
     end
 
     def test_scheme=(scheme)

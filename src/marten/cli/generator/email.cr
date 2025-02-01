@@ -46,7 +46,7 @@ module Marten
 
           # Add the "Email" suffix if missing, which is a best practice.
           unless email_name.ends_with?("Email")
-            self.email_name += "Email"
+            self.email_name += "Email" # ameba:disable Style/RedundantSelf
           end
 
           # Generate the email.

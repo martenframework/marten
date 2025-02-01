@@ -146,7 +146,7 @@ describe Marten::Cache::Store::Base do
 
         spawn do
           val = store.fetch("foo", race_condition_ttl: 10.seconds) do
-            sleep 0.5
+            sleep(Time::Span.new(nanoseconds: 500_000_000))
             "new_value_1"
           end
 

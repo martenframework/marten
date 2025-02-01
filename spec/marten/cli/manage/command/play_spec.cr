@@ -14,7 +14,7 @@ describe Marten::CLI::Manage::Command::Play do
 
       spawn { command.handle }
 
-      sleep 1
+      sleep(Time::Span.new(nanoseconds: 1_000_000_000))
 
       command.playground_process.try(&.terminate)
 
@@ -33,7 +33,7 @@ describe Marten::CLI::Manage::Command::Play do
 
       spawn { command.handle }
 
-      sleep 1
+      sleep(Time::Span.new(nanoseconds: 1_000_000_000))
 
       command.playground_process.try(&.terminate)
 
@@ -52,7 +52,7 @@ describe Marten::CLI::Manage::Command::Play do
 
       spawn { command.handle }
 
-      sleep 1
+      sleep(Time::Span.new(nanoseconds: 1_000_000_000))
 
       command.playground_process.try(&.terminate)
 
@@ -71,7 +71,7 @@ describe Marten::CLI::Manage::Command::Play do
 
       spawn { command.handle }
 
-      sleep 1
+      sleep(Time::Span.new(nanoseconds: 1_000_000_000))
 
       command.playground_process.try(&.terminate)
 

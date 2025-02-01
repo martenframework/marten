@@ -783,7 +783,7 @@ module Marten
           #
           # It should be noted that this method enforces type-checking for the custom queryset to ensure its
           # model matches the relation being prefetched. If a type mismatch is detected, a
-          # `Marten::DB::Errors::MismatchedQuerySetType` exception will be raised. For example:
+          # `Marten::DB::Errors::UnmetQuerySetCondition` exception will be raised. For example:
           #
           # ```
           # # Valid usage
@@ -791,7 +791,7 @@ module Marten
           #
           # # Invalid usage: Type mismatch
           # posts = Post.all.prefetch(:tags, query_set: Comment.order(:created_at))
-          # # Raises Marten::DB::Errors::MismatchedQuerySetType:
+          # # Raises Marten::DB::Errors::UnmetQuerySetCondition:
           # # "Can't prefetch :tags using Comment query set."
           # ```
           def prefetch(relation_name : String | Symbol, query_set : Query::Set::AnyQuerySet)

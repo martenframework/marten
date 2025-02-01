@@ -3331,7 +3331,7 @@ describe Marten::DB::Query::Set do
       qset = Marten::DB::Query::Set(TestUser).new.order(:username).prefetch(:tags, TestUser.filter(username: "jd1"))
 
       expect_raises(
-        Marten::DB::Errors::MismatchedQuerySetType,
+        Marten::DB::Errors::UnmetQuerySetCondition,
         "Can't prefetch :tags using TestUser query set."
       ) do
         qset.to_a

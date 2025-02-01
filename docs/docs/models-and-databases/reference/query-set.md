@@ -262,7 +262,7 @@ query_set = Post.all
 query_set.prefetch(:author__favorite_tags)
 ```
 
-In some situations it might be necessary to use a custom set for the prefetched records. This is possible by providing a `custom_query` argument:
+In some situations it might be necessary to use a custom query set for the prefetched records. This is possible by providing a `query_set` argument:
 
 ```crystal
 # Query all lists and order the list items by its position

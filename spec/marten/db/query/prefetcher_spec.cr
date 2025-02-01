@@ -2023,7 +2023,7 @@ describe Marten::DB::Query::Prefetcher do
         )
 
         expect_raises(
-          Marten::DB::Errors::MismatchedQuerySetType,
+          Marten::DB::Errors::UnmetQuerySetCondition,
           "Can't prefetch :authors using Marten::DB::Query::PrefetcherSpec::Bio query set"
         ) do
           prefetcher.execute

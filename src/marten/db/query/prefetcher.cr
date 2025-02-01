@@ -14,7 +14,7 @@ module Marten
           @records : Array(Model),
           @relations : Array(String),
           @using : String?,
-          @custom_query_sets : Hash(String, Set::AnyQuerySet) = {} of String => Set::AnyQuerySet,
+          @custom_query_sets : Hash(String, Set::Any) = {} of String => Set::Any,
         )
         end
 
@@ -298,7 +298,7 @@ module Marten
           relation_name : String,
           m2m_field : Field::ManyToMany,
           records_to_decorate : Array(Model),
-          query_set : Set::AnyQuerySet,
+          query_set : Set::Any,
           forward : Bool,
         ) : Array(Model)
           # Retrieve the through records in order to get the related records.

@@ -16,7 +16,7 @@ module Marten
 
         @result_cache : Array(M)?
         @prefetched_relations = [] of String
-        @custom_query_sets : Hash(String, AnyQuerySet) = {} of String => AnyQuerySet
+        @custom_query_sets : Hash(String, Any) = {} of String => Any
 
         # :nodoc:
         getter custom_query_sets
@@ -36,7 +36,7 @@ module Marten
         def initialize(
           @query = SQL::Query(M).new,
           @prefetched_relations = [] of String,
-          @custom_query_sets = {} of String => AnyQuerySet,
+          @custom_query_sets = {} of String => Any,
         )
         end
 
@@ -1211,7 +1211,7 @@ module Marten
         # # Raises Marten::DB::Errors::UnmetQuerySetCondition:
         # # "Can't prefetch :tags using Comment query set."
         # ```
-        def prefetch(relation_name : String | Symbol, query_set : AnyQuerySet)
+        def prefetch(relation_name : String | Symbol, query_set : Any)
           qs = clone
           relation_name = relation_name.to_s
           qs.prefetched_relations << relation_name
@@ -1512,16 +1512,22 @@ module Marten
           qs
         end
 
+
+        # Creates an alias `Any` representing the query sets of all existing models.
+        #
+        # For example, if you have the models `User` and `Post`,
+        # then this macro will generate:
+        #
+        #   alias Any = Set(User) | Set(Post)
+        #
+        # That means anywhere in your code where you accept `Any`, you accept
+        # any `Set(M)` specialized to these models.
         macro finished
           {% model_types = Marten::DB::Model.all_subclasses.reject(&.abstract?).map(&.name) %}
           {% if model_types.size > 0 %}
             alias Any = {% for t, i in model_types %}Set({{ t }}){% if i + 1 < model_types.size %} | {% end %}{% end %}
-            alias AnyQuerySet = {% for t, i in model_types %}
-              {{ t }}::QuerySet{% if i + 1 < model_types.size %} | {% end %}
-            {% end %}
           {% else %}
             alias Any = Nil
-            alias AnyQuerySet = Nil
           {% end %}
         end
 

@@ -1955,7 +1955,7 @@ describe Marten::DB::Query::Prefetcher do
           using: nil,
           custom_query_sets: {
             "authors" => Marten::DB::Query::PrefetcherSpec::Author
-              .filter(name__contains: "Muster").as(Marten::DB::Query::Set::AnyQuerySet),
+              .filter(name__contains: "Muster").as(Marten::DB::Query::Set::Any),
           }
         )
 
@@ -1990,7 +1990,7 @@ describe Marten::DB::Query::Prefetcher do
           using: nil,
           custom_query_sets: {
             "conferences" => Marten::DB::Query::PrefetcherSpec::Conference
-              .filter(name__contains: "Crystal").as(Marten::DB::Query::Set::AnyQuerySet),
+              .filter(name__contains: "Crystal").as(Marten::DB::Query::Set::Any),
           }
         )
 
@@ -2018,7 +2018,7 @@ describe Marten::DB::Query::Prefetcher do
           using: nil,
           custom_query_sets: {
             "authors" => Marten::DB::Query::PrefetcherSpec::Bio
-              .filter(content__contains: "Muster").as(Marten::DB::Query::Set::AnyQuerySet),
+              .filter(content__contains: "Muster").as(Marten::DB::Query::Set::Any),
           }
         )
 

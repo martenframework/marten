@@ -794,7 +794,7 @@ module Marten
           # # Raises Marten::DB::Errors::UnmetQuerySetCondition:
           # # "Can't prefetch :tags using Comment query set."
           # ```
-          def prefetch(relation_name : String | Symbol, query_set : Query::Set::AnyQuerySet)
+          def prefetch(relation_name : String | Symbol, query_set : Query::Set::Any)
             all.prefetch(relation_name, query_set)
           end
 
@@ -1000,7 +1000,7 @@ module Marten
                 def initialize(
                   @query = Marten::DB::Query::SQL::Query({{ @type }}).new,
                   @prefetched_relations = [] of ::String,
-                  @custom_query_sets  = {} of ::String => AnyQuerySet
+                  @custom_query_sets  = {} of ::String => Any
                 )
                   super(@query, @prefetched_relations, @custom_query_sets)
                 end

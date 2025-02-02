@@ -16,6 +16,10 @@ module Marten
 
         @result_cache : Array(M)?
         @prefetched_relations = [] of String
+        @custom_query_sets : Hash(String, Any) = {} of String => Any
+
+        # :nodoc:
+        getter custom_query_sets
 
         # :nodoc:
         getter query
@@ -29,7 +33,11 @@ module Marten
         # :nodoc:
         setter prefetched_relations
 
-        def initialize(@query = SQL::Query(M).new, @prefetched_relations = [] of String)
+        def initialize(
+          @query = SQL::Query(M).new,
+          @prefetched_relations = [] of String,
+          @custom_query_sets = {} of String => Any,
+        )
         end
 
         # Returns the record at the given index.
@@ -1179,6 +1187,39 @@ module Marten
           qs
         end
 
+        # Returns a queryset that will automatically prefetch in a single batch the records for the specified relation,
+        # with a custom queryset to control how the related records are queried. The prefetched records will be
+        # populated on the returned queryset. Using this method can result in performance improvements by reducing
+        # the number of SQL queries, as illustrated by the following example:
+        #
+        # ```
+        # # Prefetching with a custom queryset
+        # posts = Post.all.prefetch(:tags, query_set: Tag.order(:name)).to_a
+        # puts posts[0].tags # Prefetched with custom ordering
+        # ```
+        #
+        # It should be noted that this method enforces type-checking for the custom queryset to ensure its model matches
+        # the relation being prefetched. If a type mismatch is detected, a `Marten::DB::Errors::UnmetQuerySetCondition`
+        # exception will be raised. For example:
+        #
+        # ```
+        # # Valid usage
+        # posts = Post.all.prefetch(:tags, query_set: Tag.order(:name))
+        #
+        # # Invalid usage: Type mismatch
+        # posts = Post.all.prefetch(:tags, query_set: Comment.order(:created_at))
+        # # Raises Marten::DB::Errors::UnmetQuerySetCondition:
+        # # "Can't prefetch :tags using Comment query set."
+        # ```
+        def prefetch(relation_name : String | Symbol, query_set : Any)
+          relation_name = relation_name.to_s
+
+          qs = clone
+          qs.prefetched_relations << relation_name
+          qs.custom_query_sets[relation_name] = query_set
+          qs
+        end
+
         # :nodoc:
         def product
           raise NotImplementedError.new("#product is not supported for query sets")
@@ -1471,6 +1512,15 @@ module Marten
         end
 
         macro finished
+          # Creates an alias `Any` representing the query sets of all existing models.
+          #
+          # For example, if you have the models `User` and `Post`,
+          # then this macro will generate:
+          #
+          #   alias Any = Set(User) | Set(Post)
+          #
+          # That means anywhere in your code where you accept `Any`, you accept
+          # any `Set(M)` specialized to these models.
           {% model_types = Marten::DB::Model.all_subclasses.reject(&.abstract?).map(&.name) %}
           {% if model_types.size > 0 %}
             alias Any = {% for t, i in model_types %}Set({{ t }}){% if i + 1 < model_types.size %} | {% end %}{% end %}
@@ -1487,6 +1537,7 @@ module Marten
           Set(M).new(
             query: other_query.nil? ? @query.clone : other_query.not_nil!,
             prefetched_relations: prefetched_relations,
+            custom_query_sets: custom_query_sets
           )
         end
 
@@ -1555,6 +1606,7 @@ module Marten
             records: Array(Model).new.concat(@result_cache.not_nil!),
             relations: prefetched_relations,
             using: @query.using,
+            custom_query_sets: custom_query_sets,
           )
           prefetcher.execute
         end

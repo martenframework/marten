@@ -770,6 +770,34 @@ module Marten
             all.prefetch(*relations)
           end
 
+          # Returns a queryset that will automatically prefetch in a single batch the records for the
+          # specified relation, with a custom queryset to control how the related records are queried.
+          # The prefetched records will be populated on the returned queryset. Using this method can result in
+          # performance improvements by reducing the number of SQL queries, as illustrated by the following example:
+          #
+          # ```
+          # # Prefetching with a custom queryset
+          # posts = Post.all.prefetch(:tags, query_set: Tag.order(:name)).to_a
+          # puts posts[0].tags # Prefetched with custom ordering
+          # ```
+          #
+          # It should be noted that this method enforces type-checking for the custom queryset to ensure its
+          # model matches the relation being prefetched. If a type mismatch is detected, a
+          # `Marten::DB::Errors::UnmetQuerySetCondition` exception will be raised. For example:
+          #
+          # ```
+          # # Valid usage
+          # posts = Post.all.prefetch(:tags, query_set: Tag.order(:name))
+          #
+          # # Invalid usage: Type mismatch
+          # posts = Post.all.prefetch(:tags, query_set: Comment.order(:created_at))
+          # # Raises Marten::DB::Errors::UnmetQuerySetCondition:
+          # # "Can't prefetch :tags using Comment query set."
+          # ```
+          def prefetch(relation_name : String | Symbol, query_set : Query::Set::Any)
+            all.prefetch(relation_name, query_set)
+          end
+
           # Returns a raw query set for the passed SQL query and optional positional parameters.
           #
           # This method returns a `Marten::DB::Query::RawSet` object, which allows to iterate over the model records
@@ -971,9 +999,10 @@ module Marten
               class ::{{ @type }}::QuerySet < Marten::DB::Query::Set({{ @type }})
                 def initialize(
                   @query = Marten::DB::Query::SQL::Query({{ @type }}).new,
-                  @prefetched_relations = [] of ::String
+                  @prefetched_relations = [] of ::String,
+                  @custom_query_sets  = {} of ::String => Any
                 )
-                  super(@query, @prefetched_relations)
+                  super(@query, @prefetched_relations, @custom_query_sets)
                 end
 
                 {% for queryset_id, block in MODEL_SCOPES[:custom] %}
@@ -986,6 +1015,7 @@ module Marten
                   ::{{ @type }}::QuerySet.new(
                     other_query.nil? ? @query.clone : other_query.not_nil!,
                     prefetched_relations,
+                    custom_query_sets
                   )
                 end
               end

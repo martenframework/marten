@@ -171,7 +171,7 @@ module Marten
           records_to_decorate
         end
 
-        private def prefetch_query_set(relation_name, default_model)
+        private def query_set_for_prefetched_relation(relation_name, default_model)
           if custom_query = @custom_query_sets[relation_name]?
             raise Errors::UnmetQuerySetCondition.new(
               "Cannot prefetch '#{relation_name}' relation using a #{custom_query.model.name} query set."
@@ -189,7 +189,7 @@ module Marten
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
-          query_set = prefetch_query_set(relation_name, context.field.related_model)
+          query_set = query_set_for_prefetched_relation(relation_name, context.field.related_model)
 
           if context.field.is_a?(Field::ManyToOne) || context.field.is_a?(Field::OneToOne)
             prefetched_records_pks = records_to_decorate.compact_map(&.get_field_value(context.field.id))
@@ -234,7 +234,7 @@ module Marten
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
-          query_set = prefetch_query_set(relation_name, context.reverse_relation.model)
+          query_set = query_set_for_prefetched_relation(relation_name, context.reverse_relation.model)
 
           if context.reverse_relation.one_to_one?
             prefetched_records.concat(

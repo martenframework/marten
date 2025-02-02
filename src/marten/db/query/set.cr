@@ -1225,6 +1225,20 @@ module Marten
           qs
         end
 
+        # Limits the number of records returned in the query result.
+        #
+        # ```
+        # query_set = Post.all
+        # query_set.limit(100)
+        # ```
+        #
+        # In the above example, at most 100 records will be returned.
+        def limit(number : Int)
+          qs = clone
+          qs.query.slice(0, number)
+          qs
+        end
+
         # Returns a queryset that will automatically prefetch in a single batch the records for the specified relations.
         #
         # When using `#prefetch`, the records corresponding to the specified relationships will be prefetched in single

@@ -174,7 +174,7 @@ module Marten
         private def prefetch_query_set(relation_name, default_model)
           if custom_query = @custom_query_sets[relation_name]?
             raise Errors::UnmetQuerySetCondition.new(
-              "Can't prefetch :#{relation_name} using #{custom_query.model} query set."
+              "Cannot prefetch '#{relation_name}' relation using a #{custom_query.model.name} query set."
             ) if custom_query.model != default_model
             custom_query
           else

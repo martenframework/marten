@@ -1212,12 +1212,11 @@ module Marten
         # # "Can't prefetch :tags using Comment query set."
         # ```
         def prefetch(relation_name : String | Symbol, query_set : Any)
-          qs = clone
           relation_name = relation_name.to_s
+
+          qs = clone
           qs.prefetched_relations << relation_name
-
-          qs.custom_query_sets[relation_name] = query_set if query_set
-
+          qs.custom_query_sets[relation_name] = query_set
           qs
         end
 
@@ -1512,17 +1511,16 @@ module Marten
           qs
         end
 
-
-        # Creates an alias `Any` representing the query sets of all existing models.
-        #
-        # For example, if you have the models `User` and `Post`,
-        # then this macro will generate:
-        #
-        #   alias Any = Set(User) | Set(Post)
-        #
-        # That means anywhere in your code where you accept `Any`, you accept
-        # any `Set(M)` specialized to these models.
         macro finished
+          # Creates an alias `Any` representing the query sets of all existing models.
+          #
+          # For example, if you have the models `User` and `Post`,
+          # then this macro will generate:
+          #
+          #   alias Any = Set(User) | Set(Post)
+          #
+          # That means anywhere in your code where you accept `Any`, you accept
+          # any `Set(M)` specialized to these models.
           {% model_types = Marten::DB::Model.all_subclasses.reject(&.abstract?).map(&.name) %}
           {% if model_types.size > 0 %}
             alias Any = {% for t, i in model_types %}Set({{ t }}){% if i + 1 < model_types.size %} | {% end %}{% end %}

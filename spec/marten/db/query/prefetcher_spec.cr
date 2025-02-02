@@ -2024,7 +2024,7 @@ describe Marten::DB::Query::Prefetcher do
 
         expect_raises(
           Marten::DB::Errors::UnmetQuerySetCondition,
-          "Can't prefetch :authors using Marten::DB::Query::PrefetcherSpec::Bio query set"
+          "Cannot prefetch 'authors' relation using a Marten::DB::Query::PrefetcherSpec::Bio query set."
         ) do
           prefetcher.execute
         end

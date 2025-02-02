@@ -3332,7 +3332,7 @@ describe Marten::DB::Query::Set do
 
       expect_raises(
         Marten::DB::Errors::UnmetQuerySetCondition,
-        "Can't prefetch :tags using TestUser query set."
+        "Cannot prefetch 'tags' relation using a TestUser query set."
       ) do
         qset.to_a
       end

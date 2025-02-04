@@ -601,6 +601,8 @@ module Marten
                   from_columns.delete({removed_table_id, removed_column_name})
                   from_columns.add({table_id, column_name})
                   renamed_columns[{table_id, column_name}] = removed_column_name
+
+                  break
                 end
               end
             end

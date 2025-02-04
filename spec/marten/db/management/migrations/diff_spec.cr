@@ -738,7 +738,7 @@ describe Marten::DB::Management::Migrations::Diff do
       operation_2.index_name.should eq "test_index"
     end
 
-    it "is able to detect renamed columns" do
+    it "is able to detect a renamed column" do
       from_project_state = Marten::DB::Management::ProjectState.new(
         tables: [
           Marten::DB::Management::TableState.new(
@@ -779,6 +779,57 @@ describe Marten::DB::Management::Migrations::Diff do
       operation.table_name.should eq "test_table"
       operation.old_name.should eq "col"
       operation.new_name.should eq "renamed_col"
+    end
+
+    it "is able to detect multiple renamed columns" do
+      from_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("col_1", null: false, default: 42),
+              Marten::DB::Management::Column::BigInt.new("col_2", null: false, default: 42),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      to_project_state = Marten::DB::Management::ProjectState.new(
+        tables: [
+          Marten::DB::Management::TableState.new(
+            app_label: "app",
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::BigInt.new("renamed_col_1", null: false, default: 42),
+              Marten::DB::Management::Column::BigInt.new("renamed_col_2", null: false, default: 42),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [] of Marten::DB::Management::Constraint::Unique
+          ),
+        ]
+      )
+
+      diff = Marten::DB::Management::Migrations::Diff.new(from_project_state, to_project_state)
+      changes = diff.detect
+
+      changes["app"][0].name.ends_with?("_auto").should be_true
+
+      changes["app"][0].operations.size.should eq 2
+
+      changes["app"][0].operations[0].should be_a Marten::DB::Migration::Operation::RenameColumn
+      operation = changes["app"][0].operations[0].as(Marten::DB::Migration::Operation::RenameColumn)
+      operation.table_name.should eq "test_table"
+      operation.old_name.should eq "col_1"
+      operation.new_name.should eq "renamed_col_1"
+
+      changes["app"][0].operations[1].should be_a Marten::DB::Migration::Operation::RenameColumn
+      operation = changes["app"][0].operations[1].as(Marten::DB::Migration::Operation::RenameColumn)
+      operation.table_name.should eq "test_table"
+      operation.old_name.should eq "col_2"
+      operation.new_name.should eq "renamed_col_2"
     end
 
     it "properly generates a dependency between an added table containing a foreign key and the target table" do

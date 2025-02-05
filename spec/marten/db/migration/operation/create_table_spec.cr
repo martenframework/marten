@@ -481,14 +481,14 @@ describe Marten::DB::Migration::Operation::CreateTable do
       operation.serialize.strip.should eq(
         (
           <<-OPERATION
-          create_table :operation_test_table do
-            column :id, :big_int, primary_key: true, auto: true
-            column :foo, :int
-            column :bar, :int
+            create_table :operation_test_table do
+              column :id, :big_int, primary_key: true, auto: true
+              column :foo, :int
+              column :bar, :int
 
-            unique_constraint :test_constraint, [:foo, :bar]
-          end
-          OPERATION
+              unique_constraint :test_constraint, [:foo, :bar]
+            end
+            OPERATION
         ).strip
       )
     end
@@ -508,14 +508,14 @@ describe Marten::DB::Migration::Operation::CreateTable do
       operation.serialize.strip.should eq(
         (
           <<-OPERATION
-          create_table :operation_test_table do
-            column :id, :big_int, primary_key: true, auto: true
-            column :foo, :int
-            column :bar, :int
+            create_table :operation_test_table do
+              column :id, :big_int, primary_key: true, auto: true
+              column :foo, :int
+              column :bar, :int
 
-            index :test_index, [:foo, :bar]
-          end
-          OPERATION
+              index :test_index, [:foo, :bar]
+            end
+            OPERATION
         ).strip
       )
     end

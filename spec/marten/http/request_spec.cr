@@ -253,27 +253,27 @@ describe Marten::HTTP::Request do
             "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
           },
           body: <<-FORMDATA
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="text"
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="text"
 
-          hello
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="file"; filename="a.txt"
-          Content-Type: text/plain
+            hello
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="file"; filename="a.txt"
+            Content-Type: text/plain
 
-          Content of a.txt.
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="file2"; filename="a.html"
-          Content-Type: text/html
+            Content of a.txt.
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="file2"; filename="a.html"
+            Content-Type: text/html
 
-          <!DOCTYPE html><title>Content of a.html.</title>
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="file2"; filename="b.html"
-          Content-Type: text/html
+            <!DOCTYPE html><title>Content of a.html.</title>
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="file2"; filename="b.html"
+            Content-Type: text/html
 
-          <!DOCTYPE html><title>Content of b.html.</title>
-          -----------------------------735323031399963166993862150--
-          FORMDATA
+            <!DOCTYPE html><title>Content of b.html.</title>
+            -----------------------------735323031399963166993862150--
+            FORMDATA
             .gsub('\n', "\r\n")
         )
       )

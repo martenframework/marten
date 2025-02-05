@@ -62,12 +62,12 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'operation_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'operation_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -81,10 +81,10 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
 
           db.query(
             <<-SQL
-              SELECT COLUMN_NAME, CONSTRAINT_NAME
-              FROM information_schema.KEY_COLUMN_USAGE
-              WHERE TABLE_NAME = 'operation_test_table';
-            SQL
+                SELECT COLUMN_NAME, CONSTRAINT_NAME
+                FROM information_schema.KEY_COLUMN_USAGE
+                WHERE TABLE_NAME = 'operation_test_table';
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -100,12 +100,12 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'operation_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'operation_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -119,16 +119,16 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
 
           db.query(
             <<-SQL
-              SELECT
-                pgc.conname AS constraint_name,
-                ccu.column_name
-              FROM pg_constraint pgc
-              JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
-              JOIN pg_class cls ON pgc.conrelid = cls.oid
-              LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
-                AND nsp.nspname = ccu.constraint_schema
-              WHERE contype = 'u' AND ccu.table_name = 'operation_test_table'
-            SQL
+                SELECT
+                  pgc.conname AS constraint_name,
+                  ccu.column_name
+                FROM pg_constraint pgc
+                JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
+                JOIN pg_class cls ON pgc.conrelid = cls.oid
+                LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
+                  AND nsp.nspname = ccu.constraint_schema
+                WHERE contype = 'u' AND ccu.table_name = 'operation_test_table'
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -155,18 +155,18 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'operation_test_table'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = 'operation_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -234,12 +234,12 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'operation_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'operation_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)
@@ -250,12 +250,12 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'operation_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'operation_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)
@@ -266,18 +266,18 @@ describe Marten::DB::Migration::Operation::RemoveUniqueConstraint do
         for_sqlite do
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'operation_test_table'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = 'operation_test_table'
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)

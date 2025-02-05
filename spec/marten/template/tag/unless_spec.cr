@@ -20,9 +20,9 @@ describe Marten::Template::Tag::Unless do
     it "properly renders a simple unless condition" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        It works!
-        {% endunless %}
-        TEMPLATE
+          It works!
+          {% endunless %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::Unless.new(parser, "unless var1 || var2")
 
@@ -33,11 +33,11 @@ describe Marten::Template::Tag::Unless do
     it "properly renders a simple unless/else condition" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        It works!
-        {% else %}
-        It also works!
-        {% endunless %}
-        TEMPLATE
+          It works!
+          {% else %}
+          It also works!
+          {% endunless %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::Unless.new(parser, "if var1 || var2")
 

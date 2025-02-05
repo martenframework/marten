@@ -5,9 +5,9 @@ describe Marten::Template::Tag::Capture do
     it "can initialize a regular capture tag" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       tag = Marten::Template::Tag::Capture.new(parser, "capture my_var")
@@ -21,9 +21,9 @@ describe Marten::Template::Tag::Capture do
     it "can initialize a capture tag making use of the 'unless defined' modifier" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       tag = Marten::Template::Tag::Capture.new(parser, "capture my_var unless defined")
@@ -37,9 +37,9 @@ describe Marten::Template::Tag::Capture do
     it "raises a syntax error if no variable name is given" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       expect_raises(
@@ -53,9 +53,9 @@ describe Marten::Template::Tag::Capture do
     it "raises a syntax error if more than one variable name is given" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       expect_raises(
@@ -71,9 +71,9 @@ describe Marten::Template::Tag::Capture do
     it "returns an empty string and assigns the captured content to the specified variable" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       tag = Marten::Template::Tag::Capture.new(parser, "capture my_var")
@@ -87,9 +87,9 @@ describe Marten::Template::Tag::Capture do
     it "returns an empty string and assigns the captured content to the specified variable even if it already exists" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       tag = Marten::Template::Tag::Capture.new(parser, "capture my_var")
@@ -103,9 +103,9 @@ describe Marten::Template::Tag::Capture do
     it "does the assignment when the 'unless defined' modifier is used and the variable does not exist" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       tag = Marten::Template::Tag::Capture.new(parser, "capture my_var unless defined")
@@ -119,9 +119,9 @@ describe Marten::Template::Tag::Capture do
     it "does not do the assignment when the 'unless defined' modifier is used and the variable already exists" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, <b>{{ name }}</b>!
-        {% endcapture %}
-        TEMPLATE
+          Hello World, <b>{{ name }}</b>!
+          {% endcapture %}
+          TEMPLATE
       )
 
       tag = Marten::Template::Tag::Capture.new(parser, "capture my_var unless defined")

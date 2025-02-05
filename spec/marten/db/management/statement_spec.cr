@@ -271,11 +271,11 @@ describe Marten::DB::Management::Statement do
       statement = Marten::DB::Management::Statement.new(
         (
           <<-SQL
-            ALTER TABLE %{table}
-            ADD CONSTRAINT %{constraint}
-            FOREIGN KEY (%{column})
-            REFERENCES %{to_table} (%{to_column})
-          SQL
+              ALTER TABLE %{table}
+              ADD CONSTRAINT %{constraint}
+              FOREIGN KEY (%{column})
+              REFERENCES %{to_table} (%{to_column})
+            SQL
         ),
         table: Marten::DB::Management::Statement::Table.new(->(x : String) { x }, "test_table"),
         constraint: Marten::DB::Management::Statement::ForeignKeyName.new(
@@ -300,11 +300,11 @@ describe Marten::DB::Management::Statement do
 
       statement.to_s.strip.should eq (
         <<-SQL
-          ALTER TABLE test_table
-          ADD CONSTRAINT indexname
-          FOREIGN KEY (test_column)
-          REFERENCES test_to_table (test_to_column)
-        SQL
+            ALTER TABLE test_table
+            ADD CONSTRAINT indexname
+            FOREIGN KEY (test_column)
+            REFERENCES test_to_table (test_to_column)
+          SQL
       ).strip
     end
   end

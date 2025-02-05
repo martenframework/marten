@@ -101,18 +101,18 @@ for_sqlite do
         Marten::DB::Connection.default.open do |db|
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = '#{Tag.db_table}'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = '#{Tag.db_table}'
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)

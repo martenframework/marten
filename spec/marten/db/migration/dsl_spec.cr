@@ -286,13 +286,13 @@ module Marten::DB::Migration::DSLSpec
       execute(
         (
           <<-SQL
-          SELECT 1
-          SQL
+            SELECT 1
+            SQL
         ),
         (
           <<-SQL
-          SELECT 2
-          SQL
+            SELECT 2
+            SQL
         )
       )
     end

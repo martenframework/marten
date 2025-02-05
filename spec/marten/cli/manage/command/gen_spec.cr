@@ -130,21 +130,21 @@ describe Marten::CLI::Manage::Command::Gen do
 
       stdout.rewind.gets_to_end.chomp("\n").includes?(
         <<-USAGE
-        Usage: marten gen [options] [generator] [arguments]
+          Usage: marten gen [options] [generator] [arguments]
 
-        Generate various structures, abstractions, and values within an existing project.
+          Generate various structures, abstractions, and values within an existing project.
 
-        Arguments:
-            generator                        Name of the generator to use
+          Arguments:
+              generator                        Name of the generator to use
 
-        Options:
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
+          Options:
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
 
-        Available generators are listed below.
-        USAGE
+          Available generators are listed below.
+          USAGE
       ).should be_true
     end
 
@@ -162,23 +162,23 @@ describe Marten::CLI::Manage::Command::Gen do
 
       stdout.rewind.gets_to_end.chomp("\n").includes?(
         <<-USAGE
-        Usage: marten gen model [options] [name] [field_definitions]
+          Usage: marten gen model [options] [name] [field_definitions]
 
-        Generate a model.
+          Generate a model.
 
-        Arguments:
-            name                             Name of the model to generate
-            field_definitions                Field definitions of the model to generate
+          Arguments:
+              name                             Name of the model to generate
+              field_definitions                Field definitions of the model to generate
 
-        Options:
-            --app=APP                        Target app where the model should be created
-            --parent=PARENT                  Parent class name for the generated model
-            --no-timestamps                  Do not include timestamp fields in the generated model
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --app=APP                        Target app where the model should be created
+              --parent=PARENT                  Parent class name for the generated model
+              --no-timestamps                  Do not include timestamp fields in the generated model
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       ).should be_true
     end
 
@@ -196,21 +196,21 @@ describe Marten::CLI::Manage::Command::Gen do
 
       stdout.rewind.gets_to_end.chomp("\n").includes?(
         <<-USAGE
-        Options:
-            --app=APP                        Target app where the model should be created
-            --parent=PARENT                  Parent class name for the generated model
-            --no-timestamps                  Do not include timestamp fields in the generated model
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
+          Options:
+              --app=APP                        Target app where the model should be created
+              --parent=PARENT                  Parent class name for the generated model
+              --no-timestamps                  Do not include timestamp fields in the generated model
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
 
-        Description:
+          Description:
 
-          Generates a model with the specified name and field definitions. The model will be
-          generated in the app specified by the --app option or in the main app if no app is
-          specified.
-        USAGE
+            Generates a model with the specified name and field definitions. The model will be
+            generated in the app specified by the --app option or in the main app if no app is
+            specified.
+          USAGE
       )
     end
   end

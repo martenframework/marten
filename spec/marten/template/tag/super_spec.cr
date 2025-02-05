@@ -5,9 +5,9 @@ describe Marten::Template::Tag::Super do
     it "renders the parent block's content as expected" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% extend "base.html" %}
-        {% block title %}{% super %} - Local title{% endblock %}
-        TEMPLATE
+          {% extend "base.html" %}
+          {% block title %}{% super %} - Local title{% endblock %}
+          TEMPLATE
       )
       nodes = parser.parse
       nodes.render(Marten::Template::Context.new).includes?("<title>Test project - Local title</title>").should be_true

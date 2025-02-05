@@ -9,37 +9,37 @@ module Marten
 
         footer_description(
           <<-FOOTER_DESCRIPTION
-          Description:
+            Description:
 
-            Generates a schema with the specified name and field definitions. The schema will be
-            generated in the app specified by the --app option or in the main app if no app is
-            specified.
+              Generates a schema with the specified name and field definitions. The schema will be
+              generated in the app specified by the --app option or in the main app if no app is
+              specified.
 
-            Field definitions can be specified using the following formats:
+              Field definitions can be specified using the following formats:
 
-              name:type
-              name:type:modifier:modifier
+                name:type
+                name:type:modifier:modifier
 
-            Where `name` is the name of the field and `type` is the type of the field.
+              Where `name` is the name of the field and `type` is the type of the field.
 
-            `modifier` is an optional field modifier. Field modifiers are used to specify additional
-            (but non-mandatory) field options. For example: `name:string:optional` will produce a
-            string field whose `required` option is set to `false`.
+              `modifier` is an optional field modifier. Field modifiers are used to specify additional
+              (but non-mandatory) field options. For example: `name:string:optional` will produce a
+              string field whose `required` option is set to `false`.
 
-          Examples:
+            Examples:
 
-            Generate a schema in the main app:
+              Generate a schema in the main app:
 
-              $ marten gen schema ArticleSchema title:string body:string
+                $ marten gen schema ArticleSchema title:string body:string
 
-            Generate a schema in the blog app:
+              Generate a schema in the blog app:
 
-              $ marten gen schema ArticleSchema title:string body:string --app admin
+                $ marten gen schema ArticleSchema title:string body:string --app admin
 
-            Generate a schema with a parent class:
+              Generate a schema with a parent class:
 
-              $ marten gen schema ArticleSchema title:string body:string --parent BaseSchema
-          FOOTER_DESCRIPTION
+                $ marten gen schema ArticleSchema title:string body:string --parent BaseSchema
+            FOOTER_DESCRIPTION
         )
 
         @app_label : String? = nil

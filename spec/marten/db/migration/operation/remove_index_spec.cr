@@ -70,8 +70,8 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
 
           db.query(
             <<-SQL
-              SHOW INDEX FROM operation_test_table;
-            SQL
+                SHOW INDEX FROM operation_test_table;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String) # table
@@ -98,22 +98,22 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
 
           db.query(
             <<-SQL
-              SELECT
-                i.relname AS index_name,
-                a.attname AS column_name
-              FROM
-                pg_class t,
-                pg_class i,
-                pg_index ix,
-                pg_attribute a
-              WHERE
-                t.oid = ix.indrelid
-                AND i.oid = ix.indexrelid
-                AND a.attrelid = t.oid
-                AND a.attnum = ANY(ix.indkey)
-                AND t.relkind = 'r'
-                AND t.relname = 'operation_test_table'
-            SQL
+                SELECT
+                  i.relname AS index_name,
+                  a.attname AS column_name
+                FROM
+                  pg_class t,
+                  pg_class i,
+                  pg_index ix,
+                  pg_attribute a
+                WHERE
+                  t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND a.attrelid = t.oid
+                  AND a.attnum = ANY(ix.indkey)
+                  AND t.relkind = 'r'
+                  AND t.relname = 'operation_test_table'
+              SQL
           ) do |rs|
             rs.each do
               current_index_name = rs.read(String)
@@ -145,17 +145,17 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS index_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                m.tbl_name = 'operation_test_table'
-            SQL
+                SELECT
+                  il.name AS index_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  m.tbl_name = 'operation_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -230,8 +230,8 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
 
           db.query(
             <<-SQL
-              SHOW INDEX FROM operation_test_table;
-            SQL
+                SHOW INDEX FROM operation_test_table;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String) # table
@@ -244,22 +244,22 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT
-                i.relname AS index_name,
-                a.attname AS column_name
-              FROM
-                pg_class t,
-                pg_class i,
-                pg_index ix,
-                pg_attribute a
-              WHERE
-                t.oid = ix.indrelid
-                AND i.oid = ix.indexrelid
-                AND a.attrelid = t.oid
-                AND a.attnum = ANY(ix.indkey)
-                AND t.relkind = 'r'
-                AND t.relname = 'operation_test_table'
-            SQL
+                SELECT
+                  i.relname AS index_name,
+                  a.attname AS column_name
+                FROM
+                  pg_class t,
+                  pg_class i,
+                  pg_index ix,
+                  pg_attribute a
+                WHERE
+                  t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND a.attrelid = t.oid
+                  AND a.attnum = ANY(ix.indkey)
+                  AND t.relkind = 'r'
+                  AND t.relname = 'operation_test_table'
+              SQL
           ) do |rs|
             rs.each do
               index_names << rs.read(String)

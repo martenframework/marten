@@ -128,10 +128,10 @@ describe Marten::DB::Migration::Operation::ExecuteSQL do
       operation.serialize.strip.should eq(
         (
           <<-OPERATION
-          execute <<-SQL
-            SELECT 1
-          SQL
-          OPERATION
+            execute <<-SQL
+              SELECT 1
+            SQL
+            OPERATION
         ).strip
       )
     end
@@ -142,19 +142,19 @@ describe Marten::DB::Migration::Operation::ExecuteSQL do
     operation.serialize.strip.should eq(
       (
         <<-OPERATION
-        execute(
-          (
-            <<-SQL
-              SELECT 1
-            SQL
-          ),
-          (
-            <<-SQL
-              SELECT 2
-            SQL
+          execute(
+            (
+              <<-SQL
+                SELECT 1
+              SQL
+            ),
+            (
+              <<-SQL
+                SELECT 2
+              SQL
+            )
           )
-        )
-        OPERATION
+          OPERATION
       ).strip
     )
   end

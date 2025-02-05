@@ -33,9 +33,9 @@ describe Marten::Template::Tag::For do
     it "properly renders a simple for block" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ item }};
-        {% endfor %}
-        TEMPLATE
+          {{ item }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -46,9 +46,9 @@ describe Marten::Template::Tag::For do
     it "properly renders a for block involving unpacking multiple iteration variables" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ x }}|{{ y }};
-        {% endfor %}
-        TEMPLATE
+          {{ x }}|{{ y }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for x, y in h")
 
@@ -59,11 +59,11 @@ describe Marten::Template::Tag::For do
     it "properly renders a simple for block with an else block" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ item }};
-        {% else %}
-        No item
-        {% endfor %}
-        TEMPLATE
+          {{ item }};
+          {% else %}
+          No item
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -74,15 +74,15 @@ describe Marten::Template::Tag::For do
     it "properly renders a simple for block with an else block containing an if/else block" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% if item == "foo" %}
-        foo!
-        {% else %}
-        not foo!
-        {% endif %}
-        {% else %}
-        No item
-        {% endfor %}
-        TEMPLATE
+          {% if item == "foo" %}
+          foo!
+          {% else %}
+          not foo!
+          {% endif %}
+          {% else %}
+          No item
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -93,9 +93,9 @@ describe Marten::Template::Tag::For do
     it "exposes the index (starting at 1) of each iteration" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ loop.index }};
-        {% endfor %}
-        TEMPLATE
+          {{ loop.index }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -105,9 +105,9 @@ describe Marten::Template::Tag::For do
     it "exposes the index (starting at 10) of each iteration" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ loop.index0 }};
-        {% endfor %}
-        TEMPLATE
+          {{ loop.index0 }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -117,9 +117,9 @@ describe Marten::Template::Tag::For do
     it "exposes the reverse index (ending at 1) of each iteration" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ loop.revindex }};
-        {% endfor %}
-        TEMPLATE
+          {{ loop.revindex }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -129,9 +129,9 @@ describe Marten::Template::Tag::For do
     it "exposes the reverse index (ending at 0) of each iteration" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ loop.revindex0 }};
-        {% endfor %}
-        TEMPLATE
+          {{ loop.revindex0 }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -141,9 +141,9 @@ describe Marten::Template::Tag::For do
     it "exposes whether a specific iteration is the first one or not" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% if loop.first? %}1{% else %}0{% endif %};
-        {% endfor %}
-        TEMPLATE
+          {% if loop.first? %}1{% else %}0{% endif %};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -153,9 +153,9 @@ describe Marten::Template::Tag::For do
     it "exposes whether a specific iteration is the last one or not" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% if loop.last? %}1{% else %}0{% endif %};
-        {% endfor %}
-        TEMPLATE
+          {% if loop.last? %}1{% else %}0{% endif %};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -165,11 +165,11 @@ describe Marten::Template::Tag::For do
     it "exposes the parent loop information if applicable" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% for sub_item in sub_arr %}
-        {{ loop.parent.index }};
-        {% endfor %}
-        {% endfor %}
-        TEMPLATE
+          {% for sub_item in sub_arr %}
+          {{ loop.parent.index }};
+          {% endfor %}
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for item in arr")
 
@@ -182,9 +182,9 @@ describe Marten::Template::Tag::For do
     it "raises if each iteration item cannot be unpacked into multiple variables" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ x }}|{{ y }};
-        {% endfor %}
-        TEMPLATE
+          {{ x }}|{{ y }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for x, y in arr")
 
@@ -199,9 +199,9 @@ describe Marten::Template::Tag::For do
     it "raises if there are missing variables to unpack" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {{ x }}|{{ y }};
-        {% endfor %}
-        TEMPLATE
+          {{ x }}|{{ y }};
+          {% endfor %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::For.new(parser, "for x, y, z in h")
 

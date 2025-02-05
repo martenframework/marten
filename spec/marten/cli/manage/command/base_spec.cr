@@ -361,14 +361,14 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options]
+          Usage: marten empty_command [options]
 
-        Options:
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
 
@@ -385,17 +385,17 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options] [arg]
+          Usage: marten empty_command [options] [arg]
 
-        Arguments:
-            arg                              This is an argument
+          Arguments:
+              arg                              This is an argument
 
-        Options:
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
 
@@ -413,18 +413,18 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options] [arg1] [arg2]
+          Usage: marten empty_command [options] [arg1] [arg2]
 
-        Arguments:
-            arg1                             This is the first argument
-            arg2                             This is the second argument
+          Arguments:
+              arg1                             This is the first argument
+              arg2                             This is the second argument
 
-        Options:
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
 
@@ -443,19 +443,19 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options] [arg1] [arg2]
+          Usage: marten empty_command [options] [arg1] [arg2]
 
-        Arguments:
-            arg1                             This is the first argument
-            arg2                             This is the second argument
+          Arguments:
+              arg1                             This is the first argument
+              arg2                             This is the second argument
 
-        Options:
-            --option                         This is an option
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --option                         This is an option
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
 
@@ -474,19 +474,19 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options] [arg1] [arg2]
+          Usage: marten empty_command [options] [arg1] [arg2]
 
-        Arguments:
-            arg1                             This is the first argument
-            arg2                             This is the second argument
+          Arguments:
+              arg1                             This is the first argument
+              arg2                             This is the second argument
 
-        Options:
-            -o, --option                     This is an option
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              -o, --option                     This is an option
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
 
@@ -505,18 +505,18 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options] [arg1] [arg2] [arguments]
+          Usage: marten empty_command [options] [arg1] [arg2] [arguments]
 
-        Arguments:
-            arg1                             This is the first argument
-            arg2                             This is the second argument
+          Arguments:
+              arg1                             This is the first argument
+              arg2                             This is the second argument
 
-        Options:
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
 
@@ -535,19 +535,19 @@ describe Marten::CLI::Manage::Command::Base do
 
       stdout.rewind.gets_to_end.chomp("\n").should eq(
         <<-USAGE
-        Usage: marten empty_command [options] [arg1] [arg2] [args]
+          Usage: marten empty_command [options] [arg1] [arg2] [args]
 
-        Arguments:
-            arg1                             This is the first argument
-            arg2                             This is the second argument
-            args                             Custom arguments
+          Arguments:
+              arg1                             This is the first argument
+              arg2                             This is the second argument
+              args                             Custom arguments
 
-        Options:
-            --error-trace                    Show full error trace (if a compilation is involved)
-            --log-level=level                Set the log level (default to "info")
-            --no-color                       Disable colored output
-            -h, --help                       Show this help
-        USAGE
+          Options:
+              --error-trace                    Show full error trace (if a compilation is involved)
+              --log-level=level                Set the log level (default to "info")
+              --no-color                       Disable colored output
+              -h, --help                       Show this help
+          USAGE
       )
     end
   end

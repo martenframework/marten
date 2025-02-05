@@ -54,14 +54,14 @@ describe Marten::Emailing::Backend::Development do
       stdout.rewind
       stdout.gets_to_end.should eq(
         <<-OUTPUT
-        From: webmaster@localhost
-        To: test@example.com
-        Subject: Hello World!
-        ---------- TEXT ----------
-        Text body
-        ---------- HTML ----------
-        HTML body
-        OUTPUT
+          From: webmaster@localhost
+          To: test@example.com
+          Subject: Hello World!
+          ---------- TEXT ----------
+          Text body
+          ---------- HTML ----------
+          HTML body
+          OUTPUT
       )
     end
 
@@ -76,11 +76,11 @@ describe Marten::Emailing::Backend::Development do
       stdout.rewind
       stdout.gets_to_end.should eq(
         <<-OUTPUT
-        From: webmaster@localhost
-        To: test@example.com
-        CC: cc1@example.com, cc2@example.com
-        Subject: Hello World!
-        OUTPUT
+          From: webmaster@localhost
+          To: test@example.com
+          CC: cc1@example.com, cc2@example.com
+          Subject: Hello World!
+          OUTPUT
       )
     end
 
@@ -95,11 +95,11 @@ describe Marten::Emailing::Backend::Development do
       stdout.rewind
       stdout.gets_to_end.should eq(
         <<-OUTPUT
-        From: webmaster@localhost
-        To: test@example.com
-        BCC: bcc1@example.com, bcc2@example.com
-        Subject: Hello World!
-        OUTPUT
+          From: webmaster@localhost
+          To: test@example.com
+          BCC: bcc1@example.com, bcc2@example.com
+          Subject: Hello World!
+          OUTPUT
       )
     end
 
@@ -114,11 +114,11 @@ describe Marten::Emailing::Backend::Development do
       stdout.rewind
       stdout.gets_to_end.should eq(
         <<-OUTPUT
-        From: webmaster@localhost
-        To: test@example.com
-        Reply-To: reply-to@example.com
-        Subject: Hello World!
-        OUTPUT
+          From: webmaster@localhost
+          To: test@example.com
+          Reply-To: reply-to@example.com
+          Subject: Hello World!
+          OUTPUT
       )
     end
 
@@ -133,11 +133,11 @@ describe Marten::Emailing::Backend::Development do
       stdout.rewind
       stdout.gets_to_end.should eq(
         <<-OUTPUT
-        From: webmaster@localhost
-        To: test@example.com
-        Subject: Hello World!
-        Headers: {"foo" => "bar"}
-        OUTPUT
+          From: webmaster@localhost
+          To: test@example.com
+          Subject: Hello World!
+          Headers: {"foo" => "bar"}
+          OUTPUT
       )
     end
   end

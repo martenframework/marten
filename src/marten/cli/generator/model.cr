@@ -9,53 +9,53 @@ module Marten
 
         footer_description(
           <<-FOOTER_DESCRIPTION
-          Description:
+            Description:
 
-            Generates a model with the specified name and field definitions. The model will be
-            generated in the app specified by the --app option or in the main app if no app is
-            specified.
+              Generates a model with the specified name and field definitions. The model will be
+              generated in the app specified by the --app option or in the main app if no app is
+              specified.
 
-            Field definitions can be specified using the following formats:
+              Field definitions can be specified using the following formats:
 
-              name:type
-              name:type{qualifier}
-              name:type:modifier:modifier
+                name:type
+                name:type{qualifier}
+                name:type:modifier:modifier
 
-            Where `name` is the name of the field and `type` is the type of the field.
+              Where `name` is the name of the field and `type` is the type of the field.
 
-            `qualifier` can be required depending on the considered field type; when this is the
-            case, it corresponds to a mandatory field option. For example, `label:string{128}` will
-            produce a string field whose `max_size` option is set to `128`. Another example:
-            `author:many_to_one{User}` will produce a many-to-one field whose `to` option is set to
-            target the `User` model.
+              `qualifier` can be required depending on the considered field type; when this is the
+              case, it corresponds to a mandatory field option. For example, `label:string{128}` will
+              produce a string field whose `max_size` option is set to `128`. Another example:
+              `author:many_to_one{User}` will produce a many-to-one field whose `to` option is set to
+              target the `User` model.
 
-            `modifier` is an optional field modifier. Field modifiers are used to specify additional
-            (but non-mandatory) field options. For example: `name:string:uniq` will produce a string
-            field whose `unique` option is set to `true`. Another example: `name:string:uniq:index`
-            will produce a string field whose `unique` and `index` options are set to `true`.
+              `modifier` is an optional field modifier. Field modifiers are used to specify additional
+              (but non-mandatory) field options. For example: `name:string:uniq` will produce a string
+              field whose `unique` option is set to `true`. Another example: `name:string:uniq:index`
+              will produce a string field whose `unique` and `index` options are set to `true`.
 
-          Examples:
+            Examples:
 
-            Generate a model in the main app:
+              Generate a model in the main app:
 
-              $ marten gen model User name:string email:string
+                $ marten gen model User name:string email:string
 
-            Generate a model in the admin app:
+              Generate a model in the admin app:
 
-              $ marten gen model User name:string email:string --app admin
+                $ marten gen model User name:string email:string --app admin
 
-            Generate a model with a many-to-one reference:
+              Generate a model with a many-to-one reference:
 
-              $ marten gen model Article label:string body:text author:many_to_one{User}
+                $ marten gen model Article label:string body:text author:many_to_one{User}
 
-            Generate a model with a parent class:
+              Generate a model with a parent class:
 
-              $ marten gen model Admin::User name:string email:string --parent User
+                $ marten gen model Admin::User name:string email:string --parent User
 
-            Generate a model without timestamps:
+              Generate a model without timestamps:
 
-              $ marten gen model User name:string email:string --no-timestamps
-          FOOTER_DESCRIPTION
+                $ marten gen model User name:string email:string --no-timestamps
+            FOOTER_DESCRIPTION
         )
 
         @app_label : String? = nil

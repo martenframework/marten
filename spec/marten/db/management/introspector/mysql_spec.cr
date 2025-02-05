@@ -109,14 +109,14 @@ for_mysql do
         Marten::DB::Connection.default.open do |db|
           db.query(
             <<-SQL
-              SELECT kc.constraint_name, kc.column_name
-              FROM information_schema.key_column_usage AS kc, information_schema.table_constraints AS c
-              WHERE kc.table_schema = DATABASE() AND kc.table_name = '#{Tag.db_table}'
-              AND c.table_schema = kc.table_schema
-              AND c.table_name = kc.table_name
-              AND c.constraint_name = kc.constraint_name
-              AND (c.constraint_type = 'PRIMARY KEY' OR c.constraint_type = 'UNIQUE')
-            SQL
+                SELECT kc.constraint_name, kc.column_name
+                FROM information_schema.key_column_usage AS kc, information_schema.table_constraints AS c
+                WHERE kc.table_schema = DATABASE() AND kc.table_name = '#{Tag.db_table}'
+                AND c.table_schema = kc.table_schema
+                AND c.table_name = kc.table_name
+                AND c.constraint_name = kc.constraint_name
+                AND (c.constraint_type = 'PRIMARY KEY' OR c.constraint_type = 'UNIQUE')
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)

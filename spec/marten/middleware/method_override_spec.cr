@@ -171,12 +171,12 @@ describe Marten::Middleware::MethodOverride do
             "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
           },
           body: <<-FORMDATA
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="_method"
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="_method"
 
-          delete
-          -----------------------------735323031399963166993862150--
-          FORMDATA
+            delete
+            -----------------------------735323031399963166993862150--
+            FORMDATA
             .gsub('\n', "\r\n")
         )
       )
@@ -200,12 +200,12 @@ describe Marten::Middleware::MethodOverride do
             "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
           },
           body: <<-FORMDATA
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="_method"
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="_method"
 
-          invalid
-          -----------------------------735323031399963166993862150--
-          FORMDATA
+            invalid
+            -----------------------------735323031399963166993862150--
+            FORMDATA
             .gsub('\n', "\r\n")
         )
       )
@@ -229,13 +229,13 @@ describe Marten::Middleware::MethodOverride do
             "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
           },
           body: <<-FORMDATA
-          -----------------------------735323031399963166993862150
-          Content-Disposition: form-data; name="_method"; filename="a.txt"
-          Content-Type: text/plain
+            -----------------------------735323031399963166993862150
+            Content-Disposition: form-data; name="_method"; filename="a.txt"
+            Content-Type: text/plain
 
-          delete
-          -----------------------------735323031399963166993862150--
-          FORMDATA
+            delete
+            -----------------------------735323031399963166993862150--
+            FORMDATA
             .gsub('\n', "\r\n")
         )
       )

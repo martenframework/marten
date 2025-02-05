@@ -195,10 +195,10 @@ describe Marten::Handlers::Defaults::Debug::ServerError do
     it "returns the expected template snippet lines if the error is a template syntax error" do
       with_overridden_setting(:debug, true) do
         source = <<-TEMPLATE
-        HEADER
-        Hello World, {% %}!
-        FOOTER
-        TEMPLATE
+          HEADER
+          Hello World, {% %}!
+          FOOTER
+          TEMPLATE
 
         parser = Marten::Template::Parser.new(source)
 

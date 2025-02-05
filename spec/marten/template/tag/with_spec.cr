@@ -33,9 +33,9 @@ describe Marten::Template::Tag::With do
   it "properly renders with multiple variables assigned" do
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE
-          {{ x }} - {{ y }}
-          {% endwith %}
-          TEMPLATE
+        {{ x }} - {{ y }}
+        {% endwith %}
+        TEMPLATE
     )
     tag = Marten::Template::Tag::With.new(parser, "with x=1, y=2")
 
@@ -45,9 +45,9 @@ describe Marten::Template::Tag::With do
   it "does not pollute the outer context with local variables" do
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE
-          {{ x }} - {{ y }}
-          {% endwith %}
-          TEMPLATE
+        {{ x }} - {{ y }}
+        {% endwith %}
+        TEMPLATE
     )
 
     context = Marten::Template::Context.new
@@ -62,9 +62,9 @@ describe Marten::Template::Tag::With do
   it "use context variables as value" do
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE
-          {{ x }}
-          {% endwith %}
-          TEMPLATE
+        {{ x }}
+        {% endwith %}
+        TEMPLATE
     )
 
     tag = Marten::Template::Tag::With.new(parser, "with x = var")
@@ -83,9 +83,9 @@ describe Marten::Template::Tag::With do
 
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE
-          {{ y }} - {{ x }}
-          {% endwith %}
-          TEMPLATE
+        {{ y }} - {{ x }}
+        {% endwith %}
+        TEMPLATE
     )
 
     tag = Marten::Template::Tag::With.new(parser, "with y = x, x = 1")
@@ -99,9 +99,9 @@ describe Marten::Template::Tag::With do
 
     parser = Marten::Template::Parser.new(
       <<-TEMPLATE
-          {{ y }} - {{ x }}
-          {% endwith %}
-          TEMPLATE
+        {{ y }} - {{ x }}
+        {% endwith %}
+        TEMPLATE
     )
 
     tag = Marten::Template::Tag::With.new(parser, "with x = 1, y = x")

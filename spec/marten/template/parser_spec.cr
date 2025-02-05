@@ -18,14 +18,14 @@ describe Marten::Template::Parser do
     it "returns an array containing the encountered blocks if the template source contains blocks" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        {% block title %}
-        Hello
-        {% endblock title %}
+          {% block title %}
+          Hello
+          {% endblock title %}
 
-        {% block body %}
-        Hello
-        {% endblock body %}
-        TEMPLATE
+          {% block body %}
+          Hello
+          {% endblock body %}
+          TEMPLATE
       )
 
       parser.parse
@@ -37,9 +37,9 @@ describe Marten::Template::Parser do
     it "returns the node set corresponding to the parsed template" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, {{ name }}!
-        {% if var %}Foo Bar{% endif %}
-        TEMPLATE
+          Hello World, {{ name }}!
+          {% if var %}Foo Bar{% endif %}
+          TEMPLATE
       )
 
       node_set = parser.parse
@@ -54,8 +54,8 @@ describe Marten::Template::Parser do
     it "raises if an empty variable is detected" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, {{ }}!
-        TEMPLATE
+          Hello World, {{ }}!
+          TEMPLATE
       )
 
       expect_raises(
@@ -69,8 +69,8 @@ describe Marten::Template::Parser do
     it "raises if an empty tag is detected" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, {% %}!
-        TEMPLATE
+          Hello World, {% %}!
+          TEMPLATE
       )
 
       expect_raises(
@@ -84,8 +84,8 @@ describe Marten::Template::Parser do
     it "raises if an end tag is expected" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World!
-        TEMPLATE
+          Hello World!
+          TEMPLATE
       )
 
       expect_raises(
@@ -99,8 +99,8 @@ describe Marten::Template::Parser do
     it "properly decorates invalid syntax errors when in debug mode" do
       with_overridden_setting(:debug, true) do
         source = <<-TEMPLATE
-        Hello World, {% %}!
-        TEMPLATE
+          Hello World, {% %}!
+          TEMPLATE
 
         parser = Marten::Template::Parser.new(source)
 
@@ -119,8 +119,8 @@ describe Marten::Template::Parser do
     it "does not decorate invalid syntax errors when not in debug mode" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        Hello World, {% %}!
-        TEMPLATE
+          Hello World, {% %}!
+          TEMPLATE
       )
 
       error = expect_raises(

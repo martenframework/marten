@@ -132,11 +132,11 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-            SELECT a.attname
-            FROM pg_index i
-            JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-            WHERE i.indrelid = 'schema_editor_test_table'::regclass AND i.indisprimary;
-            SQL
+              SELECT a.attname
+              FROM pg_index i
+              JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+              WHERE i.indrelid = 'schema_editor_test_table'::regclass AND i.indisprimary;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String).should eq "foo"
@@ -190,11 +190,11 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-            SELECT a.attname
-            FROM pg_index i
-            JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
-            WHERE i.indrelid = 'schema_editor_test_table'::regclass AND i.indisprimary;
-            SQL
+              SELECT a.attname
+              FROM pg_index i
+              JOIN pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+              WHERE i.indrelid = 'schema_editor_test_table'::regclass AND i.indisprimary;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String).should eq "test"
@@ -236,12 +236,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -255,12 +255,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'schema_editor_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -343,17 +343,17 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                kcu.column_name,
-                ccu.table_name AS foreign_table_name,
-                ccu.column_name AS foreign_column_name
-              FROM information_schema.table_constraints AS tc
-              JOIN information_schema.key_column_usage AS kcu
-                ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-              JOIN information_schema.constraint_column_usage AS ccu
-                ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
-              WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
-            SQL
+                SELECT
+                  kcu.column_name,
+                  ccu.table_name AS foreign_table_name,
+                  ccu.column_name AS foreign_column_name
+                FROM information_schema.table_constraints AS tc
+                JOIN information_schema.key_column_usage AS kcu
+                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage AS ccu
+                  ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
+                WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -457,17 +457,17 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                kcu.column_name,
-                ccu.table_name AS foreign_table_name,
-                ccu.column_name AS foreign_column_name
-              FROM information_schema.table_constraints AS tc
-              JOIN information_schema.key_column_usage AS kcu
-                ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-              JOIN information_schema.constraint_column_usage AS ccu
-                ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
-              WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
-            SQL
+                SELECT
+                  kcu.column_name,
+                  ccu.table_name AS foreign_table_name,
+                  ccu.column_name AS foreign_column_name
+                FROM information_schema.table_constraints AS tc
+                JOIN information_schema.key_column_usage AS kcu
+                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage AS ccu
+                  ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
+                WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -568,8 +568,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SHOW INDEX FROM schema_editor_test_table;
-            SQL
+                SHOW INDEX FROM schema_editor_test_table;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String) # table
@@ -596,22 +596,22 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                i.relname AS index_name,
-                a.attname AS column_name
-              FROM
-                pg_class t,
-                pg_class i,
-                pg_index ix,
-                pg_attribute a
-              WHERE
-                t.oid = ix.indrelid
-                AND i.oid = ix.indexrelid
-                AND a.attrelid = t.oid
-                AND a.attnum = ANY(ix.indkey)
-                AND t.relkind = 'r'
-                AND t.relname = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  i.relname AS index_name,
+                  a.attname AS column_name
+                FROM
+                  pg_class t,
+                  pg_class i,
+                  pg_index ix,
+                  pg_attribute a
+                WHERE
+                  t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND a.attrelid = t.oid
+                  AND a.attnum = ANY(ix.indkey)
+                  AND t.relkind = 'r'
+                  AND t.relname = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               current_index_name = rs.read(String)
@@ -643,17 +643,17 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS index_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                m.tbl_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  il.name AS index_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  m.tbl_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -703,12 +703,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -722,10 +722,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT COLUMN_NAME, CONSTRAINT_NAME
-              FROM information_schema.KEY_COLUMN_USAGE
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT COLUMN_NAME, CONSTRAINT_NAME
+                FROM information_schema.KEY_COLUMN_USAGE
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -741,12 +741,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'schema_editor_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -760,16 +760,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                pgc.conname AS constraint_name,
-                ccu.column_name
-              FROM pg_constraint pgc
-              JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
-              JOIN pg_class cls ON pgc.conrelid = cls.oid
-              LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
-                AND nsp.nspname = ccu.constraint_schema
-              WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  pgc.conname AS constraint_name,
+                  ccu.column_name
+                FROM pg_constraint pgc
+                JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
+                JOIN pg_class cls ON pgc.conrelid = cls.oid
+                LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
+                  AND nsp.nspname = ccu.constraint_schema
+                WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -796,18 +796,18 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -853,12 +853,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -872,10 +872,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT COLUMN_NAME, CONSTRAINT_NAME
-              FROM information_schema.KEY_COLUMN_USAGE
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT COLUMN_NAME, CONSTRAINT_NAME
+                FROM information_schema.KEY_COLUMN_USAGE
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -891,12 +891,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'schema_editor_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -910,16 +910,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                pgc.conname AS constraint_name,
-                ccu.column_name
-              FROM pg_constraint pgc
-              JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
-              JOIN pg_class cls ON pgc.conrelid = cls.oid
-              LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
-                AND nsp.nspname = ccu.constraint_schema
-              WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  pgc.conname AS constraint_name,
+                  ccu.column_name
+                FROM pg_constraint pgc
+                JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
+                JOIN pg_class cls ON pgc.conrelid = cls.oid
+                LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
+                  AND nsp.nspname = ccu.constraint_schema
+                WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -946,18 +946,18 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -1059,12 +1059,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -1078,10 +1078,10 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT COLUMN_NAME, CONSTRAINT_NAME
-              FROM information_schema.KEY_COLUMN_USAGE
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT COLUMN_NAME, CONSTRAINT_NAME
+                FROM information_schema.KEY_COLUMN_USAGE
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -1097,12 +1097,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'schema_editor_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -1116,16 +1116,16 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                pgc.conname AS constraint_name,
-                ccu.column_name
-              FROM pg_constraint pgc
-              JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
-              JOIN pg_class cls ON pgc.conrelid = cls.oid
-              LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
-                AND nsp.nspname = ccu.constraint_schema
-              WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  pgc.conname AS constraint_name,
+                  ccu.column_name
+                FROM pg_constraint pgc
+                JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
+                JOIN pg_class cls ON pgc.conrelid = cls.oid
+                LEFT JOIN information_schema.constraint_column_usage ccu ON pgc.conname = ccu.constraint_name
+                  AND nsp.nspname = ccu.constraint_schema
+                WHERE contype = 'u' AND ccu.table_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               constraint_name = rs.read(String)
@@ -1152,18 +1152,18 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -1243,8 +1243,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SHOW INDEX FROM schema_editor_test_table;
-            SQL
+                SHOW INDEX FROM schema_editor_test_table;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String) # table
@@ -1271,22 +1271,22 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                i.relname AS index_name,
-                a.attname AS column_name
-              FROM
-                pg_class t,
-                pg_class i,
-                pg_index ix,
-                pg_attribute a
-              WHERE
-                t.oid = ix.indrelid
-                AND i.oid = ix.indexrelid
-                AND a.attrelid = t.oid
-                AND a.attnum = ANY(ix.indkey)
-                AND t.relkind = 'r'
-                AND t.relname = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  i.relname AS index_name,
+                  a.attname AS column_name
+                FROM
+                  pg_class t,
+                  pg_class i,
+                  pg_index ix,
+                  pg_attribute a
+                WHERE
+                  t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND a.attrelid = t.oid
+                  AND a.attnum = ANY(ix.indkey)
+                  AND t.relkind = 'r'
+                  AND t.relname = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               current_index_name = rs.read(String)
@@ -1318,17 +1318,17 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                il.name AS index_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                m.tbl_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  il.name AS index_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  m.tbl_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String)
@@ -1513,8 +1513,8 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SHOW INDEX FROM schema_editor_test_table;
-            SQL
+                SHOW INDEX FROM schema_editor_test_table;
+              SQL
           ) do |rs|
             rs.each do
               rs.read(String) # table
@@ -1527,22 +1527,22 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT
-                i.relname AS index_name,
-                a.attname AS column_name
-              FROM
-                pg_class t,
-                pg_class i,
-                pg_index ix,
-                pg_attribute a
-              WHERE
-                t.oid = ix.indrelid
-                AND i.oid = ix.indexrelid
-                AND a.attrelid = t.oid
-                AND a.attnum = ANY(ix.indkey)
-                AND t.relkind = 'r'
-                AND t.relname = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  i.relname AS index_name,
+                  a.attname AS column_name
+                FROM
+                  pg_class t,
+                  pg_class i,
+                  pg_index ix,
+                  pg_attribute a
+                WHERE
+                  t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND a.attrelid = t.oid
+                  AND a.attnum = ANY(ix.indkey)
+                  AND t.relkind = 'r'
+                  AND t.relname = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               index_names << rs.read(String)
@@ -1599,12 +1599,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_mysql do
           db.query(
             <<-SQL
-              SELECT
-                CONSTRAINT_NAME,
-                CONSTRAINT_TYPE
-              FROM information_schema.TABLE_CONSTRAINTS
-              WHERE TABLE_NAME = 'schema_editor_test_table';
-            SQL
+                SELECT
+                  CONSTRAINT_NAME,
+                  CONSTRAINT_TYPE
+                FROM information_schema.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)
@@ -1615,12 +1615,12 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_postgresql do
           db.query(
             <<-SQL
-              SELECT con.conname, con.contype
-              FROM pg_catalog.pg_constraint con
-              INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
-              INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
-              WHERE rel.relname = 'schema_editor_test_table';
-            SQL
+                SELECT con.conname, con.contype
+                FROM pg_catalog.pg_constraint con
+                INNER JOIN pg_catalog.pg_class rel ON rel.oid = con.conrelid
+                INNER JOIN pg_catalog.pg_namespace nsp ON nsp.oid = connamespace
+                WHERE rel.relname = 'schema_editor_test_table';
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)
@@ -1631,18 +1631,18 @@ describe Marten::DB::Management::SchemaEditor::Base do
         for_sqlite do
           db.query(
             <<-SQL
-              SELECT
-                il.name AS constraint_name,
-                ii.name AS column_name
-              FROM
-                sqlite_master AS m,
-                pragma_index_list(m.name) AS il,
-                pragma_index_info(il.name) AS ii
-              WHERE
-                m.type = 'table' AND
-                il.origin = 'u' AND
-                m.tbl_name = 'schema_editor_test_table'
-            SQL
+                SELECT
+                  il.name AS constraint_name,
+                  ii.name AS column_name
+                FROM
+                  sqlite_master AS m,
+                  pragma_index_list(m.name) AS il,
+                  pragma_index_info(il.name) AS ii
+                WHERE
+                  m.type = 'table' AND
+                  il.origin = 'u' AND
+                  m.tbl_name = 'schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)
@@ -2503,17 +2503,17 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                kcu.column_name,
-                ccu.table_name AS foreign_table_name,
-                ccu.column_name AS foreign_column_name
-              FROM information_schema.table_constraints AS tc
-              JOIN information_schema.key_column_usage AS kcu
-                ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-              JOIN information_schema.constraint_column_usage AS ccu
-                ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
-              WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_other_test_table'
-            SQL
+                SELECT
+                  kcu.column_name,
+                  ccu.table_name AS foreign_table_name,
+                  ccu.column_name AS foreign_column_name
+                FROM information_schema.table_constraints AS tc
+                JOIN information_schema.key_column_usage AS kcu
+                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage AS ccu
+                  ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
+                WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_other_test_table'
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)
@@ -2642,17 +2642,17 @@ describe Marten::DB::Management::SchemaEditor::Base do
 
           db.query(
             <<-SQL
-              SELECT
-                kcu.column_name,
-                ccu.table_name AS foreign_table_name,
-                ccu.column_name AS foreign_column_name
-              FROM information_schema.table_constraints AS tc
-              JOIN information_schema.key_column_usage AS kcu
-                ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-              JOIN information_schema.constraint_column_usage AS ccu
-                ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
-              WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
-            SQL
+                SELECT
+                  kcu.column_name,
+                  ccu.table_name AS foreign_table_name,
+                  ccu.column_name AS foreign_column_name
+                FROM information_schema.table_constraints AS tc
+                JOIN information_schema.key_column_usage AS kcu
+                  ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
+                JOIN information_schema.constraint_column_usage AS ccu
+                  ON ccu.constraint_name = tc.constraint_name AND ccu.table_schema = tc.table_schema
+                WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_name='schema_editor_test_table'
+              SQL
           ) do |rs|
             rs.each do
               column_name = rs.read(String)

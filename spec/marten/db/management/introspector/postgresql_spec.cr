@@ -109,19 +109,19 @@ for_postgresql do
         Marten::DB::Connection.default.open do |db|
           db.query(
             <<-SQL
-              SELECT c.conname
-              FROM pg_constraint AS c
-              JOIN pg_class AS cl ON c.conrelid = cl.oid
-              WHERE cl.relname = '#{Tag.db_table}'
-              AND pg_catalog.pg_table_is_visible(cl.oid) AND (c.contype = 'u' OR c.contype = 'p')
-              AND 'name'=ANY(array(
-                SELECT attname
-                FROM unnest(c.conkey) WITH ORDINALITY cols(colid, arridx)
-                JOIN pg_attribute AS ca ON cols.colid = ca.attnum
-                WHERE ca.attrelid = c.conrelid
-                ORDER BY cols.arridx
-              ))
-            SQL
+                SELECT c.conname
+                FROM pg_constraint AS c
+                JOIN pg_class AS cl ON c.conrelid = cl.oid
+                WHERE cl.relname = '#{Tag.db_table}'
+                AND pg_catalog.pg_table_is_visible(cl.oid) AND (c.contype = 'u' OR c.contype = 'p')
+                AND 'name'=ANY(array(
+                  SELECT attname
+                  FROM unnest(c.conkey) WITH ORDINALITY cols(colid, arridx)
+                  JOIN pg_attribute AS ca ON cols.colid = ca.attnum
+                  WHERE ca.attrelid = c.conrelid
+                  ORDER BY cols.arridx
+                ))
+              SQL
           ) do |rs|
             rs.each do
               constraint_names << rs.read(String)

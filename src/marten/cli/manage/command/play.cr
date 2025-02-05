@@ -49,13 +49,13 @@ module Marten
           end
 
           private PLAYGROUND_SOURCE_CONTENT = <<-CRYSTAL
-          require "./src/project"
+            require "./src/project"
 
-          # Setup the project.
-          Marten.setup
+            # Setup the project.
+            Marten.setup
 
-          # Write your code here.
-          CRYSTAL
+            # Write your code here.
+            CRYSTAL
 
           private PLAYGROUND_SOURCE_PATH = "tmp/project_playground.cr"
 

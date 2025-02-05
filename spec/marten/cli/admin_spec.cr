@@ -143,11 +143,11 @@ module Marten::CLI::AdminSpec
                  end
 
     full_code = <<-CR
-      require "../../../../../src/marten"
-      require "../../../../../src/marten/cli"
+        require "../../../../../src/marten"
+        require "../../../../../src/marten/cli"
 
-      #{invocation}
-    CR
+        #{invocation}
+      CR
 
     stdout = IO::Memory.new
     stderr = IO::Memory.new
@@ -165,11 +165,11 @@ module Marten::CLI::AdminSpec
                  end
 
     full_code = <<-CR
-      require "./src/marten"
-      require "./src/marten/cli"
+        require "./src/marten"
+        require "./src/marten/cli"
 
-      #{invocation}
-    CR
+        #{invocation}
+      CR
 
     stdout = IO::Memory.new
     stderr = IO::Memory.new

@@ -20,9 +20,9 @@ describe Marten::Template::Tag::If do
     it "properly renders a simple if condition" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        It works!
-        {% endif %}
-        TEMPLATE
+          It works!
+          {% endif %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::If.new(parser, "if var1 || var2")
 
@@ -33,11 +33,11 @@ describe Marten::Template::Tag::If do
     it "properly renders a simple if/else condition" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        It works!
-        {% else %}
-        It also works!
-        {% endif %}
-        TEMPLATE
+          It works!
+          {% else %}
+          It also works!
+          {% endif %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::If.new(parser, "if var1 || var2")
 
@@ -48,15 +48,15 @@ describe Marten::Template::Tag::If do
     it "properly renders a simple if/elsif/else condition" do
       parser = Marten::Template::Parser.new(
         <<-TEMPLATE
-        It works!
-        {% elsif var1 %}
-        Var 1 is set
-        {% elsif var2 %}
-        Var 2 is set
-        {% else %}
-        No vars set
-        {% endif %}
-        TEMPLATE
+          It works!
+          {% elsif var1 %}
+          Var 1 is set
+          {% elsif var2 %}
+          Var 2 is set
+          {% else %}
+          No vars set
+          {% endif %}
+          TEMPLATE
       )
       tag = Marten::Template::Tag::If.new(parser, "if var1 && var2")
 

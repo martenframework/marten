@@ -10,11 +10,11 @@ describe Marten::Template::Parser::Lexer do
     it "is able to extract text tokens" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE
-        {% for user in users %}
-        Hello {{ user.name }}
-        {% endfor %}
-        Bye!
-        TEMPLATE
+          {% for user in users %}
+          Hello {{ user.name }}
+          {% endfor %}
+          Bye!
+          TEMPLATE
       )
       tokens = lexer.tokenize
 
@@ -34,11 +34,11 @@ describe Marten::Template::Parser::Lexer do
     it "is able to extract tag tokens" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE
-        {% for user in users %}
-        Hello {{ user.name }}
-        {% endfor %}
-        Bye!
-        TEMPLATE
+          {% for user in users %}
+          Hello {{ user.name }}
+          {% endfor %}
+          Bye!
+          TEMPLATE
       )
       tokens = lexer.tokenize
 
@@ -54,11 +54,11 @@ describe Marten::Template::Parser::Lexer do
     it "is able to extract variable tokens" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE
-        {% for user in users %}
-        Hello {{ user.name }}
-        {% endfor %}
-        Bye!
-        TEMPLATE
+          {% for user in users %}
+          Hello {{ user.name }}
+          {% endfor %}
+          Bye!
+          TEMPLATE
       )
       tokens = lexer.tokenize
 
@@ -70,12 +70,12 @@ describe Marten::Template::Parser::Lexer do
     it "is able to extract comment tokens" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE
-        {% for user in users %}
-        Hello {{ user.name }}
-        {% endfor %}
-        {# Did it work? #}
-        Bye!
-        TEMPLATE
+          {% for user in users %}
+          Hello {{ user.name }}
+          {% endfor %}
+          {# Did it work? #}
+          Bye!
+          TEMPLATE
       )
       tokens = lexer.tokenize
 
@@ -87,14 +87,14 @@ describe Marten::Template::Parser::Lexer do
     it "is able to process ignored verbatim blocks as expected" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE
-        {% for user in users %}
-        {% verbatim %}
-        Hello {{ user.name }}
-        {% endverbatim %}
-        {% endfor %}
-        {# Did it work? #}
-        Bye!
-        TEMPLATE
+          {% for user in users %}
+          {% verbatim %}
+          Hello {{ user.name }}
+          {% endverbatim %}
+          {% endfor %}
+          {# Did it work? #}
+          Bye!
+          TEMPLATE
       )
       tokens = lexer.tokenize
 

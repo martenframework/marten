@@ -204,9 +204,9 @@ describe Marten::Routing::Reverser do
         }
       )
       params = {unknown_param: "hello-world"}.to_h
-      result = reverser.reverse(params)
-      result.should be_nil
-      mismatch = reverser.explain_mismatch(params)
+      reverser.reverse(params).should be_nil
+
+      mismatch = reverser.reverse_mismatch(params)
       mismatch.extra_params.should eq ["unknown_param"]
       mismatch.missing_params.should eq ["param1", "param2"]
       mismatch.invalid_params.should be_empty
@@ -222,10 +222,9 @@ describe Marten::Routing::Reverser do
         }
       )
       params = {param1: "hello-world", param2: "foobar"}.to_h
-      result = reverser.reverse(params)
-      result.should be_nil
+      reverser.reverse(params).should be_nil
 
-      mismatch = reverser.explain_mismatch(params)
+      mismatch = reverser.reverse_mismatch(params)
       mismatch.extra_params.should be_empty
       mismatch.missing_params.should be_empty
       mismatch.invalid_params.should eq [
@@ -243,10 +242,9 @@ describe Marten::Routing::Reverser do
         }
       )
       params = {param1: "hello-world"}.to_h
-      result = reverser.reverse(params)
-      result.should be_nil
+      reverser.reverse(params).should be_nil
 
-      mismatch = reverser.explain_mismatch(params)
+      mismatch = reverser.reverse_mismatch(params)
       mismatch.missing_params.should eq ["param2"]
       mismatch.extra_params.should be_empty
       mismatch.invalid_params.should be_empty
@@ -269,13 +267,11 @@ describe Marten::Routing::Reverser do
       reverser.prefix_default_locale = true
 
       I18n.with_locale("en") do
-        res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.should eq "/en/this-is-a-test/hello-world/xyz/42"
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/en/this-is-a-test/hello-world/xyz/42"
       end
 
       I18n.with_locale("fr") do
-        res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
       end
     end
 
@@ -296,13 +292,11 @@ describe Marten::Routing::Reverser do
       reverser.prefix_default_locale = false
 
       I18n.with_locale("en") do
-        res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.should eq "/this-is-a-test/hello-world/xyz/42"
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/this-is-a-test/hello-world/xyz/42"
       end
 
       I18n.with_locale("fr") do
-        res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
+        reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
       end
     end
   end

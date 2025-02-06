@@ -219,32 +219,59 @@ module Marten
         parameter_names.size != parameter_names.uniq.size
       end
 
-      def perform_reverse(name : String, params : Hash(String | Symbol, Parameter::Types)) : String
+      private def perform_reverse(name, params)
         begin
           reverser = reversers[name]
-          result = reverser.reverse(params)
+          reversed = reverser.reverse(params)
         rescue KeyError
           raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")
         end
 
-        return result unless result.nil?
+        return reversed unless reversed.nil?
 
-        mismatch = reverser.explain_mismatch(params)
+        raise Errors::NoReverseMatch.new(
+          build_detailed_error_message_for(
+            name,
+            params,
+            reverser.reverse_mismatch(params)
+          )
+        )
+      end
 
-        message = String.build do |msg|
-          msg << "'#{name}' route cannot receive #{params} as parameters."
+      private def build_detailed_error_message_for(route_name, params, mismatch) : String
+        String.build(capacity: 128) do |io|
+          io << "'"
+          io << route_name
+          io << "' route cannot receive "
+          io << params
+          io << " as parameters."
 
-          msg << " Missing: #{mismatch.missing_params}" unless mismatch.missing_params.empty?
+          unless mismatch.missing_params.empty?
+            io << " Missing: "
+            io << mismatch.missing_params
+          end
 
-          msg << " Extra: #{mismatch.extra_params}" unless mismatch.extra_params.empty?
+          unless mismatch.extra_params.empty?
+            io << " Extra: "
+            io << mismatch.extra_params
+          end
 
           unless mismatch.invalid_params.empty?
-            invalid_str = mismatch.invalid_params.map { |(key, val)| "#{key} => #{val}" }.join(", ")
-            msg << " Invalid: [#{invalid_str}]"
+            io << " Invalid: ["
+            first = true
+            mismatch.invalid_params.each do |(key, val)|
+              if first
+                first = false
+              else
+                io << ", "
+              end
+              io << key
+              io << " => "
+              io << val
+            end
+            io << "]"
           end
         end
-
-        raise Errors::NoReverseMatch.new(message)
       end
     end
   end

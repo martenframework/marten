@@ -64,21 +64,21 @@ module Marten
       # If the parameters do not match the expected parameters for the route, `nil` is returned.
       def reverse(params : Nil | Hash(String | Symbol, Parameter::Types)) : String?
         url_params = {} of String => String
-        params.try &.each do |k, v|
-          param_name = k.to_s
+        params.each do |key, value|
+          param_name = key.to_s
 
           # A parameter that is not present in the set of route parameter handler means that the lookup is not
           # successful.
           return unless @parameters.has_key?(param_name)
 
-          dumped = @parameters[param_name].dumps(v)
+          dumped_value = @parameters[param_name].dumps(value)
 
-          # If one of the paramter dumps result is nil, this means that the lookup is not successful because one of the
+          # If one of the parameter dumps result is nil, this means that the lookup is not successful because one of the
           # parameter handlers received a value it could not handle.
-          return unless dumped
+          return unless dumped_value
 
-          url_params[param_name] = dumped
-        end
+          url_params[param_name] = dumped_value
+        end unless params.nil?
 
         # If not all expected parameters were passed this means that the lookup is not successful.
         return unless url_params.size == @parameters.size
@@ -92,7 +92,7 @@ module Marten
         end
       end
 
-      def explain_mismatch(params : Nil | Hash(String | Symbol, Parameter::Types)) : Mismatch
+      def reverse_mismatch(params : Nil | Hash(String | Symbol, Parameter::Types)) : Mismatch
         mismatch = Mismatch.new
         provided = (params || Hash(String | Symbol, Parameter::Types).new).keys.map(&.to_s)
         expected = @parameters.keys
@@ -100,7 +100,6 @@ module Marten
         mismatch.missing_params = expected - provided
         mismatch.extra_params = provided - expected
 
-        # Check each provided param if it’s invalid
         params.try &.each do |k, v|
           param_name = k.to_s
           next unless expected.includes?(param_name)

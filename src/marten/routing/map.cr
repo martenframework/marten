@@ -219,9 +219,7 @@ module Marten
         parameter_names.size != parameter_names.uniq.size
       end
 
-      private def perform_reverse(name : String, params : Hash(String | Symbol, Parameter::Types)) : String
-        result : ReverseResult
-
+      def perform_reverse(name : String, params : Hash(String | Symbol, Parameter::Types)) : String
         begin
           reverser = reversers[name]
           result = reverser.reverse(params)
@@ -229,19 +227,21 @@ module Marten
           raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")
         end
 
-        return result.url.not_nil! if result.success?
+        return result unless result.nil?
 
-        mismatch = result.mismatch.not_nil!
+        mismatch = reverser.explain_mismatch(params)
 
-        message = "'#{name}' route cannot receive #{params} as parameters."
+        message = String.build do |msg|
+          msg << "'#{name}' route cannot receive #{params} as parameters."
 
-        message += " Missing: #{mismatch.missing_params}" unless mismatch.missing_params.empty?
+          msg << " Missing: #{mismatch.missing_params}" unless mismatch.missing_params.empty?
 
-        message += " Extra: #{mismatch.extra_params}" unless mismatch.extra_params.empty?
+          msg << " Extra: #{mismatch.extra_params}" unless mismatch.extra_params.empty?
 
-        unless mismatch.invalid_params.empty?
-          invalid_str = mismatch.invalid_params.map { |(key, val)| "#{key} => #{val}" }.join(", ")
-          message += " Invalid: [#{invalid_str}]"
+          unless mismatch.invalid_params.empty?
+            invalid_str = mismatch.invalid_params.map { |(key, val)| "#{key} => #{val}" }.join(", ")
+            msg << " Invalid: [#{invalid_str}]"
+          end
         end
 
         raise Errors::NoReverseMatch.new(message)

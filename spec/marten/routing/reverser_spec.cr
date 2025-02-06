@@ -191,12 +191,10 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      result = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-      result.success?.should be_true
-      result.url.should eq "/test/hello-world/xyz/42"
+      reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/test/hello-world/xyz/42"
     end
 
-    it "returns a mismatch result if one parameter is not expected by the reverser" do
+    it "returns nil and explains the mismatch if one parameter is not expected by the reverser" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -205,15 +203,16 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      result = reverser.reverse({unknown_param: "hello-world"}.to_h)
-      result.success?.should be_false
-      mismatch = result.mismatch.not_nil!
+      params = {unknown_param: "hello-world"}.to_h
+      result = reverser.reverse(params)
+      result.should be_nil
+      mismatch = reverser.explain_mismatch(params)
       mismatch.extra_params.should eq ["unknown_param"]
       mismatch.missing_params.should eq ["param1", "param2"]
       mismatch.invalid_params.should be_empty
     end
 
-    it "returns a mismatch result if one parameter has the wrong type" do
+    it "returns nil and explains the mismatch if one parameter has the wrong type" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -222,10 +221,11 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      result = reverser.reverse({param1: "hello-world", param2: "foobar"}.to_h)
-      result.success?.should be_false
+      params = {param1: "hello-world", param2: "foobar"}.to_h
+      result = reverser.reverse(params)
+      result.should be_nil
 
-      mismatch = result.mismatch.not_nil!
+      mismatch = reverser.explain_mismatch(params)
       mismatch.extra_params.should be_empty
       mismatch.missing_params.should be_empty
       mismatch.invalid_params.should eq [
@@ -233,7 +233,7 @@ describe Marten::Routing::Reverser do
       ]
     end
 
-    it "returns a mismatch result if not all expected parameters are present" do
+    it "returns nil and explains the mismatch if not all expected parameters are present" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -242,10 +242,11 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      result = reverser.reverse({param1: "hello-world"}.to_h)
-      result.success?.should be_false
+      params = {param1: "hello-world"}.to_h
+      result = reverser.reverse(params)
+      result.should be_nil
 
-      mismatch = result.mismatch.not_nil!
+      mismatch = reverser.explain_mismatch(params)
       mismatch.missing_params.should eq ["param2"]
       mismatch.extra_params.should be_empty
       mismatch.invalid_params.should be_empty
@@ -269,14 +270,12 @@ describe Marten::Routing::Reverser do
 
       I18n.with_locale("en") do
         res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.success?.should be_true
-        res.url.should eq "/en/this-is-a-test/hello-world/xyz/42"
+        res.should eq "/en/this-is-a-test/hello-world/xyz/42"
       end
 
       I18n.with_locale("fr") do
         res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.success?.should be_true
-        res.url.should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
+        res.should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
       end
     end
 
@@ -298,14 +297,12 @@ describe Marten::Routing::Reverser do
 
       I18n.with_locale("en") do
         res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.success?.should be_true
-        res.url.should eq "/this-is-a-test/hello-world/xyz/42"
+        res.should eq "/this-is-a-test/hello-world/xyz/42"
       end
 
       I18n.with_locale("fr") do
         res = reverser.reverse({param1: "hello-world", param2: 42}.to_h)
-        res.success?.should be_true
-        res.url.should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
+        res.should eq "/fr/ceci-est-un-test/hello-world/xyz/42"
       end
     end
   end

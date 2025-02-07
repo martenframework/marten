@@ -387,6 +387,32 @@ describe Marten::Routing::Match do
         map.reverse("home", {"sid" => "hello-world"})
       end
     end
+
+    it "includes mismatch detail in the NoReverseMatch error message" do
+      map = Marten::Routing::Map.new
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
+
+      expect_raises(
+        Marten::Routing::Errors::NoReverseMatch,
+        %('home' route cannot receive {"sid" => "my-slug", "unknown_param" => "42"}) \
+        %( as parameters. Missing: ["number"] Extra: ["unknown_param"])
+      ) do
+        map.reverse("home", {"sid" => "my-slug", "unknown_param" => "42"})
+      end
+    end
+
+    it "includes mismatch detail in the NoReverseMatch error message on type mismatch" do
+      map = Marten::Routing::Map.new
+      map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
+
+      expect_raises(
+        Marten::Routing::Errors::NoReverseMatch,
+        %('home' route cannot receive {"sid" => "my-slug", "number" => "not_a_number"}) \
+        %( as parameters. Invalid: [number => not_a_number])
+      ) do
+        map.reverse("home", {"sid" => "my-slug", "number" => "not_a_number"})
+      end
+    end
   end
 
   describe "#t" do

@@ -194,7 +194,7 @@ describe Marten::Routing::Reverser do
       reverser.reverse({param1: "hello-world", param2: 42}.to_h).should eq "/test/hello-world/xyz/42"
     end
 
-    it "returns nil if one of the parameters is not expected by the reverser" do
+    it "returns nil and explains the mismatch if one parameter is not expected by the reverser" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -203,10 +203,16 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({unknown_param: "hello-world"}.to_h).should be_nil
+      params = {unknown_param: "hello-world"}.to_h
+      reverser.reverse(params).should be_nil
+
+      mismatch = reverser.reverse_mismatch(params)
+      mismatch.extra_params.should eq ["unknown_param"]
+      mismatch.missing_params.should eq ["param1", "param2"]
+      mismatch.invalid_params.should be_empty
     end
 
-    it "returns nil if one of the parameters has not the expected type" do
+    it "returns nil and explains the mismatch if one parameter has the wrong type" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -215,10 +221,18 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({param1: "hello-world", param2: "foobar"}.to_h).should be_nil
+      params = {param1: "hello-world", param2: "foobar"}.to_h
+      reverser.reverse(params).should be_nil
+
+      mismatch = reverser.reverse_mismatch(params)
+      mismatch.extra_params.should be_empty
+      mismatch.missing_params.should be_empty
+      mismatch.invalid_params.should eq [
+        {"param2", "foobar"},
+      ]
     end
 
-    it "returns nil if not all expected paramters are present" do
+    it "returns nil and explains the mismatch if not all expected parameters are present" do
       reverser = Marten::Routing::Reverser.new(
         "path:name",
         "/test/%{param1}/xyz/%{param2}",
@@ -227,7 +241,13 @@ describe Marten::Routing::Reverser do
           "param2" => Marten::Routing::Parameter.registry["int"],
         }
       )
-      reverser.reverse({param1: "hello-world"}.to_h).should be_nil
+      params = {param1: "hello-world"}.to_h
+      reverser.reverse(params).should be_nil
+
+      mismatch = reverser.reverse_mismatch(params)
+      mismatch.missing_params.should eq ["param2"]
+      mismatch.extra_params.should be_empty
+      mismatch.invalid_params.should be_empty
     end
 
     it "returns the interpolated path for matching parameters when prefixed and localized paths are used" do

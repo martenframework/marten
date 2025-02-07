@@ -121,6 +121,18 @@ The `time` filter allows outputting the string representation of a time variable
 
 In the above example, the output will be a date string such as `2023-09-25`.
 
+## `underscore`
+
+The `underscore` filter allows to convert a string to its underscored version.
+
+For example:
+
+```html
+{{ value|underscore }}
+```
+
+If `value` is "FooBar", then the output will be "foo_bar".
+
 ## `upcase`
 
 The `upcase` filter allows to convert a string so that each of its characters is uppercase.

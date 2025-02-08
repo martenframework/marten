@@ -1,6 +1,7 @@
 en:
   simple:
     translation: "This is a simple translation"
+    translation_with_html: "This is a <strong>simple</strong> translation"
     interpolation: "Hello, %{name}!"
     pluralization:
       one: "One item"

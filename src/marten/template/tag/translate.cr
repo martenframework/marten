@@ -25,6 +25,7 @@ module Marten
       class Translate < Base
         include CanExtractKwargs
         include CanSplitSmartly
+        include CanEscapeValues
 
         @assigned_to : String? = nil
 
@@ -65,7 +66,10 @@ module Marten
             raise Errors::UnsupportedType.new("#{count.class} objects cannot be used for translation count parameters")
           end
 
-          translation = I18n.t(lookup_key, lookup_params, count: count.as(Float64 | Int32 | Int64 | Nil))
+          translation = escape_value(
+            I18n.t(lookup_key, lookup_params, count: count.as(Float64 | Int32 | Int64 | Nil)),
+            context
+          )
 
           if @assigned_to.nil?
             translation

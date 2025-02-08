@@ -64,13 +64,28 @@ describe Marten::Template::Tag::Translate do
       tag_2.render(Marten::Template::Context{"number" => 42}).should eq I18n.t("simple.pluralization", count: 42)
     end
 
-    it "is able to asign the resolved translatin to a specific variable" do
+    it "is able to asign the resolved translation to a specific variable" do
       parser = Marten::Template::Parser.new("")
 
       context = Marten::Template::Context{"cname" => "John Doe"}
       tag = Marten::Template::Tag::Translate.new(parser, %{translate "simple.interpolation" name: cname as resolved})
       tag.render(context).should eq ""
       context["resolved"].should eq I18n.t("simple.interpolation", name: "John Doe")
+    end
+
+    it "escapes the translation as expected" do
+      parser = Marten::Template::Parser.new("")
+      tag = Marten::Template::Tag::Translate.new(parser, %{translate "simple.translation_with_html"})
+      tag.render(Marten::Template::Context.new).should eq "This is a &lt;strong&gt;simple&lt;/strong&gt; translation"
+    end
+
+    it "escapes the translation as expected when the output is assigned to a variable" do
+      parser = Marten::Template::Parser.new("")
+
+      context = Marten::Template::Context{"cname" => "John Doe"}
+      tag = Marten::Template::Tag::Translate.new(parser, %{translate "simple.translation_with_html" as translated})
+      tag.render(context).should eq ""
+      context["translated"].should eq "This is a &lt;strong&gt;simple&lt;/strong&gt; translation"
     end
 
     it "raises if one of the count parameter id not a number or a nil value" do

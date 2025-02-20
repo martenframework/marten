@@ -220,8 +220,6 @@ module Marten
       end
 
       private def perform_reverse(name, params)
-        reversed = nil
-
         begin
           reverser = reversers[name]
           reversed = reverser.reverse(params)
@@ -229,9 +227,51 @@ module Marten
           raise Errors::NoReverseMatch.new("'#{name}' does not match any registered route")
         end
 
-        raise Errors::NoReverseMatch.new("'#{name}' route cannot receive #{params} as parameters") if reversed.nil?
+        return reversed unless reversed.nil?
 
-        reversed
+        raise Errors::NoReverseMatch.new(
+          build_detailed_error_message_for(
+            name,
+            params,
+            reverser.reverse_mismatch(params)
+          )
+        )
+      end
+
+      private def build_detailed_error_message_for(route_name, params, mismatch) : String
+        String.build(capacity: 128) do |io|
+          io << "'"
+          io << route_name
+          io << "' route cannot receive "
+          io << params
+          io << " as parameters."
+
+          unless mismatch.missing_params.empty?
+            io << " Missing: "
+            io << mismatch.missing_params
+          end
+
+          unless mismatch.extra_params.empty?
+            io << " Extra: "
+            io << mismatch.extra_params
+          end
+
+          unless mismatch.invalid_params.empty?
+            io << " Invalid: ["
+            first = true
+            mismatch.invalid_params.each do |(key, val)|
+              if first
+                first = false
+              else
+                io << ", "
+              end
+              io << key
+              io << " => "
+              io << val
+            end
+            io << "]"
+          end
+        end
       end
     end
   end

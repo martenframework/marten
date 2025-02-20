@@ -90,8 +90,8 @@ describe Marten::Template::Value do
     end
 
     it "is able to initialize a new value value from a bool" do
-      Marten::Template::Value.from(true).raw.should eq true
-      Marten::Template::Value.from(false).raw.should eq false
+      Marten::Template::Value.from(true).raw.should be_true
+      Marten::Template::Value.from(false).raw.should be_false
     end
 
     it "is able to initialize a new value value from a float" do

@@ -106,19 +106,19 @@ describe Marten::Template::Tag::For::Loop do
     it "returns true if the index is odd" do
       loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
       loop.index = 1
-      loop.odd?.should eq true
+      loop.odd?.should be_true
 
       loop.index = 3
-      loop.odd?.should eq true
+      loop.odd?.should be_true
     end
 
     it "return false if the index is even" do
       loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
       loop.index = 2
-      loop.odd?.should eq false
+      loop.odd?.should be_false
 
       loop.index = 4
-      loop.odd?.should eq false
+      loop.odd?.should be_false
     end
   end
 
@@ -126,19 +126,19 @@ describe Marten::Template::Tag::For::Loop do
     it "returns true if the index is even" do
       loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
       loop.index = 0
-      loop.even?.should eq true
+      loop.even?.should be_true
 
       loop.index = 2
-      loop.even?.should eq true
+      loop.even?.should be_true
     end
 
     it "return false if the index is odd" do
       loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
       loop.index = 1
-      loop.even?.should eq false
+      loop.even?.should be_false
 
       loop.index = 3
-      loop.even?.should eq false
+      loop.even?.should be_false
     end
   end
 end

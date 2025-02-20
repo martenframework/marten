@@ -55,8 +55,8 @@ describe Marten::Template::Tag::With do
 
     tag.render(context)
 
-    context["x"]?.should eq nil
-    context["y"]?.should eq nil
+    context["x"]?.should be_nil
+    context["y"]?.should be_nil
   end
 
   it "use context variables as value" do

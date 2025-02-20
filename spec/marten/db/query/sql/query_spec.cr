@@ -1920,7 +1920,7 @@ describe Marten::DB::Query::SQL::Query do
     it "returns nil if there are no records available" do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
 
-      query.maximum("price").should eq nil
+      query.maximum("price").should be_nil
     end
 
     it "returns nil if the predicates will raise an empty results exception" do
@@ -1963,7 +1963,7 @@ describe Marten::DB::Query::SQL::Query do
     it "returns nil if there are no records available" do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
 
-      query.minimum("price").should eq nil
+      query.minimum("price").should be_nil
     end
 
     it "returns nil if the predicates will raise an empty results exception" do

@@ -267,18 +267,18 @@ describe Marten::Handlers::Schema do
       )
       handler = Marten::Handlers::SchemaSpec::TestHandlerWithSuccessCallbacks.new(request)
 
-      handler.foo.should eq nil
-      handler.bar.should eq nil
-      handler.baz.should eq nil
-      handler.foobar.should eq nil
+      handler.foo.should be_nil
+      handler.bar.should be_nil
+      handler.baz.should be_nil
+      handler.foobar.should be_nil
 
       handler.post
 
-      handler.schema.valid?.should eq true
+      handler.schema.valid?.should be_true
       handler.foo.should eq "set_foo"
       handler.bar.should eq "set_bar"
       handler.baz.should eq "set_baz"
-      handler.foobar.should eq nil
+      handler.foobar.should be_nil
     end
 
     it "executes failed callback" do
@@ -291,17 +291,17 @@ describe Marten::Handlers::Schema do
       )
       handler = Marten::Handlers::SchemaSpec::TestHandlerWithFailedCallbacks.new(request)
 
-      handler.foo.should eq nil
-      handler.bar.should eq nil
-      handler.baz.should eq nil
-      handler.foobar.should eq nil
+      handler.foo.should be_nil
+      handler.bar.should be_nil
+      handler.baz.should be_nil
+      handler.foobar.should be_nil
 
       handler.post
 
-      handler.schema.valid?.should eq false
+      handler.schema.valid?.should be_false
       handler.foo.should eq "set_foo"
       handler.bar.should eq "set_bar"
-      handler.baz.should eq nil
+      handler.baz.should be_nil
       handler.foobar.should eq "set_foobar"
     end
 

@@ -155,7 +155,7 @@ for_sqlite do
     describe "#supports_logical_xor?" do
       it "returns false" do
         conn = Marten::DB::Connection.default
-        conn.supports_logical_xor?.should eq false
+        conn.supports_logical_xor?.should be_false
       end
     end
   end

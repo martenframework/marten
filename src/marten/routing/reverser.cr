@@ -92,7 +92,9 @@ module Marten
         end
       end
 
-      def reverse_mismatch(params : Nil | Hash(String | Symbol, Parameter::Types)) : Mismatch
+      protected getter path_for_interpolations
+
+      protected def build_mismatch(params : Nil | Hash(String | Symbol, Parameter::Types)) : Mismatch
         mismatch = Mismatch.new
         provided = (params || Hash(String | Symbol, Parameter::Types).new).keys.map(&.to_s)
         expected = @parameters.keys
@@ -110,14 +112,6 @@ module Marten
 
         mismatch
       end
-
-      struct Mismatch
-        property missing_params : Array(String) = [] of String
-        property extra_params : Array(String) = [] of String
-        property invalid_params : Array(Tuple(String, Parameter::Types)) = [] of Tuple(String, Parameter::Types)
-      end
-
-      protected getter path_for_interpolations
     end
   end
 end

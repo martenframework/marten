@@ -167,6 +167,42 @@ module Marten
       private setter localized_rule
       private setter localizing
 
+      private def build_no_reverse_match_error_message_for(route_name, params, mismatch) : String
+        String.build(capacity: 128) do |io|
+          io << "'"
+          io << route_name
+          io << "' route cannot receive "
+          io << params
+          io << " as parameters."
+
+          unless mismatch.missing_params.empty?
+            io << " Missing: "
+            io << mismatch.missing_params
+          end
+
+          unless mismatch.extra_params.empty?
+            io << " Extra: "
+            io << mismatch.extra_params
+          end
+
+          unless mismatch.invalid_params.empty?
+            io << " Invalid: ["
+            first = true
+            mismatch.invalid_params.each do |(key, val)|
+              if first
+                first = false
+              else
+                io << ", "
+              end
+              io << key
+              io << " => "
+              io << val
+            end
+            io << "]"
+          end
+        end
+      end
+
       private def insert_path(
         path : String | TranslatedPath,
         target : Marten::Handlers::Base.class | Map,
@@ -230,48 +266,12 @@ module Marten
         return reversed unless reversed.nil?
 
         raise Errors::NoReverseMatch.new(
-          build_detailed_error_message_for(
+          build_no_reverse_match_error_message_for(
             name,
             params,
-            reverser.reverse_mismatch(params)
+            reverser.build_mismatch(params)
           )
         )
-      end
-
-      private def build_detailed_error_message_for(route_name, params, mismatch) : String
-        String.build(capacity: 128) do |io|
-          io << "'"
-          io << route_name
-          io << "' route cannot receive "
-          io << params
-          io << " as parameters."
-
-          unless mismatch.missing_params.empty?
-            io << " Missing: "
-            io << mismatch.missing_params
-          end
-
-          unless mismatch.extra_params.empty?
-            io << " Extra: "
-            io << mismatch.extra_params
-          end
-
-          unless mismatch.invalid_params.empty?
-            io << " Invalid: ["
-            first = true
-            mismatch.invalid_params.each do |(key, val)|
-              if first
-                first = false
-              else
-                io << ", "
-              end
-              io << key
-              io << " => "
-              io << val
-            end
-            io << "]"
-          end
-        end
       end
     end
   end

@@ -488,7 +488,7 @@ end
 config.database :other do |db|
   db.backend = :sqlite
   db.name = "other_db.db"
-db
+end
 ```
 
 Configuring other database backends such as MariaDB, MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). As such, you must define a block to configure the appropriate database options when calling the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString|Nil%3Dnil%2C%26)-instance-method) method. For example:

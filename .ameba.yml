@@ -44,5 +44,8 @@ Performance/AnyInsteadOfEmpty:
 Style/ParenthesesAroundCondition:
   Enabled: false
 
+Style/PercentLiteralDelimiters:
+  Enabled: false
+
 Style/QueryBoolMethods:
   Enabled: false

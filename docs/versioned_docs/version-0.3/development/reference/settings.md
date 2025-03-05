@@ -379,7 +379,7 @@ end
 config.database :other do |db|
   db.backend = :sqlite
   db.name = "other_db.db"
-db
+end
 ```
 
 Configuring other database backends such as MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). For example:

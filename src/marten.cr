@@ -253,7 +253,7 @@ module Marten
 
     show_server_info
 
-    Signal::INT.trap do
+    Process.on_terminate do
       Signal::INT.reset
       Log.info { "Shutting down" }
       Marten::Server.stop

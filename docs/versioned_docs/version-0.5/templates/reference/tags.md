@@ -3,6 +3,8 @@ title: Template tags
 description: Template tags reference.
 ---
 
+This page provides a reference for all the available tags that can be used when defining [templates](../introduction.md).
+
 ## `asset`
 
 The `asset` template tag allows to generate the URL of a given [asset](../../assets/introduction.md). It must take at least one argument (the filepath of the asset).
@@ -212,24 +214,7 @@ For example:
 {% endif %}
 ```
 
-The following equality and comparison operators can be used as part of `if` conditions:
-
-| Operator | Description |
-| -------- | ----------- |
-| `==` | Equals |
-| `!=` | Not equals |
-| `>` | Greater than |
-| `>=` | Greater than or equals |
-| `<` | Less than |
-| `<=` | Greater than or equals |
-
-Additionally, the following logical operators can be used as part of `if` conditions:
-
-| Operator | Description |
-| -------- | ----------- |
-| `&&` | Logical AND |
-| `\|\|` | Logical OR |
-| `!` or `not` | Logical negation |
+The supported operators are listed in the [operators reference](./operators.md).
 
 ## `include`
 
@@ -380,7 +365,7 @@ For example:
 {% endunless %}
 ```
 
-The `unless` template tag supports the same equality, comparison, and logical operators as the ones supported by the [`if`](#if) template tag.
+The `unless` template tag supports the same [operators](./operators.md) as the ones supported by the [`if`](#if) template tag.
 
 ## `url`
 

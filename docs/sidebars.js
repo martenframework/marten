@@ -96,6 +96,7 @@ module.exports = {
           items: [
             'templates/reference/filters',
             'templates/reference/tags',
+            'templates/reference/operators',
             'templates/reference/context-producers',
             'templates/reference/loaders',
           ],

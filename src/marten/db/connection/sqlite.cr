@@ -144,6 +144,12 @@ module Marten
           "lt"          => "< %s",
           "lte"         => "<= %s",
           "startswith"  => "LIKE %s ESCAPE '\\'",
+          "year"        => "strftime('%Y', %s)",
+          "month"       => "strftime('%m', %s)",
+          "day"         => "strftime('%d', %s)",
+          "hour"        => "strftime('%H', %s)",
+          "minute"      => "strftime('%M', %s)",
+          "second"      => "strftime('%S', %s)",
         }
 
         private IN_MEMORY_ID = ":memory:"

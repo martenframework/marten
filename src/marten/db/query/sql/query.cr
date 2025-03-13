@@ -1256,12 +1256,27 @@ module Marten
           private def where_clause_and_parameters(offset = 0)
             if predicate_node = @where_predicate_node
               where, parameters = predicate_node.to_sql(connection)
-              parameters.each_with_index do |_p, i|
-                where = where % (
-                  [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
+
+              parts = where.split("%s")
+
+              if parameters.size != parts.size - 1
+                raise Errors::InvalidField.new(
+                  "The number of parameters in the predicate node does not match the number of placeholders"
                 )
               end
-              where = "WHERE #{where}"
+
+              replaced_where = String.build do |io|
+                parts.each_with_index do |part, i|
+                  io << part
+
+
+                  unless i == parts.size - 1
+                    io << connection.parameter_id_for_ordered_argument(offset + i + 1)
+                  end
+                end
+              end
+
+              where = "WHERE #{replaced_where}"
             else
               where = nil
               parameters = nil

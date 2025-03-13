@@ -29,6 +29,7 @@ module Marten
           register LessThan
           register LessThanOrEqual
           register StartsWith
+          register Year
         end
       end
     end

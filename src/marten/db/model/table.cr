@@ -602,7 +602,11 @@ module Marten
         # :ditto:
         def set_field_values(values : Hash | NamedTuple)
           sanitized_values = Hash(String, Field::Any | Model).new
-          values.each { |key, value| sanitized_values[key.to_s] = value }
+          values.each do |key, value|
+            next unless value.is_a?(Field::Any | Model)
+            sanitized_values[key.to_s] = value
+          end
+
           assign_field_values(sanitized_values)
         end
 

@@ -22,7 +22,7 @@ module Marten
           date_time.in(Marten.settings.time_zone) unless date_time.nil?
         end
 
-        def serialize(value) : ::String?
+        def serialize(value) : ::Array(::String) | Nil | ::String
           value.try(&.to_s)
         end
 

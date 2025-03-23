@@ -34,7 +34,7 @@ module Marten
           raise_unexpected_field_value(value)
         end
 
-        def serialize(value) : ::String?
+        def serialize(value) : ::Array(::String) | Nil | ::String
           return if value.nil?
 
           if (v = value).is_a?(::JSON::Any | ::JSON::Serializable)

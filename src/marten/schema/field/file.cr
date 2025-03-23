@@ -34,8 +34,8 @@ module Marten
           end
         end
 
-        def serialize(value) : ::String?
-          # Files cannot really be serialized as strings, so simply return nil.
+        def serialize(value) : ::Array(::String) | Nil | ::String
+          # Files cannot really be serialized, so simply return nil.
           nil
         end
 

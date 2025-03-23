@@ -11,7 +11,7 @@ module Marten
           [true, "true", 1, "1", "yes", "on"].includes?(value.is_a?(::JSON::Any) ? value.raw : value)
         end
 
-        def serialize(value) : ::String?
+        def serialize(value) : ::Array(::String) | Nil | ::String
           value.try(&.to_s)
         end
       end

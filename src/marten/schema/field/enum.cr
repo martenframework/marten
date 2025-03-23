@@ -3,13 +3,13 @@ module Marten
     module Field
       # Represents an enum schema field.
       class Enum < Base
-        @values : Array(::String)
+        @values : ::Array(::String)
 
         getter values
 
         def initialize(
           @id : ::String,
-          enum_values : Array(::String),
+          enum_values : ::Array(::String),
           @required : ::Bool = true,
           **kwargs,
         )
@@ -20,7 +20,7 @@ module Marten
           value.to_s.strip
         end
 
-        def serialize(value) : ::String?
+        def serialize(value) : ::Array(::String) | Nil | ::String
           value.try(&.to_s)
         end
 
@@ -38,6 +38,54 @@ module Marten
           {% if kwargs.is_a?(NilLiteral) || kwargs[:values].is_a?(NilLiteral) %}
             {% raise "Enum fields must define the 'values' property" %}
           {% end %}
+        end
+
+        # :nodoc:
+        macro contribute_array_to_schema(schema_klass, field_id, field_ann, kwargs)
+          {% enum_klass = kwargs[:values] %}
+          {% field_accessor_name = "raw_" + field_id.stringify %}
+
+          class ::{{ schema_klass }}
+            def self.{{ field_id }}_member_field
+              {{ @type }}.new(
+                "{{ field_id }}_member",
+                enum_values: {{ enum_klass }}.values.map(&.to_s)
+              )
+            end
+
+            def {{ field_accessor_name.id }} : ::Array({{ field_ann[:exposed_type] }})?
+              return if validated_data[{{ field_id.stringify }}]?.nil?
+
+              ret = ::Array({{ field_ann[:exposed_type] }}).new
+              validated_data[{{ field_id.stringify }}].as(::Array(Field::Any)).try do |values|
+                values.each do |value|
+                  ret << value.as({{ field_ann[:exposed_type] }})
+                end
+              end
+
+              ret
+            end
+
+            def {{ field_accessor_name.id }}!
+              {{ field_id }}.not_nil!
+            end
+
+            def {{ field_id }} : ::Array({{ enum_klass }})?
+              {{ field_accessor_name.id }}.try do |values|
+                values.map do |value|
+                  {{ enum_klass }}.parse(value.to_s)
+                end
+              end
+            end
+
+            def {{ field_id }}!
+              {{ field_id }}.not_nil!
+            end
+
+            def {{ field_id }}?
+              !self.class.get_field({{ field_id.stringify }}).empty_value?({{ field_accessor_name.id }})
+            end
+          end
         end
 
         # :nodoc:

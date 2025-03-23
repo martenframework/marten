@@ -16,11 +16,16 @@ module Marten
         abstract def deserialize(value)
 
         # Serializes a field value.
-        abstract def serialize(value) : ::String?
+        abstract def serialize(value) : ::Array(::String) | Nil | ::String
 
         # Returns `true` if the value is considered empty by the field.
         def empty_value?(value) : ::Bool
           EMPTY_VALUES.includes?(value.is_a?(::JSON::Any) ? value.raw : value)
+        end
+
+        # Returns the raw data of the field.
+        def get_raw_data(data)
+          data[id]?
         end
 
         # :nodoc:
@@ -54,6 +59,43 @@ module Marten
 
         # :nodoc:
         macro check_definition(field_id, kwargs)
+        end
+
+        # :nodoc:
+        macro contribute_array_to_schema(schema_klass, field_id, field_ann, kwargs)
+          class ::{{ schema_klass }}
+            def self.{{ field_id }}_member_field
+              {{ @type }}.new(
+                "{{ field_id }}_member",
+                {% if !kwargs.is_a?(NilLiteral) && !kwargs.empty? %}
+                  {% for key, value in kwargs %}
+                    {{ key }}: {{ value }},
+                  {% end %}
+                {% end %}
+              )
+            end
+
+            def {{ field_id }} : ::Array({{ field_ann[:exposed_type] }})?
+              return if validated_data[{{ field_id.stringify }}]?.nil?
+
+              ret = ::Array({{ field_ann[:exposed_type] }}).new
+              validated_data[{{ field_id.stringify }}].as(::Array(Field::Any)).try do |values|
+                values.each do |value|
+                  ret << value.as({{ field_ann[:exposed_type] }})
+                end
+              end
+
+              ret
+            end
+
+            def {{ field_id }}!
+              {{ field_id }}.not_nil!
+            end
+
+            def {{ field_id }}?
+              !self.class.get_field({{ field_id.stringify }}).empty_value?({{ field_id }})
+            end
+          end
         end
 
         # :nodoc:

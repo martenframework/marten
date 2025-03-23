@@ -1,3 +1,4 @@
+require "./field/array"
 require "./field/base"
 require "./field/bool"
 require "./field/date"
@@ -80,6 +81,7 @@ module Marten
         alias Any = {% for t, i in field_types %}{{ t }}{% if i + 1 < field_types.size %} | {% end %}{% end %}
       end
 
+      register "array", Array
       register "bool", Bool
       register "date", Date
       register "date_time", DateTime

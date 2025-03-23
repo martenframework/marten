@@ -15,6 +15,34 @@ The `required` argument can be used to specify whether a schema field is require
 
 ## Field types
 
+### `array`
+
+An `array` field allows validating a list of values, with each value subject to the validation rules of an array member field. The type of the underlying array member field must be specified through the use of the [`of`](#of) option. This option must reference an [existing schema field type](#field-types) (such as `string`, `enum`, etc).
+
+For example, the following schema allows validating an array of strings:
+
+```crystal
+class ColorsSchema < Marten::Schema
+  field :colors, of: :string
+end
+```
+
+It is possible to specify options that are specific to the chosen array member field. For example:
+
+```crystal
+class ColorsSchema < Marten::Schema
+  field :colors, of: :string, max_size: 10
+end
+```
+
+:::info
+The definition of nested array fields is not permitted.
+:::
+
+#### `of`
+
+The `of` option is mandatory for `array` fields and allows specifying the type of the underlying array member field. This option must reference an [existing schema field type](#field-types) (such as `string`, `enum`, etc).
+
 ### `bool`
 
 A `bool` field allows validating boolean values.

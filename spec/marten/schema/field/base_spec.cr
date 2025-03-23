@@ -22,6 +22,20 @@ describe Marten::Schema::Field::Base do
     end
   end
 
+  describe "#get_raw_data" do
+    it "returns the raw data of based on the provided data object" do
+      schema = Marten::Schema::Field::BaseSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"test_field" => ["  hello  "]}
+      )
+
+      field_1 = Marten::Schema::Field::BaseSpec::TestField.new("test_field")
+      field_1.get_raw_data(schema.data).should eq "  hello  "
+
+      field_2 = Marten::Schema::Field::BaseSpec::TestField.new("other_field")
+      field_2.get_raw_data(schema.data).should be_nil
+    end
+  end
+
   describe "#id" do
     it "returns the field identifier" do
       field = Marten::Schema::Field::BaseSpec::TestField.new("test_field")
@@ -88,6 +102,34 @@ describe Marten::Schema::Field::Base do
     end
   end
 
+  describe "::contribute_array_to_schema" do
+    it "sets up the expected getter method allowing to fetch type-safe validated field data" do
+      schema = Marten::Schema::Field::BaseSpec::WithArrayFields.new(
+        Marten::HTTP::Params::Data{"colors" => ["red", "blue"]}
+      )
+
+      schema.colors.should be_nil
+      expect_raises(NilAssertionError) { schema.colors! }
+      schema.colors?.should be_false
+
+      schema.numbers.should be_nil
+      expect_raises(NilAssertionError) { schema.numbers! }
+      schema.numbers?.should be_false
+
+      schema.valid?.should be_true
+
+      schema.colors.should eq ["red", "blue"]
+      schema.colors!.should eq ["red", "blue"]
+      schema.colors?.should be_true
+      typeof(schema.colors).should eq ::Array(String?)?
+
+      schema.numbers.should be_nil
+      expect_raises(NilAssertionError) { schema.numbers! }
+      schema.numbers?.should be_false
+      typeof(schema.numbers).should eq ::Array(Int64?)?
+    end
+  end
+
   describe "::contribute_to_schema" do
     it "sets up the expected getter method allowing to fetch type-safe validated field data" do
       schema = Marten::Schema::Field::BaseSpec::FooBarSchema.new(
@@ -145,5 +187,10 @@ module Marten::Schema::Field::BaseSpec
     def serialize(value) : ::String?
       value.to_s
     end
+  end
+
+  class WithArrayFields < Marten::Schema
+    field :colors, :array, of: :string
+    field :numbers, :array, of: :int, required: false
   end
 end

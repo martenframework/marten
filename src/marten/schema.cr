@@ -9,7 +9,7 @@ module Marten
     include Core::Validation
 
     # :nodoc:
-    alias DataHash = Hash(String, Field::Any | Nil | HTTP::UploadedFile | Routing::Parameter::Types)
+    alias DataHash = Hash(String, Array(String) | Field::Any | Nil | HTTP::UploadedFile | Routing::Parameter::Types)
 
     # :nodoc:
     alias AnyDataHash = DataHash | Routing::MatchParameters | HTTP::Params::Data | HTTP::Params::Query
@@ -19,6 +19,8 @@ module Marten
     @bound_fields : Hash(String, BoundField) | Nil = nil
     @validated_data = {} of String => Field::Any | Nil | HTTP::UploadedFile
 
+    getter data
+    getter initial
     getter validated_data
 
     macro inherited
@@ -117,11 +119,8 @@ module Marten
     # match any existing field, a `Marten::Schema::Errors::UnknownField` exception is raised.
     def get_field_value(field_name : String | Symbol)
       field = self.class.get_field(field_name)
-      @data[field.id]? || @initial[field.id]?
+      field.get_raw_data(data) || field.get_raw_data(initial)
     end
-
-    protected getter data
-    protected getter initial
 
     private def bound_fields
       @bound_fields ||= begin

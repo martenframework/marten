@@ -25,7 +25,7 @@ module Marten
 
       # Returns the field value.
       def value
-        schema.data[id]? || schema.initial[id]?
+        field.get_raw_data(schema.data) || field.get_raw_data(schema.initial)
       end
 
       # Returns the field identifier.

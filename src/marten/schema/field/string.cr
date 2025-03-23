@@ -22,7 +22,7 @@ module Marten
           strip? ? value.to_s.strip : value.to_s
         end
 
-        def serialize(value) : ::String?
+        def serialize(value) : ::Array(::String) | Nil | ::String
           value.try(&.to_s)
         end
 

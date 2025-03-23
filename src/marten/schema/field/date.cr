@@ -22,7 +22,7 @@ module Marten
           date.in(Marten.settings.time_zone) unless date.nil?
         end
 
-        def serialize(value) : ::String?
+        def serialize(value) : ::Array(::String) | Nil | ::String
           case value
           when ::Time
             value.to_s("%F")

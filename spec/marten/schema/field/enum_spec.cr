@@ -80,6 +80,29 @@ describe Marten::Schema::Field::Enum do
     end
   end
 
+  describe "::contribute_array_to_schema" do
+    it "sets up the expected getter method allowing to fetch type-safe validated field data" do
+      schema = Marten::Schema::Field::EnumSpec::WithArrayFields.new(
+        Marten::HTTP::Params::Data{"colors" => ["red", "blue"]}
+      )
+
+      schema.colors.should be_nil
+      expect_raises(NilAssertionError) { schema.colors! }
+      schema.colors?.should be_false
+
+      schema.valid?.should be_true
+
+      schema.colors.should eq(
+        [Marten::Schema::Field::EnumSpec::Color::RED, Marten::Schema::Field::EnumSpec::Color::BLUE]
+      )
+      schema.colors!.should eq(
+        [Marten::Schema::Field::EnumSpec::Color::RED, Marten::Schema::Field::EnumSpec::Color::BLUE]
+      )
+      schema.colors?.should be_true
+      typeof(schema.colors).should eq ::Array(Marten::Schema::Field::EnumSpec::Color)?
+    end
+  end
+
   describe "::contribute_to_schema" do
     it "creates a #raw_<field_id> method giving access to the raw field value" do
       schema = Marten::Schema::Field::EnumSpec::TestSchema.new(
@@ -152,5 +175,9 @@ module Marten::Schema::Field::EnumSpec
 
   class TestSchema < Marten::Schema
     field :test_field, :enum, values: Color
+  end
+
+  class WithArrayFields < Marten::Schema
+    field :colors, :array, of: :enum, values: Color
   end
 end

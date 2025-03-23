@@ -36,7 +36,6 @@ jobs:
       matrix:
         db_version: ['10.11.6', '11.2.2']
         crystal: [
-          '1.13.1',
           '1.14.0',
           '1.15.0',
           'nightly',
@@ -83,7 +82,6 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.13.1',
           '1.14.0',
           '1.15.0',
           'nightly',
@@ -131,7 +129,6 @@ jobs:
       matrix:
         db_version: ['14', '15', '16']
         crystal: [
-          '1.13.1',
           '1.14.0',
           '1.15.0',
           'nightly',
@@ -164,7 +161,6 @@ jobs:
       fail-fast: false
       matrix:
         crystal: [
-          '1.13.1',
           '1.14.0',
           '1.15.0',
           'nightly',

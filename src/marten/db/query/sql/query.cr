@@ -146,8 +146,6 @@ module Marten
                                    # operator works as expected.
                                    other.predicate_node.try(&.clone) ||
                                      PredicateNode.new(raw_predicate: MATCH_ALL_PREDICATE)
-                                 else
-                                   nil
                                  end
 
             if connector.xor? && predicate_node.nil?
@@ -1113,8 +1111,6 @@ module Marten
                                     elsif !reverse_relation_context.nil? &&
                                           reverse_relation_context.model != current_model
                                       reverse_relation_context.model
-                                    else
-                                      nil
                                     end
 
               # Given the identified targeted parent model, we can build a chain of models that must be joined in order

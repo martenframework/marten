@@ -8,8 +8,6 @@ module Marten
             value.to_s
           when ::String
             ::UUID.parse?(value).try(&.to_s)
-          else
-            nil
           end
         end
 

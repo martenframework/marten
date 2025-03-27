@@ -29,8 +29,6 @@ module Marten
             end
 
             ret.reject!(Nil)
-          else
-            nil
           end
         end
 
@@ -40,8 +38,6 @@ module Marten
             value.map do |v|
               of_field.serialize(v).to_s
             end
-          else
-            nil
           end
         end
 

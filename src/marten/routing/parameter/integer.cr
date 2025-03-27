@@ -7,8 +7,6 @@ module Marten
             value.to_s
           elsif value.is_a?(Int8 | Int16 | Int32 | Int64) && value >= 0
             value.to_s
-          else
-            nil
           end
         end
 

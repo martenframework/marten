@@ -93,7 +93,7 @@ jobs:
     - name: Install packages required for MySQL
       run: |
         apt-get update
-        apt-get -yqq install mysql-client libmysqlclient-dev
+        apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev
     - name: Create additional DB for MySQL
       run: |
         mysql -u root -h mysql --password=mysql -e 'create database marten_other_test;'

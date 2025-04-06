@@ -47,7 +47,7 @@ jobs:
     - name: Install packages required for MySQL
       run: |
         apt-get update
-        apt-get -yqq install mysql-client libmysqlclient-dev
+        apt-get -yqq install mysql-client libmysqlclient-dev libvips
     - name: Create additional DB for MySQL
       run: |
         mysql -u root -h mariadb --password=mariadb -e 'create database marten_other_test;'
@@ -140,7 +140,7 @@ jobs:
     - name: Install packages required for PostgreSQL
       run: |
         apt-get update
-        apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev
+        apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev libvips
     - name: Create additional DB for PostgreSQL
       run: |
         createdb marten_other_test -h postgres -U postgres
@@ -172,7 +172,7 @@ jobs:
     - name: Install packages required for SQLite
       run: |
         apt-get update
-        apt-get -yqq install libsqlite3-dev
+        apt-get -yqq install libsqlite3-dev libvips
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Setup env JSON file
@@ -190,7 +190,7 @@ jobs:
     - name: Install packages required for SQLite
       run: |
         apt-get update
-        apt-get -yqq install libsqlite3-dev
+        apt-get -yqq install libsqlite3-dev libvips
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI
@@ -219,7 +219,7 @@ jobs:
     - name: Install packages required for SQLite
       run: |
         apt-get update
-        apt-get -yqq install libsqlite3-dev
+        apt-get -yqq install libsqlite3-dev libvips
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI

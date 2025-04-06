@@ -34,7 +34,7 @@ jobs:
     - name: Install packages required for SQLite
       run: |
         apt-get update
-        apt-get -yqq install libsqlite3-dev libvips
+        apt-get -yqq install libsqlite3-dev libvips libvips-dev
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI

@@ -5,7 +5,7 @@ module Marten
       module Email
         extend self
 
-        # Returns `true` of the passed string corresponds to a valid email address.
+        # Returns `true` if the passed string corresponds to a valid email address.
         def self.valid?(value : String) : Bool
           return false if value.empty? || !value.includes?('@')
 

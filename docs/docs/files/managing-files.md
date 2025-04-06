@@ -8,7 +8,7 @@ Marten gives you the ability to associate uploaded files with model records and 
 
 ## Using files with models
 
-You can make use of the [`file`](../models-and-databases/reference/fields.md#file) field when defining models: this allows to associate an uploaded file with specific model records.
+You can make use of the [`file`](../models-and-databases/reference/fields.md#file) or [`image`](../models-and-databases/reference/fields.md#image) fields when defining models: this allows to associate an uploaded file with specific model records.
 
 For example, let's consider the following model:
 

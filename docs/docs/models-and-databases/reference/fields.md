@@ -129,7 +129,7 @@ The `values` argument **is required** and allows to specify the actual enum clas
 
 A `file` field allows persisting the reference to an uploaded file.
 
-:::info
+:::warning
 `file` fields can't be configured as primary keys.
 :::
 
@@ -173,6 +173,71 @@ end
 ### `float`
 
 A `float` field allows persisting floating point numbers (`Float64` objects).
+
+### `image`
+
+An `image` field allows persisting the reference to an uploaded image file.
+
+:::info
+The [crystal-vips](https://github.com/naqvis/crystal-vips) shard is required for defining `image` model fields. If this shard is not installed and required by your project, it will not be possible to use `image` model fields and compilation errors will be raised.
+
+As such, make sure that:
+
+1. Your project's `shard.yml` includes:
+
+```yaml
+dependencies:
+  vips:
+    github: naqvis/crystal-vips
+```
+
+2. Your project's `src/project.cr` includes:
+
+```crystal
+require "vips"
+```
+:::
+
+:::warning
+`image` fields can't be configured as primary keys.
+:::
+
+#### `storage`
+
+This optional argument can be used to configure the storage that will be used to persist the actual image files. It defaults to the media files storage (configured via the `media_files.storage` setting), but can be overridden on a per-field basis if needed:
+
+```crystal
+my_storage = Marten::Core::Storage::FileSystem.new(root: "files", base_url: "/files/")
+
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :uploaded_image, :image, storage: my_storage
+end
+```
+
+Please refer to [Managing files](../../files/managing-files.md) for more details on how to manage uploaded files and the associated storages.
+
+#### `upload_to`
+
+This optional argument can be used to configure where the uploaded images files are persisted in the storage. It defaults to an empty string and can be set to either a string or a proc.
+
+If set to a string, it allows to define in which directory of the underlying storage files will be persisted:
+
+```crystal
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :uploaded_image, :image, upload_to: "foo/bar"
+end
+```
+
+If set to a proc, it allows to customize the logic allowing to generate the resulting path _and_ filename:
+
+```crystal
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :uploaded_image, :image, upload_to: ->(filename : String) { File.join("files/uploads", filename) }
+end
+```
 
 ### `int`
 

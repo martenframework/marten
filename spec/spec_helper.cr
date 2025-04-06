@@ -4,6 +4,7 @@ require "json"
 require "log/spec"
 require "spec"
 require "timecop"
+require "vips"
 
 {% if env("MARTEN_SPEC_DB_CONNECTION").id == "postgresql" %}
   require "pg"

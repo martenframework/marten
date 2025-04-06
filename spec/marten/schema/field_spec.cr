@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Marten::Schema::Field do
   describe "#registry" do
     it "returns the expected field abstractions" do
-      Marten::Schema::Field.registry.size.should eq 15
+      Marten::Schema::Field.registry.size.should eq 16
       Marten::Schema::Field.registry["array"].should eq Marten::Schema::Field::Array
       Marten::Schema::Field.registry["bool"].should eq Marten::Schema::Field::Bool
       Marten::Schema::Field.registry["date"].should eq Marten::Schema::Field::Date
@@ -13,6 +13,7 @@ describe Marten::Schema::Field do
       Marten::Schema::Field.registry["enum"].should eq Marten::Schema::Field::Enum
       Marten::Schema::Field.registry["file"].should eq Marten::Schema::Field::File
       Marten::Schema::Field.registry["float"].should eq Marten::Schema::Field::Float
+      Marten::Schema::Field.registry["image"].should eq Marten::Schema::Field::Image
       Marten::Schema::Field.registry["int"].should eq Marten::Schema::Field::Int
       Marten::Schema::Field.registry["json"].should eq Marten::Schema::Field::JSON
       Marten::Schema::Field.registry["string"].should eq Marten::Schema::Field::String

@@ -176,6 +176,34 @@ The `max_value` argument allows defining the maximum value allowed. The default 
 
 The `min_value` argument allows defining the minimum value allowed. The default value for this argument is `nil`, which means that the minimum value is not validated by default.
 
+### `image`
+
+An `image` field allows validating uploaded files by ensuring that they are indeed images. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+:::info
+The [crystal-vips](https://github.com/naqvis/crystal-vips) shard is required for defining `image` schema fields. If this shard is not installed and required by your project, it will not be possible to use `image` schema fields and compilation errors will be raised.
+
+As such, make sure that:
+
+1. Your project's `shard.yml` includes:
+
+```yaml
+dependencies:
+  vips:
+    github: naqvis/crystal-vips
+```
+
+2. Your project's `src/project.cr` includes:
+
+```crystal
+require "vips"
+```
+:::
+
+#### `max_name_size`
+
+The `max_name_size` argument allows defining the maximum file name size allowed. The default value is `nil`, which means that uploaded file name sizes are not validated.
+
 ### `int`
 
 An `int` field allows validating integer values. Fields using this type are converted to `Int64` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:

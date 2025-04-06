@@ -8,6 +8,7 @@ require "./field/email"
 require "./field/enum"
 require "./field/file"
 require "./field/float"
+require "./field/image"
 require "./field/int"
 require "./field/json"
 require "./field/slug"
@@ -111,6 +112,7 @@ module Marten
       register "enum", Enum
       register "file", File
       register "float", Float
+      register "image", Image
       register "int", Int
       register "json", JSON
       register "many_to_many", ManyToMany

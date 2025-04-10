@@ -35,6 +35,65 @@ describe Marten::Conf::GlobalSettings::I18n do
     end
   end
 
+  describe "#fallbacks" do
+    it "returns the expected default value if not configured" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks.default.should eq ["en"]
+      i18n_conf.fallbacks.mapping.should be_empty
+    end
+
+    it "returns the expected value if explicitly configured" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = ["fr"]
+      i18n_conf.fallbacks.default.should eq ["fr"]
+      i18n_conf.fallbacks.mapping.should be_empty
+    end
+  end
+
+  describe "#fallbacks=" do
+    it "allows to configure the fallbacks using an array of strings" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = ["fr"]
+      i18n_conf.fallbacks.default.should eq ["fr"]
+      i18n_conf.fallbacks.mapping.should be_empty
+    end
+
+    it "allows to configure the fallbacks using an array of symbols" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = [:fr]
+      i18n_conf.fallbacks.default.should eq ["fr"]
+      i18n_conf.fallbacks.mapping.should be_empty
+    end
+
+    it "allows to configure the fallbacks using a hash of strings" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = {"fr" => ["en"]}
+      i18n_conf.fallbacks.default.should be_empty
+      i18n_conf.fallbacks.mapping.should eq({"fr" => ["en"]})
+    end
+
+    it "allows to configure the fallbacks using a hash of symbols" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = {:fr => [:en]}
+      i18n_conf.fallbacks.default.should be_empty
+      i18n_conf.fallbacks.mapping.should eq({"fr" => ["en"]})
+    end
+
+    it "allows to configure the fallbacks using a named tuple" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = {fr: ["en"]}
+      i18n_conf.fallbacks.default.should be_empty
+      i18n_conf.fallbacks.mapping.should eq({"fr" => ["en"]})
+    end
+
+    it "allows to configure the fallbacks using an I18n::Locale::Fallbacks instance" do
+      i18n_conf = Marten::Conf::GlobalSettings::I18n.new
+      i18n_conf.fallbacks = ::I18n::Locale::Fallbacks.new(default: ["en"], mapping: {"fr" => ["en"]})
+      i18n_conf.fallbacks.default.should eq ["en"]
+      i18n_conf.fallbacks.mapping.should eq({"fr" => ["en"]})
+    end
+  end
+
   describe "#locale_cookie_name" do
     it "returns the expected default value if not configured" do
       i18n_conf = Marten::Conf::GlobalSettings::I18n.new

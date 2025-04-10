@@ -679,6 +679,36 @@ Default: `"en"`
 
 The default locale used by the Marten project.
 
+### `fallbacks`
+
+Default: `["en"]`
+
+The locale fallbacks of the project.
+
+By configuring locale fallbacks, you can force your project to try to lookup translations in other (configured) locales if the current locale the translation is requested into is missing.
+
+The specified fallbacks can be:
+
+* a hash or a named tuple defining the chains of fallbacks to use for specific locales.
+* a simple array of fallbacks. In that case, this chain of fallbacked locales will be used as a default for all the available locales when translations are missing.
+* an `I18n::Locale::Fallbacks` object, allowing you to specify a general default fallback array and fallback mappings at the same time (see the [crystal-i18n documentation](https://crystal-i18n.github.io/configuration.html#fallbacks)).
+
+For example:
+
+```crystal
+# Simple fallback chain used by all configured locales:
+config.i18n.fallbacks = ["en-US", "en"]
+
+# Locale-specific fallback chains:
+config.i18n.fallbacks = {"en-CA" => ["en-US", "en"], "fr-CA" => "fr"}
+
+# Default fallback chain and locale-specific fallback chains:
+config.i18n.fallbacks = ::I18n::Locale::Fallbacks.new(
+  {"fr-CA-special": ["fr-CA", "fr", "en"]},
+  default: ["en"]
+)
+```
+
 ### `locale_cookie_name`
 
 Default: `"marten_locale"`

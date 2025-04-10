@@ -54,6 +54,15 @@ describe Marten do
     end
   end
 
+  describe "#setup_i18n" do
+    it "properly configure I18n fallbacks" do
+      with_overridden_setting("i18n.fallbacks", ["en", "fr"]) do
+        Marten.setup_i18n
+        I18n.config.fallbacks.not_nil!.default.should eq ["en", "fr"]
+      end
+    end
+  end
+
   describe "#setup_templates" do
     after_each do
       Marten.setup_templates

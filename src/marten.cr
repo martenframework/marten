@@ -226,6 +226,7 @@ module Marten
   def self.setup_i18n : Nil
     I18n.config.default_locale = settings.i18n.default_locale
     I18n.config.available_locales = settings.i18n.available_locales
+    I18n.config.fallbacks = settings.i18n.fallbacks
 
     # Add Marten's built-in translations first.
     I18n.config.loaders << I18n::Loader::YAML.new("#{effective_marten_location}/marten/locales")

@@ -152,7 +152,7 @@ module Marten::CLI::AdminSpec
     stdout = IO::Memory.new
     stderr = IO::Memory.new
 
-    Process.run("crystal", ["eval"], input: IO::Memory.new(full_code), output: stdout, error: stderr)
+    Process.run("crystal", ["eval", full_code], output: stdout, error: stderr)
 
     stdout.rewind.to_s
   end
@@ -174,7 +174,7 @@ module Marten::CLI::AdminSpec
     stdout = IO::Memory.new
     stderr = IO::Memory.new
 
-    Process.run("crystal", ["eval"], input: IO::Memory.new(full_code), output: stdout, error: stderr)
+    Process.run("crystal", ["eval", full_code], output: stdout, error: stderr)
 
     stdout.rewind.to_s
   end

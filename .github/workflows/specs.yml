@@ -38,6 +38,7 @@ jobs:
         crystal: [
           '1.14.0',
           '1.15.0',
+          '1.16.0',
           'nightly',
         ]
     container:
@@ -84,6 +85,7 @@ jobs:
         crystal: [
           '1.14.0',
           '1.15.0',
+          '1.16.0',
           'nightly',
         ]
     container:
@@ -131,6 +133,7 @@ jobs:
         crystal: [
           '1.14.0',
           '1.15.0',
+          '1.16.0',
           'nightly',
         ]
     container:
@@ -163,6 +166,7 @@ jobs:
         crystal: [
           '1.14.0',
           '1.15.0',
+          '1.16.0',
           'nightly',
         ]
     container:
@@ -184,7 +188,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.15.0
+      image: crystallang/crystal:1.16.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite
@@ -213,7 +217,7 @@ jobs:
     strategy:
       fail-fast: false
     container:
-      image: crystallang/crystal:1.15.0
+      image: crystallang/crystal:1.16.0
     steps:
     - uses: actions/checkout@v2
     - name: Install packages required for SQLite

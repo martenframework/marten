@@ -148,6 +148,13 @@ module.exports = {
             'files/how-to/create-custom-file-storages',
           ],
         },
+        {
+          type: 'category',
+          label: 'Reference',
+          items: [
+            'files/reference/stores',
+          ],
+        },
       ],
     },
     {

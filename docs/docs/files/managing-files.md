@@ -147,6 +147,8 @@ Marten uses a file storage mechanism to perform file operations like saving file
 
 By default, [`file`](../models-and-databases/reference/fields.md#file) model fields make use of the configured "media" storage. This storage uses the [`settings.media_files`](../development/reference/settings.md#media-files-settings) settings to determine what storage backend to use, and where to persist files. By default, the media storage uses the [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage backend, which ensures that files are persisted in the local file system, where the Marten application is running.
 
+All the available file storages are listed in the [file storage reference](./reference/stores.md).
+
 ### Interacting with the media file storage
 
 You won't usually need to interact directly with the file storage, but it's worth mentioning that storage objects share the same API. Indeed, the class of these storage objects must inherit from the [`Marten::Core::Storage::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html) abstract class and implement a set of mandatory methods which provide the following functionalities:

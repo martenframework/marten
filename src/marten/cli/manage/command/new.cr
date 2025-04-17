@@ -27,6 +27,9 @@ module Marten
               description: "Configure default database (options: mysql/postgresql/sqlite3/none)") do |db|
               @database = db
             end
+            on_option(:"with-image-support", description: "Adds support for image fields") do
+              @with_image_support = true
+            end
             on_option(:e, :edge, description: "Use the development version of Marten") { @edge = true }
           end
 

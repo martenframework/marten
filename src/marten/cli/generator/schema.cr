@@ -84,7 +84,7 @@ module Marten
 
           # Add the "Schema" suffix if missing, which is a best practice.
           unless schema_name.ends_with?("Schema")
-            self.schema_name += "Schema" # ameba:disable Style/RedundantSelf
+            self.schema_name += "Schema"
           end
 
           # Extract field definitions.

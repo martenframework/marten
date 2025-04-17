@@ -64,7 +64,7 @@ module Marten
                                 mask_cipher_secret(unmask_cipher_token(csrf_token.not_nil!))
                               end
 
-        self.csrf_token ||= returned_csrf_token # ameba:disable Style/RedundantSelf
+        self.csrf_token ||= returned_csrf_token
         self.csrf_token_update_required = true
 
         returned_csrf_token

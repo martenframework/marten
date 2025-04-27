@@ -644,6 +644,22 @@ describe Marten::Handlers::Base do
       response.content_type.should eq "text/plain"
       response.content.should eq "Dummy error handled"
     end
+
+    it "raises as expected if the exception handling callback does not return an HTTP response" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::TestHandlerWithUselessExceptionHandling.new(request)
+
+      expect_raises(Marten::Handlers::BaseSpec::TestHandlerWithUselessExceptionHandling::DummyError) do
+        handler.process_dispatch
+      end
+    end
   end
 
   describe "#redirect" do
@@ -1271,6 +1287,18 @@ module Marten::Handlers::BaseSpec
 
     rescue_from DummyError do
       Marten::HTTP::Response.new("Dummy error handled", content_type: "text/plain", status: 200)
+    end
+
+    def get
+      raise DummyError.new
+    end
+  end
+
+  class TestHandlerWithUselessExceptionHandling < Marten::Handlers::Base
+    class DummyError < Exception; end
+
+    rescue_from DummyError do
+      "Dummy error handled"
     end
 
     def get

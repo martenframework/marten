@@ -1,6 +1,7 @@
 require "./concerns/callbacks"
 require "./concerns/content_security_policy"
 require "./concerns/cookies"
+require "./concerns/exception_handling"
 require "./concerns/flash"
 require "./concerns/request_forgery_protection"
 require "./concerns/session"
@@ -15,6 +16,7 @@ module Marten
     class Base
       include Core::DebugModeLoggable
       include Callbacks
+      include ExceptionHandling
       include Cookies
       include Flash
       include RequestForgeryProtection
@@ -195,6 +197,9 @@ module Marten
         @response = after_dispatch_response if !after_dispatch_response.nil?
 
         response!
+      rescue error
+        response = handle_exception(error)
+        response.nil? ? raise error : response
       end
 
       # Returns a redirect HTTP response for a specific `url`.

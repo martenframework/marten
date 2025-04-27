@@ -231,6 +231,46 @@ end
 
 It should be noted that Marten also support a couple of exceptions that can be raised to automatically trigger default error handlers. For example [`Marten::HTTP::Errors::NotFound`](pathname:///api/dev/Marten/HTTP/Errors/NotFound.html) can be raised from any handler to force a 404 Not Found response to be returned. Default error handlers can be returned automatically by the framework in many situations (eg. a record is not found, or an unhandled exception is raised); you can learn more about them in [Error handlers](./error-handlers.md).
 
+### Exceptions handling
+
+Marten lets you define callback methods that are invoked when certain exceptions are encountered during the execution of your handler's `#dispatch` method. These exception handling callbacks can be defined by using the [`#rescue_from`](pathname:///api/dev/Marten/Handlers/ExceptionHandling.html#rescue_from(*exception_klasses%2C**kwargs%2C%26block)-macro) macro, which accepts one or more exception classes and an exception handler that can be specified by a trailing `:with` option containing the name of a method to invoke or a block containing the exception handling logic.
+
+For example, the following handler will react to possible `Auth::UnauthorizedUser` exceptions by calling the `#handle_unauthorized_user` private method:
+
+```crystal
+class ProfileHandler < Marten::Handlers::Template
+  include RequireSignedInUser
+
+  template_name "auth/profile.html"
+
+  rescue_from Auth::UnauthorizedUser, with: :handle_unauthorized_user
+
+  private def handle_unauthorized_user
+    head :forbidden
+  end
+end
+```
+
+And the following handler will do exactly the same by invoking the specified block:
+
+```crystal
+class ProfileHandler < Marten::Handlers::Template
+  include RequireSignedInUser
+
+  template_name "auth/profile.html"
+
+  rescue_from Auth::UnauthorizedUser do
+    head :forbidden
+  end
+end
+```
+
+It is worth mentioning that exception handling callbacks are inherited and that they are searched bottom-up in the inheritance hierarchy.
+
+:::warning
+Your exception handling callbacks should return [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) objects. If that's not the case, then your exception handling callback logic will be executed but the original exception will be allowed to "bubble up" (which will likely result in a server error).
+:::
+
 ## Mapping handlers to URLs
 
 Handlers define the logic allowing to handle incoming HTTP requests and return corresponding HTTP responses. In order to define which handler gets called for a specific URL (and what are the expected URL parameters), handlers need to be associated with a specific route. This configuration usually takes place in the `config/routes.rb` configuration file, where you can define "paths" and associate them to your handler classes:

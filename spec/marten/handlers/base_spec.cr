@@ -628,6 +628,22 @@ describe Marten::Handlers::Base do
       handler.response!.content_type.should eq "text/plain"
       handler.response!.content.should eq "after_dispatch response"
     end
+
+    it "returns the expected response if an exception is raised and handled by the exception handlers" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::TestHandlerWithExceptionHandling.new(request)
+      response = handler.process_dispatch
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "Dummy error handled"
+    end
   end
 
   describe "#redirect" do
@@ -1247,6 +1263,18 @@ module Marten::Handlers::BaseSpec
 
     private def return_after_dispatch_response
       Marten::HTTP::Response.new("after_dispatch response", content_type: "text/plain", status: 200)
+    end
+  end
+
+  class TestHandlerWithExceptionHandling < Marten::Handlers::Base
+    class DummyError < Exception; end
+
+    rescue_from DummyError do
+      Marten::HTTP::Response.new("Dummy error handled", content_type: "text/plain", status: 200)
+    end
+
+    def get
+      raise DummyError.new
     end
   end
 end

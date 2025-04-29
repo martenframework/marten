@@ -10,6 +10,9 @@ require "mysql"
 <%- elsif context.database == "postgresql" -%>
 require "pg"
 <%- end -%>
+<%- if context.targets_image? -%>
+require "vips"
+<%- end -%>
 
 # Configuration requirements.
 require "../config/settings/base"

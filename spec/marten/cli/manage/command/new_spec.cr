@@ -144,6 +144,23 @@ describe Marten::CLI::Manage::Command::New do
       stdout.rewind.gets_to_end.should be_empty
     end
 
+    it "prints an error when trying to use --with-image-support for an app structure" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["app", "dummy_project", "--with-image-support"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      stderr.rewind.gets_to_end.includes?("--with-image-support can only be used when creating new projects")
+        .should be_true
+      stdout.rewind.gets_to_end.should be_empty
+    end
+
     it "creates a new project structure" do
       stdout = IO::Memory.new
 
@@ -172,6 +189,20 @@ describe Marten::CLI::Manage::Command::New do
       Marten::CLI::Manage::Command::NewSpec::PROJECT_WITH_AUTH_FILES.each do |path|
         File.exists?(File.join(".", "dummy_project", path)).should be_true, "File #{path} does not exist"
       end
+    end
+
+    it "creates a new project structure with image support" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project", "--with-image-support"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      File.read("./dummy_project/shard.yml").should contain "github: naqvis/crystal-vips"
+      File.read("./dummy_project/src/project.cr").should contain "require \"vips\""
     end
 
     it "creates the expected project structure when using the --edge option" do

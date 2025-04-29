@@ -19,3 +19,7 @@ dependencies:
   mysql:
     github: crystal-lang/crystal-mysql
 <%- end -%>
+<%- if context.targets_image? -%>
+  vips:
+    github: naqvis/crystal-vips
+<%- end -%>

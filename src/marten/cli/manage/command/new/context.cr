@@ -11,6 +11,7 @@ module Marten
 
             TARGET_AUTH    = "auth"
             TARGET_GENERAL = "general"
+            TARGET_IMAGE   = "image"
 
             def initialize(
               @name = "example",
@@ -26,6 +27,10 @@ module Marten
 
             def targets_auth?
               @targets.includes?(TARGET_AUTH)
+            end
+
+            def targets_image?
+              @targets.includes?(TARGET_IMAGE)
             end
           end
         end

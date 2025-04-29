@@ -63,6 +63,11 @@ module Marten
               return
             end
 
+            if app? && with_image_support?
+              print_error("--with-image-support can only be used when creating new projects")
+              return
+            end
+
             if database == SUPPORTED_DATABASES[3] && with_auth?
               print_error("--with-auth can only be used for projects that use a database")
               return
@@ -71,6 +76,7 @@ module Marten
             context = Context.new
             context.name = name.not_nil!
             context.targets << Context::TARGET_AUTH if with_auth?
+            context.targets << Context::TARGET_IMAGE if with_image_support?
             context.database = database
             context.edge = edge?
 
@@ -93,6 +99,7 @@ module Marten
           private getter? edge
           private getter? interactive_mode
           private getter? with_auth
+          private getter? with_image_support
 
           private def app? : Bool
             type == TYPE_APP

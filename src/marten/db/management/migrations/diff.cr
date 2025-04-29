@@ -717,7 +717,7 @@ module Marten
               # We maintain a boolean indicating if the result of an operation optimization should be inserted before
               # (left) or after (right) the operations that are between the current operation we are trying to optimize
               # and the candidate operation (that we try to "combine" into the current operation). If we can put the
-              # resulting optimized operation to the right, this means that all the operations the initially come after
+              # resulting optimized operation to the right, this means that all the operations that initially come after
               # the current operation do not depend on it. If at least one of the operations that come after the current
               # operation depend on it (ie. the order of operations must be respected), then the result of the
               # optimization is put to the left.
@@ -811,7 +811,7 @@ module Marten
                 end
               end
 
-              # Perform a topological sort in orrder to ensure that operations are processed when all their dependencies
+              # Perform a topological sort in order to ensure that operations are processed when all their dependencies
               # have already been processed.
               ordered_operations = [] of DetectedOperation
               remaining_deps = in_app_dependencies.dup

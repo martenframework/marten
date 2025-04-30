@@ -12,6 +12,8 @@ class Marten::Schema::BoundField
       field
     when "id"
       id
+    when "required?"
+      required?
     when "value"
       value
     else

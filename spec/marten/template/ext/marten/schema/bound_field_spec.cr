@@ -38,6 +38,13 @@ describe Marten::Schema::BoundField do
       bound_field.resolve_template_attribute("field").should eq schema.class.get_field("foo")
     end
 
+    it "is able to return the result of #required?" do
+      schema = Marten::Schema::BoundFieldExtSpec::TestSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
+
+      bound_field = Marten::Schema::BoundField.new(schema, schema.class.get_field("foo"))
+      bound_field.resolve_template_attribute("required?").should be_true
+    end
+
     it "is able to return the result of #value" do
       schema = Marten::Schema::BoundFieldExtSpec::TestSchema.new(Marten::HTTP::Params::Data{"foo" => ["hello"]})
 

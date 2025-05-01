@@ -321,7 +321,7 @@ module Marten
     if Marten.settings.debug?
       Log.info do
         String.build do |s|
-          s << "#{"=" * base_message.size}\n"
+          s << "\n#{"=" * base_message.size}\n"
           s << base_message
           s << "\n#{"=" * base_message.size}"
         end

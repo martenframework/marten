@@ -137,7 +137,8 @@ module Marten
         Marten.settings.csrf.trusted_origin_subdomains_per_scheme[parsed_origin.scheme].any? do |host_pattern|
           same_domain?(domain, host_pattern)
         end
-      rescue HTTP::Errors::UnexpectedHost | NilAssertionError
+      rescue ex : HTTP::Errors::UnexpectedHost | NilAssertionError
+        Log.warn(exception: ex) { "Origin is not trusted" }
         false
       end
 
@@ -233,7 +234,9 @@ module Marten
         else
           parsed_referer_host == request.host
         end
-      rescue HTTP::Errors::UnexpectedHost | NilAssertionError
+      rescue ex : HTTP::Errors::UnexpectedHost | NilAssertionError
+        Log.warn(exception: ex) { "Referer is not trusted" }
+
         false
       end
 

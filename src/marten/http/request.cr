@@ -338,7 +338,7 @@ module Marten
             end
           end
         elsif content_type?(CONTENT_TYPE_APPLICATION_JSON)
-          if !(json_params = JSON.parse(body).as_h?).nil?
+          if !body.blank? && !(json_params = JSON.parse(body).as_h?).nil?
             json_params.each do |key, value|
               params[key] = [] of Params::Data::Value unless params.has_key?(key)
               params[key].as(Params::Data::Values) << value

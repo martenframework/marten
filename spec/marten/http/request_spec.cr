@@ -302,6 +302,32 @@ describe Marten::HTTP::Request do
       request.data.fetch_all("test").should eq ["xyz"]
     end
 
+    it "returns empty object if application/json inputs is empty on POST" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/json"},
+          body: %{}
+        )
+      )
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+
+    it "returns empty object if application/json inputs is empty on GET" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/json"},
+          body: %{}
+        )
+      )
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+
     it "returns an object without parsed params if the content type is not supported" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

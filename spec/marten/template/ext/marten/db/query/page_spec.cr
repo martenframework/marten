@@ -159,6 +159,19 @@ describe Marten::DB::Query::Page do
       Marten::DB::Query::Page(Tag).new([] of Tag, 2, paginator).resolve_template_attribute("size").should eq 0
     end
 
+    it "returns the expected result when requesting the 'total_count' attribute" do
+      Tag.create!(name: "a_tag", is_active: true)
+      Tag.create!(name: "b_tag", is_active: true)
+      Tag.create!(name: "c_tag", is_active: true)
+      Tag.create!(name: "d_tag", is_active: true)
+      Tag.create!(name: "e_tag", is_active: true)
+
+      paginator = Tag.all.order(:name).paginator(2)
+      page = paginator.page(2)
+
+      page.resolve_template_attribute("total_count").should eq 5
+    end
+
     it "raises as expected if the specified attribute is not supported" do
       tag = Tag.create!(name: "a_tag", is_active: true)
       paginator = Tag.all.order(:name).paginator(2)

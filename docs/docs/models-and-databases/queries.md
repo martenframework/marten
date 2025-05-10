@@ -388,6 +388,7 @@ query_set = Article.filter(published: true)
 paginator = query_set.paginator(10)
 paginator.page_size   # => 10
 paginator.pages_count # => 6
+paginator.total_count # => 60
 
 # Retrieve the first page and iterate over the underlying records
 page = paginator.page(1)
@@ -397,6 +398,7 @@ page.previous_page?       # => false
 page.previous_page_number # => nil
 page.next_page?           # => true
 page.next_page_number     # => 2
+page.total_count          # => 60
 ```
 
 As you can see, paginator objects let you request specific pages by providing a page number (1-indexed!) to the [`#page`](pathname:///api/dev/Marten/DB/Query/Paginator.html#page(number%3AInt)-instance-method) method. Such pages are instances of [`Marten::DB::Query::Page`](pathname:///api/dev/Marten/DB/Query/Page.html) and give you the ability to easily iterate over the corresponding records. They also give you the ability to retrieve some pagination-related information (eg. about the previous and next pages by leveraging the [`#previous_page?`](pathname:///api/dev/Marten/DB/Query/Page.html#previous_page%3F-instance-method), [`#previous_page_number`](pathname:///api/dev/Marten/DB/Query/Page.html#previous_page_number-instance-method), [`#next_page?`](pathname:///api/dev/Marten/DB/Query/Page.html#next_page%3F-instance-method), and [`#next_page_number`](pathname:///api/dev/Marten/DB/Query/Page.html#next_page_number-instance-method) methods).

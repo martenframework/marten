@@ -13,6 +13,7 @@ module Marten
         class EmptyPageError < Exception; end
 
         @pages_count : Int32? = nil
+        @total_count : (Int32 | Int64 | Nil) = nil
 
         getter queryset
         getter page_size
@@ -44,7 +45,12 @@ module Marten
 
         # Returns the number of pages.
         def pages_count
-          @pages_count ||= ([1, queryset.size].max / page_size).ceil.to_i32
+          @pages_count ||= ([1, total_count].max / page_size).ceil.to_i32
+        end
+
+        # Returns the total number of records in the queryset, without applying pagination.
+        def total_count : Int32 | Int64
+          @total_count ||= queryset.size
         end
 
         private def validate_number(number)

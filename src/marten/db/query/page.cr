@@ -36,6 +36,11 @@ module Marten
           paginator.pages_count
         end
 
+        # Returns the total number of records in the queryset, without applying pagination.
+        def total_count
+          paginator.total_count
+        end
+
         # Returns `true` if there is a previous page.
         def previous_page?
           number > 1

@@ -129,4 +129,30 @@ describe Marten::DB::Query::Paginator do
       paginator.pages_count.should eq 3
     end
   end
+
+  describe "#total_count" do
+    it "returns the expected pages count if there are no pages" do
+      paginator = Tag.all.order(:name).paginator(2)
+      paginator.total_count.should eq 0
+    end
+
+    it "returns two elements if there is only one page" do
+      Tag.create!(name: "a_tag", is_active: true)
+      Tag.create!(name: "b_tag", is_active: true)
+
+      paginator = Tag.all.order(:name).paginator(2)
+      paginator.total_count.should eq 2
+    end
+
+    it "returns the total count if there are multiple pages" do
+      Tag.create!(name: "a_tag", is_active: true)
+      Tag.create!(name: "b_tag", is_active: true)
+      Tag.create!(name: "c_tag", is_active: true)
+      Tag.create!(name: "d_tag", is_active: true)
+      Tag.create!(name: "e_tag", is_active: true)
+
+      paginator = Tag.all.order(:name).paginator(2)
+      paginator.total_count.should eq 5
+    end
+  end
 end

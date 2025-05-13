@@ -262,7 +262,7 @@ module Marten
           values = local_field_db_values
 
           pk_field = self.class.pk_field
-          if self.class.auto_increment_pk_field?
+          if self.class.auto_increment_pk_field? && values[pk_field.db_column!]?.nil?
             pk_column_to_fetch = pk_field.db_column!
             values.delete(pk_column_to_fetch)
           else

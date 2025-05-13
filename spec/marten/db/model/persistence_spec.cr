@@ -961,6 +961,19 @@ describe Marten::DB::Model::Persistence do
       obj.not_nil!.after_save_commit_track.should eq "unset"
       obj.not_nil!.after_delete_commit_track.should eq "unset"
     end
+
+    it "allows to manually set values of auto-incremented primary keys" do
+      object = TestUser.new(id: 42, username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.save!.should be_true
+      object.persisted?.should be_true
+
+      refetched_object = TestUser.get!(id: 42)
+      refetched_object.id.should eq 42
+      refetched_object.username.should eq "jd"
+      refetched_object.email.should eq "jd@example.com"
+      refetched_object.first_name.should eq "John"
+      refetched_object.last_name.should eq "Doe"
+    end
   end
 
   describe "#update" do

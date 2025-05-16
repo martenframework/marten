@@ -13,6 +13,17 @@ describe Marten::Template::Object::Enum do
       enum_object.should eq enum_object
     end
 
+    it "returns true if the other enum corresponds to the same enum object" do
+      enum_object = Marten::Template::Object::Enum.new(
+        enum_class_name: Marten::Template::Object::EnumSpec::Color.name,
+        enum_value_names: Marten::Template::Object::EnumSpec::Color.values.map(&.to_s),
+        name: Marten::Template::Object::EnumSpec::Color::Blue.to_s,
+        value: Marten::Template::Object::EnumSpec::Color::Blue.to_i64,
+      )
+
+      enum_object.should eq Marten::Template::Object::EnumSpec::Color::Blue
+    end
+
     it "returns true if the other enum has the same properties" do
       enum_object_1 = Marten::Template::Object::Enum.new(
         enum_class_name: Marten::Template::Object::EnumSpec::Color.name,
@@ -79,6 +90,17 @@ describe Marten::Template::Object::Enum do
       )
 
       enum_object_1.should_not eq enum_object_2
+    end
+
+    it "returns false if the other enum does not correspond to the same enum object" do
+      enum_object = Marten::Template::Object::Enum.new(
+        enum_class_name: Marten::Template::Object::EnumSpec::Color.name,
+        enum_value_names: Marten::Template::Object::EnumSpec::Color.values.map(&.to_s),
+        name: Marten::Template::Object::EnumSpec::Color::Blue.to_s,
+        value: Marten::Template::Object::EnumSpec::Color::Blue.to_i64,
+      )
+
+      enum_object.should_not eq Marten::Template::Object::EnumSpec::Color::Red
     end
   end
 

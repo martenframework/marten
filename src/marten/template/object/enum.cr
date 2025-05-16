@@ -21,6 +21,10 @@ module Marten
           super || (enum_class_name == other.enum_class_name && name == other.name && value == other.value)
         end
 
+        def ==(other : ::Enum)
+          super || (enum_class_name == other.class.name && name == other.to_s && value == other.to_i64)
+        end
+
         # :nodoc:
         def resolve_template_attribute(key : String)
           case key

@@ -65,9 +65,21 @@ describe Marten::Template::Variable do
       variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int32
     end
 
+    it "returns the value of a negative integer literal" do
+      variable = Marten::Template::Variable.new("-42")
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).should eq -42
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int32
+    end
+
     it "returns the value of a float literal" do
       variable = Marten::Template::Variable.new("42.44")
       variable.resolve(Marten::Template::Context{"foo" => "bar"}).should eq 42.44
+    end
+
+    it "returns the value of a negative float literal" do
+      variable = Marten::Template::Variable.new("-42.44")
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).should eq -42.44
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Float64
     end
 
     it "returns the value of a string literal" do

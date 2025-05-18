@@ -1000,7 +1000,7 @@ module Marten
                 def initialize(
                   @query = Marten::DB::Query::SQL::Query({{ @type }}).new,
                   @prefetched_relations = [] of ::String,
-                  @custom_query_sets  = {} of ::String => Any
+                  @custom_query_sets  = {} of ::String => Marten::DB::Query::Set::Any
                 )
                   super(@query, @prefetched_relations, @custom_query_sets)
                 end
@@ -1081,6 +1081,12 @@ module Marten
                     query: other_query.nil? ? @query.clone : other_query.not_nil!
                   )
                 end
+              end
+
+              class ::{{ @type }}::Paginator < Marten::DB::Query::Paginator({{ @type }})
+              end
+
+              class ::{{ @type }}::Page < Marten::DB::Query::Page({{ @type }})
               end
             {% end %}
           {% end %}

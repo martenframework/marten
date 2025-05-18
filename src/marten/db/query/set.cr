@@ -12,7 +12,11 @@ module Marten
       # considered database. Querying the database is always deferred to the last possible moment: that is, when the
       # actual records are requested.
       class Set(M)
+        # :nodoc:
+        module Any; end
+
         include Enumerable(M)
+        include Any
 
         @result_cache : Array(M)?
         @prefetched_relations = [] of String
@@ -1509,24 +1513,6 @@ module Marten
           qs = clone
           qs.query.using = db.try(&.to_s)
           qs
-        end
-
-        macro finished
-          # Creates an alias `Any` representing the query sets of all existing models.
-          #
-          # For example, if you have the models `User` and `Post`,
-          # then this macro will generate:
-          #
-          #   alias Any = Set(User) | Set(Post)
-          #
-          # That means anywhere in your code where you accept `Any`, you accept
-          # any `Set(M)` specialized to these models.
-          {% model_types = Marten::DB::Model.all_subclasses.reject(&.abstract?).map(&.name) %}
-          {% if model_types.size > 0 %}
-            alias Any = {% for t, i in model_types %}Set({{ t }}){% if i + 1 < model_types.size %} | {% end %}{% end %}
-          {% else %}
-            alias Any = Nil
-          {% end %}
         end
 
         protected def build_record(**kwargs)

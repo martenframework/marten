@@ -70,19 +70,13 @@ module Marten
                   # No unpacking needed.
                   loop_context[@loop_vars.first] = item
                 else
-                  if item.raw.is_a?(Iterable)
-                    item_arr = item.to_a
-                    @loop_vars.each_with_index do |var, var_index|
-                      if var_index + 1 > item_arr.size
-                        raise Errors::UnsupportedType.new("Missing objects to unpack")
-                      end
-
-                      loop_context[var] = item_arr[var_index]
+                  item_arr = item.to_a
+                  @loop_vars.each_with_index do |var, var_index|
+                    if var_index + 1 > item_arr.size
+                      raise Errors::UnsupportedType.new("Missing objects to unpack")
                     end
-                  else
-                    raise Errors::UnsupportedType.new(
-                      "Unable to unpack #{item.raw.class} objects into multiple variables"
-                    )
+
+                    loop_context[var] = item_arr[var_index]
                   end
                 end
 

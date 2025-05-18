@@ -190,7 +190,7 @@ describe Marten::Template::Tag::For do
 
       expect_raises(
         Marten::Template::Errors::UnsupportedType,
-        "Unable to unpack String objects into multiple variables"
+        "String objects are not iterable"
       ) do
         tag.render(Marten::Template::Context{"arr" => ["foo", "bar"]})
       end

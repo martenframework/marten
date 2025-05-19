@@ -62,10 +62,25 @@ module Marten
         initial_data
       end
 
+      # Prepares the model attributes from the validated schema data.
+      #
+      # This method can be overridden to customize how schema data is transformed into model attributes. By default, the
+      # method returns the validated data as is, but only the fields that are part of the model are included.
+      def prepare_record_attributes
+        schema.validated_data.select(model.fields.map(&.id))
+      end
+
       def process_valid_schema
-        record.update!(schema.validated_data.select(model.fields.map(&.id)))
+        save_record
 
         super
+      end
+
+      # Saves the record after the schema has been validated.
+      #
+      # This method can be overridden in order to change the way the record is saved from the validated data.
+      def save_record : Nil
+        record.update!(prepare_record_attributes)
       end
 
       private def add_record_to_context : Nil

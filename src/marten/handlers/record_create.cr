@@ -54,12 +54,19 @@ module Marten
         raise_improperly_configured_model
       end
 
+      # Prepares the model attributes from the validated schema data.
+      #
+      # This method can be overridden to customize how schema data is transformed into model attributes. By default, the
+      # method returns the data that was validated by the schema as is.
+      def prepare_record_attributes
+        schema.validated_data
+      end
+
       # Produces the response when the processed schema is valid.
       #
       # By default, this will create the new record and return a 302 redirect targetting the configured success URL.
       def process_valid_schema
-        self.record = model.new(schema.validated_data)
-        record.try(&.save!)
+        self.record = save_record
 
         super
       end
@@ -70,6 +77,16 @@ module Marten
 
       def record=(r)
         raise_improperly_configured_model
+      end
+
+      # Saves the record after the schema has been validated.
+      #
+      # This method can be overridden in order to change the way the record is saved from the validated data.
+      def save_record : DB::Model
+        new_record = model.new(prepare_record_attributes)
+        new_record.save!
+
+        new_record
       end
 
       private def raise_improperly_configured_model

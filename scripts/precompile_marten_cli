@@ -1,6 +1,9 @@
 #!/bin/sh -e
 
+set -x
 if [ -z "$SKIP_MARTEN_CLI_PRECOMPILATION" ]; then
-  mkdir -p "$PWD/../../bin"
-  crystal build src/marten_cli.cr -o "$PWD/../../bin/marten"
+	pwd
+	crystal build -o "$PWD/marten" src/marten_cli.cr
+	mkdir -p ../../bin
+	mv "$PWD/marten" "$PWD/../../bin/"
 fi

@@ -1,7 +1,6 @@
 #!/bin/sh -e
 
 if [ -z "$SKIP_MARTEN_CLI_PRECOMPILATION" ]; then
-  shards build
-  mkdir -p ../../bin
-  cp -r "$PWD/bin/marten" "$PWD/../../bin/"
+  mkdir -p "$PWD/../../bin"
+  crystal build src/marten_cli.cr -o "$PWD/../../bin/marten"
 fi

@@ -32,10 +32,6 @@ development_dependencies:
   vips:
     github: naqvis/crystal-vips
 
-targets:
-  marten:
-    main: src/marten_cli.cr
-
 scripts:
   postinstall: scripts/precompile_marten_cli
 

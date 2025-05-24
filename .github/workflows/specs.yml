@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db_version: ['10.11.6', '11.2.2']
+        db_version: ['10.11.13', '11.7.2']
         crystal: [
           '1.14.0',
           '1.15.0',
@@ -129,7 +129,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db_version: ['14', '15', '16']
+        db_version: ['15', '16', '17']
         crystal: [
           '1.14.0',
           '1.15.0',

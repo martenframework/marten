@@ -327,6 +327,7 @@ module.exports = {
             'the-marten-project/release-notes/0.5.4',
             'the-marten-project/release-notes/0.5.5',
             'the-marten-project/release-notes/0.5.6',
+            'the-marten-project/release-notes/0.5.7',
             'the-marten-project/release-notes/0.6',
           ],
         },

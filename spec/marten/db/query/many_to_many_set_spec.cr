@@ -105,6 +105,42 @@ describe Marten::DB::Query::ManyToManySet do
 
       qset.to_set.should eq(Set{tag_1, tag_2})
     end
+
+    it "adds the given records to the considered object's set of associated objects with a non-id pk" do
+      order = Order.create!
+      product = Product.create!(
+        sku: "ABC-123-XYZ",
+        name: "Widget",
+        price_cents: 19_99
+      )
+
+      order.products.add(product)
+
+      qset = Marten::DB::Query::ManyToManySet(Product).new(order, "products", "order_products", "order", "product")
+      qset.all.to_set.should eq(Set{product})
+    end
+
+    it (
+      "does not add records that are already in the considered"
+      " object's set of associated objects with a non-id pk"
+    ) do
+      order = Order.create!
+      product = Product.create!(
+        sku: "ABC-123-XYZ",
+        name: "Widget",
+        price_cents: 19_99
+      )
+
+      order.products.add(product)
+
+      qset = Marten::DB::Query::ManyToManySet(Product).new(order, "products", "order_products", "order", "product")
+      qset.all.to_set.should eq(Set{product})
+
+      order.products.add(product)
+
+      qset = Marten::DB::Query::ManyToManySet(Product).new(order, "products", "order_products", "order", "product")
+      qset.all.to_set.should eq(Set{product})
+    end
   end
 
   describe "#clear" do

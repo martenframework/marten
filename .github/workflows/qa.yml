@@ -15,10 +15,11 @@ on:
 jobs:
   crystal:
     runs-on: ubuntu-latest
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
       - uses: actions/checkout@v1
+      - uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: latest
       - name: Install shards
         run: shards install --ignore-crystal-version
       - name: QA checks
@@ -27,14 +28,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: latest
     - name: Install packages required for SQLite
       run: |
-        apt-get update
-        apt-get -yqq install libsqlite3-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI
@@ -60,14 +62,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: latest
     - name: Install packages required for SQLite
       run: |
-        apt-get update
-        apt-get -yqq install libsqlite3-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libsqlite3-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI
@@ -93,14 +96,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: latest
     - name: Install packages required for SQLite
       run: |
-        apt-get update
-        apt-get -yqq install libsqlite3-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libsqlite3-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI
@@ -124,10 +128,11 @@ jobs:
         bin/ameba
   docs:
     runs-on: ubuntu-latest
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
       - uses: actions/checkout@v1
+      - uses: crystal-lang/install-crystal@v1
+        with:
+          crystal: latest
       - name: Use Node.js 18.x
         uses: actions/setup-node@v1
         with:

@@ -41,17 +41,18 @@ jobs:
           '1.16.3',
           'nightly',
         ]
-    container:
-      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: ${{ matrix.crystal }}
     - name: Install packages required for MySQL
       run: |
-        apt-get update
-        apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev --fix-missing
     - name: Create additional DB for MySQL
       run: |
-        mysql -u root -h mariadb --password=mariadb -e 'create database marten_other_test;'
+        mysql -u root -h 127.0.0.1 --password=mariadb -e 'create database marten_other_test;'
       env:
         PGPASSWORD: mysql
     - name: Install shards
@@ -88,17 +89,18 @@ jobs:
           '1.16.3',
           'nightly',
         ]
-    container:
-      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: ${{ matrix.crystal }}
     - name: Install packages required for MySQL
       run: |
-        apt-get update
-        apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev --fix-missing
     - name: Create additional DB for MySQL
       run: |
-        mysql -u root -h mysql --password=mysql -e 'create database marten_other_test;'
+        mysql -u root -h 127.0.0.1 -P 3307 --password=mysql -e 'create database marten_other_test;'
       env:
         PGPASSWORD: mysql
     - name: Install shards
@@ -136,17 +138,18 @@ jobs:
           '1.16.3',
           'nightly',
         ]
-    container:
-      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: ${{ matrix.crystal }}
     - name: Install packages required for PostgreSQL
       run: |
-        apt-get update
-        apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Create additional DB for PostgreSQL
       run: |
-        createdb marten_other_test -h postgres -U postgres
+        createdb marten_other_test -h 127.0.0.1 -U postgres
       env:
         PGPASSWORD: postgres
     - name: Install shards
@@ -169,14 +172,15 @@ jobs:
           '1.16.3',
           'nightly',
         ]
-    container:
-      image: crystallang/crystal:${{ matrix.crystal }}
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: ${{ matrix.crystal }}
     - name: Install packages required for SQLite
       run: |
-        apt-get update
-        apt-get -yqq install libsqlite3-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Setup env JSON file
@@ -187,14 +191,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: latest
     - name: Install packages required for SQLite
       run: |
-        apt-get update
-        apt-get -yqq install libsqlite3-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI
@@ -216,14 +221,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-    container:
-      image: crystallang/crystal:1.16.3
     steps:
     - uses: actions/checkout@v2
+    - uses: crystal-lang/install-crystal@v1
+      with:
+        crystal: latest
     - name: Install packages required for SQLite
       run: |
-        apt-get update
-        apt-get -yqq install libsqlite3-dev libvips libvips-dev
+        sudo apt-get update
+        sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
     - name: Build the Marten CLI

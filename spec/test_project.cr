@@ -23,6 +23,7 @@ Marten.configure :test do |config|
       db.user = env_settings["MARIADB_DB_USER"].as(String)
       db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
       db.host = env_settings["MARIADB_DB_HOST"].as(String)
+      db.port = env_settings["MARIADB_DB_PORT"]?.as(Int32?)
       db.options = {"encoding" => "utf8mb4"}
     end
 
@@ -32,6 +33,8 @@ Marten.configure :test do |config|
       db.user = env_settings["MARIADB_DB_USER"].as(String)
       db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
       db.host = env_settings["MARIADB_DB_HOST"].as(String)
+      db.port = env_settings["MARIADB_DB_PORT"]?.as(Int32?)
+      db.options = {"encoding" => "utf8mb4"}
     end
   end
 
@@ -42,6 +45,7 @@ Marten.configure :test do |config|
       db.user = env_settings["MYSQL_DB_USER"].as(String)
       db.password = env_settings["MYSQL_DB_PASSWORD"].as(String)
       db.host = env_settings["MYSQL_DB_HOST"].as(String)
+      db.port = env_settings["MYSQL_DB_PORT"]?.as(Int32?)
       db.options = {"encoding" => "utf8mb4"}
     end
 
@@ -51,6 +55,8 @@ Marten.configure :test do |config|
       db.user = env_settings["MYSQL_DB_USER"].as(String)
       db.password = env_settings["MYSQL_DB_PASSWORD"].as(String)
       db.host = env_settings["MYSQL_DB_HOST"].as(String)
+      db.port = env_settings["MYSQL_DB_PORT"]?.as(Int32?)
+      db.options = {"encoding" => "utf8mb4"}
     end
   end
 
@@ -61,6 +67,7 @@ Marten.configure :test do |config|
       db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
       db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
       db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
+      db.port = env_settings["POSTGRESQL_DB_PORT"]?.as(Int32?)
     end
 
     config.database :other do |db|
@@ -69,6 +76,7 @@ Marten.configure :test do |config|
       db.user = env_settings["POSTGRESQL_DB_USER"].as(String)
       db.password = env_settings["POSTGRESQL_DB_PASSWORD"].as(String)
       db.host = env_settings["POSTGRESQL_DB_HOST"].as(String)
+      db.port = env_settings["POSTGRESQL_DB_PORT"]?.as(Int32?)
     end
   end
 

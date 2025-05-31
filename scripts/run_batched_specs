@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-batch_number=6
+batch_number=10
 spec_files=$(find ./spec -name "*_spec.cr")
 num_files=$(echo "$spec_files" | wc -l)
 batch_size=$(( $num_files / $batch_number ))

@@ -29,6 +29,10 @@ module Marten
             @index == (@items_size - 1)
           end
 
+          def length
+            @items_size
+          end
+
           def revindex
             @items_size - @index
           end

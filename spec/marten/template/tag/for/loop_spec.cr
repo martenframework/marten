@@ -61,6 +61,13 @@ describe Marten::Template::Tag::For::Loop do
     end
   end
 
+  describe "#length" do
+    it "returns the size of the loop" do
+      loop = Marten::Template::Tag::For::Loop.new(items_size: 10)
+      loop.length.should eq 10
+    end
+  end
+
   describe "#parent" do
     it "returns nil by default" do
       loop = Marten::Template::Tag::For::Loop.new(items_size: 10)

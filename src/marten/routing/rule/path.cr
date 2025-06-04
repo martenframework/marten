@@ -17,7 +17,7 @@ module Marten
           match = @path_info.resolve(path)
           return if match.nil?
 
-          Match.new(@handler, match.parameters)
+          Match.new(handler: @handler, kwargs: match.parameters, rule: self)
         end
 
         protected def reversers : Array(Reverser)

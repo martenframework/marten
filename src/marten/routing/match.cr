@@ -4,8 +4,9 @@ module Marten
     struct Match
       getter handler
       getter kwargs
+      getter rule
 
-      def initialize(@handler : Marten::Handlers::Base.class, @kwargs = MatchParameters.new)
+      def initialize(@handler : Marten::Handlers::Base.class, @kwargs = MatchParameters.new, @rule = Marten::Routing::Rule::Path.new)
       end
     end
   end

@@ -22,6 +22,7 @@ module Marten
 
         private def process(context)
           matched = Marten.routes.resolve(context.request.path)
+          context.marten.request.route = matched
 
           debug_mode_info_log("Routed to: #{matched.handler.name}")
 

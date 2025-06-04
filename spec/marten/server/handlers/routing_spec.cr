@@ -16,6 +16,8 @@ describe Marten::Server::Handlers::Routing do
 
       handler.call(context)
 
+      context.marten.request.route.not_nil!.rule.name.should eq "dummy"
+      context.marten.request.route.not_nil!.rule.path.should eq "/dummy"
       context.marten.response.not_nil!.content.should eq "It works!"
     end
 
@@ -33,6 +35,8 @@ describe Marten::Server::Handlers::Routing do
 
       handler.call(context)
 
+      context.marten.request.route.not_nil!.rule.name.should eq "dummy_with_id_and_scope"
+      context.marten.request.route.not_nil!.rule.path.should eq "/dummy/<id:int>/and/<scope:slug>"
       context.marten.response.not_nil!.content.should eq "It works!"
     end
 

@@ -13,6 +13,7 @@ module Marten
       @host_and_port : NamedTuple(host: String, port: String)?
       @scheme : String?
       @session : Session::Store::Base?
+      property route : Marten::Routing::Match?
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.

@@ -25,7 +25,7 @@ module Marten
 
           return if sub_match.nil?
 
-          Match.new(sub_match.handler, match.parameters.merge(sub_match.kwargs))
+          Match.new(handler: sub_match.handler, kwargs: match.parameters.merge(sub_match.kwargs), rule: sub_match.rule)
         end
 
         protected def reversers : Array(Reverser)

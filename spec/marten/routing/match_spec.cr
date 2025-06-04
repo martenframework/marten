@@ -4,8 +4,9 @@ describe Marten::Routing::Match do
   describe "#handler" do
     it "returns the associated handler class" do
       match = Marten::Routing::Match.new(
-        Marten::Routing::MatchSpec::TestHandler,
-        Marten::Routing::MatchParameters{"id" => 123},
+        handler: Marten::Routing::MatchSpec::TestHandler,
+        rule: Marten::Routing::Rule::Path.new(name: "test", handler: Marten::Routing::MatchSpec::TestHandler, path: "/test"),
+        kwargs: Marten::Routing::MatchParameters{"id" => 123},
       )
       match.handler.should eq Marten::Routing::MatchSpec::TestHandler
     end
@@ -14,8 +15,9 @@ describe Marten::Routing::Match do
   describe "#kwargs" do
     it "returns the associated handler parameters" do
       match = Marten::Routing::Match.new(
-        Marten::Routing::MatchSpec::TestHandler,
-        Marten::Routing::MatchParameters{"id" => 123},
+        handler: Marten::Routing::MatchSpec::TestHandler,
+        rule: Marten::Routing::Rule::Path.new(name: "test", handler: Marten::Routing::MatchSpec::TestHandler, path: "/test"),
+        kwargs: Marten::Routing::MatchParameters{"id" => 123},
       )
       match.kwargs.should eq({"id" => 123})
     end

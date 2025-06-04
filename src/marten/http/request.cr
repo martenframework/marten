@@ -13,6 +13,7 @@ module Marten
       @host_and_port : NamedTuple(host: String, port: String)?
       @scheme : String?
       @session : Session::Store::Base?
+      @route : Marten::Routing::Match?
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
@@ -207,6 +208,20 @@ module Marten
       # Returns `true` if the content type "application/x-www-form-urlencoded"
       def urlencoded?
         content_type?(CONTENT_TYPE_URL_ENCODED_FORM)
+      end
+
+      def route?
+        @route ||= Marten.routes.resolve(@request.path)
+      rescue Marten::Routing::Errors::NoResolveMatch
+        nil
+      end
+
+      def route_uri_pattern
+        if r = route?
+          r.rule.path.as(String)
+        else
+          nil
+        end
       end
 
       protected getter? disable_request_forgery_protection

@@ -16,6 +16,8 @@ describe Marten::Server::Handlers::Routing do
 
       handler.call(context)
 
+      context.marten.request.route?.not_nil!.rule.name.should eq "dummy"
+      context.marten.request.route?.not_nil!.rule.path.should eq "/dummy"
       context.marten.response.not_nil!.content.should eq "It works!"
     end
 
@@ -33,6 +35,8 @@ describe Marten::Server::Handlers::Routing do
 
       handler.call(context)
 
+      context.marten.request.route?.not_nil!.rule.name.should eq "dummy_with_id_and_scope"
+      context.marten.request.route?.not_nil!.rule.path.should eq "/dummy/<id:int>/and/<scope:slug>"
       context.marten.response.not_nil!.content.should eq "It works!"
     end
 
@@ -72,9 +76,9 @@ describe Marten::Server::Handlers::Routing do
           response: ::HTTP::Server::Response.new(io: IO::Memory.new)
         )
 
-        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
-          handler.call(context)
-        end
+        handler.call(context)
+        context.marten.response.not_nil!.status.should eq(404)
+        context.marten.response.not_nil!.content.should eq "The requested resource was not found."
       end
     end
 
@@ -99,9 +103,9 @@ describe Marten::Server::Handlers::Routing do
           response: ::HTTP::Server::Response.new(io: IO::Memory.new)
         )
 
-        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
-          handler.call(context)
-        end
+        handler.call(context)
+        context.marten.response.not_nil!.status.should eq(404)
+        context.marten.response.not_nil!.content.should eq "The requested resource was not found."
       end
 
       it "raises if the request route is the root" do
@@ -116,9 +120,9 @@ describe Marten::Server::Handlers::Routing do
           response: ::HTTP::Server::Response.new(io: IO::Memory.new)
         )
 
-        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
-          handler.call(context)
-        end
+        handler.call(context)
+        context.marten.response.not_nil!.status.should eq(404)
+        context.marten.response.not_nil!.content.should eq "The requested resource was not found."
       end
 
       it "returns a permanent redirect if the requested route cannot be resolved and does not end with a slash" do
@@ -161,9 +165,9 @@ describe Marten::Server::Handlers::Routing do
           response: ::HTTP::Server::Response.new(io: IO::Memory.new)
         )
 
-        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
-          handler.call(context)
-        end
+        handler.call(context)
+        context.marten.response.not_nil!.status.should eq(404)
+        context.marten.response.not_nil!.content.should eq "The requested resource was not found."
       end
 
       it "raises if the requested route is the root" do
@@ -178,9 +182,9 @@ describe Marten::Server::Handlers::Routing do
           response: ::HTTP::Server::Response.new(io: IO::Memory.new)
         )
 
-        expect_raises(Marten::Routing::Errors::NoResolveMatch) do
-          handler.call(context)
-        end
+        handler.call(context)
+        context.marten.response.not_nil!.status.should eq(404)
+        context.marten.response.not_nil!.content.should eq "The requested resource was not found."
       end
 
       it "returns a permanent redirect if the requested route cannot be resolved and ends with a slash" do

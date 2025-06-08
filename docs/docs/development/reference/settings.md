@@ -592,6 +592,14 @@ config.database do |db|
 end
 ```
 
+The options that you can set here will vary based on your chosen database backend. For example, you could set the `sslmode` option for PostgreSQL databases or some [pragma options](https://github.com/crystal-lang/crystal-sqlite3?tab=readme-ov-file#setting-pragmas) for SQLite3 databases.
+
+Please refer to the applicable DB binding shard documentation for more details about the available options:
+
+* [crystal-pg](https://github.com/will/crystal-pg) (PostgreSQL)
+* [crystal-mysql](https://github.com/crystal-lang/crystal-mysql) (MariaDB, MySQL)
+* [crystal-sqlite3](https://github.com/crystal-lang/crystal-sqlite3) (SQLite3)
+
 ### `password`
 
 Default: `nil`

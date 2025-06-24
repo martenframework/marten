@@ -3,9 +3,11 @@ module Marten
     module Query
       module SQL
         class Query(Model)
+          @annotations = {} of String => SQL::Annotation::Base
           @default_ordering = true
           @distinct = false
           @distinct_columns = [] of String
+          @group_by_pk = false
           @joins = [] of Join
           @limit = nil
           @offset = nil
@@ -14,7 +16,7 @@ module Marten
           @predicate_node = nil
           @using = nil
 
-          getter default_ordering
+          getter annotations
           getter distinct
           getter distinct_columns
           getter joins
@@ -23,6 +25,10 @@ module Marten
           getter order_clauses
           getter predicate_node
           getter using
+
+          getter? default_ordering
+          getter? distinct
+          getter? group_by_pk
 
           setter default_ordering
           setter distinct
@@ -36,9 +42,11 @@ module Marten
           end
 
           def initialize(
+            @annotations : Hash(String, SQL::Annotation::Base),
             @default_ordering : Bool,
             @distinct : Bool,
             @distinct_columns : Array(String),
+            @group_by_pk : Bool,
             @joins : Array(Join),
             @limit : Int64?,
             @offset : Int64?,
@@ -49,7 +57,34 @@ module Marten
           )
           end
 
-          def add_query_node(query_node)
+          def add_annotation(ann : DB::Query::Annotation) : Nil
+            field_path = verify_field(ann.field, only_relations: false, allow_many: true)
+            relation_field_path = field_path.select { |field, _r| field.relation? }
+
+            if relation_field_path.empty? || (field_path.size == 1 && field_path.last[1].nil?)
+              # If we are not considering a relation field or if we are considering a direct relationship (eg. a
+              # many-to-one or one-to-one field), then we can assume that the column is available on the current model.
+              field = field_path.first[0]
+              join = nil
+            else
+              join = ensure_join_for_field_path(relation_field_path, selected: false)
+              field = field_path.last[0]
+            end
+
+            annotation_klass = Annotation.registry.fetch(ann.type) do
+              raise Errors::InvalidField.new("Unknown annotation type '#{ann.type}'")
+            end
+
+            @annotations[ann.alias_name] = annotation_klass.new(
+              field: field,
+              alias_name: ann.alias_name,
+              distinct: ann.distinct?,
+              alias_prefix: join.nil? ? Model.db_table : join.table_alias
+            )
+            @group_by_pk = true
+          end
+
+          def add_query_node(query_node) : Nil
             predicate_node = process_query_node(query_node)
             @predicate_node ||= PredicateNode.new
             @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
@@ -88,9 +123,11 @@ module Marten
 
           def clone
             self.class.new(
+              annotations: @annotations.clone,
               default_ordering: @default_ordering,
               distinct: @distinct,
               distinct_columns: @distinct_columns,
+              group_by_pk: @group_by_pk,
               joins: @joins,
               limit: @limit,
               offset: @offset,
@@ -106,7 +143,7 @@ module Marten
               raise Errors::UnmetQuerySetCondition.new("Cannot combine queries that are sliced")
             end
 
-            if distinct != other.distinct
+            if distinct != other.distinct?
               raise Errors::UnmetQuerySetCondition.new("Cannot combine a distinct query with a non-distinct query")
             end
 
@@ -116,6 +153,10 @@ module Marten
 
             if using != other.using
               raise Errors::UnmetQuerySetCondition.new("Cannot combine queries that target different databases")
+            end
+
+            if !annotations.empty? || !other.annotations.empty?
+              raise Errors::UnmetQuerySetCondition.new("Cannot combine queries with annotations")
             end
 
             # STEP 1: Change the table alias prefixes of the joins in the other query to avoid conflicts with the
@@ -258,8 +299,14 @@ module Marten
             fields.map(&.to_s).each do |raw_field|
               reversed = raw_field.starts_with?('-')
               raw_field = raw_field[1..] if reversed
-              _, column_name = solve_field_and_column(raw_field)
-              order_clauses << {column_name, reversed}
+
+              matching_annotation = annotations[raw_field]?
+              if matching_annotation
+                order_clauses << {matching_annotation.alias_name, reversed}
+              else
+                _, column_name = solve_field_and_column(raw_field)
+                order_clauses << {column_name, reversed}
+              end
             end
 
             @order_clauses = order_clauses
@@ -374,9 +421,11 @@ module Marten
 
           def to_empty
             EmptyQuery(Model).new(
+              annotations: @annotations.clone,
               default_ordering: @default_ordering,
               distinct: @distinct,
               distinct_columns: @distinct_columns,
+              group_by_pk: @group_by_pk,
               joins: @joins,
               limit: @limit,
               offset: @offset,
@@ -461,6 +510,16 @@ module Marten
 
           private MATCH_ALL_PREDICATE = "1=1"
 
+          private def build_annotations
+            built_annotations = [] of String
+
+            @annotations.each do |_, ann|
+              built_annotations << ann.to_sql
+            end
+
+            built_annotations.join(", ")
+          end
+
           private def build_average_query(column_name : String)
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
@@ -505,6 +564,7 @@ module Marten
               s << "FROM #{table_name}"
               s << build_joins
               s << where
+              s << group_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -641,10 +701,11 @@ module Marten
             sql = build_sql do |s|
               s << "SELECT"
               s << connection.distinct_clause_for(distinct_columns) if distinct
-              s << columns
+              s << [columns, build_annotations].reject(&.empty?).join(", ")
               s << "FROM #{table_name}"
               s << build_joins
               s << where
+              s << group_by
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -852,7 +913,14 @@ module Marten
             connection.open do |db|
               db.query query, args: parameters do |result_set|
                 result_set.each do
-                  results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, @joins + parent_model_joins))
+                  results << Model.from_db_row_iterator(
+                    RowIterator.new(
+                      model: Model,
+                      result_set: result_set,
+                      joins: @joins + parent_model_joins,
+                      annotations: @annotations.values,
+                    )
+                  )
                 end
               end
             end
@@ -909,6 +977,12 @@ module Marten
             end
 
             field_context
+          end
+
+          private def group_by
+            return unless group_by_pk?
+
+            "GROUP BY #{Model.db_table}.#{Model.pk_field.db_column}"
           end
 
           private def order_by

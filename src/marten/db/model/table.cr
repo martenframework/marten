@@ -24,6 +24,14 @@ module Marten
           @@parent_models : Array(Marten::DB::Model.class) = [] of Marten::DB::Model.class
           @@reverse_relation_contexts : Array(ReverseRelationContext) | Nil = nil
 
+          @annotations = {} of String => Field::Any
+
+          # Provides access to the annotations that were specified at query time.
+          #
+          # This getter allows to access the annotations that were specified at query time using the `#annotate` query
+          # set method.
+          getter annotations
+
           extend Marten::DB::Model::Table::ClassMethods
 
           macro inherited
@@ -661,7 +669,7 @@ module Marten
           values
         end
 
-        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
+        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator) : Nil
           row_iterator.each_local_column do |result_set, column_name|
             assign_local_field_from_db_result_set(result_set, column_name)
           end
@@ -687,6 +695,10 @@ module Marten
               # then case, then this means that current record does not have a reverse related object.
               assign_reverse_related_object(related_object, reverse_relation.id) if related_object.pk?
             end
+          end
+
+          row_iterator.each_annotation do |result_set, ann|
+            @annotations[ann.alias_name] = ann.from_db_result_set(result_set).as(Field::Any)
           end
         end
 

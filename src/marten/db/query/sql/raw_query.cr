@@ -54,7 +54,14 @@ module Marten
             connection.open do |db|
               db.query query, args: parameters do |result_set|
                 result_set.each do
-                  results << Model.from_db_row_iterator(RowIterator.new(Model, result_set, Array(Join).new))
+                  results << Model.from_db_row_iterator(
+                    RowIterator.new(
+                      model: Model,
+                      result_set: result_set,
+                      joins: Array(Join).new,
+                      annotations: Array(Annotation::Base).new,
+                    )
+                  )
                 end
               end
             end

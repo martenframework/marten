@@ -55,6 +55,29 @@ module Marten
             default_queryset
           end
 
+          # Returns a new query set with the specified annotations.
+          #
+          # This method returns a new query set with the specified annotations. The annotations are specified using a
+          # block where each annotation has to be wrapped using the `annotate` method. For example:
+          #
+          # ```
+          # query_set = Book.annotate { count(:authors) }
+          # other_query_set = Book.annotate do
+          #   count(:authors, as: :author_count)
+          #   sum(:pages, as: :total_pages)
+          # end
+          # ```
+          #
+          # Each of the specified annotations is then available for further use in the query set (in order to filter or
+          # order the records). The annotations are also available in retrieved model records via the `#annotations`
+          # method, which returns a hash containing the annotations as keys and their values as values.
+          def annotate(&)
+            expr = Query::Expression::Annotate.new
+            with expr yield
+
+            default_queryset.annotate(expr)
+          end
+
           # Returns `true` if the model query set matches at least one record or `false` otherwise. Alias of `#exists?`.
           def any?
             exists?

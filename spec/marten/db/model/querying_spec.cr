@@ -31,6 +31,25 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::annotate" do
+    it "returns a new query set with the specified annotations" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "jd3", email: "jd3@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Example post 1", score: 5.0)
+      Post.create!(author: user_1, title: "Example post 2", score: 5.0)
+      Post.create!(author: user_3, title: "Example post 3", score: 5.0)
+
+      qset = TestUser.annotate { count(:posts) }.order("-posts_count")
+
+      qset.to_a.should eq [user_1, user_3, user_2]
+      qset[0].annotations["posts_count"].should eq 2
+      qset[1].annotations["posts_count"].should eq 1
+      qset[2].annotations["posts_count"].should eq 0
+    end
+  end
+
   describe "::any?" do
     it "returns true if the default queryset matches at least one record" do
       Tag.create!(name: "crystal", is_active: true)

@@ -177,6 +177,45 @@ module Marten
           clone
         end
 
+        # Returns a new query set with the specified annotations.
+        #
+        # This method returns a new query set with the specified annotations. The annotations are specified using a
+        # block where each annotation has to be wrapped using the `annotate` method. For example:
+        #
+        # ```
+        # query_set = Book.all.annotate { count(:authors) }
+        # other_query_set = Book.all.annotate do
+        #   count(:authors, as: :author_count)
+        #   sum(:pages, as: :total_pages)
+        # end
+        # ```
+        #
+        # Each of the specified annotations is then available for further use in the query set (in order to filter or
+        # order the records). The annotations are also available in retrieved model records via the `#annotations`
+        # method, which returns a hash containing the annotations as keys and their values as values.
+        def annotate(&)
+          expression = Expression::Annotate.new
+          with expression yield
+
+          annotate(expression)
+        end
+
+        # Returns a new query set with the specified annotations.
+        #
+        # This method returns a new query set with the specified annotations. The annotations are specified as a
+        # `Marten::DB::Query::Expression::Annotate` object.
+        def annotate(expression : Expression::Annotate)
+          return self if expression.annotations.empty?
+
+          qs = clone
+
+          expression.annotations.each do |ann|
+            qs.query.add_annotation(ann)
+          end
+
+          qs
+        end
+
         # Returns `true` if the query set matches at least one record, or `false` otherwise. Alias for `#exists?`.
         def any?
           exists?
@@ -1422,7 +1461,7 @@ module Marten
         # Allows to reverse the order of the current query set.
         def reverse
           qs = clone
-          qs.query.default_ordering = !@query.default_ordering
+          qs.query.default_ordering = !@query.default_ordering?
           qs
         end
 

@@ -16,7 +16,8 @@ describe Marten::DB::Query::SQL::RowIterator do
             row_iterator = Marten::DB::Query::SQL::RowIterator.new(
               Tag,
               result_set,
-              Array(Marten::DB::Query::SQL::Join).new
+              Array(Marten::DB::Query::SQL::Join).new,
+              Array(Marten::DB::Query::SQL::Annotation::Base).new
             )
 
             if outer_iteration == 0
@@ -75,7 +76,12 @@ describe Marten::DB::Query::SQL::RowIterator do
         db.query "SELECT #{columns.join(", ")} FROM #{Post.db_table} #{join.to_sql}" do |result_set|
           outer_iteration = 0
           result_set.each do
-            row_iterator = Marten::DB::Query::SQL::RowIterator.new(Post, result_set, [join])
+            row_iterator = Marten::DB::Query::SQL::RowIterator.new(
+              Post,
+              result_set,
+              [join],
+              Array(Marten::DB::Query::SQL::Annotation::Base).new
+            )
 
             if outer_iteration == 0
               row_iterator.advance
@@ -107,6 +113,57 @@ describe Marten::DB::Query::SQL::RowIterator do
     end
   end
 
+  describe "#each_annotation" do
+    it "allows to yield the result set and an annotation for each of the specified annotations" do
+      Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "coding", is_active: true)
+
+      ann = Marten::DB::Query::SQL::Annotation::Count.new(
+        field: Tag.get_field("name"),
+        alias_name: "name_count",
+        distinct: false,
+        alias_prefix: Tag.db_table
+      )
+
+      columns = [] of String
+      columns += Tag.local_fields.compact_map do |field|
+        next unless field.db_column?
+        "#{Tag.db_table}.#{field.db_column!}"
+      end
+      columns += [ann.to_sql]
+
+      annotation_results = [] of Int64 | Int32 | Int16 | Int8
+
+      Marten::DB::Connection.default.open do |db|
+        db.query(
+          "SELECT #{columns.join(", ")} FROM #{Tag.db_table} GROUP BY #{Tag.get_field("id").db_column}"
+        ) do |result_set|
+          result_set.each do
+            row_iterator = Marten::DB::Query::SQL::RowIterator.new(
+              Tag,
+              result_set,
+              Array(Marten::DB::Query::SQL::Join).new,
+              [ann] of Marten::DB::Query::SQL::Annotation::Base
+            )
+
+            row_iterator.each_local_column { |rs, _| rs.read(Int8 | ::DB::Any) }
+
+            row_iterator.each_annotation do |rs, a|
+              a.field.db_column.should eq "name"
+              a.alias_name.should eq "name_count"
+              a.alias_prefix.should eq Tag.db_table
+              a.distinct?.should be_false
+
+              annotation_results << rs.read(Int64 | Int32 | Int16 | Int8)
+            end
+          end
+        end
+      end
+
+      annotation_results.should eq [1, 1]
+    end
+  end
+
   describe "#each_local_column" do
     it "allows to yield the result set for each of the local columns of a model" do
       tag_1 = Tag.create!(name: "crystal", is_active: true)
@@ -119,7 +176,8 @@ describe Marten::DB::Query::SQL::RowIterator do
             row_iterator = Marten::DB::Query::SQL::RowIterator.new(
               Tag,
               result_set,
-              Array(Marten::DB::Query::SQL::Join).new
+              Array(Marten::DB::Query::SQL::Join).new,
+              Array(Marten::DB::Query::SQL::Annotation::Base).new
             )
 
             inner_iteration = 0
@@ -183,7 +241,12 @@ describe Marten::DB::Query::SQL::RowIterator do
         db.query "SELECT #{columns.join(", ")} FROM #{Post.db_table} #{join.to_sql}" do |result_set|
           outer_iteration = 0
           result_set.each do
-            row_iterator = Marten::DB::Query::SQL::RowIterator.new(Post, result_set, [join])
+            row_iterator = Marten::DB::Query::SQL::RowIterator.new(
+              Post,
+              result_set,
+              [join],
+              Array(Marten::DB::Query::SQL::Annotation::Base).new
+            )
 
             row_iterator.each_local_column { |rs, _| rs.read(Int8 | ::DB::Any) }
 
@@ -254,7 +317,12 @@ describe Marten::DB::Query::SQL::RowIterator do
         db.query "SELECT #{columns.join(", ")} FROM #{Post.db_table} #{join.to_sql}" do |result_set|
           outer_iteration = 0
           result_set.each do
-            row_iterator = Marten::DB::Query::SQL::RowIterator.new(Post, result_set, [join])
+            row_iterator = Marten::DB::Query::SQL::RowIterator.new(
+              Post,
+              result_set,
+              [join],
+              Array(Marten::DB::Query::SQL::Annotation::Base).new
+            )
 
             row_iterator.each_local_column { |rs, _| rs.read(Int8 | ::DB::Any) }
 
@@ -352,7 +420,8 @@ describe Marten::DB::Query::SQL::RowIterator do
             row_iterator = Marten::DB::Query::SQL::RowIterator.new(
               Marten::DB::Query::SQL::RowIteratorSpec::AltStudent,
               result_set,
-              parent_model_joins
+              parent_model_joins,
+              Array(Marten::DB::Query::SQL::Annotation::Base).new
             )
 
             row_iterator.each_local_column { |rs, _| rs.read(Int8 | ::DB::Any) }

@@ -4,6 +4,97 @@ require "./query_spec/app"
 describe Marten::DB::Query::SQL::Query do
   with_installed_apps Marten::DB::Query::SQL::QuerySpec::App
 
+  describe "#add_annotation" do
+    it "allows to add an annotation targeting a non-relation field to a query" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(
+        field: "username",
+        alias_name: "username_count",
+        type: "count",
+        distinct: true,
+      ))
+      query.order([:pk])
+
+      query.count.should eq 3
+
+      results = query.execute
+      results.should eq [user_1, user_2, user_3]
+
+      results[0].annotations["username_count"].should eq 1
+      results[1].annotations["username_count"].should eq 1
+      results[2].annotations["username_count"].should eq 1
+    end
+
+    it "allows to add an annotation targeting a direct relation to a query" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_1, title: "Post 2")
+      post_3 = Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_annotation(
+        Marten::DB::Query::Annotation.new(
+          field: "author",
+          alias_name: "author_count",
+          type: "count",
+        )
+      )
+      query.order([:pk])
+
+      query.count.should eq 3
+
+      results = query.execute
+      results.should eq [post_1, post_2, post_3]
+
+      results[0].annotations["author_count"].should eq 1
+      results[1].annotations["author_count"].should eq 1
+      results[2].annotations["author_count"].should eq 1
+    end
+
+    it "allows to add an annotation targeting a reverse relation to a query" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+      query.order([:pk])
+
+      query.count.should eq 3
+
+      results = query.execute
+      results.should eq [user_1, user_2, user_3]
+
+      results[0].annotations["posts_count"].should eq 2
+      results[1].annotations["posts_count"].should eq 1
+      results[2].annotations["posts_count"].should eq 0
+    end
+
+    it "raises if an annotation targeting an unknown field is added" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      expect_raises(Marten::DB::Errors::InvalidField) do
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(
+            field: "unknown",
+            alias_name: "unknown_count",
+            type: "count",
+          )
+        )
+      end
+    end
+  end
+
   describe "#add_query_node" do
     it "can add a new filter to an unfiltered query" do
       Tag.create!(name: "ruby", is_active: true)
@@ -1021,11 +1112,11 @@ describe Marten::DB::Query::SQL::Query do
     it "properly clones a query by respecting the default ordering" do
       query_1 = Marten::DB::Query::SQL::Query(Tag).new
       query_1.default_ordering = true
-      query_1.clone.default_ordering.should be_true
+      query_1.clone.default_ordering?.should be_true
 
       query_2 = Marten::DB::Query::SQL::Query(Tag).new
       query_2.default_ordering = false
-      query_2.clone.default_ordering.should be_false
+      query_2.clone.default_ordering?.should be_false
     end
 
     it "properly clones a query by respecting joins" do
@@ -1483,6 +1574,57 @@ describe Marten::DB::Query::SQL::Query do
       expect_raises(
         Marten::DB::Errors::UnmetQuerySetCondition,
         "Cannot combine queries that target different databases",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if the combining query contains annotations and the other query does not" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_annotation(
+        Marten::DB::Query::Annotation.new(field: "author", alias_name: "author_count", type: "count")
+      )
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries with annotations",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if the combining query does not contain annotations and the other query does" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.add_annotation(
+        Marten::DB::Query::Annotation.new(field: "author", alias_name: "author_count", type: "count")
+      )
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries with annotations",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if both the combining query and the other query contain annotations" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_annotation(
+        Marten::DB::Query::Annotation.new(field: "author", alias_name: "author_count", type: "count")
+      )
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.add_annotation(
+        Marten::DB::Query::Annotation.new(field: "author", alias_name: "author_count", type: "count")
+      )
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries with annotations",
       ) do
         query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
       end
@@ -2137,6 +2279,40 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.should eq [user_1, user_2, user_3]
     end
 
+    it "can order by an annotation" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Foo", last_name: "Bar")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Bob", last_name: "Ka")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(
+        Marten::DB::Query::Annotation.new(field: "posts", alias_name: "post_count", type: "count")
+      )
+      query.order("post_count")
+      query.execute.should eq [user_2, user_3, user_1]
+    end
+
+    it "can order by an annotation in reverse order" do
+      user_1 = TestUser.create!(username: "u1", email: "u1@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "u2", email: "u2@example.com", first_name: "Foo", last_name: "Bar")
+      user_3 = TestUser.create!(username: "u3", email: "u3@example.com", first_name: "Bob", last_name: "Ka")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(
+        Marten::DB::Query::Annotation.new(field: "posts", alias_name: "post_count", type: "count")
+      )
+      query.order("-post_count")
+      query.execute.should eq [user_1, user_3, user_2]
+    end
+
     it "raises if the specified field is a many-to-many field" do
       expect_raises(Marten::DB::Errors::InvalidField, "Unable to resolve 'tags' as a field.") do
         Marten::DB::Query::SQL::Query(TestUser).new.order(["tags"])
@@ -2575,11 +2751,11 @@ describe Marten::DB::Query::SQL::Query do
     it "properly creates an empty query by respecting the default ordering" do
       query_1 = Marten::DB::Query::SQL::Query(Tag).new
       query_1.default_ordering = true
-      query_1.to_empty.default_ordering.should be_true
+      query_1.to_empty.default_ordering?.should be_true
 
       query_2 = Marten::DB::Query::SQL::Query(Tag).new
       query_2.default_ordering = false
-      query_2.to_empty.default_ordering.should be_false
+      query_2.to_empty.default_ordering?.should be_false
     end
 
     it "properly creates an empty query a query by respecting joins" do

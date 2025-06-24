@@ -14,6 +14,7 @@ module Marten
             @model : Model.class,
             @result_set : ::DB::ResultSet,
             @joins : Array(Join),
+            @annotations : Array(SQL::Annotation::Base),
             @cursor : Int32 = 0,
           )
           end
@@ -26,15 +27,23 @@ module Marten
             each_local_column { |rs, _c| rs.read(Int8 | ::DB::Any) }
             each_parent_column { |_pm, rs, _c| rs.read(Int8 | ::DB::Any) }
             each_joined_relation { |ri, _c| ri.advance }
+            each_annotation { |rs, _a| rs.read(Int8 | ::DB::Any) }
+          end
+
+          def each_annotation(&)
+            @annotations.each do |ann|
+              yield @result_set, ann
+            end
           end
 
           def each_joined_relation(&)
             effective_joins.each do |join|
               relation_iterator = self.class.new(
-                join.to_model,
-                @result_set,
-                join.children,
-                @cursor
+                model: join.to_model,
+                result_set: @result_set,
+                joins: join.children,
+                annotations: Array(Annotation::Base).new,
+                cursor: @cursor,
               )
 
               yield relation_iterator, join.from_common_field, join.reverse_relation

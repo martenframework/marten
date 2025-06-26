@@ -23,7 +23,7 @@ For example, the following schema allows validating an array of strings:
 
 ```crystal
 class ColorsSchema < Marten::Schema
-  field :colors, of: :string
+  field :colors, :array, of: :string
 end
 ```
 
@@ -31,7 +31,7 @@ It is possible to specify options that are specific to the chosen array member f
 
 ```crystal
 class ColorsSchema < Marten::Schema
-  field :colors, of: :string, max_size: 10
+  field :colors, :array, of: :string, max_size: 10
 end
 ```
 

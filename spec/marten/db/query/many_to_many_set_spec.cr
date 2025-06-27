@@ -120,10 +120,7 @@ describe Marten::DB::Query::ManyToManySet do
       qset.all.to_set.should eq(Set{product})
     end
 
-    it (
-      "does not add records that are already in the considered"
-      " object's set of associated objects with a non-id pk"
-    ) do
+    it "does not add records that are already in the considered object's set of associated objects with a non-id pk" do
       order = Order.create!
       product = Product.create!(
         sku: "ABC-123-XYZ",

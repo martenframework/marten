@@ -12,5 +12,6 @@ module Marten::DB::Model::QueryingSpec
     scope :published { filter(published: true) }
     scope :recent { filter(published_at__gt: 1.year.ago) }
     scope :prefixed { |prefix| filter(title__istartswith: prefix) }
+    scope :active { filter(published: true, published_at__gt: Time.utc) }
   end
 end

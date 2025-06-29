@@ -1355,7 +1355,8 @@ describe Marten::DB::Model::Querying do
       post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
         title: "Post 1",
         content: "Content 1",
-        published: true
+        published: true,
+        published_at: 10.days.from_now,
       )
       post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
         title: "Post 2",
@@ -1365,11 +1366,13 @@ describe Marten::DB::Model::Querying do
       post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
         title: "Post 3",
         content: "Content 3",
-        published: true
+        published: true,
+        published_at: 1.day.ago,
       )
 
       Marten::DB::Model::QueryingSpec::Post.all.to_a.should eq [post_1, post_2, post_3]
       Marten::DB::Model::QueryingSpec::Post.published.to_a.should eq [post_1, post_3]
+      Marten::DB::Model::QueryingSpec::Post.active.to_a.should eq [post_3]
     end
 
     it "allows to define a scope that requires arguments for a model" do

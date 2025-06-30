@@ -1265,6 +1265,34 @@ describe Marten::DB::Model::Querying do
       Marten::DB::Model::QueryingSpec::ChildPost.all.to_a.should eq [post_1, post_2, post_3]
       Marten::DB::Model::QueryingSpec::ChildPost.published.to_a.should eq [post_1, post_3]
     end
+
+    it "ensures scopes with similar names are independent of each other across different models" do
+      tag_1 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 1", is_active: true)
+      tag_2 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 2", is_active: true)
+      tag_3 = Marten::DB::Model::QueryingSpec::Tag.create!(name: "Tag 3", is_active: true)
+
+      post_1 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 1",
+        content: "Content 1",
+        published: true,
+        published_at: 2.days.ago,
+      )
+      post_2 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 2",
+        content: "Content 2",
+        published: true,
+        published_at: 3.months.ago,
+      )
+      post_3 = Marten::DB::Model::QueryingSpec::Post.create!(
+        title: "Post 3",
+        content: "Content 3",
+        published: true,
+        published_at: 1.month.ago,
+      )
+
+      Marten::DB::Model::QueryingSpec::Post.recent.to_set.should eq [post_1, post_2, post_3].to_set
+      Marten::DB::Model::QueryingSpec::Tag.recent.to_set.should eq [tag_1, tag_2, tag_3].to_set
+    end
   end
 
   describe "::sum" do

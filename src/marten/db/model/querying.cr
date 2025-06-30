@@ -994,7 +994,7 @@ module Marten
         macro _inherit_scoped_querysets
           {% ancestor_model = @type.ancestors.first %}
 
-          {% if ancestor_model.has_constant?("MODEL_SCOPES") %}
+          {% if ancestor_model.name != "Marten::DB::Model" && ancestor_model.has_constant?("MODEL_SCOPES") %}
             {% for key, value in ancestor_model.constant("MODEL_SCOPES") %}
               {% MODEL_SCOPES[key] = value %}
             {% end %}

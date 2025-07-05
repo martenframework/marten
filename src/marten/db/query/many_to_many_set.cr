@@ -75,7 +75,7 @@ module Marten
               .using(query.using)
               .filter(Query::Node.new({m2m_through_from_field.id => @instance.pk.as(Field::Any)}))
 
-            if (query.predicate_node.try(&.children.size) || 1) > 1
+            if (query.where_predicate_node.try(&.children.size) || 1) > 1
               # If the m2m queryset was filtered we need to target the right objects for deletion.
               deletion_qs = deletion_qs
                 .filter(Query::Node.new({"#{m2m_through_to_field.id}__in" => pluck(:pk).flatten}))

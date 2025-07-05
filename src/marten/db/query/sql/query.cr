@@ -13,8 +13,8 @@ module Marten
           @offset = nil
           @order_clauses = [] of {String, Bool}
           @parent_model_joins : Array(Join)?
-          @predicate_node = nil
           @using = nil
+          @where_predicate_node = nil
 
           getter annotations
           getter distinct
@@ -23,8 +23,8 @@ module Marten
           getter limit
           getter offset
           getter order_clauses
-          getter predicate_node
           getter using
+          getter where_predicate_node
 
           getter? default_ordering
           getter? distinct
@@ -52,8 +52,8 @@ module Marten
             @offset : Int64?,
             @order_clauses : Array({String, Bool}),
             @parent_model_joins : Array(Join)?,
-            @predicate_node : PredicateNode?,
             @using : String?,
+            @where_predicate_node : PredicateNode?,
           )
           end
 
@@ -86,8 +86,8 @@ module Marten
 
           def add_query_node(query_node) : Nil
             predicate_node = process_query_node(query_node)
-            @predicate_node ||= PredicateNode.new
-            @predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+            @where_predicate_node ||= PredicateNode.new
+            @where_predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
           end
 
           def add_selected_join(relation : String) : Nil
@@ -110,9 +110,9 @@ module Marten
           end
 
           def average(raw_field : String)
-            column_name = solve_field_and_column(raw_field).last
-
-            sql, parameters = build_average_query(column_name)
+            sql, parameters = build_average_query(
+              annotations[raw_field]? || solve_field_and_column(raw_field).last,
+            )
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               result ? result.to_s.to_f : nil
@@ -133,8 +133,8 @@ module Marten
               offset: @offset,
               order_clauses: @order_clauses,
               parent_model_joins: @parent_model_joins,
-              predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
-              using: @using
+              using: @using,
+              where_predicate_node: @where_predicate_node.nil? ? nil : @where_predicate_node.clone,
             )
           end
 
@@ -177,23 +177,27 @@ module Marten
             # if the connector is AND (an OR connector would not make sense in this case since one of the queries is
             # targeting all the records while the other one is targeting a subset of them).
 
-            new_predicate_node = if !other.predicate_node.nil? && !predicate_node.nil?
-                                   other.predicate_node.try(&.clone)
+            new_predicate_node = if !other.where_predicate_node.nil? && !where_predicate_node.nil?
+                                   other.where_predicate_node.try(&.clone)
                                  elsif connector.and?
-                                   predicate_node.nil? ? other.predicate_node.try(&.clone) : PredicateNode.new
+                                   if where_predicate_node.nil?
+                                     other.where_predicate_node.try(&.clone)
+                                   else
+                                     PredicateNode.new
+                                   end
                                  elsif connector.xor?
                                    # If the current query has no predicate node and the connector is XOR, we have to
                                    # create a dummy predicate node for the other query. This will ensure that the XOR
                                    # operator works as expected.
-                                   other.predicate_node.try(&.clone) ||
+                                   other.where_predicate_node.try(&.clone) ||
                                      PredicateNode.new(raw_predicate: MATCH_ALL_PREDICATE)
                                  end
 
-            if connector.xor? && predicate_node.nil?
+            if connector.xor? && where_predicate_node.nil?
               # If the current query has no predicate node and the connector is XOR, we have to create a dummy predicate
               # node for the current query. This will ensure that the XOR operator works as expected.
-              @predicate_node = PredicateNode.new
-              @predicate_node.not_nil!.add(
+              @where_predicate_node = PredicateNode.new
+              @where_predicate_node.not_nil!.add(
                 PredicateNode.new(raw_predicate: MATCH_ALL_PREDICATE),
                 PredicateConnector::AND
               )
@@ -205,11 +209,11 @@ module Marten
 
               # Add the predicate node of the other query to the current query (only if we have two predicate nodes or
               # if we are considering an AND operator).
-              (@predicate_node ||= PredicateNode.new).add(new_predicate_node, connector)
+              (@where_predicate_node ||= PredicateNode.new).add(new_predicate_node, connector)
             elsif connector.or?
               # Reset the predicate node if the other query has no predicate node and the connector is OR: indeed, this
               # essentially means that we are targeting all the records.
-              @predicate_node = nil
+              @where_predicate_node = nil
             end
 
             # Order using the order clauses of the other query if it has any. Otherwise, keep the order clauses of the
@@ -256,9 +260,9 @@ module Marten
           end
 
           def maximum(raw_field : String)
-            column_name = solve_field_and_column(raw_field).last
-
-            sql, parameters = build_maximum_query(column_name)
+            sql, parameters = build_maximum_query(
+              annotations[raw_field]? || solve_field_and_column(raw_field).last,
+            )
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               return result unless result
@@ -273,9 +277,9 @@ module Marten
           end
 
           def minimum(raw_field : String)
-            column_name = solve_field_and_column(raw_field).last
-
-            sql, parameters = build_minimum_query(column_name)
+            sql, parameters = build_minimum_query(
+              annotations[raw_field]? || solve_field_and_column(raw_field).last,
+            )
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
               return result unless result
@@ -404,7 +408,9 @@ module Marten
           end
 
           def sum(raw_field : String)
-            sql, parameters = build_sum_query(solve_field_and_column(raw_field).last)
+            sql, parameters = build_sum_query(
+              annotations[raw_field]? || solve_field_and_column(raw_field).last,
+            )
 
             connection.open do |db|
               result = db.scalar(sql, args: parameters)
@@ -431,8 +437,8 @@ module Marten
               offset: @offset,
               order_clauses: @order_clauses,
               parent_model_joins: @parent_model_joins,
-              predicate_node: @predicate_node.nil? ? nil : @predicate_node.clone,
-              using: @using
+              using: @using,
+              where_predicate_node: @where_predicate_node.nil? ? nil : @where_predicate_node.clone,
             )
           end
 
@@ -520,7 +526,17 @@ module Marten
             built_annotations.join(", ")
           end
 
-          private def build_average_query(column_name : String)
+          private def build_average_query(column_name_or_annotation : Annotation::Base | String)
+            if column_name_or_annotation.is_a?(Annotation::Base)
+              column_name = column_name_or_annotation.alias_name
+              selected_column_name = column_name_or_annotation.to_sql
+              group_by_clause = group_by
+            else
+              column_name = column_name_or_annotation
+              selected_column_name = column_name_or_annotation
+              group_by_clause = nil
+            end
+
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
@@ -530,11 +546,12 @@ module Marten
               s << "SELECT"
 
               s << connection.distinct_clause_for(distinct_columns) if distinct
+              s << selected_column_name
 
-              s << column_name
               s << "FROM #{table_name}"
               s << build_joins
               s << where
+              s << group_by_clause if !group_by_clause.nil?
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -629,7 +646,17 @@ module Marten
             end
           end
 
-          private def build_maximum_query(column_name : String)
+          private def build_maximum_query(column_name_or_annotation : Annotation::Base | String)
+            if column_name_or_annotation.is_a?(Annotation::Base)
+              column_name = column_name_or_annotation.alias_name
+              selected_column_name = column_name_or_annotation.to_sql
+              group_by_clause = group_by
+            else
+              column_name = column_name_or_annotation
+              selected_column_name = column_name_or_annotation
+              group_by_clause = nil
+            end
+
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
@@ -639,11 +666,12 @@ module Marten
               s << "SELECT"
 
               s << connection.distinct_clause_for(distinct_columns) if distinct
+              s << selected_column_name
 
-              s << column_name
               s << "FROM #{table_name}"
               s << build_joins
               s << where
+              s << group_by_clause if !group_by_clause.nil?
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -652,7 +680,17 @@ module Marten
             {sql, parameters}
           end
 
-          private def build_minimum_query(column_name : String)
+          private def build_minimum_query(column_name_or_annotation : Annotation::Base | String)
+            if column_name_or_annotation.is_a?(Annotation::Base)
+              column_name = column_name_or_annotation.alias_name
+              selected_column_name = column_name_or_annotation.to_sql
+              group_by_clause = group_by
+            else
+              column_name = column_name_or_annotation
+              selected_column_name = column_name_or_annotation
+              group_by_clause = nil
+            end
+
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
@@ -662,11 +700,12 @@ module Marten
               s << "SELECT"
 
               s << connection.distinct_clause_for(distinct_columns) if distinct
+              s << selected_column_name
 
-              s << column_name
               s << "FROM #{table_name}"
               s << build_joins
               s << where
+              s << group_by_clause if !group_by_clause.nil?
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -714,7 +753,17 @@ module Marten
             {sql, parameters}
           end
 
-          private def build_sum_query(column_name)
+          private def build_sum_query(column_name_or_annotation : Annotation::Base | String)
+            if column_name_or_annotation.is_a?(Annotation::Base)
+              column_name = column_name_or_annotation.alias_name
+              selected_column_name = column_name_or_annotation.to_sql
+              group_by_clause = group_by
+            else
+              column_name = column_name_or_annotation
+              selected_column_name = column_name_or_annotation
+              group_by_clause = nil
+            end
+
             where, parameters = where_clause_and_parameters
             limit = connection.limit_value(@limit)
 
@@ -723,16 +772,13 @@ module Marten
               s << "FROM ("
               s << "SELECT"
 
-              if distinct
-                s << connection.distinct_clause_for(distinct_columns)
-                s << columns
-              end
-
-              s << column_name
+              s << connection.distinct_clause_for(distinct_columns) if distinct
+              s << selected_column_name
 
               s << "FROM #{table_name}"
               s << build_joins
               s << where
+              s << group_by_clause if !group_by_clause.nil?
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -1208,7 +1254,7 @@ module Marten
           end
 
           private def where_clause_and_parameters(offset = 0)
-            if predicate_node = @predicate_node
+            if predicate_node = @where_predicate_node
               where, parameters = predicate_node.to_sql(connection)
               parameters.each_with_index do |_p, i|
                 where = where % (

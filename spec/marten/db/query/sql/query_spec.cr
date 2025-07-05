@@ -1101,6 +1101,21 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
       query.average("rating").not_nil!.should be_close(3.25, 0.00001)
     end
+
+    it "calculates the correct average value when targeting an annotation" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+
+      query.average("posts_count").should eq 1.0
+    end
   end
 
   describe "#clone" do
@@ -2099,6 +2114,21 @@ describe Marten::DB::Query::SQL::Query do
       query.maximum("price").should eq 1000
       query.maximum("rating").should eq 5.0
     end
+
+    it "calculates the correct maximum value when targeting an annotation" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+
+      query.maximum("posts_count").should eq 2
+    end
   end
 
   describe "#minimum" do
@@ -2141,6 +2171,21 @@ describe Marten::DB::Query::SQL::Query do
 
       query.minimum("price").should eq 100
       query.minimum("rating").should eq 1.0
+    end
+
+    it "calculates the correct minimum value when targeting an annotation" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+
+      query.minimum("posts_count").should eq 0
     end
   end
 
@@ -2740,6 +2785,21 @@ describe Marten::DB::Query::SQL::Query do
       query.sum("price").should eq 1600
       query.sum("rating").should eq 8.5
     end
+
+    it "calculates the correct sum value when targeting an annotation" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+
+      query.sum("posts_count").should eq 3
+    end
   end
 
   describe "#to_empty" do
@@ -2785,7 +2845,7 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Tag).new
       query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "r"))
 
-      query.to_empty.predicate_node.should eq query.predicate_node
+      query.to_empty.where_predicate_node.should eq query.where_predicate_node
     end
 
     it "properly creates an empty query by respecting the active DB alias" do

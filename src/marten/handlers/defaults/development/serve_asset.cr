@@ -5,7 +5,8 @@ module Marten
         class ServeAsset < Base
           def get
             begin
-              asset_fullpath = Marten.assets.find(params["path"].as(String))
+              filepath = URI.decode(params["path"].as(String))
+              asset_fullpath = Marten.assets.find(filepath)
             rescue Asset::Errors::AssetNotFound
               return head 404
             end

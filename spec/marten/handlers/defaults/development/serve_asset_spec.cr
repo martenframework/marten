@@ -20,6 +20,24 @@ describe Marten::Handlers::Defaults::Development::ServeAsset do
       response.content.should eq File.read(Marten.assets.find("css/test.css"))
     end
 
+    it "returns the content of a specific asset with spaces in its name" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      params = Marten::Routing::MatchParameters{"path" => "css/test%20with%20spaces.css"}
+      handler = Marten::Handlers::Defaults::Development::ServeAsset.new(request, params)
+
+      response = handler.dispatch
+
+      response.status.should eq 200
+      response.content_type.should eq MIME.from_filename("css/test with spaces.css")
+      response.content.should eq File.read(Marten.assets.find("css/test with spaces.css"))
+    end
+
     it "returns a default content type if no content type can be determined for the given asset path" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

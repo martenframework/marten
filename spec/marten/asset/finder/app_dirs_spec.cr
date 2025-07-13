@@ -26,6 +26,7 @@ describe Marten::Asset::Finder::AppDirs do
       finder.list.to_set.should eq(
         [
           {"test.css", File.join(TestApp.new.assets_finder.not_nil!.root, "test.css")},
+          {"css/test with spaces.css", File.join(TestApp.new.assets_finder.not_nil!.root, "css/test with spaces.css")},
           {"css/test.css", File.join(TestApp.new.assets_finder.not_nil!.root, "css/test.css")},
           {"unidentified_file", File.join(TestApp.new.assets_finder.not_nil!.root, "unidentified_file")},
         ].to_set

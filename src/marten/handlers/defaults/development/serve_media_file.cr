@@ -4,7 +4,7 @@ module Marten
       module Development
         class ServeMediaFile < Base
           def get
-            filepath = params["path"].as(String)
+            filepath = URI.decode(params["path"].as(String))
             return head 404 if !Marten.media_files_storage.exists?(filepath)
 
             content_type = begin

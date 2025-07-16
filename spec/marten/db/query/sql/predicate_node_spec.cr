@@ -487,6 +487,82 @@ describe Marten::DB::Query::SQL::PredicateNode do
     end
   end
 
+  describe "#contains_annotations?" do
+    it "returns true if the predicate node contains an annotation in its direct predicates" do
+      ann = Marten::DB::Query::SQL::Annotation::Count.new(
+        field: Post.get_field("id"),
+        alias_name: "post_count",
+        distinct: false,
+        alias_prefix: Post.db_table,
+      )
+
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(ann, 42, "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_1.contains_annotations?.should be_true
+    end
+
+    it "returns true if the predicate node contains an annotation in its children" do
+      ann = Marten::DB::Query::SQL::Annotation::Count.new(
+        field: Post.get_field("id"),
+        alias_name: "post_count",
+        distinct: false,
+        alias_prefix: Post.db_table,
+      )
+
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(ann, 42, "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        [node_1],
+        Marten::DB::Query::SQL::PredicateConnector::OR,
+        true,
+        predicate_1
+      )
+
+      node_2.contains_annotations?.should be_true
+    end
+
+    it "returns false if the predicate node does not contain an annotation" do
+      predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")
+      predicate_2 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Bar", "t2")
+
+      node_1 = Marten::DB::Query::SQL::PredicateNode.new(
+        Array(Marten::DB::Query::SQL::PredicateNode).new,
+        Marten::DB::Query::SQL::PredicateConnector::AND,
+        false,
+        predicate_1,
+        predicate_2
+      )
+
+      node_2 = Marten::DB::Query::SQL::PredicateNode.new(
+        [node_1],
+        Marten::DB::Query::SQL::PredicateConnector::OR,
+        true,
+        predicate_1
+      )
+
+      node_1.contains_annotations?.should be_false
+      node_2.contains_annotations?.should be_false
+    end
+  end
+
   describe "#replace_table_alias_prefix" do
     it "properly replaces the table alias prefix in the predicate node, its children, and predicates" do
       predicate_1 = Marten::DB::Query::SQL::Predicate::Exact.new(Post.get_field("title"), "Foo", "t1")

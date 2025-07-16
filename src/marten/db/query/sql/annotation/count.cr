@@ -8,12 +8,14 @@ module Marten
               result_set.read(Int64 | Int32 | Int16 | Int8 | Nil)
             end
 
-            def to_sql : String
-              if distinct?
-                "COUNT(DISTINCT #{alias_prefix}.#{field.db_column}) as #{alias_name}"
-              else
-                "COUNT(#{alias_prefix}.#{field.db_column}) as #{alias_name}"
-              end
+            def to_sql(with_alias : Bool = true) : String
+              sql_part = if distinct?
+                           "COUNT(DISTINCT #{alias_prefix}.#{field.db_column})"
+                         else
+                           "COUNT(#{alias_prefix}.#{field.db_column})"
+                         end
+
+              with_alias ? "#{sql_part} as #{alias_name}" : sql_part
             end
           end
         end

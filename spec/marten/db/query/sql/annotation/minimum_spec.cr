@@ -62,5 +62,16 @@ describe Marten::DB::Query::SQL::Annotation::Minimum do
 
       ann.to_sql.should eq "MIN(DISTINCT #{Post.db_table}.score) as score_min"
     end
+
+    it "returns the expected SQL string when with_alias is false" do
+      ann = Marten::DB::Query::SQL::Annotation::Minimum.new(
+        field: Post.get_field("score"),
+        alias_name: "score_min",
+        distinct: false,
+        alias_prefix: Post.db_table,
+      )
+
+      ann.to_sql(with_alias: false).should eq "MIN(#{Post.db_table}.score)"
+    end
   end
 end

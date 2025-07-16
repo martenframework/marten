@@ -418,6 +418,63 @@ describe Marten::DB::Query::SQL::Query do
       end
     end
 
+    it "can add a query node targeting annotations" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_1, title: "Post 1")
+      Post.create!(author: user_1, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+      query.order([:pk])
+
+      query_1 = query.clone
+      query_1.add_query_node(Marten::DB::Query::Node.new(posts_count: 1))
+      query_1.count.should eq 1
+      query_1.execute.should eq [user_2]
+
+      query_2 = query.clone
+      query_2.add_query_node(Marten::DB::Query::Node.new(posts_count: 2))
+      query_2.count.should eq 1
+      query_2.execute.should eq [user_1]
+
+      query_3 = query.clone
+      query_3.add_query_node(Marten::DB::Query::Node.new(posts_count: 0))
+      query_3.count.should eq 1
+      query_3.execute.should eq [user_3]
+
+      query_4 = query.clone
+      query_4.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0))
+      query_4.count.should eq 2
+      query_4.execute.to_set.should eq [user_1, user_2].to_set
+    end
+
+    for_db_backends :postgresql, :sqlite do
+      it "can add a query node targeting annotations and other fields" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_1, title: "Post 1")
+        Post.create!(author: user_1, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(Marten::DB::Query::Annotation.new(
+          field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.order([:pk])
+
+        query_1 = query.clone
+        query_1.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 1, username: "foo"))
+        query_1.count.should eq 1
+        query_1.execute.should eq [user_1]
+      end
+    end
+
     context "with multi table inheritance" do
       it "can filter on local attributes seamlessly" do
         address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")
@@ -1061,6 +1118,26 @@ describe Marten::DB::Query::SQL::Query do
       query.add_query_node(Marten::DB::Query::Node.new(name__startswith: "Awesome"))
       query.average("price").not_nil!.should be_close(1000.0, 0.00001)
       query.average("rating").not_nil!.should be_close(5.0, 0.00001)
+    end
+
+    for_db_backends :postgresql, :sqlite do
+      it "properly calculates the average on a filtered set involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query.average("posts_count").should eq 1.5
+      end
     end
 
     it "properly handles zero rows" do
@@ -1852,6 +1929,26 @@ describe Marten::DB::Query::SQL::Query do
       query.using = "other"
       query.count.should eq 1
     end
+
+    for_db_backends :postgresql, :sqlite do
+      it "properly calculates the count on a filtered set involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query.count.should eq 2
+      end
+    end
   end
 
   describe "#execute" do
@@ -2057,6 +2154,33 @@ describe Marten::DB::Query::SQL::Query do
       query_2 = Marten::DB::Query::SQL::Query(Tag).new
       query_2.exists?.should be_false
     end
+
+    for_db_backends :postgresql, :sqlite do
+      it "returns the expected results for a filtered set involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query_1 = Marten::DB::Query::SQL::Query(TestUser).new
+        query_1.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query_1.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query_1.exists?.should be_true
+
+        query_2 = Marten::DB::Query::SQL::Query(TestUser).new
+        query_2.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query_2.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 2, username__startswith: "a"))
+        query_2.exists?.should be_false
+      end
+    end
   end
 
   describe "#joins?" do
@@ -2129,6 +2253,26 @@ describe Marten::DB::Query::SQL::Query do
 
       query.maximum("posts_count").should eq 2
     end
+
+    for_db_backends :postgresql, :sqlite do
+      it "properly calculates the maximum on a filtered set involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query.maximum("posts_count").should eq 2
+      end
+    end
   end
 
   describe "#minimum" do
@@ -2186,6 +2330,26 @@ describe Marten::DB::Query::SQL::Query do
       query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
 
       query.minimum("posts_count").should eq 0
+    end
+
+    for_db_backends :postgresql, :sqlite do
+      it "properly calculates the minimum on a filtered set involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query.minimum("posts_count").should eq 1
+      end
     end
   end
 
@@ -2441,6 +2605,23 @@ describe Marten::DB::Query::SQL::Query do
 
       Marten::DB::Query::SQL::Query(Post).new.execute.to_set.should eq(Set{post_2, post_3})
     end
+
+    it "properly deletes records when the query involves filtered annotations" do
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_3, title: "Post 1")
+      Post.create!(author: user_3, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+      query.add_query_node(Marten::DB::Query::Node.new(posts_count: 0, username__startswith: "f"))
+      query.raw_delete.should eq 1
+
+      Marten::DB::Query::SQL::Query(TestUser).new.execute.to_set.should eq(Set{user_2, user_3})
+    end
   end
 
   describe "#pluck" do
@@ -2529,6 +2710,26 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
       query.add_query_node(Marten::DB::Query::Node.new(name__in: [] of String))
       query.pluck(["name"]).should be_empty
+    end
+
+    for_db_backends :postgresql, :sqlite do
+      it "works as expected on filtered sets involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query.pluck(["username"]).should eq [["bar"], ["baz"]]
+      end
     end
   end
 
@@ -2800,6 +3001,26 @@ describe Marten::DB::Query::SQL::Query do
 
       query.sum("posts_count").should eq 3
     end
+
+    for_db_backends :postgresql, :sqlite do
+      it "properly calculates the sum on a filtered set involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
+        query.sum("posts_count").should eq 3
+      end
+    end
   end
 
   describe "#to_empty" do
@@ -3019,6 +3240,35 @@ describe Marten::DB::Query::SQL::Query do
 
       post_3.reload
       post_3.title.should eq "Updated"
+    end
+
+    for_db_backends :postgresql, :sqlite do
+      it "works as expected on filtered sets involving annotations" do
+        user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+        user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+        user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+        Post.create!(author: user_3, title: "Post 1")
+        Post.create!(author: user_3, title: "Post 2")
+        Post.create!(author: user_2, title: "Post 3")
+        Post.create!(author: user_1, title: "Post 4")
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_annotation(
+          Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
+        )
+        query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 1, username__startswith: "b"))
+        query.update_with({"username" => "Updated"}).should eq 1
+
+        user_1.reload
+        user_1.username.should eq "foo"
+
+        user_2.reload
+        user_2.username.should eq "bar"
+
+        user_3.reload
+        user_3.username.should eq "Updated"
+      end
     end
 
     context "with multi table inheritance" do

@@ -73,6 +73,13 @@ module Marten
             )
           end
 
+          def contains_annotations? : Bool
+            return false unless filter_predicates?
+
+            filter_predicates.any? { |p| p.left_operand.is_a?(Annotation::Base) } ||
+              children.any?(&.contains_annotations?)
+          end
+
           def filter_predicates : FilterPredicates
             @predicates.as(FilterPredicates)
           end

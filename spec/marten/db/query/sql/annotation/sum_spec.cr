@@ -63,5 +63,16 @@ describe Marten::DB::Query::SQL::Annotation::Sum do
 
       ann.to_sql.should eq "SUM(DISTINCT #{Post.db_table}.score) as score_sum"
     end
+
+    it "returns the expected SQL string when with_alias is false" do
+      ann = Marten::DB::Query::SQL::Annotation::Sum.new(
+        field: Post.get_field("score"),
+        alias_name: "score_sum",
+        distinct: false,
+        alias_prefix: Post.db_table,
+      )
+
+      ann.to_sql(with_alias: false).should eq "SUM(#{Post.db_table}.score)"
+    end
   end
 end

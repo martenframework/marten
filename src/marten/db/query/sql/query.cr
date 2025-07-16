@@ -9,6 +9,7 @@ module Marten
           @distinct_columns = [] of String
           @group_by_pk = false
           @joins = [] of Join
+          @having_predicate_node = nil
           @limit = nil
           @offset = nil
           @order_clauses = [] of {String, Bool}
@@ -20,6 +21,7 @@ module Marten
           getter distinct
           getter distinct_columns
           getter joins
+          getter having_predicate_node
           getter limit
           getter offset
           getter order_clauses
@@ -48,6 +50,7 @@ module Marten
             @distinct_columns : Array(String),
             @group_by_pk : Bool,
             @joins : Array(Join),
+            @having_predicate_node : PredicateNode?,
             @limit : Int64?,
             @offset : Int64?,
             @order_clauses : Array({String, Bool}),
@@ -86,8 +89,14 @@ module Marten
 
           def add_query_node(query_node) : Nil
             predicate_node = process_query_node(query_node)
-            @where_predicate_node ||= PredicateNode.new
-            @where_predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+
+            if predicate_node.contains_annotations?
+              @having_predicate_node ||= PredicateNode.new
+              @having_predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+            else
+              @where_predicate_node ||= PredicateNode.new
+              @where_predicate_node.not_nil!.add(predicate_node, PredicateConnector::AND)
+            end
           end
 
           def add_selected_join(relation : String) : Nil
@@ -129,6 +138,7 @@ module Marten
               distinct_columns: @distinct_columns,
               group_by_pk: @group_by_pk,
               joins: @joins,
+              having_predicate_node: @having_predicate_node.nil? ? nil : @having_predicate_node.clone,
               limit: @limit,
               offset: @offset,
               order_clauses: @order_clauses,
@@ -433,6 +443,7 @@ module Marten
               distinct_columns: @distinct_columns,
               group_by_pk: @group_by_pk,
               joins: @joins,
+              having_predicate_node: @having_predicate_node.nil? ? nil : @having_predicate_node.clone,
               limit: @limit,
               offset: @offset,
               order_clauses: @order_clauses,
@@ -537,7 +548,9 @@ module Marten
               group_by_clause = nil
             end
 
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
+            group_by_clause = group_by if !having_clause.nil?
+
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -550,8 +563,9 @@ module Marten
 
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
               s << group_by_clause if !group_by_clause.nil?
+              s << having_clause
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -561,7 +575,7 @@ module Marten
           end
 
           private def build_count_query(column_name : String?)
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -580,8 +594,9 @@ module Marten
 
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
               s << group_by
+              s << having_clause
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -591,14 +606,16 @@ module Marten
           end
 
           private def build_delete_query
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
 
             sql = build_sql do |s|
               s << "DELETE"
               s << "FROM #{table_name}"
 
               if @joins.empty?
-                s << where
+                s << where_clause
+                s << group_by
+                s << having_clause
               else
                 # If the filters involve joins we are forced to rely on a subquery in order to fetch the IDs of the
                 # records to delete. Actually we even rely on subquery that fetches everything from an extra subquery in
@@ -609,7 +626,9 @@ module Marten
                 s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
                 s << "    FROM #{table_name}"
                 s << build_joins
-                s << where
+                s << where_clause
+                s << group_by
+                s << having_clause
                 s << "  ) subquery"
                 s << ")"
               end
@@ -622,14 +641,16 @@ module Marten
           end
 
           private def build_exists_query
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
               s << "SELECT EXISTS("
               s << "SELECT 1 FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
+              s << group_by
+              s << having_clause
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ")"
@@ -657,7 +678,8 @@ module Marten
               group_by_clause = nil
             end
 
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
+            group_by_clause = group_by if !having_clause.nil?
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -670,8 +692,9 @@ module Marten
 
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
               s << group_by_clause if !group_by_clause.nil?
+              s << having_clause
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -691,7 +714,8 @@ module Marten
               group_by_clause = nil
             end
 
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
+            group_by_clause = group_by if !having_clause.nil?
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -704,8 +728,9 @@ module Marten
 
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
               s << group_by_clause if !group_by_clause.nil?
+              s << having_clause
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -715,7 +740,7 @@ module Marten
           end
 
           private def build_pluck_query(plucked_columns)
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -724,7 +749,9 @@ module Marten
               s << plucked_columns.map(&.last).join(", ")
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
+              s << group_by
+              s << having_clause
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -734,7 +761,7 @@ module Marten
           end
 
           private def build_query
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -743,8 +770,9 @@ module Marten
               s << [columns, build_annotations].reject(&.empty?).join(", ")
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
               s << group_by
+              s << having_clause
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
@@ -764,7 +792,8 @@ module Marten
               group_by_clause = nil
             end
 
-            where, parameters = where_clause_and_parameters
+            where_clause, having_clause, parameters = where_and_having_clauses_and_parameters
+            group_by_clause = group_by if !having_clause.nil?
             limit = connection.limit_value(@limit)
 
             sql = build_sql do |s|
@@ -777,8 +806,9 @@ module Marten
 
               s << "FROM #{table_name}"
               s << build_joins
-              s << where
+              s << where_clause
               s << group_by_clause if !group_by_clause.nil?
+              s << having_clause
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
               s << ") subquery"
@@ -788,16 +818,16 @@ module Marten
           end
 
           private def build_update_query(local_values)
-            where, where_parameters = where_clause_and_parameters(offset: local_values.size)
+            where_clause, having_clause, filter_parameters = where_and_having_clauses_and_parameters(local_values.size)
 
             column_names = local_values.keys.map_with_index do |column_name, i|
               "#{quote(column_name)}=#{connection.parameter_id_for_ordered_argument(i + 1)}"
             end.join(", ")
 
             final_parameters = local_values.values
-            final_parameters += where_parameters if !where_parameters.nil?
+            final_parameters += filter_parameters if !filter_parameters.nil?
 
-            sql = if !where_parameters.nil? && (!@joins.empty? || !parent_model_joins.empty?)
+            sql = if !filter_parameters.nil? && (!@joins.empty? || !parent_model_joins.empty?)
                     # Construct an update query involving subqueries in order to counteract the fact that we have to
                     # rely on joined tables. The extra subquery is necessary because MySQL doesn't allow to reference
                     # update tables in a where clause.
@@ -810,7 +840,9 @@ module Marten
                       s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
                       s << "    FROM #{table_name}"
                       s << build_joins
-                      s << where
+                      s << where_clause
+                      s << group_by
+                      s << having_clause
                       s << "  ) subquery"
                       s << ")"
                     end
@@ -819,7 +851,9 @@ module Marten
                       s << "UPDATE"
                       s << table_name
                       s << "SET #{column_names}"
-                      s << where
+                      s << where_clause
+                      s << group_by
+                      s << having_clause
                     end
                   end
 
@@ -974,6 +1008,22 @@ module Marten
             results
           end
 
+          private def filtering_clause_and_parameters(predicate_node, offset = 0)
+            if !predicate_node.nil?
+              clause, parameters = predicate_node.to_sql(connection)
+              parameters.each_with_index do |_p, i|
+                clause = clause % (
+                  [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
+                )
+              end
+            else
+              clause = nil
+              parameters = nil
+            end
+
+            {clause, parameters}
+          end
+
           private def flattened_joins
             @joins.flat_map(&.to_a)
           end
@@ -1029,6 +1079,13 @@ module Marten
             return unless group_by_pk?
 
             "GROUP BY #{Model.db_table}.#{Model.pk_field.db_column}"
+          end
+
+          private def having_clause_and_parameters(offset = 0)
+            clause, parameters = filtering_clause_and_parameters(@having_predicate_node, offset)
+            clause = "HAVING #{clause}" if !clause.nil?
+
+            {clause, parameters}
           end
 
           private def order_by
@@ -1120,25 +1177,34 @@ module Marten
             raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
             raw_predicate = qparts[1].empty? ? qparts[0] : qparts[2]
 
-            begin
-              field_path = verify_field(raw_query)
+            # First attempt to verify if the specified field corresponds to an existing annotation or an existing field.
+            if !annotations[raw_query]?.nil?
+              left_operand = annotations[raw_query]
               raw_predicate = nil
-            rescue e : Errors::InvalidField
-              raise e if raw_predicate.try(&.empty?)
-              field_path = verify_field(raw_field)
+            elsif !annotations[raw_field]?.nil?
+              left_operand = annotations[raw_field]
+            else
+              begin
+                field_path = verify_field(raw_query)
+                raw_predicate = nil
+              rescue e : Errors::InvalidField
+                raise e if raw_predicate.try(&.empty?)
+                field_path = verify_field(raw_field)
+              end
+
+              relation_field_path = field_path.select { |field, _r| field.relation? }
+
+              join = unless relation_field_path.empty? || field_path.size == 1
+                # Prevent the last field to generate an extra join if the last field in the predicate is a relation
+                # (which is the case when a foreign key field is filtered on for example).
+                relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
+                ensure_join_for_field_path(relation_field_path)
+              end
+
+              left_operand = field_path.last[0]
             end
 
-            relation_field_path = field_path.select { |field, _r| field.relation? }
-
-            join = unless relation_field_path.empty? || field_path.size == 1
-              # Prevent the last field to generate an extra join if the last field in the predicate is a relation (which
-              # is the case when a foreign key field is filtered on for example).
-              relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
-              ensure_join_for_field_path(relation_field_path)
-            end
-
-            field = field_path.last[0]
-
+            # Then prepare the value to be used in the predicate.
             value : Field::Any | Array(Field::Any) = case raw_value
             when Field::Any, Array(Field::Any)
               raw_value
@@ -1150,6 +1216,7 @@ module Marten
               end
             end
 
+            # Then identify the type of predicate to use.
             if raw_predicate.nil? && value.nil?
               predicate_klass = Predicate::IsNull
               value = true
@@ -1161,7 +1228,7 @@ module Marten
               end
             end
 
-            predicate_klass.new(field, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
+            predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end
 
           private def solve_plucked_fields_and_columns(fields)
@@ -1253,21 +1320,20 @@ module Marten
             field_path
           end
 
-          private def where_clause_and_parameters(offset = 0)
-            if predicate_node = @where_predicate_node
-              where, parameters = predicate_node.to_sql(connection)
-              parameters.each_with_index do |_p, i|
-                where = where % (
-                  [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
-                )
-              end
-              where = "WHERE #{where}"
-            else
-              where = nil
-              parameters = nil
-            end
+          private def where_and_having_clauses_and_parameters(offset = 0)
+            where_clause, where_parameters = where_clause_and_parameters(offset)
+            having_clause, having_parameters = having_clause_and_parameters(
+              offset + (where_parameters.try(&.size) || 0)
+            )
 
-            {where, parameters}
+            {where_clause, having_clause, [where_parameters, having_parameters].compact.flat_map(&.to_a)}
+          end
+
+          private def where_clause_and_parameters(offset = 0)
+            clause, parameters = filtering_clause_and_parameters(@where_predicate_node, offset)
+            clause = "WHERE #{clause}" if !clause.nil?
+
+            {clause, parameters}
           end
         end
       end

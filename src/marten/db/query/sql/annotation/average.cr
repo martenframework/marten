@@ -10,12 +10,14 @@ module Marten
               result_set.read(Float64 | Float32 | Nil)
             end
 
-            def to_sql : String
-              if distinct?
-                "AVG(DISTINCT #{alias_prefix}.#{field.db_column}) as #{alias_name}"
-              else
-                "AVG(#{alias_prefix}.#{field.db_column}) as #{alias_name}"
-              end
+            def to_sql(with_alias : Bool = true) : String
+              sql_part = if distinct?
+                           "AVG(DISTINCT #{alias_prefix}.#{field.db_column})"
+                         else
+                           "AVG(#{alias_prefix}.#{field.db_column})"
+                         end
+
+              with_alias ? "#{sql_part} as #{alias_name}" : sql_part
             end
           end
         end

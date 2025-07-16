@@ -15,7 +15,7 @@ module Marten
             end
 
             def initialize(
-              @left_operand : Field::Base,
+              @left_operand : Annotation::Base | Field::Base,
               @right_operand : Field::Any | Array(Field::Any),
               @alias_prefix : String,
             )
@@ -25,11 +25,21 @@ module Marten
               {"%s %s" % [sql_left_operand(connection), sql_right_operand(connection)], sql_params(connection)}
             end
 
+            protected getter left_operand
+
             private def sql_left_operand(connection)
-              connection.left_operand_for(
-                "#{@alias_prefix}.#{@left_operand.db_column}",
-                self.class.predicate_name
-              )
+              case @left_operand
+              when Annotation::Base
+                connection.left_operand_for(
+                  @left_operand.as(Annotation::Base).to_sql(with_alias: false),
+                  self.class.predicate_name
+                )
+              else
+                connection.left_operand_for(
+                  "#{@alias_prefix}.#{@left_operand.as(Field::Base).db_column}",
+                  self.class.predicate_name
+                )
+              end
             end
 
             private def sql_params(connection)
@@ -41,7 +51,12 @@ module Marten
             end
 
             private def sql_right_operand_param(_connection) : ::DB::Any
-              @left_operand.to_db(@right_operand.as(Field::Any))
+              case @left_operand
+              when Annotation::Base
+                @left_operand.as(Annotation::Base).field.to_db(@right_operand.as(Field::Any))
+              else
+                @left_operand.as(Field::Base).to_db(@right_operand.as(Field::Any))
+              end
             end
           end
         end

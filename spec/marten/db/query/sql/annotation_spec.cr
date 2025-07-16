@@ -27,7 +27,7 @@ module Marten::DB::Query::SQL::AnnotationSpec
       result_set.read(Int64 | Int32 | Int16 | Int8 | Float64 | Float32)
     end
 
-    def to_sql : String
+    def to_sql(with_alias : Bool = true) : String
       "TEST_ANNOTATION"
     end
   end

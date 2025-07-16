@@ -62,5 +62,16 @@ describe Marten::DB::Query::SQL::Annotation::Count do
 
       ann.to_sql.should eq "COUNT(DISTINCT #{Post.db_table}.id) as post_count"
     end
+
+    it "returns the expected SQL string when with_alias is false" do
+      ann = Marten::DB::Query::SQL::Annotation::Count.new(
+        field: Post.get_field("id"),
+        alias_name: "post_count",
+        distinct: false,
+        alias_prefix: Post.db_table,
+      )
+
+      ann.to_sql(with_alias: false).should eq "COUNT(#{Post.db_table}.id)"
+    end
   end
 end

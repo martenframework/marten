@@ -25,7 +25,13 @@ module Marten
             end
 
             private def sql_right_operand_param(_connection)
-              @right_operand.as(Array(Field::Any)).map { |o| @left_operand.to_db(o) }
+              @right_operand.as(Array(Field::Any)).map do |o|
+                if @left_operand.is_a?(Annotation::Base)
+                  @left_operand.as(Annotation::Base).field.to_db(o)
+                else
+                  @left_operand.as(Field::Base).to_db(o)
+                end
+              end
             end
           end
         end

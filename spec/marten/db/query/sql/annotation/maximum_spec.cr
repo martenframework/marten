@@ -62,5 +62,16 @@ describe Marten::DB::Query::SQL::Annotation::Maximum do
 
       ann.to_sql.should eq "MAX(DISTINCT #{Post.db_table}.score) as score_max"
     end
+
+    it "returns the expected SQL string when with_alias is false" do
+      ann = Marten::DB::Query::SQL::Annotation::Maximum.new(
+        field: Post.get_field("score"),
+        alias_name: "score_max",
+        distinct: false,
+        alias_prefix: Post.db_table,
+      )
+
+      ann.to_sql(with_alias: false).should eq "MAX(#{Post.db_table}.score)"
+    end
   end
 end

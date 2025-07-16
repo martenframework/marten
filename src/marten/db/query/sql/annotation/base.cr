@@ -24,7 +24,7 @@ module Marten
             abstract def from_db_result_set(result_set : ::DB::ResultSet)
 
             # Returns the SQL string corresponding to the annotation.
-            abstract def to_sql : String
+            abstract def to_sql(with_alias : Bool = true) : String
 
             def clone
               self.class.new(

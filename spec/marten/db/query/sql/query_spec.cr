@@ -2617,7 +2617,7 @@ describe Marten::DB::Query::SQL::Query do
 
       query = Marten::DB::Query::SQL::Query(TestUser).new
       query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
-      query.add_query_node(Marten::DB::Query::Node.new(posts_count: 0, username__startswith: "f"))
+      query.add_query_node(Marten::DB::Query::Node.new(posts_count: 0))
       query.raw_delete.should eq 1
 
       Marten::DB::Query::SQL::Query(TestUser).new.execute.to_set.should eq(Set{user_2, user_3})

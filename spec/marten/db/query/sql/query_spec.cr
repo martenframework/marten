@@ -2712,6 +2712,22 @@ describe Marten::DB::Query::SQL::Query do
       query.pluck(["name"]).should be_empty
     end
 
+    it "can pluck annotations" do
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "baz", email: "baz@example.com", first_name: "John", last_name: "Doe")
+
+      Post.create!(author: user_3, title: "Post 1")
+      Post.create!(author: user_3, title: "Post 2")
+      Post.create!(author: user_2, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_annotation(Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count"))
+      query.order("id")
+
+      query.pluck(["username", "posts_count"]).should eq([["foo", 0], ["bar", 1], ["baz", 2]])
+    end
+
     for_db_backends :postgresql, :sqlite do
       it "works as expected on filtered sets involving annotations" do
         user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")

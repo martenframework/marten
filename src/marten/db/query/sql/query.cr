@@ -977,9 +977,14 @@ module Marten
             connection.open do |db|
               db.query query, args: parameters do |result_set|
                 result_set.each do
-                  results << plucked_columns.each_with_object(Array(Field::Any).new) do |(field, _c), plucked_values|
-                    plucked_values << field.from_db_result_set(result_set)
-                  end
+                  results << plucked_columns
+                    .each_with_object(Array(Field::Any).new) do |(field_or_ann, _c), plucked_values|
+                      plucked_values << if field_or_ann.is_a?(Annotation::Base)
+                        field_or_ann.field.from_db_result_set(result_set)
+                      else
+                        field_or_ann.from_db_result_set(result_set)
+                      end
+                    end
                 end
               end
             end
@@ -1232,8 +1237,12 @@ module Marten
           end
 
           private def solve_plucked_fields_and_columns(fields)
-            fields.each_with_object([] of Tuple(Field::Base, String)) do |raw_field, plucked_columns|
-              plucked_columns << solve_field_and_column(raw_field)
+            fields.each_with_object([] of Tuple(Annotation::Base | Field::Base, String)) do |raw_field, plucked_columns|
+              plucked_columns << if !(ann = annotations[raw_field]?).nil?
+                {ann, ann.to_sql(with_alias: false)}
+              else
+                solve_field_and_column(raw_field)
+              end
             end
           end
 

@@ -4,7 +4,6 @@ module Marten
       module SQL
         module Expression
           class Extract < Base
-
             def initialize(@field : Field::Base, @predicate_name : String); end
 
             def to_sql_left(connection : Connection::Base, alias_prefix : String) : String

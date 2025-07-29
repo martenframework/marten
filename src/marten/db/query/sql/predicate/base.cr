@@ -29,11 +29,11 @@ module Marten
 
             protected def sql_left_operand(connection)
               rendered = case @left_operand
-              when Field::Base
-                "#{@alias_prefix}.#{@left_operand.as(Field::Base).db_column}"
-              else
-                @left_operand.as(SQL::Expression::Base).to_sql_left(connection, @alias_prefix)
-              end
+                         when Field::Base
+                           "#{@alias_prefix}.#{@left_operand.as(Field::Base).db_column}"
+                         else
+                           @left_operand.as(SQL::Expression::Base).to_sql_left(connection, @alias_prefix)
+                         end
               connection.left_operand_for(
                 rendered,
                 self.class.predicate_name

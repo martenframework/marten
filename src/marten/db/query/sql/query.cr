@@ -1188,21 +1188,26 @@ module Marten
 
           private def parse_lookup(raw : String) : ParsedLookup
             tokens = raw.split(Constants::LOOKUP_SEP)
+            len = tokens.size
 
-            if
-              tokens.size >= 3 && Predicate.registry[tokens[-1]]? && Predicate.transform_registry[tokens[-2]]?
-              field_part = tokens[0, tokens.size - 2]
-              return ParsedLookup.new(field_part, tokens[-2], tokens[-1])
+            # Check for both a transform and a comparison
+            if len >= 3
+              transform_name = tokens[-2]
+              comparison_name = tokens[-1]
+              if Predicate.transform_registry[transform_name]? && Predicate.registry[comparison_name]?
+                return ParsedLookup.new(tokens[0, len - 2], transform_name, comparison_name)
+              end
             end
 
-            if tokens.size >= 2 && Predicate.transform_registry[tokens[-1]]? && Predicate.registry[tokens[-1]]?.nil?
-              field_part = tokens[0, tokens.size - 1]
-              return ParsedLookup.new(field_part, tokens[-1], nil)
-            end
-
-            if tokens.size >= 2 && Predicate.registry[tokens[-1]]?
-              field_part = tokens[0, tokens.size - 1]
-              return ParsedLookup.new(field_part, nil, tokens[-1])
+            # Check for transform only or comparison only
+            if len >= 2
+              name = tokens[-1]
+              field_part = tokens[0, len - 1]
+              if Predicate.transform_registry[name]? && !Predicate.registry[name]?
+                return ParsedLookup.new(field_part, name, nil)
+              elsif Predicate.registry[name]?
+                return ParsedLookup.new(field_part, nil, name)
+              end
             end
 
             ParsedLookup.new(tokens, nil, nil)
@@ -1229,7 +1234,13 @@ module Marten
               verify_field(field_lookup)
             rescue e : Errors::InvalidField
               begin
-                verify_field(raw_query).tap { parsed = ParsedLookup.new(parsed.field_tokens + [parsed.transform_name, parsed.comparison_name].compact, nil, nil) }
+                verify_field(raw_query).tap do
+                  parsed = ParsedLookup.new(
+                    parsed.field_tokens + [parsed.transform_name, parsed.comparison_name].compact,
+                    nil,
+                    nil
+                  )
+                end
               rescue
                 raise e
               end

@@ -143,12 +143,12 @@ module Marten
           "lt"          => "< %s",
           "lte"         => "<= %s",
           "startswith"  => "LIKE %s",
-          "year"       => "EXTRACT(YEAR FROM %s)",
-          "month"      => "EXTRACT(MONTH FROM %s)",
-          "day"        => "EXTRACT(DAY FROM %s)",
-          "hour"       => "EXTRACT(HOUR FROM %s)",
-          "minute"     => "EXTRACT(MINUTE FROM %s)",
-          "second"     => "EXTRACT(SECOND FROM %s)",
+          "year"        => "EXTRACT(YEAR FROM %s)",
+          "month"       => "EXTRACT(MONTH FROM %s)",
+          "day"         => "EXTRACT(DAY FROM %s)",
+          "hour"        => "EXTRACT(HOUR FROM %s)",
+          "minute"      => "EXTRACT(MINUTE FROM %s)",
+          "second"      => "EXTRACT(SECOND FROM %s)",
         }
       end
     end

@@ -185,8 +185,8 @@ module Marten
         # ```
         # query_set = Book.all.annotate { count(:authors) }
         # other_query_set = Book.all.annotate do
-        #   count(:authors, as: :author_count)
-        #   sum(:pages, as: :total_pages)
+        #   count(:authors, alias_name: :author_count)
+        #   sum(:pages, alias_name: :total_pages)
         # end
         # ```
         #

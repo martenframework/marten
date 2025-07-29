@@ -12,6 +12,7 @@ This documents covers the main features of the [query set API](./reference/query
 class City < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
   field :name, :string, max_size: 255
+  field :population, :int, null: true, blank: true
 end
 
 class Author < Marten::Model
@@ -24,8 +25,9 @@ end
 class Article < Marten::Model
   field :id, :big_int, primary_key: true, auto: true
   field :title, :string, max_size: 255
+  field :subtitle, :string, max_size: 255, blank: true, null: true
   field :content, :text
-  field :author, :many_to_one, to: Author
+  field :author, :many_to_one, to: Author, related: :articles
 end
 ```
 
@@ -552,3 +554,176 @@ Considering, the above model definition, you can retrieve all the `Post` records
 ```crystal
 Post.unscoped # => Post::QuerySet [...]>
 ```
+
+## Aggregations
+
+The previous sections have covered the ways to filter and order model records. However, there are times when you need to retrieve calculated values that summarize or aggregate collections of objects. This section describes how to generate and return aggregate values using Marten's query API.
+
+When considering aggregations, we can usually consider two main use cases:
+
+* Returning a single calculated value from a given query set.
+* Annotating a query set with additional aggregated data that can be filtered on and that is made available for each record in the query set.
+
+### Returning a single aggregated value
+
+#### Counting objects
+
+The most basic aggregation is counting the number of objects in a query set. This can be done by using the [`#count`](./reference/query-set.md#count) method.
+
+For example:
+
+```crystal
+Article.all.count                              # returns the number of article records
+Article.all.count(:subtitle)                   # returns the number of articles where the subtitle is not null
+Article.filter(title__startswith: "Top").count # returns the number of articles whose title start with "Top"
+```
+
+#### Summing values
+
+The [`#sum`](./reference/query-set.md#sum) method returns the sum of the values of a given model field.
+
+For example:
+
+```crystal
+City.all.sum(:population) # returns the sum of the population values of all cities
+```
+
+#### Calculating averages
+
+The [`#average`](./reference/query-set.md#average) method returns the average of the values of a given model field.
+
+For example:
+
+```crystal
+City.all.average(:population) # returns the average of the population values of all cities
+```
+
+#### Calculating minimum and maximum values
+
+The [`#minimum`](./reference/query-set.md#minimum) and [`#maximum`](./reference/query-set.md#maximum) methods return the minimum and maximum values of a given model field across a query set, respectively.
+
+For example:
+
+```crystal
+City.all.minimum(:population) # returns the minimum population value of all cities
+City.all.maximum(:population) # returns the maximum population value of all cities
+```
+
+### Annotating query sets with aggregated data
+
+The previous sections have covered the ways to retrieve a single aggregated value from a given query set. However, sometimes you will need to "retain" the aggregated values for each record in the query set (possibly for further filtering or for making use of the aggregated values when dealing with individual records). This can be achieved by using the [`#annotate`](./reference/query-set.md#annotate) method.
+
+This method requires the use of a block that will be used to define the aggregated value for each record in the query set. For example:
+
+```crystal
+query_set = Author.all.annotate { count(:articles) }
+```
+
+All the types of aggregation methods covered previously can be used within the block. For example:
+
+| Aggregation method | Description |
+|---------------------|-------------|
+| `count` | Counts the number of records |
+| `sum` | Returns the sum of the values of a given field |
+| `average` | Returns the average of the values of a given field |
+| `minimum` | Returns the minimum value of a given field |
+| `maximum` | Returns the maximum value of a given field |
+
+For example:
+
+```crystal
+Author.all.annotate { count(:articles) }
+Author.all.annotate { sum(:articles__score) }
+Author.all.annotate { average(:articles__score) }
+Author.all.annotate { minimum(:articles__score) }
+Author.all.annotate { maximum(:articles__score) }
+```
+
+#### Accessing annotated values
+
+Once an annotated query set has been retrieved, it is possible to access the annotated values for each record by using the [`#annotations`](pathname:///api/dev/Marten/DB/Model.html#annotations%3AHash(String%2CBool|File|Float32|Float64|Int32|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3ADB%3A%3AField%3A%3AFile%3A%3AFile|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Symbol|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method. This method returns a hash where the keys are the names of the annotated fields and the values are the annotated values.
+
+For example:
+
+```crystal
+annotated_query_set = Author.all.annotate { count(:articles) }
+annotated_query_set.each do |author|
+  puts author.annotations["articles_count"]
+end
+```
+
+It is worth mentioning that the annotation names are generated by concatenating the field or relation name with the annotation type. For example, the annotation name for the `count` annotation on the `articles` reverse relation is `articles_count`, unless [an alias name is specified](#specifying-an-alias-name-for-an-annotation).
+
+#### Specifying multiple annotations
+
+It is also possible to specify multiple annotations at once when using the [`#annotate`](./reference/query-set.md#annotate) method. This can be achieved by calling the method multiple times or by defining the block over multiple lines.
+
+For example, the following two query sets are equivalent:
+
+```crystal
+query_set_1 = Author.all
+  .annotate { count(:articles) }
+  .annotate { sum(:articles__score) }
+
+query_set_2 = Article.all.annotate do
+  count(:articles)
+  sum(:articles__score)
+end
+```
+
+#### Specifying an alias name for an annotation
+
+It is also possible to specify an alias name for an annotation by using the [`#as`](./reference/query-set.md#as) method. This can be achieved by calling the annotation method with the alias name specified with the `alias_name` argument or by calling the `#alias` method on the annotation object itself.
+
+For example, the following two query sets are equivalent:
+
+```crystal
+query_set_1 = Author.all.annotate { count(:articles, alias_name: :my_ann) }
+query_set_2 = Author.all.annotate { count(:articles).alias(:my_ann) }
+```
+
+In the previous examples, the annotation value will be available under the `my_ann` key instead of the default `articles_count` one when [accessing the annotated values](#accessing-annotated-values).
+
+#### Computing distinct annotations
+
+It is also possible to compute distinct annotations by specifying the `distinct: true` argument to the annotation method or by calling the `#distinct` method on the annotation object itself.
+
+For example, the following two query sets are equivalent:
+
+```crystal
+query_set_1 = Author.all.annotate { sum(:articles__score, distinct: true) }
+query_set_2 = Author.all.annotate { sum(:articles__score).distinct }
+```
+
+In the previous examples, the annotation value will be computed by summing the distinct values of the `score` field.
+
+#### Ordering by annotated values
+
+It is possible to order the records of a query set by an annotated value by using the [`#order`](./reference/query-set.md#order) method. To do so, you can simply specify the aliases of the annotated values you want to order by.
+
+For example:
+
+```crystal
+Author.all.annotate { count(:articles) }.order(:articles_count)
+Author.all.annotate { count(:articles) }.order("-articles_count")
+```
+
+#### Filtering on annotated values
+
+To filter on annotated values, you can use the [`#filter`](./reference/query-set.md#filter) method and use the aliases of the annotated values you want to filter on.
+
+For example:
+
+```crystal
+Author.all.annotate { count(:articles) }.filter(articles_count__gt: 10)
+Author
+  .filter(first_name: "John")
+  .annotate { count(:articles) }
+  .filter(articles_count__gt: 10)
+```
+
+:::warning
+Filtering on annotated values is an experimental feature. All database backends supported by Marten allow filtering on annotated values as long as those filters are applied separately from filters targeting other fields.
+
+If you want to combine filters in a single `#filter` call that targets both annotated values and other fields, you should note that this is only supported by the PostgreSQL and SQLite backends at the moment.
+:::

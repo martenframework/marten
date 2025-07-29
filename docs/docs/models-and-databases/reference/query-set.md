@@ -131,6 +131,34 @@ qset = Article.all # returns a query set matching "all" the records of the Artic
 qset2 = qset.all   # returns a copy of the initial query set
 ```
 
+### `annotate`
+
+Returns a new query set that will include the specified annotations.
+
+This method returns a new query set with the specified annotations. The annotations are specified using a block where each annotation has to be wrapped using the `#annotate` method. For example:
+
+```crystal
+query_set = Book.all.annotate { count(:authors) }
+other_query_set = Book.all.annotate do
+  count(:authors, alias_name: :author_count)
+  sum(:pages, alias_name: :total_pages)
+end
+```
+
+Each of the specified annotations is then available for further use in the query set (in order to filter or order the records). The annotations are also available in retrieved model records via the [`#annotations`](pathname:///api/dev/Marten/DB/Model.html#annotations%3AHash(String%2CBool|File|Float32|Float64|Int32|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3ADB%3A%3AField%3A%3AFile%3A%3AFile|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Symbol|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method, which returns a hash containing the annotations as keys and their values as values.
+
+Those are the supported annotation types:
+
+| Aggregation method | Description |
+|---------------------|-------------|
+| `count` | Counts the number of records |
+| `sum` | Returns the sum of the values of a given field |
+| `average` | Returns the average of the values of a given field |
+| `minimum` | Returns the minimum value of a given field |
+| `maximum` | Returns the maximum value of a given field |
+
+Please refer to the [Annotating query sets with aggregated data](../queries.md#annotating-query-sets-with-aggregated-data) section to learn more about using annotations.
+
 ### `distinct`
 
 Returns a new query set that will use `SELECT DISTINCT` or `SELECT DISTINCT ON` in its SQL query.

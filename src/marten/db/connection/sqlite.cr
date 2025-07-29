@@ -144,12 +144,12 @@ module Marten
           "lt"          => "< %s",
           "lte"         => "<= %s",
           "startswith"  => "LIKE %s ESCAPE '\\'",
-          "year"        => "strftime('%Y', %s)",
-          "month"       => "strftime('%m', %s)",
-          "day"         => "strftime('%d', %s)",
-          "hour"        => "strftime('%H', %s)",
-          "minute"      => "strftime('%M', %s)",
-          "second"      => "strftime('%S', %s)",
+          "year"        => "CAST(strftime('%Y', %s) AS INTEGER)",
+          "month"       => "CAST(strftime('%m', %s) AS INTEGER)",
+          "day"         => "CAST(strftime('%d', %s) AS INTEGER)",
+          "hour"        => "CAST(strftime('%H', %s) AS INTEGER)",
+          "minute"      => "CAST(strftime('%M', %s) AS INTEGER)",
+          "second"      => "CAST(strftime('%S', %s) AS INTEGER)",
         }
 
         private IN_MEMORY_ID = ":memory:"

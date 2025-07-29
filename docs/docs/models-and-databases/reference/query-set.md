@@ -985,3 +985,50 @@ Allows filtering records based on field values that start with a specific substr
 ```crystal
 Article.all.filter(title__startswith: "Top")
 ```
+
+## Field transforms
+
+Field transforms allow filtering on a computed part of a field value. Time-related transforms are available for date/time fields:
+
+- `year`
+- `month`
+- `day`
+- `hour`
+- `minute`
+- `second`
+
+A transform can be combined with any supported predicate using the double‑underscores notation.
+
+### Basics
+
+You can use a transform on its own with an implicit an exact comparison:
+
+```crystal
+# Short form (implicit __exact):
+Article.all.filter(published_at__year: 2025)
+
+# Equivalent explicit form:
+Article.all.filter(published_at__year__exact: 2025)
+```
+
+Transforms can also be used through relations:
+
+```crystal
+Post.all.filter(author__created_at__year__lte: 2025)
+```
+
+:::tip
+While time transforms are supported on indexed columns, they typically **prevent the use of indexes** because they apply a function to the column. This can lead to slower queries on large datasets.
+
+If your date or datetime field is indexed, **prefer range-based filters** to allow the database to use the index:
+
+```crystal
+# Instead of:
+Article.all.filter(published_at__year: 2025)
+
+# Prefer:
+Article.all
+  .filter(published_at__gte: Time.utc(2025, 1, 1))
+  .filter(published_at__lt:  Time.utc(2026, 1, 1))
+```
+:::

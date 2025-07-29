@@ -1186,62 +1186,90 @@ module Marten
             {field, column}
           end
 
-          private def solve_field_and_predicate(raw_query, raw_value)
-            qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
-            raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
-            raw_predicate = qparts[1].empty? ? qparts[0] : qparts[2]
+          private def parse_lookup(raw : String) : ParsedLookup
+            tokens = raw.split(Constants::LOOKUP_SEP)
 
-            # First attempt to verify if the specified field corresponds to an existing annotation or an existing field.
-            if !annotations[raw_query]?.nil?
-              left_operand = annotations[raw_query]
-              raw_predicate = nil
-            elsif !annotations[raw_field]?.nil?
-              left_operand = annotations[raw_field]
-            else
-              begin
-                field_path = verify_field(raw_query)
-                raw_predicate = nil
-              rescue e : Errors::InvalidField
-                raise e if raw_predicate.try(&.empty?)
-                field_path = verify_field(raw_field)
-              end
-
-              relation_field_path = field_path.select { |field, _r| field.relation? }
-
-              join = unless relation_field_path.empty? || field_path.size == 1
-                # Prevent the last field to generate an extra join if the last field in the predicate is a relation
-                # (which is the case when a foreign key field is filtered on for example).
-                relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
-                ensure_join_for_field_path(relation_field_path)
-              end
-
-              left_operand = field_path.last[0]
+            if
+              tokens.size >= 3 && Predicate.registry[tokens[-1]]? && Predicate.transform_registry[tokens[-2]]?
+              field_part = tokens[0, tokens.size - 2]
+              return ParsedLookup.new(field_part, tokens[-2], tokens[-1])
             end
 
-            # Then prepare the value to be used in the predicate.
-            value : Field::Any | Array(Field::Any) = case raw_value
+            if tokens.size >= 2 && Predicate.transform_registry[tokens[-1]]? && Predicate.registry[tokens[-1]]?.nil?
+              field_part = tokens[0, tokens.size - 1]
+              return ParsedLookup.new(field_part, tokens[-1], nil)
+            end
+
+            if tokens.size >= 2 && Predicate.registry[tokens[-1]]?
+              field_part = tokens[0, tokens.size - 1]
+              return ParsedLookup.new(field_part, nil, tokens[-1])
+            end
+
+            ParsedLookup.new(tokens, nil, nil)
+          end
+
+          private def coerce_filter_value(raw_value) : Field::Any | Array(Field::Any)
+            case raw_value
             when Field::Any, Array(Field::Any)
               raw_value
             when DB::Model
               raw_value.pk
             when Array(DB::Model)
-              raw_value.each_with_object(Array(Field::Any).new) do |v, values|
-                values << v.pk
-              end
-            end
-
-            # Then identify the type of predicate to use.
-            if raw_predicate.nil? && value.nil?
-              predicate_klass = Predicate::IsNull
-              value = true
-            elsif raw_predicate.nil?
-              predicate_klass = Predicate::Exact
+              raw_value.each_with_object(Array(Field::Any).new) { |v, arr| arr << v.pk }
             else
-              predicate_klass = Predicate.registry.fetch(raw_predicate) do
-                raise Errors::InvalidField.new("Unknown predicate type '#{raw_predicate}'")
+              raw_value
+            end
+          end
+
+          private def solve_field_and_predicate(raw_query, raw_value)
+            parsed = parse_lookup(raw_query)
+            field_lookup = parsed.field_tokens.join(Constants::LOOKUP_SEP)
+
+            field_path = begin
+              verify_field(field_lookup)
+            rescue e : Errors::InvalidField
+              begin
+                verify_field(raw_query).tap { parsed = ParsedLookup.new(parsed.field_tokens + [parsed.transform_name, parsed.comparison_name].compact, nil, nil) }
+              rescue
+                raise e
               end
             end
 
+            relation_field_path = field_path.select { |field, _r| field.relation? }
+
+            join = unless relation_field_path.empty? || field_path.size == 1
+              relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
+              ensure_join_for_field_path(relation_field_path)
+            end
+
+            left_operand = field_path.last[0]
+
+            if tname = parsed.transform_name
+              tklass = Predicate.transform_registry.fetch(tname) do
+                raise Errors::InvalidField.new("Unknown transform '#{tname}'")
+              end
+              unless tklass.responds_to?(:apply)
+                raise Errors::InvalidField.new("Transform '#{tname}' is not applicable")
+              end
+              left_operand = tklass.apply(
+                left_operand.as(Field::Base),
+              )
+            end
+
+            value = coerce_filter_value(raw_value)
+
+            predicate_klass = if cname = parsed.comparison_name
+                                Predicate.registry.fetch(cname) do
+                                  raise Errors::InvalidField.new("Unknown predicate type '#{cname}'")
+                                end
+                              else
+                                if value.nil?
+                                  value = true
+                                  Predicate::IsNull
+                                else
+                                  Predicate::Exact
+                                end
+                              end
             predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end
 

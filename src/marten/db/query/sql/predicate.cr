@@ -6,6 +6,7 @@ module Marten
       module SQL
         module Predicate
           @@registry = {} of String => Base.class
+          @@transform_registry = {} of String => Base.class
 
           def self.register(predicate_klass : Base.class)
             @@registry[predicate_klass.predicate_name] = predicate_klass
@@ -13,6 +14,14 @@ module Marten
 
           def self.registry
             @@registry
+          end
+
+          def self.register_transform(predicate_klass : Base.class)
+            @@transform_registry[predicate_klass.predicate_name] = predicate_klass
+          end
+
+          def self.transform_registry
+            @@transform_registry
           end
 
           register Contains
@@ -29,7 +38,13 @@ module Marten
           register LessThan
           register LessThanOrEqual
           register StartsWith
-          register Year
+
+          register_transform Year
+          register_transform Month
+          register_transform Day
+          register_transform Hour
+          register_transform Minute
+          register_transform Second
         end
       end
     end

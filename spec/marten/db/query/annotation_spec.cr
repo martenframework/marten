@@ -100,4 +100,29 @@ describe Marten::DB::Query::Annotation do
       ann.alias_name.should eq "custom_alias_name"
     end
   end
+
+  describe "#alias" do
+    it "allows to set the alias name for the annotation" do
+      ann = Marten::DB::Query::Annotation.average("posts")
+      ann.alias("custom_alias_name").should be ann
+
+      ann.alias_name.should eq "custom_alias_name"
+    end
+  end
+
+  describe "#distinct" do
+    it "allows to set the distinct value for the annotation" do
+      ann_1 = Marten::DB::Query::Annotation.average("posts")
+      ann_1.distinct(true).should be ann_1
+      ann_1.distinct?.should be_true
+
+      ann_2 = Marten::DB::Query::Annotation.average("posts")
+      ann_2.distinct(true).should be ann_2
+      ann_2.distinct?.should be_true
+
+      ann_3 = Marten::DB::Query::Annotation.average("posts")
+      ann_3.distinct(false).should be ann_3
+      ann_3.distinct?.should be_false
+    end
+  end
 end

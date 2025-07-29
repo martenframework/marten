@@ -30,6 +30,16 @@ module Marten
 
         def initialize(@type : String, @field : String, @alias_name : String, @distinct : Bool = false)
         end
+
+        def alias(alias_name : String | Symbol)
+          @alias_name = alias_name.to_s
+          self
+        end
+
+        def distinct(distinct : Bool = true)
+          @distinct = distinct
+          self
+        end
       end
     end
   end

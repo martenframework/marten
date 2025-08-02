@@ -106,9 +106,7 @@ describe Marten do
     it "shows the build information when invoked with the -v flag" do
       result = MartenSpec.run_start_command(["-v"])
 
-      expected_result = "Marten #{Marten::VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"
-
-      result.should contain expected_result
+      result.should contain "Marten #{Marten::VERSION} [#{Marten.env.id}]"
     end
   end
 end

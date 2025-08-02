@@ -288,7 +288,15 @@ module Marten
   end
 
   private def self.build_information : String
-    "Marten #{VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"
+    # "Marten #{VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"
+    revision_info = ""
+    if Crystal::BUILD_COMMIT
+      revision_info = " revision #{Crystal::BUILD_COMMIT}"
+    end
+    <<-INFO
+      Marten #{VERSION} [#{Marten.env.id}]
+      crystal #{Crystal::VERSION} (#{Crystal::BUILD_DATE}#{revision_info} llvm #{Crystal::LLVM_VERSION}) [#{Crystal::TARGET_TRIPLE}]
+      INFO
   end
 
   private def self.debug_server_startup_banner(addresses_str : String, ready_in : Time::Span) : String
@@ -349,6 +357,7 @@ module Marten
         exit 0
       end
       opts.on("-h", "--help", "Shows this help") do
+        puts build_information
         puts opts
         exit 0
       end

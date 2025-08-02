@@ -2744,7 +2744,7 @@ describe Marten::DB::Query::SQL::Query do
           Marten::DB::Query::Annotation.new(field: "posts", alias_name: "posts_count", type: "count")
         )
         query.add_query_node(Marten::DB::Query::Node.new(posts_count__gt: 0, username__startswith: "b"))
-        query.pluck(["username"]).should eq [["bar"], ["baz"]]
+        query.pluck(["username"]).to_set.should eq [["bar"], ["baz"]].to_set
       end
     end
   end

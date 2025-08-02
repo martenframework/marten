@@ -309,7 +309,7 @@ module Marten
         puts opts
         exit 0
       end
-      opts.on("--log-level PORT", "Custom log level to use") do |log_level|
+      opts.on("--log-level LOG_LEVEL", "Custom log level to use") do |log_level|
         override_log_level(log_level)
       end
     end

@@ -306,6 +306,7 @@ module Marten
         override_server_port(port.to_i)
       end
       opts.on("-h", "--help", "Shows this help") do
+        puts build_info
         puts opts
         exit 0
       end
@@ -329,5 +330,17 @@ module Marten
     else
       Log.info { base_message }
     end
+  end
+
+  private def self.build_info
+    revision_info = ""
+    if Crystal::BUILD_COMMIT
+      revision_info = " revision #{Crystal::BUILD_COMMIT}"
+    end
+    <<-INFO
+      Marten v#{VERSION} [#{Marten.env.id}]
+      crystal #{Crystal::VERSION} (#{Crystal::BUILD_DATE}#{revision_info} llvm #{Crystal::LLVM_VERSION}) [#{Crystal::TARGET_TRIPLE}]
+      #{Crystal::DESCRIPTION}
+      INFO
   end
 end

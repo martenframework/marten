@@ -668,6 +668,19 @@ module Marten
             last.not_nil!
           end
 
+          # Returns a queryset that will limit the number of records returned.
+          #
+          # This method allows to specify the maximum number of records to return. For example:
+          #
+          # ```
+          # posts = Post.limit(10)
+          # ```
+          #
+          # In the above example, only the first 10 records will be returned.
+          def limit(value : Int)
+            default_queryset.limit(value)
+          end
+
           # Returns the maximum value of a field for the current model.
           #
           # Finds the largest value within the specified field for the records targeted by the model. For example:
@@ -692,6 +705,19 @@ module Marten
           # This would identify the lowest-priced product.
           def minimum(field : String | Symbol)
             default_queryset.minimum(field)
+          end
+
+          # Returns a queryset that will offset the records returned.
+          #
+          # This method allows to specify the starting point for the records to return. For example:
+          #
+          # ```
+          # posts = Post.offset(10)
+          # ```
+          #
+          # In the above example, the records will be returned starting from the 10th record.
+          def offset(value : Int)
+            default_queryset.offset(value)
           end
 
           # Returns a queryset targetting all the records for the considered model with the specified ordering.

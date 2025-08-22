@@ -824,6 +824,26 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::limit" do
+    it "allows to limit the number of records returned" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      Tag.create!(name: "tag-3", is_active: true)
+
+      Tag.limit(2).to_a.should eq [tag_1, tag_2]
+    end
+  end
+
+  describe "::offset" do
+    it "allows to offset the records returned" do
+      Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+
+      Tag.offset(1).to_a.should eq [tag_2, tag_3]
+    end
+  end
+
   describe "::order" do
     it "allows to order using a specific column specified as a string" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

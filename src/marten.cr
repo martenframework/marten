@@ -312,6 +312,10 @@ module Marten
       opts.on("--log-level LOG_LEVEL", "Custom log level to use") do |log_level|
         override_log_level(log_level)
       end
+      opts.on("-v", "--version", "Show the build information") do
+        puts build_info
+        exit 0
+      end
     end
   end
 
@@ -329,5 +333,17 @@ module Marten
     else
       Log.info { base_message }
     end
+  end
+
+  private def self.build_info
+    revision_info = ""
+    if Crystal::BUILD_COMMIT
+      revision_info = " revision #{Crystal::BUILD_COMMIT}"
+    end
+    <<-INFO
+      Marten v#{VERSION} [#{Marten.env.id}]
+      crystal #{Crystal::VERSION} (#{Crystal::BUILD_DATE}#{revision_info} llvm #{Crystal::LLVM_VERSION}) [#{Crystal::TARGET_TRIPLE}]
+      #{Crystal::DESCRIPTION}
+      INFO
   end
 end

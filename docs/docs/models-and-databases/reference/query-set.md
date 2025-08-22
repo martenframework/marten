@@ -243,6 +243,18 @@ query_set.join(:author__profile)
 The `#join` method also supports targeting the reverse relation of a [`one_to_one`](./fields.md#one_to_one) field (such reverse relation can be defined through the use of the [`related`](./fields.md#related-2) field option). That way, you can traverse a [`one_to_one`](./fields.md#one_to_one) field back to the model record on which the field is specified.
 :::
 
+### `limit`
+
+Returns a query set that will limit the number of records returned.
+
+This method allows to specify the maximum number of records to return. For example:
+
+```crystal
+query_set = Post.all.limit(10)
+```
+
+In the above example, only the first 10 records will be returned.
+
 ### `none`
 
 Returns a query set that will always return an empty array of records, without querying the database.
@@ -253,6 +265,18 @@ Once this method is used, any subsequent method calls (such as extra filters) wi
 query_set = Post.all
 query_set.none.exists? # => false
 ```
+
+### `offset`
+
+Returns a query set that will offset the records returned.
+
+This method allows to specify the starting point for the records to return. For example:
+
+```crystal
+query_set = Post.all.offset(10)
+```
+
+In the above example, the records will be returned starting from the 10th record.
 
 ### `order`
 

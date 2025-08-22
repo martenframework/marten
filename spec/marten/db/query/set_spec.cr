@@ -2695,6 +2695,33 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#limit" do
+    it "allows to limit the number of records returned by the query set" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+      qset = qset.order(:id).limit(2)
+
+      qset.size.should eq 2
+      qset.to_a.should eq [tag_1, tag_2]
+    end
+
+    it "works as expected if an offset was specified" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+      Tag.create!(name: "tag-4", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+      qset = qset.order(:id).offset(1).limit(2)
+
+      qset.size.should eq 2
+      qset.to_a.should eq [tag_2, tag_3]
+    end
+  end
+
   describe "#maximum" do
     it "properly returns the maximum value when specifying a field expressed as a string" do
       user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
@@ -2751,6 +2778,33 @@ describe Marten::DB::Query::Set do
       qset.none.exists?.should be_false
       qset.none.size.should eq 0
       qset.none.should be_empty
+    end
+  end
+
+  describe "#offset" do
+    it "allows to specify the starting point for the records to return" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+      qset = qset.order(:id).offset(1)
+
+      qset.size.should eq 2
+      qset.to_a.should eq [tag_2, tag_3]
+    end
+
+    it "works as expected if a limit was specified" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      Tag.create!(name: "tag-3", is_active: true)
+      Tag.create!(name: "tag-4", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+      qset = qset.order(:id).limit(2).offset(1)
+
+      qset.size.should eq 1
+      qset.to_a.should eq [tag_2]
     end
   end
 

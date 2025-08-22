@@ -1124,6 +1124,21 @@ module Marten
           last.not_nil!
         end
 
+        # Specifies the maximum number of records to return.
+        #
+        # This method allows to limit the number of records returned by the query set. For example:
+        #
+        # ```
+        # posts = Post.all.limit(10)
+        # ```
+        #
+        # In the above example, only the first 10 records will be returned.
+        def limit(value : Int)
+          qs = clone
+          qs.query.slice(0, value)
+          qs
+        end
+
         # Returns the maximum value of a field for the current query set.
         #
         # Finds the smallest value within the specified field for the records targeted by the query set. For example:
@@ -1163,6 +1178,21 @@ module Marten
         # array of records.
         def none
           clone(query.to_empty)
+        end
+
+        # Specifies the starting point for the records to return.
+        #
+        # This method allows to specify the starting point for the records to return. For example:
+        #
+        # ```
+        # posts = Post.all.offset(10)
+        # ```
+        #
+        # In the above example, the records will be returned starting from the 10th record.
+        def offset(value : Int)
+          qs = clone
+          qs.query.slice(value)
+          qs
         end
 
         # Allows to specify the ordering in which records should be returned when evaluating the query set.

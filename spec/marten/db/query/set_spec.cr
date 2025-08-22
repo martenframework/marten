@@ -2699,7 +2699,7 @@ describe Marten::DB::Query::Set do
     it "allows to limit the number of records returned by the query set" do
       tag_1 = Tag.create!(name: "tag-1", is_active: true)
       tag_2 = Tag.create!(name: "tag-2", is_active: true)
-      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+      Tag.create!(name: "tag-3", is_active: true)
 
       qset = Marten::DB::Query::Set(Tag).new
       qset = qset.order(:id).limit(2)
@@ -2709,7 +2709,7 @@ describe Marten::DB::Query::Set do
     end
 
     it "works as expected if an offset was specified" do
-      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      Tag.create!(name: "tag-1", is_active: true)
       tag_2 = Tag.create!(name: "tag-2", is_active: true)
       tag_3 = Tag.create!(name: "tag-3", is_active: true)
       Tag.create!(name: "tag-4", is_active: true)
@@ -2783,7 +2783,7 @@ describe Marten::DB::Query::Set do
 
   describe "#offset" do
     it "allows to specify the starting point for the records to return" do
-      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      Tag.create!(name: "tag-1", is_active: true)
       tag_2 = Tag.create!(name: "tag-2", is_active: true)
       tag_3 = Tag.create!(name: "tag-3", is_active: true)
 
@@ -2795,7 +2795,7 @@ describe Marten::DB::Query::Set do
     end
 
     it "works as expected if a limit was specified" do
-      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      Tag.create!(name: "tag-1", is_active: true)
       tag_2 = Tag.create!(name: "tag-2", is_active: true)
       Tag.create!(name: "tag-3", is_active: true)
       Tag.create!(name: "tag-4", is_active: true)

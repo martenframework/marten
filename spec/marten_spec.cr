@@ -95,4 +95,32 @@ describe Marten do
       end
     end
   end
+
+  describe "#start" do
+    it "shows the build information when invoked with the -v flag" do
+      result = MartenSpec.run_start_command(["-v"])
+
+      expected_result = "Marten #{Marten::VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"
+
+      result.should contain expected_result
+    end
+  end
+end
+
+module MartenSpec
+  def self.run_start_command(options = [] of String)
+    full_code = <<-CR
+        require "./src/marten"
+
+        ARGV.concat(#{options.inspect})
+        Marten.start
+      CR
+
+    stdout = IO::Memory.new
+    stderr = IO::Memory.new
+
+    Process.run("crystal", ["eval", full_code], output: stdout, error: stderr)
+
+    stdout.rewind.to_s
+  end
 end

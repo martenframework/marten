@@ -274,6 +274,10 @@ module Marten
     __DIR__
   end
 
+  private def self.build_information : String
+    "Marten #{VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"
+  end
+
   private def self.effective_marten_location : String
     if !(root_path = Marten.settings.root_path).nil?
       Path[_marten_app_location]
@@ -305,12 +309,16 @@ module Marten
       opts.on("-p PORT", "--port PORT", "Custom port to listen for connections") do |port|
         override_server_port(port.to_i)
       end
+      opts.on("--log-level LOG_LEVEL", "Custom log level to use") do |log_level|
+        override_log_level(log_level)
+      end
+      opts.on("-v", "--version", "Show build information") do
+        puts build_information
+        exit 0
+      end
       opts.on("-h", "--help", "Shows this help") do
         puts opts
         exit 0
-      end
-      opts.on("--log-level LOG_LEVEL", "Custom log level to use") do |log_level|
-        override_log_level(log_level)
       end
     end
   end

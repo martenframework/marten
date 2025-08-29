@@ -429,7 +429,7 @@ The `Student` model will have four model fields in total (`id`, `name`, `email`,
 
 ### Multi table inheritance
 
-Marten also supports another form of model inheritance, where each model in the hierarchy is a concrete model (i.e., a model that is not abstract). In this situation, each model can be used/queried individually and has its own associated database. The framework upholds "links" between each model that uses multi table inheritance and its parent models in order to ensure that the relational structure and inheritance hierarchy are accurately maintained.
+Marten also supports another form of model inheritance, where each model in the hierarchy is a concrete model (i.e., a model that is not abstract). In this situation, each model can be used/queried individually and has its own associated table. The framework upholds "links" between each model that uses multi table inheritance and its parent models in order to ensure that the relational structure and inheritance hierarchy are accurately maintained.
 
 For example, let's consider the following models:
 

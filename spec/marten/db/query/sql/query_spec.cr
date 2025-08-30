@@ -1079,6 +1079,90 @@ describe Marten::DB::Query::SQL::Query do
         results[0].should eq student_profile
         results[0].__query_spec_student.should eq student
       end
+
+      it "allows to specify multiple child model relations" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        teacher = Marten::DB::Query::SQL::QuerySpec::Teacher.create!(
+          name: "Teacher 1",
+          email: "teacher-1@example.com",
+          address: address,
+          subject: "Math"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Person).new
+        query.order("id")
+        query.add_selected_join("student")
+        query.add_selected_join("teacher")
+
+        results = query.execute
+
+        results.size.should eq 2
+
+        results[0].should eq student
+        results[0].__query_spec_student.should eq student
+        results[0].__query_spec_teacher.should be_nil
+
+        results[1].should eq teacher
+        results[1].__query_spec_student.should be_nil
+        results[1].__query_spec_teacher.should eq teacher
+      end
+
+      it "allows to specify multiple child model relations spawning over multiple levels" do
+        address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 2")
+
+        student = Marten::DB::Query::SQL::QuerySpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        alt_student = Marten::DB::Query::SQL::QuerySpec::AltStudent.create!(
+          name: "Alt Student 1",
+          email: "alt-student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11"
+        )
+
+        teacher = Marten::DB::Query::SQL::QuerySpec::Teacher.create!(
+          name: "Teacher 1",
+          email: "teacher-1@example.com",
+          address: address,
+          subject: "Math"
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Person).new
+        query.order("id")
+        query.add_selected_join("student")
+        query.add_selected_join("student__alt_student")
+        query.add_selected_join("teacher")
+
+        results = query.execute
+
+        results.size.should eq 3
+
+        results[0].should eq student
+        results[0].__query_spec_student.should eq student
+        results[0].__query_spec_teacher.should be_nil
+        results[0].student!.__query_spec_alt_student.should be_nil
+
+        results[1].__query_spec_student.should eq alt_student.student_ptr
+        results[1].__query_spec_teacher.should be_nil
+        results[1].student!.__query_spec_alt_student.should eq alt_student
+
+        results[2].should eq teacher
+        results[2].__query_spec_student.should be_nil
+        results[2].__query_spec_teacher.should eq teacher
+      end
     end
   end
 

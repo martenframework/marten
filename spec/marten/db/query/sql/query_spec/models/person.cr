@@ -13,5 +13,13 @@ module Marten::DB::Query::SQL::QuerySpec
     def __query_spec_person_profile
       @_reverse_o2o_person_profile
     end
+
+    def __query_spec_student
+      @_reverse_o2o_student
+    end
+
+    def __query_spec_teacher
+      @_reverse_o2o_teacher
+    end
   end
 end

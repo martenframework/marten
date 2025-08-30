@@ -880,6 +880,8 @@ module Marten
             model_chain = [] of DB::Model.class
 
             current_model.parent_models.each do |int_model|
+              break if int_model == Model
+
               model_chain << int_model
 
               break if int_model == target_model
@@ -939,9 +941,16 @@ module Marten
 
               # No existing join means that we must create a new one.
               if join.nil?
+                join_type = if field.null? || !reverse_relation.nil? ||
+                               (field.is_a?(Field::OneToOne) && field.parent_link?)
+                              JoinType::LEFT_OUTER
+                            else
+                              JoinType::INNER
+                            end
+
                 join = Join.new(
                   id: all_joins.size + 1,
-                  type: field.null? || !reverse_relation.nil? ? JoinType::LEFT_OUTER : JoinType::INNER,
+                  type: join_type,
                   from_model: from_model,
                   from_common_field: from_common_field,
                   reverse_relation: reverse_relation,

@@ -1243,18 +1243,13 @@ module Marten
           private def solve_field_and_predicate(raw_query, raw_value)
             parsed = parse_lookup(raw_query)
             field_lookup = parsed[:field_tokens].join(Constants::LOOKUP_SEP)
+            join = nil
 
             # First attempt to verify if the specified field corresponds to an existing annotation
-            if !annotations[raw_query]?.nil?
-              left_operand = annotations[raw_query]
-              parsed = {
-                field_tokens:    parsed[:field_tokens],
-                transform_name:  nil,
-                comparison_name: parsed[:comparison_name],
-              }
-            elsif !annotations[field_lookup]?.nil?
-              left_operand = annotations[field_lookup]
-            else
+            left_operand = annotations[raw_query]? || annotations[field_lookup]?
+
+            # If no annotation found, resolve the field path and handle transforms
+            unless left_operand
               # Try to resolve field path for the field tokens
               field_path = begin
                 verify_field(field_lookup)
@@ -1262,57 +1257,51 @@ module Marten
                 begin
                   # Fallback: try the entire raw_query as field name
                   verify_field(raw_query).tap do
-                    tokens = (parsed[:field_tokens] + [parsed[:transform_name], parsed[:comparison_name]]).compact
-                    parsed = {
-                      field_tokens:    tokens,
-                      transform_name:  nil,
-                      comparison_name: nil,
-                    }
+                    # Reset parsing since we're using the full query as field name
+                    parsed = {field_tokens: [raw_query], transform_name: nil, comparison_name: nil}
                   end
                 rescue
                   raise e
                 end
               end
 
+              # Handle joins for relation fields
               relation_field_path = field_path.select { |field, _r| field.relation? }
-
-              join = unless relation_field_path.empty? || field_path.size == 1
+              unless relation_field_path.empty? || field_path.size == 1
                 # Prevent the last field to generate an extra join if the last field in the predicate is a relation
                 # (which is the case when a foreign key field is filtered on for example).
-                relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
-                ensure_join_for_field_path(relation_field_path)
+                relation_field_path = relation_field_path[0..-2] if relation_field_path.size == field_path.size
+                join = ensure_join_for_field_path(relation_field_path)
               end
 
               left_operand = field_path.last[0]
 
-              if tname = parsed[:transform_name]
-                tklass = Predicate.transform_registry.fetch(tname) do
-                  raise Errors::InvalidField.new("Unknown transform '#{tname}'")
+              # Apply transform if specified
+              if transform_name = parsed[:transform_name]
+                transform_class = Predicate.transform_registry.fetch(transform_name) do
+                  raise Errors::InvalidField.new("Unknown transform '#{transform_name}'")
                 end
-
-                left_operand = tklass.apply(
-                  left_operand.as(Field::Base)
-                )
+                left_operand = transform_class.apply(left_operand.as(Field::Base))
               end
             end
 
+            # Prepare the value to be used in the predicate
             value = coerce_filter_value(raw_value)
 
-            # Determine predicate class
-            predicate_klass = if cname = parsed[:comparison_name]
-                                Predicate.registry.fetch(cname) do
-                                  raise Errors::InvalidField.new("Unknown predicate type '#{cname}'")
+            predicate_class = case
+                              when comparison_name = parsed[:comparison_name]
+                                Predicate.registry.fetch(comparison_name) do
+                                  raise Errors::InvalidField.new("Unknown predicate type '#{comparison_name}'")
                                 end
+                              when value.nil?
+                                value = true
+                                Predicate::IsNull
                               else
-                                if value.nil?
-                                  value = true
-                                  Predicate::IsNull
-                                else
-                                  Predicate::Exact
-                                end
+                                Predicate::Exact
                               end
 
-            predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
+            alias_prefix = join.try(&.table_alias) || Model.db_table
+            predicate_class.new(left_operand, value, alias_prefix: alias_prefix)
           end
 
           private def solve_plucked_fields_and_columns(fields)

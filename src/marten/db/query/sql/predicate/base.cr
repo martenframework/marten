@@ -4,7 +4,7 @@ module Marten
       module SQL
         module Predicate
           abstract class Base
-            alias LeftOperand = Field::Base | SQL::Expression::Base
+            alias LeftOperand = Annotation::Base | Field::Base | SQL::Expression::Base
 
             class_getter predicate_name : String = ""
 
@@ -27,12 +27,16 @@ module Marten
               {"%s %s" % [sql_left_operand(connection), sql_right_operand(connection)], sql_params(connection)}
             end
 
-            protected def sql_left_operand(connection)
+            protected getter left_operand
+
+            private def sql_left_operand(connection)
               rendered = case @left_operand
-                         when Field::Base
-                           "#{@alias_prefix}.#{@left_operand.as(Field::Base).db_column}"
-                         else
+                         when Annotation::Base
+                           @left_operand.as(Annotation::Base).to_sql(with_alias: false)
+                         when SQL::Expression::Base
                            @left_operand.as(SQL::Expression::Base).to_sql_left(connection, @alias_prefix)
+                         else
+                           "#{@alias_prefix}.#{@left_operand.as(Field::Base).db_column}"
                          end
               connection.left_operand_for(
                 rendered,
@@ -50,10 +54,18 @@ module Marten
 
             private def sql_right_operand_param(_connection) : ::DB::Any
               case @left_operand
-              when Field::Base
-                @left_operand.as(Field::Base).to_db(@right_operand.as(Field::Any))
+              when Annotation::Base
+                @left_operand.as(Annotation::Base).field.to_db(@right_operand.as(Field::Any))
+              when SQL::Expression::Base
+                value = @right_operand.as(Field::Any)
+                case value
+                when ::DB::Any
+                  value
+                else
+                  value.to_s
+                end
               else
-                @left_operand.as(SQL::Expression::Base).field.to_db(@right_operand.as(Field::Any))
+                @left_operand.as(Field::Base).to_db(@right_operand.as(Field::Any))
               end
             end
           end

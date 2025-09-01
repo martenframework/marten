@@ -40,6 +40,11 @@ module Marten
           delegate build_sql, to: connection
           delegate quote, to: connection
 
+          alias ParsedLookup = NamedTuple(
+            field_tokens: Array(String),
+            transform_name: String?,
+            comparison_name: String?)
+
           def initialize
           end
 
@@ -1025,10 +1030,23 @@ module Marten
           private def filtering_clause_and_parameters(predicate_node, offset = 0)
             if !predicate_node.nil?
               clause, parameters = predicate_node.to_sql(connection)
-              parameters.each_with_index do |_p, i|
-                clause = clause % (
-                  [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
+
+              parts = clause.split("%s")
+
+              if parameters.size != parts.size - 1
+                raise Errors::InvalidField.new(
+                  "The number of parameters in the predicate node does not match the number of placeholders"
                 )
+              end
+
+              clause = String.build do |io|
+                parts.each_with_index do |part, i|
+                  io << part
+
+                  unless i == parts.size - 1
+                    io << connection.parameter_id_for_ordered_argument(offset + i + 1)
+                  end
+                end
               end
             else
               clause = nil
@@ -1195,7 +1213,11 @@ module Marten
               transform_name = tokens[-2]
               comparison_name = tokens[-1]
               if Predicate.transform_registry[transform_name]? && Predicate.registry[comparison_name]?
-                return ParsedLookup.new(tokens[0, len - 2], transform_name, comparison_name)
+                return {
+                  field_tokens:    tokens[0, len - 2],
+                  transform_name:  transform_name,
+                  comparison_name: comparison_name,
+                }
               end
             end
 
@@ -1204,13 +1226,25 @@ module Marten
               name = tokens[-1]
               field_part = tokens[0, len - 1]
               if Predicate.transform_registry[name]? && !Predicate.registry[name]?
-                return ParsedLookup.new(field_part, name, nil)
+                return {
+                  field_tokens:    field_part,
+                  transform_name:  name,
+                  comparison_name: nil,
+                }
               elsif Predicate.registry[name]?
-                return ParsedLookup.new(field_part, nil, name)
+                return {
+                  field_tokens:    field_part,
+                  transform_name:  nil,
+                  comparison_name: name,
+                }
               end
             end
 
-            ParsedLookup.new(tokens, nil, nil)
+            {
+              field_tokens:    tokens,
+              transform_name:  nil,
+              comparison_name: nil,
+            }
           end
 
           private def coerce_filter_value(raw_value) : Field::Any | Array(Field::Any)
@@ -1228,48 +1262,64 @@ module Marten
 
           private def solve_field_and_predicate(raw_query, raw_value)
             parsed = parse_lookup(raw_query)
-            field_lookup = parsed.field_tokens.join(Constants::LOOKUP_SEP)
+            field_lookup = parsed[:field_tokens].join(Constants::LOOKUP_SEP)
 
-            field_path = begin
-              verify_field(field_lookup)
-            rescue e : Errors::InvalidField
-              begin
-                verify_field(raw_query).tap do
-                  parsed = ParsedLookup.new(
-                    parsed.field_tokens + [parsed.transform_name, parsed.comparison_name].compact,
-                    nil,
-                    nil
-                  )
+            # First attempt to verify if the specified field corresponds to an existing annotation
+            if !annotations[raw_query]?.nil?
+              left_operand = annotations[raw_query]
+              parsed = {
+                field_tokens:    parsed[:field_tokens],
+                transform_name:  nil,
+                comparison_name: parsed[:comparison_name],
+              }
+            elsif !annotations[field_lookup]?.nil?
+              left_operand = annotations[field_lookup]
+            else
+              # Try to resolve field path for the field tokens
+              field_path = begin
+                verify_field(field_lookup)
+              rescue e : Errors::InvalidField
+                begin
+                  # Fallback: try the entire raw_query as field name
+                  verify_field(raw_query).tap do
+                    tokens = (parsed[:field_tokens] + [parsed[:transform_name], parsed[:comparison_name]]).compact
+                    parsed = {
+                      field_tokens:    tokens,
+                      transform_name:  nil,
+                      comparison_name: nil,
+                    }
+                  end
+                rescue
+                  raise e
                 end
-              rescue
-                raise e
               end
-            end
 
-            relation_field_path = field_path.select { |field, _r| field.relation? }
+              relation_field_path = field_path.select { |field, _r| field.relation? }
 
-            join = unless relation_field_path.empty? || field_path.size == 1
-              relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
-              ensure_join_for_field_path(relation_field_path)
-            end
-
-            left_operand = field_path.last[0]
-
-            if tname = parsed.transform_name
-              tklass = Predicate.transform_registry.fetch(tname) do
-                raise Errors::InvalidField.new("Unknown transform '#{tname}'")
+              join = unless relation_field_path.empty? || field_path.size == 1
+                # Prevent the last field to generate an extra join if the last field in the predicate is a relation
+                # (which is the case when a foreign key field is filtered on for example).
+                relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
+                ensure_join_for_field_path(relation_field_path)
               end
-              unless tklass.responds_to?(:apply)
-                raise Errors::InvalidField.new("Transform '#{tname}' is not applicable")
+
+              left_operand = field_path.last[0]
+
+              if tname = parsed[:transform_name]
+                tklass = Predicate.transform_registry.fetch(tname) do
+                  raise Errors::InvalidField.new("Unknown transform '#{tname}'")
+                end
+
+                left_operand = tklass.apply(
+                  left_operand.as(Field::Base)
+                )
               end
-              left_operand = tklass.apply(
-                left_operand.as(Field::Base),
-              )
             end
 
             value = coerce_filter_value(raw_value)
 
-            predicate_klass = if cname = parsed.comparison_name
+            # Determine predicate class
+            predicate_klass = if cname = parsed[:comparison_name]
                                 Predicate.registry.fetch(cname) do
                                   raise Errors::InvalidField.new("Unknown predicate type '#{cname}'")
                                 end
@@ -1281,6 +1331,7 @@ module Marten
                                   Predicate::Exact
                                 end
                               end
+
             predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end
 

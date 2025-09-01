@@ -6,7 +6,7 @@ module Marten
       module SQL
         module Predicate
           @@registry = {} of String => Base.class
-          @@transform_registry = {} of String => Base.class
+          @@transform_registry = {} of String => DateTimeBase.class
 
           def self.register(predicate_klass : Base.class)
             @@registry[predicate_klass.predicate_name] = predicate_klass
@@ -16,7 +16,7 @@ module Marten
             @@registry
           end
 
-          def self.register_transform(predicate_klass : Base.class)
+          def self.register_transform(predicate_klass : DateTimeBase.class)
             @@transform_registry[predicate_klass.predicate_name] = predicate_klass
           end
 

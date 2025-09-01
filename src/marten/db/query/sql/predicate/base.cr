@@ -4,7 +4,7 @@ module Marten
       module SQL
         module Predicate
           abstract class Base
-            alias LeftOperand = Annotation::Base | Field::Base | SQL::Expression::Base
+            alias LeftOperand = Annotation::Base | Field::Base | SQL::Expression::Extract
 
             class_getter predicate_name : String = ""
 
@@ -33,8 +33,8 @@ module Marten
               rendered = case @left_operand
                          when Annotation::Base
                            @left_operand.as(Annotation::Base).to_sql(with_alias: false)
-                         when SQL::Expression::Base
-                           @left_operand.as(SQL::Expression::Base).to_sql_left(connection, @alias_prefix)
+                         when SQL::Expression::Extract
+                           @left_operand.as(SQL::Expression::Extract).to_sql_left(connection, @alias_prefix)
                          else
                            "#{@alias_prefix}.#{@left_operand.as(Field::Base).db_column}"
                          end
@@ -56,7 +56,7 @@ module Marten
               case @left_operand
               when Annotation::Base
                 @left_operand.as(Annotation::Base).field.to_db(@right_operand.as(Field::Any))
-              when SQL::Expression::Base
+              when SQL::Expression::Extract
                 value = @right_operand.as(Field::Any)
                 case value
                 when ::DB::Any

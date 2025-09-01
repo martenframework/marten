@@ -5,7 +5,8 @@ module Marten
         module Expression
           # Represents a SQL EXTRACT expression for extracting parts from date/time fields
           # This provides a database-agnostic way to extract year, month, day, hour, minute, second
-          class Extract < Base
+          class Extract
+            getter field : Field::Base
             getter extract_part : String
 
             def initialize(@field : Field::Base, @extract_part : String)

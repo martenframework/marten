@@ -5,7 +5,7 @@ module Marten
         module Predicate
           # Base class for time-based transform predicates
           abstract class DateTimeBase < Base
-            def self.apply(field : Field::Base) : SQL::Expression::Base
+            def self.apply(field : Field::Base) : SQL::Expression::Extract
               SQL::Expression::Extract.new(field, predicate_name)
             end
           end

@@ -1206,45 +1206,25 @@ module Marten
 
           private def parse_lookup(raw : String) : ParsedLookup
             tokens = raw.split(Constants::LOOKUP_SEP)
-            len = tokens.size
 
-            # Check for both a transform and a comparison
-            if len >= 3
-              transform_name = tokens[-2]
-              comparison_name = tokens[-1]
-              if Predicate.transform_registry[transform_name]? && Predicate.registry[comparison_name]?
-                return {
-                  field_tokens:    tokens[0, len - 2],
-                  transform_name:  transform_name,
-                  comparison_name: comparison_name,
-                }
-              end
+            case
+            when tokens.size >= 3 && valid_transform_comparison?(tokens[-2], tokens[-1])
+              {field_tokens: tokens[0..-3], transform_name: tokens[-2], comparison_name: tokens[-1]}
+            when tokens.size >= 2 && transform_only?(tokens[-1])
+              {field_tokens: tokens[0..-2], transform_name: tokens[-1], comparison_name: nil}
+            when tokens.size >= 2 && Predicate.registry[tokens[-1]]?
+              {field_tokens: tokens[0..-2], transform_name: nil, comparison_name: tokens[-1]}
+            else
+              {field_tokens: tokens, transform_name: nil, comparison_name: nil}
             end
+          end
 
-            # Check for transform only or comparison only
-            if len >= 2
-              name = tokens[-1]
-              field_part = tokens[0, len - 1]
-              if Predicate.transform_registry[name]? && !Predicate.registry[name]?
-                return {
-                  field_tokens:    field_part,
-                  transform_name:  name,
-                  comparison_name: nil,
-                }
-              elsif Predicate.registry[name]?
-                return {
-                  field_tokens:    field_part,
-                  transform_name:  nil,
-                  comparison_name: name,
-                }
-              end
-            end
+          private def valid_transform_comparison?(transform, comparison)
+            Predicate.transform_registry[transform]? && Predicate.registry[comparison]?
+          end
 
-            {
-              field_tokens:    tokens,
-              transform_name:  nil,
-              comparison_name: nil,
-            }
+          private def transform_only?(token)
+            Predicate.transform_registry[token]? && !Predicate.registry[token]?
           end
 
           private def coerce_filter_value(raw_value) : Field::Any | Array(Field::Any)

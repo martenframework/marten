@@ -29,7 +29,7 @@ module Marten
                 case @left_operand
                 when Annotation::Base
                   @left_operand.as(Annotation::Base).field.to_db(o)
-                when SQL::Expression::Base
+                when SQL::Expression::Extract
                   case o
                   when ::DB::Any
                     o

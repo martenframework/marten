@@ -13,6 +13,12 @@ describe Marten do
     end
   end
 
+  describe "#root" do
+    it "returns the root path of the Marten project" do
+      Marten.root.expand.should eq Path.new(__DIR__).join("..").expand
+    end
+  end
+
   describe "#routes" do
     it "returns the main routes map with the root flag set to true" do
       Marten.routes.should be_a Marten::Routing::Map

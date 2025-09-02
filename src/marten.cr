@@ -48,6 +48,7 @@ module Marten
   @@apps : Apps::Registry?
   @@media_files_storage : Core::Storage::Base?
   @@env : Conf::Env?
+  @@root : Path?
   @@routes : Routing::Map?
   @@settings : Conf::GlobalSettings?
 
@@ -122,6 +123,19 @@ module Marten
   # operations like saving files, deleting files, generating URLs...
   def self.media_files_storage
     @@media_files_storage.not_nil!
+  end
+
+  # Returns the root path of the Marten project.
+  #
+  # This method returns a `Path` object, which allows to interact with the root path of the current project. The path
+  # returned by this method will correspond to the `root_path` setting if it is defined, otherwise it will correspond
+  # to the parent of the `src` folder.
+  def self.root : Path
+    @@root ||= if !(root_path = Marten.settings.root_path).nil?
+                 Path.new(root_path).expand
+               else
+                 Path.new(Marten.apps.main.class._marten_app_location).join("..").expand
+               end
   end
 
   # Returns the main routes map.
@@ -232,9 +246,7 @@ module Marten
     I18n.config.loaders << I18n::Loader::YAML.new("#{effective_marten_location}/marten/locales")
 
     # Add a config/locales directory to the I18n config.
-    I18n.config.loaders << I18n::Loader::YAML.new(
-      Path.new(Marten.apps.main.class._marten_app_location).expand.join("../config/locales").to_s
-    )
+    I18n.config.loaders << I18n::Loader::YAML.new(Marten.root.join("config/locales").to_s)
 
     # Ensure each app config translation loader is properly bound to the I18n config.
     I18n.config.loaders += apps.app_configs.compact_map(&.translations_loader)

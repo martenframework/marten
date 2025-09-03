@@ -1206,14 +1206,29 @@ module Marten
 
           private def parse_lookup(raw : String) : ParsedLookup
             tokens = raw.split(Constants::LOOKUP_SEP)
+            token_count = tokens.size
+            last_token = tokens.last?
+            second_last_token = tokens[-2]? if token_count >= 2
 
             case
-            when tokens.size >= 3 && valid_transform_comparison?(tokens[-2], tokens[-1])
-              {field_tokens: tokens[0..-3], transform_name: tokens[-2], comparison_name: tokens[-1]}
-            when tokens.size >= 2 && transform_only?(tokens[-1])
-              {field_tokens: tokens[0..-2], transform_name: tokens[-1], comparison_name: nil}
-            when tokens.size >= 2 && Predicate.registry[tokens[-1]]?
-              {field_tokens: tokens[0..-2], transform_name: nil, comparison_name: tokens[-1]}
+            when token_count >= 3 &&
+              second_last_token && last_token &&
+              valid_transform_comparison?(second_last_token, last_token)
+              field_tokens = tokens[0..-3]
+              transform_name = second_last_token
+              comparison_name = last_token
+
+              {field_tokens: field_tokens, transform_name: transform_name, comparison_name: comparison_name}
+            when token_count >= 2 && last_token && transform_only?(last_token)
+              field_tokens = tokens[0..-2]
+              transform_name = last_token
+
+              {field_tokens: field_tokens, transform_name: transform_name, comparison_name: nil}
+            when token_count >= 2 && last_token && Predicate.registry[last_token]?
+              field_tokens = tokens[0..-2]
+              comparison_name = last_token
+
+              {field_tokens: field_tokens, transform_name: nil, comparison_name: comparison_name}
             else
               {field_tokens: tokens, transform_name: nil, comparison_name: nil}
             end

@@ -3,7 +3,7 @@ module Marten
     module Query
       module SQL
         module Predicate
-          class Day < DateTimeBase
+          class Day < TransformBase
             predicate_name "day"
           end
         end

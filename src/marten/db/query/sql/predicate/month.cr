@@ -3,7 +3,7 @@ module Marten
     module Query
       module SQL
         module Predicate
-          class Month < DateTimeBase
+          class Month < TransformBase
             predicate_name "month"
           end
         end

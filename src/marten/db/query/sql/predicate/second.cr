@@ -3,7 +3,7 @@ module Marten
     module Query
       module SQL
         module Predicate
-          class Second < DateTimeBase
+          class Second < TransformBase
             predicate_name "second"
           end
         end

@@ -3,7 +3,7 @@ module Marten
     module Query
       module SQL
         module Predicate
-          class Year < DateTimeBase
+          class Year < TransformBase
             predicate_name "year"
           end
         end

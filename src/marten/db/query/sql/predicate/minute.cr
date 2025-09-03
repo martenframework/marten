@@ -3,7 +3,7 @@ module Marten
     module Query
       module SQL
         module Predicate
-          class Minute < DateTimeBase
+          class Minute < TransformBase
             predicate_name "minute"
           end
         end

@@ -1,19 +1,27 @@
 require "./spec_helper"
 
-describe Marten::Middleware::LiveReload do
+module Marten
+  describe LiveReload do
   it "injects reload script into HTML responses when enabled" do
     original_settings = Marten.settings.debug?
     begin
       Marten.settings.debug = true
-      middleware = Marten::Middleware::LiveReload.new
+      Marten.settings.live_reload_enabled = true
+      middleware = Marten::LiveReload.new
 
-      response = HTTP::Response.new(
-        content_type: "text/html",
-        content: "<html><body>Test</body></html>"
+      response = Marten::HTTP::Response.new("<html><body>Test</body></html>", content_type: "text/html")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/",
+headers: ::HTTP::Headers{"Host" => "example.com"}
+        )
       )
-
-      request = HTTP::Request.new("GET", "/")
-      response = middleware.process_request(request) { response }
+      response = middleware.chain(
+        request,
+        -> { response }
+      )
 
       response.content.should contain("new WebSocket('ws://localhost:35729/live_reload')")
     ensure
@@ -25,15 +33,21 @@ describe Marten::Middleware::LiveReload do
     original_settings = Marten.settings.debug?
     begin
       Marten.settings.debug = false
-      middleware = Marten::Middleware::LiveReload.new
+      middleware = Marten::LiveReload.new
 
-      response = HTTP::Response.new(
-        content_type: "text/html",
-        content: "<html><body>Test</body></html>"
+      response = Marten::HTTP::Response.new("<html><body>Test</body></html>", content_type: "text/html")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/",
+headers: ::HTTP::Headers{"Host" => "example.com"}
+        )
       )
-
-      request = HTTP::Request.new("GET", "/")
-      response = middleware.process_request(request) { response }
+      response = middleware.chain(
+        request,
+        -> { response }
+      )
 
       response.content.should_not contain("WebSocket")
     ensure
@@ -45,15 +59,21 @@ describe Marten::Middleware::LiveReload do
     original_settings = Marten.settings.debug?
     begin
       Marten.settings.debug = true
-      middleware = Marten::Middleware::LiveReload.new
+      middleware = Marten::LiveReload.new
 
-      response = HTTP::Response.new(
-        content_type: "application/json",
-        content: "{\"test\": true}"
+      response = Marten::HTTP::Response.new("{\"test\": true}", content_type: "application/json")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/",
+headers: ::HTTP::Headers{"Host" => "example.com"}
+        )
       )
-
-      request = HTTP::Request.new("GET", "/")
-      response = middleware.process_request(request) { response }
+      response = middleware.chain(
+        request,
+        -> { response }
+      )
 
       response.content.should_not contain("WebSocket")
     ensure
@@ -65,20 +85,26 @@ describe Marten::Middleware::LiveReload do
     original_settings = Marten.settings.debug?
     begin
       Marten.settings.debug = true
-      middleware = Marten::Middleware::LiveReload.new
+      middleware = Marten::LiveReload.new
 
-      response = HTTP::Response.new(
-        content_type: "text/html",
-        content: "<html><body>Test</body></html>"
+      response = Marten::HTTP::Response.new("<html><body>Test</body></html>", content_type: "text/html")
+
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/",
+headers: ::HTTP::Headers{"Host" => "example.com", "X-Requested-With" => "XMLHttpRequest"}
+        )
       )
-
-      request = HTTP::Request.new("GET", "/")
-      request.headers["X-Requested-With"] = "XMLHttpRequest"
-      response = middleware.process_request(request) { response }
+      response = middleware.chain(
+        request,
+        -> { response }
+      )
 
       response.content.should_not contain("WebSocket")
     ensure
       Marten.settings.debug = original_settings
     end
   end
+end
 end

@@ -15,6 +15,11 @@ module Marten
       @target_env : String?
       @trailing_slash : TrailingSlash
       @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
+      @live_reload_enabled : Bool
+      @live_reload_host : String
+      @live_reload_port : Int32
+      @live_reload_patterns : Array(String)
+      @live_reload_debounce : Int32
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -101,6 +106,19 @@ module Marten
 
       # Returns the strategy to use when an unsupported HTTP method is encountered.
       getter unsupported_http_method_strategy
+
+      # Returns whether live reload is enabled in development.
+      getter live_reload_enabled
+      # :ditto:
+      getter? live_reload_enabled
+      # Returns the host used by the live reload server.
+      getter live_reload_host
+      # Returns the port used by the live reload server.
+      getter live_reload_port
+      # Returns the watched file patterns for live reload.
+      getter live_reload_patterns
+      # Returns the debounce (ms) used for live reload notifications.
+      getter live_reload_debounce
 
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
@@ -212,6 +230,13 @@ module Marten
       # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
       setter use_x_forwarded_proto
 
+      # Live reload settings setters.
+      setter live_reload_enabled
+      setter live_reload_host
+      setter live_reload_port
+      setter live_reload_patterns
+      setter live_reload_debounce
+
       # :nodoc:
       def self.register_settings_namespace(ns : String)
         if settings_namespace_registered?(ns)
@@ -272,6 +297,16 @@ module Marten
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
         @x_frame_options = "DENY"
+        @live_reload_enabled = false
+        @live_reload_host = "localhost"
+        @live_reload_port = 35729
+        @live_reload_patterns = [
+          "src/**/*.cr",
+          "src/**/*.ecr",
+          "src/assets/**/*",
+          "config/**/*",
+        ]
+        @live_reload_debounce = 1000
       end
 
       # Provides access to assets settings.

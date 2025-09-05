@@ -3,8 +3,8 @@ module Marten
     # Provides a WebSocket-based live reload server for development.
     # This server is only enabled in development mode when the live_reload setting is enabled.
     module LiveReload
-      @@clients = [] of HTTP::WebSocket
-      @@server : HTTP::Server?
+      @@clients = [] of ::HTTP::WebSocket
+      @@server : ::HTTP::Server?
       @@watcher : FileWatcher?
 
       # List of file patterns to watch for changes
@@ -29,7 +29,7 @@ module Marten
       end
 
       # Returns all connected WebSocket clients
-      def self.clients : Array(HTTP::WebSocket)
+      def self.clients : Array(::HTTP::WebSocket)
         @@clients
       end
 
@@ -70,9 +70,9 @@ module Marten
       end
 
       private def self.setup_server(options)
-        server = HTTP::Server.new do |context|
-          if context.request.path == "/live_reload"
-            ws_handler = HTTP::WebSocketHandler.new do |ws, _ctx|
+        server = ::HTTP::Server.new do |context|
+          if context.request.resource == "/live_reload"
+            ws_handler = ::HTTP::WebSocketHandler.new do |ws, _ctx|
               @@clients << ws
 
               # Keep connection alive with ping/pong

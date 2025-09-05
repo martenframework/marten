@@ -1,6 +1,8 @@
 require "./spec_helper"
+require "http/web_socket"
 
-describe Marten::Server::LiveReload do
+module Marten
+  describe Server::LiveReload do
   describe ".running?" do
     it "returns false by default" do
       Marten::Server::LiveReload.running?.should be_false
@@ -29,7 +31,7 @@ describe Marten::Server::LiveReload do
         Marten::Server::LiveReload.running?.should be_true
 
         # Test WebSocket connection
-        socket = HTTP::WebSocket.new("ws://localhost:35729/live_reload")
+socket = HTTP::WebSocket::Client.new("localhost", "/live_reload", 35729)
         socket.on_message do |message|
           message.should eq "reload"
           socket.close
@@ -49,7 +51,7 @@ describe Marten::Server::LiveReload do
         Marten::Server::LiveReload.running?.should be_true
 
         # Test WebSocket connection
-        socket = HTTP::WebSocket.new("ws://localhost:#{custom_port}/live_reload")
+socket = HTTP::WebSocket::Client.new("localhost", "/live_reload", custom_port)
         socket.on_message do |message|
           message.should eq "reload"
           socket.close
@@ -81,10 +83,10 @@ describe Marten::Server::LiveReload do
         Marten::Server::LiveReload.start
 
         # Connect two clients
-        socket1 = HTTP::WebSocket.new("ws://localhost:35729/live_reload")
+        socket1 = HTTP::WebSocket::Client.new("localhost", "/live_reload", 35729)
         socket1.on_message { |_| messages_received += 1 }
 
-        socket2 = HTTP::WebSocket.new("ws://localhost:35729/live_reload")
+        socket2 = HTTP::WebSocket::Client.new("localhost", "/live_reload", 35729)
         socket2.on_message { |_| messages_received += 1 }
 
         # Allow time for connections to establish
@@ -102,4 +104,5 @@ describe Marten::Server::LiveReload do
       end
     end
   end
+end
 end

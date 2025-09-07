@@ -24,7 +24,7 @@ Marten.configure :test do |config|
       db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
       db.host = env_settings["MARIADB_DB_HOST"].as(String)
       db.port = env_settings["MARIADB_DB_PORT"]?.as(Int32?)
-      db.options = {"encoding" => "utf8mb4"}
+      db.options = {"encoding" => "utf8mb4", "ssl-mode" => "disabled"}
     end
 
     config.database :other do |db|
@@ -34,7 +34,7 @@ Marten.configure :test do |config|
       db.password = env_settings["MARIADB_DB_PASSWORD"].as(String)
       db.host = env_settings["MARIADB_DB_HOST"].as(String)
       db.port = env_settings["MARIADB_DB_PORT"]?.as(Int32?)
-      db.options = {"encoding" => "utf8mb4"}
+      db.options = {"encoding" => "utf8mb4", "ssl-mode" => "disabled"}
     end
   end
 

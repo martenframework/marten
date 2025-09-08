@@ -40,7 +40,7 @@ module Marten
         begin
           custom_patterns = ["custom/**/*.cr"]
           Dir.mkdir_p("custom")
-          
+
           Marten::Server::LiveReload.start(custom_patterns)
           # Give watcher time to start
           sleep Time::Span.new(nanoseconds: 100_000_000)

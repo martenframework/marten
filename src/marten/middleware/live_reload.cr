@@ -13,22 +13,22 @@ module Marten
       return response unless insert_at
 
       script = <<-SCRIPT
-      <script>
-        (function() {
-          const events = new EventSource('/live-reload');
-          events.onmessage = function(e) {
-            window.location.reload();
-          };
-          events.onerror = function() {
-            events.close();
-            setTimeout(() => {
-              const newEvents = new EventSource('/live-reload');
-              newEvents.onmessage = events.onmessage;
-              newEvents.onerror = events.onerror;
-            }, 1000);
-          };
-        })();
-      </script>
+  <script>
+    (function() {
+      const events = new EventSource('/live-reload');
+      events.onmessage = function(e) {
+        window.location.reload();
+      };
+      events.onerror = function() {
+        events.close();
+        setTimeout(() => {
+          const newEvents = new EventSource('/live-reload');
+          newEvents.onmessage = events.onmessage;
+          newEvents.onerror = events.onerror;
+        }, 1000);
+      };
+    })();
+  </script>
       SCRIPT
 
       response.content = body.insert(insert_at, script)

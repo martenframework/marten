@@ -17,10 +17,7 @@ module Marten
 
       def self.start(patterns = DEFAULT_WATCH_PATTERNS) : Nil
         return if running?
-
-        spawn do
-          setup_watcher(patterns)
-        end
+        setup_watcher(patterns)
       end
 
       def self.stop : Nil
@@ -31,14 +28,16 @@ module Marten
       end
 
       private def self.setup_watcher(patterns)
+        # Create the watcher synchronously so running? can reflect state immediately
         watcher = FileWatcher.new(patterns: patterns)
-
         watcher.on_change do
           Marten::Handlers::LiveReload.broadcast("reload")
         end
-
-        watcher.start
         @@watcher = watcher
+        # Start watching asynchronously
+        spawn do
+          watcher.start
+        end
       end
     end
   end

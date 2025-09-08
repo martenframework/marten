@@ -26,7 +26,7 @@ module Marten
         spawn do
           while @running
             check_for_changes
-            sleep 0.5
+            sleep(Time::Span.new(nanoseconds: 500_000_000)) # 0.5 seconds
           end
         end
       end

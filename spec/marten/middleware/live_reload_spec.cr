@@ -23,7 +23,7 @@ headers: ::HTTP::Headers{"Host" => "example.com"}
         -> { response }
       )
 
-      response.content.should contain("new WebSocket('ws://localhost:35729/live_reload')")
+      response.content.should contain("new EventSource('/live-reload')")
     ensure
       Marten.settings.debug = original_settings
     end
@@ -49,7 +49,7 @@ headers: ::HTTP::Headers{"Host" => "example.com"}
         -> { response }
       )
 
-      response.content.should_not contain("WebSocket")
+      response.content.should_not contain("EventSource")
     ensure
       Marten.settings.debug = original_settings
     end
@@ -75,7 +75,7 @@ headers: ::HTTP::Headers{"Host" => "example.com"}
         -> { response }
       )
 
-      response.content.should_not contain("WebSocket")
+      response.content.should_not contain("EventSource")
     ensure
       Marten.settings.debug = original_settings
     end
@@ -101,7 +101,7 @@ headers: ::HTTP::Headers{"Host" => "example.com", "X-Requested-With" => "XMLHttp
         -> { response }
       )
 
-      response.content.should_not contain("WebSocket")
+      response.content.should_not contain("EventSource")
     ensure
       Marten.settings.debug = original_settings
     end

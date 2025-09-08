@@ -52,7 +52,8 @@ module Marten
                 @timestamps[file] = current_time
                 changed = true
               end
-            rescue
+            rescue ex : File::Error | Errno
+              # File may have been removed or is temporarily inaccessible; skip it
               next
             end
           end

@@ -41,10 +41,7 @@ module Marten
             headers: ::HTTP::Headers{"Host" => "example.com"}
           )
         )
-        response = middleware.chain(
-          request,
-          -> { response }
-        )
+        response = middleware.call(request, -> { response })
 
         response.content.should_not contain("EventSource")
       ensure
@@ -67,10 +64,7 @@ module Marten
             headers: ::HTTP::Headers{"Host" => "example.com"}
           )
         )
-        response = middleware.chain(
-          request,
-          -> { response }
-        )
+        response = middleware.call(request, -> { response })
 
         response.content.should_not contain("EventSource")
       ensure
@@ -93,10 +87,7 @@ module Marten
             headers: ::HTTP::Headers{"Host" => "example.com", "X-Requested-With" => "XMLHttpRequest"}
           )
         )
-        response = middleware.chain(
-          request,
-          -> { response }
-        )
+        response = middleware.call(request, -> { response })
 
         response.content.should_not contain("EventSource")
       ensure

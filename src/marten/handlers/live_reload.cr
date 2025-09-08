@@ -15,7 +15,7 @@ module Marten
             message = channel.receive
             Log.info { "[LiveReload] Broadcasting: #{message}" }
             "data: #{message}\n\n"
-          rescue
+          rescue Channel::ClosedError
             Log.info { "[LiveReload] SSE client disconnected" }
             cleanup(channel)
             Iterator::Stop::INSTANCE

@@ -23,8 +23,8 @@ module Marten
               events.close();
               setTimeout(() => {
                 const newEvents = new EventSource('/live-reload');
-                events.onmessage = events.onmessage;
-                events.onerror = events.onerror;
+                newEvents.onmessage = events.onmessage;
+                newEvents.onerror = events.onerror;
               }, 1000);
             };
           })();

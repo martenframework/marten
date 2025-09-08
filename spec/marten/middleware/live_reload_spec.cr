@@ -18,10 +18,7 @@ module Marten
 headers: ::HTTP::Headers{"Host" => "example.com"}
         )
       )
-      response = middleware.chain(
-        request,
-        -> { response }
-      )
+      response = middleware.call(request, -> { response })
 
       response.content.should contain("new EventSource('/live-reload')")
     ensure

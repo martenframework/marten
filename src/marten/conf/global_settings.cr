@@ -15,11 +15,8 @@ module Marten
       @target_env : String?
       @trailing_slash : TrailingSlash
       @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
-      @live_reload_enabled : Bool
-      @live_reload_host : String
-      @live_reload_port : Int32
-      @live_reload_patterns : Array(String)
-      @live_reload_debounce : Int32
+      @live_reload_enabled : Bool = false
+      @live_reload_patterns : Array(String) = Server::LiveReload::DEFAULT_WATCH_PATTERNS
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -111,14 +108,8 @@ module Marten
       getter live_reload_enabled
       # :ditto:
       getter? live_reload_enabled
-      # Returns the host used by the live reload server.
-      getter live_reload_host
-      # Returns the port used by the live reload server.
-      getter live_reload_port
       # Returns the watched file patterns for live reload.
       getter live_reload_patterns
-      # Returns the debounce (ms) used for live reload notifications.
-      getter live_reload_debounce
 
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
@@ -232,10 +223,7 @@ module Marten
 
       # Live reload settings setters.
       setter live_reload_enabled
-      setter live_reload_host
-      setter live_reload_port
       setter live_reload_patterns
-      setter live_reload_debounce
 
       # :nodoc:
       def self.register_settings_namespace(ns : String)
@@ -298,15 +286,7 @@ module Marten
         @use_x_forwarded_proto = false
         @x_frame_options = "DENY"
         @live_reload_enabled = false
-        @live_reload_host = "localhost"
-        @live_reload_port = 35729
-        @live_reload_patterns = [
-          "src/**/*.cr",
-          "src/**/*.ecr",
-          "src/assets/**/*",
-          "config/**/*",
-        ]
-        @live_reload_debounce = 1000
+        @live_reload_patterns = Server::LiveReload::DEFAULT_WATCH_PATTERNS
       end
 
       # Provides access to assets settings.

@@ -28,14 +28,9 @@ module Marten
     def self.setup : Nil
       instance.bind_tcp(Marten.settings.host, Marten.settings.port, Marten.settings.port_reuse)
       
-      # Start live reload server if enabled in development mode
+      # Start live reload if enabled in development mode
       if Marten.settings.debug? && Marten.settings.live_reload_enabled?
-        LiveReload.start(
-          host: Marten.settings.live_reload_host,
-          port: Marten.settings.live_reload_port,
-          patterns: Marten.settings.live_reload_patterns,
-          debounce: Time::Span.new(milliseconds: Marten.settings.live_reload_debounce)
-        )
+        LiveReload.start(Marten.settings.live_reload_patterns)
       end
     end
 

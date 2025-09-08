@@ -26,7 +26,7 @@ module Marten
         spawn do
           while @running
             check_for_changes
-            sleep(Time::Span.new(nanoseconds: 500_000_000)) # 0.5 seconds
+            sleep(POLL_INTERVAL)
           end
         end
       end
@@ -35,6 +35,8 @@ module Marten
       def stop : Nil
         @running = false
       end
+
+      private POLL_INTERVAL = 0.5.seconds
 
       private def check_for_changes
         changed = false

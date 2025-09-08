@@ -16,7 +16,7 @@ Marten.configure :development do |config|
 
   # Add the live reload middleware to the stack
   config.middleware = [
-    Marten::Middleware::LiveReload.new,
+    Marten::LiveReload,
     # ... other middleware ...
   ]
 

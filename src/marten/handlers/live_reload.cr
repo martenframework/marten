@@ -30,8 +30,13 @@ module Marten
       end
 
       def self.broadcast(message : String)
-        @@channels.each do |channel|
-          spawn { channel.send(message) }
+        @@channels.reject! do |channel|
+          begin
+            channel.send(message)
+            false
+          rescue Channel::ClosedError
+            true
+          end
         end
       end
 

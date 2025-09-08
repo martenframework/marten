@@ -11,7 +11,7 @@ module Marten
         begin
           Marten::Server::LiveReload.start
           # Give watcher time to start
-          sleep Time::Span.new(nanoseconds: 100_000_000)
+          sleep 0.1.seconds
           Marten::Server::LiveReload.running?.should be_true
         ensure
           Marten::Server::LiveReload.stop
@@ -27,7 +27,7 @@ module Marten
 
           File.write("src/temp_test.cr", "# test")
           # Give the watcher time to detect the change
-          sleep Time::Span.new(nanoseconds: 100_000_000)
+          sleep 0.1.seconds
 
           # Cleanup
           File.delete("src/temp_test.cr")
@@ -43,12 +43,12 @@ module Marten
 
           Marten::Server::LiveReload.start(custom_patterns)
           # Give watcher time to start
-          sleep Time::Span.new(nanoseconds: 100_000_000)
+          sleep 0.1.seconds
           Marten::Server::LiveReload.running?.should be_true
 
           File.write("custom/temp_test.cr", "# test")
           # Give the watcher time to detect the change
-          sleep Time::Span.new(nanoseconds: 100_000_000)
+          sleep 0.1.seconds
 
           # Cleanup
           File.delete("custom/temp_test.cr")

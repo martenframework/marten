@@ -12,7 +12,7 @@ module Marten
       insert_at = body.downcase.rindex("</body>")
       return response unless insert_at
 
-      script = {{ read_file "#{__DIR__}/live_reload.js" }}
+      script = {{ read_file "#{__DIR__}/live_reload.html" }}
 
       response.content = body.insert(insert_at, script)
       response

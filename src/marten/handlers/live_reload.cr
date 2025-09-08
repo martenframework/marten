@@ -6,17 +6,14 @@ module Marten
       @@channels = [] of Channel(String)
 
       def get
-        Log.info { "[LiveReload] SSE client connected" }
         channel = Channel(String).new
         @@channels << channel
 
         streamed_content = Iterator.of do
           begin
             message = channel.receive
-            Log.info { "[LiveReload] Broadcasting: #{message}" }
             "data: #{message}\n\n"
           rescue Channel::ClosedError
-            Log.info { "[LiveReload] SSE client disconnected" }
             cleanup(channel)
             Iterator::Stop::INSTANCE
           end

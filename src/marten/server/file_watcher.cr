@@ -23,11 +23,9 @@ module Marten
         return if @running
         @running = true
 
-        spawn do
-          while @running
-            check_for_changes
-            sleep(POLL_INTERVAL)
-          end
+        while @running
+          check_for_changes
+          sleep(POLL_INTERVAL)
         end
       end
 

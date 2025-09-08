@@ -1,6 +1,7 @@
 name: QA
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - "*"

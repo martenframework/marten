@@ -1,5 +1,3 @@
-require "http"
-
 module Marten
   # Wrapper around the Marten server.
   module Server

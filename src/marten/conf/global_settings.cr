@@ -15,6 +15,8 @@ module Marten
       @target_env : String?
       @trailing_slash : TrailingSlash
       @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
+      @live_reload_enabled : Bool = false
+      @live_reload_patterns : Array(String) = Server::LiveReload::DEFAULT_WATCH_PATTERNS
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -101,6 +103,13 @@ module Marten
 
       # Returns the strategy to use when an unsupported HTTP method is encountered.
       getter unsupported_http_method_strategy
+
+      # Returns whether live reload is enabled in development.
+      getter live_reload_enabled
+      # :ditto:
+      getter? live_reload_enabled
+      # Returns the watched file patterns for live reload.
+      getter live_reload_patterns
 
       # Returns a boolean indicating whether the X-Forwarded-Host header is used to look for the host.
       getter use_x_forwarded_host
@@ -212,6 +221,10 @@ module Marten
       # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
       setter use_x_forwarded_proto
 
+      # Live reload settings setters.
+      setter live_reload_enabled
+      setter live_reload_patterns
+
       # :nodoc:
       def self.register_settings_namespace(ns : String)
         if settings_namespace_registered?(ns)
@@ -272,6 +285,8 @@ module Marten
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
         @x_frame_options = "DENY"
+        @live_reload_enabled = false
+        @live_reload_patterns = Server::LiveReload::DEFAULT_WATCH_PATTERNS
       end
 
       # Provides access to assets settings.

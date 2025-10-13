@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: bitnami/mysql:8.3.0
+        image: public.ecr.aws/bitnami/mysql:8.3.0
         env:
           MYSQL_ROOT_PASSWORD: "mysql"
           MYSQL_DATABASE: marten_test

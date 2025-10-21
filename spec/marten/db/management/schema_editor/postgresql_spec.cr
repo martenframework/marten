@@ -62,6 +62,12 @@ for_postgresql do
         schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
         schema_editor.column_type_for_built_in_column(column).should eq "uuid"
       end
+
+      it "returns the expected column type for an enum column" do
+        column = Marten::DB::Management::Column::Enum.new("test", values: ["foo", "bar"])
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+        schema_editor.column_type_for_built_in_column(column).should eq "text"
+      end
     end
 
     describe "#column_type_suffix_for_built_in_column" do

@@ -716,7 +716,7 @@ module Marten
                 )
               end
               self.{{ ann[:accessor] || field_var.id }} = value
-              values.delete({{field_var.name.stringify}})
+              values.delete({{ field_var.name.stringify }})
             end
 
             {% if ann && ann[:relation_name] %}

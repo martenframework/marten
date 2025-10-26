@@ -79,7 +79,7 @@ module Marten
           exposed_type: {{ exposed_type }},
           additional_type: {{ additional_type }}
         )]
-        class ::{{klass.id}}; end
+        class ::{{ klass.id }}; end
         Marten::DB::Field.add_field_to_registry({{ id }}, {{ klass }})
       end
 

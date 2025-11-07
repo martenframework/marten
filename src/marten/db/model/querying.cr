@@ -939,6 +939,38 @@ module Marten
             {% end %}
           end
 
+          # Updates all the records with the passed values.
+          #
+          # This method allows to update all the records with a hash or a named tuple of values. It returns the number
+          # of records that were updated:
+          #
+          # ```
+          # Post.update({"title" => "Updated"})
+          # ```
+          #
+          # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+          # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+          # either.
+          def update(values : Hash | NamedTuple)
+            default_queryset.update(values)
+          end
+
+          # Updates all the records with the passed values.
+          #
+          # This method allows to update all the records with the values defined in the `kwargs` double splat argument.
+          # It returns the number of records that were updated:
+          #
+          # ```
+          # Post.update(title: "Updated")
+          # ```
+          #
+          # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+          # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+          # either.
+          def update(**kwargs)
+            default_queryset.update(kwargs.to_h)
+          end
+
           # Returns a queryset that will be evaluated using the specified database.
           #
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the

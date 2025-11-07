@@ -1642,6 +1642,77 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::update" do
+    it "allows to update all the records with values specified as keyword arguments" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.update(last_name: "Updated", is_admin: true).should eq 3
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Updated"
+      user_3.is_admin.should be_true
+    end
+
+    it "allows to update all the records with values specified as a hash" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.update({"last_name" => "Updated", "is_admin" => true}).should eq 3
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Updated"
+      user_3.is_admin.should be_true
+    end
+
+    it "allows to update all the records with values specified as a named tuple" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.update({last_name: "Updated", is_admin: true}).should eq 3
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Updated"
+      user_3.is_admin.should be_true
+    end
+  end
+
   describe "::using" do
     before_each do
       TestUser.using(:other).create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

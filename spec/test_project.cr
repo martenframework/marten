@@ -125,6 +125,7 @@ Marten.routes.draw do
   path "/dummy/<id:int>/and/<scope:slug>", DummyHandler, name: "dummy_with_id_and_scope"
   path "/request-method-respond", RequestMethodRespondHandler, name: "request_method_respond"
   path "/query-params-respond", QueryParamsRespondHandler, name: "query_params_respond"
+  path "/request-data-respond", RequestDataRespondHandler, name: "request_data_respond"
   path "/headers-respond", HeadersRespondHandler, name: "headers_respond"
   path "/secure-request-require", SecureRequestRequireHandler, name: "secure_request_require"
   path "/session-value-get", SessionValueGetHandler, name: "session_value_get"

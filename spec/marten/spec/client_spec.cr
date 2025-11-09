@@ -230,12 +230,13 @@ describe Marten::Spec::Client do
       client = Marten::Spec::Client.new
 
       response = client.patch(
-        Marten.routes.reverse("simple_schema"),
+        Marten.routes.reverse("request_data_respond"),
         data: {first_name: "John", last_name: "Doe"}.to_json,
         content_type: "application/json"
       )
 
-      response.status.should eq 302
+      response.status.should eq 200
+      response.content.should eq(%({"first_name":"John","last_name":"Doe"}))
     end
   end
 

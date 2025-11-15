@@ -106,7 +106,8 @@ module Marten
           private def drop_enum_check_constraint_statement(table : TableState, column : Column::Enum) : String
             constraint_name = enum_check_constraint_name(column)
             build_sql do |s|
-              s << "ALTER TABLE #{quote(table.name)} DROP CONSTRAINT #{quote(constraint_name)}"
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "DROP CONSTRAINT IF EXISTS #{quote(constraint_name)}"
             end
           end
 

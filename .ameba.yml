@@ -47,5 +47,8 @@ Style/ParenthesesAroundCondition:
 Style/PercentLiteralDelimiters:
   Enabled: false
 
+Style/RedundantSelf:
+  Enabled: false
+
 Style/QueryBoolMethods:
   Enabled: false

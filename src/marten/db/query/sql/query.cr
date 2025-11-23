@@ -1068,7 +1068,7 @@ module Marten
             field_context = begin
               model.get_relation_field_context(raw_relation.to_s)
             rescue Errors::UnknownField
-              return nil if silent
+              return if silent
               raise_invalid_field_error_with_valid_choices(
                 raw_relation,
                 model,

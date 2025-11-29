@@ -176,6 +176,24 @@ describe Marten::DB::Deletion::Runner do
         Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
       end
 
+      it "registers the record's child for deletion" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Deletion::RunnerSpec::Student.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10"
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(Marten::DB::Deletion::RunnerSpec::Person.get!(name: "Student 1"))
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+      end
+
       it "registers the record's parents for deletion with multiple levels of inheritance" do
         address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
 
@@ -189,6 +207,26 @@ describe Marten::DB::Deletion::Runner do
 
         deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
         deletion.add(student)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+      end
+
+      it "registers the record's childs for deletion with multiple levels of inheritance" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11",
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(Marten::DB::Deletion::RunnerSpec::Person.get!(name: "Student 1"))
         deletion.execute
 
         Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
@@ -286,6 +324,53 @@ describe Marten::DB::Deletion::Runner do
         Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 2").should_not be_nil
         Marten::DB::Deletion::RunnerSpec::Article.get(title: "Article 2-1").should_not be_nil
         Marten::DB::Deletion::RunnerSpec::AltArticle.get(title: "Article 2-2").should_not be_nil
+      end
+
+      it "deletes all related records when an associated parent-level reverse relation record is deleted" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          grade: "10",
+          alt_grade: "11",
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(address)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+
+        Marten::DB::Deletion::RunnerSpec::Address.get(street: "Street 2").should be_nil
+      end
+
+      it "deletes all related records when an associated child-level reverse relation record is deleted" do
+        address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
+        alt_address = Marten::DB::Deletion::RunnerSpec::AltAddress.create!(street: "Street 3")
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.create!(
+          name: "Student 1",
+          email: "student-1@example.com",
+          address: address,
+          alt_address: alt_address,
+          grade: "10",
+          alt_grade: "11",
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(alt_address)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::AltStudent.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Student.get(name: "Student 1").should be_nil
+        Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
+
+        Marten::DB::Deletion::RunnerSpec::Address.get(street: "Street 2").should_not be_nil
+        Marten::DB::Deletion::RunnerSpec::AltAddress.get(street: "Street 3").should be_nil
       end
     end
   end

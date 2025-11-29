@@ -213,9 +213,9 @@ module Marten
           end
 
           protected def parent_fields
-            parent_models.compact_map do |parent_model|
-              if (f = pk_field).is_a?(Field::OneToOne) && f.parent_link?
-                pk_field
+            ([self] + parent_models).compact_map do |parent_model|
+              if (f = parent_model.pk_field).is_a?(Field::OneToOne) && f.parent_link?
+                parent_model.pk_field
               end
             end
           end

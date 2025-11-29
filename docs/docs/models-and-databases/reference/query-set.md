@@ -985,3 +985,49 @@ Allows filtering records based on field values that start with a specific substr
 ```crystal
 Article.all.filter(title__startswith: "Top")
 ```
+
+## Field transforms
+
+Field transforms allow filtering records based on specific parts of field values, such as extracting the year from a date. Transforms can be combined with any supported predicate using the double‑underscores notation.
+
+The following time-related transforms are available for date and datetime fields:
+
+| Transform | Description | Example |
+|-----------|-------------|---------|
+| `year` | Extracts the year from a date/datetime field | `published_at__year: 2025` |
+| `month` | Extracts the month (1-12) from a date/datetime field | `created_at__month: 12` |
+| `day` | Extracts the day of month (1-31) from a date/datetime field | `updated_at__day: 15` |
+| `hour` | Extracts the hour (0-23) from a datetime field | `created_at__hour: 14` |
+| `minute` | Extracts the minute (0-59) from a datetime field | `logged_at__minute: 30` |
+| `second` | Extracts the second (0-59) from a datetime field | `timestamp__second: 45` |
+
+```crystal
+# Basic usage
+Article.filter(published_at__year: 2025)
+Article.filter(created_at__month__gte: 6)
+
+# Through relations
+Post.filter(author__joined_at__year: 2024)
+
+# Multiple transforms
+Event.filter(
+  start_time__year: 2025,
+  start_time__month: 12,
+  start_time__day__gte: 15
+)
+```
+
+:::warning
+Time transforms typically prevent the use of database indexes. For better performance on large datasets, prefer range-based filters:
+
+```crystal
+# Slower (prevents index usage)
+Article.filter(published_at__year: 2025)
+
+# Faster (allows index usage)
+Article.filter(
+  published_at__gte: Time.utc(2025, 1, 1),
+  published_at__lt: Time.utc(2026, 1, 1)
+)
+```
+:::

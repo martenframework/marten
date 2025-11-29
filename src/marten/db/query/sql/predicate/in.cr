@@ -26,8 +26,16 @@ module Marten
 
             private def sql_right_operand_param(_connection)
               @right_operand.as(Array(Field::Any)).map do |o|
-                if @left_operand.is_a?(Annotation::Base)
+                case @left_operand
+                when Annotation::Base
                   @left_operand.as(Annotation::Base).field.to_db(o)
+                when SQL::Expression::Extract
+                  case o
+                  when ::DB::Any
+                    o
+                  else
+                    o.to_s
+                  end
                 else
                   @left_operand.as(Field::Base).to_db(o)
                 end

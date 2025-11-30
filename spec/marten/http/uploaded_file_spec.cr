@@ -59,8 +59,7 @@ describe Marten::HTTP::UploadedFile do
         )
       )
       actual = JSON.parse(uploaded_file.to_json).as_h
-      actual.keys.sort!.should eq ["content_type", "original_filename", "tempfile"]
-      actual["content_type"].should eq "text/plain"
+      actual.keys.sort!.should eq ["original_filename", "tempfile"]
       actual["original_filename"].should eq "a.txt"
       actual["tempfile"].as_s.matches?(/\#<File:.*>/).should be_true
     end

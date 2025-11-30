@@ -7,7 +7,7 @@ module Marten
       # Returns the `File` object associated with the corresponding temporary file.
       getter io
 
-      def initialize(@part : ::HTTP::FormData::Part, @ct : String = "text/plain")
+      def initialize(@part : ::HTTP::FormData::Part)
         @io = File.tempfile
         ::File.open(@io.as(File).path, "w") do |file|
           IO.copy(@part.body, file)
@@ -22,7 +22,6 @@ module Marten
         json.object do
           json.field "original_filename", @part.filename
           json.field "tempfile", @io.inspect
-          json.field "content_type", @ct
         end
       end
 

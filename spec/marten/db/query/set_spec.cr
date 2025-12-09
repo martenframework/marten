@@ -524,8 +524,8 @@ describe Marten::DB::Query::Set do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
 
-      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
-      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns true if the queryset matches existing records and if it was already fetched" do
@@ -538,30 +538,30 @@ describe Marten::DB::Query::Set do
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
       qset_2.each { }
 
-      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
-      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match existing records and if it wasn't already fetched" do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
-      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
 
       Tag.create!(name: "crystal", is_active: true)
 
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
-      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match existing records and if it was already fetched" do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
       qset_1.each { }
-      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
 
       Tag.create!(name: "crystal", is_active: true)
 
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
       qset_2.each { }
-      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
   end
 

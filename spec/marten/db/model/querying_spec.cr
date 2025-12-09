@@ -55,11 +55,11 @@ describe Marten::DB::Model::Querying do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
 
-      Tag.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      Tag.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match at least one record" do
-      Tag.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      Tag.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
   end
 

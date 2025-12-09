@@ -12,7 +12,7 @@ Here are listed the release notes for each version of the Marten web framework.
 
 ## Marten 0.6
 
-* [Marten 0.6.2 release notes](./release-notes/0.6.2.md) _(under development)_
+* [Marten 0.6.2 release notes](./release-notes/0.6.2.md)
 * [Marten 0.6.1 release notes](./release-notes/0.6.1.md)
 * [Marten 0.6 release notes](./release-notes/0.6.md)
 

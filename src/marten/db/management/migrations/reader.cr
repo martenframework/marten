@@ -99,7 +99,7 @@ module Marten
                 @applied_migrations.delete(migration.id)
               end
 
-              if replacements_applied.all? || !replacements_applied.present?
+              if replacements_applied.all? || !replacements_applied.any? # ameba:disable Performance/AnyInsteadOfPresent
                 @graph.setup_replacement(migration)
               else
                 @graph.teardown_replacement(migration)

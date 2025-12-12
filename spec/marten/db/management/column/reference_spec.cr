@@ -508,7 +508,7 @@ describe Marten::DB::Management::Column::Reference do
   end
 
   describe "#to_column" do
-    it "returns the targetted column name" do
+    it "returns the targeted column name" do
       column = Marten::DB::Management::Column::Reference.new(
         "test",
         to_table: "other_table",
@@ -519,7 +519,7 @@ describe Marten::DB::Management::Column::Reference do
   end
 
   describe "#to_table" do
-    it "returns the targetted table name" do
+    it "returns the targeted table name" do
       column = Marten::DB::Management::Column::Reference.new(
         "test",
         to_table: "other_table",

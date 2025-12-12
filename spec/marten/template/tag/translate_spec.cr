@@ -64,7 +64,7 @@ describe Marten::Template::Tag::Translate do
       tag_2.render(Marten::Template::Context{"number" => 42}).should eq I18n.t("simple.pluralization", count: 42)
     end
 
-    it "is able to asign the resolved translation to a specific variable" do
+    it "is able to assign the resolved translation to a specific variable" do
       parser = Marten::Template::Parser.new("")
 
       context = Marten::Template::Context{"cname" => "John Doe"}

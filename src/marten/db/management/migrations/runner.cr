@@ -39,7 +39,7 @@ module Marten
               execute_backward(plan, full_plan, fake) { |progress| yield progress }
             end
 
-            mark_elligible_replacements_as_applied { |progress| yield progress }
+            mark_eligible_replacements_as_applied { |progress| yield progress }
           end
 
           # Returns `true` if the execution of the runner is needed for the specified app config and migration name.
@@ -182,7 +182,7 @@ module Marten
             end
           end
 
-          def mark_elligible_replacements_as_applied(&)
+          def mark_eligible_replacements_as_applied(&)
             applied_migration_ids = get_applied_migration_ids
 
             @reader.replacements.each do |replacement_migration_id, replacement_migration|

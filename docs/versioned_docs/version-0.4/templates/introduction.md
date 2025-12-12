@@ -152,7 +152,7 @@ Given the above base template (that we assume is named `base.html`), a "child" t
 {% block content %}Custom page content{% endblock %}
 ```
 
-Here we make use of the [`extend`](./reference/tags.md#extend) template tag in order to indicate that we want to inherit from the `base.html` template that we created previously. When Marten encounters this tag, it'll make sure that the targetted template is properly loaded before resuming the evaluation of the current template.
+Here we make use of the [`extend`](./reference/tags.md#extend) template tag in order to indicate that we want to inherit from the `base.html` template that we created previously. When Marten encounters this tag, it'll make sure that the targeted template is properly loaded before resuming the evaluation of the current template.
 
 :::warning
 The `{% extend %}` tag should always be called at the top of the file, before the actual content of the template. Inheritance won't work properly if that's not the case.

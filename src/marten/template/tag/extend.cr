@@ -7,7 +7,7 @@ module Marten
       #
       # The `extend` template tag allows to define that a template inherits from a specific base template. This tag
       # must be used with one mandatory argument, which can be either a string literal or a variable that will be
-      # resolved at runtime. This mechanism is useful only if the base template defines blocks that are overriden or
+      # resolved at runtime. This mechanism is useful only if the base template defines blocks that are overridden or
       # extended by the child template.
       class Extend < Base
         include CanSplitSmartly
@@ -25,7 +25,7 @@ module Marten
             )
           end
 
-          # Processes the parent template name as a regular filter expression and retrieves the remining nodes.
+          # Processes the parent template name as a regular filter expression and retrieves the remaining nodes.
           @parent_name_expression = FilterExpression.new(parts[1])
           @nodes = parser.parse
           @block_tags = @nodes.compact_map do |n|

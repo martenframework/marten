@@ -16,7 +16,7 @@ describe Marten::DB::ReverseRelation do
   end
 
   describe "#model" do
-    it "returns the model class targetted by the reverse relation" do
+    it "returns the model class targeted by the reverse relation" do
       reverse_relation = Marten::DB::ReverseRelation.new("posts", Post, "author_id")
       reverse_relation.model.should eq Post
     end

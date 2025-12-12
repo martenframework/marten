@@ -29,8 +29,8 @@ module Marten
     #
     # The `#template_name` class method allows to define the name of the template to use to render the schema while the
     # `#success_route_name` method can be used to specify the name of a route to redirect to once the schema has been
-    # validated. Alternatively, the `#sucess_url` class method can be used to provide a raw URL to redirect to. The same
-    # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
+    # validated. Alternatively, the `#success_url` class method can be used to provide a raw URL to redirect to. The same
+    # method can also be overridden at the instance level in order to rely on a custom logic to generate the success URL
     # to redirect to.
     class RecordCreate < Handlers::Schema
       # Allows to configure the model class that should be used to create the new record.
@@ -64,7 +64,7 @@ module Marten
 
       # Produces the response when the processed schema is valid.
       #
-      # By default, this will create the new record and return a 302 redirect targetting the configured success URL.
+      # By default, this will create the new record and return a 302 redirect targeting the configured success URL.
       def process_valid_schema
         self.record = save_record
 

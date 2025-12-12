@@ -13,7 +13,7 @@ describe Marten::CLI::Generator::Email do
   end
 
   describe "#run" do
-    context "when targetting the main application" do
+    context "when targeting the main application" do
       with_main_app_location "#{__DIR__}/email_spec/main_app/"
 
       it "generates the expected email files" do
@@ -39,7 +39,7 @@ describe Marten::CLI::Generator::Email do
       end
     end
 
-    context "when targetting a specific application" do
+    context "when targeting a specific application" do
       with_installed_apps Marten::CLI::Generator::EmailSpec::App
 
       it "generates the expected email files" do

@@ -71,7 +71,7 @@ describe Marten::Template::Tag::Url do
       end
     end
 
-    it "is able to asign the resolved URL t a specific variable" do
+    it "is able to assign the resolved URL t a specific variable" do
       parser = Marten::Template::Parser.new("")
 
       tag = Marten::Template::Tag::Url.new(parser, %{url rname id: 42, scope: "ns" as resolved_url})

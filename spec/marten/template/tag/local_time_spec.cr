@@ -53,7 +53,7 @@ describe Marten::Template::Tag::LocalTime do
       end
     end
 
-    it "is able to asign the local time to a specific variable" do
+    it "is able to assign the local time to a specific variable" do
       parser = Marten::Template::Parser.new("")
 
       tag = Marten::Template::Tag::LocalTime.new(parser, %{local_time "%Y" as current_year})

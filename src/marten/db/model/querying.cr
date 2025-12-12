@@ -47,7 +47,7 @@ module Marten
             {% end %}
           end
 
-          # Returns a queryset targetting all the records for the considered model.
+          # Returns a queryset targeting all the records for the considered model.
           #
           # This method returns a `Marten::DB::Query::Set` object that - if evaluated - will return all the records for
           # the considered model.
@@ -720,7 +720,7 @@ module Marten
             default_queryset.offset(value)
           end
 
-          # Returns a queryset targetting all the records for the considered model with the specified ordering.
+          # Returns a queryset targeting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:
           #
@@ -734,7 +734,7 @@ module Marten
             default_queryset.order(fields.to_a)
           end
 
-          # Returns a queryset targetting all the records for the considered model with the specified ordering.
+          # Returns a queryset targeting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:
           #

@@ -42,7 +42,7 @@ module Marten
 
       # Deletes a specific cookie and return its value, or `nil` if the cookie does not exist.
       #
-      # Appart from the name of the cookie to delete, this method allows to define some additional cookie properties:
+      # Apart from the name of the cookie to delete, this method allows to define some additional cookie properties:
       #
       #   * the cookie `path`
       #   * the associated `domain` (useful in order to define cross-domain cookies)
@@ -110,7 +110,7 @@ module Marten
 
       # Allows to set a new cookie.
       #
-      # The string representation of the passed `value` object will be used as the cookie value. Appart from the cookie
+      # The string representation of the passed `value` object will be used as the cookie value. Apart from the cookie
       # name and value, this method allows to define some additional cookie properties:
       #
       #   * the cookie expiry datetime (`expires` argument)

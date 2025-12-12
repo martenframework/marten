@@ -46,21 +46,21 @@ describe Marten::Core::Signer do
       signer = Marten::Core::Signer.new
       signed_value = signer.sign("hello world", expires: expiry)
 
-      expected_metada = {
+      expected_metadata = {
         "_marten" => {
           "value"   => Base64.strict_encode("hello world"),
           "expires" => Time::Format::RFC_3339.format(expiry.to_utc, fraction_digits: 0),
         },
       }
 
-      signed_value.split("--").first.should eq Base64.strict_encode(expected_metada.to_json)
-      Base64.decode_string(signed_value.split("--").first).should eq expected_metada.to_json
+      signed_value.split("--").first.should eq Base64.strict_encode(expected_metadata.to_json)
+      Base64.decode_string(signed_value.split("--").first).should eq expected_metadata.to_json
 
       signed_value.split("--").last.should eq(
         OpenSSL::HMAC.hexdigest(
           OpenSSL::Algorithm::SHA256,
           Marten.settings.secret_key,
-          Base64.strict_encode(expected_metada.to_json)
+          Base64.strict_encode(expected_metadata.to_json)
         )
       )
 

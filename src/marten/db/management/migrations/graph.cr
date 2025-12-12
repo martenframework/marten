@@ -93,7 +93,7 @@ module Marten
 
           # Returns an array of migration nodes to apply in order to apply a specific migration node.
           #
-          # The returned array will start with the depdendencies of the target node and will end with the target node.
+          # The returned array will start with the dependencies of the target node and will end with the target node.
           # The resulting "path" should be followed in order to apply the migration corresponding to the target node.
           def path_forward(target_node : Node)
             path = acyclic_dfs_traversal(target_node.migration.id, forwards: true, silent: true)

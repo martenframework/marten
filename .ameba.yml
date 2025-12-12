@@ -18,9 +18,6 @@ Lint/SpecFilename:
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Naming/AccessorMethodName:
-  Enabled: false
-
 Naming/BlockParameterName:
   Enabled: false
 

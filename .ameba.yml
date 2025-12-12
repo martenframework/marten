@@ -2,15 +2,9 @@ Excluded:
   - lib
   - "**/*.ecr"
 
-Documentation/DocumentationAdmonition:
-  Enabled: false
-
 Layout/LineLength:
   Enabled: true
   MaxLength: 120
-
-Lint/DocumentationAdmonition:
-  Enabled: false
 
 Lint/NotNil:
   Enabled: false
@@ -19,12 +13,6 @@ Lint/NotNilAfterNoBang:
   Enabled: false
 
 Lint/SpecFilename:
-  Enabled: false
-
-Lint/UnusedComparison:
-  Enabled: false
-
-Lint/UnusedLiteral:
   Enabled: false
 
 Metrics/CyclomaticComplexity:
@@ -36,11 +24,6 @@ Naming/AccessorMethodName:
 Naming/BlockParameterName:
   Enabled: false
 
-Performance/AnyInsteadOfEmpty:
-  Enabled: true
-  Excluded:
-    - src/marten/db/management/migrations/reader.cr
-
 Style/ParenthesesAroundCondition:
   Enabled: false
 
@@ -48,7 +31,4 @@ Style/PercentLiteralDelimiters:
   Enabled: false
 
 Style/RedundantSelf:
-  Enabled: false
-
-Style/QueryBoolMethods:
   Enabled: false

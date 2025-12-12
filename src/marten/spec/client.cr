@@ -221,7 +221,7 @@ module Marten
 
         ::HTTP::FormData.build(io, MULTIPART_BOUNDARY) do |builder|
           data.each do |key, value|
-            case (object = value)
+            case object = value
             when Enumerable, Iterable
               object.each { |v| builder.field(key.to_s, v.to_s) }
             when DB::Field::File::File
@@ -241,7 +241,7 @@ module Marten
         query_params = URI::Params.new
 
         raw_query_params.each do |key, value|
-          query_params[key.to_s] = case (object = value)
+          query_params[key.to_s] = case object = value
                                    when Enumerable, Iterable
                                      object.map(&.to_s)
                                    else

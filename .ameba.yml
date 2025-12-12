@@ -21,9 +21,6 @@ Metrics/CyclomaticComplexity:
 Naming/BlockParameterName:
   Enabled: false
 
-Style/ParenthesesAroundCondition:
-  Enabled: false
-
 Style/PercentLiteralDelimiters:
   Enabled: false
 

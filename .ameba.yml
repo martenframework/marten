@@ -1,6 +1,6 @@
-Globs:
-  - "src/**/*.cr"
-  - "spec/**/*.cr"
+Excluded:
+  - lib
+  - "**/*.ecr"
 
 Documentation/DocumentationAdmonition:
   Enabled: false

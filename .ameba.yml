@@ -20,6 +20,3 @@ Naming/BlockParameterName:
 
 Style/PercentLiteralDelimiters:
   Enabled: false
-
-Style/RedundantSelf:
-  Enabled: false

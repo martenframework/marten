@@ -44,7 +44,7 @@ This will ensure that your database is properly migrated during each deployment.
 
 During deployment on Heroku, your application is prepared and compiled in a temporary directory, which is distinct from the location where the server runs your application. Specifically, the root of your application will be available under the `/app` folder on the Heroku platform. It's important to keep this in mind when setting up your application for deployment to Heroku.
 
-Marten's [application mechanism](../../development/applications.md) relies heaviliy on paths when it comes to locate things like [templates](../../templates.mdx), [translations](../../i18n.mdx), or [assets](../../assets.mdx). Because the path where your application is compiled will differ from the path where it runs, we need to ensure that you explicitly configure Marten so that it can find your project structure.
+Marten's [application mechanism](../../development/applications.md) relies heavily on paths when it comes to locate things like [templates](../../templates.mdx), [translations](../../i18n.mdx), or [assets](../../assets.mdx). Because the path where your application is compiled will differ from the path where it runs, we need to ensure that you explicitly configure Marten so that it can find your project structure.
 
 To address this, we need to define a specific "root path" for your project in production. The root path specifies the actual location of the project sources in your system. This can prove helpful in scenarios where the project was compiled in a specific location different from the final destination where the project sources (and the `lib` folder) are copied, which is the case with Heroku.
 
@@ -189,7 +189,7 @@ The final step is to upload your application's code to Heroku. This can be done 
 git push heroku main
 ```
 
-It is worth mentioning that a few things will happen when you push your application's code to Heroku like in the above example. Indeed, Heroku will detect the type of your application and apply the buildpacks you [configured previously](#set-up-the-required-buildpacks) (ie. first the Node.js one and then the Marten one). As part of this step, your application's dependencies will be installed and your project will be compiled. If you defined a `release` process in your `Procfile` (like explained in [Create a Procfile](#create-a-procfile)), the specfied command will also be executed (for example in order to run your project's migrations).
+It is worth mentioning that a few things will happen when you push your application's code to Heroku like in the above example. Indeed, Heroku will detect the type of your application and apply the buildpacks you [configured previously](#set-up-the-required-buildpacks) (ie. first the Node.js one and then the Marten one). As part of this step, your application's dependencies will be installed and your project will be compiled. If you defined a `release` process in your `Procfile` (like explained in [Create a Procfile](#create-a-procfile)), the specified command will also be executed (for example in order to run your project's migrations).
 
 A few additional things should also be noted:
 

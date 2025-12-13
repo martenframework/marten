@@ -430,7 +430,7 @@ describe Marten::DB::Management::Migrations::Graph do
   end
 
   describe "#to_project_state" do
-    it "returns a projet state object corresponding to the graph" do
+    it "returns a project state object corresponding to the graph" do
       migration_1 = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
       migration_2 = Marten::DB::Management::Migrations::GraphSpec::TestMigration2.new
       migration_3 = Marten::DB::Management::Migrations::GraphSpec::TestMigration3.new

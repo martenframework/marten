@@ -38,7 +38,7 @@ describe Marten::Template::Tag::Asset do
       tag.render(Marten::Template::Context{"aname" => "css/app.css"}).should eq Marten.assets.storage.url("css/app.css")
     end
 
-    it "is able to asign the resolved URL to a specific variable" do
+    it "is able to assign the resolved URL to a specific variable" do
       parser = Marten::Template::Parser.new("")
 
       tag = Marten::Template::Tag::Asset.new(parser, %{asset "css/app.css" as asset_url})

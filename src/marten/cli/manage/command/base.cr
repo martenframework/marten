@@ -128,7 +128,7 @@ module Marten
 
           # Allows to configure a proc to call when invalid options are encountered.
           #
-          # This method will confiugure a proc to call when invalid options are encountered. The proc will be called for
+          # This method will configure a proc to call when invalid options are encountered. The proc will be called for
           # each invalid option, and it will receive the option flag as the first argument.
           def on_invalid_option(&block : String ->)
             @invalid_option_proc = block

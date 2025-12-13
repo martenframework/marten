@@ -93,7 +93,7 @@ module Marten
           # Syncs all models for the current database connection.
           #
           # Every model whose table is not yet created will be created at the database level. This method should not be
-          # used on production databases (those are likely to be mutated using migrations), but this can be usefull when
+          # used on production databases (those are likely to be mutated using migrations), but this can be useful when
           # initializing a database for the first time in development or when running tests.
           def sync_models : Nil
             table_names = Introspector.for(@connection).table_names

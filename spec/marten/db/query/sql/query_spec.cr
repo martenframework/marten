@@ -2637,7 +2637,7 @@ describe Marten::DB::Query::SQL::Query do
       query.exists?.should be_false
     end
 
-    it "returns 0 if no rows are currently targetted by the query" do
+    it "returns 0 if no rows are currently targeted by the query" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)

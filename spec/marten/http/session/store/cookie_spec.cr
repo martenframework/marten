@@ -2,7 +2,7 @@ require "./spec_helper"
 
 describe Marten::HTTP::Session::Store::Cookie do
   describe "#create" do
-    it "does nothing and marks the store as modifed" do
+    it "does nothing and marks the store as modified" do
       store = Marten::HTTP::Session::Store::Cookie.new(nil)
       store.create
       store.modified?.should be_true

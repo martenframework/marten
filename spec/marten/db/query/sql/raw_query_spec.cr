@@ -76,7 +76,7 @@ describe Marten::DB::Query::SQL::RawQuery do
       raw_query_2.execute.should eq [tag_2]
     end
 
-    it "returns the expected records for a non-parameterized query targetting a specific DB connection" do
+    it "returns the expected records for a non-parameterized query targeting a specific DB connection" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.using(:other).create!(name: "crystal", is_active: true)
       tag_3 = Tag.using(:other).create!(name: "coding", is_active: true)

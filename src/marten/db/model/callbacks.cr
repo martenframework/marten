@@ -133,19 +133,19 @@ module Marten
         macro after_commit(*names, **kwargs)
           {% on_kwarg = kwargs[:on] %}
           {% if on_kwarg.is_a?(NilLiteral) %}
-            {% targetted_actions = [:create, :update, :delete] %}
+            {% targeted_actions = [:create, :update, :delete] %}
           {% elsif on_kwarg.is_a?(ArrayLiteral) %}
-            {% targetted_actions = on_kwarg.map(&.id.symbolize) %}
+            {% targeted_actions = on_kwarg.map(&.id.symbolize) %}
           {% else %}
-            {% targetted_actions = [on_kwarg.id.symbolize] %}
+            {% targeted_actions = [on_kwarg.id.symbolize] %}
           {% end %}
 
-          {% if !targetted_actions.all? { |action| [:create, :update, :save, :delete].includes?(action) } %}
+          {% if !targeted_actions.all? { |action| [:create, :update, :save, :delete].includes?(action) } %}
             raise "Invalid actions for after_commit callback: #{on_kwarg}"
           {% end %}
 
           {%
-            targetted_actions.each do |action|
+            targeted_actions.each do |action|
               names.reduce(MODEL_CALLBACKS[action][:commit]) do |array, name|
                 array << name.id.stringify
                 array
@@ -175,19 +175,19 @@ module Marten
         macro after_rollback(*names, **kwargs)
           {% on_kwarg = kwargs[:on] %}
           {% if on_kwarg.is_a?(NilLiteral) %}
-            {% targetted_actions = [:create, :update, :delete] %}
+            {% targeted_actions = [:create, :update, :delete] %}
           {% elsif on_kwarg.is_a?(ArrayLiteral) %}
-            {% targetted_actions = on_kwarg.map(&.id.symbolize) %}
+            {% targeted_actions = on_kwarg.map(&.id.symbolize) %}
           {% else %}
-            {% targetted_actions = [on_kwarg.id.symbolize] %}
+            {% targeted_actions = [on_kwarg.id.symbolize] %}
           {% end %}
 
-          {% if !targetted_actions.all? { |action| [:create, :update, :save, :delete].includes?(action) } %}
+          {% if !targeted_actions.all? { |action| [:create, :update, :save, :delete].includes?(action) } %}
             raise "Invalid actions for after_rollback callback: #{on_kwarg}"
           {% end %}
 
           {%
-            targetted_actions.each do |action|
+            targeted_actions.each do |action|
               names.reduce(MODEL_CALLBACKS[action][:rollback]) do |array, name|
                 array << name.id.stringify
                 array

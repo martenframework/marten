@@ -217,7 +217,7 @@ module Marten
               @deferred_statements << create_index_deferred_statement(table, [column])
             end
 
-            # Forwards custom indexes (indexes targetting multiple columns) to the array of deferred SQL statements.
+            # Forwards custom indexes (indexes targeting multiple columns) to the array of deferred SQL statements.
             table.indexes.each do |index|
               @deferred_statements << create_index_deferred_statement(
                 table,

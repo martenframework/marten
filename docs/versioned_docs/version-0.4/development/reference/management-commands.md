@@ -130,7 +130,7 @@ marten listmigrations foo # Lists all the migrations of the "foo" app
 
 Runs database migrations.
 
-The `migrate` command allows you to apply (or unapply) migrations to your databases. By default, when executed without arguments, it will execute all the non-applied migrations for your installed applications. That being said, it is possible to ensure that only the migrations of a specific application are applied by specifying an additional `app_label` argument. To unapply certain migrations (or to apply some of them up to a certain version only), it is possible to specify another `migration` argument corresponding to the version of a targetted migration. Please refer to [Migrations](../../models-and-databases/migrations.md) to learn more about this mechanism.
+The `migrate` command allows you to apply (or unapply) migrations to your databases. By default, when executed without arguments, it will execute all the non-applied migrations for your installed applications. That being said, it is possible to ensure that only the migrations of a specific application are applied by specifying an additional `app_label` argument. To unapply certain migrations (or to apply some of them up to a certain version only), it is possible to specify another `migration` argument corresponding to the version of a targeted migration. Please refer to [Migrations](../../models-and-databases/migrations.md) to learn more about this mechanism.
 
 ### Options
 

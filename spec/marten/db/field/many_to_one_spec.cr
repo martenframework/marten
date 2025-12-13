@@ -202,7 +202,7 @@ describe Marten::DB::Field::ManyToOne do
       obj_2.author?.should be_false
     end
 
-    it "works as expected when target models don't involve interger pk fields" do
+    it "works as expected when target models don't involve integer pk fields" do
       article = Marten::DB::Field::ManyToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
       comment = Marten::DB::Field::ManyToOneSpec::Comment.create!(article: article, text: "This article is dope")
 

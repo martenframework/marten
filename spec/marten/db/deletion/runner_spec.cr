@@ -214,7 +214,7 @@ describe Marten::DB::Deletion::Runner do
         Marten::DB::Deletion::RunnerSpec::Person.get(name: "Student 1").should be_nil
       end
 
-      it "registers the record's childs for deletion with multiple levels of inheritance" do
+      it "registers the record's children for deletion with multiple levels of inheritance" do
         address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")
 
         Marten::DB::Deletion::RunnerSpec::AltStudent.create!(

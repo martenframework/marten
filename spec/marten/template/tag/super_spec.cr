@@ -19,7 +19,7 @@ describe Marten::Template::Tag::Super do
 
       expect_raises(
         Marten::Template::Errors::InvalidSyntax,
-        "super must be called from whithin a block tag"
+        "super must be called from within a block tag"
       ) do
         tag.render(Marten::Template::Context.new)
       end

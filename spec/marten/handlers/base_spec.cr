@@ -60,11 +60,11 @@ describe Marten::Handlers::Base do
   end
 
   describe "::http_method_names" do
-    it "returns all the HTTP method names unless explicitely set" do
+    it "returns all the HTTP method names unless explicitly set" do
       Marten::Handlers::Base.http_method_names.should eq %w(GET POST PUT PATCH DELETE HEAD OPTIONS TRACE)
     end
 
-    it "returns the configured HTTP method names if explictely set" do
+    it "returns the configured HTTP method names if explicitly set" do
       Marten::Handlers::BaseSpec::Test1Handler.http_method_names.should eq %w(GET POST OPTIONS)
     end
   end
@@ -238,7 +238,7 @@ describe Marten::Handlers::Base do
       response.status.should eq 405
     end
 
-    it "returns a 200 OK response containing alloed method names for OPTIONS requests" do
+    it "returns a 200 OK response containing allowed method names for OPTIONS requests" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "OPTIONS",
@@ -260,7 +260,7 @@ describe Marten::Handlers::Base do
       response_2.headers["Content-Length"].should eq "0"
     end
 
-    it "returns the response for GET request when handling HEAD requests if the head method is not overriden" do
+    it "returns the response for GET request when handling HEAD requests if the head method is not overridden" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "HEAD",

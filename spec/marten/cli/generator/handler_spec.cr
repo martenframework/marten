@@ -13,7 +13,7 @@ describe Marten::CLI::Generator::Handler do
   end
 
   describe "#run" do
-    context "when targetting the main application" do
+    context "when targeting the main application" do
       with_main_app_location "#{__DIR__}/handler_spec/main_app/"
 
       it "generates the expected handler file" do
@@ -60,7 +60,7 @@ describe Marten::CLI::Generator::Handler do
       end
     end
 
-    context "when targetting a specific application" do
+    context "when targeting a specific application" do
       with_installed_apps Marten::CLI::Generator::HandlerSpec::App
 
       it "generates the expected handler file" do

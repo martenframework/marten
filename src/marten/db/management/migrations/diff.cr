@@ -789,7 +789,7 @@ module Marten
               end
             end
 
-            # Keep only the changes targetted by the required apps.
+            # Keep only the changes targeted by the required apps.
             changes.reject! { |app_label, _| !required_apps.includes?(app_label) }
 
             changes

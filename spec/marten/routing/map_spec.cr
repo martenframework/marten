@@ -240,7 +240,7 @@ describe Marten::Routing::Match do
       end
     end
 
-    it "raises an error if the matched route name does not receive all the expected paramter" do
+    it "raises an error if the matched route name does not receive all the expected parameter" do
       map = Marten::Routing::Map.new
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 
@@ -379,7 +379,7 @@ describe Marten::Routing::Match do
       end
     end
 
-    it "raises an error if the matched route name does not receive all the expected paramter" do
+    it "raises an error if the matched route name does not receive all the expected parameter" do
       map = Marten::Routing::Map.new
       map.path("/home/<sid:slug>/test/<number:int>", Marten::Handlers::Base, name: "home")
 

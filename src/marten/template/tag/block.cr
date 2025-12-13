@@ -3,7 +3,7 @@ module Marten
     module Tag
       # The `block` template tag.
       #
-      # Blocks allow to define that some specific portions of a template can be overriden by child templates. This tag
+      # Blocks allow to define that some specific portions of a template can be overridden by child templates. This tag
       # is only useful when used in conjunction with the `extend` tag.
       class Block < Base
         @nodes : NodeSet

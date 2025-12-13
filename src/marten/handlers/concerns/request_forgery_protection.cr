@@ -13,7 +13,7 @@ module Marten
     # `TRACE`), the module will verify that the CSRF token cookie is available and that a `csrftoken` field is present
     # in the request data hash, or that a `X-CSRF-Token` header is defined. These two token will be verified and they
     # must match; otherwise a 403 error is returned to the user. In addition to that, the module will also verify that
-    # the HTTP request host is either part of the allowed hosts (`Marten.settins.allowed_hosts` setting) or that the
+    # the HTTP request host is either part of the allowed hosts (`Marten.settings.allowed_hosts` setting) or that the
     # value of the `Origin` header matches the configured trusted origins (`Marten.settings.csrf.trusted_origins`
     # setting) - in order to protect against cross-subdomain attacks. The `Referer` header will also be checked for
     # HTTPS request (if the `Origin` header is not set) in order to prevent subdomains to perform unsafe HTTP requests
@@ -21,7 +21,7 @@ module Marten
     # `Marten.settings.csrf.trusted_origins` setting).
     #
     # By default, handlers will use the CSRF protection by complying with what is defined as part of the
-    # `Marten.settins.csrf.protection_enabled` setting (whose value is `true` by default). It is also possible to
+    # `Marten.settings.csrf.protection_enabled` setting (whose value is `true` by default). It is also possible to
     # override whether or not CSRF protection is used on a per-handler basis by using the `#protect_from_forgery`
     # method.
     module RequestForgeryProtection

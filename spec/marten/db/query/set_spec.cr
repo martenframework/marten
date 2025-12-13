@@ -885,7 +885,7 @@ describe Marten::DB::Query::Set do
       tag.persisted?.should be_true
     end
 
-    it "properly uses the default connection as expected when no special connection is targetted" do
+    it "properly uses the default connection as expected when no special connection is targeted" do
       tag_1 = Marten::DB::Query::Set(Tag).new.create(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.create(is_active: false) do |o|
@@ -896,7 +896,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.using(:other).to_a.should be_empty
     end
 
-    it "properly uses the targetted connection as expected" do
+    it "properly uses the targeted connection as expected" do
       tag_1 = Marten::DB::Query::Set(Tag).new.using(:other).create(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.using(:other).create(is_active: false) do |o|
@@ -937,7 +937,7 @@ describe Marten::DB::Query::Set do
       tag.persisted?.should be_true
     end
 
-    it "properly uses the default connection as expected when no special connection is targetted" do
+    it "properly uses the default connection as expected when no special connection is targeted" do
       tag_1 = Marten::DB::Query::Set(Tag).new.create!(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.create!(is_active: false) do |o|
@@ -948,7 +948,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.using(:other).to_a.should be_empty
     end
 
-    it "properly uses the targetted connection as expected" do
+    it "properly uses the targeted connection as expected" do
       tag_1 = Marten::DB::Query::Set(Tag).new.using(:other).create!(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.using(:other).create!(is_active: false) do |o|
@@ -961,7 +961,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#delete" do
-    it "allows to delete the records targetted by a specific query set" do
+    it "allows to delete the records targeted by a specific query set" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
@@ -1192,7 +1192,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#each" do
-    it "allows to iterate over the records targetted by the query set if it wasn't already fetched" do
+    it "allows to iterate over the records targeted by the query set if it wasn't already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -1206,7 +1206,7 @@ describe Marten::DB::Query::Set do
       tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
-    it "allows to iterate over the records targetted by the query set if it was already fetched" do
+    it "allows to iterate over the records targeted by the query set if it was already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -1349,7 +1349,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.exists? { q(name: "crystal") }.should be_true
     end
 
-    it "returns false if the passed q() expression does not match anythin" do
+    it "returns false if the passed q() expression does not match anything" do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)

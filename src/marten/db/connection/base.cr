@@ -94,7 +94,7 @@ module Marten
           IMPLEMENTATIONS.key_for(self.class)
         end
 
-        # Registers a proc to be called when the current transaction is committed to the databse.
+        # Registers a proc to be called when the current transaction is committed to the database.
         #
         # This method has no effect if it is called outside of a transaction block.
         def observe_transaction_commit(block : -> Nil)
@@ -141,7 +141,7 @@ module Marten
         # Returns true if the current database was explicitly configured for the test environment.
         #
         # The only way this method can return true is when the database name was explicitly set in a configuration
-        # targetting the test environment.
+        # targeting the test environment.
         def test_database?
           @config.name_set_with_env == Conf::Env::TEST
         end

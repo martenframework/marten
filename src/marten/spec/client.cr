@@ -10,7 +10,7 @@ module Marten
     # a specific client instance.
     #
     # Moreover, the test client disables CSRF checks by default in order to ease the process of testing unsafe request
-    # methods. If you trully need to have these checks applied when running specs, you can initialize a test client by
+    # methods. If you truly need to have these checks applied when running specs, you can initialize a test client by
     # setting `disable_request_forgery_protection` to `false`.
     class Client
       @server_handler : ::HTTP::Handler?

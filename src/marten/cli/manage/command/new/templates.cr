@@ -83,7 +83,7 @@ module Marten
                 files << {"shard.override.yml", ECR.render("#{__DIR__}/templates/shared/shard.override.yml.ecr")}
               end
 
-              # Add authentification files if needed.
+              # Add authentication files if needed.
               if context.targets_auth?
                 auth_context = CLI::Templates::App::Context.new("auth")
                 auth_app_files = CLI::Templates::Auth.app_files(auth_context).map do |path, content|

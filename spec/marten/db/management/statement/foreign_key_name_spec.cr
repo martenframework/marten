@@ -37,7 +37,7 @@ describe Marten::DB::Management::Statement::ForeignKeyName do
       statement.references_column?("test_to_table", "test_to_column").should be_true
     end
 
-    it "returns fale if the statement does not reference the passed column" do
+    it "returns false if the statement does not reference the passed column" do
       statement = Marten::DB::Management::Statement::ForeignKeyName.new(
         ->(_x : String, _y : Array(String), _z : String) { "indexname" },
         "test_table",

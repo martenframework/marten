@@ -40,7 +40,7 @@ describe Marten::Conf::GlobalSettings::Assets do
   end
 
   describe "#app_dirs=" do
-    it "allows to change the app_dirs confiuration as expected" do
+    it "allows to change the app_dirs configuration as expected" do
       assets_conf = Marten::Conf::GlobalSettings::Assets.new
 
       assets_conf.app_dirs = true

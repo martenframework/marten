@@ -75,7 +75,7 @@ describe Marten::DB::Field::Date do
   end
 
   describe "#from_db_result_set" do
-    it "is able to read a date time froma a DB result set" do
+    it "is able to read a date time from a DB result set" do
       field = Marten::DB::Field::Date.new("my_field")
 
       Marten::DB::Connection.default.open do |db|

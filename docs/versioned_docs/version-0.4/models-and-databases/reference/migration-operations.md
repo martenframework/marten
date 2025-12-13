@@ -28,7 +28,7 @@ add_index :test_table, :test_index, [:foo, :bar]
 
 ## `add_unique_constraint`
 
-The `add_unique_constraint` operation allows adding a unique constraint to an existing table. It must be called with a table name as first argument, followed by a unique constraint definition (constraint name and targetted column names).
+The `add_unique_constraint` operation allows adding a unique constraint to an existing table. It must be called with a table name as first argument, followed by a unique constraint definition (constraint name and targeted column names).
 
 For example:
 

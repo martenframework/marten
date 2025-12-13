@@ -39,7 +39,7 @@ module Marten
           reorder_records_to_delete_according_to_dependencies
 
           @connection.transaction do
-            # Step 1: delete all the querysets that were identified as raw-deleteable.
+            # Step 1: delete all the querysets that were identified as raw-deletable.
             @querysets_to_raw_delete.each do |model_klass, node|
               count += model_klass._base_queryset.using(@connection.alias).filter(node).delete(raw: true)
             end
@@ -67,7 +67,7 @@ module Marten
           )
         end
 
-        private def raw_deleteable?(model_klass)
+        private def raw_deletable?(model_klass)
           model_klass.local_reverse_relations.select { |r| r.many_to_one? || r.one_to_one? }.all? do |reverse_relation|
             reverse_relation.on_delete.do_nothing?
           end
@@ -116,7 +116,7 @@ module Marten
             related_records = reverse_relation.model._base_queryset.using(@connection.alias)
               .filter(query_node_for(records, reverse_relation))
 
-            if reverse_relation.on_delete.cascade? && raw_deleteable?(reverse_relation.model)
+            if reverse_relation.on_delete.cascade? && raw_deletable?(reverse_relation.model)
               @querysets_to_raw_delete << {reverse_relation.model, query_node_for(records, reverse_relation)}
             elsif reverse_relation.on_delete.cascade?
               add(related_records, source: model, process_parent_models: !reverse_relation.parent_link?)

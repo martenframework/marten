@@ -94,7 +94,7 @@ describe Marten::Apps::Config do
       FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
     end
 
-    it "returns an assets finder targetting the app assets folder" do
+    it "returns an assets finder targeting the app assets folder" do
       app_config = Marten::Apps::ConfigSpec::AppWithAssets::App.new
       assets_finder = app_config.assets_finder
       assets_finder.should be_a Marten::Asset::Finder::FileSystem
@@ -164,7 +164,7 @@ describe Marten::Apps::Config do
       FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")
     end
 
-    it "returns a templates loader targetting the app templates" do
+    it "returns a templates loader targeting the app templates" do
       app_config = Marten::Apps::ConfigSpec::AppWithTemplates::App.new
       templates_loader = app_config.templates_loader
       templates_loader.should be_a Marten::Template::Loader::FileSystem

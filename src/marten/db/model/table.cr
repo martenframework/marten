@@ -608,7 +608,7 @@ module Marten
         end
 
         # :ditto:
-        def set_field_values(values : Hash | NamedTuple)
+        def set_field_values(values : Hash | NamedTuple) # ameba:disable Naming/AccessorMethodName
           sanitized_values = Hash(String, Field::Any | Model).new
           values.each do |key, value|
             next unless value.is_a?(Field::Any | Model)

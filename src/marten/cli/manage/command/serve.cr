@@ -126,7 +126,7 @@ module Marten
             if file_changed
               stop_server_process
               build_server
-              start_server_process if self.server_build_success
+              start_server_process if server_build_success
               open_server if should_open?
             end
           end

@@ -21,7 +21,6 @@ describe Marten::DB::Model::Connection do
         TestUser.transaction do
           TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
           raise "Unexpected error"
-          TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
         end
       end
       TestUser.all.size.should eq 0
@@ -41,7 +40,6 @@ describe Marten::DB::Model::Connection do
         TestUser.transaction(using: :other) do
           TestUser.using(:other).create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
           raise "Unexpected error"
-          TestUser.using(:other).create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
         end
       end
       TestUser.all.size.should eq 0
@@ -68,7 +66,6 @@ describe Marten::DB::Model::Connection do
         user.transaction do
           TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
           raise "Unexpected error"
-          TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
         end
       end
 
@@ -97,7 +94,6 @@ describe Marten::DB::Model::Connection do
         user.transaction(using: :other) do
           TestUser.using(:other).create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
           raise "Unexpected error"
-          TestUser.using(:other).create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
         end
       end
       TestUser.all.size.should eq 0

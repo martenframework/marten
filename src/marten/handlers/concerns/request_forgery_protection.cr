@@ -55,7 +55,7 @@ module Marten
       #
       # Calling this method will force the CSRF token to be generated if it wasn't set already. It will also result in
       # the token cookie to be set as part of the HTTP response returned by the handler.
-      def get_csrf_token
+      def get_csrf_token # ameba:disable Naming/AccessorMethodName
         returned_csrf_token = if csrf_token.nil?
                                 gen_new_token
                               else

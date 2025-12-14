@@ -542,7 +542,7 @@ Post.all.pluck("title", "published")
 
 ### `size`
 
-Alias for [`#count`](#count): returns the number of records that are targetted by the query set.
+Alias for [`#count`](#count): returns the number of records that are targeted by the query set.
 
 ### `update`
 

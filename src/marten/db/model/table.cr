@@ -50,8 +50,8 @@ module Marten
         module ClassMethods
           # Allows to explicitly configure a new index for a specific set of fields.
           #
-          # This method allows to configure a new index targetting a specific set of `fields`. Indexes must be
-          # associated with a mandatory `name` that must be unique accross all the indexes of the considered model.
+          # This method allows to configure a new index targeting a specific set of `fields`. Indexes must be
+          # associated with a mandatory `name` that must be unique across all the indexes of the considered model.
           def db_index(name : String | Symbol, field_names : Array(String) | Array(Symbol)) : Nil
             @@db_indexes << Index.new(
               name.to_s,
@@ -70,7 +70,7 @@ module Marten
 
           # Returns the name of the table associated with the considered model.
           #
-          # Unless explicitely specified, the table name is automatically generated based on the label of the app
+          # Unless explicitly specified, the table name is automatically generated based on the label of the app
           # associated with the considered model and the class name of the model.
           def db_table
             @@db_table ||= String.build do |s|
@@ -80,15 +80,15 @@ module Marten
             end
           end
 
-          # Allows to explicitely define the name of the table associated with the model.
+          # Allows to explicitly define the name of the table associated with the model.
           def db_table(db_table : String | Symbol)
             @@db_table = db_table.to_s
           end
 
           # Allows to explicitly configure a new unique constraint for a specific set of fields.
           #
-          # This method allows to configure a new unique constraint targetting a specific set of `fields`. Unique
-          # constraints must be associated with a mandatory `name` that must be unique accross all the constraints of
+          # This method allows to configure a new unique constraint targeting a specific set of `fields`. Unique
+          # constraints must be associated with a mandatory `name` that must be unique across all the constraints of
           # the considered model.
           def db_unique_constraint(name : String | Symbol, field_names : Array(String) | Array(Symbol)) : Nil
             @@db_unique_constraints << Constraint::Unique.new(

@@ -28,9 +28,9 @@ module Marten
     #
     # The `#template_name` class method allows to define the name of the template to use to render the schema while the
     # `#success_route_name` method can be used to specify the name of a route to redirect to once the schema has been
-    # validated. Alternatively, the `#sucess_url` class method can be used to provide a raw URL to redirect to. The same
-    # method can also be overridden at the instance level in order to rely on a custom logic to generate the sucess URL
-    # to redirect to.
+    # validated. Alternatively, the `#success_url` class method can be used to provide a raw URL to redirect to. The
+    # same method can also be overridden at the instance level in order to rely on a custom logic to generate the
+    # success URL to redirect to.
     class Schema < Template
       include Callbacks
 
@@ -123,7 +123,7 @@ module Marten
 
       # Produces the response when the processed schema is valid.
       #
-      # By default, this will return a 302 redirect targetting the configured success URL.
+      # By default, this will return a 302 redirect targeting the configured success URL.
       def process_valid_schema
         HTTP::Response::Found.new(success_url)
       end
@@ -155,7 +155,7 @@ module Marten
       rescue NilAssertionError
         raise Errors::ImproperlyConfigured.new(
           "'#{self.class.name}' must define a success route via the '#success_route_name' or '#success_url' class " \
-          "method, or by overridding the '#success_url' method"
+          "method, or by overriding the '#success_url' method"
         )
       end
 
@@ -165,7 +165,7 @@ module Marten
 
       private def raise_improperly_configured_schema
         raise Errors::ImproperlyConfigured.new(
-          "'#{self.class.name}' must define a schema class name via the '#schema' macro, or by overridding the " \
+          "'#{self.class.name}' must define a schema class name via the '#schema' macro, or by overriding the " \
           "'#schema_class' method"
         )
       end

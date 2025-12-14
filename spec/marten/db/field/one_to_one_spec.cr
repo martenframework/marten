@@ -270,7 +270,7 @@ describe Marten::DB::Field::OneToOne do
       end
     end
 
-    it "works as expected when target models don't involve interger pk fields" do
+    it "works as expected when target models don't involve integer pk fields" do
       article = Marten::DB::Field::OneToOneSpec::Article.create!(title: "This is an article", body: "This is a test")
       comment = Marten::DB::Field::OneToOneSpec::Comment.create!(article: article, text: "This article is dope")
 

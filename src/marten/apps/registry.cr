@@ -35,7 +35,7 @@ module Marten
         get(label.to_s)
       end
 
-      # Returns the application config object contaning the passed class.
+      # Returns the application config object containing the passed class.
       def get_containing(klass)
         candidates = [] of Config.class
 

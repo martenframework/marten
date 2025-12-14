@@ -9,7 +9,7 @@ module Marten
       # Returns the field ID that initiated the reverse relation.
       getter field_id
 
-      # Returns the model class targetted by the reverse relation.
+      # Returns the model class targeted by the reverse relation.
       getter model
 
       def initialize(@id : String?, @model : Model.class, @field_id : String)

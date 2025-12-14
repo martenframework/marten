@@ -22,7 +22,7 @@ module Marten
         {{ run("./config/fetch_compilation_root_path.cr") }}
       end
 
-      # Allows to define the lable of the application config.
+      # Allows to define the label of the application config.
       def self.label(label : String | Symbol)
         validate_label(label)
 

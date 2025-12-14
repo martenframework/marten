@@ -3,7 +3,7 @@ module Marten
     module Query
       # The main prefetcher class.
       #
-      # A prefetcher is responsible for prefetching relation recordss for the records matched by a given query set. This
+      # A prefetcher is responsible for prefetching relation records for the records matched by a given query set. This
       # allows to avoid N+1 queries problems for relation fields (and reverse relations) that map to multiple records.
       #
       # A prefetcher is initialized with an array of records, an array of relation strings to prefetch, and an the

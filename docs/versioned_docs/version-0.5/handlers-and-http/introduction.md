@@ -79,12 +79,12 @@ The `response` object corresponds to the HTTP response that is returned to the c
 | `#content` | Returns the content of the response as a string. |
 | `#content_type` | Returns the content type of the response as a string. |
 | `#cookies` | Returns a hash-like object (instance of [`Marten::HTTP::Cookies`](pathname:///api/0.5/Marten/HTTP/Cookies.html)) containing the cookies that will be sent with the response. |
-| `#headers` | Returns a hash-like object (instance of [`Marten::HTTP::Headers`](pathname:///api/0.5/Marten/HTTP/Headers.html)) containg the headers that will be used for the response. |
+| `#headers` | Returns a hash-like object (instance of [`Marten::HTTP::Headers`](pathname:///api/0.5/Marten/HTTP/Headers.html)) containing the headers that will be used for the response. |
 | `#status` | Returns the status of the response (eg. 200 or 404). |
 
 ### Parameters
 
-Handlers are mapped to URLs through a [routing configuration](#mapping-handlers-to-urls). Some routes require parameters that are used by the handler to retrieve objects or perform any arbirtary logic. These parameters can be accessed by using the `#params` method, which returns a hash of all the parameters that were used to initialize the considered handler.
+Handlers are mapped to URLs through a [routing configuration](#mapping-handlers-to-urls). Some routes require parameters that are used by the handler to retrieve objects or perform any arbitrary logic. These parameters can be accessed by using the `#params` method, which returns a hash of all the parameters that were used to initialize the considered handler.
 
 For example such parameters can be used to retrieve a specific model instance:
 

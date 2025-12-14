@@ -53,7 +53,7 @@ module Marten
 
         # Runs custom validation logic for a specific schema field and schema object.
         #
-        # This method should be overriden for each field implementation that requires custom validation logic.
+        # This method should be overridden for each field implementation that requires custom validation logic.
         def validate(schema, value)
         end
 

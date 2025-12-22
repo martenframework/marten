@@ -1,6 +1,8 @@
 Excluded:
-  - lib
   - "**/*.ecr"
+  - example_projects
+  - lib
+  - "tmp"
 
 Layout/LineLength:
   Enabled: true

@@ -126,7 +126,11 @@ module Marten
         private getter of_field
 
         private def get_raw_data_as_array(data)
-          if data.responds_to?(:fetch_all)
+          if (json_data = data[id]?).is_a?(::JSON::Any) && json_data.as_a?
+            json_data.as_a.map do |v|
+              v.as_s
+            end
+          elsif data.responds_to?(:fetch_all)
             data.fetch_all(id)
           else
             data[id]?.try do |value|

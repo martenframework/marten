@@ -59,6 +59,29 @@ describe Marten::Schema::Field::Array do
       field_2 = Marten::Schema::Field::Array.new("other_field", Marten::Schema::Field::String.new("other_field"))
       field_2.get_raw_data(schema.data).should eq ["foo"]
     end
+
+    it "returns the expected raw data if the values were extracted from a parsed JSON" do
+      raw_data = %{{ "test_field": ["hello", "world"], "other_field": "foo" }}
+      raw_data_hash = Marten::HTTP::Params::Data::RawHash.new
+
+      if !(json_params = JSON.parse(raw_data).as_h?).nil?
+        json_params.each do |key, value|
+          raw_data_hash[key] = [] of Marten::HTTP::Params::Data::Value unless raw_data_hash.has_key?(key)
+          raw_data_hash[key].as(Marten::HTTP::Params::Data::Values) << value
+        end
+      end
+
+      data = Marten::HTTP::Params::Data.new(raw_data_hash)
+
+      schema = Marten::Schema::Field::ArraySpec::TestSchema.new(data)
+      field = Marten::Schema::Field::Array.new("test_field", Marten::Schema::Field::String.new("test_field"))
+
+      field.get_raw_data(schema.data).should eq ["hello", "world"]
+
+      schema.valid?.should be_true
+
+      schema.test_field.should eq ["hello", "world"]
+    end
   end
 
   describe "#serialize" do

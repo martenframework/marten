@@ -1432,11 +1432,11 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2]
     end
 
-    it "raises an error when filtering with a misspelled column in a raw SQL condition", tags: "raw" do
+    it "raises an error when filtering with a non existing column in a raw SQL condition", tags: "raw" do
       Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(Exception) do
-        Marten::DB::Query::Set(Tag).new.filter("namme=:name", name: "crystal").to_a
+        Marten::DB::Query::Set(Tag).new.filter("unknown=:name", name: "crystal").to_a
       end
     end
 
@@ -1930,11 +1930,11 @@ describe Marten::DB::Query::Set do
       result.should eq tag_2
     end
 
-    it "raises an error when getting with a misspelled column in a raw SQL condition", tags: "get_raw" do
+    it "raises an error when getting with a non existing column in a raw SQL condition", tags: "get_raw" do
       Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(Exception) do
-        Marten::DB::Query::Set(Tag).new.get("namme=:name", name: "crystal")
+        Marten::DB::Query::Set(Tag).new.get("unknown=:name", name: "crystal")
       end
     end
 

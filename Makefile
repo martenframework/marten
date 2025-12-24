@@ -60,6 +60,11 @@ format_checks:
 lint:
 	bin/ameba
 
+.PHONY: typos
+## Trigger spelling checks.
+typos:
+	typos
+
 
 # TESTING
 # ~~~~~~~

@@ -12,6 +12,9 @@ on:
   schedule:
     - cron: '0 0 * * *'
 
+env:
+  CLICOLOR: 1
+
 jobs:
   crystal:
     runs-on: ubuntu-latest
@@ -24,6 +27,12 @@ jobs:
         run: shards install --ignore-crystal-version
       - name: QA checks
         run: make qa
+  spelling:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Check spelling
+      uses: crate-ci/typos@v1.40.0
   generated-app:
     runs-on: ubuntu-latest
     strategy:

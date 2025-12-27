@@ -355,6 +355,26 @@ Marten also provide the ability to update the records that are targeted by a spe
 Article.filter(title: "My article").update(title: "Updated!")
 ```
 
+#### Updating specific columns
+
+If you need to update only specific columns without running validations or callbacks, you can use the `#update_columns` or `#update_columns!` methods:
+
+```crystal
+article = Article.get(id: 42)
+article.update_columns(title: "Updated!")
+```
+
+These methods are useful when you want to efficiently update a subset of fields without triggering the full save lifecycle. The `#update_columns!` variant will raise an error if called on a new (unsaved) record:
+
+```crystal
+article = Article.new
+article.update_columns!(title: "New article")  # Raises Marten::DB::Errors::UnmetSaveCondition
+```
+
+:::caution
+The `#update_columns` and `#update_columns!` methods bypass model validations and lifecycle callbacks (such as `before_update`, `after_update`, etc.). Use them with caution and only when you're certain that skipping these checks is safe for your application.
+:::
+
 ### Delete
 
 Once a model record has been retrieved from the database, it is possible to delete it by using the `#delete` method:

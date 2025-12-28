@@ -26,7 +26,7 @@ jobs:
       - name: Install shards
         run: shards install --ignore-crystal-version
       - name: QA checks
-        run: make qa
+        run: make qa_crystal
   spelling:
     runs-on: ubuntu-latest
     steps:

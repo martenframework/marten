@@ -202,6 +202,82 @@ module Marten
           save!
         end
 
+        # Updates specific columns in the database without running validations or callbacks.
+        #
+        # This method allows you to update only the specified columns while leaving other fields unchanged.
+        # Unlike `#update`, this method bypasses model validations and lifecycle callbacks (such as
+        # `before_update`, `after_update`, etc.), making it more efficient for partial updates where
+        # validations and callbacks are not required.
+        #
+        # Both the in-memory model instance and the database record are updated. However, this method
+        # does not reload the record after the update, so any changes made to other fields by database
+        # triggers or defaults will not be reflected in the model instance.
+        #
+        # ```
+        # user = User.get!(id: 42)
+        # user.update_columns(last_login: Time.utc)                    # Updates only last_login
+        # user.update_columns(username: "jd", email: "jd@example.com") # Updates multiple columns
+        # ```
+        def update_columns(**values) : Bool
+          update_columns(values: values)
+        end
+
+        # :ditto:
+        def update_columns(values : Hash | NamedTuple) : Bool
+          set_field_values(values)
+          fields = local_field_db_values
+          keys = values.keys.map(&.to_s)
+          fields.select!(keys)
+
+          connection = self.class.connection
+          connection.update(
+            self.class.db_table,
+            fields,
+            pk_column_name: self.class.pk_field.db_column!,
+            pk_value: self.class.pk_field.to_db(pk)
+          )
+          true
+        end
+
+        # Updates specific columns in the database without running validations or callbacks.
+        #
+        # This method provides the same functionality as `#update_columns` but with stricter validation.
+        # It raises a `Marten::DB::Errors::UnmetSaveCondition` exception if called on a new (unsaved) record,
+        # ensuring that updates are only performed on persisted records.
+        #
+        # Like `#update_columns`, this method bypasses model validations and lifecycle callbacks, making it
+        # suitable for performance-critical updates where these features are not needed.
+        #
+        # ```
+        # user = User.get!(id: 42)
+        # user.update_columns!(last_login: Time.utc) # Updates only last_login
+        #
+        # new_user = User.new(username: "jd")
+        # new_user.update_columns!(email: "jd@example.com") # Raises UnmetSaveCondition
+        # ```
+        def update_columns!(**values) : Bool
+          update_columns!(values: values)
+        end
+
+        # :ditto:
+        def update_columns!(values : Hash | NamedTuple) : Bool
+          raise Errors::UnmetSaveCondition.new("Cannot update columns on a new record") if new_record?
+
+          set_field_values(values)
+          fields = local_field_db_values
+          keys = values.keys.map(&.to_s)
+          fields.select!(keys)
+
+          connection = self.class.connection
+          connection.update(
+            self.class.db_table,
+            fields,
+            pk_column_name: self.class.pk_field.db_column!,
+            pk_value: self.class.pk_field.to_db(pk)
+          )
+          true
+        end
+
         protected setter new_record
 
         protected def prepare_fields_for_save : Nil

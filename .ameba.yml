@@ -22,3 +22,6 @@ Naming/BlockParameterName:
 
 Style/PercentLiteralDelimiters:
   Enabled: false
+
+Style/VerboseNilType:
+  Enabled: false

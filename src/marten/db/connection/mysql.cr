@@ -151,6 +151,12 @@ module Marten
           "lt"          => "< %s",
           "lte"         => "<= %s",
           "startswith"  => "LIKE BINARY %s",
+          "year"        => "YEAR(%s)",
+          "month"       => "MONTH(%s)",
+          "day"         => "DAY(%s)",
+          "hour"        => "HOUR(%s)",
+          "minute"      => "MINUTE(%s)",
+          "second"      => "SECOND(%s)",
         }
       end
     end

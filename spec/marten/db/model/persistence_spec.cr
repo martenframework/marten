@@ -1579,6 +1579,17 @@ describe Marten::DB::Model::Persistence do
       object.username.should eq "test1"
       object.email.should eq "test1@example.com"
     end
+
+    it "does not allow to update for a new record" do
+      object = TestUser.new(first_name: "John", last_name: "Doe")
+      object.update_columns({"username" => "test1", "email" => "test1@example.com"}).should be_false
+    end
+
+    it "does not allow to update for a destroyed record" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.delete
+      object.update_columns({"username" => "test1", "email" => "test1@example.com"}).should be_false
+    end
   end
 
   describe "#update_columns!" do
@@ -1627,12 +1638,24 @@ describe Marten::DB::Model::Persistence do
       object.email.should eq "test1@example.com"
     end
 
-    it "raises an error when trying to update a new record" do
+    it "does not allow to update for a new record" do
       object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
 
       expect_raises(
         Marten::DB::Errors::UnmetSaveCondition,
         "Cannot update columns on a new record"
+      ) do
+        object.update_columns!(username: "updated")
+      end
+    end
+
+    it "does not allow to update for a destroyed record" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.delete
+
+      expect_raises(
+        Marten::DB::Errors::UnmetSaveCondition,
+        "Cannot update columns on a deleted record"
       ) do
         object.update_columns!(username: "updated")
       end

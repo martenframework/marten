@@ -224,6 +224,8 @@ module Marten
 
         # :ditto:
         def update_columns(values : Hash | NamedTuple) : Bool
+          return false if !persisted?
+
           set_field_values(values)
           fields = local_field_db_values
           keys = values.keys.map(&.to_s)
@@ -262,6 +264,7 @@ module Marten
         # :ditto:
         def update_columns!(values : Hash | NamedTuple) : Bool
           raise Errors::UnmetSaveCondition.new("Cannot update columns on a new record") if new_record?
+          raise Errors::UnmetSaveCondition.new("Cannot update columns on a deleted record") if deleted?
 
           set_field_values(values)
           fields = local_field_db_values

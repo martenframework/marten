@@ -110,3 +110,11 @@ after_rollback :do_something_else, on: [:create, :delete] # Will run after rolle
 ```
 
 The actions supported by the `on` argument are `create`, `update`, `save`, and `delete`.
+
+## Methods that bypass callbacks
+
+Some model methods intentionally bypass callbacks for performance or specific use cases. The following methods do **not** trigger callbacks:
+
+* `#update_columns` and `#update_columns!` - These methods update specific columns directly in the database without running validations or any lifecycle callbacks. They are useful for performance-critical updates where you want to avoid the overhead of the full save lifecycle.
+
+If you need to update records while ensuring that callbacks are executed, use the standard `#save`, `#save!`, `#update`, or `#update!` methods instead.

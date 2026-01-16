@@ -13,6 +13,7 @@ module Marten
     # methods. If you truly need to have these checks applied when running specs, you can initialize a test client by
     # setting `disable_request_forgery_protection` to `false`.
     class Client
+      @flash : HTTP::FlashStore?
       @server_handler : ::HTTP::Handler?
       @session : HTTP::Session::Store::Base?
 
@@ -49,6 +50,14 @@ module Marten
           headers: headers,
           secure: secure
         )
+      end
+
+      # Returns the flash store for the client.
+      #
+      # This method returns a flash store object, initialized using the currently configured session store. This can be
+      # helpful to access flash messages that might have been set by handlers.
+      def flash
+        @flash ||= HTTP::FlashStore.from_session(session)
       end
 
       # Allows to issue a GET request to the server.

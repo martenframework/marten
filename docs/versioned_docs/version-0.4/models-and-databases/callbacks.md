@@ -8,7 +8,7 @@ Models callbacks let you define logic that is triggered before or after a record
 
 ## Overview
 
-As stated above, callbacks are methods that will be called when specific events occur for a specific model instance. They need to be registered explicitly as part your model definitions. There are [many types of of callbacks](#available-callbacks), and it is possible to register "before" or "after" callbacks for most of these types.
+As stated above, callbacks are methods that will be called when specific events occur for a specific model instance. They need to be registered explicitly as part your model definitions. There are [many types of callbacks](#available-callbacks), and it is possible to register "before" or "after" callbacks for most of these types.
 
 Registering a callback is as simple as calling the right callback macro (eg. `#before_validation`) with a symbol of the name of the method to call when the callback is executed. For example:
 

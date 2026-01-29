@@ -8,6 +8,9 @@ Layout/LineLength:
   Enabled: true
   MaxLength: 120
 
+Lint/AssignmentInCallArgument:
+  Enabled: false
+
 Lint/NotNil:
   Enabled: false
 

@@ -1,3 +1,4 @@
+# :nodoc:
 class Array
   include Marten::Template::CanDefineTemplateAttributes
 

@@ -1,3 +1,4 @@
+# :nodoc:
 class String
   include Marten::Template::CanDefineTemplateAttributes
 

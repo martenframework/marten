@@ -20,6 +20,8 @@ require "./field/uuid"
 require "./field/many_to_many"
 require "./field/many_to_one"
 require "./field/one_to_one"
+require "./field/polymorphic"
+require "./field/polymorphic_reference"
 
 module Marten
   module DB
@@ -118,6 +120,8 @@ module Marten
       register "many_to_many", ManyToMany
       register "many_to_one", ManyToOne
       register "one_to_one", OneToOne
+      register "polymorphic", Polymorphic
+      register "polymorphic_reference", PolymorphicReference
       register "slug", Slug
       register "string", String
       register "text", Text

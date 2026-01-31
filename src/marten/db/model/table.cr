@@ -338,8 +338,10 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% if !(ann[:no_value] == true) %}
           when {{ field_var.name.stringify }}
             {{ ann[:accessor] || field_var.id }}
+          {% end %}
           {% end %}
           else
             raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
@@ -469,8 +471,10 @@ module Marten
 
           {% for field_var in local_field_vars %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if !(ann[:has_value] == false) %}
             field = self.class.get_field({{ field_var.name.stringify }})
             values[field.db_column!] = field.to_db({{ ann[:accessor] || field_var.id }}) if field.db_column?
+            {% end %}
           {% end %}
 
           values
@@ -663,8 +667,10 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if !(ann[:no_value] == true) %}
             field = self.class.get_field({{ field_var.name.stringify }})
             values[field.db_column!] = {{ ann[:accessor] || field_var.id }} if field.db_column?
+            {% end %}
           {% end %}
           values
         end
@@ -706,18 +712,20 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
-            if values.has_key?({{ field_var.name.stringify }})
-              value = values[{{ field_var.name.stringify }}]
-              if !value.is_a?(
-                {{ field_var.type }}{% if ann[:field_type] %} | {{ ann[:field_type] }}{% end %}
-              )
-                raise Errors::UnexpectedFieldValue.new(
-                  "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
+            {% if !(ann[:no_value] == true) %}
+              if values.has_key?({{ field_var.name.stringify }})
+                value = values[{{ field_var.name.stringify }}]
+                if !value.is_a?(
+                  {{ field_var.type }}{% if ann[:field_type] %} | {{ ann[:field_type] }}{% end %}
                 )
+                  raise Errors::UnexpectedFieldValue.new(
+                    "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
+                  )
+                end
+                self.{{ ann[:accessor] || field_var.id }} = value
+                values.delete({{ field_var.name.stringify }})
               end
-              self.{{ ann[:accessor] || field_var.id }} = value
-              values.delete({{ field_var.name.stringify }})
-            end
+            {% end %}
 
             {% if ann && ann[:relation_name] %}
               if values.has_key?({{ ann[:relation_name].stringify }})
@@ -761,10 +769,12 @@ module Marten
 
           {% for field_var in local_field_vars %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if !(ann[:no_value] == true) %}
             if model_klass.name == {{ ann[:model_klass].id.stringify }}
               field = {{ ann[:model_klass].id }}.get_field({{ field_var.name.stringify }})
               values[field.db_column!] = field.to_db({{ ann[:accessor] || field_var.id }}) if field.db_column?
             end
+            {% end %}
           {% end %}
 
           values

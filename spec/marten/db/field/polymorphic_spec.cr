@@ -360,5 +360,42 @@ describe Marten::DB::Field::Polymorphic do
       unique_constraint.name.should eq "target_unique_constraint"
       unique_constraint.fields.map(&.id).should eq ["target_type", "target_id"]
     end
+
+    it "properly sets up reverse relations on all the target models" do
+      article_1 = Marten::DB::Field::PolymorphicSpec::Article.create!(title: "This is an article")
+      article_2 = Marten::DB::Field::PolymorphicSpec::Article.create!(title: "This is another article")
+      article_3 = Marten::DB::Field::PolymorphicSpec::Article.create!(title: "This is a third article")
+      recipe_1 = Marten::DB::Field::PolymorphicSpec::Recipe.create!(title: "This is a recipe")
+      recipe_2 = Marten::DB::Field::PolymorphicSpec::Recipe.create!(title: "This is another recipe")
+      recipe_3 = Marten::DB::Field::PolymorphicSpec::Recipe.create!(title: "This is a third recipe")
+      article_comment_1 = Marten::DB::Field::PolymorphicSpec::Comment.create!(
+        text: "This is a comment",
+        target: article_1
+      )
+      article_comment_2 = Marten::DB::Field::PolymorphicSpec::Comment.create!(
+        text: "This is a comment",
+        target: article_2
+      )
+      recipe_comment_1 = Marten::DB::Field::PolymorphicSpec::Comment.create!(
+        text: "This is a comment",
+        target: recipe_1
+      )
+      recipe_comment_2 = Marten::DB::Field::PolymorphicSpec::Comment.create!(
+        text: "This is a comment",
+        target: recipe_2
+      )
+
+      article_1.comments.to_a.should eq [article_comment_1]
+      article_2.comments.to_a.should eq [article_comment_2]
+      article_3.comments.to_a.should be_empty
+      recipe_1.comments.to_a.should eq [recipe_comment_1]
+      recipe_2.comments.to_a.should eq [recipe_comment_2]
+      recipe_3.comments.to_a.should be_empty
+
+      built_comment = article_1.comments.build(text: "This is a comment")
+      built_comment.target.should eq article_1
+      built_comment.target_type.should eq "Marten::DB::Field::PolymorphicSpec::Article"
+      built_comment.target_id.should eq article_1.id!
+    end
   end
 end

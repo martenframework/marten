@@ -24,8 +24,10 @@ module Marten
           @null = false,
           @unique = false,
           @index = false,
+          @related : Nil | ::String | Symbol = nil,
         )
           @primary_key = false
+          @related = @related.try(&.to_s)
         end
 
         def db_column
@@ -102,7 +104,7 @@ module Marten
               reverse: false,
               relation_name: {{ field_id }},
             )]
-            @{{ field_id }} : {% for type in types %}{{ type }} |{% end %} Nil
+            @{{ field_id }} :{% for type in types %} {{ type }} |{% end %} Nil
 
             register_field(
               {{ @type }}.new(
@@ -187,20 +189,20 @@ module Marten
             end
 
             {% for type in types %}
-              def self.with_{{ type.stringify.underscore.id }}_{{ field_id }}
+              def self.with_{{ type.stringify.split("::").last.underscore.id }}_{{ field_id }}
                 field = get_field({{ field_id.stringify }}).as(Marten::DB::Field::Polymorphic)
                 filter({{ polymorphic_target_type_field_id.id }}: field.type_class("{{ type.id }}").name)
               end
 
-              def {{ type.stringify.underscore.id }}_{{ field_id }} : {{ type }}?
+              def {{ type.stringify.split("::").last.underscore.id }}_{{ field_id }} : {{ type }}?
                 {{ field_id }}.as?({{ type }})
               end
 
-              def {{ type.stringify.underscore.id }}_{{ field_id }}! : {{ type }}
+              def {{ type.stringify.split("::").last.underscore.id }}_{{ field_id }}! : {{ type }}
                 {{ field_id }}.as({{ type }})
               end
 
-              def {{ type.stringify.underscore.id }}_{{ field_id }}? : ::Bool
+              def {{ type.stringify.split("::").last.underscore.id }}_{{ field_id }}? : ::Bool
                 field = self.class.get_field({{ field_id.stringify }}).as(Marten::DB::Field::Polymorphic)
                 {{ field_id }}? &&
                   get_field_value(
@@ -209,6 +211,48 @@ module Marten
               end
             {% end %}
           end
+
+          {% if !model_klass.resolve.abstract? %}
+            {% related_field_name = kwargs[:related] %}
+
+            {% for type in types %}
+            ::{{ type }}.register_reverse_relation(
+              Marten::DB::ReverseRelation.new(
+                {% if !related_field_name.is_a?(NilLiteral) %}
+                  {{ related_field_name.id.stringify }},
+                {% else %}
+                  nil,
+                {% end %}
+                ::{{ model_klass }},
+                {{ field_id.stringify }}
+              )
+            )
+            {% end %}
+
+            # Configure reverse relation methods if applicable (when the 'related' option is set).
+
+            {% if !related_field_name.is_a?(NilLiteral) %}
+              class ::{{ model_klass }}
+                macro finished
+                  {% for type in types %}
+                    class ::{{ type }}
+                      @[Marten::DB::Model::Table::RelationInstanceVariable(
+                        many: true,
+                        reverse: true,
+                        relation_name: {{ related_field_name.id }}
+                      )]
+                      @_reverse_polymorphic_{{ related_field_name.id }} : {{ model_klass }}::RelatedQuerySet?
+
+                      def {{ related_field_name.id }}
+                        @_reverse_polymorphic_{{ related_field_name.id }} ||=
+                          {{ model_klass }}::RelatedQuerySet.new(self, {{ field_id.stringify }}, assign_related: true)
+                      end
+                    end
+                  {% end %}
+                end
+              end
+            {% end %}
+          {% end %}
         end
       end
     end

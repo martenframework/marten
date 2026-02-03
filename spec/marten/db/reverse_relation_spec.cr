@@ -64,4 +64,16 @@ describe Marten::DB::ReverseRelation do
       reverse_relation.one_to_one?.should be_false
     end
   end
+
+  describe "#polymorphic?" do
+    it "returns true if the associated field is a polymorphic field" do
+      reverse_relation = Marten::DB::ReverseRelation.new("comments", Comment, "target")
+      reverse_relation.polymorphic?.should be_true
+    end
+
+    it "returns false if the associated field is not a polymorphic field" do
+      reverse_relation = Marten::DB::ReverseRelation.new("posts", Post, "author_id")
+      reverse_relation.polymorphic?.should be_false
+    end
+  end
 end

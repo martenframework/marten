@@ -13,7 +13,7 @@ module Marten
         )
           @query = if query.nil?
                      q = SQL::Query(M).new
-                     q.add_query_node(Node.new({@related_field_id => @instance.pk}))
+                     q.add_query_node(effective_query_node)
                      q
                    else
                      query.not_nil!
@@ -39,6 +39,15 @@ module Marten
             query: other_query.nil? ? @query.clone : other_query.not_nil!,
             assign_related: @assign_related
           )
+        end
+
+        private def effective_query_node
+          field = M.get_field(@related_field_id)
+          if field.is_a?(Field::Polymorphic)
+            Node.new({field.id_field_id => @instance.pk, field.type_field_id => @instance.class.name})
+          else
+            Node.new({@related_field_id => @instance.pk})
+          end
         end
 
         private getter? assign_related

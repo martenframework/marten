@@ -7,7 +7,10 @@ module Marten::DB::Field::PolymorphicSpec
     field :text, :text
     field :target,
       :polymorphic,
-      to: [ArticleWithStringPk, RecipeWithStringPk],
+      to: [
+        Marten::DB::Field::PolymorphicSpec::ArticleWithStringPk,
+        Marten::DB::Field::PolymorphicSpec::RecipeWithStringPk,
+      ],
       blank: false,
       null: false,
       unique: true,

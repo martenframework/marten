@@ -43,6 +43,11 @@ module Marten
         one_to_one? && field.as(Field::OneToOne).parent_link?
       end
 
+      # Returns `true` if the reverse relation is associated with a polymorphic field.
+      def polymorphic?
+        field.is_a?(Field::Polymorphic)
+      end
+
       protected def field
         @field ||= model.get_local_field(@field_id)
       end

@@ -3718,6 +3718,115 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#update_or_create" do
+    it "updates the record matched by the specified arguments" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      updated_user = qset.update_or_create(
+        updates: {first_name: "Jane"},
+        defaults: {first_name: "Jack", is_admin: true},
+        username: "abc"
+      )
+
+      updated_user.should eq user
+
+      user.reload
+      user.first_name.should eq "Jane"
+      user.is_admin.should be_falsey
+    end
+
+    it "creates a record using the specified updates if no record is found" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create(
+        updates: {
+          username:   "newuser",
+          email:      "newuser@example.com",
+          first_name: "John",
+          last_name:  "Doe",
+        },
+        username: "newuser",
+        email: "newuser@example.com"
+      )
+
+      new_user.persisted?.should be_true
+      new_user.username.should eq "newuser"
+      new_user.first_name.should eq "John"
+      new_user.last_name.should eq "Doe"
+    end
+
+    it "uses defaults when creating a new record if they are provided" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create(
+        updates: {first_name: "John", last_name: "Doe"},
+        defaults: {
+          username:   "default-user",
+          email:      "default@example.com",
+          first_name: "Johnny",
+          last_name:  "Doe",
+          is_admin:   true,
+        },
+        username: "default-user",
+        email: "default@example.com"
+      )
+
+      new_user.persisted?.should be_true
+      new_user.first_name.should eq "Johnny"
+      new_user.is_admin.should be_true
+    end
+
+    it "does not use lookup filters when creating a new record" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create(
+        updates: {
+          username:   "filter-user",
+          email:      "filter@example.com",
+          first_name: "John",
+          last_name:  "Doe",
+        },
+        username: "filter-user",
+        is_admin: true
+      )
+
+      new_user.persisted?.should be_true
+      new_user.username.should eq "filter-user"
+      new_user.is_admin.should be_falsey
+    end
+
+    it "raises MultipleRecordsFound if the filters match multiple records" do
+      TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+      TestUser.create!(
+        username: "def",
+        email: "def@example.com",
+        first_name: "John",
+        last_name: "Smith"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
+        qset.update_or_create(
+          updates: {first_name: "Jane"},
+          first_name: "John"
+        )
+      end
+    end
+  end
+
   describe "#using" do
     it "allows to switch to another DB connection expressed as a symbol" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)

@@ -971,6 +971,40 @@ module Marten
             default_queryset.update(kwargs.to_h)
           end
 
+          # Updates a model record matching the given filters or creates a new one if no one is found.
+          #
+          # This method first attempts to retrieve a record that matches the specified filters. If it exists,
+          # the record is updated using the attributes provided via the required `updates` argument.
+          # If no matching record is found, a new one is created using the attributes defined in `updates`:
+          #
+          # ```
+          # person = Person.update_or_create(updates: {first_name: "Bob"}, first_name: "John", last_name: "Doe")
+          # ```
+          #
+          # If additional attributes should only be used when creating new records, a `defaults` argument can be
+          # provided (these attributes will then be used instead of `updates` when creating the record).
+          #
+          # ```
+          # person = Person.update_or_create(
+          #   updates: {first_name: "Bob"},
+          #   defaults: {first_name: "Bob", active: true},
+          #   first_name: "John",
+          #   last_name: "Doe"
+          # )
+          # ```
+          #
+          # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+          # exception if multiple records match the specified set of filters.
+          def update_or_create(
+            *,
+            updates : Hash | NamedTuple,
+            defaults : Hash | NamedTuple | Nil = nil,
+            **kwargs,
+          )
+            arguments = kwargs.merge({updates: updates, defaults: defaults})
+            default_queryset.update_or_create(**arguments)
+          end
+
           # Returns a queryset that will be evaluated using the specified database.
           #
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the

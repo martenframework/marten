@@ -452,6 +452,25 @@ describe Marten::DB::Query::SQL::Query do
       query_4.execute.to_set.should eq [user_1, user_2].to_set
     end
 
+    it "can add a query node targeting a field by going through a reverse polymorphic relation" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1")
+      post_2 = Post.create!(author: user_1, title: "Post 2")
+      post_3 = Post.create!(author: user_2, title: "Post 3")
+
+      Comment.create!(target: post_1, text: "Comment 1")
+      Comment.create!(target: post_2, text: "Weird comment")
+      Comment.create!(target: post_3, text: "Comment 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+
+      query.add_query_node(Marten::DB::Query::Node.new(comments__text__startswith: "Comment"))
+      query.count.should eq 2
+      query.execute.to_set.should eq [post_1, post_3].to_set
+    end
+
     for_db_backends :postgresql, :sqlite do
       it "can add a query node targeting annotations and other fields" do
         user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")

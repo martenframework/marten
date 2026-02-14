@@ -345,6 +345,21 @@ describe Marten::DB::Query::SQL::Join do
         "LEFT OUTER JOIN app_test_user t2 ON (t1.author_id = t2.id)"
       )
     end
+
+    it "returns the expected SQL for a join node targeting a polymorphic relation" do
+      join = Marten::DB::Query::SQL::Join.new(
+        id: 1,
+        type: Marten::DB::Query::SQL::JoinType::INNER,
+        from_model: Post,
+        from_common_field: Post.get_field("id"),
+        reverse_relation: nil,
+        to_model: Comment,
+        to_common_field: Comment.get_field("target"),
+        selected: true,
+      )
+
+      join.to_sql.should eq "INNER JOIN app_comment t1 ON (posts.id = t1.target_id AND t1.target_type = 'Post')"
+    end
   end
 
   describe "#selected?" do

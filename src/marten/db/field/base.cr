@@ -108,7 +108,7 @@ module Marten
         # This method will raise a `NotImplementedError` exception by default and should only be overridden if the
         # `#relation?` method returns `true` (this is the case for fields such as many to one, one to one, etc).
         def related_model
-          raise NotImplementedError.new("#relation_model must be implemented by subclasses if necessary")
+          raise NotImplementedError.new("#related_model must be implemented by subclasses if necessary")
         end
 
         # Returns true if the field is a relation.

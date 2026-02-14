@@ -1611,8 +1611,51 @@ module Marten
           record.save(using: @query.using)
           record
         rescue Errors::RecordNotFound
-          update_attributes = defaults.nil? ? updates : defaults.not_nil!
+          update_attributes = defaults.nil? ? updates : defaults.not_nil!.merge(updates)
           create do |new_record|
+            new_record.set_field_values(update_attributes)
+          end
+        end
+
+        # Updates a model record matching the given filters or creates a new one if no one is found.
+        #
+        # This method first attempts to retrieve a record that matches the specified filters. If it exists, the record
+        # is updated using the attributes provided via the required `updates` argument. If no matching record is found,
+        # a new one is created using the `updates` attributes:
+        #
+        # ```
+        # person = Person.all.update_or_create!(updates: {first_name: "Bob"}, first_name: "John", last_name: "Doe")
+        # ```
+        #
+        # If additional attributes should only be used when creating new records, a `defaults` argument can be provided:
+        #
+        # ```
+        # person = Person.all.update_or_create!(
+        #   updates: {first_name: "Bob"},
+        #   defaults: {first_name: "Bob", active: true},
+        #   first_name: "John",
+        #   last_name: "Doe"
+        # )
+        # ```
+        #
+        # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+        # exception if multiple records match the specified set of filters.
+        #
+        # Raises a `Marten::DB::Errors::InvalidRecord` exception if the updated or created
+        # record is invalid.
+        def update_or_create!(
+          *,
+          updates : Hash | NamedTuple,
+          defaults : Hash | NamedTuple | Nil = nil,
+          **kwargs,
+        )
+          record = get!(Node.new(**kwargs))
+          record.set_field_values(updates)
+          record.save!(using: @query.using)
+          record
+        rescue Errors::RecordNotFound
+          update_attributes = defaults.nil? ? updates : defaults.not_nil!.merge(updates)
+          create! do |new_record|
             new_record.set_field_values(update_attributes)
           end
         end

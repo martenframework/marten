@@ -1781,6 +1781,94 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::update_or_create!" do
+    with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+    it "updates the record matched by the specified arguments" do
+      tag = Marten::DB::Model::QueryingSpec::Tag.create!(name: "crystal", is_active: true)
+
+      updated_tag = Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+        updates: {is_active: false},
+        defaults: {name: "crystal", is_active: true},
+        name: "crystal"
+      )
+
+      updated_tag.should eq tag
+
+      tag.reload
+      tag.is_active.should be_false
+    end
+
+    it "creates a record using the specified updates if no record is found" do
+      Marten::DB::Model::QueryingSpec::Tag.create!(name: "crystal", is_active: true)
+
+      new_tag = Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+        updates: {name: "newtag", is_active: true},
+        name: "newtag"
+      )
+      new_tag.persisted?.should be_true
+      new_tag.name.should eq "newtag"
+      new_tag.is_active.should be_true
+
+      Marten::DB::Model::QueryingSpec::Tag.all.size.should eq 2
+    end
+
+    it "uses defaults when creating a new record if they are provided" do
+      new_tag = Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+        updates: {name: "unused", is_active: true},
+        defaults: {name: "newtag", is_active: false},
+        name: "newtag"
+      )
+
+      new_tag.persisted?.should be_true
+      new_tag.is_active.should be_false
+      new_tag.name.should eq "newtag"
+    end
+
+    it "does not use lookup filters when creating a new record" do
+      new_tag = Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+        updates: {name: "filtered"},
+        is_active: false
+      )
+
+      new_tag.persisted?.should be_true
+      new_tag.name.should eq "filtered"
+      new_tag.is_active.should be_true
+    end
+
+    it "raises MultipleRecordsFound if the filters match multiple records" do
+      Marten::DB::Model::QueryingSpec::Tag.create!(name: "crystal", is_active: true)
+      Marten::DB::Model::QueryingSpec::Tag.create!(name: "crystal", is_active: false)
+
+      expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
+        Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+          updates: {is_active: true},
+          name: "crystal"
+        )
+      end
+    end
+
+    it "raises InvalidRecord if the updated record is invalid" do
+      Marten::DB::Model::QueryingSpec::Tag.create!(name: "crystal", is_active: true)
+
+      expect_raises(Marten::DB::Errors::InvalidRecord) do
+        Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+          updates: {name: ""},
+          name: "crystal"
+        )
+      end
+    end
+
+    it "raises InvalidRecord if the created record is invalid" do
+      expect_raises(Marten::DB::Errors::InvalidRecord) do
+        Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
+          updates: {name: ""},
+          name: "invalid"
+        )
+      end
+    end
+  end
+
   describe "::using" do
     before_each do
       TestUser.using(:other).create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

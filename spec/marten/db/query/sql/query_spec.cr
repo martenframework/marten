@@ -942,7 +942,7 @@ describe Marten::DB::Query::SQL::Query do
       query = Marten::DB::Query::SQL::Query(TestUser).new
       expect_raises(
         Marten::DB::Errors::InvalidField,
-        "Unable to resolve 'posts' as a relation field. Valid choices are:"
+        "Unable to resolve 'posts' as a relation field."
       ) do
         query.add_selected_join("posts")
       end

@@ -1,0 +1,13 @@
+module Marten
+  module DB
+    module Query
+      module SQL
+        module Predicate
+          class Year < TransformBase
+            predicate_name "year"
+          end
+        end
+      end
+    end
+  end
+end

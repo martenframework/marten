@@ -7,12 +7,10 @@ Marten.configure :production do |config|
   config.secret_key = ENV.fetch("MARTEN_SECRET_KEY")
 
   # MARTEN_ALLOWED_HOSTS should be a comma-separated list (eg. "example.com, www.example.com").
-  allowed_hosts = ENV.fetch("MARTEN_ALLOWED_HOSTS")
+  config.allowed_hosts = ENV.fetch("MARTEN_ALLOWED_HOSTS")
     .split(",")
     .map(&.strip)
     .reject(&.empty?)
-  raise "MARTEN_ALLOWED_HOSTS cannot be empty" if allowed_hosts.empty?
-  config.allowed_hosts = allowed_hosts
 
   # Secure session and CSRF cookies.
   config.sessions.cookie_secure = true

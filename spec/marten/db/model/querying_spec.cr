@@ -1745,7 +1745,7 @@ describe Marten::DB::Model::Querying do
       Marten::DB::Model::QueryingSpec::Tag.all.size.should eq 2
     end
 
-    it "uses defaults when creating a new record if they are provided" do
+    it "uses updates even when defaults are specified when creating a new record if they are provided" do
       new_tag = Marten::DB::Model::QueryingSpec::Tag.update_or_create(
         updates: {name: "unused", is_active: true},
         defaults: {name: "newtag", is_active: false},
@@ -1753,8 +1753,8 @@ describe Marten::DB::Model::Querying do
       )
 
       new_tag.persisted?.should be_true
-      new_tag.is_active.should be_false
-      new_tag.name.should eq "newtag"
+      new_tag.is_active.should be_true
+      new_tag.name.should eq "unused"
     end
 
     it "does not use lookup filters when creating a new record" do
@@ -1813,7 +1813,7 @@ describe Marten::DB::Model::Querying do
       Marten::DB::Model::QueryingSpec::Tag.all.size.should eq 2
     end
 
-    it "uses defaults when creating a new record if they are provided" do
+    it "uses updates even when defaults are specified when creating a new record if they are provided" do
       new_tag = Marten::DB::Model::QueryingSpec::Tag.update_or_create!(
         updates: {name: "unused", is_active: true},
         defaults: {name: "newtag", is_active: false},
@@ -1821,8 +1821,8 @@ describe Marten::DB::Model::Querying do
       )
 
       new_tag.persisted?.should be_true
-      new_tag.is_active.should be_false
-      new_tag.name.should eq "newtag"
+      new_tag.is_active.should be_true
+      new_tag.name.should eq "unused"
     end
 
     it "does not use lookup filters when creating a new record" do

@@ -162,7 +162,7 @@ module Marten
             # during formatting process
             prepared_predicate = raw_predicate[:predicate].gsub("%", "%%")
 
-            case (params = raw_predicate[:params])
+            case params = raw_predicate[:params]
             when Array(::DB::Any)
               sanitize_positional_parameters(prepared_predicate, params.as(Array(::DB::Any)))
             else

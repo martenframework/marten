@@ -12,7 +12,7 @@ module Marten
 
         def render(context : Context) : String
           block_data = context["block"]?
-          raise Errors::InvalidSyntax.new("super must be called from whithin a block tag") if block_data.nil?
+          raise Errors::InvalidSyntax.new("super must be called from within a block tag") if block_data.nil?
 
           parent_block = context.blocks.get(block_data.not_nil!["name"].raw.as(String))
           parent_block.nil? ? "" : parent_block.not_nil!.render(context)

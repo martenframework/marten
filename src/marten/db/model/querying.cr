@@ -47,7 +47,7 @@ module Marten
             {% end %}
           end
 
-          # Returns a queryset targetting all the records for the considered model.
+          # Returns a queryset targeting all the records for the considered model.
           #
           # This method returns a `Marten::DB::Query::Set` object that - if evaluated - will return all the records for
           # the considered model.
@@ -720,7 +720,7 @@ module Marten
             default_queryset.offset(value)
           end
 
-          # Returns a queryset targetting all the records for the considered model with the specified ordering.
+          # Returns a queryset targeting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:
           #
@@ -734,7 +734,7 @@ module Marten
             default_queryset.order(fields.to_a)
           end
 
-          # Returns a queryset targetting all the records for the considered model with the specified ordering.
+          # Returns a queryset targeting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:
           #
@@ -937,6 +937,38 @@ module Marten
             {{ @type }}::QuerySet.new
             {% end %}
             {% end %}
+          end
+
+          # Updates all the records with the passed values.
+          #
+          # This method allows to update all the records with a hash or a named tuple of values. It returns the number
+          # of records that were updated:
+          #
+          # ```
+          # Post.update({"title" => "Updated"})
+          # ```
+          #
+          # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+          # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+          # either.
+          def update(values : Hash | NamedTuple)
+            default_queryset.update(values)
+          end
+
+          # Updates all the records with the passed values.
+          #
+          # This method allows to update all the records with the values defined in the `kwargs` double splat argument.
+          # It returns the number of records that were updated:
+          #
+          # ```
+          # Post.update(title: "Updated")
+          # ```
+          #
+          # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+          # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+          # either.
+          def update(**kwargs)
+            default_queryset.update(kwargs.to_h)
           end
 
           # Returns a queryset that will be evaluated using the specified database.

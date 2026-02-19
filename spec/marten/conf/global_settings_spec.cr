@@ -33,7 +33,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.allowed_hosts.empty?.should be_true
     end
 
-    it "returns the list of allowed hosts if explicitely set" do
+    it "returns the list of allowed hosts if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.allowed_hosts = ["localhost"]
       global_settings.allowed_hosts.should eq ["localhost"]
@@ -367,7 +367,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.installed_apps.empty?.should be_true
     end
 
-    it "returns the list of installed apps if explicitely set" do
+    it "returns the list of installed apps if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.installed_apps = [Marten::Conf::GlobalSettingsSpec::TestAppConfig]
       global_settings.installed_apps.should eq [Marten::Conf::GlobalSettingsSpec::TestAppConfig]
@@ -432,7 +432,7 @@ describe Marten::Conf::GlobalSettings do
       end
     end
 
-    it "returns the configured log backend if explicitely set" do
+    it "returns the configured log backend if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.log_backend = ::Log::MemoryBackend.new
       global_settings.log_backend.should be_a ::Log::MemoryBackend
@@ -453,7 +453,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.log_level.should eq Log::Severity::Info
     end
 
-    it "returns the configured log level if explicitely set" do
+    it "returns the configured log level if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.log_level = Log::Severity::Debug
       global_settings.log_level.should eq Log::Severity::Debug
@@ -481,7 +481,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.port.should eq 8000
     end
 
-    it "returns the configured port if explicitely set" do
+    it "returns the configured port if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.port = 80
       global_settings.port.should eq 80
@@ -502,7 +502,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.port_reuse.should be_true
     end
 
-    it "returns the specific port reuse configuration if explicitely set" do
+    it "returns the specific port reuse configuration if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.port_reuse = false
       global_settings.port_reuse.should be_false
@@ -515,7 +515,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.port_reuse?.should be_true
     end
 
-    it "returns the specific port reuse configuration if explicitely set" do
+    it "returns the specific port reuse configuration if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.port_reuse = false
       global_settings.port_reuse?.should be_false
@@ -536,7 +536,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.referrer_policy.should eq "same-origin"
     end
 
-    it "returns the specified Referrer-Policy if explicitely set" do
+    it "returns the specified Referrer-Policy if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.referrer_policy = "origin"
       global_settings.referrer_policy.should eq "origin"
@@ -557,7 +557,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.request_max_parameters.should eq 1000
     end
 
-    it "returns the specific request max parameters limit if explicitely set" do
+    it "returns the specific request max parameters limit if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.request_max_parameters = 500
       global_settings.request_max_parameters.should eq 500
@@ -624,7 +624,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.secret_key.should eq ""
     end
 
-    it "returns the secret key if explicitely set" do
+    it "returns the secret key if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.secret_key = "not_secret"
       global_settings.secret_key.should eq "not_secret"
@@ -673,7 +673,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.time_zone.should eq Time::Location.load("UTC")
     end
 
-    it "returns the configured time zone location if explicitely set" do
+    it "returns the configured time zone location if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.time_zone = Time::Location.load("Europe/Paris")
       global_settings.time_zone.should eq Time::Location.load("Europe/Paris")
@@ -681,7 +681,7 @@ describe Marten::Conf::GlobalSettings do
   end
 
   describe "#time_zone=" do
-    it "allows to configure tje time zone of the application" do
+    it "allows to configure the time zone of the application" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.time_zone = Time::Location.load("EST")
       global_settings.time_zone.should eq Time::Location.load("EST")
@@ -694,7 +694,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.trailing_slash.do_nothing?.should be_true
     end
 
-    it "returns the configured trailing slash behavior if explicitely set" do
+    it "returns the configured trailing slash behavior if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.trailing_slash = :remove
 
@@ -754,7 +754,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.use_x_forwarded_host.should be_false
     end
 
-    it "returns the configured boolean value if explicitely set" do
+    it "returns the configured boolean value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_host = true
       global_settings.use_x_forwarded_host.should be_true
@@ -767,7 +767,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.use_x_forwarded_host?.should be_false
     end
 
-    it "returns the configured boolean value if explicitely set" do
+    it "returns the configured boolean value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_host = true
       global_settings.use_x_forwarded_host?.should be_true
@@ -788,7 +788,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.use_x_forwarded_port.should be_false
     end
 
-    it "returns the configured boolean value if explicitely set" do
+    it "returns the configured boolean value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_port = true
       global_settings.use_x_forwarded_port.should be_true
@@ -801,7 +801,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.use_x_forwarded_port?.should be_false
     end
 
-    it "returns the configured boolean value if explicitely set" do
+    it "returns the configured boolean value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_port = true
       global_settings.use_x_forwarded_port?.should be_true
@@ -822,7 +822,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.use_x_forwarded_proto.should be_false
     end
 
-    it "returns the configured boolean value if explicitely set" do
+    it "returns the configured boolean value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_proto = true
       global_settings.use_x_forwarded_proto.should be_true
@@ -835,7 +835,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.use_x_forwarded_proto?.should be_false
     end
 
-    it "returns the configured boolean value if explicitely set" do
+    it "returns the configured boolean value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.use_x_forwarded_proto = true
       global_settings.use_x_forwarded_proto?.should be_true
@@ -856,7 +856,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.handler400.should eq Marten::Handlers::Defaults::BadRequest
     end
 
-    it "returns the configured handler class if explictely set" do
+    it "returns the configured handler class if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.handler400 = Marten::Conf::GlobalSettingsSpec::TestHandler
       global_settings.handler400.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
@@ -877,7 +877,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.handler403.should eq Marten::Handlers::Defaults::PermissionDenied
     end
 
-    it "returns the configured handler class if explictely set" do
+    it "returns the configured handler class if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.handler403 = Marten::Conf::GlobalSettingsSpec::TestHandler
       global_settings.handler403.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
@@ -898,7 +898,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.handler404.should eq Marten::Handlers::Defaults::PageNotFound
     end
 
-    it "returns the configured handler class if explictely set" do
+    it "returns the configured handler class if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.handler404 = Marten::Conf::GlobalSettingsSpec::TestHandler
       global_settings.handler404.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
@@ -919,7 +919,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.handler500.should eq Marten::Handlers::Defaults::ServerError
     end
 
-    it "returns the configured handler class if explictely set" do
+    it "returns the configured handler class if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.handler500 = Marten::Conf::GlobalSettingsSpec::TestHandler
       global_settings.handler500.should eq Marten::Conf::GlobalSettingsSpec::TestHandler
@@ -960,7 +960,7 @@ describe Marten::Conf::GlobalSettings do
       global_settings.x_frame_options.should eq "DENY"
     end
 
-    it "returns the configured X-Frame-Options header value if explicitely set" do
+    it "returns the configured X-Frame-Options header value if explicitly set" do
       global_settings = Marten::Conf::GlobalSettings.new
       global_settings.x_frame_options = "SAMEORIGIN"
       global_settings.x_frame_options.should eq "SAMEORIGIN"

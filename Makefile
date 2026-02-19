@@ -43,7 +43,11 @@ docs_site:
 
 .PHONY: qa
 ## Trigger all quality assurance checks.
-qa: format_checks lint
+qa: qa_crystal typos
+
+.PHONY: qa_crystal
+## Trigger Crystal quality assurance checks.
+qa_crystal: format_checks lint
 
 .PHONY: format
 ## Perform and apply crystal formatting.
@@ -58,7 +62,12 @@ format_checks:
 .PHONY: lint
 ## Trigger code quality checks.
 lint:
-	bin/ameba
+	bin/ameba.cr
+
+.PHONY: typos
+## Trigger spelling checks.
+typos:
+	typos
 
 
 # TESTING

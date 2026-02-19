@@ -6,12 +6,12 @@ module Marten
     module DebugModeLoggable
       # Logs a debug mode-only debug message.
       macro debug_mode_debug_log(message)
-        Log.debug { (Log.context.metadata[:prefix]?.try(&.to_s) || "") + {{message}} } if Marten.settings.debug?
+        Log.debug { (Log.context.metadata[:prefix]?.try(&.to_s) || "") + {{ message }} } if Marten.settings.debug?
       end
 
       # Logs a debug mode-only info message.
       macro debug_mode_info_log(message)
-        Log.info { (Log.context.metadata[:prefix]?.try(&.to_s) || "") + {{message}} } if Marten.settings.debug?
+        Log.info { (Log.context.metadata[:prefix]?.try(&.to_s) || "") + {{ message }} } if Marten.settings.debug?
       end
     end
   end

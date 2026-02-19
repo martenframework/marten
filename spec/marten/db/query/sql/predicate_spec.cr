@@ -14,6 +14,8 @@ describe Marten::DB::Query::SQL::Predicate do
     it "returns the registered predicate implementations" do
       Marten::DB::Query::SQL::Predicate.registry["contains"].should eq(Marten::DB::Query::SQL::Predicate::Contains)
       Marten::DB::Query::SQL::Predicate.registry["exact"].should eq(Marten::DB::Query::SQL::Predicate::Exact)
+      Marten::DB::Query::SQL::Predicate.registry["year"].should eq(Marten::DB::Query::SQL::Predicate::Year)
+      Marten::DB::Query::SQL::Predicate.registry["second"].should eq(Marten::DB::Query::SQL::Predicate::Second)
     end
   end
 end

@@ -10,7 +10,7 @@ module Marten
         @middleware_chain : Array(Marten::Middleware)?
 
         def call(context : ::HTTP::Server::Context)
-          # Call each middleware in order to let them process the incoming request and optionnaly bypass the routing
+          # Call each middleware in order to let them process the incoming request and optionally bypass the routing
           # mechanism by returning an early response. Each middleware should have access to the final response in order
           # to process it if necessary (or to completely replace it!).
           response : HTTP::Response? = if middleware_chain.empty?

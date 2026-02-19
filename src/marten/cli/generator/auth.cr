@@ -89,11 +89,11 @@ module Marten
             # Find and modify the middleware array definition
             modified_content = content.gsub(/\h+(config\.middleware\s*=\s*\[[^\]]*\])/) do |match|
               middlewares = match
-                .match(/\[([\s\S]*?)\]/)
-                .not_nil![1]
+                .match!(/\[([\s\S]*?)\]/)
+                .[1]
                 .split(",")
-                .map(&.strip)
-                .reject(&.empty?)
+                .map!(&.strip)
+                .reject!(&.empty?)
 
               middlewares << "MartenAuth::Middleware"
 

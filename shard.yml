@@ -1,5 +1,5 @@
 name: marten
-version: 0.6.0
+version: 0.6.2
 
 authors:
   - Morgan Aubert <me@morganaubert.name>
@@ -25,6 +25,7 @@ development_dependencies:
     github: crystal-lang/crystal-mysql
   pg:
     github: will/crystal-pg
+    commit: c5b8ac1
   sqlite3:
     github: crystal-lang/crystal-sqlite3
   timecop:

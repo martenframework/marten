@@ -3,7 +3,7 @@ require "./spec_helper"
 describe Marten::DB::Field do
   describe "#registry" do
     it "returns the expected field abstractions" do
-      Marten::DB::Field.registry.size.should eq 20
+      Marten::DB::Field.registry.size.should eq 22
       Marten::DB::Field.registry["big_int"].should eq Marten::DB::Field::BigInt
       Marten::DB::Field.registry["bool"].should eq Marten::DB::Field::Bool
       Marten::DB::Field.registry["date"].should eq Marten::DB::Field::Date
@@ -19,6 +19,8 @@ describe Marten::DB::Field do
       Marten::DB::Field.registry["many_to_many"].should eq Marten::DB::Field::ManyToMany
       Marten::DB::Field.registry["many_to_one"].should eq Marten::DB::Field::ManyToOne
       Marten::DB::Field.registry["one_to_one"].should eq Marten::DB::Field::OneToOne
+      Marten::DB::Field.registry["polymorphic"].should eq Marten::DB::Field::Polymorphic
+      Marten::DB::Field.registry["polymorphic_reference"].should eq Marten::DB::Field::PolymorphicReference
       Marten::DB::Field.registry["slug"].should eq Marten::DB::Field::Slug
       Marten::DB::Field.registry["string"].should eq Marten::DB::Field::String
       Marten::DB::Field.registry["text"].should eq Marten::DB::Field::Text

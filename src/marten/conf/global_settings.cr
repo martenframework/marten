@@ -128,7 +128,7 @@ module Marten
 
       # Allows to set the explicit list of allowed hosts for the application.
       #
-      # The application has to be explictely configured to serve a list of allowed hosts. This is to mitigate HTTP Host
+      # The application has to be explicitly configured to serve a list of allowed hosts. This is to mitigate HTTP Host
       # header attacks.
       setter allowed_hosts
 
@@ -141,7 +141,7 @@ module Marten
       # Allows to set the list of default date time input formats.
       setter date_time_input_formats
 
-      # Allows to activate or deactive debug mode.
+      # Allows to activate or deactivate debug mode.
       setter debug
 
       # Allows to set the handler class that should generate responses for Bad Request responses (HTTP 400).

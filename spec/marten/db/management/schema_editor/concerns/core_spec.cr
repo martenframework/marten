@@ -2696,5 +2696,79 @@ describe Marten::DB::Management::SchemaEditor::Base do
         end
       end
     end
+
+    it "can change the values of an enum column as expected" do
+      connection = Marten::DB::Connection.default
+      schema_editor = Marten::DB::Management::SchemaEditor.for(connection)
+
+      old_column = Marten::DB::Management::Column::Enum.new("test", values: ["foo", "bar"])
+      new_column = Marten::DB::Management::Column::Enum.new("test", values: ["foo", "bar", "baz"])
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("id", primary_key: true),
+          old_column,
+        ] of Marten::DB::Management::Column::Base
+      )
+      project_state = Marten::DB::Management::ProjectState.new(
+        [table_state]
+      )
+
+      old_column.contribute_to_project(project_state)
+      new_column.contribute_to_project(project_state)
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.change_column(project_state, table_state, old_column, new_column)
+
+      db_column = Marten::DB::Management::Introspector.for(connection)
+        .columns_details(table_state.name).find! { |c| c.name == "test" }
+
+      for_postgresql do
+        db_column.type.should eq "text"
+
+        Marten::DB::Connection.default.open do |db|
+          db.query(
+            <<-SQL
+                SELECT conname AS constraint_name,
+                    pg_get_constraintdef(oid) AS definition
+                FROM pg_constraint
+                WHERE conrelid = 'schema_editor_test_table'::regclass
+                  AND contype = 'c';
+              SQL
+          ) do |rs|
+            rs.each do
+              constraint_name = rs.read(String)
+              constraint_name.should eq "test_enum_check"
+
+              constraint_def = rs.read(String)
+              constraint_def.should eq "CHECK ((test = ANY (ARRAY['foo'::text, 'bar'::text, 'baz'::text])))"
+            end
+          end
+        end
+      end
+
+      for_mysql do
+        db_column.type.should eq "enum"
+
+        Marten::DB::Connection.default.open do |db|
+          db.query(
+            <<-SQL
+                SELECT COLUMN_TYPE
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_NAME = 'schema_editor_test_table' AND COLUMN_NAME = 'test';
+              SQL
+          ) do |rs|
+            rs.each do
+              rs.read(String).should eq "enum('foo','bar','baz')"
+            end
+          end
+        end
+      end
+
+      for_sqlite { db_column.type.should eq "TEXT" }
+    end
   end
 end

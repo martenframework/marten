@@ -7,6 +7,12 @@ module Marten
         class PostgreSQL < Base
           include Core
 
+          def add_column(table : TableState, column : Column::Base) : Nil
+            super
+
+            execute(add_enum_check_constraint_statement(table, column)) if column.is_a?(Column::Enum)
+          end
+
           def column_type_for_built_in_column(column : Column::Base) : String
             column_type = BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING[column.class.name]
 
@@ -21,6 +27,16 @@ module Marten
 
           def column_type_suffix_for_built_in_column(column : Column::Base) : String?
             nil
+          end
+
+          def create_table(table : TableState) : Nil
+            super
+
+            table.columns.each do |column|
+              next if !column.is_a?(Column::Enum)
+
+              execute(add_enum_check_constraint_statement(table, column))
+            end
           end
 
           def ddl_rollbackable? : Bool
@@ -49,7 +65,7 @@ module Marten
             "Marten::DB::Management::Column::Bool"     => "boolean",
             "Marten::DB::Management::Column::Date"     => "date",
             "Marten::DB::Management::Column::DateTime" => "timestamp with time zone",
-            "Marten::DB::Management::Column::Enum"     => "text CHECK (%{name} IN (%{values}))",
+            "Marten::DB::Management::Column::Enum"     => "text",
             "Marten::DB::Management::Column::Float"    => "double precision",
             "Marten::DB::Management::Column::Int"      => "integer",
             "Marten::DB::Management::Column::JSON"     => "jsonb",
@@ -57,6 +73,15 @@ module Marten
             "Marten::DB::Management::Column::Text"     => "text",
             "Marten::DB::Management::Column::UUID"     => "uuid",
           }
+
+          private def add_enum_check_constraint_statement(table : TableState, column : Column::Enum) : String
+            constraint_name = enum_check_constraint_name(column)
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "ADD CONSTRAINT #{quote(constraint_name)}"
+              s << "CHECK (#{column.name} IN (#{column.values.map { |v| "'#{v}'" }.join(", ")}))"
+            end
+          end
 
           private def add_foreign_key_constraint_statement(table : TableState, column : Column::Reference) : String
             constraint_name = index_name(table.name, [column.name], "_fk_#{column.to_table}_#{column.to_column}")
@@ -75,6 +100,14 @@ module Marten
               s << "ALTER TABLE #{quote(table.name)}"
               s << "ADD CONSTRAINT #{quote(constraint_name)}"
               s << "PRIMARY KEY (#{quote(column.name)})"
+            end
+          end
+
+          private def drop_enum_check_constraint_statement(table : TableState, column : Column::Enum) : String
+            constraint_name = enum_check_constraint_name(column)
+            build_sql do |s|
+              s << "ALTER TABLE #{quote(table.name)}"
+              s << "DROP CONSTRAINT IF EXISTS #{quote(constraint_name)}"
             end
           end
 
@@ -159,6 +192,17 @@ module Marten
             end
           end
 
+          private def eligible_to_post_change_column_type_statements?(
+            old_column : Column::Base,
+            new_column : Column::Base,
+          ) : Bool
+            new_column.is_a?(Column::Enum) # means that the enum values constraint must be updated.
+          end
+
+          private def enum_check_constraint_name(column : Column::Enum) : String
+            "#{column.name}_enum_check"
+          end
+
           private def flush_tables_statements(table_names : Array(String)) : Array(String)
             ["TRUNCATE #{table_names.join(", ")} RESTART IDENTITY CASCADE;"]
           end
@@ -237,6 +281,9 @@ module Marten
               # If the column was previously a primary key, the associated sequence needs to be dropped.
               sequence_name = "#{table.name}_#{old_column.name}_seq"
               statements << "DROP SEQUENCE IF EXISTS #{quote(sequence_name)} CASCADE"
+            elsif new_column.is_a?(Column::Enum)
+              statements << drop_enum_check_constraint_statement(table, new_column)
+              statements << add_enum_check_constraint_statement(table, new_column)
             end
 
             statements

@@ -55,11 +55,11 @@ describe Marten::DB::Model::Querying do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
 
-      Tag.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      Tag.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match at least one record" do
-      Tag.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      Tag.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
   end
 
@@ -290,7 +290,7 @@ describe Marten::DB::Model::Querying do
       Tag.exists? { q(name: "crystal") }.should be_true
     end
 
-    it "returns false if the passed q() expression does not match anythin" do
+    it "returns false if the passed q() expression does not match anything" do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
@@ -370,6 +370,55 @@ describe Marten::DB::Model::Querying do
 
     it "allows filtering records by providing a raw predicate and a named tuple of named parameters" do
       TestUser.filter("username = :username", {username: "jd1"}).to_a.should eq [TestUser.get!(username: "jd1")]
+    end
+  end
+
+  describe "::filter with time-part predicates" do
+    with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+    it "allows filtering date and date_time fields using time-part predicates" do
+      record_1 = Marten::DB::Model::QueryingSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 12, 1),
+        event_at: Time.utc(2023, 12, 1, 9, 10, 11),
+      )
+      record_2 = Marten::DB::Model::QueryingSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Model::QueryingSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 11, 12),
+        event_at: Time.utc(2024, 11, 12, 7, 15, 5),
+      )
+
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_date__year: 2024).order(:id).to_a.should eq(
+        [record_2, record_3]
+      )
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__month: "12").order(:id).to_a.should eq(
+        [record_1, record_2]
+      )
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__gte: Time.utc(2024, 1, 1))
+        .order(:id)
+        .to_a
+        .should eq([record_2, record_3])
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__exact: 2024).order(:id).to_a.should eq(
+        [record_2, record_3]
+      )
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(
+        event_date__month__in: ([Time.utc(2024, 11, 1), "12"] of Marten::DB::Field::Any)
+      )
+        .order(:id)
+        .to_a
+        .should eq([record_1, record_2, record_3])
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__isnull: false)
+        .order(:id)
+        .to_a
+        .should eq([record_1, record_2, record_3])
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__isnull: true).to_a.should eq(
+        [] of Marten::DB::Model::QueryingSpec::TemporalRecord
+      )
     end
   end
 
@@ -1639,6 +1688,77 @@ describe Marten::DB::Model::Querying do
 
       Marten::DB::Model::QueryingSpec::PostWithDefaultScope.all.to_a.should eq [post_1, post_3]
       Marten::DB::Model::QueryingSpec::PostWithDefaultScope.unscoped.to_a.should eq [post_1, post_2, post_3]
+    end
+  end
+
+  describe "::update" do
+    it "allows to update all the records with values specified as keyword arguments" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.update(last_name: "Updated", is_admin: true).should eq 3
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Updated"
+      user_3.is_admin.should be_true
+    end
+
+    it "allows to update all the records with values specified as a hash" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.update({"last_name" => "Updated", "is_admin" => true}).should eq 3
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Updated"
+      user_3.is_admin.should be_true
+    end
+
+    it "allows to update all the records with values specified as a named tuple" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      TestUser.update({last_name: "Updated", is_admin: true}).should eq 3
+
+      user_1.reload
+      user_1.first_name.should eq "John"
+      user_1.last_name.should eq "Updated"
+      user_1.is_admin.should be_true
+
+      user_2.reload
+      user_2.first_name.should eq "John"
+      user_2.last_name.should eq "Updated"
+      user_2.is_admin.should be_true
+
+      user_3.reload
+      user_3.first_name.should eq "Bob"
+      user_3.last_name.should eq "Updated"
+      user_3.is_admin.should be_true
     end
   end
 

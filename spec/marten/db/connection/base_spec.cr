@@ -213,7 +213,6 @@ describe Marten::DB::Connection::Base do
         conn.transaction do
           TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
           raise "Unexpected error"
-          TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
         end
       end
 
@@ -228,7 +227,6 @@ describe Marten::DB::Connection::Base do
       conn.transaction do
         TestUser.create!(username: "jd1", email: "jd@example.com", first_name: "John", last_name: "Doe")
         raise Marten::DB::Errors::Rollback.new("Roll back!")
-        TestUser.create!(username: "jd2", email: "jd@example.com", first_name: "Jil", last_name: "Dan")
       end
 
       TestUser.all.size.should eq 0

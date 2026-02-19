@@ -1,3 +1,4 @@
+# :nodoc:
 class Hash
   include Marten::Template::CanDefineTemplateAttributes
 

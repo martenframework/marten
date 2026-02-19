@@ -1,51 +1,30 @@
-Globs:
-  - "src/**/*.cr"
-  - "spec/**/*.cr"
-
-Documentation/DocumentationAdmonition:
-  Enabled: false
+Excluded:
+  - "**/*.ecr"
+  - example_projects
+  - lib
+  - "tmp"
 
 Layout/LineLength:
   Enabled: true
   MaxLength: 120
 
-Lint/DocumentationAdmonition:
+Lint/AssignmentInCallArgument:
   Enabled: false
 
 Lint/NotNil:
   Enabled: false
 
-Lint/NotNilAfterNoBang:
-  Enabled: false
-
 Lint/SpecFilename:
-  Enabled: false
-
-Lint/UnusedComparison:
-  Enabled: false
-
-Lint/UnusedLiteral:
   Enabled: false
 
 Metrics/CyclomaticComplexity:
   Enabled: false
 
-Naming/AccessorMethodName:
-  Enabled: false
-
 Naming/BlockParameterName:
-  Enabled: false
-
-Performance/AnyInsteadOfEmpty:
-  Enabled: true
-  Excluded:
-    - src/marten/db/management/migrations/reader.cr
-
-Style/ParenthesesAroundCondition:
   Enabled: false
 
 Style/PercentLiteralDelimiters:
   Enabled: false
 
-Style/QueryBoolMethods:
+Style/VerboseNilType:
   Enabled: false

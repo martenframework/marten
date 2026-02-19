@@ -33,7 +33,7 @@ module Marten
       end
 
       private def extract_override_method(request)
-        value = request.data[override_param_key]? if (request.urlencoded? || request.form_data?)
+        value = request.data[override_param_key]? if request.urlencoded? || request.form_data?
 
         return value if value.is_a?(String)
 

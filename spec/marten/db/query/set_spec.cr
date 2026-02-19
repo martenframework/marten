@@ -524,8 +524,8 @@ describe Marten::DB::Query::Set do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
 
-      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
-      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns true if the queryset matches existing records and if it was already fetched" do
@@ -538,30 +538,30 @@ describe Marten::DB::Query::Set do
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
       qset_2.each { }
 
-      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
-      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match existing records and if it wasn't already fetched" do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
-      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
 
       Tag.create!(name: "crystal", is_active: true)
 
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
-      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match existing records and if it was already fetched" do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
       qset_1.each { }
-      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
 
       Tag.create!(name: "crystal", is_active: true)
 
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
       qset_2.each { }
-      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
   end
 
@@ -885,7 +885,7 @@ describe Marten::DB::Query::Set do
       tag.persisted?.should be_true
     end
 
-    it "properly uses the default connection as expected when no special connection is targetted" do
+    it "properly uses the default connection as expected when no special connection is targeted" do
       tag_1 = Marten::DB::Query::Set(Tag).new.create(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.create(is_active: false) do |o|
@@ -896,7 +896,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.using(:other).to_a.should be_empty
     end
 
-    it "properly uses the targetted connection as expected" do
+    it "properly uses the targeted connection as expected" do
       tag_1 = Marten::DB::Query::Set(Tag).new.using(:other).create(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.using(:other).create(is_active: false) do |o|
@@ -937,7 +937,7 @@ describe Marten::DB::Query::Set do
       tag.persisted?.should be_true
     end
 
-    it "properly uses the default connection as expected when no special connection is targetted" do
+    it "properly uses the default connection as expected when no special connection is targeted" do
       tag_1 = Marten::DB::Query::Set(Tag).new.create!(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.create!(is_active: false) do |o|
@@ -948,7 +948,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.using(:other).to_a.should be_empty
     end
 
-    it "properly uses the targetted connection as expected" do
+    it "properly uses the targeted connection as expected" do
       tag_1 = Marten::DB::Query::Set(Tag).new.using(:other).create!(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.using(:other).create!(is_active: false) do |o|
@@ -961,7 +961,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#delete" do
-    it "allows to delete the records targetted by a specific query set" do
+    it "allows to delete the records targeted by a specific query set" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
@@ -1192,7 +1192,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#each" do
-    it "allows to iterate over the records targetted by the query set if it wasn't already fetched" do
+    it "allows to iterate over the records targeted by the query set if it wasn't already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -1206,7 +1206,7 @@ describe Marten::DB::Query::Set do
       tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
-    it "allows to iterate over the records targetted by the query set if it was already fetched" do
+    it "allows to iterate over the records targeted by the query set if it was already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -1349,7 +1349,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.exists? { q(name: "crystal") }.should be_true
     end
 
-    it "returns false if the passed q() expression does not match anythin" do
+    it "returns false if the passed q() expression does not match anything" do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
@@ -1384,6 +1384,105 @@ describe Marten::DB::Query::Set do
       qset = Marten::DB::Query::Set(Tag).new.filter(name__startswith: :c)
 
       qset.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
+    end
+
+    it "allows filtering records with time-part predicates" do
+      record_1 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 12, 1),
+        event_at: Time.utc(2023, 12, 1, 9, 10, 11),
+      )
+      record_2 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 11, 12),
+        event_at: Time.utc(2024, 11, 12, 7, 15, 5),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new.order(:id)
+
+      qset.filter(event_date__year: 2024).to_a.should eq [record_2, record_3]
+      qset.filter(event_date__month: 12).to_a.should eq [record_1, record_2]
+      qset.filter(event_date__day: 12).to_a.should eq [record_3]
+      qset.filter(event_at__hour: 23).to_a.should eq [record_2]
+      qset.filter(event_at__minute: 55).to_a.should eq [record_2]
+      qset.filter(event_at__second: 5).to_a.should eq [record_3]
+    end
+
+    it "allows chaining comparison predicates with time-part predicates" do
+      record_1 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 6, 1),
+        event_at: Time.utc(2023, 6, 1, 11, 0, 0),
+      )
+      record_2 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 2, 12),
+        event_at: Time.utc(2024, 2, 12, 7, 15, 5),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new.order(:id)
+
+      qset.filter(event_at__year__gte: 2024).to_a.should eq [record_2, record_3]
+      qset.filter(event_at__year__lt: 2024).to_a.should eq [record_1]
+      qset.filter(event_at__hour__gt: 10).to_a.should eq [record_1, record_2]
+      qset.filter(event_date__month__lte: 6).to_a.should eq [record_1, record_3]
+      qset.filter(event_at__month__in: ([Time.utc(2024, 6, 1), "12"] of Marten::DB::Field::Any)).to_a.should eq(
+        [record_1, record_2]
+      )
+      qset.filter(event_at__year__isnull: false).to_a.should eq [record_1, record_2, record_3]
+      qset.filter(event_at__year__isnull: true).to_a.should eq([] of Marten::DB::Query::SetSpec::TemporalRecord)
+    end
+
+    it "coerces Time and numeric strings when filtering time-part predicates" do
+      record_1 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 12, 1),
+        event_at: Time.utc(2023, 12, 1, 9, 10, 11),
+      )
+      record_2 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 11, 12),
+        event_at: Time.utc(2024, 11, 12, 7, 15, 5),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new.order(:id)
+
+      qset.filter(event_at__year: Time.utc(2024, 5, 1)).to_a.should eq [record_2, record_3]
+      qset.filter(event_at__month: "12").to_a.should eq [record_1, record_2]
+    end
+
+    it "raises for invalid time-part filters" do
+      Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new
+
+      expect_raises(Marten::DB::Errors::InvalidField) { qset.filter(label__year: 2024).to_a }
+      expect_raises(Marten::DB::Errors::InvalidField) { qset.filter(event_date__hour: 10).to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__month: 13).to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__hour: 24).to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__second: "foo").to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__year__in: "2024").to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__year__isnull: "false").to_a }
+      expect_raises(Marten::DB::Errors::InvalidField) { qset.filter(event_at__year__contains: 2024).to_a }
     end
 
     it "filters records using a raw SQL equality condition", tags: "raw" do
@@ -1432,11 +1531,11 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2]
     end
 
-    it "raises an error when filtering with a misspelled column in a raw SQL condition", tags: "raw" do
+    it "raises an error when filtering with a non existing column in a raw SQL condition", tags: "raw" do
       Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(Exception) do
-        Marten::DB::Query::Set(Tag).new.filter("namme=:name", name: "crystal").to_a
+        Marten::DB::Query::Set(Tag).new.filter("unknown=:name", name: "crystal").to_a
       end
     end
 
@@ -1930,11 +2029,11 @@ describe Marten::DB::Query::Set do
       result.should eq tag_2
     end
 
-    it "raises an error when getting with a misspelled column in a raw SQL condition", tags: "get_raw" do
+    it "raises an error when getting with a non existing column in a raw SQL condition", tags: "get_raw" do
       Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(Exception) do
-        Marten::DB::Query::Set(Tag).new.get("namme=:name", name: "crystal")
+        Marten::DB::Query::Set(Tag).new.get("unknown=:name", name: "crystal")
       end
     end
 

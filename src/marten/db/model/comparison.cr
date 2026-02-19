@@ -9,7 +9,7 @@ module Marten
 
         # Allows to sort model instances based on primary keys.
         def <=>(other : self)
-          return nil if pk.nil? || other.pk.nil?
+          return if pk.nil? || other.pk.nil?
           pk!.to_s <=> other.pk!.to_s
         end
       end

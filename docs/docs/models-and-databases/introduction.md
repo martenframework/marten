@@ -349,11 +349,31 @@ article.title = "Updated!"
 article.save
 ```
 
-Marten also provide the ability to update the records that are targetted by a specific query set through the use of the `#update` method, like in the following example:
+Marten also provide the ability to update the records that are targeted by a specific query set through the use of the `#update` method, like in the following example:
 
 ```crystal
 Article.filter(title: "My article").update(title: "Updated!")
 ```
+
+#### Updating specific columns
+
+If you need to update only specific columns without running validations or callbacks, you can use the `#update_columns` or `#update_columns!` methods:
+
+```crystal
+article = Article.get(id: 42)
+article.update_columns(title: "Updated!")
+```
+
+These methods are useful when you want to efficiently update a subset of fields without triggering the full save lifecycle. The `#update_columns!` variant will raise an error if called on a new (unsaved) record:
+
+```crystal
+article = Article.new
+article.update_columns!(title: "New article")  # Raises Marten::DB::Errors::UnmetSaveCondition
+```
+
+:::caution
+The `#update_columns` and `#update_columns!` methods bypass model validations and lifecycle callbacks (such as `before_update`, `after_update`, etc.). Use them with caution and only when you're certain that skipping these checks is safe for your application.
+:::
 
 ### Delete
 
@@ -364,7 +384,7 @@ article = Article.get(id: 42)
 article.delete
 ```
 
-Marten also provide the ability to delete the records that are targetted by a specific query set through the use of the `#delete` method, like in the following example:
+Marten also provide the ability to delete the records that are targeted by a specific query set through the use of the `#delete` method, like in the following example:
 
 ```crystal
 Article.filter(title: "My article").delete
@@ -462,7 +482,7 @@ employee = Employee.create!(
 )
 ```
 
-Additionaly, it's important to note that attempting to filter or retrieve `Person` records will return `Person` instances. When manipulating a parent model instance, it is possible to get a child model record by calling the `#<child_model>` method - with `child_model` being the downcased version of the child model name. For example:
+Additionally, it's important to note that attempting to filter or retrieve `Person` records will return `Person` instances. When manipulating a parent model instance, it is possible to get a child model record by calling the `#<child_model>` method - with `child_model` being the downcased version of the child model name. For example:
 
 ```crystal
 person = Person.filter(first_name: "John").first!

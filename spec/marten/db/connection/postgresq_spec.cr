@@ -67,6 +67,16 @@ for_postgresql do
         conn.left_operand_for("table.column", "contains").should eq "table.column"
         conn.left_operand_for("table.column", "exact").should eq "table.column"
       end
+
+      it "returns the expected operand for a year predicate" do
+        conn = Marten::DB::Connection.default
+        conn.left_operand_for("table.column", "year").should eq "EXTRACT(YEAR FROM table.column)"
+      end
+
+      it "returns the expected operand for a minute predicate" do
+        conn = Marten::DB::Connection.default
+        conn.left_operand_for("table.column", "minute").should eq "EXTRACT(MINUTE FROM table.column)"
+      end
     end
 
     describe "#max_name_size" do

@@ -6,7 +6,9 @@ module Marten
       module SQL
         module Predicate
           @@registry = {} of String => Base.class
-          @@transform_registry = {} of String => TransformBase.class
+
+          TIME_PART_PREDICATE_TYPES       = %w(year month day hour minute second)
+          TIME_PART_COMPARISON_PREDICATES = %w(exact gt gte lt lte in isnull)
 
           def self.register(predicate_klass : Base.class)
             @@registry[predicate_klass.predicate_name] = predicate_klass
@@ -16,19 +18,21 @@ module Marten
             @@registry
           end
 
-          def self.register_transform(predicate_klass : TransformBase.class)
-            @@transform_registry[predicate_klass.predicate_name] = predicate_klass
+          def self.time_part_comparison_predicate?(name : String) : Bool
+            TIME_PART_COMPARISON_PREDICATES.includes?(name)
           end
 
-          def self.transform_registry
-            @@transform_registry
+          def self.time_part_predicate?(name : String) : Bool
+            TIME_PART_PREDICATE_TYPES.includes?(name)
           end
 
           register Contains
+          register Day
           register EndsWith
           register Exact
           register GreaterThan
           register GreaterThanOrEqual
+          register Hour
           register IContains
           register IEndsWith
           register IExact
@@ -37,14 +41,11 @@ module Marten
           register IStartsWith
           register LessThan
           register LessThanOrEqual
+          register Minute
+          register Month
+          register Second
           register StartsWith
-
-          register_transform Year
-          register_transform Month
-          register_transform Day
-          register_transform Hour
-          register_transform Minute
-          register_transform Second
+          register Year
         end
       end
     end

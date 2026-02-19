@@ -40,11 +40,6 @@ module Marten
           delegate build_sql, to: connection
           delegate quote, to: connection
 
-          alias ParsedLookup = NamedTuple(
-            field_tokens: Array(String),
-            transform_name: String?,
-            comparison_name: String?)
-
           def initialize
           end
 
@@ -66,7 +61,7 @@ module Marten
           end
 
           def add_annotation(ann : DB::Query::Annotation) : Nil
-            field_path = verify_field(ann.field, only_relations: false, allow_many: true)
+            field_path = verify_field(ann.field, only_relations: false, allow_many: true, allow_polymorphic: false)
             relation_field_path = field_path.select { |field, _r| field.relation? }
 
             if relation_field_path.empty? || (field_path.size == 1 && field_path.last[1].nil?)
@@ -105,7 +100,7 @@ module Marten
           end
 
           def add_selected_join(relation : String) : Nil
-            field_path = verify_field(relation, only_relations: true, allow_many: false)
+            field_path = verify_field(relation, only_relations: true, allow_many: false, allow_polymorphic: false)
 
             # Special case: if the last model makes use of multi table inheritance, we have to ensure that the parent
             # models are retrieved as well in order to ensure that the joined records can properly be instantiated.
@@ -1030,22 +1025,18 @@ module Marten
           private def filtering_clause_and_parameters(predicate_node, offset = 0)
             if !predicate_node.nil?
               clause, parameters = predicate_node.to_sql(connection)
+              clause_parts = clause.split("%s")
 
-              parts = clause.split("%s")
-
-              if parameters.size != parts.size - 1
+              if parameters.size != clause_parts.size - 1
                 raise Errors::InvalidField.new(
                   "The number of parameters in the predicate node does not match the number of placeholders"
                 )
               end
 
               clause = String.build do |io|
-                parts.each_with_index do |part, i|
+                clause_parts.each_with_index do |part, i|
                   io << part
-
-                  unless i == parts.size - 1
-                    io << connection.parameter_id_for_ordered_argument(offset + i + 1)
-                  end
+                  io << connection.parameter_id_for_ordered_argument(offset + i + 1) if i < parameters.size
                 end
               end
             else
@@ -1068,30 +1059,57 @@ module Marten
             get_field_context(raw_field, model).field
           end
 
-          private def get_field_context(raw_field, model, allow_many = true)
+          private def get_field_context(raw_field, model, allow_many = true, allow_polymorphic = true)
             field_context = begin
               model.get_field_context(raw_field.to_s)
             rescue Errors::UnknownField
-              raise_invalid_field_error_with_valid_choices(raw_field, model, allow_many: allow_many)
+              raise_invalid_field_error_with_valid_choices(
+                raw_field,
+                model,
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+              )
             end
 
             if !allow_many && field_context.field.is_a?(Field::ManyToMany)
-              raise_invalid_field_error_with_valid_choices(raw_field, model, allow_many: allow_many)
+              raise_invalid_field_error_with_valid_choices(
+                raw_field,
+                model,
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+              )
+            end
+
+            if !allow_polymorphic && field_context.field.is_a?(Field::Polymorphic)
+              raise_invalid_field_error_with_valid_choices(
+                raw_field,
+                model,
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+              )
             end
 
             field_context
           end
 
-          private def get_relation_field_context(raw_relation, model, allow_many = true, silent = false)
+          private def get_relation_field_context(
+            raw_relation,
+            model,
+            allow_many = true,
+            allow_polymorphic = true,
+            silent = false,
+          )
             field_context = begin
               model.get_relation_field_context(raw_relation.to_s)
             rescue Errors::UnknownField
-              return nil if silent
+              return if silent
               raise_invalid_field_error_with_valid_choices(
                 raw_relation,
                 model,
                 "relation field",
-                allow_many: allow_many
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+                only_relations: true,
               )
             end
 
@@ -1100,7 +1118,20 @@ module Marten
                 raw_relation,
                 model,
                 field_type: "relation field",
-                allow_many: allow_many
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+                only_relations: true,
+              )
+            end
+
+            if !allow_polymorphic && field_context.field.is_a?(Field::Polymorphic)
+              raise_invalid_field_error_with_valid_choices(
+                raw_relation,
+                model,
+                field_type: "relation field",
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+                only_relations: true,
               )
             end
 
@@ -1167,17 +1198,27 @@ module Marten
             model,
             field_type = "field",
             allow_many = true,
+            allow_polymorphic = true,
+            only_relations = false,
           )
             fields = model.fields
             fields = fields.reject(Field::ManyToMany) if !allow_many
+            fields = fields.reject(Field::Polymorphic) if !allow_polymorphic
+            fields = fields.select(&.relation?) if only_relations
+
+            choices = fields.map(&.id).join(", ")
+            choices_string = choices.empty? ? nil : "Valid choices are: #{choices}."
 
             raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_field}' as a #{field_type}. Valid choices are: #{fields.join(", ", &.id)}."
+              [
+                "Unable to resolve '#{raw_field}' as a #{field_type}.",
+                choices_string,
+              ].compact.join(" ")
             )
           end
 
           private def solve_field_and_column(raw_field)
-            field_path = verify_field(raw_field.to_s, allow_many: false)
+            field_path = verify_field(raw_field.to_s, allow_many: false, allow_polymorphic: false)
             relation_field_path = field_path.select { |field, _r| field.relation? }
 
             if relation_field_path.empty? || (field_path.size == 1 && field_path.last[1].nil?)
@@ -1204,119 +1245,115 @@ module Marten
             {field, column}
           end
 
-          private def parse_lookup(raw : String) : ParsedLookup
-            tokens = raw.split(Constants::LOOKUP_SEP)
-            token_count = tokens.size
-            last_token = tokens.last?
-            second_last_token = tokens[-2]? if token_count >= 2
+          private def solve_field_and_predicate(raw_query, raw_value)
+            qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
+            raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
+            raw_predicate = qparts[1].empty? ? qparts[0] : qparts[2]
+            chained_time_part_lookup : NamedTuple(
+              raw_field: String,
+              time_part_predicate: String,
+              comparison_predicate: String,
+            )? = nil
+            join = nil
 
-            case
-            when token_count >= 3 &&
-              second_last_token && last_token &&
-              valid_transform_comparison?(second_last_token, last_token)
-              field_tokens = tokens[0..-3]
-              transform_name = second_last_token
-              comparison_name = last_token
-
-              {field_tokens: field_tokens, transform_name: transform_name, comparison_name: comparison_name}
-            when token_count >= 2 && last_token && transform_only?(last_token)
-              field_tokens = tokens[0..-2]
-              transform_name = last_token
-
-              {field_tokens: field_tokens, transform_name: transform_name, comparison_name: nil}
-            when token_count >= 2 && last_token && Predicate.registry[last_token]?
-              field_tokens = tokens[0..-2]
-              comparison_name = last_token
-
-              {field_tokens: field_tokens, transform_name: nil, comparison_name: comparison_name}
+            # First attempt to verify if the specified field corresponds to an existing annotation or an existing field.
+            if !annotations[raw_query]?.nil?
+              left_operand = annotations[raw_query]
+              raw_predicate = nil
+            elsif !annotations[raw_field]?.nil?
+              left_operand = annotations[raw_field]
             else
-              {field_tokens: tokens, transform_name: nil, comparison_name: nil}
+              begin
+                field_path = verify_field(raw_query)
+                raw_predicate = nil
+              rescue e : Errors::InvalidField
+                raise e if raw_predicate.try(&.empty?)
+
+                begin
+                  field_path = verify_field(raw_field)
+                rescue nested_error : Errors::InvalidField
+                  chained_time_part_lookup = parse_chained_time_part_lookup(raw_query)
+                  raise nested_error if chained_time_part_lookup.nil?
+
+                  field_path = verify_field(chained_time_part_lookup.not_nil![:raw_field])
+                  raw_predicate = chained_time_part_lookup.not_nil![:time_part_predicate]
+                end
+              end
+
+              relation_field_path = field_path.select { |field, _r| field.relation? }
+
+              join = unless relation_field_path.empty? || field_path.size == 1
+                # Prevent the last field to generate an extra join if the last field in the predicate is a relation
+                # (which is the case when a foreign key field is filtered on for example).
+                relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
+                ensure_join_for_field_path(relation_field_path)
+              end
+
+              left_operand = field_path.last[0]
             end
-          end
 
-          private def valid_transform_comparison?(transform, comparison)
-            Predicate.transform_registry[transform]? && Predicate.registry[comparison]?
-          end
-
-          private def transform_only?(token)
-            Predicate.transform_registry[token]? && !Predicate.registry[token]?
-          end
-
-          private def coerce_filter_value(raw_value) : Field::Any | Array(Field::Any)
-            case raw_value
+            # Then prepare the value to be used in the predicate.
+            value : Field::Any | Array(Field::Any) = case raw_value
             when Field::Any, Array(Field::Any)
               raw_value
             when DB::Model
               raw_value.pk
             when Array(DB::Model)
-              raw_value.each_with_object(Array(Field::Any).new) { |v, arr| arr << v.pk }
-            else
-              raw_value
+              raw_value.each_with_object(Array(Field::Any).new) do |v, values|
+                values << v.pk
+              end
             end
+
+            # Then identify the type of predicate to use.
+            if raw_predicate.nil? && value.nil?
+              predicate_klass = Predicate::IsNull
+              value = true
+            elsif raw_predicate.nil?
+              predicate_klass = Predicate::Exact
+            elsif Predicate.time_part_predicate?(raw_predicate)
+              predicate_klass = Predicate.registry.fetch(raw_predicate) do
+                raise Errors::InvalidField.new("Unknown predicate type '#{raw_predicate}'")
+              end
+
+              return predicate_klass
+                .as(Predicate::TimePart.class)
+                .new(
+                  left_operand,
+                  value,
+                  alias_prefix: join.nil? ? Model.db_table : join.not_nil!.table_alias,
+                  comparison_predicate: chained_time_part_lookup.try(&.[](:comparison_predicate)) || "exact"
+                )
+            else
+              predicate_klass = Predicate.registry.fetch(raw_predicate) do
+                raise Errors::InvalidField.new("Unknown predicate type '#{raw_predicate}'")
+              end
+            end
+
+            predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
           end
 
-          private def solve_field_and_predicate(raw_query, raw_value)
-            parsed = parse_lookup(raw_query)
-            field_lookup = parsed[:field_tokens].join(Constants::LOOKUP_SEP)
-            join = nil
+          private def parse_chained_time_part_lookup(raw_query : String)
+            parts = raw_query.split(Constants::LOOKUP_SEP)
+            return if parts.size < 3
 
-            # First attempt to verify if the specified field corresponds to an existing annotation
-            left_operand = annotations[raw_query]? || annotations[field_lookup]?
+            comparison_predicate = parts[-1]
+            time_part_predicate = parts[-2]
+            return unless Predicate.time_part_predicate?(time_part_predicate)
 
-            # If no annotation found, resolve the field path and handle transforms
-            unless left_operand
-              # Try to resolve field path for the field tokens
-              field_path = begin
-                verify_field(field_lookup)
-              rescue e : Errors::InvalidField
-                begin
-                  # Fallback: try the entire raw_query as field name
-                  verify_field(raw_query).tap do
-                    # Reset parsing since we're using the full query as field name
-                    parsed = {field_tokens: [raw_query], transform_name: nil, comparison_name: nil}
-                  end
-                rescue
-                  raise e
-                end
-              end
-
-              # Handle joins for relation fields
-              relation_field_path = field_path.select { |field, _r| field.relation? }
-              unless relation_field_path.empty? || field_path.size == 1
-                # Prevent the last field to generate an extra join if the last field in the predicate is a relation
-                # (which is the case when a foreign key field is filtered on for example).
-                relation_field_path = relation_field_path[0..-2] if relation_field_path.size == field_path.size
-                join = ensure_join_for_field_path(relation_field_path)
-              end
-
-              left_operand = field_path.last[0]
-
-              # Apply transform if specified
-              if transform_name = parsed[:transform_name]
-                transform_class = Predicate.transform_registry.fetch(transform_name) do
-                  raise Errors::InvalidField.new("Unknown transform '#{transform_name}'")
-                end
-                left_operand = transform_class.apply(left_operand.as(Field::Base))
-              end
+            unless Predicate.time_part_comparison_predicate?(comparison_predicate)
+              raise Errors::InvalidField.new(
+                "Unsupported chained predicate type '#{comparison_predicate}' for '#{time_part_predicate}'"
+              )
             end
 
-            # Prepare the value to be used in the predicate
-            value = coerce_filter_value(raw_value)
+            raw_field = parts[0..-3].join(Constants::LOOKUP_SEP)
+            return if raw_field.empty?
 
-            predicate_class = case
-                              when comparison_name = parsed[:comparison_name]
-                                Predicate.registry.fetch(comparison_name) do
-                                  raise Errors::InvalidField.new("Unknown predicate type '#{comparison_name}'")
-                                end
-                              when value.nil?
-                                value = true
-                                Predicate::IsNull
-                              else
-                                Predicate::Exact
-                              end
-
-            alias_prefix = join.try(&.table_alias) || Model.db_table
-            predicate_class.new(left_operand, value, alias_prefix: alias_prefix)
+            {
+              raw_field:            raw_field,
+              time_part_predicate:  time_part_predicate,
+              comparison_predicate: comparison_predicate,
+            }
           end
 
           private def solve_plucked_fields_and_columns(fields)
@@ -1333,7 +1370,7 @@ module Marten
             quote(Model.db_table)
           end
 
-          private def verify_field(raw_field, only_relations = false, allow_many = true)
+          private def verify_field(raw_field, only_relations = false, allow_many = true, allow_polymorphic = true)
             field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
 
             current_model = Model
@@ -1357,9 +1394,19 @@ module Marten
 
               field_context = begin
                 if only_relations
-                  get_relation_field_context(part, current_model, allow_many: allow_many)
+                  get_relation_field_context(
+                    part,
+                    current_model,
+                    allow_many: allow_many,
+                    allow_polymorphic: allow_polymorphic,
+                  )
                 else
-                  get_field_context(part, current_model, allow_many: allow_many)
+                  get_field_context(
+                    part,
+                    current_model,
+                    allow_many: allow_many,
+                    allow_polymorphic: allow_polymorphic,
+                  )
                 end
               rescue e : Errors::InvalidField
                 reverse_relation_context = current_model.get_reverse_relation_context(part.to_s)

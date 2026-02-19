@@ -278,7 +278,7 @@ The `to` argument **is required** and allows to specify the model class that is 
 
 #### `related`
 
-The `related` argument allows defining the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Tag` records expose their related `Article` records:
+The `related` argument allows defining the name of the reverse (or backward) relation on the targeted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Tag` records expose their related `Article` records:
 
 ```crystal
 class Tag < Marten::Model
@@ -291,9 +291,9 @@ class Article < Marten::Model
 end
 ```
 
-When the `related` argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records using a specific `Tag` record could be accessed through the use of the `Tag#articles` method in the previous snippet.
+When the `related` argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that all the `Article` records using a specific `Tag` record could be accessed through the use of the `Tag#articles` method in the previous snippet.
 
-The default value is `nil`, which means that no reverse relation is defined on the targetted model by default.
+The default value is `nil`, which means that no reverse relation is defined on the targeted model by default.
 
 ### `many_to_one`
 
@@ -320,7 +320,7 @@ The `to` argument **is required** and allows to specify the model class that is 
 
 #### `related`
 
-The `related` argument allows defining the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Author` records expose their related `Article` records:
+The `related` argument allows defining the name of the reverse (or backward) relation on the targeted model. If we consider the previous example, it could be possible to define an `articles` backward relation in order to let `Author` records expose their related `Article` records:
 
 ```crystal
 class Author < Marten::Model
@@ -333,9 +333,9 @@ class Article < Marten::Model
 end
 ```
 
-When the `related` argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Author` record could be accessed through the use of the `Author#articles` method in the previous snippet.
+When the `related` argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Author` record could be accessed through the use of the `Author#articles` method in the previous snippet.
 
-The default value is `nil`, which means that no reverse relation is defined on the targetted model by default.
+The default value is `nil`, which means that no reverse relation is defined on the targeted model by default.
 
 #### `on_delete`
 
@@ -371,7 +371,7 @@ The `to` argument **is required** and allows to specify the model class that is 
 
 #### `related`
 
-The `related` argument allows defining the name of the reverse (or backward) relation on the targetted model. If we consider the previous example, it could be possible to define a `user` backward relation in order to let `Profile` records expose their related `User` record:
+The `related` argument allows defining the name of the reverse (or backward) relation on the targeted model. If we consider the previous example, it could be possible to define a `user` backward relation in order to let `Profile` records expose their related `User` record:
 
 ```crystal
 class Profile < Marten::Model
@@ -384,9 +384,9 @@ class User < Marten::Model
 end
 ```
 
-When the `related` argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record could be accessed through the use of the `Profile#user` method in the previous snippet.
+When the `related` argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record could be accessed through the use of the `Profile#user` method in the previous snippet.
 
-The default value is `nil`, which means that no reverse relation is defined on the targetted model by default.
+The default value is `nil`, which means that no reverse relation is defined on the targeted model by default.
 
 #### `on_delete`
 

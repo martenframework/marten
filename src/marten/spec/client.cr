@@ -10,9 +10,10 @@ module Marten
     # a specific client instance.
     #
     # Moreover, the test client disables CSRF checks by default in order to ease the process of testing unsafe request
-    # methods. If you trully need to have these checks applied when running specs, you can initialize a test client by
+    # methods. If you truly need to have these checks applied when running specs, you can initialize a test client by
     # setting `disable_request_forgery_protection` to `false`.
     class Client
+      @flash : HTTP::FlashStore?
       @server_handler : ::HTTP::Handler?
       @session : HTTP::Session::Store::Base?
 
@@ -49,6 +50,14 @@ module Marten
           headers: headers,
           secure: secure
         )
+      end
+
+      # Returns the flash store for the client.
+      #
+      # This method returns a flash store object, initialized using the currently configured session store. This can be
+      # helpful to access flash messages that might have been set by handlers.
+      def flash
+        @flash ||= HTTP::FlashStore.from_session(session)
       end
 
       # Allows to issue a GET request to the server.
@@ -221,7 +230,7 @@ module Marten
 
         ::HTTP::FormData.build(io, MULTIPART_BOUNDARY) do |builder|
           data.each do |key, value|
-            case (object = value)
+            case object = value
             when Enumerable, Iterable
               object.each { |v| builder.field(key.to_s, v.to_s) }
             when DB::Field::File::File
@@ -241,7 +250,7 @@ module Marten
         query_params = URI::Params.new
 
         raw_query_params.each do |key, value|
-          query_params[key.to_s] = case (object = value)
+          query_params[key.to_s] = case object = value
                                    when Enumerable, Iterable
                                      object.map(&.to_s)
                                    else

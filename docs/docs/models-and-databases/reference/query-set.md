@@ -814,7 +814,7 @@ Post.all.pluck("title", "published")
 
 ### `size`
 
-Alias for [`#count`](#count): returns the number of records that are targetted by the query set.
+Alias for [`#count`](#count): returns the number of records that are targeted by the query set.
 
 ### `sum`
 
@@ -986,48 +986,39 @@ Allows filtering records based on field values that start with a specific substr
 Article.all.filter(title__startswith: "Top")
 ```
 
-## Field transforms
+## Time predicates
 
-Field transforms allow filtering records based on specific parts of field values, such as extracting the year from a date. Transforms can be combined with any supported predicate using the double‑underscores notation.
+Marten also supports time-related predicates that let you filter on specific parts of `date` and `date_time` fields.
 
-The following time-related transforms are available for date and datetime fields:
+The following time predicates are available:
 
-| Transform | Description | Example |
-|-----------|-------------|---------|
-| `year` | Extracts the year from a date/datetime field | `published_at__year: 2025` |
-| `month` | Extracts the month (1-12) from a date/datetime field | `created_at__month: 12` |
-| `day` | Extracts the day of month (1-31) from a date/datetime field | `updated_at__day: 15` |
-| `hour` | Extracts the hour (0-23) from a datetime field | `created_at__hour: 14` |
-| `minute` | Extracts the minute (0-59) from a datetime field | `logged_at__minute: 30` |
-| `second` | Extracts the second (0-59) from a datetime field | `timestamp__second: 45` |
+| Predicate | Description | Supported field types | Example |
+|-----------|-------------|-----------------------|---------|
+| `year` | Filters by year | `date`, `date_time` | `published_at__year: 2025` |
+| `month` | Filters by month (`1..12`) | `date`, `date_time` | `created_at__month: 12` |
+| `day` | Filters by day of month (`1..31`) | `date`, `date_time` | `updated_at__day: 15` |
+| `hour` | Filters by hour (`0..23`) | `date_time` | `created_at__hour: 14` |
+| `minute` | Filters by minute (`0..59`) | `date_time` | `logged_at__minute: 30` |
+| `second` | Filters by second (`0..59`) | `date_time` | `timestamp__second: 45` |
 
 ```crystal
 # Basic usage
 Article.filter(published_at__year: 2025)
-Article.filter(created_at__month__gte: 6)
+Article.filter(created_at__month: 12)
 
 # Through relations
-Post.filter(author__joined_at__year: 2024)
-
-# Multiple transforms
-Event.filter(
-  start_time__year: 2025,
-  start_time__month: 12,
-  start_time__day__gte: 15
-)
+Post.filter(author__created_at__year: 2024)
 ```
 
-:::warning
-Time transforms typically prevent the use of database indexes. For better performance on large datasets, prefer range-based filters:
+Time predicates also support comparator chaining with `exact`, `gt`, `gte`, `lt`, `lte`, `in`, and `isnull`:
 
 ```crystal
-# Slower (prevents index usage)
-Article.filter(published_at__year: 2025)
-
-# Faster (allows index usage)
-Article.filter(
-  published_at__gte: Time.utc(2025, 1, 1),
-  published_at__lt: Time.utc(2026, 1, 1)
-)
+Article.filter(created_at__year__exact: 2022)
+Article.filter(created_at__year__gte: 2022)
+Article.filter(created_at__hour__lt: 12)
+Article.filter(created_at__month__in: [11, 12])
+Article.filter(created_at__year__isnull: false)
 ```
-:::
+
+Accepted values for scalar comparisons are integers, numeric strings (for example `"2025"`), or `Time` instances.
+For `in`, pass arrays containing these value types. For `isnull`, pass a boolean.

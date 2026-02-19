@@ -519,7 +519,7 @@ describe Marten::Conf::GlobalSettings::Database do
       db_config.name_set_with_env.should be_nil
     end
 
-    it "returns the current env targetted when setting the DB name" do
+    it "returns the current env targeted when setting the DB name" do
       db_config = Marten::Conf::GlobalSettings::Database.new("default")
       db_config.with_target_env("test") do |c|
         c.name = "test_db"

@@ -128,6 +128,12 @@ module Marten
           "iendswith"   => "UPPER(%s)",
           "iexact"      => "UPPER(%s)",
           "istartswith" => "UPPER(%s)",
+          "year"        => "EXTRACT(YEAR FROM %s)",
+          "month"       => "EXTRACT(MONTH FROM %s)",
+          "day"         => "EXTRACT(DAY FROM %s)",
+          "hour"        => "EXTRACT(HOUR FROM %s)",
+          "minute"      => "EXTRACT(MINUTE FROM %s)",
+          "second"      => "EXTRACT(SECOND FROM %s)",
         }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
@@ -143,12 +149,6 @@ module Marten
           "lt"          => "< %s",
           "lte"         => "<= %s",
           "startswith"  => "LIKE %s",
-          "year"        => "EXTRACT(YEAR FROM %s)",
-          "month"       => "EXTRACT(MONTH FROM %s)",
-          "day"         => "EXTRACT(DAY FROM %s)",
-          "hour"        => "EXTRACT(HOUR FROM %s)",
-          "minute"      => "EXTRACT(MINUTE FROM %s)",
-          "second"      => "EXTRACT(SECOND FROM %s)",
         }
       end
     end

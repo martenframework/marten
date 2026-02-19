@@ -3,6 +3,6 @@ module Marten::DB::Deletion::RunnerSpec
     field :id, :big_int, primary_key: true, auto: true
     field :name, :string, max_size: 255
     field :email, :string, max_size: 255
-    field :address, :many_to_one, to: Marten::DB::Deletion::RunnerSpec::Address
+    field :address, :many_to_one, to: Marten::DB::Deletion::RunnerSpec::Address, on_delete: :cascade
   end
 end

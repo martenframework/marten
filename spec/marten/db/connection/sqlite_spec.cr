@@ -45,6 +45,16 @@ for_sqlite do
         conn.left_operand_for("table.column", "contains").should eq "table.column"
         conn.left_operand_for("table.column", "istartswith").should eq "table.column"
       end
+
+      it "returns the expected operand for a year predicate" do
+        conn = Marten::DB::Connection.default
+        conn.left_operand_for("table.column", "year").should eq "CAST(STRFTIME('%Y', table.column) AS INTEGER)"
+      end
+
+      it "returns the expected operand for a second predicate" do
+        conn = Marten::DB::Connection.default
+        conn.left_operand_for("table.column", "second").should eq "CAST(STRFTIME('%S', table.column) AS INTEGER)"
+      end
     end
 
     describe "#limit_value" do

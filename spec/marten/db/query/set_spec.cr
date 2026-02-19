@@ -1386,6 +1386,105 @@ describe Marten::DB::Query::Set do
       qset.to_a.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
+    it "allows filtering records with time-part predicates" do
+      record_1 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 12, 1),
+        event_at: Time.utc(2023, 12, 1, 9, 10, 11),
+      )
+      record_2 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 11, 12),
+        event_at: Time.utc(2024, 11, 12, 7, 15, 5),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new.order(:id)
+
+      qset.filter(event_date__year: 2024).to_a.should eq [record_2, record_3]
+      qset.filter(event_date__month: 12).to_a.should eq [record_1, record_2]
+      qset.filter(event_date__day: 12).to_a.should eq [record_3]
+      qset.filter(event_at__hour: 23).to_a.should eq [record_2]
+      qset.filter(event_at__minute: 55).to_a.should eq [record_2]
+      qset.filter(event_at__second: 5).to_a.should eq [record_3]
+    end
+
+    it "allows chaining comparison predicates with time-part predicates" do
+      record_1 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 6, 1),
+        event_at: Time.utc(2023, 6, 1, 11, 0, 0),
+      )
+      record_2 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 2, 12),
+        event_at: Time.utc(2024, 2, 12, 7, 15, 5),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new.order(:id)
+
+      qset.filter(event_at__year__gte: 2024).to_a.should eq [record_2, record_3]
+      qset.filter(event_at__year__lt: 2024).to_a.should eq [record_1]
+      qset.filter(event_at__hour__gt: 10).to_a.should eq [record_1, record_2]
+      qset.filter(event_date__month__lte: 6).to_a.should eq [record_1, record_3]
+      qset.filter(event_at__month__in: ([Time.utc(2024, 6, 1), "12"] of Marten::DB::Field::Any)).to_a.should eq(
+        [record_1, record_2]
+      )
+      qset.filter(event_at__year__isnull: false).to_a.should eq [record_1, record_2, record_3]
+      qset.filter(event_at__year__isnull: true).to_a.should eq([] of Marten::DB::Query::SetSpec::TemporalRecord)
+    end
+
+    it "coerces Time and numeric strings when filtering time-part predicates" do
+      record_1 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 12, 1),
+        event_at: Time.utc(2023, 12, 1, 9, 10, 11),
+      )
+      record_2 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 11, 12),
+        event_at: Time.utc(2024, 11, 12, 7, 15, 5),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new.order(:id)
+
+      qset.filter(event_at__year: Time.utc(2024, 5, 1)).to_a.should eq [record_2, record_3]
+      qset.filter(event_at__month: "12").to_a.should eq [record_1, record_2]
+    end
+
+    it "raises for invalid time-part filters" do
+      Marten::DB::Query::SetSpec::TemporalRecord.create!(
+        label: "Record",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::TemporalRecord).new
+
+      expect_raises(Marten::DB::Errors::InvalidField) { qset.filter(label__year: 2024).to_a }
+      expect_raises(Marten::DB::Errors::InvalidField) { qset.filter(event_date__hour: 10).to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__month: 13).to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__hour: 24).to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__second: "foo").to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__year__in: "2024").to_a }
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition) { qset.filter(event_at__year__isnull: "false").to_a }
+      expect_raises(Marten::DB::Errors::InvalidField) { qset.filter(event_at__year__contains: 2024).to_a }
+    end
+
     it "filters records using a raw SQL equality condition", tags: "raw" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)

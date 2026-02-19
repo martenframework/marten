@@ -1049,3 +1049,40 @@ Allows filtering records based on field values that start with a specific substr
 ```crystal
 Article.all.filter(title__startswith: "Top")
 ```
+
+## Time predicates
+
+Marten also supports time-related predicates that let you filter on specific parts of `date` and `date_time` fields.
+
+The following time predicates are available:
+
+| Predicate | Description | Supported field types | Example |
+|-----------|-------------|-----------------------|---------|
+| `year` | Filters by year | `date`, `date_time` | `published_at__year: 2025` |
+| `month` | Filters by month (`1..12`) | `date`, `date_time` | `created_at__month: 12` |
+| `day` | Filters by day of month (`1..31`) | `date`, `date_time` | `updated_at__day: 15` |
+| `hour` | Filters by hour (`0..23`) | `date_time` | `created_at__hour: 14` |
+| `minute` | Filters by minute (`0..59`) | `date_time` | `logged_at__minute: 30` |
+| `second` | Filters by second (`0..59`) | `date_time` | `timestamp__second: 45` |
+
+```crystal
+# Basic usage
+Article.filter(published_at__year: 2025)
+Article.filter(created_at__month: 12)
+
+# Through relations
+Post.filter(author__created_at__year: 2024)
+```
+
+Time predicates also support comparator chaining with `exact`, `gt`, `gte`, `lt`, `lte`, `in`, and `isnull`:
+
+```crystal
+Article.filter(created_at__year__exact: 2022)
+Article.filter(created_at__year__gte: 2022)
+Article.filter(created_at__hour__lt: 12)
+Article.filter(created_at__month__in: [11, 12])
+Article.filter(created_at__year__isnull: false)
+```
+
+Accepted values for scalar comparisons are integers, numeric strings (for example `"2025"`), or `Time` instances.
+For `in`, pass arrays containing these value types. For `isnull`, pass a boolean.

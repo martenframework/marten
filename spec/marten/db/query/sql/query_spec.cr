@@ -199,6 +199,101 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.to_set.should eq [post_1, post_3].to_set
     end
 
+    it "is able to process query nodes with transform-only time predicates on relations" do
+      year = Time.utc.year.to_i64
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1", updated_by: user_2)
+      post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__created_at__year: year))
+      query.execute.to_set.should eq [post_1, post_2, post_3].to_set
+    end
+
+    it "is able to process query nodes with exact chained time predicates on relations" do
+      year = Time.utc.year.to_i64
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1", updated_by: user_2)
+      post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__created_at__year__exact: year))
+      query.execute.to_set.should eq [post_1, post_2, post_3].to_set
+    end
+
+    it "is able to process query nodes with chained time predicates on relations" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1", updated_by: user_2)
+      post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__created_at__month__gte: 1))
+      query.add_query_node(Marten::DB::Query::Node.new(author__created_at__hour__gte: 0))
+      query.execute.to_set.should eq [post_1, post_2, post_3].to_set
+    end
+
+    it "is able to process query nodes with in chained time predicates on relations" do
+      year = Time.utc.year.to_i64
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1", updated_by: user_2)
+      post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(
+        Marten::DB::Query::Node.new(
+          author__created_at__year__in: ([Time.utc(year.to_i, 1, 1), year.to_s] of Marten::DB::Field::Any)
+        )
+      )
+      query.execute.to_set.should eq [post_1, post_2, post_3].to_set
+    end
+
+    it "is able to process query nodes with isnull chained time predicates on relations" do
+      user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_1, title: "Post 1", updated_by: user_2)
+      post_2 = Post.create!(author: user_2, title: "Post 2", updated_by: user_1)
+      post_3 = Post.create!(author: user_1, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__created_at__year__isnull: false))
+      query.execute.to_set.should eq [post_1, post_2, post_3].to_set
+
+      query_with_null_check = Marten::DB::Query::SQL::Query(Post).new
+      query_with_null_check.add_query_node(Marten::DB::Query::Node.new(author__created_at__year__isnull: true))
+      query_with_null_check.execute.to_a.should be_empty
+    end
+
+    it "raises if unsupported chained predicate is used for a time predicate" do
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+
+      expect_raises(Marten::DB::Errors::InvalidField) do
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__year__contains: 2024))
+      end
+    end
+
+    it "raises if isnull chained time predicate does not receive a boolean" do
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+
+      query.add_query_node(Marten::DB::Query::Node.new(created_at__year__isnull: "false"))
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "'year__isnull' expects a boolean") do
+        query.execute.to_a
+      end
+    end
+
     it "is able to process query nodes with a direct filter on a relation model instance" do
       user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")

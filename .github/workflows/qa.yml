@@ -31,8 +31,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    - name: Check spelling
-      uses: crate-ci/typos@v1.40.0
+    - name: Install typos
+      run: apt-get update && apt-get -yqq install typos
+    - name: Check typos
+      run: make typos
   generated-app:
     runs-on: ubuntu-latest
     strategy:

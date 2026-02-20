@@ -32,7 +32,9 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Install typos
-      run: apt-get update && apt-get -yqq install typos
+      run: |
+        sudo apt-get update
+        sudo apt-get -yqq install typos
     - name: Check typos
       run: make typos
   generated-app:

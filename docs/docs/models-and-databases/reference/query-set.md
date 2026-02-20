@@ -846,6 +846,70 @@ Tag.filter(name__startswith: "r").to_sql
 The outputted SQL will vary depending on the database backend in use.
 :::
 
+### `update_or_create`
+
+Updates the model record matching the given set of filters, or creates a new one if no one is found.
+
+Model fields that uniquely identify a record should be used here. This method first attempts to retrieve a record that
+matches the specified filters. If it exists, the record is updated using the attributes provided in the required
+`updates` argument:
+
+```crystal
+user = User.all.update_or_create(
+  updates: {first_name: "Jane"},
+  username: "abc"
+)
+```
+
+If no matching record is found, a new one is created using the attributes defined in `updates`. If additional attributes
+should only be used when creating new records, a `defaults` argument can be provided (these attributes will then be used
+instead of `updates` when creating the record):
+
+```crystal
+user = User.all.update_or_create(
+  updates: {first_name: "Jane"},
+  defaults: {first_name: "Jane", is_admin: true},
+  username: "abc"
+)
+```
+
+In order to ensure data consistency, this method will raise a
+`Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
+
+### `update_or_create!`
+
+Updates the model record matching the given set of filters, or creates a new one if no one is found.
+
+Model fields that uniquely identify a record should be used here. This method first attempts to retrieve a record that
+matches the specified filters. If it exists, the record is updated using the attributes provided in the required
+`updates` argument:
+
+```crystal
+user = User.all.update_or_create!(
+  updates: {first_name: "Jane"},
+  username: "abc"
+)
+```
+
+If no matching record is found, a new one is created using the attributes defined in `updates`. If additional attributes
+should only be used when creating new records, a `defaults` argument can be provided (these attributes will then be used
+instead of `updates` when creating the record):
+
+```crystal
+user = User.all.update_or_create!(
+  updates: {first_name: "Jane"},
+  defaults: {first_name: "Jane", is_admin: true},
+  username: "abc"
+)
+```
+
+In order to ensure data consistency, this method will raise a
+`Marten::DB::Errors::MultipleRecordsFound` exception if multiple records match the specified set of filters.
+
+Raises a `Marten::DB::Errors::InvalidRecord` exception if the updated or created
+record is invalid.
+```
+
 ### `update`
 
 Updates all the records matched by the current query set with the passed values.

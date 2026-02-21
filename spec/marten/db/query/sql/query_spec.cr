@@ -471,6 +471,18 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.to_set.should eq [post_1, post_3].to_set
     end
 
+    it "raises when trying to filter by going through a polymorphic relation" do
+      query = Marten::DB::Query::SQL::Query(Comment).new
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot traverse polymorphic field 'target' in expression 'target__title__startswith'. " \
+        "Polymorphic relations cannot be traversed forward because the target model cannot be determined."
+      ) do
+        query.add_query_node(Marten::DB::Query::Node.new(target__title__startswith: "Top"))
+      end
+    end
+
     for_db_backends :postgresql, :sqlite do
       it "can add a query node targeting annotations and other fields" do
         user_1 = TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")

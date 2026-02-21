@@ -1387,6 +1387,17 @@ module Marten
               # The current model must be set in order to be able to correctly identify the actual targeted model field
               # in the next iteration.
               if reverse_relation_context.nil? && field_context.field.relation?
+                # We must raise if the field is a polymorphic one because it is not possible to determine the actual
+                # targeted model. Going through polymorphic relations can only be done by going backwards through the
+                # reverse relation.
+                if field_context.field.is_a?(Field::Polymorphic)
+                  field_path = raw_field.split(Constants::LOOKUP_SEP)[0..i].join(Constants::LOOKUP_SEP)
+                  raise Errors::UnmetQuerySetCondition.new(
+                    "Cannot traverse polymorphic field '#{field_context.field.id}' in expression '#{raw_field}'. " \
+                    "Polymorphic relations cannot be traversed forward because the target model cannot be determined. "
+                  )
+                end
+
                 current_model = field_context.field.related_model
               elsif !reverse_relation_context.nil?
                 current_model = reverse_relation_context.reverse_relation.model

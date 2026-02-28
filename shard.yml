@@ -30,6 +30,7 @@ development_dependencies:
     github: crystal-lang/crystal-sqlite3
   timecop:
     github: crystal-community/timecop.cr
+    commit: 85a4fb2
   vips:
     github: naqvis/crystal-vips
 

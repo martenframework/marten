@@ -968,6 +968,23 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#remote_ip_address" do
+    it "returns the peer IPv4 address when present" do
+      raw_request = HTTP::Request.new("GET", "/")
+      raw_request.remote_address = Socket::IPAddress.new("203.0.113.10", 12345)
+
+      request = Marten::HTTP::Request.new(raw_request)
+
+      request.remote_ip_address.should eq("203.0.113.10")
+    end
+
+    it "returns nil when the peer address is missing" do
+      request = Marten::HTTP::Request.new(HTTP::Request.new("GET", "/"))
+
+      request.remote_ip_address.should be_nil
+    end
+  end
+
   describe "#scheme" do
     around_each do |t|
       original_use_x_forwarded_proto = Marten.settings.use_x_forwarded_proto

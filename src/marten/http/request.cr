@@ -163,6 +163,11 @@ module Marten
         @query_parans ||= Params::Query.new(extract_raw_query_params)
       end
 
+      # Returns the direct peer IP of the incoming TCP connection (if available).
+      def remote_ip_address : String?
+        @request.remote_address.as?(Socket::IPAddress).try(&.address)
+      end
+
       # Returns the scheme of the request (either `"http"` or `"https"`).
       def scheme : String
         @scheme ||= begin

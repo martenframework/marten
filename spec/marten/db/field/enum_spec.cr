@@ -231,7 +231,6 @@ describe Marten::DB::Field::Enum do
       article.category.should eq Marten::DB::Field::EnumSpec::Article::Category::BLOG
       article.raw_category.should eq "BLOG"
     end
-
   end
 end
 

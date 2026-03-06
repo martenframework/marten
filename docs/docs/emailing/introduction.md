@@ -128,6 +128,46 @@ class WelcomeEmail < Marten::Email
 end
 ```
 
+### Defining attachments
+
+Attachments can be associated with an email by calling [`#attach`](pathname:///api/dev/Marten/Emailing/Email.html#attach(path%3AString,filename%3AString%7CNil%3Dnil,mime_type%3AString%7CNil%3Dnil)%3ANil-instance-method). In most cases, this is done in a [`before_deliver`](./callbacks.md#before_deliver) callback so that attachments are set right before the email is delivered.
+
+The following `#attach` method signatures are available:
+
+* `attach(path : String, filename : String? = nil, mime_type : String? = nil)`
+* `attach(file : File, filename : String? = nil, mime_type : String? = nil)`
+* `attach(io : IO, *, filename : String, mime_type : String? = nil)`
+
+:::note[IO Attachments]
+When using `attach(io, ...)`, the `filename` is required and the IO is read from its current position to EOF. If you need to attach the full IO content, call `io.rewind` before attaching it.
+:::
+
+For example:
+
+```crystal
+class WelcomeEmail < Marten::Email
+  from "no-reply@martenframework.com"
+  to @user.email
+  subject "Hello!"
+  template_name "emails/welcome_email.html"
+
+  before_deliver :add_attachments
+
+  def initialize(@user : User)
+  end
+
+  private def add_attachments
+    # Attach a file from a path.
+    attach "public/docs/terms.pdf"
+
+    # Attach generated content from an IO.
+    attach generate_pdf_io(@user), filename: "welcome.pdf", mime_type: "application/pdf"
+  end
+end
+```
+
+When a `mime_type` is not specified, Marten infers it from the attachment file name. If no MIME type can be inferred, it defaults to `application/octet-stream`.
+
 ## Sending emails
 
 Emails are sent _synchronously_ through the use of the [`#deliver`](pathname:///api/dev/Marten/Emailing/Email.html#deliver-instance-method). For example, the `WelcomeEmail` email defined in the previous sections could be initialized and delivered by doing:

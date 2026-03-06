@@ -3716,6 +3716,40 @@ describe Marten::DB::Query::Set do
 
       qset.to_a.should be_empty
     end
+
+    it "accepts enum values for enum fields" do
+      article_1 = Marten::DB::Query::SetSpec::EnumArticle.create!(
+        title: "Post 1",
+        category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS
+      )
+      article_2 = Marten::DB::Query::SetSpec::EnumArticle.create!(
+        title: "Post 2",
+        category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      qset
+        .filter(title__in: ["Post 1", "Post 2"])
+        .update(category: Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG)
+        .should eq 2
+
+      article_1.reload
+      article_2.reload
+      article_1.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
+      article_2.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
+    end
+
+    it "keeps strictness when update values are invalid" do
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      expect_raises(
+        Marten::DB::Errors::UnexpectedFieldValue,
+        "Value '[\"BLOG\"]' cannot be used in update queries"
+      ) do
+        qset.update(category: ["BLOG"])
+      end
+    end
   end
 
   describe "#update_or_create" do
@@ -3824,6 +3858,23 @@ describe Marten::DB::Query::Set do
           first_name: "John"
         )
       end
+    end
+
+    it "accepts enum values in updates and merged defaults when creating" do
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      created_article = qset.update_or_create(
+        updates: {category: Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG},
+        defaults: {
+          title:    "Created through defaults",
+          category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS,
+        },
+        title: "missing"
+      )
+
+      created_article.persisted?.should be_true
+      created_article.title.should eq "Created through defaults"
+      created_article.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
     end
   end
 
@@ -3962,6 +4013,23 @@ describe Marten::DB::Query::Set do
           username: "invalid"
         )
       end
+    end
+
+    it "accepts enum values in updates and merged defaults when creating" do
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      created_article = qset.update_or_create!(
+        updates: {category: Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG},
+        defaults: {
+          title:    "Created through defaults with bang",
+          category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS,
+        },
+        title: "missing-bang"
+      )
+
+      created_article.persisted?.should be_true
+      created_article.title.should eq "Created through defaults with bang"
+      created_article.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
     end
   end
 

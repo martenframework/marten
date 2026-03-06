@@ -603,6 +603,11 @@ module Marten
           assign_field_values(sanitized_values)
         end
 
+        # :ditto:
+        def set_field_value(field_name : String | Symbol, value : ::Enum)
+          set_field_value(field_name, value.to_s)
+        end
+
         # Allows to set the values of multiple fields.
         #
         # If one of the specified field names doesn't match any existing field, a `Marten::DB::Errors::UnknownField`
@@ -615,8 +620,9 @@ module Marten
         def set_field_values(values : Hash | NamedTuple) # ameba:disable Naming/AccessorMethodName
           sanitized_values = Hash(String, Field::Any | Model).new
           values.each do |key, value|
-            next unless value.is_a?(Field::Any | Model)
-            sanitized_values[key.to_s] = value
+            accepted, normalized_value = normalize_set_field_value(value)
+            next unless accepted
+            sanitized_values[key.to_s] = normalized_value
           end
 
           assign_field_values(sanitized_values)
@@ -739,6 +745,18 @@ module Marten
           unless values.empty?
             raise Errors::UnknownField.new("Unknown field '#{values.first[0]}' for #{self.class.name}")
           end
+        end
+
+        private def normalize_set_field_value(value : Field::Any | Model)
+          {true, value}
+        end
+
+        private def normalize_set_field_value(value : ::Enum)
+          {true, value.to_s}
+        end
+
+        private def normalize_set_field_value(value)
+          {false, nil}
         end
 
         private def get_cached_related_object(relation_field)

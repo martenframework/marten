@@ -56,7 +56,7 @@ module Marten
             nil
           when ::String
             value
-          when Symbol
+          when Symbol, ::Enum
             value.to_s
           else
             raise_unexpected_field_value(value)

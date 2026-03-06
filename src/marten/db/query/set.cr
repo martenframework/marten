@@ -1550,7 +1550,18 @@ module Marten
         # either.
         def update(values : Hash | NamedTuple)
           update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
-          update_hash.merge!(values.to_h)
+          values.each do |k, v|
+            case v
+            when Field::Any, DB::Model
+              update_hash[k.to_s] = v
+            when ::Enum
+              update_hash[k.to_s] = v.to_s
+            else
+              raise Errors::UnexpectedFieldValue.new(
+                "Value '#{v.inspect}' cannot be used in update queries"
+              )
+            end
+          end
 
           qs = clone
           updated_count = qs.query.update_with(update_hash)

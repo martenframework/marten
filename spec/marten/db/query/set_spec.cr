@@ -3740,6 +3740,22 @@ describe Marten::DB::Query::Set do
       article_2.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
     end
 
+    it "raises if values are provided from a different enum type" do
+      article = Marten::DB::Query::SetSpec::EnumArticle.create!(
+        title: "Post",
+        category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        qset.update(category: Marten::DB::Query::SetSpec::EnumArticle::PermissionKind::BLOG)
+      end
+
+      article.reload
+      article.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS
+    end
+
     it "keeps strictness when update values are invalid" do
       qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
 

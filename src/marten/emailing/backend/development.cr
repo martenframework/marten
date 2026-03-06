@@ -37,6 +37,13 @@ module Marten
           parts << "Subject: #{email.subject}"
           parts << "Headers: #{email.headers}" unless email.headers.empty?
 
+          unless email.attachments.empty?
+            parts << "Attachments:"
+            email.attachments.each do |attachment|
+              parts << "- #{attachment.filename} (#{attachment.mime_type}, #{attachment.size} bytes)"
+            end
+          end
+
           if !(text = email.text_body).nil?
             parts << "---------- TEXT ----------"
             parts << text

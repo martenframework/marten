@@ -78,6 +78,28 @@ describe Marten::DB::Query::Prefetcher do
       records[1].get_related_object_variable(:publisher).should eq publisher_2
     end
 
+    it "allows to prefetch a single polymorphic relation" do
+      article = Marten::DB::Query::PrefetcherSpec::Article.create!(title: "Abc", text: "Abc")
+      recipe = Marten::DB::Query::PrefetcherSpec::Recipe.create!(title: "Def", text: "Def")
+      Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 1", target: article)
+      Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 2", target: recipe)
+      Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 3", target: article)
+
+      records = Marten::DB::Query::PrefetcherSpec::Comment.order(:pk).to_a
+
+      prefetcher = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(records),
+        relations: ["target"],
+        using: nil
+      )
+
+      expect_db_query_count(2) { prefetcher.execute }
+
+      records[0].get_related_object_variable(:target).should eq article
+      records[1].get_related_object_variable(:target).should eq recipe
+      records[2].get_related_object_variable(:target).should eq article
+    end
+
     it "always uses unscoped queries when prefetching many-to-one relations" do
       author_1 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Abc Doe")
       author_2 = Marten::DB::Query::PrefetcherSpec::ScopedAuthor.create!(name: "Def Doe")
@@ -213,6 +235,42 @@ describe Marten::DB::Query::Prefetcher do
 
       records[0].authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_1, author_3]
       records[1].authors.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [author_2, author_4]
+    end
+
+    it "allows to prefetch a single reverse polymorphic relation" do
+      article_1 = Marten::DB::Query::PrefetcherSpec::Article.create!(title: "Abc", text: "Abc")
+      article_2 = Marten::DB::Query::PrefetcherSpec::Article.create!(title: "Def", text: "Def")
+      comment_1 = Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 1", target: article_1)
+      comment_2 = Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 2", target: article_2)
+      comment_3 = Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 3", target: article_1)
+
+      recipe_1 = Marten::DB::Query::PrefetcherSpec::Recipe.create!(title: "Abc", text: "Abc")
+      recipe_2 = Marten::DB::Query::PrefetcherSpec::Recipe.create!(title: "Def", text: "Def")
+      comment_4 = Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 4", target: recipe_1)
+      comment_5 = Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 5", target: recipe_2)
+      comment_6 = Marten::DB::Query::PrefetcherSpec::Comment.create!(text: "Comment 6", target: recipe_1)
+
+      article_records = Marten::DB::Query::PrefetcherSpec::Article.order(:pk).to_a
+      recipe_records = Marten::DB::Query::PrefetcherSpec::Recipe.order(:pk).to_a
+
+      prefetcher_1 = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(article_records),
+        relations: ["comments"],
+        using: nil
+      )
+      prefetcher_2 = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(recipe_records),
+        relations: ["comments"],
+        using: nil
+      )
+
+      expect_db_query_count(1) { prefetcher_1.execute }
+      expect_db_query_count(1) { prefetcher_2.execute }
+
+      article_records[0].comments.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [comment_1, comment_3]
+      article_records[1].comments.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [comment_2]
+      recipe_records[0].comments.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [comment_4, comment_6]
+      recipe_records[1].comments.result_cache.try(&.sort_by(&.pk!.to_s)).should eq [comment_5]
     end
 
     it "allows to prefetch a single reverse many-to-many relation" do

@@ -142,7 +142,8 @@ module Marten
         ) : Array(Model)
           records_to_decorate = Array(Model).new
 
-          if context.field.is_a?(Field::ManyToOne) || context.field.is_a?(Field::OneToOne)
+          if context.field.is_a?(Field::ManyToOne) || context.field.is_a?(Field::OneToOne) ||
+             context.field.is_a?(Field::Polymorphic)
             records_to_decorate += records_to_possibly_decorate
               .reject { |r| r.related_object_assigned?(context.field.relation_name) }
           elsif context.field.is_a?(Field::ManyToMany)
@@ -189,14 +190,12 @@ module Marten
         ) : Array(Model)
           prefetched_records = Array(Model).new
 
-          query_set = query_set_for_prefetched_relation(relation_name, context.field.related_model)
-
           if context.field.is_a?(Field::ManyToOne) || context.field.is_a?(Field::OneToOne)
             prefetched_records_pks = records_to_decorate.compact_map(&.get_field_value(context.field.id))
             return prefetched_records if prefetched_records_pks.empty?
 
             prefetched_records.concat(
-              query_set
+              query_set_for_prefetched_relation(relation_name, context.field.related_model)
                 .using(using)
                 .filter(pk__in: prefetched_records_pks)
                 .query
@@ -212,13 +211,48 @@ module Marten
                 context.field.id,
               )
             end
+          elsif (polymorphic_field = context.field).is_a?(Field::Polymorphic)
+            prefetched_records_pks_by_type = records_to_decorate
+              .each_with_object(Hash(String, Array(Field::Any)).new) do |record, acc|
+                record.get_field_value(polymorphic_field.type_field_id).try do |type|
+                  acc[type.to_s] ||= [] of Field::Any
+                  acc[type.to_s] << record.get_field_value(polymorphic_field.id_field_id)
+                end
+              end
+
+            prefetched_records_pks_by_type.each do |type, pks|
+              type_class = polymorphic_field.type_class(type)
+              prefetched_records.concat(
+                type_class.unscoped
+                  .using(using)
+                  .filter(pk__in: pks)
+                  .query
+                  .execute
+              )
+            end
+
+            prefetched_records_by_type_and_pk = prefetched_records.index_by { |r| [r.class.name, r.pk] }
+
+            records_to_decorate.each do |record_to_decorate|
+              raw_type = record_to_decorate.get_field_value(polymorphic_field.type_field_id)
+              next if raw_type.nil?
+
+              related_type_class = polymorphic_field.type_class(raw_type.to_s)
+              related_pk = record_to_decorate.get_field_value(polymorphic_field.id_field_id)
+              next if !prefetched_records_by_type_and_pk.has_key?([related_type_class.name, related_pk])
+
+              record_to_decorate.assign_related_object(
+                prefetched_records_by_type_and_pk[[related_type_class.name, related_pk]],
+                polymorphic_field.id,
+              )
+            end
           elsif (m2m_field = context.field).is_a?(Field::ManyToMany)
             prefetched_records.concat(
               prefetch_m2m_relation_records(
                 relation_name,
                 m2m_field,
                 records_to_decorate,
-                query_set,
+                query_set_for_prefetched_relation(relation_name, context.field.related_model),
                 true,
               )
             )
@@ -271,6 +305,34 @@ module Marten
               record_to_decorate.prefetched_records_cache[relation_name].concat(
                 prefetched_records.select do |r|
                   r.get_field_value(context.reverse_relation.field.id) == record_to_decorate.pk
+                end
+              )
+
+              qs = record_to_decorate.get_reverse_related_queryset(relation_name)
+              qs.assign_cached_records(record_to_decorate.prefetched_records_cache[relation_name])
+            end
+          elsif context.reverse_relation.polymorphic?
+            polymorphic_field = context.reverse_relation.field.as(Field::Polymorphic)
+
+            prefetched_records.concat(
+              query_set
+                .using(using)
+                .filter(
+                  Node.new(
+                    {
+                      "#{polymorphic_field.id_field_id}__in" => records_to_decorate.map(&.pk),
+                      polymorphic_field.type_field_id        => records_to_decorate.first.class.name,
+                    }))
+                .query
+                .execute
+            )
+
+            records_to_decorate.each do |record_to_decorate|
+              record_to_decorate.prefetched_records_cache[relation_name] = Array(Model).new
+              record_to_decorate.prefetched_records_cache[relation_name].concat(
+                prefetched_records.select do |r|
+                  r.get_field_value(polymorphic_field.id_field_id) == record_to_decorate.pk &&
+                    r.get_field_value(polymorphic_field.type_field_id) == record_to_decorate.class.name
                 end
               )
 

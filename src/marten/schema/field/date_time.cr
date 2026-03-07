@@ -47,7 +47,6 @@ module Marten
 
           localized_format_index = 0
           fallback_format_index = 0
-          format = I18n.t("marten.schema.field.date_time.input_formats.#{localized_format_index}")
 
           while result.nil?
             format = fetch_localized_date_time_format(localized_format_index)

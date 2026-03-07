@@ -116,6 +116,12 @@ describe Marten::DB::Field::Enum do
       field.to_db(:hello).should eq "hello"
     end
 
+    it "returns a string value if the initial value is an enum" do
+      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+
+      field.to_db(Marten::DB::Field::EnumSpec::Color::GREEN).should eq "GREEN"
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
 
@@ -206,6 +212,24 @@ describe Marten::DB::Field::Enum do
       article.category = nil
       article.category.should be_nil
       article.raw_category.should be_nil
+    end
+
+    it "accepts enum values in #set_field_value" do
+      article = Marten::DB::Field::EnumSpec::Article.new(title: "Hello")
+
+      article.set_field_value(:category, Marten::DB::Field::EnumSpec::Article::Category::BLOG)
+
+      article.category.should eq Marten::DB::Field::EnumSpec::Article::Category::BLOG
+      article.raw_category.should eq "BLOG"
+    end
+
+    it "accepts enum values in #set_field_values" do
+      article = Marten::DB::Field::EnumSpec::Article.new(title: "Hello")
+
+      article.set_field_values(category: Marten::DB::Field::EnumSpec::Article::Category::BLOG)
+
+      article.category.should eq Marten::DB::Field::EnumSpec::Article::Category::BLOG
+      article.raw_category.should eq "BLOG"
     end
   end
 end

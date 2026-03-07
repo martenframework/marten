@@ -4,14 +4,17 @@ module Marten
       # Represents an enum field.
       class Enum < Base
         @default : ::String?
+        @enum_type : ::Enum.class | Nil
 
         getter default
+        getter enum_type
 
         getter values
 
         def initialize(
           @id : ::String,
           enum_values : Array(::String),
+          @enum_type : ::Enum.class | Nil = nil,
           @primary_key = false,
           @blank = false,
           @null = false,
@@ -58,6 +61,11 @@ module Marten
             value
           when Symbol
             value.to_s
+          when ::Enum
+            if !enum_type.nil? && value.class != enum_type
+              raise_unexpected_field_value(value)
+            end
+            value.to_s
           else
             raise_unexpected_field_value(value)
           end
@@ -78,12 +86,13 @@ module Marten
 
           class ::{{ model_klass }}
             register_field(
-              {{ @type }}.new(
-                {{ field_id.stringify }},
-                {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
-                enum_values: {{ enum_klass }}.values.map(&.to_s),
+                {{ @type }}.new(
+                  {{ field_id.stringify }},
+                  {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
+                  enum_type: {{ enum_klass }},
+                  enum_values: {{ enum_klass }}.values.map(&.to_s),
+                )
               )
-            )
 
             {% if !model_klass.resolve.abstract? %}
               @[Marten::DB::Model::Table::FieldInstanceVariable(

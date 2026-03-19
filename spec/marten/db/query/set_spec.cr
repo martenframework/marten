@@ -3761,7 +3761,7 @@ describe Marten::DB::Query::Set do
 
       expect_raises(
         Marten::DB::Errors::UnexpectedFieldValue,
-        "Value '[\"BLOG\"]' cannot be used in update queries"
+        "Unexpected value received for field 'category': [\"BLOG\"]"
       ) do
         qset.update(category: ["BLOG"])
       end

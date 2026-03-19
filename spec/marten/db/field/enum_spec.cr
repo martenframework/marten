@@ -4,7 +4,7 @@ require "./enum_spec/**"
 describe Marten::DB::Field::Enum do
   describe "#default" do
     it "returns nil if no default value is set" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.default.should be_nil
     end
@@ -12,7 +12,7 @@ describe Marten::DB::Field::Enum do
     it "returns the default value if set" do
       field = Marten::DB::Field::Enum.new(
         "my_field",
-        enum_values: ["RED", "GREEN", "BLUE"],
+        enum_class: Marten::DB::Field::EnumSpec::Color,
         default: Marten::DB::Field::EnumSpec::Color::GREEN
       )
 
@@ -22,19 +22,19 @@ describe Marten::DB::Field::Enum do
 
   describe "#from_db" do
     it "returns a string if the value is a string" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.from_db("foo").should eq "foo"
     end
 
     it "returns nil if the value is nil" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.from_db(nil).should be_nil
     end
 
     it "raises UnexpectedFieldValue if the value is not supported" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
         field.from_db(true)
@@ -44,7 +44,7 @@ describe Marten::DB::Field::Enum do
 
   describe "#from_db_result_set" do
     it "is able to read an string value from a DB result set" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       Marten::DB::Connection.default.open do |db|
         db.query("SELECT 'hello'") do |rs|
@@ -58,7 +58,7 @@ describe Marten::DB::Field::Enum do
     end
 
     it "is able to read a null value from a DB result set" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       Marten::DB::Connection.default.open do |db|
         db.query("SELECT NULL") do |rs|
@@ -72,7 +72,11 @@ describe Marten::DB::Field::Enum do
 
   describe "#to_column" do
     it "returns the expected column" do
-      field = Marten::DB::Field::Enum.new("my_field", db_column: "my_field_col", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new(
+        "my_field",
+        db_column: "my_field_col",
+        enum_class: Marten::DB::Field::EnumSpec::Color
+      )
 
       column = field.to_column
       column.should be_a Marten::DB::Management::Column::Enum
@@ -88,7 +92,7 @@ describe Marten::DB::Field::Enum do
     it "properly forwards the default value if applicable" do
       field = Marten::DB::Field::Enum.new(
         "my_field",
-        enum_values: ["RED", "GREEN", "BLUE"],
+        enum_class: Marten::DB::Field::EnumSpec::Color,
         default: Marten::DB::Field::EnumSpec::Color::GREEN
       )
 
@@ -99,31 +103,39 @@ describe Marten::DB::Field::Enum do
 
   describe "#to_db" do
     it "returns nil if the value is nil" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.to_db(nil).should be_nil
     end
 
     it "returns a string value if the initial value is a string" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.to_db("hello").should eq "hello"
     end
 
     it "returns a string value if the initial value is a symbol" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.to_db(:hello).should eq "hello"
     end
 
     it "returns a string value if the initial value is an enum" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.to_db(Marten::DB::Field::EnumSpec::Color::GREEN).should eq "GREEN"
     end
 
+    it "raises UnexpectedFieldValue if the enum type is invalid" do
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
+
+      expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
+        field.to_db(Marten::DB::Field::EnumSpec::OtherColor::GREEN)
+      end
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
         field.to_db(["foo", "bar"])
@@ -133,7 +145,7 @@ describe Marten::DB::Field::Enum do
 
   describe "#values" do
     it "returns the enum values" do
-      field = Marten::DB::Field::Enum.new("my_field", enum_values: ["RED", "GREEN", "BLUE"])
+      field = Marten::DB::Field::Enum.new("my_field", enum_class: Marten::DB::Field::EnumSpec::Color)
 
       field.values.should eq ["RED", "GREEN", "BLUE"]
     end
@@ -236,6 +248,12 @@ end
 
 module Marten::DB::Field::EnumSpec
   enum Color
+    RED
+    GREEN
+    BLUE
+  end
+
+  enum OtherColor
     RED
     GREEN
     BLUE

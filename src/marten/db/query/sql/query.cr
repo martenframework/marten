@@ -458,8 +458,21 @@ module Marten
           end
 
           def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))
+            internal_update_with(values.transform_keys(&.to_s))
+          end
+
+          def update_with(values : Hash(String | Symbol, Field::Any | DB::Model | EnumType)) forall EnumType
+            {% unless EnumType <= ::Enum %}
+              {% raise "Query#update_with only accepts field values, model instances, and enum values" %}
+            {% end %}
+
+            internal_update_with(values.transform_keys(&.to_s))
+          end
+
+          # :nodoc:
+          def internal_update_with(values : Hash(String, V)) forall V
             values_to_update = Hash(String, ::DB::Any).new
-            related_values_to_update = Hash(DB::Model.class, Hash(String | Symbol, Field::Any | DB::Model)).new
+            related_values_to_update = Hash(DB::Model.class, Hash(String, V)).new
 
             values.each do |name, value|
               field_context = get_field_context(name, Model)
@@ -470,14 +483,13 @@ module Marten
               end
 
               if field_context.model == Model
-                values_to_update[field_context.field.db_column!] = case value
-                                                                   when Field::Any
-                                                                     field_context.field.to_db(value)
-                                                                   when DB::Model
+                values_to_update[field_context.field.db_column!] = if value.is_a?(DB::Model)
                                                                      Model.pk_field.to_db(value.pk)
+                                                                   else
+                                                                     field_context.field.to_db(value)
                                                                    end
               else
-                related_values_to_update[field_context.model] ||= Hash(String | Symbol, Field::Any | DB::Model).new
+                related_values_to_update[field_context.model] ||= Hash(String, V).new
                 related_values_to_update[field_context.model][name] = value
               end
             end
@@ -514,7 +526,7 @@ module Marten
                 related_values_to_update.each do |model, v|
                   related_model_query = model._base_query
                   related_model_query.add_query_node(Node.new(pk__in: related_pks))
-                  related_rows_affected = related_model_query.update_with(v)
+                  related_rows_affected = related_model_query.internal_update_with(v)
 
                   # Only return the number of rows affected by related model updates if no local columns were updated.
                   rows_affected = related_rows_affected if rows_affected.nil?

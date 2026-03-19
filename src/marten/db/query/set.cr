@@ -1549,22 +1549,13 @@ module Marten
         # are updated through the use of this method won't be validated, and no callbacks will be executed for them
         # either.
         def update(values : Hash | NamedTuple)
-          update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
-          values.each do |k, v|
-            case v
-            when Field::Any, DB::Model
-              update_hash[k.to_s] = v
-            when ::Enum
-              update_hash[k.to_s] = normalize_enum_update_value(k, v)
-            else
-              raise Errors::UnexpectedFieldValue.new(
-                "Value '#{v.inspect}' cannot be used in update queries"
-              )
-            end
-          end
-
           qs = clone
-          updated_count = qs.query.update_with(update_hash)
+          updated_count = case values
+                          when Hash
+                            qs.query.internal_update_with(values.transform_keys(&.to_s))
+                          when NamedTuple
+                            qs.query.internal_update_with(values.to_h.transform_keys(&.to_s))
+                          end
 
           reset_result_cache
 
@@ -1688,17 +1679,6 @@ module Marten
             prefetched_relations: prefetched_relations,
             custom_query_sets: custom_query_sets
           )
-        end
-
-        private def normalize_enum_update_value(field_name : String | Symbol, value : ::Enum) : Field::Any
-          field = begin
-            M.get_field(field_name)
-          rescue Errors::UnknownField
-            nil
-          end
-          return value.to_s if field.nil? || !field.is_a?(Field::Enum)
-
-          field.as(Field::Enum).to_db(value).as(Field::Any)
         end
 
         protected def fetch

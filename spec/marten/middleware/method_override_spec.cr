@@ -1,5 +1,8 @@
 require "./spec_helper"
 
+MULTIPART_BOUNDARY     = "---------------------------735323031399963166993862150"
+MULTIPART_CONTENT_TYPE = "multipart/form-data; boundary=#{MULTIPART_BOUNDARY}"
+
 describe Marten::Middleware::MethodOverride do
   describe "#call" do
     it "does not override the request method if _method is not present" do
@@ -168,7 +171,7 @@ describe Marten::Middleware::MethodOverride do
           resource: "/test/xyz",
           headers: HTTP::Headers{
             "Host"         => "example.com",
-            "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
+            "Content-Type" => MULTIPART_CONTENT_TYPE,
           },
           body: <<-FORMDATA
             -----------------------------735323031399963166993862150
@@ -197,7 +200,7 @@ describe Marten::Middleware::MethodOverride do
           resource: "/test/xyz",
           headers: HTTP::Headers{
             "Host"         => "example.com",
-            "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
+            "Content-Type" => MULTIPART_CONTENT_TYPE,
           },
           body: <<-FORMDATA
             -----------------------------735323031399963166993862150
@@ -226,7 +229,7 @@ describe Marten::Middleware::MethodOverride do
           resource: "/test/xyz",
           headers: HTTP::Headers{
             "Host"         => "example.com",
-            "Content-Type" => "multipart/form-data; boundary=---------------------------735323031399963166993862150",
+            "Content-Type" => MULTIPART_CONTENT_TYPE,
           },
           body: <<-FORMDATA
             -----------------------------735323031399963166993862150
@@ -247,6 +250,49 @@ describe Marten::Middleware::MethodOverride do
       )
 
       request.delete?.should_not be_true
+    end
+
+    it "does not fail for an empty multipart/form-data body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => MULTIPART_CONTENT_TYPE,
+          },
+        )
+      )
+
+      middleware = Marten::Middleware::MethodOverride.new
+      middleware.call(
+        request,
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      request.post?.should be_true
+    end
+
+    it "falls back to the override header for an empty multipart/form-data body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"                   => "example.com",
+            "Content-Type"           => MULTIPART_CONTENT_TYPE,
+            "X-Http-Method-Override" => "DELETE",
+          },
+        )
+      )
+
+      middleware = Marten::Middleware::MethodOverride.new
+      middleware.call(
+        request,
+        -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
+      )
+
+      request.delete?.should be_true
     end
   end
 end

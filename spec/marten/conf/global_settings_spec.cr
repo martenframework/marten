@@ -632,10 +632,31 @@ describe Marten::Conf::GlobalSettings do
   end
 
   describe "#secret_key=" do
-    it "allows to set the app secret key" do
+    it "allows to set the secret key of the application" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.secret_key = "not_secret"
-      global_settings.secret_key.should eq "not_secret"
+      global_settings.secret_key = "secret"
+      global_settings.secret_key.should eq "secret"
+    end
+  end
+
+  describe "#socket" do
+    it "returns nil by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.socket.should be_nil
+    end
+
+    it "returns the configured socket value" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.socket = "/tmp/marten.sock"
+      global_settings.socket.should eq "/tmp/marten.sock"
+    end
+  end
+
+  describe "#socket=" do
+    it "allows to set the socket of the application" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.socket = "/tmp/marten.sock"
+      global_settings.socket.should eq "/tmp/marten.sock"
     end
   end
 

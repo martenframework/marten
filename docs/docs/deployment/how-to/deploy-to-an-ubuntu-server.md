@@ -255,13 +255,15 @@ server {
     proxy_buffering off;
 
     proxy_pass http://localhost:<yourport>;
+    # Alternatively, if you configured a Unix socket in your Marten settings:
+    # proxy_pass http://unix:/run/<yourapp>/server.sock;
   }
 }
 ```
 
 Don't forget to replace the `<yourapp>`, `<yourdomain>`, `<yourassetspath>`, `<yourmediapath>`, and `<yourport>` placeholders with the right values and, when ready, save the file using `Ctrl-X` and `y`.
 
-As you can see, the reverse proxy will serve our application on the HTTP port 80 and is configured to target our Marten server host (`localhost`) and port. Because of this, you should ensure that your Marten server is not using the HTTP port 80 (instead it could use something like 8080 or 8000 for example).
+As you can see, the reverse proxy will serve our application on the HTTP port 80 and is configured to target our Marten server host (`localhost`) and port. Because of this, you should ensure that your Marten server is not using the HTTP port 80 (instead it could use something like 8080 or 8000 for example). Alternatively, you can configure your Marten server to listen on a Unix socket by setting the [`socket`](../../development/reference/settings.md#socket) setting and update the `proxy_pass` directive accordingly.
 
 You should also note that the above configuration defines two additional locations in order to serve assets (`/assets/`) and media files (`/media/`). This makes the assumption that those files are _locally_ available on the considered server. As such you should remove these lines if this is not applicable to your use case or if these files are uploaded somewhere else (eg. in a cloud bucket).
 

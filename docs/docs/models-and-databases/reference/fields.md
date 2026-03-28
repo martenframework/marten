@@ -516,3 +516,53 @@ The default value is `nil`, which means that no reverse relation is defined on t
 #### `on_delete`
 
 Same as [the similar option for the `#many_to_one` field](#on_delete).
+
+### `polymorphic`
+
+A `polymorphic` field allows defining a polymorphic relationship. This special field type requires the use of a special `to` argument in order to specify the model classes to which the current model can be related.
+
+For example, a `Comment` model could have a polymorphic field towards an `Article` or a `Recipe` model. In such case, a `Comment` record could be associated with an `Article` or a `Recipe` record:
+
+```crystal
+class Article < Marten::Model
+  # ...
+end
+
+class Recipe < Marten::Model
+  # ...
+end
+
+class Comment < Marten::Model
+  # ...
+  field :target, :polymorphic, to: [Article, Recipe]
+end
+```
+
+In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `to`
+
+The `to` argument **is required** and allows to specify the model classes that can be related to the model where the `polymorphic` field is defined.
+
+#### `related`
+
+The `related` argument allows defining the name of the reverse (or backward) relation on the targeted model. If we consider the previous example, it could be possible to define a `comments` backward relation in order to let `Article` and `Recipe` records access their related `Comment` records:
+
+```crystal
+class Article < Marten::Model
+  # ...
+end
+
+class Recipe < Marten::Model
+  # ...
+end
+
+class Comment < Marten::Model
+  # ...
+  field :target, :polymorphic, to: [Article, Recipe], related: :comments
+end
+```
+
+When the `related` argument is used, a method will be automatically created on the associated models by using the chosen argument's value. For example, this means that all the `Comment` records associated with a specific `Article` or `Recipe` record could be accessed through the use of the `Article#comments` or `Recipe#comments` methods in the previous snippet.
+
+The default value is `nil`, which means that no reverse relation is defined on the associated models by default.

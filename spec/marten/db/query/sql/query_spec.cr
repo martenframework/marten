@@ -960,6 +960,30 @@ describe Marten::DB::Query::SQL::Query do
       end
     end
 
+    it "raises if the passed relation is a many-to-many relation" do
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Unable to resolve 'tags' as a relation field " \
+        "('tags' is a many-to-many relation and cannot be used in this context)."
+      ) do
+        query.add_selected_join("tags")
+      end
+    end
+
+    it "raises if the passed relation is a polymorphic relation" do
+      query = Marten::DB::Query::SQL::Query(Comment).new
+
+      expect_raises(
+        Marten::DB::Errors::InvalidField,
+        "Unable to resolve 'target' as a relation field " \
+        "('target' is a polymorphic relation and cannot be used in this context)."
+      ) do
+        query.add_selected_join("target")
+      end
+    end
+
     context "with multi table inheritance" do
       it "allows to specify a relation that targets a top-level parent model" do
         address = Marten::DB::Query::SQL::QuerySpec::Address.create!(street: "Street 1")

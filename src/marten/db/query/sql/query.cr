@@ -1112,6 +1112,7 @@ module Marten
                 allow_many: allow_many,
                 allow_polymorphic: allow_polymorphic,
                 only_relations: true,
+                additional_context: "'#{raw_relation}' is a many-to-many relation and cannot be used in this context",
               )
             end
 
@@ -1123,6 +1124,7 @@ module Marten
                 allow_many: allow_many,
                 allow_polymorphic: allow_polymorphic,
                 only_relations: true,
+                additional_context: "'#{raw_relation}' is a polymorphic relation and cannot be used in this context",
               )
             end
 
@@ -1191,6 +1193,7 @@ module Marten
             allow_many = true,
             allow_polymorphic = true,
             only_relations = false,
+            additional_context = nil,
           )
             fields = model.fields
             fields = fields.reject(Field::ManyToMany) if !allow_many
@@ -1200,9 +1203,11 @@ module Marten
             choices = fields.map(&.id).join(", ")
             choices_string = choices.empty? ? nil : "Valid choices are: #{choices}."
 
+            parenthesis_content = additional_context.nil? ? nil : " (#{additional_context})"
+
             raise Errors::InvalidField.new(
               [
-                "Unable to resolve '#{raw_field}' as a #{field_type}.",
+                "Unable to resolve '#{raw_field}' as a #{field_type}#{parenthesis_content}.",
                 choices_string,
               ].compact.join(" ")
             )

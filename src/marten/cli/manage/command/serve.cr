@@ -100,10 +100,12 @@ module Marten
           private def open_server
             sleep(Time::Span.new(nanoseconds: 500_000_000))
 
-            Process.run(
-              generate_open_command("http://#{host || Marten.settings.host}:#{port || Marten.settings.port}"),
-              shell: true,
-            )
+            unless Marten.settings.socket
+              Process.run(
+                generate_open_command("http://#{host || Marten.settings.host}:#{port || Marten.settings.port}"),
+                shell: true,
+              )
+            end
 
             self.already_opened = true
           end

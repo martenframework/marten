@@ -12,6 +12,7 @@ module Marten
       @log_backend : ::Log::Backend | Nil
       @request_max_parameters : Nil | Int32
       @root_path : String?
+      @socket : String?
       @target_env : String?
       @trailing_slash : TrailingSlash
       @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
@@ -92,6 +93,9 @@ module Marten
 
       # Returns the secret key of the application.
       getter secret_key
+
+      # Returns the socket the HTTP server running the application will be listening on.
+      getter socket
 
       # Returns the default time zone used by the application when it comes to display date times.
       getter time_zone
@@ -185,6 +189,9 @@ module Marten
       # The secret key will be used provide cryptographic signing. It should be unique and unpredictable.
       setter secret_key
 
+      # Allows to set the socket the HTTP server running the application will be listening on.
+      setter socket
+
       # Allows to set the default time zone used by the application when it comes to display date times.
       setter time_zone
 
@@ -265,6 +272,7 @@ module Marten
         @referrer_policy = "same-origin"
         @request_max_parameters = 1000
         @secret_key = ""
+        @socket = nil
         @time_zone = Time::Location.load("UTC")
         @trailing_slash = :do_nothing
         @unsupported_http_method_strategy = :deny

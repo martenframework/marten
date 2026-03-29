@@ -194,6 +194,14 @@ The secret key should be set to a unique and unpredictable string value. The sec
 The `secret_key` setting value **must** be kept secret. You should never commit this setting value to source control (instead, consider loading it from environment variables for example).
 :::
 
+### `socket`
+
+Default: `nil`
+
+The Unix socket path the HTTP server running the application will be listening on.
+
+When this setting is configured, the server will bind to the specified Unix socket instead of binding to a TCP port. In this case, the `host` and `port` settings are ignored. This is particularly useful when deploying a Marten application behind a reverse proxy like Nginx or Caddy on the same machine, as it provides better performance and security compared to TCP loopback.
+
 ### `time_zone`
 
 Default: `Time::Location.load("UTC")`

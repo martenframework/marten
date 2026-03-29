@@ -22,9 +22,13 @@ module Marten
       @@instance ||= ::HTTP::Server.new(handlers)
     end
 
-    # Setups the server (TCP binding).
+    # Setups the server (TCP or Unix socket binding).
     def self.setup : Nil
-      instance.bind_tcp(Marten.settings.host, Marten.settings.port, Marten.settings.port_reuse)
+      if socket = Marten.settings.socket
+        instance.bind_unix(socket)
+      else
+        instance.bind_tcp(Marten.settings.host, Marten.settings.port, Marten.settings.port_reuse)
+      end
     end
 
     # Starts the server.
@@ -35,6 +39,11 @@ module Marten
     # Stops the server.
     def self.stop : Nil
       instance.close
+    end
+
+    # :nodoc:
+    def self.reset_instance : Nil
+      @@instance = nil
     end
   end
 end

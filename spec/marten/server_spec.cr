@@ -26,4 +26,30 @@ describe Marten::Server do
       end
     end
   end
+
+  describe "#setup" do
+    it "binds to TCP by default" do
+      with_overridden_setting("host", "127.0.0.1") do
+        with_overridden_setting("port", 8080) do
+          Marten::Server.setup
+          Marten::Server.addresses.first.should eq "http://127.0.0.1:8080"
+        ensure
+          Marten::Server.instance.close
+          Marten::Server.reset_instance
+        end
+      end
+    end
+
+    it "binds to Unix socket when socket setting is configured" do
+      socket_path = "/tmp/marten_test.sock"
+      with_overridden_setting("socket", socket_path, nilable: true) do
+        Marten::Server.setup
+        Marten::Server.addresses.first.should eq "http://#{socket_path}"
+      ensure
+        Marten::Server.instance.close
+        Marten::Server.reset_instance
+        File.delete(socket_path) if File.exists?(socket_path)
+      end
+    end
+  end
 end

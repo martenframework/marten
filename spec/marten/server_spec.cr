@@ -40,9 +40,9 @@ describe Marten::Server do
 
     it "binds to TCP by default" do
       with_overridden_setting("host", "127.0.0.1") do
-        with_overridden_setting("port", 8080) do
+        with_overridden_setting("port", 8081) do
           Marten::Server.setup
-          Marten::Server.addresses.first.should eq "http://127.0.0.1:8080"
+          Marten::Server.addresses.first.should eq "http://127.0.0.1:8081"
         end
       end
     end

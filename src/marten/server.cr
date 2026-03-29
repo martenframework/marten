@@ -40,10 +40,5 @@ module Marten
     def self.stop : Nil
       instance.close
     end
-
-    # :nodoc:
-    def self.reset_instance : Nil
-      @@instance = nil
-    end
   end
 end

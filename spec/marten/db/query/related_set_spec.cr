@@ -58,6 +58,21 @@ describe Marten::DB::Query::RelatedSet do
       new_post.author.should eq user
       new_post.title.should eq "Post"
     end
+
+    it "initializes a new record with the expected fields set when a polymorphic relation is used" do
+      user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      post = Post.create!(author: user, title: "Post")
+
+      qset = Marten::DB::Query::RelatedSet(Comment).new(post, "target")
+
+      new_comment = qset.build(text: "Comment")
+
+      new_comment.valid?.should be_true
+      new_comment.persisted?.should be_false
+      new_comment.target.should eq post
+      new_comment.target_type.should eq "Post"
+      new_comment.target_id.should eq post.id!
+    end
   end
 
   describe "#create" do

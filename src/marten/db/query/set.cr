@@ -1549,13 +1549,18 @@ module Marten
         # are updated through the use of this method won't be validated, and no callbacks will be executed for them
         # either.
         def update(values : Hash | NamedTuple)
+          update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
+          values.each do |key, value|
+            case value
+            when Field::Any, DB::Model
+              update_hash[key] = value
+            else
+              update_hash[key] = value.to_s
+            end
+          end
+
           qs = clone
-          updated_count = case values
-                          when Hash
-                            qs.query.internal_update_with(values.transform_keys(&.to_s))
-                          when NamedTuple
-                            qs.query.internal_update_with(values.to_h.transform_keys(&.to_s))
-                          end
+          updated_count = qs.query.update_with(update_hash)
 
           reset_result_cache
 

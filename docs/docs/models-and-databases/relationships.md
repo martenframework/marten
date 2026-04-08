@@ -409,6 +409,114 @@ tag_2.articles.to_a # => [#<Article:0x1036e3ee0 id: 1, title: "First article">,
 tag_2.articles.filter(title: "First article").to_a # => [#<Article:0x1036e3ee0 id: 1, title: "First article">]
 ```
 
+## Polymorphic relationships
+
+Polymorphic relationships can be defined through the use of [`polymorphic`](./reference/fields.md#polymorphic) fields. Those are useful when you want to store a reference to a record whose model can vary among a predefined set of possible types.
+
+This special field type requires the utilization of the [`to`](./reference/fields.md#to-3) argument, allowing to explicitly define the model classes that can be related to the model where the `polymorphic` field is defined. For example, a `Comment` model could have a polymorphic field towards an `Article` or a `Recipe` model. In such case, a `Comment` record could be associated with an `Article` or a `Recipe` record, and each of these models could have many associated `Comment` records:
+
+```crystal
+class Article < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 128
+end
+
+class Recipe < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :title, :string, max_size: 128
+end
+
+class Comment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  // highlight-next-line
+  field :target, :polymorphic, to: [Article, Recipe]
+  field :text, :text
+end
+```
+
+Under the hood, the framework keeps track of both the target object's primary key and its model type, allowing it to resolve the relationship dynamically when accessed. This means that polymorphic fields contribute two columns to the model table: `<field_name>_type` and `<field_name>_id`, where `field_name` is the name of the polymorphic field. The `_type` column is used to store the type of the related record (the class name of the related record), and the `_id` column is used to store the ID of the related record. In the previous example, the `Comment` model would have two columns named `target_type` and `target_id` because of the `target` polymorphic field.
+
+### Interacting with related records
+
+Marten automatically generates getters and setters for polymorphic fields, allowing to interact with the field's value. On top of that, Marten also generates a set of methods allowing to access the related record based on its type as well as numerous helper methods.
+
+For example:
+
+```crystal
+# Create an article
+article = Article.create!(title: "This is an article")
+
+# Create a recipe
+recipe = Recipe.create!(title: "This is a recipe")
+
+# Create a comment
+comment = Comment.create!(text: "This is a comment", target: article)
+
+# Regular getter methods
+comment.target      # => #<Article:0x1036e3ee0 id: 1, title: "This is an article">
+comment.target_type # => "Article"
+comment.target_id   # => 1
+
+# Type class getter method
+comment.target_class  # => Article (or nil if no related record is set)
+comment.target_class! # => Article (or raise if no related record is set)
+
+# Predicate helper methods
+comment.article_target? # => true
+comment.recipe_target?  # => false
+
+# Typed getters methods
+comment.article_target  # => Returns the associated Recipe record if the targeted record is indeed a Recipe record (or nil otherwise)
+comment.article_target! # => Returns the associated Recipe record if the targeted record is indeed a Recipe record (or raise otherwise)
+
+# Type-specific model scopes (generated based on the specified type classes)
+Comment.with_article_target # => Returns all the comments associated with Article records
+Comment.with_recipe_target  # => Returns all the comments associated with Recipe records
+```
+
+### Backward relations
+
+By default, [`polymorphic`](./reference/fields.md#polymorphic) fields do not establish a backward relation. This means that you cannot directly retrieve records that target a specific related record starting from the related record itself. For instance, by default, it is not possible to retrieve all the `Comment` records associated with a specific `Article` or `Recipe` record.
+
+To enable this capability, you need to make use of the [`related`](./reference/fields.md#related-3) argument when defining your  [`polymorphic`](./reference/fields.md#polymorphic) field. For instance, we could modify the previous model definitions as follows in order to define a `comments` backward relation and to let `Article` and `Recipe` records expose their related `Comment` records:
+
+```crystal
+class Comment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  // highlight-next-line
+  field :target, :polymorphic, to: [Article, Recipe], related: :comments
+  field :text, :text
+end
+```
+
+When the [`related`](./reference/fields.md#related-3) argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that all the `Comment` records associated with a specific `Article` or `Recipe` record will be accessible through the use of the `Article#comments` or `Recipe#comments` methods:
+
+```crystal
+# Create an article
+article = Article.create!(title: "This is an article")
+
+# Create a recipe
+recipe = Recipe.create!(title: "This is a recipe")
+
+# Create comments
+Comment.create!(text: "This is a comment", target: article)
+Comment.create!(text: "This is a comment", target: recipe)
+
+# Get the article's comments
+article.comments.to_a # => [#<Comment:0x1036e3ee0 id: 1, text: "This is a comment">]
+
+# Get the recipe's comments
+recipe.comments.to_a # => [#<Comment:0x1036e3ee1 id: 2, text: "This is a comment">]
+```
+
+:::tip
+The method generated for the backward relation returns a [query set](./queries.md) that you can use to further filter the list of records. For example:
+
+```crystal
+article.comments.filter(text__startswith: "This is")
+```
+:::
+
 ## Advanced topics
 
 ### Recursive relationships

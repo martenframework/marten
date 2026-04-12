@@ -1711,6 +1711,24 @@ describe Marten::DB::Model::Querying do
       user_3.last_name.should eq "Updated"
       user_3.is_admin.should be_true
     end
+
+    describe "with enum fields" do
+      with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+      it "allows to update an enum field using an enum value" do
+        event = Marten::DB::Model::QueryingSpec::AuditEvent.create!(
+          name: "Login",
+          kind: Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGOUT
+        )
+
+        Marten::DB::Model::QueryingSpec::AuditEvent.update(
+          kind: Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGIN
+        )
+
+        event.reload
+        event.kind.should eq Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGIN
+      end
+    end
   end
 
   describe "::update_or_create" do

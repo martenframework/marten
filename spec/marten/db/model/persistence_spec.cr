@@ -1025,6 +1025,17 @@ describe Marten::DB::Model::Persistence do
       object.email.should eq "test1@example.com"
     end
 
+    it "allows to update enum fields using enum values" do
+      object = Marten::DB::Model::PersistenceSpec::EnumArticle.create!(
+        title: "Hello, world!",
+        category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::NEWS
+      )
+      object.update(category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG).should be_true
+
+      object.reload
+      object.category.should eq Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG
+    end
+
     it "allows to update an existing object with attributes expressed as a hash" do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.update({"username" => "test1", "email" => "test1@example.com"}).should be_true
@@ -1304,6 +1315,17 @@ describe Marten::DB::Model::Persistence do
       object.email.should eq "test1@example.com"
     end
 
+    it "allows to update enum fields using enum values" do
+      object = Marten::DB::Model::PersistenceSpec::EnumArticle.create!(
+        title: "Hello, world!",
+        category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::NEWS
+      )
+      object.update!(category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG).should be_true
+
+      object.reload
+      object.category.should eq Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG
+    end
+
     it "allows to update an existing object with attributes expressed as a hash" do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.update!({"username" => "test1", "email" => "test1@example.com"}).should be_true
@@ -1553,6 +1575,17 @@ describe Marten::DB::Model::Persistence do
       object.email.should eq "test1@example.com"
     end
 
+    it "allows to update enum fields using enum values" do
+      object = Marten::DB::Model::PersistenceSpec::EnumArticle.create!(
+        title: "Hello, world!",
+        category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::NEWS
+      )
+      object.update_columns(category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG).should be_true
+
+      object.reload
+      object.category.should eq Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG
+    end
+
     it "allows to update only specific fields without affecting others" do
       object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
       object.update_columns(username: "updated_username").should be_true
@@ -1609,6 +1642,17 @@ describe Marten::DB::Model::Persistence do
       object.reload
       object.username.should eq "test1"
       object.email.should eq "test1@example.com"
+    end
+
+    it "allows to update enum fields using enum values" do
+      object = Marten::DB::Model::PersistenceSpec::EnumArticle.create!(
+        title: "Hello, world!",
+        category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::NEWS
+      )
+      object.update_columns!(category: Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG).should be_true
+
+      object.reload
+      object.category.should eq Marten::DB::Model::PersistenceSpec::EnumArticle::Category::BLOG
     end
 
     it "allows to update only specific fields without affecting others" do

@@ -597,9 +597,14 @@ module Marten
         #
         # If the passed `field_name` doesn't match any existing field, a `Marten::DB::Errors::UnknownField` exception
         # will be raised.
-        def set_field_value(field_name : String | Symbol, value : Field::Any | Model)
+        def set_field_value(field_name : String | Symbol, value : Field::Any | Model | ::Enum)
           sanitized_values = Hash(String, Field::Any | Model).new
-          sanitized_values[field_name.to_s] = value
+          sanitized_values[field_name.to_s] = case value
+                                              when Field::Any, Model
+                                                value
+                                              when ::Enum
+                                                value.to_s
+                                              end
           assign_field_values(sanitized_values)
         end
 
@@ -615,8 +620,16 @@ module Marten
         def set_field_values(values : Hash | NamedTuple) # ameba:disable Naming/AccessorMethodName
           sanitized_values = Hash(String, Field::Any | Model).new
           values.each do |key, value|
-            next unless value.is_a?(Field::Any | Model)
-            sanitized_values[key.to_s] = value
+            sanitized_value = case value
+                              when Field::Any, Model
+                                value
+                              when ::Enum
+                                value.to_s
+                              else
+                                next
+                              end
+
+            sanitized_values[key.to_s] = sanitized_value
           end
 
           assign_field_values(sanitized_values)

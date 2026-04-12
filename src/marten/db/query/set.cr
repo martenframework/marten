@@ -1550,7 +1550,14 @@ module Marten
         # either.
         def update(values : Hash | NamedTuple)
           update_hash = Hash(String | Symbol, Field::Any | DB::Model).new
-          update_hash.merge!(values.to_h)
+          values.each do |key, value|
+            case value
+            when Field::Any, DB::Model
+              update_hash[key] = value
+            else
+              update_hash[key] = value.to_s
+            end
+          end
 
           qs = clone
           updated_count = qs.query.update_with(update_hash)

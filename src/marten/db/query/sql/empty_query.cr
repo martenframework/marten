@@ -24,7 +24,6 @@ module Marten
           def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))
             0_i64
           end
-
         end
       end
     end

@@ -3739,7 +3739,6 @@ describe Marten::DB::Query::Set do
       article_1.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
       article_2.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
     end
-
   end
 
   describe "#update_or_create" do

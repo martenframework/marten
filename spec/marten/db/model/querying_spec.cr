@@ -1715,20 +1715,18 @@ describe Marten::DB::Model::Querying do
     describe "with enum fields" do
       with_installed_apps Marten::DB::Model::QueryingSpec::App
 
-      it "raises when a different enum type is provided for the enum field" do
+      it "allows to update an enum field using an enum value" do
         event = Marten::DB::Model::QueryingSpec::AuditEvent.create!(
           name: "Login",
           kind: Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGOUT
         )
 
-        expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
-          Marten::DB::Model::QueryingSpec::AuditEvent.update(
-            kind: Marten::DB::Model::QueryingSpec::AuditEvent::PermissionKind::LOGIN
-          )
-        end
+        Marten::DB::Model::QueryingSpec::AuditEvent.update(
+          kind: Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGIN
+        )
 
         event.reload
-        event.kind.should eq Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGOUT
+        event.kind.should eq Marten::DB::Model::QueryingSpec::AuditEvent::EventKind::LOGIN
       end
     end
   end

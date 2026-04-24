@@ -19,6 +19,29 @@ class CustomEmailingBackend < Marten::Emailing::Backend::Base
 end
 ```
 
+## Handling attachments
+
+If your backend supports attachments, you can iterate over [`#attachments`](pathname:///api/dev/Marten/Emailing/Email.html) in the `#deliver` implementation:
+
+```crystal
+class CustomEmailingBackend < Marten::Emailing::Backend::Base
+  def deliver(email : Email)
+    email.attachments.each do |attachment|
+      # attachment.filename
+      # attachment.mime_type
+      # attachment.content
+    end
+  end
+end
+```
+
+Each attachment exposes:
+
+* a `filename`
+* a `mime_type`
+* a `content` byte slice
+* a `size` in bytes
+
 ## Enabling the use of custom emailing backends
 
 Custom emailing backends can be used by assigning an instance of the corresponding class to the [`emailing.backend`](../../development/reference/settings.md#backend-1) setting.

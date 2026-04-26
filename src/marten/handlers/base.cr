@@ -239,6 +239,32 @@ module Marten
         end
       end
 
+      # Renders a template without the layout, context producers, or before_render callbacks.
+      #
+      # This is useful for returning HTML fragments (e.g. for HTMX responses) where the full
+      # page layout should not be included.
+      #
+      # ```
+      # def post
+      #   render_partial("shared/_item.html", context: {item: item}, status: 200)
+      # end
+      # ```
+      def render_partial(
+        template_name : String,
+        context : Hash | NamedTuple | Nil | Marten::Template::Context = nil,
+        content_type = HTTP::Response::DEFAULT_CONTENT_TYPE,
+        status : ::HTTP::Status | Int32 = 200,
+      )
+        ctx = Marten::Template::Context.new
+        ctx.merge(context) unless context.nil?
+
+        HTTP::Response.new(
+          content: Marten.templates.get_template(template_name).render(ctx),
+          content_type: content_type,
+          status: ::HTTP::Status.new(status).to_i
+        )
+      end
+
       # Returns an HTTP response generated from a content string, content type and status code.
       def respond(
         content = "",

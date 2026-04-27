@@ -13,7 +13,7 @@ describe Marten::DB::Query::SQL::Predicate::Second do
 
       for_postgresql do
         predicate.to_sql(Marten::DB::Connection.default).should eq(
-          {"EXTRACT(SECOND FROM table.created_at) = %s", [5_i64]}
+          {"FLOOR(EXTRACT(SECOND FROM table.created_at)) = %s", [5_i64]}
         )
       end
 
@@ -40,7 +40,7 @@ describe Marten::DB::Query::SQL::Predicate::Second do
 
       for_postgresql do
         predicate.to_sql(Marten::DB::Connection.default).should eq(
-          {"EXTRACT(SECOND FROM table.created_at) IN ( %s , %s )", [58_i64, 5_i64]}
+          {"FLOOR(EXTRACT(SECOND FROM table.created_at)) IN ( %s , %s )", [58_i64, 5_i64]}
         )
       end
 
@@ -67,7 +67,7 @@ describe Marten::DB::Query::SQL::Predicate::Second do
 
       for_postgresql do
         predicate.to_sql(Marten::DB::Connection.default).should eq(
-          {"EXTRACT(SECOND FROM table.created_at) IS NOT NULL", [] of ::DB::Any}
+          {"FLOOR(EXTRACT(SECOND FROM table.created_at)) IS NOT NULL", [] of ::DB::Any}
         )
       end
 

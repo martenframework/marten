@@ -118,6 +118,17 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
+    it "can add a raw filter containing a literal %s pattern and positional parameters" do
+      Tag.create!(name: "ruby", is_active: true)
+      tag_2 = Tag.create!(name: "crystal", is_active: true)
+      Tag.create!(name: "sapphire", is_active: true)
+
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.add_query_node(Marten::DB::Query::Node.new("name LIKE '%s%' AND name != ?", ["sapphire"] of ::DB::Any))
+      query.count.should eq 1
+      query.execute.should eq [tag_2]
+    end
+
     it "can add a new filter to an already filtered query" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)

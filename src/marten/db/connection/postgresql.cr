@@ -133,7 +133,7 @@ module Marten
           "day"         => "EXTRACT(DAY FROM %s)",
           "hour"        => "EXTRACT(HOUR FROM %s)",
           "minute"      => "EXTRACT(MINUTE FROM %s)",
-          "second"      => "EXTRACT(SECOND FROM %s)",
+          "second"      => "FLOOR(EXTRACT(SECOND FROM %s))",
         }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {

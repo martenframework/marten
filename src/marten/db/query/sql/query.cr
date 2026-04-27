@@ -1025,20 +1025,7 @@ module Marten
           private def filtering_clause_and_parameters(predicate_node, offset = 0)
             if !predicate_node.nil?
               clause, parameters = predicate_node.to_sql(connection)
-              clause_parts = clause.split("%s")
-
-              if parameters.size != clause_parts.size - 1
-                raise Errors::InvalidField.new(
-                  "The number of parameters in the predicate node does not match the number of placeholders"
-                )
-              end
-
-              clause = String.build do |io|
-                clause_parts.each_with_index do |part, i|
-                  io << part
-                  io << connection.parameter_id_for_ordered_argument(offset + i + 1) if i < parameters.size
-                end
-              end
+              clause = replace_ordered_placeholders(clause, parameters.size, offset)
             else
               clause = nil
               parameters = nil
@@ -1195,6 +1182,49 @@ module Marten
             )
           end
 
+          private def replace_ordered_placeholders(clause : String, parameters_size : Int32, offset : Int32) : String
+            parameters_count = 0
+            chars = clause.chars
+
+            replaced_clause = String.build do |io|
+              i = 0
+
+              while i < chars.size
+                if chars[i] == '%'
+                  case chars[i + 1]?
+                  when '%'
+                    io << '%'
+                    i += 2
+                  when 's'
+                    if parameters_count >= parameters_size
+                      raise Errors::InvalidField.new(
+                        "The number of parameters in the predicate node does not match the number of placeholders"
+                      )
+                    end
+
+                    parameters_count += 1
+                    io << connection.parameter_id_for_ordered_argument(offset + parameters_count)
+                    i += 2
+                  else
+                    io << chars[i]
+                    i += 1
+                  end
+                else
+                  io << chars[i]
+                  i += 1
+                end
+              end
+            end
+
+            if parameters_count != parameters_size
+              raise Errors::InvalidField.new(
+                "The number of parameters in the predicate node does not match the number of placeholders"
+              )
+            end
+
+            replaced_clause
+          end
+
           private def raise_invalid_field_error_with_valid_choices(
             raw_field,
             model,
@@ -1276,9 +1306,9 @@ module Marten
 
                 begin
                   field_path = verify_field(raw_field)
-                rescue nested_error : Errors::InvalidField
+                rescue error : Errors::InvalidField
                   chained_time_part_lookup = parse_chained_time_part_lookup(raw_query)
-                  raise nested_error if chained_time_part_lookup.nil?
+                  raise error if chained_time_part_lookup.nil?
 
                   field_path = verify_field(chained_time_part_lookup.not_nil![:raw_field])
                   raw_predicate = chained_time_part_lookup.not_nil![:time_part_predicate]

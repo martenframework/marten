@@ -20,7 +20,7 @@ module Marten
               "'hour' can only be used with date_time fields"
             end
 
-            protected def validate_coerced_value(value : Int64)
+            protected def validate_coerced_value!(value : Int64)
               return if value.in?(0_i64..23_i64)
 
               raise Errors::UnmetQuerySetCondition.new("'hour' expects an integer between 0 and 23")

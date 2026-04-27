@@ -12,7 +12,7 @@ module Marten
               value.day.to_i64
             end
 
-            protected def validate_coerced_value(value : Int64)
+            protected def validate_coerced_value!(value : Int64)
               return if value.in?(1_i64..31_i64)
 
               raise Errors::UnmetQuerySetCondition.new("'day' expects an integer between 1 and 31")

@@ -39,7 +39,7 @@ module Marten
               "'#{self.class.predicate_name}' expects an integer, a numeric string, or a Time value"
             end
 
-            protected def validate_coerced_value(_value : Int64)
+            protected def validate_coerced_value!(_value : Int64)
             end
 
             protected abstract def extract_time_part(value : Time) : Int64
@@ -67,7 +67,7 @@ module Marten
 
               values.map do |value|
                 coerced_value = coerce_value(value)
-                validate_coerced_value(coerced_value)
+                validate_coerced_value!(coerced_value)
                 coerced_value
               end
             end
@@ -114,8 +114,7 @@ module Marten
                 s << " )"
               end
 
-              sql_values = [] of ::DB::Any
-              coerced_values.each { |value| sql_values << value }
+              sql_values = coerced_values.map(&.as(::DB::Any))
 
               {"#{sql_left_operand(connection)} #{placeholders}", sql_values}
             end
@@ -135,7 +134,7 @@ module Marten
               end
 
               coerced_value = coerce_value(right_operand.as(Field::Any))
-              validate_coerced_value(coerced_value)
+              validate_coerced_value!(coerced_value)
 
               operator = connection.operator_for(@comparison_predicate) % "%s"
               {"#{sql_left_operand(connection)} #{operator}", [coerced_value] of ::DB::Any}

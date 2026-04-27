@@ -1184,36 +1184,10 @@ module Marten
 
           private def replace_ordered_placeholders(clause : String, parameters_size : Int32, offset : Int32) : String
             parameters_count = 0
-            chars = clause.chars
-
-            replaced_clause = String.build do |io|
-              i = 0
-
-              while i < chars.size
-                if chars[i] == '%'
-                  case chars[i + 1]?
-                  when '%'
-                    io << '%'
-                    i += 2
-                  when 's'
-                    if parameters_count >= parameters_size
-                      raise Errors::InvalidField.new(
-                        "The number of parameters in the predicate node does not match the number of placeholders"
-                      )
-                    end
-
-                    parameters_count += 1
-                    io << connection.parameter_id_for_ordered_argument(offset + parameters_count)
-                    i += 2
-                  else
-                    io << chars[i]
-                    i += 1
-                  end
-                else
-                  io << chars[i]
-                  i += 1
-                end
-              end
+            replaced_clause = clause.gsub(/%[%s]/) do |match|
+              next "%" if match == "%%"
+              parameters_count += 1
+              connection.parameter_id_for_ordered_argument(offset + parameters_count)
             end
 
             if parameters_count != parameters_size

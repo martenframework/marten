@@ -373,6 +373,55 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::filter with time-part predicates" do
+    with_installed_apps Marten::DB::Model::QueryingSpec::App
+
+    it "allows filtering date and date_time fields using time-part predicates" do
+      record_1 = Marten::DB::Model::QueryingSpec::TemporalRecord.create!(
+        label: "Record 1",
+        event_date: Time.utc(2023, 12, 1),
+        event_at: Time.utc(2023, 12, 1, 9, 10, 11),
+      )
+      record_2 = Marten::DB::Model::QueryingSpec::TemporalRecord.create!(
+        label: "Record 2",
+        event_date: Time.utc(2024, 12, 28),
+        event_at: Time.utc(2024, 12, 28, 23, 55, 45),
+      )
+      record_3 = Marten::DB::Model::QueryingSpec::TemporalRecord.create!(
+        label: "Record 3",
+        event_date: Time.utc(2024, 11, 12),
+        event_at: Time.utc(2024, 11, 12, 7, 15, 5),
+      )
+
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_date__year: 2024).order(:id).to_a.should eq(
+        [record_2, record_3]
+      )
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__month: "12").order(:id).to_a.should eq(
+        [record_1, record_2]
+      )
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__gte: Time.utc(2024, 1, 1))
+        .order(:id)
+        .to_a
+        .should eq([record_2, record_3])
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__exact: 2024).order(:id).to_a.should eq(
+        [record_2, record_3]
+      )
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(
+        event_date__month__in: ([Time.utc(2024, 11, 1), "12"] of Marten::DB::Field::Any)
+      )
+        .order(:id)
+        .to_a
+        .should eq([record_1, record_2, record_3])
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__isnull: false)
+        .order(:id)
+        .to_a
+        .should eq([record_1, record_2, record_3])
+      Marten::DB::Model::QueryingSpec::TemporalRecord.filter(event_at__year__isnull: true).to_a.should eq(
+        [] of Marten::DB::Model::QueryingSpec::TemporalRecord
+      )
+    end
+  end
+
   describe "::first" do
     before_each do
       TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")

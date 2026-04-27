@@ -1025,11 +1025,7 @@ module Marten
           private def filtering_clause_and_parameters(predicate_node, offset = 0)
             if !predicate_node.nil?
               clause, parameters = predicate_node.to_sql(connection)
-              parameters.each_with_index do |_p, i|
-                clause = clause % (
-                  [connection.parameter_id_for_ordered_argument(offset + i + 1)] + (["%s"] * (parameters.size - i))
-                )
-              end
+              clause = replace_ordered_placeholders(clause, parameters.size, offset)
             else
               clause = nil
               parameters = nil
@@ -1186,6 +1182,23 @@ module Marten
             )
           end
 
+          private def replace_ordered_placeholders(clause : String, parameters_size : Int32, offset : Int32) : String
+            parameters_count = 0
+            replaced_clause = clause.gsub(/%[%s]/) do |match|
+              next "%" if match == "%%"
+              parameters_count += 1
+              connection.parameter_id_for_ordered_argument(offset + parameters_count)
+            end
+
+            if parameters_count != parameters_size
+              raise Errors::InvalidField.new(
+                "The number of parameters in the predicate node does not match the number of placeholders"
+              )
+            end
+
+            replaced_clause
+          end
+
           private def raise_invalid_field_error_with_valid_choices(
             raw_field,
             model,
@@ -1245,6 +1258,12 @@ module Marten
             qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
             raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
             raw_predicate = qparts[1].empty? ? qparts[0] : qparts[2]
+            chained_time_part_lookup : NamedTuple(
+              raw_field: String,
+              time_part_predicate: String,
+              comparison_predicate: String,
+            )? = nil
+            join = nil
 
             # First attempt to verify if the specified field corresponds to an existing annotation or an existing field.
             if !annotations[raw_query]?.nil?
@@ -1258,7 +1277,16 @@ module Marten
                 raw_predicate = nil
               rescue e : Errors::InvalidField
                 raise e if raw_predicate.try(&.empty?)
-                field_path = verify_field(raw_field)
+
+                begin
+                  field_path = verify_field(raw_field)
+                rescue error : Errors::InvalidField
+                  chained_time_part_lookup = parse_chained_time_part_lookup(raw_query)
+                  raise error if chained_time_part_lookup.nil?
+
+                  field_path = verify_field(chained_time_part_lookup.not_nil![:raw_field])
+                  raw_predicate = chained_time_part_lookup.not_nil![:time_part_predicate]
+                end
               end
 
               relation_field_path = field_path.select { |field, _r| field.relation? }
@@ -1291,6 +1319,19 @@ module Marten
               value = true
             elsif raw_predicate.nil?
               predicate_klass = Predicate::Exact
+            elsif Predicate.time_part_predicate?(raw_predicate)
+              predicate_klass = Predicate.registry.fetch(raw_predicate) do
+                raise Errors::InvalidField.new("Unknown predicate type '#{raw_predicate}'")
+              end
+
+              return predicate_klass
+                .as(Predicate::TimePart.class)
+                .new(
+                  left_operand,
+                  value,
+                  alias_prefix: join.nil? ? Model.db_table : join.not_nil!.table_alias,
+                  comparison_predicate: chained_time_part_lookup.try(&.[](:comparison_predicate)) || "exact"
+                )
             else
               predicate_klass = Predicate.registry.fetch(raw_predicate) do
                 raise Errors::InvalidField.new("Unknown predicate type '#{raw_predicate}'")
@@ -1298,6 +1339,30 @@ module Marten
             end
 
             predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
+          end
+
+          private def parse_chained_time_part_lookup(raw_query : String)
+            parts = raw_query.split(Constants::LOOKUP_SEP)
+            return if parts.size < 3
+
+            comparison_predicate = parts[-1]
+            time_part_predicate = parts[-2]
+            return unless Predicate.time_part_predicate?(time_part_predicate)
+
+            unless Predicate.time_part_comparison_predicate?(comparison_predicate)
+              raise Errors::InvalidField.new(
+                "Unsupported chained predicate type '#{comparison_predicate}' for '#{time_part_predicate}'"
+              )
+            end
+
+            raw_field = parts[0..-3].join(Constants::LOOKUP_SEP)
+            return if raw_field.empty?
+
+            {
+              raw_field:            raw_field,
+              time_part_predicate:  time_part_predicate,
+              comparison_predicate: comparison_predicate,
+            }
           end
 
           private def solve_plucked_fields_and_columns(fields)

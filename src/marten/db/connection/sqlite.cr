@@ -76,7 +76,8 @@ module Marten
         end
 
         def left_operand_for(id : String, predicate) : String
-          id
+          transformation = PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING.fetch(predicate, nil)
+          transformation.nil? ? id : (transformation % id)
         end
 
         def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
@@ -130,6 +131,15 @@ module Marten
         end
 
         private DISTINCT_CLAUSE = "DISTINCT"
+
+        private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
+          "year"   => "CAST(STRFTIME('%%Y', %s) AS INTEGER)",
+          "month"  => "CAST(STRFTIME('%%m', %s) AS INTEGER)",
+          "day"    => "CAST(STRFTIME('%%d', %s) AS INTEGER)",
+          "hour"   => "CAST(STRFTIME('%%H', %s) AS INTEGER)",
+          "minute" => "CAST(STRFTIME('%%M', %s) AS INTEGER)",
+          "second" => "CAST(STRFTIME('%%S', %s) AS INTEGER)",
+        }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains"    => "LIKE %s ESCAPE '\\'",

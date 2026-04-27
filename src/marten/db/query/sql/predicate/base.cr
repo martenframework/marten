@@ -26,6 +26,7 @@ module Marten
             end
 
             protected getter left_operand
+            protected getter right_operand
 
             private def sql_left_operand(connection)
               case @left_operand

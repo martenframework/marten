@@ -35,6 +35,16 @@ for_mysql do
         conn.left_operand_for("table.column", "contains").should eq "table.column"
         conn.left_operand_for("table.column", "istartswith").should eq "table.column"
       end
+
+      it "returns the expected operand for a month predicate" do
+        conn = Marten::DB::Connection.default
+        conn.left_operand_for("table.column", "month").should eq "MONTH(table.column)"
+      end
+
+      it "returns the expected operand for an hour predicate" do
+        conn = Marten::DB::Connection.default
+        conn.left_operand_for("table.column", "hour").should eq "HOUR(table.column)"
+      end
     end
 
     describe "#limit_value" do

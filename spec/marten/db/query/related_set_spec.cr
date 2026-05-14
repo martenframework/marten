@@ -160,7 +160,7 @@ describe Marten::DB::Query::RelatedSet do
     end
   end
 
-  describe "#prefetch with chained operations" do
+  describe "#prefetch" do
     it "preserves prefetched_relations through #order" do
       user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")

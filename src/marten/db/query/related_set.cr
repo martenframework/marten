@@ -10,6 +10,8 @@ module Marten
           @related_field_id : String,
           query : SQL::Query(M)? = nil,
           @assign_related : ::Bool = false,
+          @prefetched_relations = [] of String,
+          @custom_query_sets = {} of String => Set::Any,
         )
           @query = if query.nil?
                      q = SQL::Query(M).new
@@ -37,7 +39,9 @@ module Marten
             instance: @instance,
             related_field_id: @related_field_id,
             query: other_query.nil? ? @query.clone : other_query.not_nil!,
-            assign_related: @assign_related
+            assign_related: @assign_related,
+            prefetched_relations: prefetched_relations,
+            custom_query_sets: custom_query_sets,
           )
         end
 

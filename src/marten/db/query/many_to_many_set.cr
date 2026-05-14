@@ -16,6 +16,8 @@ module Marten
           @through_model_from_field_id : String,
           @through_model_to_field_id : String,
           query : SQL::Query(M)? = nil,
+          @prefetched_relations = [] of String,
+          @custom_query_sets = {} of String => Set::Any,
         )
           @query = if query.nil?
                      q = SQL::Query(M).new
@@ -118,7 +120,9 @@ module Marten
             through_related_name: @through_related_name,
             through_model_from_field_id: @through_model_from_field_id,
             through_model_to_field_id: @through_model_to_field_id,
-            query: other_query.nil? ? @query.clone : other_query.not_nil!
+            query: other_query.nil? ? @query.clone : other_query.not_nil!,
+            prefetched_relations: prefetched_relations,
+            custom_query_sets: custom_query_sets,
           )
         end
 

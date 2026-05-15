@@ -1,8 +1,6 @@
 [default]
 extend-ignore-identifiers-re = [
-  "Dentifiers",
   "enumerables",
-  "reate",
 ]
 extend-ignore-re = [
   # IPv4 (strict-ish 0-255)
@@ -18,4 +16,12 @@ extend-ignore-re = [
 extend-exclude = [
   "docs/node_modules",
   "src/marten/locales",
+]
+
+[type.md]
+extend-ignore-re = [
+  # CRUD acronym styling in models-and-databases/introduction.md
+  "\\*\\*(?:C\\*\\*reate|R\\*\\*ead|U\\*\\*pdate|D\\*\\*elete)",
+  # UUID docs: "Universally Unique IDentifiers"
+  "IDentifiers",
 ]

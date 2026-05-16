@@ -14,7 +14,7 @@ updates:
       day: "monday"
     open-pull-requests-limit: 5
     labels:
-      - "dependencies"
+      - "dependency"
       - "documentation"
     groups:
       docusaurus:
@@ -35,5 +35,5 @@ updates:
       day: "monday"
     open-pull-requests-limit: 5
     labels:
-      - "dependencies"
+      - "dependency"
       - "ci"

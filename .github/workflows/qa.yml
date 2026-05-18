@@ -32,7 +32,7 @@ jobs:
     steps:
     - uses: actions/checkout@v6
     - name: Check spelling
-      uses: crate-ci/typos@v1.46.1
+      uses: crate-ci/typos@v1.46.2
   generated-app:
     runs-on: ubuntu-latest
     strategy:

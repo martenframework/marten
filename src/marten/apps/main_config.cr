@@ -8,13 +8,25 @@ module Marten
     # started without requiring the definition of applications upfront, which is ideal for simple projects or proofs of
     # concept.
     class MainConfig < Config
-      RESERVED_LABEL = "main"
+      DEFAULT_LABEL = "main"
 
-      @@label = RESERVED_LABEL
+      @@label = DEFAULT_LABEL
 
       # :nodoc:
       def self._marten_app_location
         {{ run("./main_config/fetch_src_path.cr") }}
+      end
+
+      # :nodoc:
+      def self.validate_label(label : String | Symbol)
+        # The empty label is allowed for the main application only.
+        return if label.empty?
+
+        super
+      end
+
+      def label
+        @@label
       end
 
       # Returns `true` in order to indicate that this is the main application.

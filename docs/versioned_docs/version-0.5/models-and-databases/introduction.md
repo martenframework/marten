@@ -349,7 +349,7 @@ article.title = "Updated!"
 article.save
 ```
 
-Marten also provide the ability to update the records that are targetted by a specific query set through the use of the `#update` method, like in the following example:
+Marten also provide the ability to update the records that are targeted by a specific query set through the use of the `#update` method, like in the following example:
 
 ```crystal
 Article.filter(title: "My article").update(title: "Updated!")
@@ -364,7 +364,7 @@ article = Article.get(id: 42)
 article.delete
 ```
 
-Marten also provide the ability to delete the records that are targetted by a specific query set through the use of the `#delete` method, like in the following example:
+Marten also provide the ability to delete the records that are targeted by a specific query set through the use of the `#delete` method, like in the following example:
 
 ```crystal
 Article.filter(title: "My article").delete
@@ -462,7 +462,7 @@ employee = Employee.create!(
 )
 ```
 
-Additionaly, it's important to note that attempting to filter or retrieve `Person` records will return `Person` instances. When manipulating a parent model instance, it is possible to get a child model record by calling the `#<child_model>` method - with `child_model` being the downcased version of the child model name. For example:
+Additionally, it's important to note that attempting to filter or retrieve `Person` records will return `Person` instances. When manipulating a parent model instance, it is possible to get a child model record by calling the `#<child_model>` method - with `child_model` being the downcased version of the child model name. For example:
 
 ```crystal
 person = Person.filter(first_name: "John").first!

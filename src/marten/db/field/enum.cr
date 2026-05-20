@@ -6,12 +6,12 @@ module Marten
         @default : ::String?
 
         getter default
-
-        getter values
+        getter enum_class
 
         def initialize(
           @id : ::String,
-          enum_values : Array(::String),
+          *,
+          @enum_class : ::Enum.class,
           @primary_key = false,
           @blank = false,
           @null = false,
@@ -21,8 +21,11 @@ module Marten
           default : ::Enum? = nil,
           **kwargs,
         )
-          @values = enum_values
           @default = default.try(&.to_s)
+        end
+
+        def values : Array(::String)
+          enum_class.names
         end
 
         def from_db(value) : ::String?
@@ -58,6 +61,11 @@ module Marten
             value
           when Symbol
             value.to_s
+          when ::Enum
+            if value.class != enum_class
+              raise_unexpected_field_value(value)
+            end
+            value.to_s
           else
             raise_unexpected_field_value(value)
           end
@@ -81,7 +89,7 @@ module Marten
               {{ @type }}.new(
                 {{ field_id.stringify }},
                 {% unless kwargs.is_a?(NilLiteral) %}**{{ kwargs }}{% end %},
-                enum_values: {{ enum_klass }}.values.map(&.to_s),
+                enum_class: {{ enum_klass }},
               )
             )
 

@@ -362,7 +362,7 @@ Default: `false`
 
 A boolean indicating whether policy violations are reported without enforcing them.
 
-If this setting is set to `true`, the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares.md#content-security-policy-middleware) middleware will set a [Conten-Security-Policy-Report-Only](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) header instead of the regular Content-Security-Policy header. Doing so can be useful to experiment with policies without enforcing them.
+If this setting is set to `true`, the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares.md#content-security-policy-middleware) middleware will set a [Content-Security-Policy-Report-Only](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) header instead of the regular Content-Security-Policy header. Doing so can be useful to experiment with policies without enforcing them.
 
 ## Database settings
 

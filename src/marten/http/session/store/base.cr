@@ -67,7 +67,7 @@ module Marten
           #
           # This method will return `nil` if the session is set to expire when the browser is closed.
           def expires_at
-            return nil if expires_at_browser_close?
+            return if expires_at_browser_close?
 
             Time.local + expires_in
           end

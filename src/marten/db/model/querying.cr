@@ -47,7 +47,7 @@ module Marten
             {% end %}
           end
 
-          # Returns a queryset targetting all the records for the considered model.
+          # Returns a queryset targeting all the records for the considered model.
           #
           # This method returns a `Marten::DB::Query::Set` object that - if evaluated - will return all the records for
           # the considered model.
@@ -720,7 +720,7 @@ module Marten
             default_queryset.offset(value)
           end
 
-          # Returns a queryset targetting all the records for the considered model with the specified ordering.
+          # Returns a queryset targeting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:
           #
@@ -734,7 +734,7 @@ module Marten
             default_queryset.order(fields.to_a)
           end
 
-          # Returns a queryset targetting all the records for the considered model with the specified ordering.
+          # Returns a queryset targeting all the records for the considered model with the specified ordering.
           #
           # Multiple fields can be specified in order to define the final ordering. For example:
           #
@@ -939,6 +939,109 @@ module Marten
             {% end %}
           end
 
+          # Updates all the records with the passed values.
+          #
+          # This method allows to update all the records with a hash or a named tuple of values. It returns the number
+          # of records that were updated:
+          #
+          # ```
+          # Post.update({"title" => "Updated"})
+          # ```
+          #
+          # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+          # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+          # either.
+          def update(values : Hash | NamedTuple)
+            default_queryset.update(values)
+          end
+
+          # Updates all the records with the passed values.
+          #
+          # This method allows to update all the records with the values defined in the `kwargs` double splat argument.
+          # It returns the number of records that were updated:
+          #
+          # ```
+          # Post.update(title: "Updated")
+          # ```
+          #
+          # It should be noted that this methods results in a regular `UPDATE` SQL statement. As such, the records that
+          # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+          # either.
+          def update(**kwargs)
+            default_queryset.update(kwargs.to_h)
+          end
+
+          # Updates a model record matching the given filters or creates a new one if no one is found.
+          #
+          # This method first attempts to retrieve a record that matches the specified filters. If it exists,
+          # the record is updated using the attributes provided via the required `updates` argument.
+          # If no matching record is found, a new one is created using the attributes defined in `updates`:
+          #
+          # ```
+          # person = Person.update_or_create(updates: {first_name: "Bob"}, first_name: "John", last_name: "Doe")
+          # ```
+          #
+          # If additional attributes should only be used when creating new records, a `defaults` argument can be
+          # provided (these attributes will then be used instead of `updates` when creating the record).
+          #
+          # ```
+          # person = Person.update_or_create(
+          #   updates: {first_name: "Bob"},
+          #   defaults: {first_name: "Bob", active: true},
+          #   first_name: "John",
+          #   last_name: "Doe"
+          # )
+          # ```
+          #
+          # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+          # exception if multiple records match the specified set of filters.
+          def update_or_create(
+            *,
+            updates : Hash | NamedTuple,
+            defaults : Hash | NamedTuple | Nil = nil,
+            **kwargs,
+          )
+            arguments = kwargs.merge({updates: updates, defaults: defaults})
+            default_queryset.update_or_create(**arguments)
+          end
+
+          # Updates a model record matching the given filters or creates a new one if no one is found.
+          #
+          # This method first attempts to retrieve a record that matches the specified filters. If it exists,
+          # the record is updated using the attributes provided via the required `updates` argument.
+          # If no matching record is found, a new one is created using the attributes defined in `updates`:
+          #
+          # ```
+          # person = Person.update_or_create!(updates: {first_name: "Bob"}, first_name: "John", last_name: "Doe")
+          # ```
+          #
+          # If additional attributes should only be used when creating new records, a `defaults` argument can be
+          # provided (these attributes will then be used instead of `updates` when creating the record).
+          #
+          # ```
+          # person = Person.update_or_create!(
+          #   updates: {first_name: "Bob"},
+          #   defaults: {first_name: "Bob", active: true},
+          #   first_name: "John",
+          #   last_name: "Doe"
+          # )
+          # ```
+          #
+          # In order to ensure data consistency, this method will raise a `Marten::DB::Errors::MultipleRecordsFound`
+          # exception if multiple records match the specified set of filters.
+          #
+          # Raises a `Marten::DB::Errors::InvalidRecord` exception if the updated or created
+          # record is invalid.
+          def update_or_create!(
+            *,
+            updates : Hash | NamedTuple,
+            defaults : Hash | NamedTuple | Nil = nil,
+            **kwargs,
+          )
+            arguments = kwargs.merge({updates: updates, defaults: defaults})
+            default_queryset.update_or_create!(**arguments)
+          end
+
           # Returns a queryset that will be evaluated using the specified database.
           #
           # A valid database alias must be used here (it must correspond to an ID of a database configured in the
@@ -1074,9 +1177,18 @@ module Marten
                   @instance : Marten::DB::Model,
                   @related_field_id : ::String,
                   query : Marten::DB::Query::SQL::Query({{ @type }})? = nil,
-                  @assign_related : ::Bool = false
+                  @assign_related : ::Bool = false,
+                  @prefetched_relations = [] of ::String,
+                  @custom_query_sets = {} of ::String => Marten::DB::Query::Set::Any,
                 )
-                  super(@instance, @related_field_id, query, @assign_related)
+                  super(
+                    @instance,
+                    @related_field_id,
+                    query,
+                    @assign_related,
+                    @prefetched_relations,
+                    @custom_query_sets,
+                  )
                 end
 
                 {% for queryset_id, block in MODEL_SCOPES[:custom] %}
@@ -1090,7 +1202,9 @@ module Marten
                     instance: @instance,
                     related_field_id: @related_field_id,
                     query: other_query.nil? ? @query.clone : other_query.not_nil!,
-                    assign_related: @assign_related
+                    assign_related: @assign_related,
+                    prefetched_relations: prefetched_relations,
+                    custom_query_sets: custom_query_sets,
                   )
                 end
               end
@@ -1102,7 +1216,9 @@ module Marten
                   @through_related_name : ::String,
                   @through_model_from_field_id : ::String,
                   @through_model_to_field_id : ::String,
-                  query : Marten::DB::Query::SQL::Query({{ @type }})? = nil
+                  query : Marten::DB::Query::SQL::Query({{ @type }})? = nil,
+                  @prefetched_relations = [] of ::String,
+                  @custom_query_sets = {} of ::String => Marten::DB::Query::Set::Any,
                 )
                   super(
                     @instance,
@@ -1110,7 +1226,9 @@ module Marten
                     @through_related_name,
                     @through_model_from_field_id,
                     @through_model_to_field_id,
-                    query
+                    query,
+                    @prefetched_relations,
+                    @custom_query_sets,
                   )
                 end
 
@@ -1127,7 +1245,9 @@ module Marten
                     through_related_name: @through_related_name,
                     through_model_from_field_id: @through_model_from_field_id,
                     through_model_to_field_id: @through_model_to_field_id,
-                    query: other_query.nil? ? @query.clone : other_query.not_nil!
+                    query: other_query.nil? ? @query.clone : other_query.not_nil!,
+                    prefetched_relations: prefetched_relations,
+                    custom_query_sets: custom_query_sets,
                   )
                 end
               end

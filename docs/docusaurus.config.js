@@ -9,10 +9,15 @@ const darkTheme = themes.dracula;
   url: 'https://martenframework.com',
   baseUrl: '/docs/',
   onBrokenLinks: 'throw',
-  onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: 'martenframework',
   projectName: 'marten',
+
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'warn',
+    },
+  },
 
   plugins: [
     'docusaurus-plugin-sass',

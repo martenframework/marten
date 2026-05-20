@@ -49,4 +49,19 @@ describe Marten::HTTP::UploadedFile do
       uploaded_file.io.gets_to_end.should eq "This is a test"
     end
   end
+
+  describe "#to_json" do
+    it "returns JSON representation" do
+      uploaded_file = Marten::HTTP::UploadedFile.new(
+        HTTP::FormData::Part.new(
+          HTTP::Headers{"Content-Disposition" => %{form-data; name="file"; filename="a.txt"}},
+          IO::Memory.new("This is a test")
+        )
+      )
+      actual = JSON.parse(uploaded_file.to_json).as_h
+      actual.keys.sort!.should eq ["original_filename", "tempfile"]
+      actual["original_filename"].should eq "a.txt"
+      actual["tempfile"].as_s.matches?(/\#<File:.*>/).should be_true
+    end
+  end
 end

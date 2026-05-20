@@ -40,7 +40,7 @@ describe Marten::Conf::GlobalSettings::Templates do
   end
 
   describe "#app_dirs=" do
-    it "allows to change the app_dirs confiuration as expected" do
+    it "allows to change the app_dirs configuration as expected" do
       templates_conf = Marten::Conf::GlobalSettings::Templates.new
 
       templates_conf.app_dirs = true

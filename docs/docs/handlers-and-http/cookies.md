@@ -67,7 +67,7 @@ request.cookies.set(
 )
 ```
 
-Appart from the cookie name and value, the [`#set`](pathname:///api/dev/Marten/HTTP/Cookies.html#set(name%3AString|Symbol%2Cvalue%2Cexpires%3ATime|Nil%3Dnil%2Cpath%3AString%3D"/"%2Cdomain%3AString|Nil%3Dnil%2Csecure%3ABool%3Dfalse%2Chttp_only%3ABool%3Dfalse%2Csame_site%3ANil|String|Symbol%3Dnil)%3ANil-instance-method) method allows to define some additional cookie properties:
+Apart from the cookie name and value, the [`#set`](pathname:///api/dev/Marten/HTTP/Cookies.html#set(name%3AString|Symbol%2Cvalue%2Cexpires%3ATime|Nil%3Dnil%2Cpath%3AString%3D"/"%2Cdomain%3AString|Nil%3Dnil%2Csecure%3ABool%3Dfalse%2Chttp_only%3ABool%3Dfalse%2Csame_site%3ANil|String|Symbol%3Dnil)%3ANil-instance-method) method allows to define some additional cookie properties:
 
 * The cookie expiry datetime (`expires` argument).
 * The cookie `path`.

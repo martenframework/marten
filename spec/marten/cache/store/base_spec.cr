@@ -86,7 +86,7 @@ describe Marten::Cache::Store::Base do
       store.read("foo").should eq "baz"
     end
 
-    it "makes use of the store namespace when writting new entries to the cache" do
+    it "makes use of the store namespace when writing new entries to the cache" do
       store = Marten::Cache::Store::BaseSpec::TestStore.new(namespace: "test")
 
       store.fetch("foo") { "baz" }.should eq "baz"
@@ -287,7 +287,7 @@ describe Marten::Cache::Store::Base do
       store.read("foo").should eq "bar"
     end
 
-    it "writes a raw valie to the store" do
+    it "writes a raw value to the store" do
       store = Marten::Cache::Store::BaseSpec::TestStore.new
       store.write("foo", "bar", raw: true)
 

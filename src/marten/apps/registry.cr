@@ -35,7 +35,7 @@ module Marten
         get(label.to_s)
       end
 
-      # Returns the application config object contaning the passed class.
+      # Returns the application config object containing the passed class.
       def get_containing(klass)
         candidates = [] of Config.class
 
@@ -66,7 +66,7 @@ module Marten
 
       # Returns the main application config, which corresponds to the standard `src/` folder.
       def main
-        get(MainConfig::RESERVED_LABEL)
+        get(MainConfig.label)
       end
 
       # Populate the app config registry from the list of the project installed apps.

@@ -55,7 +55,7 @@ module Marten
             # Adds the Vary header to ensure that HTTP caches do not cache this redirect.
             response.headers.patch_vary("Accept-Language", "Cookie")
 
-            return response
+            response
           end
         end
       end
@@ -120,7 +120,7 @@ module Marten
 
         # Otherwise tries to return a locale that is supported and that matches the base locale tag.
         matching_locale = available_locales.find { |l| l.downcase.starts_with?("#{base_locale_tag}-") }
-        return matching_locale if !matching_locale.nil?
+        matching_locale if !matching_locale.nil?
       end
 
       private def parsed_accept_language_chain(accept_language)

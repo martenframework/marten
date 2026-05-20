@@ -3,7 +3,7 @@ module Marten
     module CanDefineTemplateAttributes
       # Allows to explicitly configure which methods are made available to the template engine.
       #
-      # Only public mehtods that don't require arguments should be made available to templates.
+      # Only public methods that don't require arguments should be made available to templates.
       macro template_attributes(*names)
         # :nodoc:
         def resolve_template_attribute(key : ::String)

@@ -80,7 +80,7 @@ class Article < Marten::Model
 end
 ```
 
-When the [`related`](./reference/fields.md#related-1) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Author` record will be accessible through the use of the `Author#articles` method:
+When the [`related`](./reference/fields.md#related-1) argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Author` record will be accessible through the use of the `Author#articles` method:
 
 ```crystal
 # Create two authors
@@ -227,7 +227,7 @@ class User < Marten::Model
 end
 ```
 
-When the [`related`](./reference/fields.md#related-2) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record will be accessible through the use of the `Profile#user` method:
+When the [`related`](./reference/fields.md#related-2) argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that the `User` record associated with a specific `Profile` record will be accessible through the use of the `Profile#user` method:
 
 ```crystal
 # Create two profiles
@@ -383,7 +383,7 @@ class Article < Marten::Model
 end
 ```
 
-When the [`related`](./reference/fields.md#related) argument is used, a method will be automatically created on the targetted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Tag` record will be accessible through the use of the `Tag#articles` method:
+When the [`related`](./reference/fields.md#related) argument is used, a method will be automatically created on the targeted model by using the chosen argument's value. For example, this means that all the `Article` records associated with a specific `Tag` record will be accessible through the use of the `Tag#articles` method:
 
 ```crystal
 # Create three tags

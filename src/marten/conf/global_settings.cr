@@ -12,6 +12,7 @@ module Marten
       @log_backend : ::Log::Backend | Nil
       @request_max_parameters : Nil | Int32
       @root_path : String?
+      @socket : String?
       @target_env : String?
       @trailing_slash : TrailingSlash
       @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
@@ -68,6 +69,9 @@ module Marten
       # The default log level used by the application.
       getter log_level
 
+      # Returns the label of the main application.
+      getter main_app_label
+
       # Returns the list of middlewares used by the application.
       getter middleware
 
@@ -94,6 +98,9 @@ module Marten
 
       # Returns the secret key of the application.
       getter secret_key
+
+      # Returns the socket the HTTP server running the application will be listening on.
+      getter socket
 
       # Returns the default time zone used by the application when it comes to display date times.
       getter time_zone
@@ -137,7 +144,7 @@ module Marten
 
       # Allows to set the explicit list of allowed hosts for the application.
       #
-      # The application has to be explictely configured to serve a list of allowed hosts. This is to mitigate HTTP Host
+      # The application has to be explicitly configured to serve a list of allowed hosts. This is to mitigate HTTP Host
       # header attacks.
       setter allowed_hosts
 
@@ -150,7 +157,7 @@ module Marten
       # Allows to set the list of default date time input formats.
       setter date_time_input_formats
 
-      # Allows to activate or deactive debug mode.
+      # Allows to activate or deactivate debug mode.
       setter debug
 
       # Allows to set the handler class that should generate responses for Bad Request responses (HTTP 400).
@@ -170,6 +177,9 @@ module Marten
 
       # Allows to set the default log level that will be used by the application (defaults to info).
       setter log_level
+
+      # Allows to set the label of the main application.
+      setter main_app_label
 
       # Allows to set the port the HTTP server running the application will be listening on.
       setter port
@@ -193,6 +203,9 @@ module Marten
       #
       # The secret key will be used provide cryptographic signing. It should be unique and unpredictable.
       setter secret_key
+
+      # Allows to set the socket the HTTP server running the application will be listening on.
+      setter socket
 
       # Allows to set the default time zone used by the application when it comes to display date times.
       setter time_zone
@@ -272,12 +285,14 @@ module Marten
         @host = "127.0.0.1"
         @installed_apps = Array(Marten::Apps::Config.class).new
         @log_level = ::Log::Severity::Info
+        @main_app_label = Apps::MainConfig::DEFAULT_LABEL
         @middleware = Array(Marten::Middleware.class).new
         @port = 8000
         @port_reuse = true
         @referrer_policy = "same-origin"
         @request_max_parameters = 1000
         @secret_key = ""
+        @socket = nil
         @time_zone = Time::Location.load("UTC")
         @trailing_slash = :do_nothing
         @unsupported_http_method_strategy = :deny
@@ -443,6 +458,7 @@ module Marten
 
       protected def setup
         setup_log_backend
+        setup_main_app_label
         setup_db_connections
       end
 
@@ -457,6 +473,10 @@ module Marten
         end
 
         sessions.validate
+      end
+
+      private def setup_main_app_label
+        Apps::MainConfig.label(main_app_label)
       end
     end
   end

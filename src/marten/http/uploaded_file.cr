@@ -14,6 +14,17 @@ module Marten
         end
       end
 
+      def to_json
+        JSON.build { |json| to_json(json) }
+      end
+
+      def to_json(json : JSON::Builder)
+        json.object do
+          json.field "original_filename", @part.filename
+          json.field "tempfile", @io.inspect
+        end
+      end
+
       # Returns the uploaded file name.
       delegate filename, to: @part
 

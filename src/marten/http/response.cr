@@ -22,7 +22,7 @@ module Marten
       # Returns the status code of the HTTP response.
       getter status
 
-      # Allows to overridde the response's content.
+      # Allows to override the response's content.
       setter content
 
       # Allows to override the content type associated with the HTTP response.

@@ -132,7 +132,7 @@ module Marten
             end
 
             # Step 9: run post column type update statements.
-            if old_type != new_type
+            if old_type != new_type || eligible_to_post_change_column_type_statements?(old_column, new_column)
               post_change_column_type_statements(table, old_column, new_column).each do |statement|
                 execute(statement)
               end
@@ -217,7 +217,7 @@ module Marten
               @deferred_statements << create_index_deferred_statement(table, [column])
             end
 
-            # Forwards custom indexes (indexes targetting multiple columns) to the array of deferred SQL statements.
+            # Forwards custom indexes (indexes targeting multiple columns) to the array of deferred SQL statements.
             table.indexes.each do |index|
               @deferred_statements << create_index_deferred_statement(
                 table,
@@ -358,6 +358,13 @@ module Marten
             new_column : Column::Base,
           ) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
+          end
+
+          private def eligible_to_post_change_column_type_statements?(
+            old_column : Column::Base,
+            new_column : Column::Base,
+          ) : Bool
+            false
           end
 
           private def flush_tables_statements(table_names : Array(String)) : Array(String)

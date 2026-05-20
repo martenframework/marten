@@ -169,6 +169,114 @@ describe Marten::Emailing::Email do
     end
   end
 
+  describe "#attachments" do
+    it "returns an empty array by default" do
+      email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+      email.attachments.should be_empty
+    end
+  end
+
+  describe "#attach" do
+    it "allows to attach a file from a path while inferring the file name and MIME type" do
+      tempfile = File.tempfile("email_attachment", ".txt")
+      tempfile.print("Path attachment content")
+      tempfile.close
+      path = tempfile.path
+
+      begin
+        email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+        email.attach(path)
+
+        email.attachments.size.should eq 1
+        attachment = email.attachments.first
+
+        attachment.filename.should eq Path[path].basename
+        attachment.mime_type.should eq MIME.from_filename(path)
+        String.new(attachment.content).should eq "Path attachment content"
+      ensure
+        File.delete(path) if File.exists?(path)
+      end
+    end
+
+    it "allows to attach a file from a path with a custom file name and MIME type" do
+      tempfile = File.tempfile("email_attachment", ".txt")
+      tempfile.print("Path attachment content")
+      tempfile.close
+      path = tempfile.path
+
+      begin
+        email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+        email.attach(path, filename: "welcome.pdf", mime_type: "application/pdf")
+
+        email.attachments.size.should eq 1
+        attachment = email.attachments.first
+
+        attachment.filename.should eq "welcome.pdf"
+        attachment.mime_type.should eq "application/pdf"
+        String.new(attachment.content).should eq "Path attachment content"
+      ensure
+        File.delete(path) if File.exists?(path)
+      end
+    end
+
+    it "allows to attach a file from a File object" do
+      file = File.tempfile("email_attachment", ".txt")
+      path = file.path
+      file.print("File object attachment content")
+      file.rewind
+
+      begin
+        file.read_string(5).should eq "File "
+
+        email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+        email.attach(file)
+
+        email.attachments.size.should eq 1
+        attachment = email.attachments.first
+
+        attachment.filename.should eq Path[path].basename
+        attachment.mime_type.should eq MIME.from_filename(path)
+        String.new(attachment.content).should eq "File object attachment content"
+      ensure
+        file.close
+        File.delete(path) if File.exists?(path)
+      end
+    end
+
+    it "allows to attach an IO by reading from its current position" do
+      email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+
+      io = IO::Memory.new("IO memory attachment content")
+      io.read_string(10).should eq "IO memory "
+
+      email.attach(io, filename: "welcome.txt")
+
+      email.attachments.size.should eq 1
+      attachment = email.attachments.first
+
+      attachment.filename.should eq "welcome.txt"
+      attachment.mime_type.should eq "text/plain"
+      String.new(attachment.content).should eq "attachment content"
+    end
+
+    it "falls back to application/octet-stream for unknown extensions" do
+      tempfile = File.tempfile("email_attachment", ".unknown_extension")
+      tempfile.print("Unknown extension content")
+      tempfile.close
+      path = tempfile.path
+
+      begin
+        email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
+        email.attach(path)
+
+        email.attachments.size.should eq 1
+        email.attachments.first.mime_type.should eq "application/octet-stream"
+      ensure
+        File.delete(path) if File.exists?(path)
+      end
+    end
+  end
+
   describe "#bcc" do
     it "returns nil by default" do
       email = Marten::Emailing::EmailSpec::EmailWithoutConfiguration.new
@@ -214,6 +322,22 @@ describe Marten::Emailing::Email do
 
       email.foo.should eq "set_foo"
       email.bar.should eq "set_bar"
+    end
+
+    it "allows before_deliver callbacks to attach files" do
+      Marten::Emailing::EmailSpec::TEST_BACKEND.delivered.clear
+
+      email = Marten::Emailing::EmailSpec::EmailWithAttachmentCallback.new
+      email.deliver
+
+      Marten::Emailing::EmailSpec::TEST_BACKEND.delivered.includes?(email).should be_true
+
+      email.attachments.size.should eq 1
+      attachment = email.attachments.first
+
+      attachment.filename.should eq "callback_attachment.txt"
+      attachment.mime_type.should eq "text/plain"
+      String.new(attachment.content).should eq "Callback attachment content"
     end
   end
 
@@ -483,6 +607,16 @@ module Marten::Emailing::EmailSpec
 
     private def set_bar
       self.bar = "set_bar"
+    end
+  end
+
+  class EmailWithAttachmentCallback < Marten::Emailing::Email
+    backend TEST_BACKEND
+
+    before_deliver :attach_generated_content
+
+    private def attach_generated_content
+      attach(IO::Memory.new("Callback attachment content"), filename: "callback_attachment.txt")
     end
   end
 end

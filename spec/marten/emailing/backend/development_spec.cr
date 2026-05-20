@@ -140,6 +140,30 @@ describe Marten::Emailing::Backend::Development do
           OUTPUT
       )
     end
+
+    it "outputs an email with attachments as expected if this capability is activated" do
+      stdout = IO::Memory.new
+
+      email = Marten::Emailing::Backend::DevelopmentSpec::TestEmailWithAttachment.new
+      backend = Marten::Emailing::Backend::Development.new(print_emails: true, stdout: stdout)
+
+      backend.deliver(email)
+
+      stdout.rewind
+      stdout.gets_to_end.should eq(
+        <<-OUTPUT
+          From: webmaster@localhost
+          To: test@example.com
+          Subject: Hello World!
+          Attachments:
+          - test_attachment.txt (text/plain, 18 bytes)
+          ---------- TEXT ----------
+          Text body
+          ---------- HTML ----------
+          HTML body
+          OUTPUT
+      )
+    end
   end
 
   describe "#delivered_emails" do
@@ -195,6 +219,12 @@ module Marten::Emailing::Backend::DevelopmentSpec
 
     def headers
       {"foo" => "bar"}
+    end
+  end
+
+  class TestEmailWithAttachment < TestEmail
+    def initialize
+      attach(IO::Memory.new("Attachment content"), filename: "test_attachment.txt")
     end
   end
 end

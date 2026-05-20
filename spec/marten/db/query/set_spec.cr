@@ -524,8 +524,8 @@ describe Marten::DB::Query::Set do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
 
-      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
-      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns true if the queryset matches existing records and if it was already fetched" do
@@ -538,30 +538,30 @@ describe Marten::DB::Query::Set do
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "crystal")
       qset_2.each { }
 
-      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
-      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
+      qset_2.any?.should be_true # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match existing records and if it wasn't already fetched" do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
-      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
 
       Tag.create!(name: "crystal", is_active: true)
 
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
-      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
 
     it "returns false if the queryset doesn't match existing records and if it was already fetched" do
       qset_1 = Marten::DB::Query::Set(Tag).new.all
       qset_1.each { }
-      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_1.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
 
       Tag.create!(name: "crystal", is_active: true)
 
       qset_2 = Marten::DB::Query::Set(Tag).new.filter(name: "ruby")
       qset_2.each { }
-      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfEmpty
+      qset_2.any?.should be_false # ameba:disable Performance/AnyInsteadOfPresent
     end
   end
 
@@ -885,7 +885,7 @@ describe Marten::DB::Query::Set do
       tag.persisted?.should be_true
     end
 
-    it "properly uses the default connection as expected when no special connection is targetted" do
+    it "properly uses the default connection as expected when no special connection is targeted" do
       tag_1 = Marten::DB::Query::Set(Tag).new.create(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.create(is_active: false) do |o|
@@ -896,7 +896,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.using(:other).to_a.should be_empty
     end
 
-    it "properly uses the targetted connection as expected" do
+    it "properly uses the targeted connection as expected" do
       tag_1 = Marten::DB::Query::Set(Tag).new.using(:other).create(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.using(:other).create(is_active: false) do |o|
@@ -937,7 +937,7 @@ describe Marten::DB::Query::Set do
       tag.persisted?.should be_true
     end
 
-    it "properly uses the default connection as expected when no special connection is targetted" do
+    it "properly uses the default connection as expected when no special connection is targeted" do
       tag_1 = Marten::DB::Query::Set(Tag).new.create!(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.create!(is_active: false) do |o|
@@ -948,7 +948,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.using(:other).to_a.should be_empty
     end
 
-    it "properly uses the targetted connection as expected" do
+    it "properly uses the targeted connection as expected" do
       tag_1 = Marten::DB::Query::Set(Tag).new.using(:other).create!(name: "crystal", is_active: true)
 
       tag_2 = Marten::DB::Query::Set(Tag).new.using(:other).create!(is_active: false) do |o|
@@ -961,7 +961,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#delete" do
-    it "allows to delete the records targetted by a specific query set" do
+    it "allows to delete the records targeted by a specific query set" do
       tag_1 = Tag.create!(name: "ruby", is_active: true)
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
@@ -1192,7 +1192,7 @@ describe Marten::DB::Query::Set do
   end
 
   describe "#each" do
-    it "allows to iterate over the records targetted by the query set if it wasn't already fetched" do
+    it "allows to iterate over the records targeted by the query set if it wasn't already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -1206,7 +1206,7 @@ describe Marten::DB::Query::Set do
       tags.sort_by(&.pk!.to_s).should eq [tag_2, tag_3].sort_by(&.pk!.to_s)
     end
 
-    it "allows to iterate over the records targetted by the query set if it was already fetched" do
+    it "allows to iterate over the records targeted by the query set if it was already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -1349,7 +1349,7 @@ describe Marten::DB::Query::Set do
       Marten::DB::Query::Set(Tag).new.exists? { q(name: "crystal") }.should be_true
     end
 
-    it "returns false if the passed q() expression does not match anythin" do
+    it "returns false if the passed q() expression does not match anything" do
       Tag.create!(name: "crystal", is_active: true)
       Tag.create!(name: "coding", is_active: true)
       Tag.create!(name: "programming", is_active: true)
@@ -1432,11 +1432,11 @@ describe Marten::DB::Query::Set do
       qset.to_a.should eq [tag_2]
     end
 
-    it "raises an error when filtering with a misspelled column in a raw SQL condition", tags: "raw" do
+    it "raises an error when filtering with a non existing column in a raw SQL condition", tags: "raw" do
       Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(Exception) do
-        Marten::DB::Query::Set(Tag).new.filter("namme=:name", name: "crystal").to_a
+        Marten::DB::Query::Set(Tag).new.filter("unknown=:name", name: "crystal").to_a
       end
     end
 
@@ -1930,11 +1930,11 @@ describe Marten::DB::Query::Set do
       result.should eq tag_2
     end
 
-    it "raises an error when getting with a misspelled column in a raw SQL condition", tags: "get_raw" do
+    it "raises an error when getting with a non existing column in a raw SQL condition", tags: "get_raw" do
       Tag.create!(name: "crystal", is_active: true)
 
       expect_raises(Exception) do
-        Marten::DB::Query::Set(Tag).new.get("namme=:name", name: "crystal")
+        Marten::DB::Query::Set(Tag).new.get("unknown=:name", name: "crystal")
       end
     end
 
@@ -3715,6 +3715,310 @@ describe Marten::DB::Query::Set do
       qset.update(first_name: "Updated", is_admin: true).should eq 2
 
       qset.to_a.should be_empty
+    end
+
+    it "accepts enum values for enum fields" do
+      article_1 = Marten::DB::Query::SetSpec::EnumArticle.create!(
+        title: "Post 1",
+        category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS
+      )
+      article_2 = Marten::DB::Query::SetSpec::EnumArticle.create!(
+        title: "Post 2",
+        category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS
+      )
+
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      qset
+        .filter(title__in: ["Post 1", "Post 2"])
+        .update(category: Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG)
+        .should eq 2
+
+      article_1.reload
+      article_2.reload
+      article_1.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
+      article_2.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
+    end
+  end
+
+  describe "#update_or_create" do
+    it "updates the record matched by the specified arguments" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      updated_user = qset.update_or_create(
+        updates: {first_name: "Jane"},
+        defaults: {first_name: "Jack", is_admin: true},
+        username: "abc"
+      )
+
+      updated_user.should eq user
+
+      user.reload
+      user.first_name.should eq "Jane"
+      user.is_admin.should be_falsey
+    end
+
+    it "creates a record using the specified updates if no record is found" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create(
+        updates: {
+          username:   "newuser",
+          email:      "newuser@example.com",
+          first_name: "John",
+          last_name:  "Doe",
+        },
+        username: "newuser",
+        email: "newuser@example.com"
+      )
+
+      new_user.persisted?.should be_true
+      new_user.username.should eq "newuser"
+      new_user.first_name.should eq "John"
+      new_user.last_name.should eq "Doe"
+    end
+
+    it "updates overrides defaults when creating a new record if they are provided" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create(
+        updates: {first_name: "John", last_name: "Doe"},
+        defaults: {
+          username:   "default-user",
+          email:      "default@example.com",
+          first_name: "Johnny",
+          last_name:  "Doe",
+          is_admin:   true,
+        },
+        username: "default-user",
+        email: "default@example.com"
+      )
+
+      new_user.persisted?.should be_true
+      new_user.first_name.should eq "John"
+      new_user.is_admin.should be_true
+    end
+
+    it "does not use lookup filters when creating a new record" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create(
+        updates: {
+          username:   "filter-user",
+          email:      "filter@example.com",
+          first_name: "John",
+          last_name:  "Doe",
+        },
+        username: "filter-user",
+        is_admin: true
+      )
+
+      new_user.persisted?.should be_true
+      new_user.username.should eq "filter-user"
+      new_user.is_admin.should be_falsey
+    end
+
+    it "raises MultipleRecordsFound if the filters match multiple records" do
+      TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+      TestUser.create!(
+        username: "def",
+        email: "def@example.com",
+        first_name: "John",
+        last_name: "Smith"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
+        qset.update_or_create(
+          updates: {first_name: "Jane"},
+          first_name: "John"
+        )
+      end
+    end
+
+    it "accepts enum values in updates and merged defaults when creating" do
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      created_article = qset.update_or_create(
+        updates: {category: Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG},
+        defaults: {
+          title:    "Created through defaults",
+          category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS,
+        },
+        title: "missing"
+      )
+
+      created_article.persisted?.should be_true
+      created_article.title.should eq "Created through defaults"
+      created_article.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
+    end
+  end
+
+  describe "#update_or_create!" do
+    it "updates the record matched by the specified arguments" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      updated_user = qset.update_or_create!(
+        updates: {first_name: "Jane"},
+        defaults: {first_name: "Jack", is_admin: true},
+        username: "abc"
+      )
+
+      updated_user.should eq user
+
+      user.reload
+      user.first_name.should eq "Jane"
+      user.is_admin.should be_falsey
+    end
+
+    it "creates a record using the specified updates if no record is found" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create!(
+        updates: {
+          username:   "newuser",
+          email:      "newuser@example.com",
+          first_name: "John",
+          last_name:  "Doe",
+        },
+        username: "newuser",
+        email: "newuser@example.com"
+      )
+
+      new_user.persisted?.should be_true
+      new_user.username.should eq "newuser"
+      new_user.first_name.should eq "John"
+      new_user.last_name.should eq "Doe"
+    end
+
+    it "updates overrides defaults when creating a new record if they are provided" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create!(
+        updates: {first_name: "John", last_name: "Doe"},
+        defaults: {
+          username:   "default-user",
+          email:      "default@example.com",
+          first_name: "Johnny",
+          last_name:  "Doe",
+          is_admin:   true,
+        },
+        username: "default-user",
+        email: "default@example.com"
+      )
+
+      new_user.persisted?.should be_true
+      new_user.first_name.should eq "John"
+      new_user.is_admin.should be_true
+    end
+
+    it "does not use lookup filters when creating a new record" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      new_user = qset.update_or_create!(
+        updates: {
+          username:   "filter-user",
+          email:      "filter@example.com",
+          first_name: "John",
+          last_name:  "Doe",
+        },
+        username: "filter-user",
+        is_admin: true
+      )
+
+      new_user.persisted?.should be_true
+      new_user.username.should eq "filter-user"
+      new_user.is_admin.should be_falsey
+    end
+
+    it "raises MultipleRecordsFound if the filters match multiple records" do
+      TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+      TestUser.create!(
+        username: "def",
+        email: "def@example.com",
+        first_name: "John",
+        last_name: "Smith"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::MultipleRecordsFound) do
+        qset.update_or_create!(
+          updates: {first_name: "Jane"},
+          first_name: "John"
+        )
+      end
+    end
+
+    it "raises InvalidRecord if the updated record is invalid" do
+      TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::InvalidRecord) do
+        qset.update_or_create!(
+          updates: {first_name: ""},
+          username: "abc"
+        )
+      end
+    end
+
+    it "raises InvalidRecord if the created record is invalid" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::InvalidRecord) do
+        qset.update_or_create!(
+          updates: {username: "invalid"},
+          username: "invalid"
+        )
+      end
+    end
+
+    it "accepts enum values in updates and merged defaults when creating" do
+      qset = Marten::DB::Query::Set(Marten::DB::Query::SetSpec::EnumArticle).new
+
+      created_article = qset.update_or_create!(
+        updates: {category: Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG},
+        defaults: {
+          title:    "Created through defaults with bang",
+          category: Marten::DB::Query::SetSpec::EnumArticle::Category::NEWS,
+        },
+        title: "missing-bang"
+      )
+
+      created_article.persisted?.should be_true
+      created_article.title.should eq "Created through defaults with bang"
+      created_article.category.should eq Marten::DB::Query::SetSpec::EnumArticle::Category::BLOG
     end
   end
 

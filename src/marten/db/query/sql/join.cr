@@ -103,18 +103,38 @@ module Marten
                           "LEFT OUTER JOIN"
                         end
 
-            to_table_name = to_model.db_table
-            to_table_common_column = to_common_field.db_column
-            from_table_name = parent.try(&.table_alias) || from_model.db_table
-            from_table_common_column = from_common_field.db_column
+            condition = "#{from_table_name}.#{from_table_common_column} = #{column_name(to_table_common_column)}"
+            if (polymorphic_field = to_common_field).is_a?(Field::Polymorphic)
+              polymorphic_type_field = to_model.get_field(polymorphic_field.type_field_id)
+              condition += " AND #{column_name(polymorphic_type_field.db_column)} = '#{from_model.name}'"
+            end
 
-            sql = "#{statement} #{to_table_name} #{table_alias} " \
-                  "ON (#{from_table_name}.#{from_table_common_column} = #{column_name(to_table_common_column)})"
+            sql = "#{statement} #{to_table_name} #{table_alias} ON (#{condition})"
 
             ([sql] + children.flat_map(&.to_sql)).join(" ")
           end
 
           protected setter parent
+
+          private def from_table_name : String
+            parent.try(&.table_alias) || from_model.db_table
+          end
+
+          private def from_table_common_column : String?
+            from_common_field.db_column
+          end
+
+          private def to_table_name : String
+            to_model.db_table
+          end
+
+          private def to_table_common_column : String?
+            if (polymorphic_field = to_common_field).is_a?(Field::Polymorphic)
+              to_model.get_field(polymorphic_field.id_field_id).db_column
+            else
+              to_common_field.db_column
+            end
+          end
         end
       end
     end

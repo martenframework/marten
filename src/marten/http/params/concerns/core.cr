@@ -65,7 +65,7 @@ module Marten
         # Returns `true` if no parameters are present.
         delegate empty?, to: @params
 
-        # Returns the hash represention of the parameters.
+        # Returns the hash representation of the parameters.
         delegate to_s, to: @params
       end
     end

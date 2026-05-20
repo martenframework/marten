@@ -43,7 +43,7 @@ Adding an application class inside this array will have the following impact on 
 The "main" application is a default application that is always implicitly used by Marten projects (which means that it does not appear in the [`installed_apps`](./reference/settings.md#installed_apps) setting). This application is associated with the standard `src` folder: this means that models, migrations, assets, or templates defined in this folder will be associated with the main application by default. For example, models defined under a `src/models` folder would be associated with the main application.
 
 :::info
-The main application is associated with the `main` label. This means that models of the main application that do not define an explicit table name will have table names starting with `main_`.
+The main application is associated with the `main` label by default (unless explicitly configured otherwise through the use of the [`main_app_label`](./reference/settings.md#main_app_label) setting). This means that models of the main application that do not define an explicit table name will have table names starting with `main_`.
 :::
 
 It should be noted that it is possible to create _explicitly defined_ applications whose structures live under the `src` folder as well: the abstractions (eg. models, migrations, etc) of these applications will be associated with them and _not_ with the main application. This is because abstractions are always associated with the closest application in the files/folders structure.

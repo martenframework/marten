@@ -28,6 +28,19 @@ describe Marten::Spec::Client do
     end
   end
 
+  describe "#flash" do
+    it "returns the flash store initialized from the session" do
+      client = Marten::Spec::Client.new
+
+      response = client.get(Marten.routes.reverse("flash"))
+
+      response.status.should eq 200
+
+      client.flash.should be_a Marten::HTTP::FlashStore
+      client.flash[:notice].should eq "Hello, world!"
+    end
+  end
+
   describe "#get" do
     it "returns the response returned by the handler matched by the specified path" do
       client = Marten::Spec::Client.new

@@ -41,7 +41,7 @@ require "./marten/server/**"
 require "./marten/template/**"
 
 module Marten
-  VERSION = "0.6.0"
+  VERSION = "0.6.3"
 
   Log = ::Log.for("marten")
 
@@ -260,11 +260,12 @@ module Marten
     override_server_host(host) if host
     override_server_port(port) if port
 
-    setup
+    ready_in = Time.measure do
+      setup
+      Marten::Server.setup
+    end
 
-    Marten::Server.setup
-
-    show_server_info
+    show_server_info(ready_in)
 
     Process.on_terminate do
       Log.info { "Shutting down" }
@@ -288,6 +289,25 @@ module Marten
 
   private def self.build_information : String
     "Marten #{VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"
+  end
+
+  private def self.debug_server_startup_banner(addresses_str : String, ready_in : Time::Span) : String
+    urls = addresses_str.split(',').map(&.strip).reject(&.empty?)
+    urls = [addresses_str.strip] if urls.empty?
+
+    ms = ready_in.total_milliseconds.round.to_i
+
+    String.build do |s|
+      s << '\n'
+      s << "Marten v#{VERSION} ready in #{ms} ms" << '\n'
+      s << '\n'
+      s << "  ➜  Listening at: #{urls.join(", ")}" << '\n'
+      s << "  ➜  Environment: #{Marten.env.id}" << '\n'
+      s << "  ➜  Crystal: #{Crystal::VERSION}" << '\n'
+      s << "  ➜  LLVM: #{Crystal::LLVM_VERSION}" << '\n'
+      s << '\n'
+      s << "Press CTRL+C to quit" << '\n'
+    end
   end
 
   private def self.effective_marten_location : String
@@ -335,17 +355,12 @@ module Marten
     end
   end
 
-  private def self.show_server_info : Nil
-    base_message = "Marten running on #{Marten::Server.addresses.join ", "} (Press CTRL+C to quit)"
+  private def self.show_server_info(ready_in : Time::Span) : Nil
+    addresses_str = Marten::Server.addresses.join ", "
+    base_message = "Marten running on #{addresses_str} (Press CTRL+C to quit)"
 
     if Marten.settings.debug?
-      Log.info do
-        String.build do |s|
-          s << "#{"=" * base_message.size}\n"
-          s << base_message
-          s << "\n#{"=" * base_message.size}"
-        end
-      end
+      Log.info { debug_server_startup_banner(addresses_str, ready_in) }
     else
       Log.info { base_message }
     end

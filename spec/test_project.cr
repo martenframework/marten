@@ -134,6 +134,7 @@ Marten.routes.draw do
   path "/simple-schema", SimpleSchemaHandler, name: "simple_schema"
   path "/simple-file-schema", SimpleFileSchemaHandler, name: "simple_file_schema"
   path "/nested-1", NESTED_ROUTES_1, name: "nested_1"
+  path "/flash", FlashHandler, name: "flash"
 
   localized do
     path "/dummy-localized", DummyHandler, name: "localized_dummy"

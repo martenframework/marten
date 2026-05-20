@@ -131,7 +131,14 @@ bin/manage migrate
 
 [SystemD](https://systemd.io) is a service manager for Linux that we can leverage in order to easily start or restart our deployed application. As such, we are going to create a service for our application.
 
-To do so, first ensure that you exit your current shell session as the `deploy` user with `Ctrl-D` or by entering the `exit` command. Then create a service file for your app by typing the following command:
+But first, create an empty `settings.env` file in the current shell session as the `deploy` user:
+
+```bash
+touch /srv/<yourapp>/settings.env
+chmod 600 /srv/<yourapp>/settings.env
+```
+
+Exit the shell with `Ctrl-D` or by entering the `exit` command and then create a service file for your app by typing the following command:
 
 ```bash
 nano /etc/systemd/system/<yourapp>.service
@@ -145,12 +152,14 @@ Description=<yourapp> server
 After=syslog.target
 
 [Service]
+User=deploy
 ExecStart=/srv/<yourapp>/project/bin/server
 Restart=always
 RestartSec=5s
 KillSignal=SIGQUIT
 WorkingDirectory=/srv/<yourapp>/project
 Environment="MARTEN_ENV=production"
+EnvironmentFiles=/srv/<yourapp>/settings.env
 
 [Install]
 WantedBy=multi-user.target
@@ -160,12 +169,23 @@ Don't forget to replace the `<yourapp>` placeholders with the right values and, 
 
 As you can see in the above snippet, we are assuming that the current [Marten environment](../../development/settings.md#environments) is the production one by setting the `MARTEN_ENV` environment variable to `production`. You should adapt this to your deployment use case obviously.
 
-:::tip
-This service file is also a good place to define any environment variables that may be required by your project's settings. For example, this may be the case for "sensitive" setting values such as the [`secret_key`](../../development/reference/settings.md#secret_key) setting: as highlighted in [Secure critical setting values](../introduction.md#secret-key) you could store the value of this setting in a dedicated environment variable and load it from your application's codebase. If you do so, you will also want to add additional lines to the service file in order to define these additional environment variables. For example:
+:::caution
+While the service file is a good place to define environment variables for your project's settings, it should not be used for secrets and sensitive information, such as the [`secret_key`](../../development/reference/settings.md#secret_key) setting.
+
+Edit the `settings.env` file as the `deploy` user:
+
+```bash
+sudo -u deploy nano /srv/<yourapp>/settings.env
+```
+
+Save the [`secret_key`](../../development/reference/settings.md#secret_key) and other sensitive settings in it:
 
 ```
-Environment="MARTEN_SECRET_KEY=<secretkey>"
+MARTEN_SECRET_KEY=<secretkey>
 ```
+
+And then load it from your application's codebase, as described in [Secure critical setting values](../introduction.md#secret-key).
+
 :::
 
 In order to ensure that SystemD takes into account the new service you just created, you can then run the following command:

@@ -191,6 +191,28 @@ describe MyHandler do
 end
 ```
 
+#### Flash messages
+
+Similarly to accessing session values, you can also access flash messages by leveraging the [`#flash`](pathname:///api/dev/Marten/Spec/Client.html#flash-instance-method) method of the test client. This method returns a [`Marten::HTTP::FlashStore`](pathname:///api/dev/Marten/HTTP/FlashStore.html) object, initialized from the currently configured session store. This can be helpful to access flash messages that might have been set by handlers and verify that they have the expected values.
+
+For example:
+
+```crystal
+describe MyHandler do
+  describe "#post" do
+    it "sets the expected flash message and redirects to the expected URL" do
+      url = Marten.routes.reverse("do_something")
+      response = Marten::Spec.client.post(url, data: {"foo" => "bar"})
+
+      response.status.should eq 302
+      response.headers["Location"].should eq "/success"
+
+      Marten::Spec.client.flash[:notice].should eq "Action successfully completed!"
+    end
+  end
+end
+```
+
 #### Testing client and authentication
 
 When using the [marten-auth](https://github.com/martenframework/marten-auth) shard and the built-in [authentication](../authentication.mdx), a few additional helpers can be leveraged in order to easily sign in/sign out users while using the test client:

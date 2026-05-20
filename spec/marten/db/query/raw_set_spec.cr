@@ -591,7 +591,7 @@ describe Marten::DB::Query::RawSet do
   end
 
   describe "#each" do
-    it "allows to iterate over the records targetted by the query set if it wasn't already fetched" do
+    it "allows to iterate over the records targeted by the query set if it wasn't already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)
@@ -610,7 +610,7 @@ describe Marten::DB::Query::RawSet do
       tags.should eq [tag_2, tag_3]
     end
 
-    it "allows to iterate over the records targetted by the query set if it was already fetched" do
+    it "allows to iterate over the records targeted by the query set if it was already fetched" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)
       tag_3 = Tag.create!(name: "coding", is_active: true)

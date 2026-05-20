@@ -60,6 +60,8 @@ class WelcomeEmail < Marten::Email
 end
 ```
 
+This callback is also a common place to call [`#attach`](./introduction.md#defining-attachments) in order to add email attachments right before delivery.
+
 ### `after_deliver`
 
 `after_deliver` callbacks are executed _after_ an email is delivered (as part of the email's [`#deliver`](pathname:///api/dev/Marten/Emailing/Email.html#deliver-instance-method) method). For example, such callbacks can be leveraged to increment email-specific metrics:

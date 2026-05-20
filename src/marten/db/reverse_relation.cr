@@ -9,7 +9,7 @@ module Marten
       # Returns the field ID that initiated the reverse relation.
       getter field_id
 
-      # Returns the model class targetted by the reverse relation.
+      # Returns the model class targeted by the reverse relation.
       getter model
 
       def initialize(@id : String?, @model : Model.class, @field_id : String)
@@ -41,6 +41,11 @@ module Marten
       # Returns `true` if the reverse relation is a parent link.
       def parent_link?
         one_to_one? && field.as(Field::OneToOne).parent_link?
+      end
+
+      # Returns `true` if the reverse relation is associated with a polymorphic field.
+      def polymorphic?
+        field.is_a?(Field::Polymorphic)
       end
 
       protected def field

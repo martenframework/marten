@@ -21,13 +21,13 @@ module Marten
 
       # Represents an error raised when the host specified in the request doesn't match the list of allowed hosts.
       #
-      # Marten has to be explictely configured to serve a list of allowed hosts. This is to mitigate HTTP Host header
+      # Marten has to be explicitly configured to serve a list of allowed hosts. This is to mitigate HTTP Host header
       # attacks.
       class UnexpectedHost < SuspiciousOperation; end
 
       # Represents an error raised when too many parameters are received for a given request.
       #
-      # This excepion is raised when too many parameters (such as GET or POST parameters) are received for a specific
+      # This exception is raised when too many parameters (such as GET or POST parameters) are received for a specific
       # request. This is to to prevent large requests that could be used in the context of DOS attacks.
       class TooManyParametersReceived < SuspiciousOperation; end
 

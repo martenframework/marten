@@ -13,7 +13,7 @@ module Marten
             yield name
           end
 
-          # Returns the value matchine the passed encrypted cookie name, or the `default` one if it is not present.
+          # Returns the value matching the passed encrypted cookie name, or the `default` one if it is not present.
           def fetch(name : String | Symbol, default = nil)
             fetch(name) { default }
           end
@@ -21,7 +21,7 @@ module Marten
           # Allows to set a cookie that is encrypted.
           #
           # The string representation of the passed `value` object will be encrypted, and the resulting string will be
-          # used as the cookie value. Appart from the cookie name and value, this method allows to define some
+          # used as the cookie value. Apart from the cookie name and value, this method allows to define some
           # additional cookie properties:
           #
           #   * the cookie expiry datetime (`expires` argument)

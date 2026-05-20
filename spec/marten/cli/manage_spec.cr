@@ -28,7 +28,7 @@ describe Marten::CLI::Manage do
       end
     end
 
-    it "does not display the same commands mulitple times when the top-level usage is outputted due to aliases" do
+    it "does not display the same commands multiple times when the top-level usage is outputted due to aliases" do
       output = Marten::CLI::ManageSpec.run_command
 
       output.scan(Marten::CLI::Manage::Command::Serve.help).size.should eq 1

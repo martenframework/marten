@@ -25,7 +25,7 @@ module Marten
         # record.errors.add("This record is invalid!")
         # ```
         #
-        # Optionnaly, an error `type` can be explicitely specified, otherwise it defaults to `:invalid`:
+        # Optionally, an error `type` can be explicitly specified, otherwise it defaults to `:invalid`:
         #
         # ```
         # record.errors.add("This record is invalid!", type: :invalid_record)
@@ -43,7 +43,7 @@ module Marten
         # record.errors.add(:attribute, "This record attribute is invalid")
         # ```
         #
-        # Optionnaly, an error `type` can be explicitely specified, otherwise it defaults to `:invalid`:
+        # Optionally, an error `type` can be explicitly specified, otherwise it defaults to `:invalid`:
         #
         # ```
         # records.errors.add(:attribute, "This record attribute is invalid!", type: :invalid_attribute)

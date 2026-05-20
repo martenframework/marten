@@ -8,7 +8,7 @@ Callbacks enable you to define logic that is triggered at different stages of a 
 
 ## Overview
 
-As stated above, callbacks are methods that will be called when specific events occur for a specific handler instance. They need to be registered explicitly in your handler classes. There are many types of of callbacks: some are [shared between all types of handlers](#shared-handler-callbacks) while some others are specific to some kinds of generic handlers. For most types of callbacks, it is generally possible to register "before" or "after" callbacks.
+As stated above, callbacks are methods that will be called when specific events occur for a specific handler instance. They need to be registered explicitly in your handler classes. There are many types of callbacks: some are [shared between all types of handlers](#shared-handler-callbacks) while some others are specific to some kinds of generic handlers. For most types of callbacks, it is generally possible to register "before" or "after" callbacks.
 
 Registering a callback is as simple as calling the right callback macro (eg. `#before_dispatch`) with a symbol of the name of the method to call when the callback is executed. 
 

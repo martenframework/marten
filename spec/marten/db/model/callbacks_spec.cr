@@ -1448,7 +1448,7 @@ module Marten::DB::Model::CallbacksSpec
       return has_after_create_rollback_callbacks? if callback == "after_create_rollback"
       return has_after_update_rollback_callbacks? if callback == "after_update_rollback"
       return has_after_save_rollback_callbacks? if callback == "after_save_rollback"
-      return has_after_delete_rollback_callbacks? if callback == "after_delete_rollback"
+      has_after_delete_rollback_callbacks? if callback == "after_delete_rollback"
     end
 
     def run_callbacks(callback = nil)

@@ -28,7 +28,7 @@ module Marten
 
         # Returns the max age (in seconds) of the CSRF cookie.
         #
-        # By default, CSRF cookie max age is set to `31556952` (approximatively one year).
+        # By default, CSRF cookie max age is set to `31556952` (approximately one year).
         getter cookie_max_age
 
         # Returns the name of the cookie to use for the CSRF token (defaults to `"csrftoken"`).

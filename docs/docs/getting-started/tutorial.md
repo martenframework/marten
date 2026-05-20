@@ -815,7 +815,7 @@ The `include` template tag provides additional options like the ability to assig
 
 ## Refactoring: using generic handlers
 
-The handlers we implemented previously map to common web development use cases: retrieving data from the database - from a specific URL paramater - and displaying it, listing multiple objects, creating or updating records, etc. These use cases are so frequently encountered that Marten provides a set of "generic handlers" that allow to easily implement them. These generic handlers take care of these common patterns so that developers don't end up reimplementing the wheel.
+The handlers we implemented previously map to common web development use cases: retrieving data from the database - from a specific URL parameter - and displaying it, listing multiple objects, creating or updating records, etc. These use cases are so frequently encountered that Marten provides a set of "generic handlers" that allow to easily implement them. These generic handlers take care of these common patterns so that developers don't end up reimplementing the wheel.
 
 We could definitely leverage these generic handlers as part of our weblog application.
 

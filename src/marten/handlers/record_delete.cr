@@ -21,9 +21,9 @@ module Marten
     #
     # The `#template_name` class method allows to define the name of the template to use to render a deletion
     # confirmation page while the `#success_route_name` method can be used to specify the name of a route to redirect to
-    # once the deletion is complete. Alternatively, the `#sucess_url` class method can be used to provide a raw URL to
+    # once the deletion is complete. Alternatively, the `#success_url` class method can be used to provide a raw URL to
     # redirect to. The same method can also be overridden at the instance level in order to rely on a custom logic to
-    # generate the sucess URL to redirect to.
+    # generate the success URL to redirect to.
     class RecordDelete < Template
       include RecordRetrieving
 

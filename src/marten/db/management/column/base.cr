@@ -11,8 +11,12 @@ module Marten
           getter default
           getter name
 
+          setter default
           setter name
+          setter null
           setter primary_key
+          setter unique
+          setter index
 
           def initialize(
             @name : ::String,

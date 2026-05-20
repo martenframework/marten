@@ -19,7 +19,7 @@ module Marten
         # Allows to set the base URL to use when exposing media file URLs.
         setter url
 
-        # Allows to set the absolute path where collected media fiels will be persisted.
+        # Allows to set the absolute path where collected media fields will be persisted.
         def root=(dir : Path | String | Symbol | Nil)
           @root = case dir
                   when Path

@@ -50,8 +50,8 @@ module Marten
         module ClassMethods
           # Allows to explicitly configure a new index for a specific set of fields.
           #
-          # This method allows to configure a new index targetting a specific set of `fields`. Indexes must be
-          # associated with a mandatory `name` that must be unique accross all the indexes of the considered model.
+          # This method allows to configure a new index targeting a specific set of `fields`. Indexes must be
+          # associated with a mandatory `name` that must be unique across all the indexes of the considered model.
           def db_index(name : String | Symbol, field_names : Array(String) | Array(Symbol)) : Nil
             @@db_indexes << Index.new(
               name.to_s,
@@ -70,25 +70,28 @@ module Marten
 
           # Returns the name of the table associated with the considered model.
           #
-          # Unless explicitely specified, the table name is automatically generated based on the label of the app
+          # Unless explicitly specified, the table name is automatically generated based on the label of the app
           # associated with the considered model and the class name of the model.
           def db_table
             @@db_table ||= String.build do |s|
-              s << app_config.label.downcase
-              s << '_'
+              unless app_config.label.blank?
+                s << app_config.label.downcase
+                s << '_'
+              end
+
               s << (model_name = name.split("::").last.underscore)
             end
           end
 
-          # Allows to explicitely define the name of the table associated with the model.
+          # Allows to explicitly define the name of the table associated with the model.
           def db_table(db_table : String | Symbol)
             @@db_table = db_table.to_s
           end
 
           # Allows to explicitly configure a new unique constraint for a specific set of fields.
           #
-          # This method allows to configure a new unique constraint targetting a specific set of `fields`. Unique
-          # constraints must be associated with a mandatory `name` that must be unique accross all the constraints of
+          # This method allows to configure a new unique constraint targeting a specific set of `fields`. Unique
+          # constraints must be associated with a mandatory `name` that must be unique across all the constraints of
           # the considered model.
           def db_unique_constraint(name : String | Symbol, field_names : Array(String) | Array(Symbol)) : Nil
             @@db_unique_constraints << Constraint::Unique.new(
@@ -213,9 +216,9 @@ module Marten
           end
 
           protected def parent_fields
-            parent_models.compact_map do |parent_model|
-              if (f = pk_field).is_a?(Field::OneToOne) && f.parent_link?
-                pk_field
+            ([self] + parent_models).compact_map do |parent_model|
+              if (f = parent_model.pk_field).is_a?(Field::OneToOne) && f.parent_link?
+                parent_model.pk_field
               end
             end
           end
@@ -338,8 +341,10 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
           {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+          {% if !(ann[:no_value] == true) %}
           when {{ field_var.name.stringify }}
             {{ ann[:accessor] || field_var.id }}
+          {% end %}
           {% end %}
           else
             raise Errors::UnknownField.new("Unknown field '#{field_name.to_s}'")
@@ -469,8 +474,10 @@ module Marten
 
           {% for field_var in local_field_vars %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if !(ann[:has_value] == false) %}
             field = self.class.get_field({{ field_var.name.stringify }})
             values[field.db_column!] = field.to_db({{ ann[:accessor] || field_var.id }}) if field.db_column?
+            {% end %}
           {% end %}
 
           values
@@ -593,9 +600,14 @@ module Marten
         #
         # If the passed `field_name` doesn't match any existing field, a `Marten::DB::Errors::UnknownField` exception
         # will be raised.
-        def set_field_value(field_name : String | Symbol, value : Field::Any | Model)
+        def set_field_value(field_name : String | Symbol, value : Field::Any | Model | ::Enum)
           sanitized_values = Hash(String, Field::Any | Model).new
-          sanitized_values[field_name.to_s] = value
+          sanitized_values[field_name.to_s] = case value
+                                              when Field::Any, Model
+                                                value
+                                              when ::Enum
+                                                value.to_s
+                                              end
           assign_field_values(sanitized_values)
         end
 
@@ -608,11 +620,19 @@ module Marten
         end
 
         # :ditto:
-        def set_field_values(values : Hash | NamedTuple)
+        def set_field_values(values : Hash | NamedTuple) # ameba:disable Naming/AccessorMethodName
           sanitized_values = Hash(String, Field::Any | Model).new
           values.each do |key, value|
-            next unless value.is_a?(Field::Any | Model)
-            sanitized_values[key.to_s] = value
+            sanitized_value = case value
+                              when Field::Any, Model
+                                value
+                              when ::Enum
+                                value.to_s
+                              else
+                                next
+                              end
+
+            sanitized_values[key.to_s] = sanitized_value
           end
 
           assign_field_values(sanitized_values)
@@ -663,8 +683,10 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if !(ann[:no_value] == true) %}
             field = self.class.get_field({{ field_var.name.stringify }})
             values[field.db_column!] = {{ ann[:accessor] || field_var.id }} if field.db_column?
+            {% end %}
           {% end %}
           values
         end
@@ -706,18 +728,20 @@ module Marten
           {% for field_var in @type.instance_vars
                                 .select { |ivar| ivar.annotation(Marten::DB::Model::Table::FieldInstanceVariable) } %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
-            if values.has_key?({{ field_var.name.stringify }})
-              value = values[{{ field_var.name.stringify }}]
-              if !value.is_a?(
-                {{ field_var.type }}{% if ann[:field_type] %} | {{ ann[:field_type] }}{% end %}
-              )
-                raise Errors::UnexpectedFieldValue.new(
-                  "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
+            {% if !(ann[:no_value] == true) %}
+              if values.has_key?({{ field_var.name.stringify }})
+                value = values[{{ field_var.name.stringify }}]
+                if !value.is_a?(
+                  {{ field_var.type }}{% if ann[:field_type] %} | {{ ann[:field_type] }}{% end %}
                 )
+                  raise Errors::UnexpectedFieldValue.new(
+                    "Value for field {{ field_var.id }} should be of type {{ field_var.type }}, not #{typeof(value)}"
+                  )
+                end
+                self.{{ ann[:accessor] || field_var.id }} = value
+                values.delete({{ field_var.name.stringify }})
               end
-              self.{{ ann[:accessor] || field_var.id }} = value
-              values.delete({{field_var.name.stringify}})
-            end
+            {% end %}
 
             {% if ann && ann[:relation_name] %}
               if values.has_key?({{ ann[:relation_name].stringify }})
@@ -761,10 +785,12 @@ module Marten
 
           {% for field_var in local_field_vars %}
             {% ann = field_var.annotation(Marten::DB::Model::Table::FieldInstanceVariable) %}
+            {% if !(ann[:no_value] == true) %}
             if model_klass.name == {{ ann[:model_klass].id.stringify }}
               field = {{ ann[:model_klass].id }}.get_field({{ field_var.name.stringify }})
               values[field.db_column!] = field.to_db({{ ann[:accessor] || field_var.id }}) if field.db_column?
             end
+            {% end %}
           {% end %}
 
           values

@@ -247,7 +247,7 @@ describe Marten::Template::Value do
       (Marten::Template::Value.from(42) == Marten::Template::Value.from(11)).should be_false
     end
 
-    it "returns true if a value object and another raw value do not corespond to the same raw value" do
+    it "returns true if a value object and another raw value do not correspond to the same raw value" do
       (Marten::Template::Value.from(42) == 11).should be_false
     end
   end

@@ -9,7 +9,7 @@ module Marten
         # `Marten::Routing::Errors::NoReverseMatch` error.
         abstract def dumps(value) : Nil | ::String
 
-        # Parses a raw string parmater and returns the corresponding Crystal object.
+        # Parses a raw string parameter and returns the corresponding Crystal object.
         #
         # The returned object is the one that will be forwarded to the handler in the route parameters hash.
         abstract def loads(value : ::String)

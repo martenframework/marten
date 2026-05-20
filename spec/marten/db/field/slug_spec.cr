@@ -35,7 +35,7 @@ describe Marten::DB::Field::Slug do
       article.slug.not_nil!.should eq("my-first-article")
     end
 
-    it "raises an error if an invalid field is targetted" do
+    it "raises an error if an invalid field is targeted" do
       article = Marten::DB::Field::SlugSpec::ArticleInvalidSlugField.new(title: "My First Article")
 
       expect_raises(Marten::DB::Errors::UnknownField) do

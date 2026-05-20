@@ -61,7 +61,7 @@ module Marten
         {% end %}
 
         @[Marten::Schema::Field::Registration(id: {{ id }}, exposed_type: {{ exposed_type }})]
-        class ::{{klass.id}}; end
+        class ::{{ klass.id }}; end
         Marten::Schema::Field.add_field_to_registry({{ id }}, {{ klass }})
       end
 

@@ -61,7 +61,7 @@ module Marten
           end
 
           def add_annotation(ann : DB::Query::Annotation) : Nil
-            field_path = verify_field(ann.field, only_relations: false, allow_many: true)
+            field_path = verify_field(ann.field, only_relations: false, allow_many: true, allow_polymorphic: false)
             relation_field_path = field_path.select { |field, _r| field.relation? }
 
             if relation_field_path.empty? || (field_path.size == 1 && field_path.last[1].nil?)
@@ -100,7 +100,7 @@ module Marten
           end
 
           def add_selected_join(relation : String) : Nil
-            field_path = verify_field(relation, only_relations: true, allow_many: false)
+            field_path = verify_field(relation, only_relations: true, allow_many: false, allow_polymorphic: false)
 
             # Special case: if the last model makes use of multi table inheritance, we have to ensure that the parent
             # models are retrieved as well in order to ensure that the joined records can properly be instantiated.
@@ -1050,30 +1050,57 @@ module Marten
             get_field_context(raw_field, model).field
           end
 
-          private def get_field_context(raw_field, model, allow_many = true)
+          private def get_field_context(raw_field, model, allow_many = true, allow_polymorphic = true)
             field_context = begin
               model.get_field_context(raw_field.to_s)
             rescue Errors::UnknownField
-              raise_invalid_field_error_with_valid_choices(raw_field, model, allow_many: allow_many)
+              raise_invalid_field_error_with_valid_choices(
+                raw_field,
+                model,
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+              )
             end
 
             if !allow_many && field_context.field.is_a?(Field::ManyToMany)
-              raise_invalid_field_error_with_valid_choices(raw_field, model, allow_many: allow_many)
+              raise_invalid_field_error_with_valid_choices(
+                raw_field,
+                model,
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+              )
+            end
+
+            if !allow_polymorphic && field_context.field.is_a?(Field::Polymorphic)
+              raise_invalid_field_error_with_valid_choices(
+                raw_field,
+                model,
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+              )
             end
 
             field_context
           end
 
-          private def get_relation_field_context(raw_relation, model, allow_many = true, silent = false)
+          private def get_relation_field_context(
+            raw_relation,
+            model,
+            allow_many = true,
+            allow_polymorphic = true,
+            silent = false,
+          )
             field_context = begin
               model.get_relation_field_context(raw_relation.to_s)
             rescue Errors::UnknownField
-              return nil if silent
+              return if silent
               raise_invalid_field_error_with_valid_choices(
                 raw_relation,
                 model,
                 "relation field",
-                allow_many: allow_many
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+                only_relations: true,
               )
             end
 
@@ -1082,7 +1109,22 @@ module Marten
                 raw_relation,
                 model,
                 field_type: "relation field",
-                allow_many: allow_many
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+                only_relations: true,
+                additional_context: "'#{raw_relation}' is a many-to-many relation and cannot be used in this context",
+              )
+            end
+
+            if !allow_polymorphic && field_context.field.is_a?(Field::Polymorphic)
+              raise_invalid_field_error_with_valid_choices(
+                raw_relation,
+                model,
+                field_type: "relation field",
+                allow_many: allow_many,
+                allow_polymorphic: allow_polymorphic,
+                only_relations: true,
+                additional_context: "'#{raw_relation}' is a polymorphic relation and cannot be used in this context",
               )
             end
 
@@ -1149,17 +1191,30 @@ module Marten
             model,
             field_type = "field",
             allow_many = true,
+            allow_polymorphic = true,
+            only_relations = false,
+            additional_context = nil,
           )
             fields = model.fields
             fields = fields.reject(Field::ManyToMany) if !allow_many
+            fields = fields.reject(Field::Polymorphic) if !allow_polymorphic
+            fields = fields.select(&.relation?) if only_relations
+
+            choices = fields.map(&.id).join(", ")
+            choices_string = choices.empty? ? nil : "Valid choices are: #{choices}."
+
+            parenthesis_content = additional_context.nil? ? nil : " (#{additional_context})"
 
             raise Errors::InvalidField.new(
-              "Unable to resolve '#{raw_field}' as a #{field_type}. Valid choices are: #{fields.join(", ", &.id)}."
+              [
+                "Unable to resolve '#{raw_field}' as a #{field_type}#{parenthesis_content}.",
+                choices_string,
+              ].compact.join(" ")
             )
           end
 
           private def solve_field_and_column(raw_field)
-            field_path = verify_field(raw_field.to_s, allow_many: false)
+            field_path = verify_field(raw_field.to_s, allow_many: false, allow_polymorphic: false)
             relation_field_path = field_path.select { |field, _r| field.relation? }
 
             if relation_field_path.empty? || (field_path.size == 1 && field_path.last[1].nil?)
@@ -1259,7 +1314,7 @@ module Marten
             quote(Model.db_table)
           end
 
-          private def verify_field(raw_field, only_relations = false, allow_many = true)
+          private def verify_field(raw_field, only_relations = false, allow_many = true, allow_polymorphic = true)
             field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
 
             current_model = Model
@@ -1283,9 +1338,19 @@ module Marten
 
               field_context = begin
                 if only_relations
-                  get_relation_field_context(part, current_model, allow_many: allow_many)
+                  get_relation_field_context(
+                    part,
+                    current_model,
+                    allow_many: allow_many,
+                    allow_polymorphic: allow_polymorphic,
+                  )
                 else
-                  get_field_context(part, current_model, allow_many: allow_many)
+                  get_field_context(
+                    part,
+                    current_model,
+                    allow_many: allow_many,
+                    allow_polymorphic: allow_polymorphic,
+                  )
                 end
               rescue e : Errors::InvalidField
                 reverse_relation_context = current_model.get_reverse_relation_context(part.to_s)
@@ -1327,6 +1392,17 @@ module Marten
               # The current model must be set in order to be able to correctly identify the actual targeted model field
               # in the next iteration.
               if reverse_relation_context.nil? && field_context.field.relation?
+                # We must raise if the field is a polymorphic one because it is not possible to determine the actual
+                # targeted model. Going through polymorphic relations can only be done by going backwards through the
+                # reverse relation.
+                if field_context.field.is_a?(Field::Polymorphic)
+                  field_path = raw_field.split(Constants::LOOKUP_SEP)[0..i].join(Constants::LOOKUP_SEP)
+                  raise Errors::UnmetQuerySetCondition.new(
+                    "Cannot traverse polymorphic field '#{field_context.field.id}' in expression '#{raw_field}'. " \
+                    "Polymorphic relations cannot be traversed forward because the target model cannot be determined. "
+                  )
+                end
+
                 current_model = field_context.field.related_model
               elsif !reverse_relation_context.nil?
                 current_model = reverse_relation_context.reverse_relation.model

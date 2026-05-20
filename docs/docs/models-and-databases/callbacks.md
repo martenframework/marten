@@ -8,7 +8,7 @@ Models callbacks let you define logic that is triggered before or after a record
 
 ## Overview
 
-As stated above, callbacks are methods that will be called when specific events occur for a specific model instance. They need to be registered explicitly as part your model definitions. There are [many types of of callbacks](#available-callbacks), and it is possible to register "before" or "after" callbacks for most of these types.
+As stated above, callbacks are methods that will be called when specific events occur for a specific model instance. They need to be registered explicitly as part your model definitions. There are [many types of callbacks](#available-callbacks), and it is possible to register "before" or "after" callbacks for most of these types.
 
 Registering a callback is as simple as calling the right callback macro (eg. `#before_validation`) with a symbol of the name of the method to call when the callback is executed. For example:
 
@@ -110,3 +110,11 @@ after_rollback :do_something_else, on: [:create, :delete] # Will run after rolle
 ```
 
 The actions supported by the `on` argument are `create`, `update`, `save`, and `delete`.
+
+## Methods that bypass callbacks
+
+Some model methods intentionally bypass callbacks for performance or specific use cases. The following methods do **not** trigger callbacks:
+
+* `#update_columns` and `#update_columns!` - These methods update specific columns directly in the database without running validations or any lifecycle callbacks. They are useful for performance-critical updates where you want to avoid the overhead of the full save lifecycle.
+
+If you need to update records while ensuring that callbacks are executed, use the standard `#save`, `#save!`, `#update`, or `#update!` methods instead.

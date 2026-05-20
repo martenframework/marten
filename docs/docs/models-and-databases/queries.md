@@ -432,7 +432,7 @@ article = Article.get(id: 42)
 article.delete
 ```
 
-Marten also provide the ability to delete the records that are targetted by a specific query set through the use of the `#delete` method, like in the following example:
+Marten also provide the ability to delete the records that are targeted by a specific query set through the use of the `#delete` method, like in the following example:
 
 ```crystal
 Article.filter(title: "My article").delete

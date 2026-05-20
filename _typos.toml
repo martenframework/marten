@@ -1,0 +1,27 @@
+[default]
+extend-ignore-identifiers-re = [
+  "enumerables",
+]
+extend-ignore-re = [
+  # IPv4 (strict-ish 0-255)
+  "\\b(?:(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\.){3}(?:25[0-5]|2[0-4]\\d|[01]?\\d?\\d)\\b",
+
+  # IPv6 (covers the common forms, incl. "::" compression)
+  "\\b(?:[0-9A-Fa-f]{1,4}:){1,7}[0-9A-Fa-f]{1,4}\\b",
+  "\\b(?:[0-9A-Fa-f]{1,4}:){1,7}:\\b",
+  "\\b:(?::[0-9A-Fa-f]{1,4}){1,7}\\b",
+]
+
+[files]
+extend-exclude = [
+  "docs/node_modules",
+  "src/marten/locales",
+]
+
+[type.md]
+extend-ignore-re = [
+  # CRUD acronym styling in models-and-databases/introduction.md
+  "\\*\\*(?:C\\*\\*reate|R\\*\\*ead|U\\*\\*pdate|D\\*\\*elete)",
+  # UUID docs: "Universally Unique IDentifiers"
+  "IDentifiers",
+]

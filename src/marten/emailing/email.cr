@@ -1,3 +1,4 @@
+require "./attachment"
 require "./email/callbacks"
 
 module Marten
@@ -10,6 +11,7 @@ module Marten
     abstract class Email
       include Callbacks
 
+      @attachments = [] of Attachment
       @context : Template::Context? = nil
       @headers = {} of String => String
 
@@ -43,6 +45,37 @@ module Marten
       # Returns the emailing backend to use in order to send this email.
       def backend
         self.class.backend || Marten.settings.emailing.backend
+      end
+
+      # Attaches the file located at the specified path.
+      def attach(path : String, filename : String? = nil, mime_type : String? = nil) : Nil
+        attachment_filename = filename || Path[path].basename
+        File.open(path) do |file|
+          attach_content(file, attachment_filename, mime_type)
+        end
+      end
+
+      # Attaches the specified file.
+      def attach(file : ::File, filename : String? = nil, mime_type : String? = nil) : Nil
+        attachment_filename = filename || Path[file.path].basename
+        initial_position = file.pos
+
+        begin
+          file.rewind
+          attach_content(file, attachment_filename, mime_type)
+        ensure
+          file.pos = initial_position
+        end
+      end
+
+      # Attaches the content read from the specified IO.
+      def attach(io : IO, *, filename : String, mime_type : String? = nil) : Nil
+        attach_content(io, filename, mime_type)
+      end
+
+      # Returns the associated attachments.
+      def attachments : Array(Attachment)
+        @attachments
       end
 
       # Returns the email addresses the email should be BBC'ed to.
@@ -166,6 +199,8 @@ module Marten
         end
       end
 
+      private DEFAULT_ATTACHMENT_MIME_TYPE = "application/octet-stream"
+
       private def normalize(value : Array(Address) | Array(String) | Address | String) : Array(Address)
         case value
         when Array(Address)
@@ -184,6 +219,24 @@ module Marten
         run_before_render_callbacks
 
         Marten.templates.get_template(template_name).render(context)
+      end
+
+      private def resolve_attachment_mime_type(filename : String, mime_type : String?) : String
+        return mime_type.not_nil! unless mime_type.nil?
+
+        begin
+          MIME.from_filename(filename)
+        rescue KeyError
+          DEFAULT_ATTACHMENT_MIME_TYPE
+        end
+      end
+
+      private def attach_content(io : IO, filename : String, mime_type : String?) : Nil
+        attachments << Attachment.new(
+          filename: filename,
+          mime_type: resolve_attachment_mime_type(filename, mime_type),
+          content: io.gets_to_end.to_slice
+        )
       end
     end
   end

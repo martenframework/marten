@@ -22,7 +22,7 @@ module Marten
         {{ run("./config/fetch_compilation_root_path.cr") }}
       end
 
-      # Allows to define the lable of the application config.
+      # Allows to define the label of the application config.
       def self.label(label : String | Symbol)
         validate_label(label)
 
@@ -42,7 +42,7 @@ module Marten
           raise Errors::InvalidAppConfig.new("App labels can only contain lowercase letters and underscores")
         end
 
-        if label.to_s == MainConfig::RESERVED_LABEL
+        if self != MainConfig && label.to_s == MainConfig.label
           raise Errors::InvalidAppConfig.new("Apps cannot use the 'main' reserved label")
         end
       end

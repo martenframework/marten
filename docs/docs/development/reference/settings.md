@@ -113,6 +113,18 @@ The default log level used by the application. Any severity defined in the [`Log
 This setting exclusively controls the log level for the Marten server. To set the log level for [management commands](../management-commands.md), use the `--log-level` command option (see [Shared options](../management-commands.md#shared-options)).
 :::
 
+### `main_app_label`
+
+Default: `"main"`
+
+The label of the main application.
+
+The [main application](../applications.md#the-main-application) is the application that corresponds to the `src` folder of the project. This setting allows to configure the label of the main application, which also impacts the names of the underlying model tables.
+
+:::warning
+Changing the main application label after the project has been initialized will impact the names of the underlying model tables. This can be an option if you don't have any models defined in the `src` folder yet or for new projects, but it is not recommended to change it when the project already has models defined in the main application as Marten **will not** automatically rename model tables to match the new label.
+:::
+
 ### `middleware`
 
 Default: `[] of Marten::Middleware.class`
@@ -193,6 +205,14 @@ The secret key should be set to a unique and unpredictable string value. The sec
 :::warning
 The `secret_key` setting value **must** be kept secret. You should never commit this setting value to source control (instead, consider loading it from environment variables for example).
 :::
+
+### `socket`
+
+Default: `nil`
+
+The Unix socket path the HTTP server running the application will be listening on.
+
+When this setting is configured, the server will bind to the specified Unix socket instead of binding to a TCP port. In this case, the `host` and `port` settings are ignored. This is particularly useful when deploying a Marten application behind a reverse proxy like Nginx or Caddy on the same machine, as it provides better performance and security compared to TCP loopback.
 
 ### `time_zone`
 
@@ -471,7 +491,7 @@ Default: `false`
 
 A boolean indicating whether policy violations are reported without enforcing them.
 
-If this setting is set to `true`, the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares.md#content-security-policy-middleware) middleware will set a [Conten-Security-Policy-Report-Only](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) header instead of the regular Content-Security-Policy header. Doing so can be useful to experiment with policies without enforcing them.
+If this setting is set to `true`, the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares.md#content-security-policy-middleware) middleware will set a [Content-Security-Policy-Report-Only](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy-Report-Only) header instead of the regular Content-Security-Policy header. Doing so can be useful to experiment with policies without enforcing them.
 
 ## Database settings
 

@@ -6,7 +6,7 @@ describe Marten::Handlers::Redirect do
       Marten::Handlers::Redirect.forward_query_string?.should be_false
     end
 
-    it "returns true if explicitely set" do
+    it "returns true if explicitly set" do
       Marten::Handlers::RedirectSpec::HandlerWithQueryStringForwardingEnabled.forward_query_string?.should be_true
     end
   end
@@ -23,7 +23,7 @@ describe Marten::Handlers::Redirect do
       Marten::Handlers::Redirect.permanent?.should be_false
     end
 
-    it "returns true if explicitely set" do
+    it "returns true if explicitly set" do
       Marten::Handlers::RedirectSpec::PermanentStaticRedirect.permanent?.should be_true
     end
   end
@@ -40,7 +40,7 @@ describe Marten::Handlers::Redirect do
       Marten::Handlers::Redirect.route_name.should be_nil
     end
 
-    it "returns the route name if explicitely set" do
+    it "returns the route name if explicitly set" do
       Marten::Handlers::RedirectSpec::TemporaryDynamicRedirect.route_name.should eq "dummy"
     end
   end
@@ -56,7 +56,7 @@ describe Marten::Handlers::Redirect do
       Marten::Handlers::Redirect.url.should be_nil
     end
 
-    it "returns the static URL to redirect to if explicitely set" do
+    it "returns the static URL to redirect to if explicitly set" do
       Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.url.should eq "https://example.com"
     end
   end

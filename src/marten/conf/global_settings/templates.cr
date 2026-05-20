@@ -59,7 +59,7 @@ module Marten
         # Allows to define whether included templates should be isolated from the outer context by default.
         setter isolated_inclusions
 
-        # Alows to enable or disable the strict variables mode.
+        # Allows to enable or disable the strict variables mode.
         #
         # When this setting is set to `true`, unknown variables encountered in templates will result in
         # `Marten::Template::Errors::UnknownVariable` exceptions to be raised.

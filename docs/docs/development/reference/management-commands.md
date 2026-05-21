@@ -231,6 +231,10 @@ marten resetmigrations foo # Resets the migrations of the "foo" application
 
 Displays all the routes of the application.
 
+### Options
+
+* `-g PATTERN, --grep=PATTERN` - Only display routes whose path or name contains the given substring (case-insensitive)
+
 ## `seed`
 
 **Usage:** `marten seed [options]`

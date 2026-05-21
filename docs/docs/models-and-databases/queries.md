@@ -248,6 +248,24 @@ Article.filter(title__contains: "top")
 
 A case insensitive equivalent (`icontains`) is also available.
 
+### Field transformations
+
+Field transformations allow to apply transformations to field values before they are used in a query set when filtering records with [predicates](#field-predicates). They map to SQL functions in the produced SQL queries. For example:
+
+```crystal
+Article.filter(released_on__year: 2022)
+```
+
+Will allow to filter `Article` records whose `released_on` field values are associated with the year 2022, with the transformation of the datetime field to an integer representing the year being performed at the SQL level.
+
+Most of the [field predicates](#field-predicates) can be used in combination with field transformations. For example:
+
+```crystal
+Article.filter(released_on__year__gt: 2022)
+```
+
+Please refer to the [field transformations reference](./reference/query-set.md#field-transformations) for more details on the available field transformations.
+
 ## Advanced querying capabilities
 
 ### Complex filters with `q` expressions

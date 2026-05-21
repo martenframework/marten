@@ -71,8 +71,12 @@ module Marten
           new_record_id
         end
 
-        def left_operand_for(id : String, predicate) : String
+        def left_operand_for_predicate(id : String, predicate) : String
           id
+        end
+
+        def left_operand_for_transformation(id : String, transformation) : String
+          COLUMN_TRANSFORMATION_TO_SQL[transformation] % id
         end
 
         def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
@@ -92,7 +96,7 @@ module Marten
           64
         end
 
-        def operator_for(predicate) : String
+        def operator_for_predicate(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end
 
@@ -137,6 +141,15 @@ module Marten
         end
 
         private DISTINCT_CLAUSE = "DISTINCT"
+
+        private COLUMN_TRANSFORMATION_TO_SQL = {
+          "year"   => "YEAR(%s)",
+          "month"  => "MONTH(%s)",
+          "day"    => "DAY(%s)",
+          "hour"   => "HOUR(%s)",
+          "minute" => "MINUTE(%s)",
+          "second" => "SECOND(%s)",
+        }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains"    => "LIKE BINARY %s",

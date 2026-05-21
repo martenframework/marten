@@ -1242,6 +1242,7 @@ module Marten
           end
 
           private def solve_field_and_predicate(raw_query, raw_value)
+            join : Join? = nil
             qparts = raw_query.rpartition(Constants::LOOKUP_SEP)
             raw_field = qparts[1].empty? ? qparts[2] : qparts[0]
             raw_predicate = qparts[1].empty? ? qparts[0] : qparts[2]
@@ -1253,24 +1254,43 @@ module Marten
             elsif !annotations[raw_field]?.nil?
               left_operand = annotations[raw_field]
             else
-              begin
-                field_path = verify_field(raw_query)
-                raw_predicate = nil
-              rescue e : Errors::InvalidField
-                raise e if raw_predicate.try(&.empty?)
-                field_path = verify_field(raw_field)
+              segments = raw_query.to_s.split(Constants::LOOKUP_SEP)
+
+              predicate_suffix : String? = nil
+              if Predicate.registry.has_key?(segments.last)
+                predicate_suffix = segments.pop
               end
+
+              transformation : Transformation::Base? = nil
+              if segments.size > 1
+                tail = segments.last
+                if Transformation.registered?(tail)
+                  prefix = segments[0..-2].join(Constants::LOOKUP_SEP)
+                  begin
+                    field_path_head = verify_field(prefix)
+                    tail_field = field_path_head.last[0]
+                    if Transformation.allows?(tail_field, tail)
+                      segments.pop
+                      transformation = Transformation.registry[tail].new(tail_field)
+                    end
+                  rescue Errors::InvalidField
+                  end
+                end
+              end
+
+              field_path_str = segments.join(Constants::LOOKUP_SEP)
+              field_path = verify_field(field_path_str, lookup_expression: raw_query.to_s)
+              raw_predicate = predicate_suffix
 
               relation_field_path = field_path.select { |field, _r| field.relation? }
 
               join = unless relation_field_path.empty? || field_path.size == 1
-                # Prevent the last field to generate an extra join if the last field in the predicate is a relation
-                # (which is the case when a foreign key field is filtered on for example).
                 relation_field_path = relation_field_path[..-2] if relation_field_path.size == field_path.size
                 ensure_join_for_field_path(relation_field_path)
               end
 
-              left_operand = field_path.last[0]
+              base_field = field_path.last[0]
+              left_operand = transformation || base_field
             end
 
             # Then prepare the value to be used in the predicate.
@@ -1297,7 +1317,7 @@ module Marten
               end
             end
 
-            predicate_klass.new(left_operand, value, alias_prefix: join.nil? ? Model.db_table : join.table_alias)
+            predicate_klass.new(left_operand, value, alias_prefix: join.try(&.table_alias) || Model.db_table)
           end
 
           private def solve_plucked_fields_and_columns(fields)
@@ -1314,10 +1334,18 @@ module Marten
             quote(Model.db_table)
           end
 
-          private def verify_field(raw_field, only_relations = false, allow_many = true, allow_polymorphic = true)
+          private def verify_field(
+            raw_field,
+            only_relations = false,
+            allow_many = true,
+            allow_polymorphic = true,
+            lookup_expression : String? = nil,
+          )
             field_path = [] of Tuple(Field::Base, Nil | ReverseRelation)
 
             current_model = Model
+
+            lookup_display = lookup_expression || raw_field
 
             raw_field.split(Constants::LOOKUP_SEP).each_with_index do |part, i|
               if i > 0
@@ -1398,8 +1426,9 @@ module Marten
                 if field_context.field.is_a?(Field::Polymorphic)
                   field_path = raw_field.split(Constants::LOOKUP_SEP)[0..i].join(Constants::LOOKUP_SEP)
                   raise Errors::UnmetQuerySetCondition.new(
-                    "Cannot traverse polymorphic field '#{field_context.field.id}' in expression '#{raw_field}'. " \
-                    "Polymorphic relations cannot be traversed forward because the target model cannot be determined. "
+                    "Cannot traverse polymorphic field '#{field_context.field.id}' in expression " \
+                    "'#{lookup_display}'. Polymorphic relations cannot be traversed forward because the target " \
+                    "model cannot be determined."
                   )
                 end
 

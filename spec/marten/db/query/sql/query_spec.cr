@@ -167,6 +167,137 @@ describe Marten::DB::Query::SQL::Query do
       query.execute.should eq [post_3]
     end
 
+    context "with column lookup transformations" do
+      it "filters records using date/time component lookups" do
+        user_a = TestUser.create!(username: "ta1", email: "ta1@example.com", first_name: "A", last_name: "One")
+        user_b = TestUser.create!(username: "ta2", email: "ta2@example.com", first_name: "B", last_name: "Two")
+
+        user_a.update!(created_at: Time.utc(2022, 6, 15, 14, 30, 45), updated_at: user_a.updated_at)
+        user_b.update!(created_at: Time.utc(2024, 12, 28, 23, 55, 1), updated_at: user_b.updated_at)
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["ta1", "ta2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__year: 2022))
+        query.execute.should eq [user_a]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["ta1", "ta2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__month: 12))
+        query.execute.should eq [user_b]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["ta1", "ta2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__day: 28))
+        query.execute.should eq [user_b]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["ta1", "ta2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__hour: 23))
+        query.execute.should eq [user_b]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["ta1", "ta2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__minute: 55))
+        query.execute.should eq [user_b]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["ta1", "ta2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__second: 1))
+        query.execute.should eq [user_b]
+      end
+
+      it "chains standard comparison predicates after column lookup transformations" do
+        user_a = TestUser.create!(username: "tc1", email: "tc1@example.com", first_name: "A", last_name: "One")
+        user_b = TestUser.create!(username: "tc2", email: "tc2@example.com", first_name: "B", last_name: "Two")
+
+        user_a.update!(created_at: Time.utc(2021, 1, 1, 0, 0, 0), updated_at: user_a.updated_at)
+        user_b.update!(created_at: Time.utc(2024, 1, 1, 0, 0, 0), updated_at: user_b.updated_at)
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(Marten::DB::Query::Node.new(username__in: ["tc1", "tc2"]))
+        query.add_query_node(Marten::DB::Query::Node.new(created_at__year__gte: 2022))
+        query.execute.to_set.should eq [user_b].to_set
+      end
+
+      it "applies typical predicates with column lookup transformations on datetimes" do
+        user_a = TestUser.create!(username: "ttp1", email: "ttp1@example.com", first_name: "A", last_name: "One")
+        user_b = TestUser.create!(username: "ttp2", email: "ttp2@example.com", first_name: "B", last_name: "Two")
+        user_c = TestUser.create!(username: "ttp3", email: "ttp3@example.com", first_name: "C", last_name: "Three")
+
+        user_a.update!(created_at: Time.utc(2022, 6, 15, 14, 0, 0), updated_at: user_a.updated_at)
+        user_b.update!(created_at: Time.utc(2024, 12, 28, 9, 0, 0), updated_at: user_b.updated_at)
+        user_c.update!(created_at: Time.utc(2021, 3, 1, 14, 0, 0), updated_at: user_c.updated_at)
+
+        scope = Marten::DB::Query::Node.new(username__in: ["ttp1", "ttp2", "ttp3"])
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(scope & Marten::DB::Query::Node.new(created_at__year__exact: 2022))
+        query.execute.should eq [user_a]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(scope & Marten::DB::Query::Node.new(created_at__year__gte: 2022))
+        query.execute.to_set.should eq [user_a, user_b].to_set
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(scope & Marten::DB::Query::Node.new(created_at__hour__lt: 12))
+        query.execute.should eq [user_b]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(scope & Marten::DB::Query::Node.new(created_at__month__in: [11, 12]))
+        query.execute.should eq [user_b]
+
+        query = Marten::DB::Query::SQL::Query(TestUser).new
+        query.add_query_node(scope & Marten::DB::Query::Node.new(created_at__year__isnull: false))
+        query.execute.to_set.should eq [user_a, user_b, user_c].to_set
+      end
+
+      it "supports year, month, and day transformations on plain date fields" do
+        Marten::DB::Query::SQL::QuerySpec::Product.create!(name: "dated-a", price: 1, released_on: Time.utc(2019, 7, 4))
+        Marten::DB::Query::SQL::QuerySpec::Product.create!(
+          name: "dated-b",
+          price: 2,
+          released_on: Time.utc(2020, 1, 20)
+        )
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+        query.add_query_node(Marten::DB::Query::Node.new(name__in: ["dated-a", "dated-b"]))
+        query.add_query_node(Marten::DB::Query::Node.new(released_on__year: 2019))
+        query.execute.map(&.name).should eq ["dated-a"]
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+        query.add_query_node(Marten::DB::Query::Node.new(name__in: ["dated-a", "dated-b"]))
+        query.add_query_node(Marten::DB::Query::Node.new(released_on__month: 1))
+        query.execute.map(&.name).should eq ["dated-b"]
+
+        query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+        query.add_query_node(Marten::DB::Query::Node.new(name__in: ["dated-a", "dated-b"]))
+        query.add_query_node(Marten::DB::Query::Node.new(released_on__day: 20))
+        query.execute.map(&.name).should eq ["dated-b"]
+      end
+
+      it "rejects hour, minute, and second transformations on date-only fields" do
+        Marten::DB::Query::SQL::QuerySpec::Product.create!(name: "dated-c", price: 1, released_on: Time.utc(2019, 7, 4))
+
+        expect_raises(Marten::DB::Errors::InvalidField) do
+          query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+          query.add_query_node(Marten::DB::Query::Node.new(released_on__hour: 0))
+          query.execute
+        end
+
+        expect_raises(Marten::DB::Errors::InvalidField) do
+          query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+          query.add_query_node(Marten::DB::Query::Node.new(released_on__minute: 0))
+          query.execute
+        end
+
+        expect_raises(Marten::DB::Errors::InvalidField) do
+          query = Marten::DB::Query::SQL::Query(Marten::DB::Query::SQL::QuerySpec::Product).new
+          query.add_query_node(Marten::DB::Query::Node.new(released_on__second: 0))
+          query.execute
+        end
+      end
+    end
+
     it "is able to process complex query nodes" do
       Tag.create!(name: "ruby", is_active: true)
       tag_2 = Tag.create!(name: "crystal", is_active: true)

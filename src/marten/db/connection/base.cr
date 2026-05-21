@@ -41,11 +41,23 @@ module Marten
           pk_column_to_fetch : String? = nil,
         ) : ::DB::Any
 
-        # Returns the left operand to use for specific query predicate.
+        # Returns the left operand to use for a specific query predicate.
         #
         # Most of the time the initial ID will be left intact but depending on the connection implementation and the
         # considered predicate type (eg. "istartswith"), specific SQL functions could be applied on the column ID.
-        abstract def left_operand_for(id : String, predicate) : String
+        #
+        # See also `#left_operand_for_transformation` for column lookup transformations applied before the predicate.
+        abstract def left_operand_for_predicate(id : String, predicate) : String
+
+        # Returns the left operand SQL after applying a column lookup transformation to `id`.
+        #
+        # `id` is qualified column SQL (for example `alias`.`col`). `transformation` matches
+        # `Marten::DB::Query::SQL::Transformation::Base.transformation_name` (for example `"year"`).
+        # Implementations map transformation names to SQL fragments, the same way predicate-specific
+        # operand shaping is handled in `#left_operand_for_predicate`.
+        #
+        # See also `#left_operand_for_predicate`, which shapes the column side for predicates.
+        abstract def left_operand_for_transformation(id : String, transformation) : String
 
         # Returns a compatible value to use in the context of a LIMIT statement for the database at hand.
         abstract def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
@@ -54,7 +66,7 @@ module Marten
         abstract def max_name_size : Int32
 
         # Returns the operator to use for a specific query predicate.
-        abstract def operator_for(predicate) : String
+        abstract def operator_for_predicate(predicate) : String
 
         # Returns the parameterized identifier for an ordered argument.
         #

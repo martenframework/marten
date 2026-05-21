@@ -70,9 +70,13 @@ module Marten
           new_record_id
         end
 
-        def left_operand_for(id : String, predicate) : String
-          transformation = PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING.fetch(predicate, nil)
-          transformation.nil? ? id : (transformation % id)
+        def left_operand_for_predicate(id : String, predicate) : String
+          predicate_template = PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING.fetch(predicate, nil)
+          predicate_template.nil? ? id : (predicate_template % id)
+        end
+
+        def left_operand_for_transformation(id : String, transformation) : String
+          COLUMN_TRANSFORMATION_TO_SQL[transformation] % id
         end
 
         def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
@@ -83,7 +87,7 @@ module Marten
           63
         end
 
-        def operator_for(predicate) : String
+        def operator_for_predicate(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end
 
@@ -122,6 +126,15 @@ module Marten
         end
 
         private DISTINCT_CLAUSE = "DISTINCT"
+
+        private COLUMN_TRANSFORMATION_TO_SQL = {
+          "year"   => "CAST(EXTRACT(YEAR FROM %s) AS INTEGER)",
+          "month"  => "CAST(EXTRACT(MONTH FROM %s) AS INTEGER)",
+          "day"    => "CAST(EXTRACT(DAY FROM %s) AS INTEGER)",
+          "hour"   => "CAST(EXTRACT(HOUR FROM %s) AS INTEGER)",
+          "minute" => "CAST(EXTRACT(MINUTE FROM %s) AS INTEGER)",
+          "second" => "CAST(EXTRACT(SECOND FROM %s) AS INTEGER)",
+        }
 
         private PREDICATE_TO_LEFT_OPERAND_TRANSFORMATION_MAPPING = {
           "icontains"   => "UPPER(%s)",

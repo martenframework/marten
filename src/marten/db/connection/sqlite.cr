@@ -75,8 +75,12 @@ module Marten
           new_record_id
         end
 
-        def left_operand_for(id : String, predicate) : String
+        def left_operand_for_predicate(id : String, predicate) : String
           id
+        end
+
+        def left_operand_for_transformation(id : String, transformation) : String
+          COLUMN_TRANSFORMATION_TO_SQL[transformation] % id
         end
 
         def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
@@ -87,7 +91,7 @@ module Marten
           128
         end
 
-        def operator_for(predicate) : String
+        def operator_for_predicate(predicate) : String
           PREDICATE_TO_OPERATOR_MAPPING[predicate]
         end
 
@@ -130,6 +134,16 @@ module Marten
         end
 
         private DISTINCT_CLAUSE = "DISTINCT"
+
+        # Uses `char(37)` so downstream `String#%` formatting does not treat strftime directives as placeholders.
+        private COLUMN_TRANSFORMATION_TO_SQL = {
+          "year"   => "CAST(strftime(char(37) || 'Y', %s) AS INTEGER)",
+          "month"  => "CAST(strftime(char(37) || 'm', %s) AS INTEGER)",
+          "day"    => "CAST(strftime(char(37) || 'd', %s) AS INTEGER)",
+          "hour"   => "CAST(strftime(char(37) || 'H', %s) AS INTEGER)",
+          "minute" => "CAST(strftime(char(37) || 'M', %s) AS INTEGER)",
+          "second" => "CAST(strftime(char(37) || 'S', %s) AS INTEGER)",
+        }
 
         private PREDICATE_TO_OPERATOR_MAPPING = {
           "contains"    => "LIKE %s ESCAPE '\\'",

@@ -41,31 +41,31 @@ for_postgresql do
       end
     end
 
-    describe "#left_operand_for" do
+    describe "#left_operand_for_predicate" do
       it "returns the expected operand for an icontains predicate" do
         conn = Marten::DB::Connection.default
-        conn.left_operand_for("table.column", "icontains").should eq "UPPER(table.column)"
+        conn.left_operand_for_predicate("table.column", "icontains").should eq "UPPER(table.column)"
       end
 
       it "returns the expected operand for an iendswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.left_operand_for("table.column", "iendswith").should eq "UPPER(table.column)"
+        conn.left_operand_for_predicate("table.column", "iendswith").should eq "UPPER(table.column)"
       end
 
       it "returns the expected operand for an iexact predicate" do
         conn = Marten::DB::Connection.default
-        conn.left_operand_for("table.column", "iexact").should eq "UPPER(table.column)"
+        conn.left_operand_for_predicate("table.column", "iexact").should eq "UPPER(table.column)"
       end
 
       it "returns the expected operand for an istartswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.left_operand_for("table.column", "istartswith").should eq "UPPER(table.column)"
+        conn.left_operand_for_predicate("table.column", "istartswith").should eq "UPPER(table.column)"
       end
 
       it "returns the original id for other predicates" do
         conn = Marten::DB::Connection.default
-        conn.left_operand_for("table.column", "contains").should eq "table.column"
-        conn.left_operand_for("table.column", "exact").should eq "table.column"
+        conn.left_operand_for_predicate("table.column", "contains").should eq "table.column"
+        conn.left_operand_for_predicate("table.column", "exact").should eq "table.column"
       end
     end
 
@@ -76,65 +76,84 @@ for_postgresql do
       end
     end
 
-    describe "#operator_for" do
+    describe "#operator_for_predicate" do
       it "returns the expected operator for a contains predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("contains").should eq "LIKE %s"
+        conn.operator_for_predicate("contains").should eq "LIKE %s"
       end
 
       it "returns the expected operator for an endswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("endswith").should eq "LIKE %s"
+        conn.operator_for_predicate("endswith").should eq "LIKE %s"
       end
 
       it "returns the expected operator for an exact predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("exact").should eq "= %s"
+        conn.operator_for_predicate("exact").should eq "= %s"
       end
 
       it "returns the expected operator for a gt predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("gt").should eq "> %s"
+        conn.operator_for_predicate("gt").should eq "> %s"
       end
 
       it "returns the expected operator for a gte predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("gte").should eq ">= %s"
+        conn.operator_for_predicate("gte").should eq ">= %s"
       end
 
       it "returns the expected operator for an icontains predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("icontains").should eq "LIKE UPPER(%s)"
+        conn.operator_for_predicate("icontains").should eq "LIKE UPPER(%s)"
       end
 
       it "returns the expected operator for an iendswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("iendswith").should eq "LIKE UPPER(%s)"
+        conn.operator_for_predicate("iendswith").should eq "LIKE UPPER(%s)"
       end
 
       it "returns the expected operator for an iexact predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("iexact").should eq "= UPPER(%s)"
+        conn.operator_for_predicate("iexact").should eq "= UPPER(%s)"
       end
 
       it "returns the expected operator for an istartswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("istartswith").should eq "LIKE UPPER(%s)"
+        conn.operator_for_predicate("istartswith").should eq "LIKE UPPER(%s)"
       end
 
       it "returns the expected operator for a lt predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("lt").should eq "< %s"
+        conn.operator_for_predicate("lt").should eq "< %s"
       end
 
       it "returns the expected operator for a lte predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("lte").should eq "<= %s"
+        conn.operator_for_predicate("lte").should eq "<= %s"
       end
 
       it "returns the expected operator for a startswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("startswith").should eq "LIKE %s"
+        conn.operator_for_predicate("startswith").should eq "LIKE %s"
+      end
+    end
+
+    describe "#left_operand_for_transformation" do
+      it "returns transformation SQL for each supported transformation name" do
+        conn = Marten::DB::Connection.default
+        ref = "posts.created_at"
+        conn.left_operand_for_transformation(ref, "year")
+          .should eq "CAST(EXTRACT(YEAR FROM posts.created_at) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "month")
+          .should eq "CAST(EXTRACT(MONTH FROM posts.created_at) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "day")
+          .should eq "CAST(EXTRACT(DAY FROM posts.created_at) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "hour")
+          .should eq "CAST(EXTRACT(HOUR FROM posts.created_at) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "minute")
+          .should eq "CAST(EXTRACT(MINUTE FROM posts.created_at) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "second")
+          .should eq "CAST(EXTRACT(SECOND FROM posts.created_at) AS INTEGER)"
       end
     end
 

@@ -39,11 +39,11 @@ for_sqlite do
       end
     end
 
-    describe "#left_operand_for" do
+    describe "#left_operand_for_predicate" do
       it "returns the original id no matter the predicate" do
         conn = Marten::DB::Connection.default
-        conn.left_operand_for("table.column", "contains").should eq "table.column"
-        conn.left_operand_for("table.column", "istartswith").should eq "table.column"
+        conn.left_operand_for_predicate("table.column", "contains").should eq "table.column"
+        conn.left_operand_for_predicate("table.column", "istartswith").should eq "table.column"
       end
     end
 
@@ -66,65 +66,81 @@ for_sqlite do
       end
     end
 
-    describe "#operator_for" do
+    describe "#operator_for_predicate" do
       it "returns the expected operator for a contains predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("contains").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("contains").should eq "LIKE %s ESCAPE '\\'"
       end
 
       it "returns the expected operator for an endswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("endswith").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("endswith").should eq "LIKE %s ESCAPE '\\'"
       end
 
       it "returns the expected operator for an exact predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("exact").should eq "= %s"
+        conn.operator_for_predicate("exact").should eq "= %s"
       end
 
       it "returns the expected operator for a gt predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("gt").should eq "> %s"
+        conn.operator_for_predicate("gt").should eq "> %s"
       end
 
       it "returns the expected operator for a gte predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("gte").should eq ">= %s"
+        conn.operator_for_predicate("gte").should eq ">= %s"
       end
 
       it "returns the expected operator for an icontains predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("icontains").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("icontains").should eq "LIKE %s ESCAPE '\\'"
       end
 
       it "returns the expected operator for an iendswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("iendswith").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("iendswith").should eq "LIKE %s ESCAPE '\\'"
       end
 
       it "returns the expected operator for an iexact predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("iexact").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("iexact").should eq "LIKE %s ESCAPE '\\'"
       end
 
       it "returns the expected operator for an istartswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("istartswith").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("istartswith").should eq "LIKE %s ESCAPE '\\'"
       end
 
       it "returns the expected operator for a lt predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("lt").should eq "< %s"
+        conn.operator_for_predicate("lt").should eq "< %s"
       end
 
       it "returns the expected operator for a gt predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("lte").should eq "<= %s"
+        conn.operator_for_predicate("lte").should eq "<= %s"
       end
 
       it "returns the expected operator for a startswith predicate" do
         conn = Marten::DB::Connection.default
-        conn.operator_for("startswith").should eq "LIKE %s ESCAPE '\\'"
+        conn.operator_for_predicate("startswith").should eq "LIKE %s ESCAPE '\\'"
+      end
+    end
+
+    describe "#left_operand_for_transformation" do
+      it "returns transformation SQL for each supported transformation name" do
+        conn = Marten::DB::Connection.default
+        ref = "posts.created_at"
+        conn.left_operand_for_transformation(ref, "year").should eq "CAST(strftime(char(37) || 'Y', #{ref}) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "month")
+          .should eq "CAST(strftime(char(37) || 'm', #{ref}) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "day").should eq "CAST(strftime(char(37) || 'd', #{ref}) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "hour").should eq "CAST(strftime(char(37) || 'H', #{ref}) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "minute")
+          .should eq "CAST(strftime(char(37) || 'M', #{ref}) AS INTEGER)"
+        conn.left_operand_for_transformation(ref, "second")
+          .should eq "CAST(strftime(char(37) || 'S', #{ref}) AS INTEGER)"
       end
     end
 

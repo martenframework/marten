@@ -4,5 +4,6 @@ module Marten::DB::Query::SQL::QuerySpec
     field :name, :string, max_size: 255
     field :price, :int
     field :rating, :float, blank: true, null: true
+    field :released_on, :date, blank: true, null: true
   end
 end

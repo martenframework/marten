@@ -1049,3 +1049,62 @@ Allows filtering records based on field values that start with a specific substr
 ```crystal
 Article.all.filter(title__startswith: "Top")
 ```
+
+## Field transformations
+
+Below are listed all the available [field transformations](../queries.md#field-transformations) that can be used when filtering query sets.
+
+### `day`
+
+Transforms a specific [`date_time`](./fields.md#date_time) or [`date`](./fields.md#date) field value to an integer representing the day.
+
+```crystal
+Article.all.filter(released_on__day: 12)
+Article.all.filter(released_on__day__gt: 12)
+```
+
+### `hour`
+
+Transforms a specific [`date_time`](./fields.md#date_time) field value to an integer representing the hour.
+
+```crystal
+Article.all.filter(released_on__hour: 12)
+Article.all.filter(released_on__hour__gt: 12)
+```
+
+### `minute`
+
+Transforms a specific [`date_time`](./fields.md#date_time) field value to an integer representing the minute.
+
+```crystal
+Article.all.filter(released_on__minute: 12)
+Article.all.filter(released_on__minute__gt: 12)
+```
+
+### `month`
+
+Transforms a specific [`date_time`](./fields.md#date_time) or [`date`](./fields.md#date) field value to an integer representing the month.
+
+```crystal
+Article.all.filter(released_on__month: 12)
+Article.all.filter(released_on__month__gt: 12)
+```
+
+### `second`
+
+Transforms a specific [`date_time`](./fields.md#date_time) field value to an integer representing the second.
+
+```crystal
+Article.all.filter(released_on__second: 12)
+Article.all.filter(released_on__second__gt: 12)
+```
+
+### `year`
+
+Transforms a specific [`date_time`](./fields.md#date_time) or [`date`](./fields.md#date) field value to an integer representing the year.
+
+```crystal
+Article.all.filter(released_on__year: 2022)
+Article.all.filter(released_on__year__gt: 2022)
+```
+

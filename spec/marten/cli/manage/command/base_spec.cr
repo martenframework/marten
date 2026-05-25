@@ -49,6 +49,19 @@ describe Marten::CLI::Manage::Command::Base do
     end
   end
 
+  describe "#do_exit" do
+    it "exits with the specified exit code" do
+      command = Marten::CLI::Manage::Command::BaseSpec::ExitingCommand.new(
+        options: [] of String,
+        exit_raises: true,
+        stdout: IO::Memory.new,
+        stderr: IO::Memory.new
+      )
+
+      command.handle.should eq 1
+    end
+  end
+
   describe "#handle" do
     around_each do |t|
       current_log_level = Marten::Log.level
@@ -607,6 +620,12 @@ module Marten::CLI::Manage::Command::BaseSpec
   class ErroredCommand < Marten::CLI::Manage::Command::Base
     def run
       print_error_and_exit("This is bad")
+    end
+  end
+
+  class ExitingCommand < Marten::CLI::Manage::Command::Base
+    def run
+      do_exit(1)
     end
   end
 end

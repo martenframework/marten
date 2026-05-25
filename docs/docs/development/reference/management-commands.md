@@ -89,6 +89,8 @@ This command will scan the table definition corresponding to your current models
 
 ### Options
 
+* `--dry-run` - Shows migrations that would be generated without writing them
+* `--check` - Exits with a non-zero status if model changes require migrations without generating them
 * `--empty` - Creates an empty migration
 
 ### Arguments
@@ -101,6 +103,7 @@ This command will scan the table definition corresponding to your current models
 marten genmigrations             # Generates new migrations for all the installed apps
 marten genmigrations foo         # Generates new migrations for the "foo" app
 marten genmigrations foo --empty # Generates an empty migration for the "foo" app
+marten genmigrations --dry-run   # Shows migrations that would be generated without writing them
 ```
 
 ## `listmigrations`

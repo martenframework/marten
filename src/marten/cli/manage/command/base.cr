@@ -85,6 +85,18 @@ module Marten
             @parser = OptionParser.new
           end
 
+          # Allows to exit the command with a specific exit code.
+          #
+          # This method will raise an `Errors::Exit` exception if the `exit_raises` option was set to `true` at
+          # initialization time, otherwise it will exit the command with the specified exit code.
+          def do_exit(exit_code)
+            if exit_raises?
+              raise Errors::Exit.new(exit_code)
+            else
+              exit(exit_code)
+            end
+          end
+
           # Setups the command and runs it.
           #
           # This method will call the `#setup` method, configure the arguments / options parser and then execute the
@@ -396,14 +408,6 @@ module Marten
 
           private def banner_help
             self.class.help
-          end
-
-          private def do_exit(exit_code)
-            if exit_raises?
-              raise Errors::Exit.new(exit_code)
-            else
-              exit(exit_code)
-            end
           end
 
           private def format_argument_name_and_description(name, description)

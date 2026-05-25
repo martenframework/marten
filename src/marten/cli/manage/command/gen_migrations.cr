@@ -7,10 +7,27 @@ module Marten
           help "Generate new database migrations."
 
           @app_label : String?
+          @check : Bool = false
           @create_empty : Bool = false
+          @dry_run : Bool = false
 
           def setup
             on_argument(:app_label, "The name of an application to generate migrations for") { |v| @app_label = v }
+
+            on_option(
+              "dry-run",
+              "Shows migrations that would be generated without writing them"
+            ) do
+              @dry_run = true
+            end
+
+            on_option(
+              :check,
+              "Exits with a non-zero status if model changes require migrations without generating them"
+            ) do
+              @check = true
+            end
+
             on_option("empty", "Create an empty migration") { @create_empty = true }
           end
 
@@ -29,17 +46,24 @@ module Marten
               changes = app_config.nil? ? diff.detect : diff.detect([app_config])
             end
 
-            if changes.empty?
+            if check?
+              show_migrations(changes) if dry_run? && !changes.empty?
+              do_exit(changes.empty? ? 0 : 1)
+            elsif changes.empty?
               print("No changes detected")
-              return
+            elsif dry_run?
+              show_migrations(changes)
+            else
+              write_migrations(changes)
             end
-
-            write_migrations(changes)
           rescue e : Apps::Errors::AppNotFound
             print_error(e.message)
           end
 
           private getter app_label
+
+          private getter? check
+          private getter? dry_run
 
           private def create_empty?
             @create_empty
@@ -66,6 +90,25 @@ module Marten
             }
           end
 
+          private def show_migrations(changes)
+            changes.each do |app_label, migrations|
+              print(style("Planned migrations for app '#{app_label}':", fore: :light_blue, mode: :bold))
+              app_config = Marten.apps.get(app_label)
+
+              migrations.each do |migration|
+                migration_filepath = app_config.migrations_path.join("#{migration.name}.cr")
+
+                print(
+                  "  › Would create [#{style(migration_filepath.to_s.gsub("#{Dir.current}/", ""), mode: :dim)}]"
+                )
+
+                migration.operations.each do |op|
+                  print("      ○ #{op.describe}")
+                end
+              end
+            end
+          end
+
           private def write_migrations(changes)
             changes.each do |app_label, migrations|
               print(style("Generating migrations for app '#{app_label}':", fore: :light_blue, mode: :bold))
@@ -79,7 +122,7 @@ module Marten
                 )
 
                 Dir.mkdir(app_config.migrations_path) unless Dir.exists?(app_config.migrations_path)
-                File.write(app_config.migrations_path.join("#{migration.name}.cr"), migration.serialize)
+                File.write(migration_filepath, migration.serialize)
 
                 print(style(" DONE", fore: :light_green, mode: :bold))
 

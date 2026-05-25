@@ -147,6 +147,56 @@ describe Marten::CLI::Manage::Command::Migrate do
       columns_details.map(&.name).sort!.should eq ["id", "label"]
     end
 
+    it "exits with a zero status when no migrations need to be applied and the --check option is used" do
+      Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default).execute
+
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Migrate.new(
+        options: ["--check"] of String,
+        stdout: stdout,
+        stderr: IO::Memory.new,
+        exit_raises: true
+      )
+
+      command.handle.should eq 0
+
+      output = stdout.rewind.gets_to_end
+      output.should be_empty
+    end
+
+    it "exits with a non-zero status when migrations need to be applied and the --check option is used" do
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Migrate.new(
+        options: ["--check"] of String,
+        stdout: IO::Memory.new,
+        stderr: stderr,
+        exit_raises: true
+      )
+
+      command.handle.should eq 1
+
+      output = stderr.rewind.gets_to_end
+      output.should be_empty
+    end
+
+    it "exits with a non-zero status after showing the plan when migrations are due and --plan and --check are used" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Migrate.new(
+        options: ["--plan", "--check"] of String,
+        stdout: stdout,
+        stderr: IO::Memory.new,
+        exit_raises: true
+      )
+
+      command.handle.should eq 1
+
+      output = stdout.rewind.gets_to_end
+      output.includes?(Marten::CLI::Manage::Command::MigrateSpec::FooApp::V202108092226113.id).should be_true
+    end
+
     it "lists all the planned migrations when no migrations are already applied and the --plan option is used" do
       stdout = IO::Memory.new
       stderr = IO::Memory.new

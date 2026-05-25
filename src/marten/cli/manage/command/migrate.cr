@@ -6,6 +6,7 @@ module Marten
           help "Run database migrations."
 
           @app_label : String?
+          @check : Bool = false
           @db : String?
           @fake : Bool = false
           @migration : String?
@@ -25,8 +26,15 @@ module Marten
             on_option(:fake, "Set migrations as applied or unapplied without running them") { @fake = true }
 
             on_option(
+              :check,
+              "Exits with a non-zero status if unapplied migrations exist without applying them"
+            ) do
+              @check = true
+            end
+
+            on_option(
               :plan,
-              "Provides a comprehensive overview of the operations that will be performed by the migrations."
+              "Provides a comprehensive overview of the operations that will be performed by the migrations"
             ) do
               @plan = true
             end
@@ -49,7 +57,12 @@ module Marten
               Marten::DB::Connection.get(db || Marten::DB::Connection::DEFAULT_CONNECTION_NAME)
             )
 
-            if !runner.execution_needed?(app_config, migration_name)
+            execution_needed = runner.execution_needed?(app_config, migration_name)
+
+            if check?
+              show_planned_migrations(runner, app_config, migration_name) if plan? && execution_needed
+              do_exit(execution_needed ? 1 : 0)
+            elsif !execution_needed
               print("No pending migrations to apply")
             elsif plan?
               show_planned_migrations(runner, app_config, migration_name)
@@ -62,6 +75,7 @@ module Marten
 
           private getter db
 
+          private getter? check
           private getter? fake
           private getter? plan
 

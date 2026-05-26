@@ -3,8 +3,8 @@ require "./gen_migrations_spec/**"
 
 describe Marten::CLI::Manage::Command::GenMigrations do
   with_installed_apps(
-    Marten::CLI::Manage::Command::GenMigrationsSpec::SyncedApp,
-    Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp
+    Marten::CLI::Manage::Command::GenMigrationsSpec::SyncedApp::App,
+    Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp::App
   )
 
   describe "#run" do
@@ -25,7 +25,7 @@ describe Marten::CLI::Manage::Command::GenMigrations do
 
     it "exits with a non-zero status when changes are detected and the --check option is used" do
       stdout = IO::Memory.new
-      migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp.new.migrations_path
+      migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp::App.new.migrations_path
 
       command = Marten::CLI::Manage::Command::GenMigrations.new(
         options: ["cli_manage_command_gen_migrations_spec_unsynced_app", "--check"] of String,
@@ -42,7 +42,7 @@ describe Marten::CLI::Manage::Command::GenMigrations do
 
     it "shows planned migrations without writing files when the --dry-run option is used" do
       stdout = IO::Memory.new
-      migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp.new.migrations_path
+      migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp::App.new.migrations_path
       initial_migration_count = Dir.exists?(migrations_path) ? Dir.children(migrations_path).size : 0
 
       command = Marten::CLI::Manage::Command::GenMigrations.new(
@@ -76,7 +76,7 @@ describe Marten::CLI::Manage::Command::GenMigrations do
     end
 
     it "does not write migration files when the --check option is used" do
-      migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp.new.migrations_path
+      migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp::App.new.migrations_path
       initial_migration_count = Dir.exists?(migrations_path) ? Dir.children(migrations_path).size : 0
 
       command = Marten::CLI::Manage::Command::GenMigrations.new(

@@ -21,4 +21,22 @@ describe Marten::Template::Parser::Token do
       token.line_number.should eq 1
     end
   end
+
+  describe "#trim_left?" do
+    it "returns whether leading whitespace should be trimmed" do
+      token = Marten::Template::Parser::Token.new(
+        Marten::Template::Parser::TokenType::TAG, "for", 1, trim_left: true
+      )
+      token.trim_left?.should be_true
+    end
+  end
+
+  describe "#trim_right?" do
+    it "returns whether trailing whitespace should be trimmed" do
+      token = Marten::Template::Parser::Token.new(
+        Marten::Template::Parser::TokenType::TAG, "for", 1, trim_right: true
+      )
+      token.trim_right?.should be_true
+    end
+  end
 end

@@ -133,6 +133,60 @@ describe Marten::Template::Parser do
       error.source.should be_nil
       error.token.should be_nil
     end
+
+    context "with whitespace control" do
+      it "strips trailing whitespace from text preceding a left-trimmed variable" do
+        parser = Marten::Template::Parser.new("Hello   {{- name }}")
+        parser.parse.render(Marten::Template::Context{"name" => "John"}).should eq "HelloJohn"
+      end
+
+      it "strips leading whitespace from text following a right-trimmed variable" do
+        parser = Marten::Template::Parser.new("Hello {{ name -}}   World")
+        parser.parse.render(Marten::Template::Context{"name" => "John"}).should eq "Hello JohnWorld"
+      end
+
+      it "strips whitespace around comments when whitespace control is used" do
+        parser = Marten::Template::Parser.new("Hello   {#- comment -#}   World")
+        parser.parse.render(Marten::Template::Context.new).should eq "HelloWorld"
+      end
+
+      it "strips whitespace around tags when whitespace control is used" do
+        parser = Marten::Template::Parser.new("  {%- assign x = 1 -%}  Done")
+        parser.parse.render(Marten::Template::Context.new).should eq "Done"
+      end
+
+      it "strips whitespace inside block tags when whitespace control is used" do
+        parser = Marten::Template::Parser.new(
+          <<-TEMPLATE
+            {%- if condition -%}
+              Content
+            {%- endif -%}
+            After
+            TEMPLATE
+        )
+
+        parser.parse.render(Marten::Template::Context{"condition" => true}).should eq "ContentAfter"
+      end
+
+      it "strips trailing whitespace from text preceding a left-trimmed block-ending tag" do
+        parser = Marten::Template::Parser.new("Inner  {%- endif %}")
+
+        nodes = parser.parse(up_to: ["endif"])
+        nodes.render(Marten::Template::Context.new).should eq "Inner"
+      end
+    end
+  end
+
+  describe "#apply_block_end_trim" do
+    it "sets pending left trim for subsequent text nodes" do
+      parser = Marten::Template::Parser.new("  After")
+      token = Marten::Template::Parser::Token.new(
+        Marten::Template::Parser::TokenType::TAG, "endif", 1, trim_right: true
+      )
+
+      parser.apply_block_end_trim(token)
+      parser.parse.render(Marten::Template::Context.new).should eq "After"
+    end
   end
 
   describe "#shift_token" do

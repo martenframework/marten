@@ -10,12 +10,19 @@ module Marten
     # in order to then generate a final output for a given context.
     class Parser
       @tokens : Array(Parser::Token)
+      @pending_trim_left : Bool
 
       getter encountered_block_names
 
       def initialize(@source : String)
         @tokens = Lexer.new(@source).tokenize
         @encountered_block_names = [] of String
+        @pending_trim_left = false
+      end
+
+      # Applies the whitespace control flags of a block-ending token (eg. `{% endif -%}`).
+      def apply_block_end_trim(token : Token)
+        @pending_trim_left = token.trim_right?
       end
 
       # Generates a set of nodes from the lexical tokens.
@@ -26,20 +33,31 @@ module Marten
           token = shift_token
 
           if token.type.text?
-            nodes.add(Node::Text.new(token.content))
+            content = token.content
+            content = content.lstrip if @pending_trim_left
+            @pending_trim_left = false
+            nodes.add(Node::Text.new(content)) unless content.empty?
           elsif token.type.variable?
+            nodes.strip_trailing_whitespace if token.trim_left?
             raise_syntax_error("Empty variable detected on line #{token.line_number}") if token.content.empty?
             nodes.add(Node::Variable.new(token.content))
+            @pending_trim_left = token.trim_right?
           elsif token.type.tag?
+            nodes.strip_trailing_whitespace if token.trim_left?
             raise_syntax_error("Empty tag detected on line #{token.line_number}") if token.content.empty?
 
             tag_name = token.content.split.first
             if !up_to.nil? && up_to.includes?(tag_name)
+              apply_block_end_trim(token)
               @tokens.unshift(token)
               return nodes
             end
 
+            @pending_trim_left = token.trim_right?
             nodes.add(Node::Tag.new(self, token.content))
+          elsif token.type.comment?
+            nodes.strip_trailing_whitespace if token.trim_left?
+            @pending_trim_left = token.trim_right?
           end
         end
 

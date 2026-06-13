@@ -20,6 +20,19 @@ module Marten
         @nodes << node
       end
 
+      # Removes trailing whitespace from the last node if it is a text node.
+      def strip_trailing_whitespace
+        return if @nodes.empty?
+
+        last_node = @nodes.last
+        return unless last_node.is_a?(Node::Text)
+
+        @nodes.pop
+        if stripped = last_node.without_trailing_whitespace
+          @nodes << stripped
+        end
+      end
+
       # Renders the node set for a specific context.
       def render(context : Context)
         String.build do |io|

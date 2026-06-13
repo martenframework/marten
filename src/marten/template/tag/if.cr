@@ -28,6 +28,9 @@ module Marten
           # Next step: optional elsif conditions.
           token = parser.shift_token
           while token.content.starts_with?(ELSIF_PART)
+            @conditions_and_nodes.last[1].strip_trailing_whitespace if token.trim_left?
+            parser.apply_block_end_trim(token)
+
             parts = split_smartly(token.content)[1..]
             condition = Condition.new(parts).parse
             inner_nodes = parser.parse(up_to: {ELSIF_PART, ELSE_PART, ENDIF_PART})
@@ -37,6 +40,9 @@ module Marten
 
           # Final step: optional else condition.
           if token.content.starts_with?(ELSE_PART)
+            @conditions_and_nodes.last[1].strip_trailing_whitespace if token.trim_left?
+            parser.apply_block_end_trim(token)
+
             inner_nodes = parser.parse(up_to: {ENDIF_PART})
             @conditions_and_nodes << {nil, inner_nodes}
             token = parser.shift_token
@@ -45,6 +51,9 @@ module Marten
           if token.content != ENDIF_PART
             raise Errors::InvalidSyntax.new("Unclosed if block")
           end
+
+          @conditions_and_nodes.last[1].strip_trailing_whitespace if token.trim_left?
+          parser.apply_block_end_trim(token)
         end
 
         def render(context : Context) : String

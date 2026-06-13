@@ -7,7 +7,16 @@ module Marten
         getter content
         getter line_number
 
-        def initialize(@type : TokenType, @content : String, @line_number : Int32)
+        getter? trim_left
+        getter? trim_right
+
+        def initialize(
+          @type : TokenType,
+          @content : String,
+          @line_number : Int32,
+          @trim_left = false,
+          @trim_right = false,
+        )
         end
       end
     end

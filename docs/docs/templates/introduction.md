@@ -108,6 +108,33 @@ Comments can be inserted in any templates and must be surrounded by **`{#`** and
 {# This will not be evaluated #}
 ```
 
+### Whitespace control
+
+By default, tags, variables, and comments do not alter the whitespace around them in the rendered output. You can change this behavior by adding a hyphen (**`-`**) immediately after an opening delimiter or immediately before a closing delimiter.
+
+This allows to strip whitespace (spaces, tabs, and newlines) adjacent to the corresponding delimiter:
+
+| Syntax | Effect |
+| ------ | ------ |
+| `{%- ... %}` | Strips whitespace before the tag |
+| `{% ... -%}` | Strips whitespace after the tag |
+| `{{- ... }}` | Strips whitespace before the variable |
+| `{{ ... -}}` | Strips whitespace after the variable |
+| `{#- ... #}` | Strips whitespace before the comment |
+| `{# ... -#}` | Strips whitespace after the comment |
+
+For example, the following template:
+
+```html
+{%- if username == "John Doe" -%}
+  Wow, {{ username -}} , you have a long name!
+{%- else -%}
+  Hello there!
+{%- endif %}
+```
+
+Would render `Wow, John Doe, you have a long name!` when `username` is set to `John Doe`, and `Hello there!` otherwise, without the indentation and extra newlines from the template source.
+
 ### Literal values
 
 The Marten templating language supports making use of literal values as part of [variables](#variables), [filter](#filters) arguments, or [tag](#tags) arguments. These literals are essentially a representation of the corresponding objects in Crystal. Each supported type of literal is listed below:

@@ -30,5 +30,22 @@ describe Marten::Template::Template do
       template = Marten::Template::Template.new("{% if answer == 42 %}ok{% endif %}")
       template.render({answer: 42}).should eq "ok"
     end
+
+    it "can render a template using whitespace control" do
+      template = Marten::Template::Template.new(
+        <<-TEMPLATE
+          {%- if username == "John Doe" -%}
+            Wow, {{ username -}} , you have a long name!
+          {%- else -%}
+            Hello there!
+          {%- endif %}
+          TEMPLATE
+      )
+
+      template.render(Marten::Template::Context{"username" => "John Doe"}).should eq(
+        "Wow, John Doe, you have a long name!"
+      )
+      template.render(Marten::Template::Context{"username" => "Bob"}).should eq "Hello there!"
+    end
   end
 end

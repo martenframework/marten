@@ -84,6 +84,35 @@ describe Marten::Template::Parser::Lexer do
       tokens[6].line_number.should eq 4
     end
 
+    it "is able to extract whitespace control flags from tags" do
+      lexer = Marten::Template::Parser::Lexer.new("{%- if answer == 42 -%}")
+      tokens = lexer.tokenize
+
+      tokens[0].type.tag?.should be_true
+      tokens[0].content.should eq "if answer == 42"
+      tokens[0].trim_left?.should be_true
+      tokens[0].trim_right?.should be_true
+    end
+
+    it "is able to extract whitespace control flags from variables" do
+      lexer = Marten::Template::Parser::Lexer.new("{{- username -}}")
+      tokens = lexer.tokenize
+
+      tokens[0].type.variable?.should be_true
+      tokens[0].content.should eq "username"
+      tokens[0].trim_left?.should be_true
+      tokens[0].trim_right?.should be_true
+    end
+
+    it "is able to extract whitespace control flags from comments" do
+      lexer = Marten::Template::Parser::Lexer.new("{#- A comment -#}")
+      tokens = lexer.tokenize
+
+      tokens[0].type.comment?.should be_true
+      tokens[0].trim_left?.should be_true
+      tokens[0].trim_right?.should be_true
+    end
+
     it "is able to process ignored verbatim blocks as expected" do
       lexer = Marten::Template::Parser::Lexer.new(
         <<-TEMPLATE

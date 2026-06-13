@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        db_version: ['10.11.13', '11.7.2']
+        db_version: ['10.11.18', '11.8.8', '12.3.2']
         crystal: [
           '1.18.1',
           '1.19.0',
@@ -67,7 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: public.ecr.aws/bitnami/mysql:8.3.0
+        image: public.ecr.aws/bitnami/mysql:8.4.0
         env:
           MYSQL_ROOT_PASSWORD: "mysql"
           MYSQL_DATABASE: marten_test

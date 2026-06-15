@@ -40,6 +40,6 @@
     ]
   },
   "devDependencies": {
-    "baseline-browser-mapping": "^2.10.34"
+    "baseline-browser-mapping": "^2.10.37"
   }
 }

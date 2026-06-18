@@ -1146,6 +1146,55 @@ describe Marten::Handlers::Base do
       handler.url("dummy_with_id", id: 42).should eq Marten.routes.reverse("dummy_with_id", id: 42)
     end
   end
+
+  describe "#render_partial" do
+    it "renders a template without context producers or layout" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response = handler.render_partial("specs/handlers/base/test.html", context: {"name" => "Partial"})
+
+      response.status.should eq 200
+      response.content.strip.should eq "Hello World, Partial!"
+    end
+
+    it "renders a partial with a named tuple context" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response = handler.render_partial("specs/handlers/base/test.html", context: {name: "Tuple"})
+
+      response.status.should eq 200
+      response.content.strip.should eq "Hello World, Tuple!"
+    end
+
+    it "renders a partial with a custom status code" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test5Handler.new(request)
+      response = handler.render_partial("specs/handlers/base/test.html", context: {"name" => "Test"}, status: 201)
+
+      response.status.should eq 201
+    end
+  end
 end
 
 module Marten::Handlers::BaseSpec

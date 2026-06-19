@@ -56,6 +56,7 @@ On macOS or Linux, Marten can be installed using [Homebrew](https://brew.sh/) (a
 
 ```bash
 brew tap martenframework/marten
+brew trust martenframework/marten
 brew install marten
 ```
 

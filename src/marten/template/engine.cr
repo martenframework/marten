@@ -13,10 +13,8 @@ module Marten
       # Returns the first compiled template matching the given template name.
       def get_template(template_name : String) : Template
         @loaders.each do |loader|
-          begin
-            return loader.get_template(template_name)
-          rescue Errors::TemplateNotFound
-          end
+          return loader.get_template(template_name)
+        rescue Errors::TemplateNotFound
         end
 
         raise Errors::TemplateNotFound.new("Template #{template_name} could not be found")

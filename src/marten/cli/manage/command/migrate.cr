@@ -117,13 +117,13 @@ module Marten
           end
 
           private def prune_migrations(runner)
-            print(style("Pruning migrations:", fore: :light_blue, mode: :bold), ending: "\n")
-
             pruned = runner.prune
 
             if pruned.empty?
-              print("  No migrations to prune")
+              print("No migrations to prune")
             else
+              print(style("Pruning migrations:", fore: :light_blue, mode: :bold), ending: "\n")
+
               pruned.each do |app_label, migration_name|
                 print(
                   "  › Pruning #{style("#{app_label}.#{migration_name}", mode: :dim)}...",

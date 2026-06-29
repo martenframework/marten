@@ -27,6 +27,7 @@ describe Marten::DB::Management::Migrations::Runner do
     Migration::RunnerSpec::FooApp::V202108092226113.reset_app_config
     Migration::RunnerSpec::BarApp::V202108092226111.reset_app_config
     Migration::RunnerSpec::BarApp::V202108092226112.reset_app_config
+    Migration::RunnerSpec::FooApp::V209901010101101.reset_app_config
   end
 
   before_each do
@@ -305,12 +306,13 @@ describe Marten::DB::Management::Migrations::Runner do
       runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
       plan = runner.plan
 
-      plan.size.should eq 3
+      plan.size.should eq 4
 
       [
         Migration::RunnerSpec::FooApp::V202108092226113,
         Migration::RunnerSpec::BarApp::V202108092226111,
         Migration::RunnerSpec::BarApp::V202108092226112,
+        Migration::RunnerSpec::FooApp::V209901010101101,
       ].each_with_index do |migration_klass, index|
         plan[index][0].class.should eq migration_klass
         plan[index][1].should be_false
@@ -370,6 +372,45 @@ describe Marten::DB::Management::Migrations::Runner do
       plan.size.should eq 1
       plan[0][0].class.should eq Migration::RunnerSpec::BarApp::V202108092226112
       plan[0][1].should be_true # backward
+    end
+  end
+
+  describe "#prune" do
+    it "removes nonexistent migration records from the database" do
+      Marten::DB::Management::Migrations::Recorder.new(Marten::DB::Connection.default).record(
+        "runner_spec_foo_app", "nonexistent_migration"
+      )
+
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+      pruned = runner.prune
+
+      pruned.should eq [{"runner_spec_foo_app", "nonexistent_migration"}]
+      Marten::DB::Management::Migrations::Record.filter(
+        app: "runner_spec_foo_app",
+        name: "nonexistent_migration"
+      ).exists?.should be_false
+    end
+
+    it "returns an empty array when there are no migrations to prune" do
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+      runner.prune.should eq [] of Tuple(String, String)
+    end
+
+    it "raises a prune conflict error when a squashed migration still references migrations to prune" do
+      Marten::DB::Management::Migrations::Recorder.new(Marten::DB::Connection.default).record(
+        "runner_spec_foo_app", "ghost_migration"
+      )
+
+      runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+
+      expect_raises(Marten::DB::Management::Migrations::Errors::PruneConflict) do
+        runner.prune
+      end
+
+      Marten::DB::Management::Migrations::Record.filter(
+        app: "runner_spec_foo_app",
+        name: "ghost_migration"
+      ).exists?.should be_true
     end
   end
 end

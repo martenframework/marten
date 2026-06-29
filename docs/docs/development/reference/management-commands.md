@@ -142,6 +142,7 @@ The `migrate` command allows you to apply (or unapply) migrations to your databa
 * `--fake` - Allows marking migrations as applied or unapplied without actually running them
 * `--check` - Exits with a non-zero status if unapplied migrations exist without applying them
 * `--plan` - Provides a comprehensive overview of the operations that will be performed by the applied or unapplied migrations
+* `--prune` - Deletes nonexistent migrations from the `marten_migrations` table
 * `--db=ALIAS` - Allows specifying the alias of the database on which migrations will be applied or unapplied (default to `default`)
 
 ### Arguments
@@ -155,6 +156,7 @@ The `migrate` command allows you to apply (or unapply) migrations to your databa
 marten migrate                     # Applies all the non-applied migrations for all the installed apps
 marten migrate foo                 # Applies migrations for the "foo" app
 marten migrate foo 202203111821451 # Applies (or unapply) migrations for the "foo" app up until the "202203111821451" migration
+marten migrate --prune             # Removes nonexistent migrations from the marten_migrations table
 ```
 
 ## `new`

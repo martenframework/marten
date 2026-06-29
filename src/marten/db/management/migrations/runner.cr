@@ -56,6 +56,60 @@ module Marten
             generate_plan(find_targets(app_config, migration_name))
           end
 
+          # Removes migration records from the database that no longer have a corresponding migration class.
+          #
+          # Returns an array of tuples containing the app label and migration name of each pruned migration.
+          #
+          # Raises `Marten::DB::Management::Migrations::Errors::PruneConflict` if a squashed migration still has a
+          # `replaces` attribute referencing migrations that would be pruned.
+          def prune : Array(Tuple(String, String))
+            @recorder.setup
+
+            defined_migration_ids = Set(String).new
+            Migrations.registry.each do |migration_klass|
+              defined_migration_ids.add(migration_klass.id)
+            rescue Marten::Apps::Errors::AppNotFound
+            end
+
+            to_prune = [] of Tuple(String, String)
+
+            @recorder.applied_migrations.each do |record|
+              app_label = record.app.not_nil!
+              migration_name = record.name.not_nil!
+              migration_id = Migration.gen_id(app_label, migration_name)
+              next if defined_migration_ids.includes?(migration_id)
+              to_prune << {app_label, migration_name}
+            end
+
+            conflicting_migration_ids = [] of String
+
+            Migrations.registry.each do |migration_klass|
+              next if migration_klass.replaces.empty?
+
+              has_replaced_to_prune = migration_klass.replaces.any? do |app_label, migration_name|
+                to_prune.any? { |app, name| app == app_label && name == migration_name }
+              end
+
+              conflicting_migration_ids << migration_klass.id if has_replaced_to_prune
+            rescue Marten::Apps::Errors::AppNotFound
+            end
+
+            unless conflicting_migration_ids.empty?
+              raise Errors::PruneConflict.new(
+                "Cannot prune migrations because the following squashed migrations still have a `replaces` " \
+                "attribute and may not be recorded as applied: #{conflicting_migration_ids.join(", ")}. " \
+                "Ensure that squashed migrations are applied and remove `replaces` attributes in their " \
+                "migration classes."
+              )
+            end
+
+            to_prune.each do |app_label, name|
+              @recorder.unrecord(app_label, name)
+            end
+
+            to_prune
+          end
+
           private def execute_backward(plan, full_plan, fake, &)
             migration_ids_to_unapply = plan.map { |m, _d| m.id }
 

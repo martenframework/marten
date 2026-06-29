@@ -245,5 +245,47 @@ describe Marten::CLI::Manage::Command::Migrate do
         .size
         .should eq 0
     end
+
+    it "prunes nonexistent migrations from the database when the --prune option is used" do
+      Marten::DB::Management::Migrations::Recorder.new(Marten::DB::Connection.default).record(
+        "cli_manage_command_migrate_spec_foo_app", "nonexistent_migration"
+      )
+
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Migrate.new(
+        options: ["--prune"] of String,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("Pruning migrations:").should be_true
+      output.includes?("cli_manage_command_migrate_spec_foo_app.nonexistent_migration").should be_true
+
+      Marten::DB::Management::Migrations::Record.filter(
+        app: "cli_manage_command_migrate_spec_foo_app",
+        name: "nonexistent_migration"
+      ).exists?.should be_false
+    end
+
+    it "shows a message when there are no migrations to prune and the --prune option is used" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::Migrate.new(
+        options: ["--prune"] of String,
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      command.handle
+
+      output = stdout.rewind.gets_to_end
+      output.includes?("No migrations to prune").should be_true
+    end
   end
 end

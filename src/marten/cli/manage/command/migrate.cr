@@ -11,6 +11,7 @@ module Marten
           @fake : Bool = false
           @migration : String?
           @plan : Bool = false
+          @prune : Bool = false
 
           def setup
             on_argument(:app_label, "The name of an application to run migrations for") { |v| @app_label = v }
@@ -39,6 +40,13 @@ module Marten
               @plan = true
             end
 
+            on_option(
+              :prune,
+              "Delete nonexistent migrations from the marten_migrations table"
+            ) do
+              @prune = true
+            end
+
             on_option_with_arg(
               :db,
               arg: "alias",
@@ -57,6 +65,11 @@ module Marten
               Marten::DB::Connection.get(db || Marten::DB::Connection::DEFAULT_CONNECTION_NAME)
             )
 
+            if prune?
+              prune_migrations(runner)
+              return
+            end
+
             execution_needed = runner.execution_needed?(app_config, migration_name)
 
             if check?
@@ -71,6 +84,8 @@ module Marten
             end
           rescue e : Apps::Errors::AppNotFound | DB::Management::Migrations::Errors::MigrationNotFound
             print_error(e.message)
+          rescue e : DB::Management::Migrations::Errors::PruneConflict
+            print_error(e.message)
           end
 
           private getter db
@@ -78,6 +93,7 @@ module Marten
           private getter? check
           private getter? fake
           private getter? plan
+          private getter? prune
 
           private def process_execution_progress(progress)
             case progress.type
@@ -97,6 +113,24 @@ module Marten
 
             runner.execute(app_config, migration_name, fake?) do |progress|
               process_execution_progress(progress)
+            end
+          end
+
+          private def prune_migrations(runner)
+            print(style("Pruning migrations:", fore: :light_blue, mode: :bold), ending: "\n")
+
+            pruned = runner.prune
+
+            if pruned.empty?
+              print("  No migrations to prune")
+            else
+              pruned.each do |app_label, migration_name|
+                print(
+                  "  › Pruning #{style("#{app_label}.#{migration_name}", mode: :dim)}...",
+                  ending: ""
+                )
+                print(style(" DONE", fore: :light_green, mode: :bold))
+              end
             end
           end
 

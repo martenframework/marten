@@ -79,8 +79,18 @@ describe Marten::DB::Field::DateTime do
       field = Marten::DB::Field::DateTime.new("my_field")
 
       Marten::DB::Connection.default.open do |db|
-        for_db_backends :mysql, :postgresql do
-          db.query("SELECT now()") do |rs|
+        for_postgresql do
+          db.query("SELECT TIMESTAMP '2017-09-28 02:57:14.839000'") do |rs|
+            rs.each do
+              value = field.from_db_result_set(rs)
+              value.should be_a Time
+              value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+            end
+          end
+        end
+
+        for_mysql do
+          db.query("SELECT CAST('2017-09-28 02:57:14.839000' AS DATETIME)") do |rs|
             rs.each do
               value = field.from_db_result_set(rs)
               value.should be_a Time

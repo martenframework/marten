@@ -79,8 +79,21 @@ describe Marten::DB::Field::Date do
       field = Marten::DB::Field::Date.new("my_field")
 
       Marten::DB::Connection.default.open do |db|
-        for_db_backends :mysql, :postgresql do
-          db.query("SELECT current_date") do |rs|
+        for_postgresql do
+          db.query("SELECT DATE '2017-09-28'") do |rs|
+            rs.each do
+              value = field.from_db_result_set(rs)
+              value.should be_a Time
+              value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+              value.not_nil!.hour.should eq 0
+              value.not_nil!.minute.should eq 0
+              value.not_nil!.second.should eq 0
+            end
+          end
+        end
+
+        for_mysql do
+          db.query("SELECT CAST('2017-09-28' AS DATE)") do |rs|
             rs.each do
               value = field.from_db_result_set(rs)
               value.should be_a Time
@@ -93,7 +106,7 @@ describe Marten::DB::Field::Date do
         end
 
         for_sqlite do
-          db.query("SELECT date()") do |rs|
+          db.query("SELECT '2017-09-28'") do |rs|
             rs.each do
               value = field.from_db_result_set(rs)
               value.should be_a Time

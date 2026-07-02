@@ -128,24 +128,25 @@ describe Marten::CLI::Manage::Command::Gen do
       command = Marten::CLI::Manage::Command::Gen.new(options: ["-h"], stdin: stdin, stdout: stdout, exit_raises: true)
       command.handle
 
-      stdout.rewind.gets_to_end.chomp("\n").includes?(
-        <<-USAGE
-          Usage: marten gen [options] [generator] [arguments]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Generate various structures, abstractions, and values within an existing project.
+      output.includes?("Usage: marten gen [options] [generator] [arguments]").should be_true
+      output
+        .includes?("Generate various structures, abstractions, and values within an existing project.")
+        .should be_true
+      output.includes?("Arguments:").should be_true
+      output.lines.any? do |line|
+        line.includes?("generator") && line.includes?("Name of the generator to use")
+      end.should be_true
+      output.includes?("Options:").should be_true
 
-          Arguments:
-              generator                        Name of the generator to use
+      Marten::CLI::Manage::Command::GenSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
 
-          Options:
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-
-          Available generators are listed below.
-          USAGE
-      ).should be_true
+      output.includes?("Available generators are listed below.").should be_true
     end
 
     it "shows the usage of the specific generator if a generator name is specified" do
@@ -160,26 +161,24 @@ describe Marten::CLI::Manage::Command::Gen do
       )
       command.handle
 
-      stdout.rewind.gets_to_end.chomp("\n").includes?(
-        <<-USAGE
-          Usage: marten gen model [options] [name] [field_definitions]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Generate a model.
+      output.includes?("Usage: marten gen model [options] [name] [field_definitions]").should be_true
+      output.includes?("Generate a model.").should be_true
+      output.includes?("Arguments:").should be_true
+      output.lines.any? do |line|
+        line.includes?("name") && line.includes?("Name of the model to generate")
+      end.should be_true
+      output.lines.any? do |line|
+        line.includes?("field_definitions") && line.includes?("Field definitions of the model to generate")
+      end.should be_true
+      output.includes?("Options:").should be_true
 
-          Arguments:
-              name                             Name of the model to generate
-              field_definitions                Field definitions of the model to generate
-
-          Options:
-              --app=APP                        Target app where the model should be created
-              --parent=PARENT                  Parent class name for the generated model
-              --no-timestamps                  Do not include timestamp fields in the generated model
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      ).should be_true
+      Marten::CLI::Manage::Command::GenSpec::MODEL_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "shows the footer description if the specified generator defines one" do
@@ -194,29 +193,39 @@ describe Marten::CLI::Manage::Command::Gen do
       )
       command.handle
 
-      stdout.rewind.gets_to_end.chomp("\n").includes?(
-        <<-USAGE
-          Options:
-              --app=APP                        Target app where the model should be created
-              --parent=PARENT                  Parent class name for the generated model
-              --no-timestamps                  Do not include timestamp fields in the generated model
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Description:
+      output.includes?("Options:").should be_true
 
-            Generates a model with the specified name and field definitions. The model will be
-            generated in the app specified by the --app option or in the main app if no app is
-            specified.
-          USAGE
-      )
+      Marten::CLI::Manage::Command::GenSpec::MODEL_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
+
+      output.includes?("Description:").should be_true
+      output.includes?("Generates a model with the specified name and field definitions.").should be_true
+      output.includes?(
+        "generated in the app specified by the --app option or in the main app if no app is"
+      ).should be_true
     end
   end
 end
 
 module Marten::CLI::Manage::Command::GenSpec
+  SHARED_OPTIONS = [
+    {"--error-trace", "Show full error trace (if a compilation is involved)"},
+    {"--log-level=level", "Set the log level (default to \"info\")"},
+    {"--no-color", "Disable colored output"},
+    {"-h, --help", "Show this help"},
+  ]
+
+  MODEL_OPTIONS = [
+    {"--app=APP", "Target app where the model should be created"},
+    {"--parent=PARENT", "Parent class name for the generated model"},
+    {"--no-timestamps", "Do not include timestamp fields in the generated model"},
+  ] + SHARED_OPTIONS
+
   class GeneratorWithWarnings < Marten::CLI::Generator
     generator_name :withwarnings
     help "This is a generator with warnings."

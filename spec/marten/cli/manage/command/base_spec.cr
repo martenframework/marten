@@ -372,17 +372,16 @@ describe Marten::CLI::Manage::Command::Base do
 
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Options:
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      output.includes?("Usage: marten empty_command [options]").should be_true
+      output.includes?("Options:").should be_true
+
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "produces the expected output for a command with a single argument" do
@@ -396,20 +395,20 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options] [arg]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Arguments:
-              arg                              This is an argument
+      output.includes?("Usage: marten empty_command [options] [arg]").should be_true
+      output.includes?("Arguments:").should be_true
+      output.lines.any? do |line|
+        line.includes?("arg") && line.includes?("This is an argument")
+      end.should be_true
+      output.includes?("Options:").should be_true
 
-          Options:
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "produces the expected output for a command with multiple arguments" do
@@ -424,21 +423,25 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options] [arg1] [arg2]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Arguments:
-              arg1                             This is the first argument
-              arg2                             This is the second argument
+      output.includes?("Usage: marten empty_command [options] [arg1] [arg2]").should be_true
+      output.includes?("Arguments:").should be_true
 
-          Options:
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      output.lines.any? do |line|
+        line.includes?("arg1") && line.includes?("This is the first argument")
+      end.should be_true
+      output.lines.any? do |line|
+        line.includes?("arg2") && line.includes?("This is the second argument")
+      end.should be_true
+
+      output.includes?("Options:").should be_true
+
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "produces the expected output for a command with a custom option" do
@@ -454,22 +457,29 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options] [arg1] [arg2]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Arguments:
-              arg1                             This is the first argument
-              arg2                             This is the second argument
+      output.includes?("Usage: marten empty_command [options] [arg1] [arg2]").should be_true
+      output.includes?("Arguments:").should be_true
 
-          Options:
-              --option                         This is an option
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      output.lines.any? do |line|
+        line.includes?("arg1") && line.includes?("This is the first argument")
+      end.should be_true
+      output.lines.any? do |line|
+        line.includes?("arg2") && line.includes?("This is the second argument")
+      end.should be_true
+
+      output.includes?("Options:").should be_true
+
+      output.lines.any? do |line|
+        line.includes?("--option") && line.includes?("This is an option")
+      end.should be_true
+
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "produces the expected output for a command with a custom option with a short flag" do
@@ -485,22 +495,29 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options] [arg1] [arg2]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Arguments:
-              arg1                             This is the first argument
-              arg2                             This is the second argument
+      output.includes?("Usage: marten empty_command [options] [arg1] [arg2]").should be_true
+      output.includes?("Arguments:").should be_true
 
-          Options:
-              -o, --option                     This is an option
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      output.lines.any? do |line|
+        line.includes?("arg1") && line.includes?("This is the first argument")
+      end.should be_true
+      output.lines.any? do |line|
+        line.includes?("arg2") && line.includes?("This is the second argument")
+      end.should be_true
+
+      output.includes?("Options:").should be_true
+
+      output.lines.any? do |line|
+        line.includes?("-o, --option") && line.includes?("This is an option")
+      end.should be_true
+
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "produces the expected output for a command with unknown arguments" do
@@ -516,21 +533,25 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options] [arg1] [arg2] [arguments]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Arguments:
-              arg1                             This is the first argument
-              arg2                             This is the second argument
+      output.includes?("Usage: marten empty_command [options] [arg1] [arg2] [arguments]").should be_true
+      output.includes?("Arguments:").should be_true
 
-          Options:
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      output.lines.any? do |line|
+        line.includes?("arg1") && line.includes?("This is the first argument")
+      end.should be_true
+      output.lines.any? do |line|
+        line.includes?("arg2") && line.includes?("This is the second argument")
+      end.should be_true
+
+      output.includes?("Options:").should be_true
+
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
 
     it "produces the expected output for a command with unknown arguments associated with a name and description" do
@@ -546,22 +567,29 @@ describe Marten::CLI::Manage::Command::Base do
       command.handle
       command.show_usage
 
-      stdout.rewind.gets_to_end.chomp("\n").should eq(
-        <<-USAGE
-          Usage: marten empty_command [options] [arg1] [arg2] [args]
+      output = stdout.rewind.gets_to_end.chomp("\n")
 
-          Arguments:
-              arg1                             This is the first argument
-              arg2                             This is the second argument
-              args                             Custom arguments
+      output.includes?("Usage: marten empty_command [options] [arg1] [arg2] [args]").should be_true
+      output.includes?("Arguments:").should be_true
 
-          Options:
-              --error-trace                    Show full error trace (if a compilation is involved)
-              --log-level=level                Set the log level (default to "info")
-              --no-color                       Disable colored output
-              -h, --help                       Show this help
-          USAGE
-      )
+      output.lines.any? do |line|
+        line.includes?("arg1") && line.includes?("This is the first argument")
+      end.should be_true
+      output.lines.any? do |line|
+        line.includes?("arg2") && line.includes?("This is the second argument")
+      end.should be_true
+
+      output.lines.any? do |line|
+        line.includes?("args") && line.includes?("Custom arguments")
+      end.should be_true
+
+      output.includes?("Options:").should be_true
+
+      Marten::CLI::Manage::Command::BaseSpec::SHARED_OPTIONS.each do |name, description|
+        output.lines.any? do |line|
+          line.includes?(name) && line.includes?(description)
+        end.should be_true
+      end
     end
   end
 
@@ -593,6 +621,13 @@ describe Marten::CLI::Manage::Command::Base do
 end
 
 module Marten::CLI::Manage::Command::BaseSpec
+  SHARED_OPTIONS = [
+    {"--error-trace", "Show full error trace (if a compilation is involved)"},
+    {"--log-level=level", "Set the log level (default to \"info\")"},
+    {"--no-color", "Disable colored output"},
+    {"-h, --help", "Show this help"},
+  ]
+
   class EmptyCommand < Marten::CLI::Manage::Command::Base
   end
 

@@ -68,11 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: public.ecr.aws/bitnami/mysql:8.3.0
-        env:
-          MYSQL_ROOT_PASSWORD: "mysql"
-          MYSQL_DATABASE: marten_test
-          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+        image: mysql:8.3
         ports:
           - 3307:3306
         options: >-
@@ -80,6 +76,12 @@ jobs:
           --health-interval=10s
           --health-timeout=5s
           --health-retries=3
+          -e MYSQL_ROOT_PASSWORD=mysql
+          -e MYSQL_DATABASE=marten_test
+          -e MYSQL_ROOT_HOST=%
+          --entrypoint sh
+          mysql:8.3
+          -c "exec docker-entrypoint.sh mysqld --default-authentication-plugin=mysql_native_password"
     continue-on-error: ${{ matrix.crystal == 'nightly' }}
     strategy:
       fail-fast: false

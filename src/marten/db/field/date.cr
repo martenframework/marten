@@ -39,13 +39,15 @@ module Marten
             value.as?(Nil)
           when Time
             value.in(Marten.settings.time_zone).as?(Time)
+          when ::String
+            parse_db_date_string(value).in(Marten.settings.time_zone)
           else
             raise_unexpected_field_value(value)
           end
         end
 
         def from_db_result_set(result_set : ::DB::ResultSet) : Time?
-          from_db(result_set.read(Time?))
+          from_db(result_set.read)
         end
 
         # :nodoc:
@@ -79,6 +81,16 @@ module Marten
             value.at_beginning_of_day.to_utc
           else
             raise_unexpected_field_value(value)
+          end
+        end
+
+        private def parse_db_date_string(value : ::String) : Time
+          if value.matches?(/\A\d{4}-\d{2}-\d{2}\z/)
+            Time.parse(value, "%F", Marten.settings.time_zone)
+          elsif value.includes?(".")
+            Time.parse(value, "%F %H:%M:%S.%L", Marten.settings.time_zone).at_beginning_of_day
+          else
+            Time.parse(value, "%F %H:%M:%S", Marten.settings.time_zone).at_beginning_of_day
           end
         end
       end

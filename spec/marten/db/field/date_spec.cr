@@ -65,6 +65,42 @@ describe Marten::DB::Field::Date do
       field.from_db(nil).should be_nil
     end
 
+    it "is able to process a date-only string" do
+      field = Marten::DB::Field::Date.new("my_field")
+      value = field.from_db("2017-09-28")
+
+      value.should be_a Time
+      value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+      value.not_nil!.to_s("%F").should eq "2017-09-28"
+      value.not_nil!.hour.should eq 0
+      value.not_nil!.minute.should eq 0
+      value.not_nil!.second.should eq 0
+    end
+
+    it "is able to process a datetime string without subseconds" do
+      field = Marten::DB::Field::Date.new("my_field")
+      value = field.from_db("2017-09-28 02:57:14")
+
+      value.should be_a Time
+      value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+      value.not_nil!.to_s("%F").should eq "2017-09-28"
+      value.not_nil!.hour.should eq 0
+      value.not_nil!.minute.should eq 0
+      value.not_nil!.second.should eq 0
+    end
+
+    it "is able to process a datetime string with subseconds" do
+      field = Marten::DB::Field::Date.new("my_field")
+      value = field.from_db("2017-09-28 02:57:14.839000")
+
+      value.should be_a Time
+      value.not_nil!.zone.name.should eq Marten.settings.time_zone.to_s
+      value.not_nil!.to_s("%F").should eq "2017-09-28"
+      value.not_nil!.hour.should eq 0
+      value.not_nil!.minute.should eq 0
+      value.not_nil!.second.should eq 0
+    end
+
     it "raises UnexpectedFieldValue if the value is not supported" do
       field = Marten::DB::Field::Date.new("my_field")
 

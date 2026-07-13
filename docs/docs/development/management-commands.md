@@ -46,19 +46,20 @@ Available commands:
 
 [marten]
 
-  › clearsessions    Clear all expired sessions.
-  › collectassets    Collect all the assets and copy them in a unique storage.
-  › gen / g          Generate various structures, abstractions, and values within an existing project.
-  › genmigrations    Generate new database migrations.
-  › listmigrations   List all database migrations.
-  › migrate          Run database migrations.
-  › new              Initialize a new Marten project or application repository.
-  › play             Start a Crystal playground server initialized for the current project.
-  › resetmigrations  Reset an existing set of migrations into a single one.
-  › routes           Display all the routes of the application.
-  › seed             Populate the database by running the seed file.
-  › serve / s        Start a development server that is automatically recompiled when source files change.
-  › version          Show the Marten version.
+  › clearsessions     Clear all expired sessions.
+  › collectartifacts  Collect runtime artifacts required by compiled applications.
+  › collectassets     Collect all the assets and copy them in a unique storage.
+  › gen / g           Generate various structures, abstractions, and values within an existing project.
+  › genmigrations     Generate new database migrations.
+  › listmigrations    List all database migrations.
+  › migrate           Run database migrations.
+  › new               Initialize a new Marten project or application repository.
+  › play              Start a Crystal playground server initialized for the current project.
+  › resetmigrations   Reset an existing set of migrations into a single one.
+  › routes            Display all the routes of the application.
+  › seed              Populate the database by running the seed file.
+  › serve / s         Start a development server that is automatically recompiled when source files change.
+  › version           Show the Marten version.
 
 Run a command followed by --help to see command specific information, ex:
 marten [command] --help

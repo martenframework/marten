@@ -25,6 +25,35 @@ marten clearsessions            # Clears all expired sessions
 marten clearsessions --no-input # Clears all expired sessions without any prompts
 ```
 
+## `collectartifacts`
+
+**Usage:** `marten collectartifacts [options]`
+
+Collects runtime artifacts that are required by compiled applications and copies them into a single destination
+directory.
+
+This command collects Marten's built-in locale files, project locale files from `config/locales`, and application
+locale and template files from `locales` and `templates` directories. Files are copied while preserving their paths
+relative to the project compilation root, so the destination directory can be used as the [`root_path`](./settings.md#root_path)
+setting in production. Symbolic links encountered in these directories are followed, and the linked files are
+collected as regular files.
+
+Custom template loaders and directories configured through `templates.dirs` are not collected by this command.
+
+### Options
+
+* `--dest-path=PATH` - Configures where artifacts should be collected (defaults to `artifacts`)
+* `--no-input` - Does not show prompts to the user
+* `--app=APP_LABEL` - Collects artifacts for the specified application only
+
+### Examples
+
+```bash
+marten collectartifacts                                     # Collects all runtime artifacts into artifacts/
+marten collectartifacts --no-input --dest-path runtime_root # Collects all runtime artifacts without any prompts
+marten collectartifacts --app=auth                          # Collects artifacts for the "auth" app only
+```
+
 ## `collectassets`
 
 **Usage:** `marten collectassets [options]`

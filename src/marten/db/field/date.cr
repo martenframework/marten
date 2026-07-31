@@ -38,9 +38,9 @@ module Marten
           when Nil
             value.as?(Nil)
           when Time
-            value.in(Marten.settings.time_zone).as?(Time)
+            local_date(value)
           when ::String
-            parse_db_date_string(value).in(Marten.settings.time_zone)
+            local_date(parse_db_date_string(value))
           else
             raise_unexpected_field_value(value)
           end
@@ -58,7 +58,7 @@ module Marten
 
         def prepare_save(record, new_record = false)
           if @auto_now || (@auto_now_add && new_record)
-            record.set_field_value(id, Time.local.at_beginning_of_day)
+            record.set_field_value(id, local_date(Time.local(Marten.settings.time_zone)))
           end
         end
 
@@ -78,19 +78,29 @@ module Marten
           when Nil
             nil
           when Time
-            value.at_beginning_of_day.to_utc
+            Time.utc(value.year, value.month, value.day)
           else
             raise_unexpected_field_value(value)
           end
         end
 
+        # Returns the start of the calendar date of `value` in the project time zone, or of the next day if that date does
+        # not exist there.
+        private def local_date(value : Time) : Time
+          time = Time.local(value.year, value.month, value.day, location: Marten.settings.time_zone)
+          while {time.year, time.month, time.day} < {value.year, value.month, value.day}
+            time += 1.hour
+          end
+          time
+        end
+
         private def parse_db_date_string(value : ::String) : Time
           if value.matches?(/\A\d{4}-\d{2}-\d{2}\z/)
-            Time.parse(value, "%F", Marten.settings.time_zone)
+            Time.parse_utc(value, "%F")
           elsif value.includes?(".")
-            Time.parse(value, "%F %H:%M:%S.%L", Marten.settings.time_zone).at_beginning_of_day
+            Time.parse_utc(value, "%F %H:%M:%S.%L")
           else
-            Time.parse(value, "%F %H:%M:%S", Marten.settings.time_zone).at_beginning_of_day
+            Time.parse_utc(value, "%F %H:%M:%S")
           end
         end
       end

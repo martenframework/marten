@@ -59,7 +59,7 @@ jobs:
     - name: Install generated app dependencies
       run: |
         cd tmp/test-app
-        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba }}" >> shard.yml
+        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba, branch: master }}" >> shard.yml
         shards install --ignore-crystal-version
         cd lib && rm -rf marten && ln -s ../../.. marten
     - name: Run ameba on the generated app
@@ -93,7 +93,7 @@ jobs:
     - name: Install generated project dependencies
       run: |
         cd tmp/test-project
-        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba }}" >> shard.yml
+        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba, branch: master }}" >> shard.yml
         shards install --ignore-crystal-version
         cd lib && rm -rf marten && ln -s ../../.. marten
     - name: Run ameba on the generated project
@@ -127,7 +127,7 @@ jobs:
     - name: Install generated project dependencies
       run: |
         cd tmp/test-auth-project
-        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba }}" >> shard.yml
+        echo "development_dependencies: { ameba: { github: crystal-ameba/ameba, branch: master }}" >> shard.yml
         shards install --ignore-crystal-version
         cd lib && rm -rf marten && ln -s ../../.. marten
     - name: Run ameba on the generated project

@@ -49,6 +49,18 @@ describe Marten::Schema::Field::String do
     end
   end
 
+  describe "#choices" do
+    it "returns nil by default" do
+      field = Marten::Schema::Field::String.new("test_field")
+      field.choices.should be_nil
+    end
+
+    it "returns the configured choices" do
+      field = Marten::Schema::Field::String.new("test_field", choices: ["draft", "published", "archived"])
+      field.choices.should eq ["draft", "published", "archived"]
+    end
+  end
+
   describe "#serialize" do
     it "returns the string representation of the passed value" do
       field = Marten::Schema::Field::String.new("test_field")
@@ -127,6 +139,30 @@ describe Marten::Schema::Field::String do
       schema.errors.size.should eq 1
       schema.errors.first.field.should eq "test_field"
       schema.errors.first.message.should eq I18n.t("marten.schema.field.string.errors.too_long", max_size: 2)
+    end
+
+    it "validates a value that matches one of the allowed choices" do
+      schema = Marten::Schema::Field::StringSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"test_field" => ["published"]}
+      )
+
+      field = Marten::Schema::Field::String.new("test_field", choices: ["draft", "published", "archived"])
+      field.perform_validation(schema)
+
+      schema.errors.should be_empty
+    end
+
+    it "does not validate a value that does not match one of the allowed choices" do
+      schema = Marten::Schema::Field::StringSpec::TestSchema.new(
+        Marten::HTTP::Params::Data{"test_field" => ["invalid"]}
+      )
+
+      field = Marten::Schema::Field::String.new("test_field", choices: ["draft", "published", "archived"])
+      field.perform_validation(schema)
+
+      schema.errors.size.should eq 1
+      schema.errors.first.field.should eq "test_field"
+      schema.errors.first.message.should eq I18n.t("marten.schema.field.string.errors.invalid_choice", value: "invalid")
     end
   end
 end

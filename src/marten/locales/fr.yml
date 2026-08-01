@@ -34,6 +34,7 @@ fr:
           errors:
             too_short: "La longueur minimale autorisée est de %{min_size} caractères."
             too_long: "La longueur maximale autorisée est de %{max_size} caractères."
+            invalid_choice: "Entrez une valeur valide. %{value} n'est pas une valeur acceptée."
         text:
           errors:
             too_long: "La longueur maximale autorisée est de %{max_size} caractères."
@@ -95,6 +96,7 @@ fr:
           errors:
             too_short: "La longueur minimale autorisée est de %{min_size} caractères."
             too_long: "La longueur maximale autorisée est de %{max_size} caractères."
+            invalid_choice: "Entrez une valeur valide. %{value} n'est pas une valeur acceptée."
         url:
           errors:
             invalid: "Entrez une URL valide."

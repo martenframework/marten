@@ -3,6 +3,9 @@ module Marten
     module Field
       # Represents a string schema field.
       class String < Base
+        # Returns the allowed string values, or `nil` if no restriction is configured.
+        getter choices
+
         # Returns the maximum string size allowed.
         getter max_size
 
@@ -14,6 +17,7 @@ module Marten
           @required : ::Bool = true,
           @max_size : ::Int32? = nil,
           @min_size : ::Int32? = nil,
+          @choices : ::Array(::String)? = nil,
           @strip : ::Bool = true,
         )
         end
@@ -40,6 +44,10 @@ module Marten
 
           if !max_size.nil? && value.size > max_size.not_nil!
             schema.errors.add(id, I18n.t("marten.schema.field.string.errors.too_long", max_size: max_size))
+          end
+
+          if !choices.nil? && !choices.not_nil!.includes?(value)
+            schema.errors.add(id, I18n.t("marten.schema.field.string.errors.invalid_choice", value: value))
           end
         end
       end

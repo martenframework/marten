@@ -68,6 +68,18 @@ describe Marten::DB::Field::String do
     end
   end
 
+  describe "#choices" do
+    it "returns nil by default" do
+      field = Marten::DB::Field::String.new("my_field", max_size: 128)
+      field.choices.should be_nil
+    end
+
+    it "returns the configured choices" do
+      field = Marten::DB::Field::String.new("my_field", max_size: 20, choices: ["draft", "published", "archived"])
+      field.choices.should eq ["draft", "published", "archived"]
+    end
+  end
+
   describe "#to_column" do
     it "returns the expected column" do
       field = Marten::DB::Field::String.new("my_field", db_column: "my_field_col", max_size: 128)
@@ -225,6 +237,35 @@ describe Marten::DB::Field::String do
 
       field = Marten::DB::Field::String.new("name", null: false, max_size: 128)
       field.validate(obj, nil)
+
+      obj.errors.size.should eq 0
+    end
+
+    it "adds an error to the record if the value is not one of the allowed choices" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", max_size: 20, choices: ["draft", "published", "archived"])
+      field.validate(obj, "invalid")
+
+      obj.errors.size.should eq 1
+      obj.errors.first.field.should eq "name"
+      obj.errors.first.message.should eq I18n.t("marten.db.field.string.errors.invalid_choice", value: "invalid")
+    end
+
+    it "does not add an error to the record if the value is one of the allowed choices" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", max_size: 20, choices: ["draft", "published", "archived"])
+      field.validate(obj, "draft")
+
+      obj.errors.size.should eq 0
+    end
+
+    it "does not add an error to the record if no choices are configured" do
+      obj = Tag.new(name: nil)
+
+      field = Marten::DB::Field::String.new("name", max_size: 20)
+      field.validate(obj, "anything")
 
       obj.errors.size.should eq 0
     end

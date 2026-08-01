@@ -356,6 +356,17 @@ The `max_size` argument **is required** and allows to specify the maximum size o
 
 The `min_size` argument allows defining the minimum size allowed for the persisted string. The default value for this argument is `nil`, which means that the minimum size is not validated by default.
 
+#### `choices`
+
+The `choices` argument allows defining an array of allowed string values. The default value for this argument is `nil`, which means that values are not restricted to a specific set of choices by default. When set, field values must match one of the configured choices.
+
+```crystal
+class Article < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :status, :string, max_size: 20, choices: ["draft", "published", "archived"]
+end
+```
+
 ### `text`
 
 A `text` field allows to persist large text values. In addition to the [common field options](#common-field-options), such fields support the following arguments:

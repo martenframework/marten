@@ -2,6 +2,10 @@ module Marten
   module DB
     module Field
       class String < Base
+        # Returns the allowed string values, or `nil` if no restriction is configured.
+        getter choices
+
+        # Returns the default string value.
         getter default
 
         # Returns the maximum string size allowed.
@@ -14,6 +18,7 @@ module Marten
           @id : ::String,
           @max_size : ::Int32,
           @min_size : ::Int32? = nil,
+          @choices : ::Array(::String)? = nil,
           @primary_key = false,
           @default : ::String? = nil,
           @blank = false,
@@ -84,6 +89,10 @@ module Marten
 
           if !min_size.nil? && value.size < min_size.not_nil!
             record.errors.add(id, I18n.t("marten.db.field.string.errors.too_short", min_size: min_size))
+          end
+
+          if !choices.nil? && !choices.not_nil!.includes?(value)
+            record.errors.add(id, I18n.t("marten.db.field.string.errors.invalid_choice", value: value))
           end
         end
 

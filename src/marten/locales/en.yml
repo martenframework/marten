@@ -37,6 +37,7 @@ en:
           errors:
             too_short: "The minimum allowed length is %{min_size}"
             too_long: "The maximum allowed length is %{max_size}"
+            invalid_choice: "Enter a valid value. %{value} is not one of the accepted values."
         text:
           errors:
             too_long: "The maximum allowed length is %{max_size}"
@@ -112,6 +113,7 @@ en:
           errors:
             too_short: "The minimum allowed length is %{min_size}."
             too_long: "The maximum allowed length is %{max_size}."
+            invalid_choice: "Enter a valid value. %{value} is not one of the accepted values."
         url:
           errors:
             invalid: "Enter a valid URL."

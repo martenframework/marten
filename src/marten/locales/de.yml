@@ -34,6 +34,7 @@ de:
           errors:
             too_short: "Die Mindestlänge beträgt %{min_size} Zeichen."
             too_long: "Die maximale Länge beträgt %{max_size} Zeichen."
+            invalid_choice: "Geben Sie einen gültigen Wert ein. %{value} ist kein zulässiger Wert."
         text:
           errors:
             too_long: "Die maximale Länge beträgt %{max_size} Zeichen."
@@ -99,6 +100,7 @@ de:
           errors:
             too_short: "Die Mindestlänge beträgt %{min_size} Zeichen."
             too_long: "Die maximale Länge beträgt %{max_size} Zeichen."
+            invalid_choice: "Geben Sie einen gültigen Wert ein. %{value} ist kein zulässiger Wert."
         url:
           errors:
             invalid: "Geben Sie eine gültige URL ein."

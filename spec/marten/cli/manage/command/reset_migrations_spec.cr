@@ -143,6 +143,45 @@ describe Marten::CLI::Manage::Command::ResetMigrations do
       output.includes?("Generating migrations for app 'reset_migrations_spec_foo_app':").should be_true
       output.includes?("○ Create reset_migrations_spec_foo_app_tag table").should be_true
     end
+
+    it "generates the expected migration for a given app without header comments when the --no-header option is used" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::ResetMigrations.new(
+        options: ["reset_migrations_spec_foo_app", "--no-header"],
+        stdout: stdout,
+        stderr: stderr
+      )
+
+      time = Marten::CLI::Manage::Command::ResetMigrationsSpec::EXPECTED_MIGRATION_TIME
+      Timecop.freeze(time) do
+        command.handle
+
+        File.exists?(Marten::CLI::Manage::Command::ResetMigrationsSpec.expected_migration_filepath).should be_true
+        generated_migration = File.read(Marten::CLI::Manage::Command::ResetMigrationsSpec.expected_migration_filepath)
+
+        generated_migration.split.map(&.strip).should eq(
+          (
+            <<-MIGRATION
+              class Migration::ResetMigrationsSpecFooApp::V#{Time.local.to_s("%Y%m%d%H%M%S")}1 < Marten::Migration
+                replaces :reset_migrations_spec_foo_app, "202108092226111_auto"
+                replaces :reset_migrations_spec_foo_app, "202108092226112_auto"
+
+                def plan
+                  create_table :reset_migrations_spec_foo_app_tag do
+                    column :id, :big_int, primary_key: true, auto: true
+                    column :label, :string, max_size: 255, unique: true
+                    column :active, :bool, default: true
+                  end
+                end
+              end
+
+              MIGRATION
+          ).split.map(&.strip)
+        )
+      end
+    end
   end
 end
 

@@ -242,5 +242,50 @@ describe Marten::DB::Management::Migrations::Diff::Migration do
         )
       end
     end
+
+    it "returns a serialized version of the generated migration without header comments when no_header is true" do
+      migration = Marten::DB::Management::Migrations::Diff::Migration.new(
+        app_label: "my_app",
+        name: "202107031819361",
+        operations: [
+          Marten::DB::Migration::Operation::CreateTable.new(
+            name: "test_table",
+            columns: [
+              Marten::DB::Management::Column::BigInt.new("id", primary_key: true, auto: true),
+              Marten::DB::Management::Column::Int.new("foo"),
+              Marten::DB::Management::Column::Int.new("bar"),
+            ] of Marten::DB::Management::Column::Base,
+            unique_constraints: [
+              Marten::DB::Management::Constraint::Unique.new("test_constraint", ["foo", "bar"]),
+            ]
+          ),
+        ] of Marten::DB::Migration::Operation::Base,
+        dependencies: [{"other_app", "other_migration"}]
+      )
+
+      time = Time.local
+      Timecop.freeze(time) do
+        migration.serialize(no_header: true).split.map(&.strip).should eq(
+          (
+            <<-MIGRATION
+              class Migration::MyApp::V202107031819361 < Marten::Migration
+                depends_on :other_app, :other_migration
+
+                def plan
+                  create_table :test_table do
+                    column :id, :big_int, primary_key: true, auto: true
+                    column :foo, :int
+                    column :bar, :int
+
+                    unique_constraint :test_constraint, [:foo, :bar]
+                  end
+                end
+              end
+
+              MIGRATION
+          ).split.map(&.strip)
+        )
+      end
+    end
   end
 end

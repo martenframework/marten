@@ -92,6 +92,7 @@ This command will scan the table definition corresponding to your current models
 * `--dry-run` - Shows migrations that would be generated without writing them
 * `--check` - Exits with a non-zero status if model changes require migrations without generating them
 * `--empty` - Creates an empty migration
+* `--no-header` - Do not add header comments at the top of newly generated migration files
 
 ### Arguments
 
@@ -220,6 +221,10 @@ marten play --open # Starts the Crystal playground using the default host/port a
 **Usage:** `marten resetmigrations [options] [app_label]`
 
 Resets an existing set of migrations into a single one. Please refer to [Resetting migrations](../../models-and-databases/migrations.md#resetting-migrations) to learn more about this capability.
+
+### Options
+
+* `--no-header` - Do not add header comments at the top of newly generated migration files
 
 ### Arguments
 

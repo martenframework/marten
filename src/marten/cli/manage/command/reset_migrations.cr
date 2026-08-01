@@ -7,9 +7,17 @@ module Marten
           help "Reset an existing set of migrations into a single one."
 
           @app_label : String?
+          @no_header : Bool = false
 
           def setup
             on_argument(:app_label, "The name of an application to reset migrations for") { |v| @app_label = v }
+
+            on_option(
+              "no-header",
+              "Do not add header comments at the top of newly generated migration files"
+            ) do
+              @no_header = true
+            end
           end
 
           def run
@@ -50,6 +58,8 @@ module Marten
           private getter app_label
           private getter migration_name
 
+          private getter? no_header
+
           private def write_migrations(changes, replacements)
             changes.each do |app_label, migrations|
               print(style("Generating migrations for app '#{app_label}':", fore: :light_blue, mode: :bold))
@@ -65,7 +75,10 @@ module Marten
                 )
 
                 Dir.mkdir(app_config.migrations_path) unless Dir.exists?(app_config.migrations_path)
-                File.write(app_config.migrations_path.join("#{migration.name}.cr"), migration.serialize)
+                File.write(
+                  app_config.migrations_path.join("#{migration.name}.cr"),
+                  migration.serialize(no_header: no_header?)
+                )
 
                 print(style(" DONE", fore: :light_green, mode: :bold))
 

@@ -10,6 +10,7 @@ module Marten
           @check : Bool = false
           @create_empty : Bool = false
           @dry_run : Bool = false
+          @no_header : Bool = false
 
           def setup
             on_argument(:app_label, "The name of an application to generate migrations for") { |v| @app_label = v }
@@ -29,6 +30,13 @@ module Marten
             end
 
             on_option("empty", "Create an empty migration") { @create_empty = true }
+
+            on_option(
+              "no-header",
+              "Do not add header comments at the top of newly generated migration files"
+            ) do
+              @no_header = true
+            end
           end
 
           def run
@@ -64,6 +72,7 @@ module Marten
 
           private getter? check
           private getter? dry_run
+          private getter? no_header
 
           private def create_empty?
             @create_empty
@@ -122,7 +131,7 @@ module Marten
                 )
 
                 Dir.mkdir(app_config.migrations_path) unless Dir.exists?(app_config.migrations_path)
-                File.write(migration_filepath, migration.serialize)
+                File.write(migration_filepath, migration.serialize(no_header: no_header?))
 
                 print(style(" DONE", fore: :light_green, mode: :bold))
 

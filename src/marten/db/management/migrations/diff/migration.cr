@@ -36,7 +36,7 @@ module Marten
               @name = name.size > Record::NAME_MAX_SIZE ? @name + "_auto" : name
             end
 
-            def serialize
+            def serialize(no_header : Bool = false)
               ECR.render "#{__DIR__}/migration.ecr"
             end
           end

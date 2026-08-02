@@ -66,7 +66,7 @@ jobs:
       run: |
         cd tmp/test-app
         echo -e "Globs:\n  - \"**/*.cr\"\n  - \"!lib\"" >> .ameba.yml
-        bin/ameba
+        lib/ameba/bin/ameba.cr
   generated-project:
     runs-on: ubuntu-latest
     strategy:
@@ -100,7 +100,7 @@ jobs:
       run: |
         cd tmp/test-project
         echo -e "Globs:\n  - \"**/*.cr\"\n  - \"!lib\"" >> .ameba.yml
-        bin/ameba
+        lib/ameba/bin/ameba.cr
   generated-auth-project:
     runs-on: ubuntu-latest
     strategy:
@@ -134,7 +134,7 @@ jobs:
       run: |
         cd tmp/test-auth-project
         echo -e "Globs:\n  - \"**/*.cr\"\n  - \"!lib\"" >> .ameba.yml
-        bin/ameba
+        lib/ameba/bin/ameba.cr
   docs:
     runs-on: ubuntu-latest
     steps:

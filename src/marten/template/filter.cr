@@ -34,6 +34,7 @@ module Marten
       register "size", Size
       register "split", Split
       register "time", Time
+      register "truncate", Truncate
       register "underscore", Underscore
       register "upcase", UpCase
     end

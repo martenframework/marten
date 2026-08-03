@@ -121,6 +121,18 @@ The `time` filter allows outputting the string representation of a time variable
 
 In the above example, the output will be a date string such as `2023-09-25`.
 
+## `truncate`
+
+The `truncate` filter truncates a string so that it fits within a maximum number of characters. A filter argument corresponding to that maximum size is mandatory. Truncated strings end with an ellipsis (`"..."`), and that ellipsis is included in the resulting size.
+
+For example:
+
+```html
+{{ value|truncate:15 }}
+```
+
+If `value` is "This is a long test sentence", then the output will be "This is a lo...".
+
 ## `underscore`
 
 The `underscore` filter allows to convert a string to its underscored version.

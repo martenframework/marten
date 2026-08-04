@@ -8,6 +8,7 @@ module Marten
       abstract class Base
         @db : ::DB::Database?
         @url : String
+        @db_mutex = Mutex.new
         @transactions = {} of UInt64 => Transaction
         @transactions_mutex = Mutex.new
 
@@ -185,7 +186,9 @@ module Marten
         end
 
         protected def db
-          @db ||= ::DB.open(@url)
+          @db_mutex.synchronize do
+            @db ||= ::DB.open(@url)
+          end
         end
 
         private def current_transaction

@@ -9,6 +9,7 @@ module Marten
         @db : ::DB::Database?
         @url : String
         @transactions = {} of UInt64 => Transaction
+        @transactions_mutex = Mutex.new
 
         def initialize(@config : Conf::GlobalSettings::Database)
           @url = build_url
@@ -187,10 +188,10 @@ module Marten
           @db ||= ::DB.open(@url)
         end
 
-        private getter transactions
-
         private def current_transaction
-          transactions[Fiber.current.object_id]?
+          @transactions_mutex.synchronize do
+            @transactions[Fiber.current.object_id]?
+          end
         end
 
         private def mark_current_transaction_as_rolled_back
@@ -200,7 +201,9 @@ module Marten
         private def new_transaction(&)
           using_connection do |conn|
             conn.transaction do |tx|
-              transactions[Fiber.current.object_id] ||= Transaction.new(tx)
+              @transactions_mutex.synchronize do
+                @transactions[Fiber.current.object_id] ||= Transaction.new(tx)
+              end
               yield
             end
           end
@@ -216,8 +219,10 @@ module Marten
         end
 
         private def release_current_transaction
-          current_transaction.try(&.notify_observers)
-          transactions.delete(Fiber.current.object_id)
+          trx = @transactions_mutex.synchronize do
+            @transactions.delete(Fiber.current.object_id)
+          end
+          trx.try(&.notify_observers)
         end
 
         private def using_connection(&)

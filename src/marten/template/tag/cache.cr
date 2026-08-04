@@ -67,10 +67,16 @@ module Marten
           Marten.cache.fetch(key, expires_in: expiry) { @inner_nodes.render(context) }
         end
 
+        private VARY_ON_SEPARATOR = ":"
+
         private def fragment_key(name : String, vary_on : Array(String)) : String
           digest = Digest::MD5.new
 
+          # Length-prefix each value so distinct vary tuples cannot collide when concatenated.
+          # For example: ["ab", "c"] vs ["a", "bc"].
           vary_on.each do |v|
+            digest.update(v.bytesize.to_s)
+            digest.update(VARY_ON_SEPARATOR)
             digest.update(v)
           end
 

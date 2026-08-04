@@ -119,6 +119,23 @@ describe Marten::Template::Tag::Cache do
       end
     end
 
+    it "does not collide when vary on values concatenate to the same string" do
+      parser = Marten::Template::Parser.new("Cached content: {{ var }}{% endcache %}")
+      tag = Marten::Template::Tag::Cache.new(parser, %{cache "mykey" 3600 foo_var bar_var})
+
+      time_now = Time.local
+
+      Timecop.freeze(time_now) do
+        tag.render(Marten::Template::Context{"var" => Time.local, "foo_var" => "ab", "bar_var" => "c"})
+          .should eq "Cached content: #{time_now}"
+      end
+
+      Timecop.freeze(time_now + 30.minutes) do
+        tag.render(Marten::Template::Context{"var" => Time.local, "foo_var" => "a", "bar_var" => "bc"})
+          .should eq "Cached content: #{(time_now + 30.minutes)}"
+      end
+    end
+
     it "properly resolves the cache key variable" do
       parser = Marten::Template::Parser.new("Cached content: {{ var }}{% endcache %}")
       tag = Marten::Template::Tag::Cache.new(parser, %{cache key 3600})

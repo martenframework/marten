@@ -102,6 +102,42 @@ describe Marten do
     end
   end
 
+  describe "#apply_execution_context_parallelism" do
+    it "does nothing when parallelism is set to 1" do
+      with_overridden_setting("parallelism", 1) do
+        {% if compare_versions(Crystal::VERSION, "1.21.0") >= 0 %}
+          original_capacity = Fiber::ExecutionContext.default.capacity
+        {% end %}
+
+        Marten.apply_execution_context_parallelism
+
+        {% if compare_versions(Crystal::VERSION, "1.21.0") >= 0 %}
+          Fiber::ExecutionContext.default.capacity.should eq original_capacity
+        {% end %}
+      end
+    end
+
+    it "resizes the default execution context when parallelism is greater than 1" do
+      with_overridden_setting("parallelism", 2) do
+        {% if compare_versions(Crystal::VERSION, "1.21.0") >= 0 %}
+          begin
+            Marten.apply_execution_context_parallelism
+            Fiber::ExecutionContext.default.capacity.should eq 2
+          ensure
+            Fiber::ExecutionContext.default.resize(1)
+          end
+        {% else %}
+          expect_raises(
+            Marten::Conf::Errors::InvalidConfiguration,
+            "The 'parallelism' setting requires Crystal 1.21 or later"
+          ) do
+            Marten.apply_execution_context_parallelism
+          end
+        {% end %}
+      end
+    end
+  end
+
   describe "#start" do
     it "shows the build information when invoked with the -v flag" do
       result = MartenSpec.run_start_command(["-v"])

@@ -892,6 +892,93 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#parallelism" do
+    it "returns 1 by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.parallelism.should eq 1
+    end
+
+    it "returns the configured parallelism value if explicitly set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.parallelism = 4
+      global_settings.parallelism.should eq 4
+    end
+
+    it "uses the MARTEN_PARALLELISM environment variable when set" do
+      original_parallelism = ENV["MARTEN_PARALLELISM"]?
+      begin
+        ENV["MARTEN_PARALLELISM"] = "4"
+        global_settings = Marten::Conf::GlobalSettings.new
+        global_settings.parallelism.should eq 4
+      ensure
+        if original_parallelism
+          ENV["MARTEN_PARALLELISM"] = original_parallelism
+        else
+          ENV.delete("MARTEN_PARALLELISM")
+        end
+      end
+    end
+
+    it "allows an explicit parallelism value to override MARTEN_PARALLELISM" do
+      original_parallelism = ENV["MARTEN_PARALLELISM"]?
+      begin
+        ENV["MARTEN_PARALLELISM"] = "4"
+        global_settings = Marten::Conf::GlobalSettings.new
+        global_settings.parallelism = 2
+        global_settings.parallelism.should eq 2
+      ensure
+        if original_parallelism
+          ENV["MARTEN_PARALLELISM"] = original_parallelism
+        else
+          ENV.delete("MARTEN_PARALLELISM")
+        end
+      end
+    end
+  end
+
+  describe "#parallelism=" do
+    it "allows to configure the parallelism value" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.parallelism = 8
+      global_settings.parallelism.should eq 8
+    end
+  end
+
+  describe "#setup" do
+    it "raises if the parallelism value is less than 1" do
+      global_settings = Marten::Conf::GlobalSettingsSpec::TestGlobalSettings.new
+      global_settings.parallelism = 0
+
+      expect_raises(
+        Marten::Conf::Errors::InvalidConfiguration,
+        "The 'parallelism' setting must be greater than or equal to 1"
+      ) do
+        global_settings.apply_setup_parallelism
+      end
+    end
+
+    it "raises if MARTEN_PARALLELISM is less than 1" do
+      original_parallelism = ENV["MARTEN_PARALLELISM"]?
+      begin
+        ENV["MARTEN_PARALLELISM"] = "0"
+        global_settings = Marten::Conf::GlobalSettingsSpec::TestGlobalSettings.new
+
+        expect_raises(
+          Marten::Conf::Errors::InvalidConfiguration,
+          "The 'parallelism' setting must be greater than or equal to 1"
+        ) do
+          global_settings.apply_setup_parallelism
+        end
+      ensure
+        if original_parallelism
+          ENV["MARTEN_PARALLELISM"] = original_parallelism
+        else
+          ENV.delete("MARTEN_PARALLELISM")
+        end
+      end
+    end
+  end
+
   describe "#handler400" do
     it "#returns Marten::Handlers::Defaults::BadRequest by default" do
       global_settings = Marten::Conf::GlobalSettings.new
@@ -1027,6 +1114,10 @@ end
 module Marten::Conf::GlobalSettingsSpec
   class TestGlobalSettings < Marten::Conf::GlobalSettings
     getter target_env
+
+    def apply_setup_parallelism
+      setup_parallelism
+    end
   end
 
   class TestAppConfig < Marten::App

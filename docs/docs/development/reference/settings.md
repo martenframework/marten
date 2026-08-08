@@ -85,6 +85,30 @@ A boolean allowing to enable or disable debug mode.
 
 When running in debug mode, Marten will automatically provide detailed information about raised exceptions (including tracebacks) and incoming HTTP requests. As such this mode is mostly useful for development environments.
 
+### `handler400`
+
+Default: `Marten::Handlers::Defaults::BadRequest`
+
+The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
+
+### `handler403`
+
+Default: `Marten::Handlers::Defaults::PermissionDenied`
+
+The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
+
+### `handler404`
+
+Default: `Marten::Handlers::Defaults::PageNotFound`
+
+The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
+
+### `handler500`
+
+Default: `Marten::Handlers::Defaults::ServerError`
+
+The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
+
 ### `host`
 
 Default: `"127.0.0.1"`
@@ -140,6 +164,32 @@ config.middleware = [
 ```
 
 Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares.md) to learn more about middlewares.
+
+### `parallelism`
+
+Default: `1` (or the value of the `MARTEN_PARALLELISM` environment variable when set)
+
+The maximum parallelism of Crystal's default execution context.
+
+This setting is applied when starting the HTTP server via [`Marten.start`](pathname:///api/dev/Marten.html#start(host%3AString%7CNil%3Dnil%2Cport%3AInt32%7CNil%3Dnil%2Cargs%3AArray(String)%3DARGV)-class-method). A value of `1` keeps Crystal's default concurrent-only behavior (fibers share a single thread). Setting a value greater than `1` opts into multi-threaded execution by resizing the default execution context, and requires **Crystal 1.21 or later**.
+
+When the `MARTEN_PARALLELISM` environment variable is set to an integer, it is used as the initial value for this setting. An explicit `config.parallelism = ...` assignment always takes precedence.
+
+:::info
+`parallelism` is **not** the maximum number of concurrent HTTP requests, and it is **not** a process count.
+
+With `parallelism = 1`, Marten can still handle many requests at once: each connection runs in a fiber, and fibers overlap while waiting on I/O (such as database queries). Raising `parallelism` only allows more fibers to execute Crystal code on multiple CPU cores at the same time. Prefer multiple server processes (or platform instances) for capacity and isolation; use `parallelism` when a single process should utilize multiple cores.
+:::
+
+For example:
+
+```bash
+MARTEN_PARALLELISM=4 ./myapp
+```
+
+:::warning
+Increasing `parallelism` enables true parallelism. Ensure your application and dependencies are ready for concurrent access to shared mutable state. Prefer a remote cache store over the default in-memory cache when running with `parallelism` greater than `1`.
+:::
 
 ### `port`
 
@@ -257,30 +307,6 @@ A boolean indicating if the `X-Forwarded-Port` header is used to determine the p
 Default: `false`
 
 A boolean indicating if the `X-Forwarded-Proto` header is used to determine whether a request is secure. This setting can be enabled if the Marten application is served behind a proxy that sets this header. For example, if such proxy sets this header to `https`, Marten will assume that the request is secure at the application level **only** if `use_x_forwarded_proto` is set to `true`.
-
-### `handler400`
-
-Default: `Marten::Handlers::Defaults::BadRequest`
-
-The handler class that should generate responses for Bad Request responses (HTTP 400). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
-
-### `handler403`
-
-Default: `Marten::Handlers::Defaults::PermissionDenied`
-
-The handler class that should generate responses for Permission Denied responses (HTTP 403). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
-
-### `handler404`
-
-Default: `Marten::Handlers::Defaults::PageNotFound`
-
-The handler class that should generate responses for Not Found responses (HTTP 404). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
-
-### `handler500`
-
-Default: `Marten::Handlers::Defaults::ServerError`
-
-The handler class that should generate responses for Internal Error responses (HTTP 500). Please refer to [Error handlers](../../handlers-and-http/error-handlers.md) to learn more about error handlers.
 
 ### `x_frame_options`
 

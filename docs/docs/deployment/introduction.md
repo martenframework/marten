@@ -129,3 +129,35 @@ Marten provides a secret key generator which can be used to generate a random ke
 bin/manage gen secretkey
 ```
 :::
+
+### Configuring parallelism
+
+By default, a Marten server process handles requests concurrently on a single thread (Crystal fibers share one OS thread). On Crystal 1.21 or later, you can opt into multi-threaded execution by increasing the [`parallelism`](../development/reference/settings.md#parallelism) setting, which resizes Crystal's default [execution context](https://crystal-lang.org/reference/guides/parallelism.html) so request fibers can run Crystal code across multiple CPU cores.
+
+:::info
+`parallelism` is **not** the maximum number of concurrent HTTP requests, and it is **not** a process count.
+
+Even with `parallelism = 1`, many I/O-bound requests can progress concurrently via fibers. Raising `parallelism` only increases how many fibers can execute Crystal code at the same time. For capacity and isolation, run multiple server processes (or platform instances); use `parallelism` when a single process should utilize multiple CPU cores.
+:::
+
+For example, in your production settings:
+
+```crystal
+Marten.configure :production do |config|
+  config.parallelism = 4
+
+  # [...]
+end
+```
+
+You can also set the initial value via the `MARTEN_PARALLELISM` environment variable (an explicit `config.parallelism` assignment always takes precedence):
+
+```bash
+MARTEN_PARALLELISM=4 bin/server
+```
+
+Multi-process deployment (several `bin/server` processes behind a reverse proxy) and multi-threaded execution (`parallelism > 1`) can be combined. Multiple processes improve isolation and horizontal capacity on a host; raising `parallelism` lets a single process use more CPU cores for CPU-bound or otherwise parallelizable work.
+
+:::warning
+Setting `parallelism` greater than `1` enables true parallelism. Ensure your application code and dependencies are safe for concurrent access to shared mutable state. In particular, prefer a remote cache store (instead of the default in-memory cache) when running with `parallelism` greater than `1`. See the [`parallelism`](../development/reference/settings.md#parallelism) setting reference for more details.
+:::

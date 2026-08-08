@@ -262,6 +262,7 @@ module Marten
 
     ready_in = Time.measure do
       setup
+      apply_execution_context_parallelism
       Marten::Server.setup
     end
 
@@ -285,6 +286,20 @@ module Marten
   # :nodoc:
   def self._marten_app_location : String
     __DIR__
+  end
+
+  # :nodoc:
+  def self.apply_execution_context_parallelism : Nil
+    parallelism = settings.parallelism
+    return if parallelism == 1
+
+    {% if compare_versions(Crystal::VERSION, "1.21.0") >= 0 %}
+      Fiber::ExecutionContext.default.resize(parallelism)
+    {% else %}
+      raise Marten::Conf::Errors::InvalidConfiguration.new(
+        "The 'parallelism' setting requires Crystal 1.21 or later (got #{Crystal::VERSION})"
+      )
+    {% end %}
   end
 
   private def self.build_information : String

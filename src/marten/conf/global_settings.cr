@@ -16,6 +16,7 @@ module Marten
       @target_env : String?
       @trailing_slash : TrailingSlash
       @unsupported_http_method_strategy : UnsupportedHttpMethodStrategy
+      @parallelism : Int32
 
       # Returns the explicit list of allowed hosts for the application.
       getter allowed_hosts
@@ -127,6 +128,15 @@ module Marten
       # :ditto:
       getter? use_x_forwarded_proto
 
+      # Returns the maximum parallelism of the default Crystal execution context.
+      #
+      # This value is applied when starting the HTTP server via `Marten.start`. A value of `1` keeps the default
+      # concurrent-only behavior. Values greater than `1` require Crystal 1.21 or later.
+      #
+      # The initial value is read from the `MARTEN_PARALLELISM` environment variable when set, and otherwise defaults
+      # to `1`.
+      getter parallelism
+
       # Returns the value to use for the X-Frame-Options header when the associated middleware is used.
       #
       # The value of this setting will be used by the `Marten::Middleware::XFrameOptions` middleware when inserting the
@@ -225,6 +235,14 @@ module Marten
       # Allows to set whether the X-Forwarded-Proto header should be used to determine whether a request is secure.
       setter use_x_forwarded_proto
 
+      # Allows to set the maximum parallelism of the default Crystal execution context.
+      #
+      # This value is applied when starting the HTTP server via `Marten.start`. A value of `1` keeps the default
+      # concurrent-only behavior. Values greater than `1` require Crystal 1.21 or later.
+      #
+      # Unless overridden, the initial value comes from the `MARTEN_PARALLELISM` environment variable when set.
+      setter parallelism
+
       # :nodoc:
       def self.register_settings_namespace(ns : String)
         if settings_namespace_registered?(ns)
@@ -286,6 +304,7 @@ module Marten
         @use_x_forwarded_host = false
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
+        @parallelism = ENV["MARTEN_PARALLELISM"]?.try(&.to_i?) || 1
         @x_frame_options = "DENY"
       end
 
@@ -445,6 +464,7 @@ module Marten
         setup_log_backend
         setup_main_app_label
         setup_db_connections
+        setup_parallelism
       end
 
       private def setup_log_backend
@@ -462,6 +482,12 @@ module Marten
 
       private def setup_main_app_label
         Apps::MainConfig.label(main_app_label)
+      end
+
+      protected def setup_parallelism
+        if parallelism < 1
+          raise Errors::InvalidConfiguration.new("The 'parallelism' setting must be greater than or equal to 1")
+        end
       end
     end
   end

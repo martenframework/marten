@@ -160,6 +160,26 @@ For example:
 
 The `extend` template tag allows to define that a template inherits from a specific base template. This tag must be used with one mandatory argument, which can be either a string literal or a variable that will be resolved at runtime. This mechanism is useful only if the base template defines [blocks](#block) that are overridden or extended by the child template. See [Template inheritance](../introduction.md#template-inheritance) to learn more about this capability.
 
+## `filter`
+
+The `filter` template tag allows to apply one or more [filters](./filters.md) to the content of a block. Multiple filters can be specified with pipes and filters can have arguments, just as in variable syntax. It should be noted that the `filter` template tag requires a closing `endfilter` tag.
+
+For example:
+
+```html
+{% filter upcase %}
+  Hello {{ name }}!
+{% endfilter %}
+```
+
+```html
+{% filter upcase|truncate:10 %}
+  Hello {{ name }}!
+{% endfilter %}
+```
+
+The [`escape`](./filters.md#escape) and [`safe`](./filters.md#safe) filters are not acceptable arguments. Instead, use the [`escape`](#escape) tag to manage auto-escaping for blocks of template code.
+
 ## `for`
 
 The `for` template tag allows to loop over the items of iterable objects and it also handles fallbacks through the use of the `else` inner block. It should be noted that the `for` template tag requires a closing `endfor` tag.

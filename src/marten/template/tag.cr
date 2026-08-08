@@ -33,6 +33,7 @@ module Marten
       register "csrf_input", CsrfInput
       register "csrf_token", CsrfToken
       register "extend", Extend
+      register "filter", Filter
       register "for", For
       register "if", If
       register "include", Include

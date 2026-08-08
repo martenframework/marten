@@ -5,10 +5,14 @@ module Marten
     # A filter expression will resolve an expression such as "foo.bar|filter1|filter2", which could contain a variable
     # (whose specific attributes are accessed) to which filters are optionally applied.
     class FilterExpression
+      # Returns the names of the filters applied by the expression.
+      getter filter_names : Array(String)
+
       def initialize(raw_expression : String)
         # Parse the raw expression and try to extract both the variable expression (literal or not) and the filters
         # (with optional arguments) that are successively applied to it.
         @filters_and_args = [] of Tuple(Filter::Base, Variable?)
+        @filter_names = [] of String
         last_match_end = 0
         raw_variable = nil
 
@@ -28,9 +32,10 @@ module Marten
 
             raw_variable = match_variable
           else
-            filter_name = match.named_captures["filter_name"]
+            filter_name = match.named_captures["filter_name"].to_s
             filter_arg = match.named_captures["filter_arg"]
-            @filters_and_args << {Filter.get(filter_name.to_s), filter_arg.nil? ? nil : Variable.new(filter_arg)}
+            @filter_names << filter_name
+            @filters_and_args << {Filter.get(filter_name), filter_arg.nil? ? nil : Variable.new(filter_arg)}
           end
 
           last_match_end = match.end

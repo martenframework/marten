@@ -104,6 +104,33 @@ describe Marten::Template::FilterExpression do
     end
   end
 
+  describe "#filter_names" do
+    it "returns an empty array when no filters are applied" do
+      expr = Marten::Template::FilterExpression.new("foo")
+      expr.filter_names.should be_empty
+    end
+
+    it "returns the name of a single applied filter" do
+      expr = Marten::Template::FilterExpression.new("foo|upcase")
+      expr.filter_names.should eq ["upcase"]
+    end
+
+    it "returns the names of multiple applied filters" do
+      expr = Marten::Template::FilterExpression.new("foo|default:bar|upcase")
+      expr.filter_names.should eq ["default", "upcase"]
+    end
+
+    it "returns filter names when spaces surround pipes and arguments" do
+      expr = Marten::Template::FilterExpression.new("foo | default : bar | upcase")
+      expr.filter_names.should eq ["default", "upcase"]
+    end
+
+    it "returns filter names when a filter argument contains a pipe character" do
+      expr = Marten::Template::FilterExpression.new(%{foo|default:"a|b"|upcase})
+      expr.filter_names.should eq ["default", "upcase"]
+    end
+  end
+
   describe "#resolve" do
     it "returns the expected value for a simple variable" do
       expr = Marten::Template::FilterExpression.new("foo")

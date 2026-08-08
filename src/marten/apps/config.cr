@@ -56,6 +56,16 @@ module Marten
         super || (label == other.label && models == other.models)
       end
 
+      # Returns the build-time directories containing the runtime artifacts of the application.
+      #
+      # These correspond to the application's `locales` and `templates` directories, whose files must be shipped
+      # alongside compiled applications. The returned directories are not guaranteed to exist. Applications with
+      # custom layouts can override this method.
+      def artifact_dirs : Array(Path)
+        app_location = Path[self.class._marten_app_location]
+        [app_location.join(LOCALES_DIR), app_location.join(TEMPLATES_DIR)]
+      end
+
       # Returns the assets finder of the application.
       #
       # If the application doesn't have a dedicated assets directory, `nil` is returned.

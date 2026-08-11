@@ -525,6 +525,17 @@ module Marten
             rows_affected.not_nil!
           end
 
+          def update_with(raw_update : String, params : Array(::DB::Any) | Hash(String, ::DB::Any))
+            sql, parameters = build_raw_update_query(raw_update, params)
+
+            connection.open do |db|
+              result = db.exec(sql, args: parameters)
+              result.rows_affected
+            end
+          rescue Errors::EmptyResults
+            0
+          end
+
           private MATCH_ALL_PREDICATE = "1=1"
 
           private def build_annotations
@@ -851,6 +862,47 @@ module Marten
                       s << "UPDATE"
                       s << table_name
                       s << "SET #{column_names}"
+                      s << where_clause
+                      s << group_by
+                      s << having_clause
+                    end
+                  end
+
+            {sql, final_parameters}
+          end
+
+          private def build_raw_update_query(raw_update, raw_parameters)
+            update_clause, update_parameters = filtering_clause_and_parameters(
+              PredicateNode.new(raw_predicate: raw_update, params: raw_parameters)
+            )
+            update_parameters = update_parameters.not_nil!
+            where_clause, having_clause, filter_parameters =
+              where_and_having_clauses_and_parameters(update_parameters.size)
+
+            final_parameters = update_parameters
+            final_parameters += filter_parameters if !filter_parameters.nil?
+
+            sql = if !filter_parameters.nil? && (!@joins.empty? || !parent_model_joins.empty?)
+                    build_sql do |s|
+                      s << "UPDATE"
+                      s << table_name
+                      s << "SET #{update_clause}"
+                      s << "WHERE #{Model.db_table}.#{Model.pk_field.db_column!} IN ("
+                      s << "  SELECT * FROM ("
+                      s << "    SELECT DISTINCT #{Model.db_table}.#{Model.pk_field.db_column!}"
+                      s << "    FROM #{table_name}"
+                      s << build_joins
+                      s << where_clause
+                      s << group_by
+                      s << having_clause
+                      s << "  ) subquery"
+                      s << ")"
+                    end
+                  else
+                    build_sql do |s|
+                      s << "UPDATE"
+                      s << table_name
+                      s << "SET #{update_clause}"
                       s << where_clause
                       s << group_by
                       s << having_clause

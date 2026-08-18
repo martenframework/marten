@@ -13,8 +13,9 @@ Each deployment pipeline is unique and will vary from one project to another. Th
 1. installing your project's dependencies
 2. compiling your project's server and [management CLI](../development/management-commands.md)
 3. collecting your project's [assets](../assets/introduction.md)
-4. applying any pending migrations to your database
-5. starting the compiled server
+4. collecting your project's runtime artifacts (eg. locales and templates)
+5. applying any pending migrations to your database
+6. starting the compiled server
 
 Where, when, and how these steps are performed will vary from one project to another. Each of these steps is highlighted below along with some recommendations.
 
@@ -28,7 +29,7 @@ One of the first things you need to do when deploying a Marten project is to ens
 
 ### Compiling your project
 
-Your project server and [management CLI](../development/management-commands.md) need to be compiled to run your project's server and to execute additional deployment-related management commands (eg. to [collect assets](#collecting-assets) or [apply migrations](#applying-migrations)).
+Your project server and [management CLI](../development/management-commands.md) need to be compiled to run your project's server and to execute additional deployment-related management commands (eg. to [collect assets](#collecting-assets), [collect runtime artifacts](#collecting-runtime-artifacts), or [apply migrations](#applying-migrations)).
 
 When it comes to your project server, you will usually need to compile the `src/server.cr` file (which is automatically created when generating new projects via the [`new`](../development/reference/management-commands.md#new) management command). This can be achieved with the following command:
 
@@ -63,6 +64,34 @@ bin/manage collectassets --no-input
 :::info
 The assets handling documentation also provides a few [guidelines](../assets/introduction.md#serving-assets-in-production) on how to serve asset files in production that may be worth reading.
 :::
+
+### Collecting runtime artifacts
+
+If your deployment does not ship the full project source tree, you should also collect runtime artifacts (eg. locale and
+template files) and ship them alongside your compiled binaries.
+
+To do so, use the [`collectartifacts`](../development/reference/management-commands.md#collectartifacts) management
+command:
+
+```bash
+bin/manage collectartifacts --no-input --dest-path artifacts
+```
+
+This will create an `artifacts` directory containing the runtime files required by Marten (including Marten built-in
+locales, project-level `config/locales`, and app-level `locales`/`templates`) while preserving the expected path
+layout.
+
+In production, you should then point the [`root_path`](../development/reference/settings.md#root_path) setting to the
+collected directory:
+
+```crystal
+Marten.configure :production do |config|
+  config.root_path = "/path/to/artifacts"
+end
+```
+
+Without this setting, a compiled application will still look for runtime files under the original project path used at
+build time.
 
 ### Applying migrations
 

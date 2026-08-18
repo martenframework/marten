@@ -137,6 +137,14 @@ MARTEN_SPEC_DB_CONNECTION=mysql make tests      # Will run specs using the MySQL
 MARTEN_SPEC_DB_CONNECTION=postgresql make tests # Will run specs using the PostgreSQL DB backend
 ```
 
+Compiling the full spec suite in a single process can require a lot of memory. If that happens, or if you want to run specs the same way CI does, you can run them in batches:
+
+```bash
+scripts/run_batched_specs
+```
+
+This splits spec files into several batches, runs `crystal spec` on each of them, and prints an aggregated summary at the end. The `MARTEN_SPEC_DB_CONNECTION` environment variable can be used with this script as well.
+
 ### Documentation
 
 Marten's documentation is written using Markdown. It is powered by [Docusaurus](https://docusaurus.io/) and lives under the `docs` folder.

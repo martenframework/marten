@@ -87,6 +87,19 @@ describe Marten::Apps::Config do
     end
   end
 
+  describe "#artifact_dirs" do
+    it "returns the locales and templates directories of the application" do
+      app_config = Marten::Apps::ConfigSpec::AppWithTemplates::App.new
+
+      app_config.artifact_dirs.should eq(
+        [
+          Path[__DIR__].join("config_spec/app_with_templates/locales"),
+          Path[__DIR__].join("config_spec/app_with_templates/templates"),
+        ]
+      )
+    end
+  end
+
   describe "#assets_finder" do
     around_each do |t|
       FileUtils.rm("/tmp/marten_spec") if File.exists?("/tmp/marten_spec")

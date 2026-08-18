@@ -19,6 +19,36 @@ describe Marten do
     end
   end
 
+  describe "#marten_locales_path" do
+    it "returns the effective Marten locales directory" do
+      Marten.marten_locales_path.should eq Path[Marten._marten_app_location].join("marten", "locales")
+    end
+  end
+
+  describe "#marten_locales_source_path" do
+    it "returns the compile-time Marten locales directory" do
+      Marten.marten_locales_source_path.should eq Path[Marten._marten_app_location].join("marten", "locales")
+    end
+  end
+
+  describe "#project_locales_path" do
+    it "returns the project locales directory under the project root" do
+      Marten.project_locales_path.should eq Marten.root.join("config", "locales")
+    end
+  end
+
+  describe "#project_locales_source_path" do
+    it "returns the compile-time project locales directory" do
+      Marten.project_locales_source_path.should eq Marten.project_source_root.join("config", "locales")
+    end
+  end
+
+  describe "#project_source_root" do
+    it "returns the parent of the main application location" do
+      Marten.project_source_root.should eq Path[Marten.apps.main.class._marten_app_location].join("..").expand
+    end
+  end
+
   describe "#routes" do
     it "returns the main routes map with the root flag set to true" do
       Marten.routes.should be_a Marten::Routing::Map

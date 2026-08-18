@@ -134,7 +134,7 @@ module Marten
     @@root ||= if !(root_path = Marten.settings.root_path).nil?
                  Path.new(root_path).expand
                else
-                 Path.new(Marten.apps.main.class._marten_app_location).join("..").expand
+                 project_source_root
                end
   end
 
@@ -243,10 +243,10 @@ module Marten
     I18n.config.fallbacks = settings.i18n.fallbacks
 
     # Add Marten's built-in translations first.
-    I18n.config.loaders << I18n::Loader::YAML.new("#{effective_marten_location}/marten/locales")
+    I18n.config.loaders << I18n::Loader::YAML.new(marten_locales_path.to_s)
 
     # Add a config/locales directory to the I18n config.
-    I18n.config.loaders << I18n::Loader::YAML.new(Marten.root.join("config/locales").to_s)
+    I18n.config.loaders << I18n::Loader::YAML.new(project_locales_path.to_s)
 
     # Ensure each app config translation loader is properly bound to the I18n config.
     I18n.config.loaders += apps.app_configs.compact_map(&.translations_loader)
@@ -289,6 +289,31 @@ module Marten
   end
 
   # :nodoc:
+  def self.marten_locales_path : Path
+    Path[effective_marten_location].join(MARTEN_LOCALES_SUBPATH)
+  end
+
+  # :nodoc:
+  def self.marten_locales_source_path : Path
+    Path[_marten_app_location].join(MARTEN_LOCALES_SUBPATH)
+  end
+
+  # :nodoc:
+  def self.project_locales_path : Path
+    root.join(PROJECT_LOCALES_SUBPATH)
+  end
+
+  # :nodoc:
+  def self.project_locales_source_path : Path
+    project_source_root.join(PROJECT_LOCALES_SUBPATH)
+  end
+
+  # :nodoc:
+  def self.project_source_root : Path
+    Path[apps.main.class._marten_app_location].join("..").expand
+  end
+
+  # :nodoc:
   def self.apply_execution_context_parallelism : Nil
     parallelism = settings.parallelism
     return if parallelism == 1
@@ -301,6 +326,9 @@ module Marten
       )
     {% end %}
   end
+
+  private MARTEN_LOCALES_SUBPATH  = Path["marten"].join("locales")
+  private PROJECT_LOCALES_SUBPATH = Path["config"].join("locales")
 
   private def self.build_information : String
     "Marten #{VERSION} [#{Marten.env.id}]\n#{Crystal::DESCRIPTION}"

@@ -71,18 +71,17 @@ module Marten
             if label = app_label
               add_app_sources(sources, app_config(label))
             else
-              # Mirrors the built-in locales lookup performed by Marten.setup_i18n.
-              marten_locales_dir = Path[Marten._marten_app_location].join("marten", "locales")
+              marten_locales_dir = Marten.marten_locales_source_path
               sources << build_source(marten_locales_dir) if Dir.exists?(marten_locales_dir)
 
-              # Mirrors the Marten.root.join("config/locales") lookup performed by Marten.setup_i18n: project
-              # locales are anchored at the destination root so that the collected tree matches the runtime
-              # lookup when the root_path setting points to the destination directory.
-              project_locales_dir = Path[Marten.apps.main.class._marten_app_location]
-                .join("..", "config", "locales")
-                .expand
+              # Project locales are anchored at the destination root so that the collected tree matches
+              # Marten.project_locales_path when the root_path setting points to the destination directory.
+              project_locales_dir = Marten.project_locales_source_path
               if Dir.exists?(project_locales_dir)
-                sources << Source.new(project_locales_dir, Path["config"].join("locales"))
+                sources << Source.new(
+                  project_locales_dir,
+                  project_locales_dir.relative_to(Marten.project_source_root)
+                )
               end
 
               Marten.apps.app_configs.each do |app_config|

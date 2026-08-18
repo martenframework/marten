@@ -1,16 +1,170 @@
 #!/bin/sh -e
 
 batch_number=10
-spec_files=$(find ./spec -name "*_spec.cr")
+spec_files=$(find ./spec -name "*_spec.cr" | sort)
 num_files=$(echo "$spec_files" | wc -l)
 batch_size=$(( $num_files / $batch_number ))
+remainder=$(( $num_files % $batch_number ))
+
+esc=$(printf '\033')
+use_color=0
+if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+  use_color=1
+fi
+
+total_examples=0
+total_failures=0
+total_errors=0
+total_pending=0
+total_us=0
+any_failed=0
+
+batch_output=$(mktemp)
+status_file=$(mktemp)
+failed_examples=$(mktemp)
+trap 'rm -f "$batch_output" "$status_file" "$failed_examples"' EXIT
+
+# Converts a Crystal "Finished in ..." line to microseconds.
+duration_to_us() {
+  echo "$1" | awk '
+    /microseconds/ { printf "%.0f", $3; next }
+    /milliseconds/ { printf "%.0f", $3 * 1000; next }
+    /seconds/      { printf "%.0f", $3 * 1000000; next }
+    /minutes/      {
+      split($3, parts, ":")
+      printf "%.0f", (parts[1] * 60 + parts[2]) * 1000000
+    }
+  '
+}
+
+# Formats microseconds using Crystal's Spec.to_human units.
+us_to_human() {
+  awk -v us="$1" 'BEGIN {
+    if (us < 1000) {
+      printf "%d microseconds", int(us + 0.5)
+      exit
+    }
+    ms = us / 1000
+    if (ms < 1000) {
+      printf "%.2f milliseconds", ms
+      exit
+    }
+    s = us / 1000000
+    if (s < 60) {
+      printf "%.2f seconds", s
+      exit
+    }
+    minutes = int(s / 60)
+    seconds = int(s) % 60
+    printf "%d:%s%d minutes", minutes, (seconds < 10 ? "0" : ""), seconds
+  }'
+}
+
+colorize() {
+  color_code=$1
+  text=$2
+  if [ "$use_color" -eq 1 ]; then
+    printf '%s[%sm%s%s[0m\n' "$esc" "$color_code" "$text" "$esc"
+  else
+    printf '%s\n' "$text"
+  fi
+}
 
 i=0
+offset=1
 while [ $i -lt $batch_number ]; do
-  batch_files=$(echo "$spec_files" | tail -n +$(( $batch_size * $i + 1 )) | head -$batch_size)
+  current_size=$batch_size
+  if [ $i -lt $remainder ]; then
+    current_size=$(( $current_size + 1 ))
+  fi
 
-  echo "Running batch $(($i + 1))..."
-  echo "$batch_files" | xargs crystal spec
-  i=$((i + 1))
-  echo ""
+  if [ $current_size -gt 0 ]; then
+    batch_files=$(echo "$spec_files" | tail -n +$offset | head -n $current_size)
+
+    echo "Running batch $(($i + 1))..."
+
+    set +e
+    {
+      echo "$batch_files" | xargs crystal spec
+      echo $? > "$status_file"
+    } 2>&1 | tee "$batch_output"
+    set -e
+
+    status=$(cat "$status_file")
+    if [ "$status" -ne 0 ]; then
+      any_failed=1
+    fi
+
+    summary=$(awk -v ESC="$esc" -v FAILED_FILE="$failed_examples" '
+      {
+        gsub(ESC "\\[[0-9;]*m", "")
+      }
+      /^Finished in / {
+        finished = $0
+      }
+      /[0-9]+ examples, [0-9]+ failures, [0-9]+ errors, [0-9]+ pending/ {
+        examples = $1
+        failures = $3
+        errors = $5
+        pending = $7
+      }
+      /^crystal spec / {
+        print $0 >> FAILED_FILE
+      }
+      END {
+        if (finished != "" && examples != "") {
+          print finished
+          print examples, failures, errors, pending
+        }
+      }
+    ' "$batch_output")
+
+    if [ -n "$summary" ]; then
+      finished_line=$(echo "$summary" | sed -n '1p')
+      counts_line=$(echo "$summary" | sed -n '2p')
+
+      batch_us=$(duration_to_us "$finished_line")
+      batch_examples=$(echo "$counts_line" | awk '{print $1}')
+      batch_failures=$(echo "$counts_line" | awk '{print $2}')
+      batch_errors=$(echo "$counts_line" | awk '{print $3}')
+      batch_pending=$(echo "$counts_line" | awk '{print $4}')
+
+      total_us=$(( $total_us + ${batch_us:-0} ))
+      total_examples=$(( $total_examples + $batch_examples ))
+      total_failures=$(( $total_failures + $batch_failures ))
+      total_errors=$(( $total_errors + $batch_errors ))
+      total_pending=$(( $total_pending + $batch_pending ))
+    fi
+
+    echo ""
+  fi
+
+  offset=$(( $offset + $current_size ))
+  i=$(( $i + 1 ))
 done
+
+echo "Finished in $(us_to_human "$total_us")"
+
+counts="${total_examples} examples, ${total_failures} failures, ${total_errors} errors, ${total_pending} pending"
+if [ "$total_failures" -gt 0 ] || [ "$total_errors" -gt 0 ] || [ "$any_failed" -ne 0 ]; then
+  colorize 31 "$counts"
+elif [ "$total_pending" -gt 0 ]; then
+  colorize 33 "$counts"
+else
+  colorize 32 "$counts"
+fi
+
+if [ -s "$failed_examples" ]; then
+  echo ""
+  echo "Failed examples:"
+  echo ""
+  if [ "$use_color" -eq 1 ]; then
+    awk -v ESC="$esc" '{ print ESC "[31m" $0 ESC "[0m" }' "$failed_examples"
+  else
+    cat "$failed_examples"
+  fi
+fi
+
+if [ "$any_failed" -ne 0 ] || [ "$total_failures" -gt 0 ] || [ "$total_errors" -gt 0 ]; then
+  exit 1
+fi

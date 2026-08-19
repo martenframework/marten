@@ -7,6 +7,15 @@ module Marten
         module Transformation
           # Base for calendar date/time part extractions (`year`, `month`, `day`, …) whose filter RHS is an integer.
           abstract class DateTimePart < Base
+            def apply(connection : Connection::Base, column_reference : String) : String
+              expr = if field.is_a?(Field::DateTime)
+                       connection.local_datetime_expression(column_reference)
+                     else
+                       column_reference
+                     end
+              connection.left_operand_for_transformation(expr, self.class.transformation_name)
+            end
+
             def bind_parameter_value(value : Field::Any) : ::DB::Any
               case v = value
               when Nil

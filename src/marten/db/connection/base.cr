@@ -61,6 +61,15 @@ module Marten
         # See also `#left_operand_for_predicate`, which shapes the column side for predicates.
         abstract def left_operand_for_transformation(id : String, transformation) : String
 
+        # Returns SQL that yields a datetime in `Marten.settings.time_zone` for date/time part extraction.
+        #
+        # PostgreSQL `EXTRACT` on `timestamp with time zone` uses the session time zone, so datetime-part
+        # lookups would otherwise depend on the database `TimeZone` setting. Other backends store naive UTC
+        # datetimes and can use `id` unchanged.
+        def local_datetime_expression(id : String) : String
+          id
+        end
+
         # Returns a compatible value to use in the context of a LIMIT statement for the database at hand.
         abstract def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
 

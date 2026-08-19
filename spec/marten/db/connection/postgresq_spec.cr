@@ -157,6 +157,14 @@ for_postgresql do
       end
     end
 
+    describe "#local_datetime_expression" do
+      it "converts the timestamp to the application time zone before extraction" do
+        conn = Marten::DB::Connection.default
+        conn.local_datetime_expression("posts.created_at")
+          .should eq "posts.created_at AT TIME ZONE 'UTC'"
+      end
+    end
+
     describe "#parameter_id_for_ordered_argument" do
       it "returns the expected ordered argument identifier" do
         conn = Marten::DB::Connection.default

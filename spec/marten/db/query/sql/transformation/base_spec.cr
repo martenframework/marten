@@ -16,7 +16,10 @@ describe Marten::DB::Query::SQL::Transformation::Base do
       year = Marten::DB::Query::SQL::Transformation::Year.new(field)
 
       year.apply(conn, "test_users.created_at").should eq(
-        conn.left_operand_for_transformation("test_users.created_at", "year")
+        conn.left_operand_for_transformation(
+          conn.local_datetime_expression("test_users.created_at"),
+          "year"
+        )
       )
     end
   end

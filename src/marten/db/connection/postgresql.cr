@@ -79,6 +79,10 @@ module Marten
           COLUMN_TRANSFORMATION_TO_SQL[transformation] % id
         end
 
+        def local_datetime_expression(id : String) : String
+          "#{id} AT TIME ZONE '#{time_zone_name}'"
+        end
+
         def limit_value(value : Int | Nil) : Int32 | Int64 | Nil | UInt32 | UInt64
           value
         end
@@ -157,6 +161,10 @@ module Marten
           "lte"         => "<= %s",
           "startswith"  => "LIKE %s",
         }
+
+        private def time_zone_name
+          Marten.settings.time_zone.name.gsub("'", "''")
+        end
       end
     end
   end

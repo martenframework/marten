@@ -19,7 +19,8 @@ module Marten
       def on_delete : Deletion::Strategy
         (
           field.as?(Field::ManyToOne).try(&.on_delete) ||
-            field.as?(Field::OneToOne).try(&.on_delete)
+            field.as?(Field::OneToOne).try(&.on_delete) ||
+            field.as?(Field::Polymorphic).try(&.on_delete)
         ).not_nil!
       end
 

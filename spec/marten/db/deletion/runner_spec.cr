@@ -157,6 +157,129 @@ describe Marten::DB::Deletion::Runner do
       Tag.all.map(&.id).should eq [tag_2.id]
     end
 
+    context "with polymorphic reverse relations" do
+      it "supports cascade on_delete" do
+        product_1 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 1")
+        product_2 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 2")
+        service = Marten::DB::Deletion::RunnerSpec::Service.create!(name: "Service 1")
+
+        Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(text: "Review 1", target: product_1)
+        review_2 = Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(text: "Review 2", target: product_2)
+        review_3 = Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(text: "Review 3", target: service)
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(product_1)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Product.all.map(&.id).should eq [product_2.id]
+        Marten::DB::Deletion::RunnerSpec::CascadeReview.all.map(&.id).to_set.should eq [review_2.id, review_3.id].to_set
+      end
+
+      it "does not cascade to records of another polymorphic type sharing the same primary key" do
+        product = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 1")
+        service = Marten::DB::Deletion::RunnerSpec::Service.create!(name: "Service 1")
+
+        product.id.should eq service.id
+
+        Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(text: "Product review", target: product)
+        service_review = Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(
+          text: "Service review",
+          target: service
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(product)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Product.all.exists?.should be_false
+        Marten::DB::Deletion::RunnerSpec::Service.all.map(&.id).should eq [service.id]
+        Marten::DB::Deletion::RunnerSpec::CascadeReview.all.map(&.id).should eq [service_review.id]
+      end
+
+      it "follows nested cascade on_delete reverse relations of polymorphic targets" do
+        product_1 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 1")
+        product_2 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 2")
+
+        review_1 = Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(text: "Review 1", target: product_1)
+        review_2 = Marten::DB::Deletion::RunnerSpec::CascadeReview.create!(text: "Review 2", target: product_2)
+
+        Marten::DB::Deletion::RunnerSpec::ReviewAttachment.create!(name: "Attachment 1", review: review_1)
+        attachment_2 = Marten::DB::Deletion::RunnerSpec::ReviewAttachment.create!(
+          name: "Attachment 2",
+          review: review_2
+        )
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(product_1)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Product.all.map(&.id).should eq [product_2.id]
+        Marten::DB::Deletion::RunnerSpec::CascadeReview.all.map(&.id).should eq [review_2.id]
+        Marten::DB::Deletion::RunnerSpec::ReviewAttachment.all.map(&.id).should eq [attachment_2.id]
+      end
+
+      it "supports set_null on_delete" do
+        product_1 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 1")
+        product_2 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 2")
+        service = Marten::DB::Deletion::RunnerSpec::Service.create!(name: "Service 1")
+
+        review_1 = Marten::DB::Deletion::RunnerSpec::SetNullReview.create!(text: "Review 1", target: product_1)
+        review_2 = Marten::DB::Deletion::RunnerSpec::SetNullReview.create!(text: "Review 2", target: product_2)
+        review_3 = Marten::DB::Deletion::RunnerSpec::SetNullReview.create!(text: "Review 3", target: service)
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(product_1)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Product.all.map(&.id).should eq [product_2.id]
+        Marten::DB::Deletion::RunnerSpec::SetNullReview.all.size.should eq 3
+
+        review_1.reload
+        review_1.target.should be_nil
+        review_1.target_id.should be_nil
+        review_1.target_type.should be_nil
+
+        review_2.reload
+        review_2.target.should eq product_2
+        review_3.reload
+        review_3.target.should eq service
+      end
+
+      it "supports protect on_delete" do
+        product_1 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 1")
+        product_2 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 2")
+
+        Marten::DB::Deletion::RunnerSpec::ProtectReview.create!(text: "Review 1", target: product_1)
+        Marten::DB::Deletion::RunnerSpec::ProtectReview.create!(text: "Review 2", target: product_2)
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+
+        expect_raises(Marten::DB::Errors::ProtectedRecord) do
+          deletion.add(product_1)
+        end
+
+        Marten::DB::Deletion::RunnerSpec::Product.all.size.should eq 2
+        Marten::DB::Deletion::RunnerSpec::ProtectReview.all.size.should eq 2
+      end
+
+      it "supports do_nothing on_delete" do
+        product_1 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 1")
+        product_2 = Marten::DB::Deletion::RunnerSpec::Product.create!(name: "Product 2")
+
+        review_1 = Marten::DB::Deletion::RunnerSpec::DoNothingReview.create!(text: "Review 1", target: product_1)
+        review_2 = Marten::DB::Deletion::RunnerSpec::DoNothingReview.create!(text: "Review 2", target: product_2)
+
+        deletion = Marten::DB::Deletion::Runner.new(Marten::DB::Connection.default)
+        deletion.add(product_1)
+        deletion.execute
+
+        Marten::DB::Deletion::RunnerSpec::Product.all.map(&.id).should eq [product_2.id]
+        Marten::DB::Deletion::RunnerSpec::DoNothingReview.all.map(&.id).to_set.should eq(
+          [review_1.id, review_2.id].to_set
+        )
+      end
+    end
+
     context "with multi table inheritance" do
       it "registers the record's parents for deletion" do
         address = Marten::DB::Deletion::RunnerSpec::Address.create!(street: "Street 2")

@@ -5,7 +5,7 @@ module Marten
         def initialize(@connection : Connection::Base)
           @records_to_delete = {} of Model.class => Array(Model)
           @dependencies = {} of Model.class => Array(Model.class)
-          @field_updates = {} of Model.class => Hash(Tuple(String, Field::Any), Query::Node)
+          @field_updates = {} of Model.class => Array(Tuple(Hash(String, Field::Any), Query::Node))
           @querysets_to_raw_delete = [] of Tuple(Model.class, Query::Node)
         end
 
@@ -45,9 +45,9 @@ module Marten
             end
 
             # Step 2: perform field updates (set null values when applicable).
-            @field_updates.each do |model_klass, query_node_updates|
-              query_node_updates.each do |(field_id, value), node|
-                model_klass._base_queryset.using(@connection.alias).filter(node).update({field_id => value})
+            @field_updates.each do |model_klass, updates|
+              updates.each do |values, node|
+                model_klass._base_queryset.using(@connection.alias).filter(node).update(values)
               end
             end
 
@@ -61,14 +61,40 @@ module Marten
           count
         end
 
+        private def field_update_values_for(reverse_relation)
+          values = {} of String => Field::Any
+
+          if reverse_relation.polymorphic?
+            poly_field = reverse_relation.model.get_local_field(reverse_relation.field_id).as(Field::Polymorphic)
+            values[poly_field.id_field_id] = nil
+            values[poly_field.type_field_id] = nil
+          else
+            values[reverse_relation.field_id] = nil
+          end
+
+          values
+        end
+
         private def query_node_for(objs, reverse_relation)
-          Query::Node.new(
-            {"#{reverse_relation.field_id}__in" => objs.map(&.pk!.as(Field::Any))}
-          )
+          pks = objs.map(&.pk!.as(Field::Any))
+
+          if reverse_relation.polymorphic?
+            poly_field = reverse_relation.model.get_local_field(reverse_relation.field_id).as(Field::Polymorphic)
+            Query::Node.new(
+              {
+                "#{poly_field.id_field_id}__in" => pks,
+                poly_field.type_field_id        => objs[0].class.name,
+              }
+            )
+          else
+            Query::Node.new({"#{reverse_relation.field_id}__in" => pks})
+          end
         end
 
         private def raw_deletable?(model_klass)
-          model_klass.local_reverse_relations.select { |r| r.many_to_one? || r.one_to_one? }.all? do |reverse_relation|
+          model_klass.local_reverse_relations.select do |r|
+            r.many_to_one? || r.one_to_one? || r.polymorphic?
+          end.all? do |reverse_relation|
             reverse_relation.on_delete.do_nothing?
           end
         end
@@ -110,15 +136,15 @@ module Marten
           # Loop over each of the deleted records model's reverse relations in order to identify how these can be
           # deleted too if applicable.
           model.local_reverse_relations.each do |reverse_relation|
-            next if reverse_relation.polymorphic? # TODO: add support for polymorphic reverse relations.
             next if reverse_relation.many_to_many?
             next if reverse_relation.on_delete.do_nothing?
 
+            related_query_node = query_node_for(records, reverse_relation)
             related_records = reverse_relation.model._base_queryset.using(@connection.alias)
-              .filter(query_node_for(records, reverse_relation))
+              .filter(related_query_node)
 
             if reverse_relation.on_delete.cascade? && raw_deletable?(reverse_relation.model)
-              @querysets_to_raw_delete << {reverse_relation.model, query_node_for(records, reverse_relation)}
+              @querysets_to_raw_delete << {reverse_relation.model, related_query_node}
             elsif reverse_relation.on_delete.cascade?
               add(related_records, source: model, process_parent_models: !reverse_relation.parent_link?)
             elsif reverse_relation.on_delete.protect? && related_records.exists?
@@ -127,11 +153,11 @@ module Marten
                 "'#{reverse_relation.model}.#{reverse_relation.field_id}'"
               )
             elsif reverse_relation.on_delete.set_null?
-              @field_updates[reverse_relation.model] ||= {} of Tuple(String, Field::Any) => Query::Node
-              @field_updates[reverse_relation.model][{reverse_relation.field_id, nil}] = query_node_for(
-                records,
-                reverse_relation
-              )
+              @field_updates[reverse_relation.model] ||= [] of Tuple(Hash(String, Field::Any), Query::Node)
+              @field_updates[reverse_relation.model] << {
+                field_update_values_for(reverse_relation),
+                related_query_node,
+              }
             end
           end
         end

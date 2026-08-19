@@ -13,6 +13,7 @@ module Marten
       # ```
       class Polymorphic < Base
         getter id_field_id
+        getter on_delete
         getter type_field_id
 
         def initialize(
@@ -25,9 +26,11 @@ module Marten
           @unique = false,
           @index = false,
           @related : Nil | ::String | Symbol = nil,
+          on_delete : ::String | Symbol = :do_nothing,
         )
           @primary_key = false
           @related = @related.try(&.to_s)
+          @on_delete = Deletion::Strategy.parse(on_delete.to_s)
         end
 
         def db_column

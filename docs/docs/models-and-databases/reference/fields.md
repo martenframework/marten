@@ -577,3 +577,9 @@ end
 When the `related` argument is used, a method will be automatically created on the associated models by using the chosen argument's value. For example, this means that all the `Comment` records associated with a specific `Article` or `Recipe` record could be accessed through the use of the `Article#comments` or `Recipe#comments` methods in the previous snippet.
 
 The default value is `nil`, which means that no reverse relation is defined on the associated models by default.
+
+#### `on_delete`
+
+Same as [the similar option for the `#many_to_one` field](#on_delete). Because polymorphic fields are not backed by a database foreign key, the default `:do_nothing` strategy will leave related records in place (with a dangling type/ID pair) unless another strategy is specified.
+
+When `:set_null` is used, both the `_id` and `_type` columns of the polymorphic field are set to `null`.

@@ -60,6 +60,31 @@ describe Marten::DB::Field::Polymorphic do
     end
   end
 
+  describe "#on_delete" do
+    it "returns do_nothing by default" do
+      field = Marten::DB::Field::Polymorphic.new(
+        "polymorphic",
+        "polymorphic_id",
+        "polymorphic_type",
+        [TestUser, Post]
+      )
+
+      field.on_delete.should eq Marten::DB::Deletion::Strategy::DO_NOTHING
+    end
+
+    it "returns the configured deletion strategy" do
+      field = Marten::DB::Field::Polymorphic.new(
+        "polymorphic",
+        "polymorphic_id",
+        "polymorphic_type",
+        [TestUser, Post],
+        on_delete: :cascade
+      )
+
+      field.on_delete.should eq Marten::DB::Deletion::Strategy::CASCADE
+    end
+  end
+
   describe "#perform_validation" do
     it "does nothing" do
       field = Marten::DB::Field::Polymorphic.new(

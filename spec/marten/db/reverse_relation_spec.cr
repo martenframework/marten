@@ -27,6 +27,11 @@ describe Marten::DB::ReverseRelation do
       reverse_relation = Marten::DB::ReverseRelation.new("posts", Post, "author_id")
       reverse_relation.on_delete.should eq Marten::DB::Deletion::Strategy::CASCADE
     end
+
+    it "returns the deletion strategy for an associated polymorphic field" do
+      reverse_relation = Marten::DB::ReverseRelation.new("comments", Comment, "target")
+      reverse_relation.on_delete.should eq Marten::DB::Deletion::Strategy::DO_NOTHING
+    end
   end
 
   describe "#many_to_many?" do

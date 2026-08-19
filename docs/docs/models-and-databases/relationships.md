@@ -517,6 +517,26 @@ article.comments.filter(text__startswith: "This is")
 ```
 :::
 
+### Deletion strategy
+
+Like for [many-to-one relationships](#deletion-strategy), the deletion strategy to use for [`polymorphic`](./reference/fields.md#polymorphic) fields can be configured by leveraging the [`on_delete`](./reference/fields.md#on_delete-2) argument. This argument allows specifying the deletion strategy to adopt when a related record (one that is targeted by the [`polymorphic`](./reference/fields.md#polymorphic) field) is deleted. This argument accepts the following values (expressed as symbols):
+
+* `:do_nothing`: This is the default strategy. With this strategy, Marten won't do anything to ensure that records referencing the record being deleted are deleted or updated. Because polymorphic fields are not backed by a database foreign key, this means that related records can be left with a dangling type/ID pair.
+* `:cascade`: This strategy can be used to perform cascade deletions. When deleting a record, Marten will try to first destroy the other records that reference the object being deleted.
+* `:protect`: This strategy allows explicitly preventing the deletion of records if they are referenced by other records. This means that attempting to delete a "protected" record will result in a `Marten::DB::Errors::ProtectedRecord` error.
+* `:set_null`: This strategy will set both the `_id` and `_type` columns of the polymorphic field to `null` when the related record is deleted.
+
+For example, we could modify our previous model definition so that `Comment` records are cascade-deleted if the associated `Article` or `Recipe` records are destroyed:
+
+```crystal
+class Comment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  // highlight-next-line
+  field :target, :polymorphic, to: [Article, Recipe], related: :comments, on_delete: :cascade
+  field :text, :text
+end
+```
+
 ## Advanced topics
 
 ### Recursive relationships

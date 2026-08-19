@@ -38,6 +38,9 @@ module Marten
       # By default, for databases that support DDL transactions, each migration will run inside a single transaction.
       # This can be disabled on a per-migration basis, which can be useful is the migration is intended to affect large
       # tables or when performing data migrations.
+      #
+      # Concurrent index operations (`add_index` / `remove_index` with `concurrently: true`) cannot run inside a
+      # transaction and require `atomic false`.
       def self.atomic(atomic : Bool)
         @@atomic = atomic
       end
@@ -87,6 +90,8 @@ module Marten
         project_state : Management::ProjectState,
         schema_editor : Management::SchemaEditor::Base,
       )
+        ensure_atomic_compatible!
+
         ops_backward, directed_forward = operations_backward
 
         if directed_forward
@@ -131,6 +136,8 @@ module Marten
         project_state : Management::ProjectState,
         schema_editor : Management::SchemaEditor::Base,
       )
+        ensure_atomic_compatible!
+
         operations_forward[0].not_nil!.each do |operation|
           old_state = project_state.clone
           operation.mutate_state_forward(self.class.app_config.label, project_state)
@@ -167,6 +174,16 @@ module Marten
       def unapply
       end
 
+      protected def ensure_atomic_compatible! : Nil
+        return unless atomic?
+        return unless requires_non_atomic?
+
+        raise Management::Migrations::Errors::InvalidAtomicMigration.new(
+          "Migration #{id} contains concurrent index operations, which cannot run inside a transaction. " \
+          "Set `atomic false` on the migration class."
+        )
+      end
+
       protected def operations_backward
         load_plan unless plan_loaded?
         @operations_backward.empty? ? {@operations_bidirectional.reverse, false} : {@operations_backward, true}
@@ -175,6 +192,11 @@ module Marten
       protected def operations_forward
         load_plan unless plan_loaded?
         {@operations_forward.empty? ? @operations_bidirectional : @operations_forward, true}
+      end
+
+      protected def requires_non_atomic? : Bool
+        operations_forward[0].not_nil!.any?(&.requires_non_atomic?) ||
+          operations_backward[0].not_nil!.any?(&.requires_non_atomic?)
       end
 
       private def faked_operations_registration?

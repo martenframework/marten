@@ -17,7 +17,10 @@ module Marten
           abstract def add_column(table : TableState, column : Column::Base) : Nil
 
           # Adds an index to a specific table.
-          abstract def add_index(table : TableState, index : Management::Index) : Nil
+          #
+          # If `concurrently` is `true`, the index is created without locking the table for writes when the backend
+          # supports it.
+          abstract def add_index(table : TableState, index : Management::Index, concurrently : Bool = false) : Nil
 
           # Adds a unique constraint to a specific table.
           abstract def add_unique_constraint(
@@ -63,7 +66,14 @@ module Marten
           abstract def remove_column(table : TableState, column : Column::Base) : Nil
 
           # Removes an index from a specific table.
-          abstract def remove_index(table : TableState, index : Management::Index) : Nil
+          #
+          # If `concurrently` is `true`, the index is dropped without locking the table for writes when the backend
+          # supports it.
+          abstract def remove_index(
+            table : TableState,
+            index : Management::Index,
+            concurrently : Bool = false,
+          ) : Nil
 
           # Removes a unique constraint from a specific table.
           abstract def remove_unique_constraint(

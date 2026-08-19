@@ -279,6 +279,92 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
 
       index_names.includes?("test_index").should be_false
     end
+
+    it "removes the index concurrently when requested" do
+      index = Marten::DB::Management::Index.new("test_index", ["foo", "bar"])
+
+      from_table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [index]
+      )
+      from_project_state = Marten::DB::Management::ProjectState.new([from_table_state])
+
+      to_table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "operation_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base
+      )
+      to_project_state = Marten::DB::Management::ProjectState.new([to_table_state])
+
+      Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
+        schema_editor.create_table(from_table_state)
+      end
+
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "operation_test_table",
+        "test_index",
+        concurrently: true
+      )
+
+      operation.mutate_db_forward(
+        "my_app",
+        Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default),
+        from_project_state,
+        to_project_state
+      )
+
+      index_names = [] of String
+
+      Marten::DB::Connection.default.open do |db|
+        for_mysql do
+          db.query("SHOW INDEX FROM operation_test_table;") do |rs|
+            rs.each do
+              rs.read(String)
+              rs.read(Bool)
+              index_names << rs.read(String)
+            end
+          end
+        end
+
+        for_postgresql do
+          db.query(
+            <<-SQL
+                SELECT i.relname
+                FROM pg_class t, pg_class i, pg_index ix
+                WHERE t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND t.relkind = 'r'
+                  AND t.relname = 'operation_test_table'
+              SQL
+          ) do |rs|
+            rs.each do
+              index_names << rs.read(String)
+            end
+          end
+        end
+
+        for_sqlite do
+          db.query("PRAGMA index_list(operation_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              index_names << rs.read(String)
+            end
+          end
+        end
+      end
+
+      index_names.includes?("test_index").should be_false
+    end
   end
 
   describe "#mutate_state_forward" do
@@ -387,6 +473,63 @@ describe Marten::DB::Migration::Operation::RemoveIndex do
         "test_index"
       )
       operation.serialize.strip.should eq %{remove_index :my_table, :test_index}
+    end
+
+    it "includes concurrently: true when the operation is concurrent" do
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "my_table",
+        "test_index",
+        concurrently: true
+      )
+      operation.serialize.strip.should eq %{remove_index :my_table, :test_index, concurrently: true}
+    end
+  end
+
+  describe "#concurrently?" do
+    it "returns false by default" do
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "test_table",
+        "test_index"
+      )
+      operation.concurrently?.should be_false
+    end
+
+    it "returns true when the operation is concurrent" do
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "test_table",
+        "test_index",
+        concurrently: true
+      )
+      operation.concurrently?.should be_true
+    end
+  end
+
+  describe "#requires_non_atomic?" do
+    it "returns false by default" do
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "test_table",
+        "test_index"
+      )
+      operation.requires_non_atomic?.should be_false
+    end
+
+    it "returns true when the operation is concurrent" do
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "test_table",
+        "test_index",
+        concurrently: true
+      )
+      operation.requires_non_atomic?.should be_true
+    end
+
+    it "returns false when the concurrent operation is faked" do
+      operation = Marten::DB::Migration::Operation::RemoveIndex.new(
+        "test_table",
+        "test_index",
+        concurrently: true
+      )
+      operation.faked = true
+      operation.requires_non_atomic?.should be_false
     end
   end
 end

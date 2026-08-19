@@ -19,6 +19,9 @@ describe Marten::DB::Management::Migrations::Runner do
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
       schema_editor.delete_table("runner_spec_foo_tags") if introspector.table_names.includes?("runner_spec_foo_tags")
       schema_editor.delete_table("runner_spec_bar_tags") if introspector.table_names.includes?("runner_spec_bar_tags")
+      if introspector.table_names.includes?("runner_spec_concurrent_tags")
+        schema_editor.delete_table("runner_spec_concurrent_tags")
+      end
     end
 
     # Reset local migration app configs to avoid them to be used elsewhere.
@@ -28,6 +31,8 @@ describe Marten::DB::Management::Migrations::Runner do
     Migration::RunnerSpec::BarApp::V202108092226111.reset_app_config
     Migration::RunnerSpec::BarApp::V202108092226112.reset_app_config
     Migration::RunnerSpec::FooApp::V209901010101101.reset_app_config
+    Migration::RunnerSpec::ConcurrentApp::V202608191700001.reset_app_config
+    Migration::RunnerSpec::ConcurrentApp::V202608191700002.reset_app_config
   end
 
   before_each do
@@ -37,6 +42,9 @@ describe Marten::DB::Management::Migrations::Runner do
     Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
       schema_editor.delete_table("runner_spec_foo_tags") if introspector.table_names.includes?("runner_spec_foo_tags")
       schema_editor.delete_table("runner_spec_bar_tags") if introspector.table_names.includes?("runner_spec_bar_tags")
+      if introspector.table_names.includes?("runner_spec_concurrent_tags")
+        schema_editor.delete_table("runner_spec_concurrent_tags")
+      end
     end
   end
 
@@ -216,6 +224,31 @@ describe Marten::DB::Management::Migrations::Runner do
       introspector.table_names.includes?("runner_spec_bar_tags").should be_true
       columns_details = introspector.columns_details("runner_spec_bar_tags")
       columns_details.map(&.name).sort!.should eq ["id", "label"]
+    end
+
+    describe "with concurrent index operations" do
+      with_installed_apps Marten::DB::Management::Migrations::RunnerSpec::ConcurrentApp
+
+      it "raises when applying an atomic migration with concurrent index operations" do
+        runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+
+        expect_raises(
+          Marten::DB::Management::Migrations::Errors::InvalidAtomicMigration,
+          /concurrent index operations/
+        ) do
+          runner.execute
+        end
+      end
+
+      it "does not raise when faking an atomic migration with concurrent index operations" do
+        runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+        runner.execute(fake: true)
+
+        Marten::DB::Management::Migrations::Record.filter(
+          app: "runner_spec_concurrent_app",
+          name: Migration::RunnerSpec::ConcurrentApp::V202608191700002.migration_name
+        ).exists?.should be_true
+      end
     end
   end
 

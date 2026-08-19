@@ -322,6 +322,18 @@ describe Marten::DB::Migration do
       columns_details.map(&.name).sort!.should eq ["id", "label", "published"]
     end
 
+    it "raises if the migration is atomic and contains concurrent index operations" do
+      project_state = Marten::DB::Management::ProjectState.new
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      expect_raises(
+        Marten::DB::Management::Migrations::Errors::InvalidAtomicMigration,
+        /concurrent index operations/
+      ) do
+        Marten::DB::MigrationSpec::MigrationWithConcurrentAddIndex.new.apply_forward(project_state, schema_editor)
+      end
+    end
+
     it "applies the faked biderectional operations at the state level but not at the DB level" do
       project_state = Marten::DB::Management::ProjectState.new
 
@@ -416,6 +428,16 @@ module Marten::DB::MigrationSpec
 
   class NonAtomicMigration < Marten::DB::Migration
     atomic false
+
+    def self.app_config
+      TestApp.new
+    end
+  end
+
+  class MigrationWithConcurrentAddIndex < Marten::DB::Migration
+    def plan
+      add_index :test_table, :test_index, [:foo, :bar], concurrently: true
+    end
 
     def self.app_config
       TestApp.new
@@ -536,6 +558,7 @@ module Marten::DB::MigrationSpec
   Marten::DB::Management::Migrations.registry.delete(EmptyMigration)
   Marten::DB::Management::Migrations.registry.delete(AtomicMigration)
   Marten::DB::Management::Migrations.registry.delete(NonAtomicMigration)
+  Marten::DB::Management::Migrations.registry.delete(MigrationWithConcurrentAddIndex)
   Marten::DB::Management::Migrations.registry.delete(MigrationWithDependencies)
   Marten::DB::Management::Migrations.registry.delete(MigrationWithReplacements)
   Marten::DB::Management::Migrations.registry.delete(MigrationToCreateTwoNewTables)

@@ -222,6 +222,8 @@ class Migration::Press::V202203302213061 < Marten::Migration
 end
 ```
 
+Concurrent index operations (`add_index` / `remove_index` with `concurrently: true`) cannot run inside a transaction. Marten raises if such an operation is used in an atomic migration; set `atomic false` in that case. See [`add_index`](./reference/migration-operations.md#add_index) and [`remove_index`](./reference/migration-operations.md#remove_index) for details.
+
 ## Data migrations
 
 Sometimes, it is necessary to write migrations that don't change the database schema but that actually write data to the database. This is often the case when backfilling column values for example. In order to do so, Marten provides the ability to run arbitrary code as part of migrations through the use of a special `#run_code` operation.

@@ -19,12 +19,13 @@ module Marten
             end
           end
 
-          def add_index(table : TableState, index : Management::Index) : Nil
+          def add_index(table : TableState, index : Management::Index, concurrently : Bool = false) : Nil
             execute(
               create_index_deferred_statement(
                 table,
                 columns: index.column_names.map { |cname| table.get_column(cname) },
-                name: index.name
+                name: index.name,
+                concurrently: concurrently
               ).to_s
             )
           end
@@ -257,8 +258,8 @@ module Marten
             @deferred_statements.reject! { |s| s.references_column?(table.name, column.name) }
           end
 
-          def remove_index(table : TableState, index : Management::Index) : Nil
-            execute(remove_index_statement(table, index))
+          def remove_index(table : TableState, index : Management::Index, concurrently : Bool = false) : Nil
+            execute(remove_index_statement(table, index, concurrently))
           end
 
           def remove_unique_constraint(table : TableState, unique_constraint : Management::Constraint::Unique) : Nil
@@ -307,6 +308,7 @@ module Marten
             table : TableState,
             columns : Array(Column::Base),
             name : String? = nil,
+            concurrently : Bool = false,
           ) : Statement
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
@@ -395,12 +397,16 @@ module Marten
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
-          private def remove_index_statement(table : TableState, name : String) : String
+          private def remove_index_statement(table : TableState, name : String, concurrently : Bool = false) : String
             raise NotImplementedError.new("Should be implemented by subclasses")
           end
 
-          private def remove_index_statement(table : TableState, index : Management::Index) : String
-            remove_index_statement(table, index.name)
+          private def remove_index_statement(
+            table : TableState,
+            index : Management::Index,
+            concurrently : Bool = false,
+          ) : String
+            remove_index_statement(table, index.name, concurrently)
           end
 
           private def remove_unique_constraint_statement(table : TableState, name : String) : String

@@ -100,9 +100,16 @@ module Marten
             table : TableState,
             columns : Array(Column::Base),
             name : String? = nil,
+            concurrently : Bool = false,
           ) : Statement
+            template = if concurrently
+                         "CREATE INDEX %{name} ON %{table} (%{columns}) ALGORITHM=INPLACE LOCK=NONE"
+                       else
+                         "CREATE INDEX %{name} ON %{table} (%{columns})"
+                       end
+
             Statement.new(
-              "CREATE INDEX %{name} ON %{table} (%{columns})",
+              template,
               name: name.try(&.to_s) || statement_index_name(table.name, columns.map(&.name)),
               table: statement_table(table.name),
               columns: statement_columns(table.name, columns.map(&.name)),
@@ -204,12 +211,16 @@ module Marten
             [] of String
           end
 
-          private def remove_index_statement(table : TableState, name : String) : String
+          private def remove_index_statement(table : TableState, name : String, concurrently : Bool = false) : String
             build_sql do |s|
               s << "DROP INDEX"
               s << quote(name)
               s << "ON"
               s << table.name
+              if concurrently
+                s << "ALGORITHM=INPLACE"
+                s << "LOCK=NONE"
+              end
             end
           end
 

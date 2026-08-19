@@ -7,8 +7,9 @@ module Marten
 
           getter table_name
           getter index
+          getter? concurrently
 
-          def initialize(table_name : String | Symbol, @index : Management::Index)
+          def initialize(table_name : String | Symbol, @index : Management::Index, @concurrently : Bool = false)
             @table_name = table_name.to_s
           end
 
@@ -23,7 +24,7 @@ module Marten
             to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, table_name)
-            schema_editor.remove_index(table, index)
+            schema_editor.remove_index(table, index, concurrently: concurrently?)
           end
 
           def mutate_db_forward(
@@ -33,7 +34,7 @@ module Marten
             to_state : Management::ProjectState,
           ) : Nil
             table = from_state.get_table(app_label, table_name)
-            schema_editor.add_index(table, index)
+            schema_editor.add_index(table, index, concurrently: concurrently?)
           end
 
           def mutate_state_forward(app_label : String, state : Management::ProjectState) : Nil
@@ -51,6 +52,10 @@ module Marten
 
           def references_table?(other_table_name : String) : Bool
             table_name == other_table_name
+          end
+
+          def requires_non_atomic? : Bool
+            concurrently? && !faked?
           end
 
           def serialize : String

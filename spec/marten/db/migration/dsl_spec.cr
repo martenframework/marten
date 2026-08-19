@@ -32,6 +32,17 @@ describe Marten::DB::Migration::DSL do
 
       operation.index.name.should eq "test_index"
       operation.index.column_names.should eq ["foo", "bar"]
+      operation.concurrently?.should be_false
+    end
+
+    it "allows to initialize a concurrent AddIndex operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_add_index_concurrently
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::AddIndex)
+      operation.table_name.should eq "test_table"
+      operation.index.name.should eq "test_index"
+      operation.concurrently?.should be_true
     end
   end
 
@@ -152,6 +163,17 @@ describe Marten::DB::Migration::DSL do
       operation = test.operations[0].as(Marten::DB::Migration::Operation::RemoveIndex)
       operation.table_name.should eq "test_table"
       operation.index_name.should eq "test_index"
+      operation.concurrently?.should be_false
+    end
+
+    it "allows to initialize a concurrent RemoveIndex operation" do
+      test = Marten::DB::Migration::DSLSpec::Test.new
+      test.run_remove_index_concurrently
+
+      operation = test.operations[0].as(Marten::DB::Migration::Operation::RemoveIndex)
+      operation.table_name.should eq "test_table"
+      operation.index_name.should eq "test_index"
+      operation.concurrently?.should be_true
     end
   end
 
@@ -260,6 +282,10 @@ module Marten::DB::Migration::DSLSpec
       add_index :test_table, :test_index, [:foo, :bar]
     end
 
+    def run_add_index_concurrently
+      add_index :test_table, :test_index, [:foo, :bar], concurrently: true
+    end
+
     def run_add_unique_constraint
       add_unique_constraint :test_table, :test_constraint, [:foo, :bar]
     end
@@ -309,6 +335,10 @@ module Marten::DB::Migration::DSLSpec
 
     def run_remove_index
       remove_index :test_table, :test_index
+    end
+
+    def run_remove_index_concurrently
+      remove_index :test_table, :test_index, concurrently: true
     end
 
     def run_remove_unique_constraint

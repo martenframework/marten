@@ -6,6 +6,10 @@ module Marten
           # Represents an error raised when a circular migration dependency is identified.
           class CircularDependency < Exception; end
 
+          # Represents an error raised when a migration is marked as atomic but contains operations that cannot run
+          # inside a transaction (such as concurrent index creations or deletions).
+          class InvalidAtomicMigration < Exception; end
+
           # Represents an error raised when an inexisting migration is requested when running migrations.
           class MigrationNotFound < Exception; end
 

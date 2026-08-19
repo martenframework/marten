@@ -151,9 +151,16 @@ module Marten
             table : TableState,
             columns : Array(Column::Base),
             name : String? = nil,
+            concurrently : Bool = false,
           ) : Statement
+            template = if concurrently
+                         "CREATE INDEX CONCURRENTLY %{name} ON %{table} (%{columns})"
+                       else
+                         "CREATE INDEX %{name} ON %{table} (%{columns})"
+                       end
+
             Statement.new(
-              "CREATE INDEX %{name} ON %{table} (%{columns})",
+              template,
               name: name.try(&.to_s) || statement_index_name(table.name, columns.map(&.name)),
               table: statement_table(table.name),
               columns: statement_columns(table.name, columns.map(&.name)),
@@ -289,9 +296,11 @@ module Marten
             statements
           end
 
-          private def remove_index_statement(table : TableState, name : String) : String
+          private def remove_index_statement(table : TableState, name : String, concurrently : Bool = false) : String
             build_sql do |s|
-              s << "DROP INDEX IF EXISTS"
+              s << "DROP INDEX"
+              s << "CONCURRENTLY" if concurrently
+              s << "IF EXISTS"
               s << quote(name)
             end
           end

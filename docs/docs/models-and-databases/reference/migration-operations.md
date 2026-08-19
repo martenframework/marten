@@ -26,6 +26,20 @@ For example:
 add_index :test_table, :test_index, [:foo, :bar]
 ```
 
+An optional `concurrently: true` argument can be used to create the index without locking the table for writes. On PostgreSQL this emits `CREATE INDEX CONCURRENTLY`; on MySQL / MariaDB it uses `ALGORITHM=INPLACE LOCK=NONE`. SQLite ignores the flag.
+
+Concurrent index operations cannot run inside a transaction. Migrations that use `concurrently: true` must set [`atomic false`](../migrations.md#transactions):
+
+```crystal
+class Migration::Blog::V202608191200000 < Marten::Migration
+  atomic false
+
+  def plan
+    add_index :blog_article, :index_blog_article_published_at, [:published_at], concurrently: true
+  end
+end
+```
+
 ## `add_unique_constraint`
 
 The `add_unique_constraint` operation allows adding a unique constraint to an existing table. It must be called with a table name as first argument, followed by a unique constraint definition (constraint name and targeted column names).
@@ -112,6 +126,20 @@ For example:
 
 ```crystal
 remove_index :test_table, :test_index
+```
+
+An optional `concurrently: true` argument can be used to drop the index without locking the table for writes. On PostgreSQL this emits `DROP INDEX CONCURRENTLY`; on MySQL / MariaDB it uses `ALGORITHM=INPLACE LOCK=NONE`. SQLite ignores the flag.
+
+As with [`add_index`](#add_index), concurrent index operations require [`atomic false`](../migrations.md#transactions) on the migration class:
+
+```crystal
+class Migration::Blog::V202608191200000 < Marten::Migration
+  atomic false
+
+  def plan
+    remove_index :blog_article, :index_blog_article_published_at, concurrently: true
+  end
+end
 ```
 
 ## `remove_unique_constraint`

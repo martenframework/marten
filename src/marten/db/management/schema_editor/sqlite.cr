@@ -107,6 +107,7 @@ module Marten
             table : TableState,
             columns : Array(Column::Base),
             name : String? = nil,
+            concurrently _concurrently : Bool = false,
           ) : Statement
             Statement.new(
               "CREATE INDEX %{name} ON %{table} (%{columns})",
@@ -211,7 +212,11 @@ module Marten
             end
           end
 
-          private def remove_index_statement(table : TableState, name : String) : String
+          private def remove_index_statement(
+            table : TableState,
+            name : String,
+            concurrently _concurrently : Bool = false,
+          ) : String
             build_sql do |s|
               s << "DROP INDEX"
               s << quote(name)

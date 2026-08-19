@@ -11,11 +11,12 @@ module Marten
           )
         end
 
-        macro add_index(table_name, name, column_names)
+        macro add_index(table_name, name, column_names, concurrently = false)
           register_operation(
             Operation::AddIndex.new(
               {{ table_name }},
-              _init_index({{ name }}, {{ column_names }})
+              _init_index({{ name }}, {{ column_names }}),
+              concurrently: {{ concurrently }}
             )
           )
         end
@@ -70,9 +71,9 @@ module Marten
           )
         end
 
-        macro remove_index(table_name, index_name)
+        macro remove_index(table_name, index_name, concurrently = false)
           register_operation(
-            Operation::RemoveIndex.new({{ table_name }}, {{ index_name }})
+            Operation::RemoveIndex.new({{ table_name }}, {{ index_name }}, concurrently: {{ concurrently }})
           )
         end
 

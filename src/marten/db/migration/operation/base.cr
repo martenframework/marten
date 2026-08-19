@@ -61,6 +61,11 @@ module Marten
           def faked? : Bool
             @faked
           end
+
+          # Returns `true` if the operation cannot run inside a transaction.
+          def requires_non_atomic? : Bool
+            false
+          end
         end
       end
     end

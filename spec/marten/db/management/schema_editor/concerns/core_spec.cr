@@ -666,6 +666,98 @@ describe Marten::DB::Management::SchemaEditor::Base do
         end
       end
     end
+
+    it "adds an index concurrently when requested" do
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base
+      )
+
+      schema_editor.create_table(table_state)
+
+      schema_editor.add_index(
+        table_state,
+        Marten::DB::Management::Index.new("index_name", ["foo", "bar"]),
+        concurrently: true
+      )
+
+      index_names = [] of String
+
+      Marten::DB::Connection.default.open do |db|
+        for_mysql do
+          db.query("SHOW INDEX FROM schema_editor_test_table;") do |rs|
+            rs.each do
+              rs.read(String)
+              rs.read(Bool)
+              index_names << rs.read(String)
+            end
+          end
+        end
+
+        for_postgresql do
+          db.query(
+            <<-SQL
+                SELECT i.relname
+                FROM pg_class t, pg_class i, pg_index ix
+                WHERE t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND t.relkind = 'r'
+                  AND t.relname = 'schema_editor_test_table'
+              SQL
+          ) do |rs|
+            rs.each do
+              index_names << rs.read(String)
+            end
+          end
+        end
+
+        for_sqlite do
+          db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              index_names << rs.read(String)
+            end
+          end
+        end
+      end
+
+      index_names.includes?("index_name").should be_true
+    end
+
+    it "cannot add an index concurrently inside a transaction" do
+      for_postgresql do
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+        table_state = Marten::DB::Management::TableState.new(
+          "my_app",
+          "schema_editor_test_table",
+          columns: [
+            Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base
+        )
+
+        schema_editor.create_table(table_state)
+
+        expect_raises(Exception, /cannot run inside a transaction/i) do
+          Marten::DB::Connection.default.transaction do
+            schema_editor.add_index(
+              table_state,
+              Marten::DB::Management::Index.new("index_name", ["foo", "bar"]),
+              concurrently: true
+            )
+          end
+        end
+      end
+    end
   end
 
   describe "#add_unique_constraint" do
@@ -1561,6 +1653,97 @@ describe Marten::DB::Management::SchemaEditor::Base do
       end
 
       index_names.includes?("index_name").should be_false
+    end
+
+    it "removes an index concurrently when requested" do
+      index = Marten::DB::Management::Index.new("index_name", ["foo", "bar"])
+      table_state = Marten::DB::Management::TableState.new(
+        "my_app",
+        "schema_editor_test_table",
+        columns: [
+          Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+          Marten::DB::Management::Column::BigInt.new("foo"),
+          Marten::DB::Management::Column::BigInt.new("bar"),
+        ] of Marten::DB::Management::Column::Base,
+        indexes: [index]
+      )
+
+      Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
+        schema_editor.create_table(table_state)
+      end
+
+      schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+      schema_editor.remove_index(table_state, index, concurrently: true)
+
+      index_names = [] of String
+
+      Marten::DB::Connection.default.open do |db|
+        for_mysql do
+          db.query("SHOW INDEX FROM schema_editor_test_table;") do |rs|
+            rs.each do
+              rs.read(String)
+              rs.read(Bool)
+              index_names << rs.read(String)
+            end
+          end
+        end
+
+        for_postgresql do
+          db.query(
+            <<-SQL
+                SELECT i.relname
+                FROM pg_class t, pg_class i, pg_index ix
+                WHERE t.oid = ix.indrelid
+                  AND i.oid = ix.indexrelid
+                  AND t.relkind = 'r'
+                  AND t.relname = 'schema_editor_test_table'
+              SQL
+          ) do |rs|
+            rs.each do
+              index_names << rs.read(String)
+            end
+          end
+        end
+
+        for_sqlite do
+          db.query("PRAGMA index_list(schema_editor_test_table)") do |rs|
+            rs.each do
+              rs.read(Int32 | Int64)
+              index_names << rs.read(String)
+            end
+          end
+        end
+      end
+
+      index_names.includes?("index_name").should be_false
+    end
+
+    it "cannot remove an index concurrently inside a transaction" do
+      for_postgresql do
+        index = Marten::DB::Management::Index.new("index_name", ["foo", "bar"])
+        table_state = Marten::DB::Management::TableState.new(
+          "my_app",
+          "schema_editor_test_table",
+          columns: [
+            Marten::DB::Management::Column::BigInt.new("test", primary_key: true, auto: true),
+            Marten::DB::Management::Column::BigInt.new("foo"),
+            Marten::DB::Management::Column::BigInt.new("bar"),
+          ] of Marten::DB::Management::Column::Base,
+          indexes: [index]
+        )
+
+        Marten::DB::Management::SchemaEditor.run_for(Marten::DB::Connection.default) do |schema_editor|
+          schema_editor.create_table(table_state)
+        end
+
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+
+        expect_raises(Exception, /cannot run inside a transaction/i) do
+          Marten::DB::Connection.default.transaction do
+            schema_editor.remove_index(table_state, index, concurrently: true)
+          end
+        end
+      end
     end
   end
 

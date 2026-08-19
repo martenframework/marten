@@ -32,6 +32,12 @@ module Marten
             plan = generate_plan(targets)
             full_plan = generate_plan(@reader.graph.leaves, full: true)
 
+            unless fake
+              plan.each do |migration, _backward|
+                migration.ensure_atomic_compatible!
+              end
+            end
+
             forward = plan.all? { |_migration, backward| !backward }
             if forward
               execute_forward(plan, full_plan, fake) { |progress| yield progress }

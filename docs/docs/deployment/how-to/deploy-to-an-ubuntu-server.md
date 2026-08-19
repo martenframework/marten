@@ -28,7 +28,7 @@ Alternatively, you can also refer to [Crystal's official installation instructio
 Secondly, we should install a few additional packages that will be required later on:
 
 * `git` to clone the project's repository
-* `nginx` to serve the project's server behind a reverse proxy and also serve [assets](../../assets/introduction.md) and [media files](../../files/managing-files.md)
+* `nginx` to serve the project's server behind a reverse proxy and also serve [assets](../../assets/serving-assets.md) and [media files](../../files/managing-files.md)
 * `postgresql` to handle our database needs
 
 This can be achieved by running the following command:
@@ -111,7 +111,7 @@ Depending on how you are handling assets as part of your projects you may have t
 
 ## Collect assets
 
-You will then want to collect your [assets](../../assets/introduction.md) so that they are uploaded to their final destination. To do so you can leverage the management CLI binary you compiled previously and run the [`collectassets`](../../development/reference/management-commands.md#collectassets) command:
+You will then want to collect your [assets](../../assets/serving-assets.md) so that they are uploaded to their final destination. To do so you can leverage the management CLI binary you compiled previously and run the [`collectassets`](../../development/reference/management-commands.md#collectassets) command:
 
 ```bash
 bin/manage collectassets --no-input

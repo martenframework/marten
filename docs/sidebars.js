@@ -132,6 +132,7 @@ module.exports = {
       link: {type: 'doc', id: 'assets'},
       items: [
         'assets/introduction',
+        'assets/serving-assets',
       ],
     },
     {

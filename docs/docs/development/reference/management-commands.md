@@ -60,7 +60,7 @@ marten collectartifacts --app=auth                          # Collects artifacts
 
 Collects all the assets and copies them into a unique storage.
 
-Please refer to [Asset handling](../../assets/introduction.md) to learn more about when and how assets are "collected".
+Please refer to [Serving assets](../../assets/serving-assets.md#collecting-assets) to learn more about when and how assets are "collected".
 
 ### Options
 

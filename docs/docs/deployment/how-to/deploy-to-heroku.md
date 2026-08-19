@@ -122,7 +122,7 @@ In this guide, the `<yourapp>` placeholder refers to the Heroku application name
 Heroku leverages [buildpacks](https://devcenter.heroku.com/articles/buildpacks) in order to "compile" web applications (which can include installing dependencies, compiling actual binaries, etc). In the context of a Marten project, it is recommended to use two buildbacks:
 
 1. First, the [Node.js official buildback](https://github.com/heroku/heroku-buildpack-nodejs) in order to "build" your project's assets.
-2. Second, the [Marten official buildback](https://github.com/martenframework/heroku-buildpack-marten) in order to (i) compile your server's binary, (ii) compile the Marten CLI, and (iii) [collect assets](../../assets/introduction.md).
+2. Second, the [Marten official buildback](https://github.com/martenframework/heroku-buildpack-marten) in order to (i) compile your server's binary, (ii) compile the Marten CLI, and (iii) [collect assets](../../assets/serving-assets.md).
 
 The sequence of buildpacks applied during the deployment process is critical: the Node.js buildpack must be the first one applied, to ensure that Heroku can initiate the necessary Node.js installations and configurations. This approach will guarantee that when the Marten buildpack is activated, the assets will have already been created and are ready to be "collected" through the [`collectassets`](../../development/reference/management-commands.md#collectassets) management command.
 
@@ -195,7 +195,7 @@ A few additional things should also be noted:
 
 * The compiled server binary will be placed under the `bin/server` path.
 * Your project's `manage.cr` file will be compiled as well and will be available by simply calling the `marten` command. This means that you can run `marten <command>` if you need to call specific [management commands](../../development/management-commands.md).
-* The Marten buildpack will automatically call the [`collectassets`](../../development/reference/management-commands.md#collectassets) management command in order to collect your project's [assets](../../assets/introduction.md) and copy them to your configured assets storage. You can set the `DISABLE_COLLECTASSETS` environment variable to `1` if you don't want this behavior.
+* The Marten buildpack will automatically call the [`collectassets`](../../development/reference/management-commands.md#collectassets) management command in order to collect your project's [assets](../../assets/serving-assets.md) and copy them to your configured assets storage. You can set the `DISABLE_COLLECTASSETS` environment variable to `1` if you don't want this behavior.
 
 ## Run management commands
 

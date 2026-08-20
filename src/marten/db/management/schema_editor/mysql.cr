@@ -212,14 +212,19 @@ module Marten
           end
 
           private def remove_index_statement(table : TableState, name : String, concurrently : Bool = false) : String
-            build_sql do |s|
-              s << "DROP INDEX"
-              s << quote(name)
-              s << "ON"
-              s << table.name
-              if concurrently
-                s << "ALGORITHM=INPLACE"
+            if concurrently
+              build_sql do |s|
+                s << "ALTER TABLE #{quote(table.name)}"
+                s << "DROP INDEX #{quote(name)},"
+                s << "ALGORITHM=INPLACE,"
                 s << "LOCK=NONE"
+              end
+            else
+              build_sql do |s|
+                s << "DROP INDEX"
+                s << quote(name)
+                s << "ON"
+                s << table.name
               end
             end
           end

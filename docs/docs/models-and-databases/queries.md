@@ -215,7 +215,9 @@ Article.all.filter(author_id: 42)
 ```
 :::
 
-Marten support numerous predicate types, which are all documented in the [field predicates reference](./reference/query-set.md#field-predicates). The ones that you'll encounter most frequently are outlined below:
+Marten support numerous predicate types, which are all documented in the [field predicates reference](./reference/query-set.md#field-predicates). Implementing custom field predicates is also a possibility that is documented in [Create custom field predicates](./how-to/create-custom-field-predicates.md).
+
+The ones that you'll encounter most frequently are outlined below:
 
 #### `exact`
 

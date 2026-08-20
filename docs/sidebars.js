@@ -29,6 +29,7 @@ module.exports = {
           label: "How-To's",
           items: [
             'models-and-databases/how-to/create-custom-model-fields',
+            'models-and-databases/how-to/create-custom-field-predicates',
           ],
         },
         {

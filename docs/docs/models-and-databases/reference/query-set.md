@@ -925,7 +925,7 @@ It should be noted that this method results in a regular `UPDATE` SQL statement.
 
 ## Field predicates
 
-Below are listed all the available [field predicates](../queries.md#field-predicates) that can be used when filtering query sets.
+Below are listed all the available [field predicates](../queries.md#field-predicates) that can be used when filtering query sets. Implementing custom field predicates is also a possibility that is documented in [Create custom field predicates](../how-to/create-custom-field-predicates.md).
 
 ### `contains`
 

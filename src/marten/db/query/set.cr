@@ -1535,6 +1535,51 @@ module Marten
           @query.to_sql
         end
 
+        # Updates all the records matched by the current query set using the passed raw SQL expression.
+        def update(raw_update : String)
+          update(raw_update, [] of ::DB::Any)
+        end
+
+        # Updates all the records matched by the current query set using a raw SQL expression and positional parameters.
+        def update(raw_update : String, *args)
+          update(raw_update, args.to_a)
+        end
+
+        # Updates all the records matched by the current query set using a raw SQL expression and named parameters.
+        def update(raw_update : String, **kwargs)
+          update(raw_update, kwargs.to_h)
+        end
+
+        # Updates all the records matched by the current query set using a raw SQL expression and positional parameters.
+        def update(raw_update : String, params : Array)
+          raise_empty_raw_update if raw_update.empty?
+
+          raw_params = [] of ::DB::Any
+          raw_params += params
+
+          qs = clone
+          updated_count = qs.query.update_with(raw_update, raw_params)
+
+          reset_result_cache
+
+          updated_count
+        end
+
+        # Updates all the records matched by the current query set using a raw SQL expression and named parameters.
+        def update(raw_update : String, params : Hash | NamedTuple)
+          raise_empty_raw_update if raw_update.empty?
+
+          raw_params = {} of String => ::DB::Any
+          params.each { |k, v| raw_params[k.to_s] = v }
+
+          qs = clone
+          updated_count = qs.query.update_with(raw_update, raw_params)
+
+          reset_result_cache
+
+          updated_count
+        end
+
         # Updates all the records matched by the current query set with the passed values.
         #
         # This method allows to update all the records that are matched by the current query set with a hash or a named
@@ -1758,6 +1803,10 @@ module Marten
 
         private def raise_empty_raw_predicate
           raise Errors::UnmetQuerySetCondition.new("Raw predicates cannot be empty")
+        end
+
+        private def raise_empty_raw_update
+          raise Errors::UnmetQuerySetCondition.new("Raw updates cannot be empty")
         end
 
         private def raise_negative_indexes_not_supported

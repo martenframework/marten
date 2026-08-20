@@ -3678,6 +3678,57 @@ describe Marten::DB::Query::Set do
       user_3.is_admin.should be_falsey
     end
 
+    it "allows to update records using a raw SQL expression" do
+      user = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.filter(username: "abc").update("first_name = last_name").should eq 1
+
+      user.reload
+      user.first_name.should eq "Doe"
+    end
+
+    it "allows to use positional parameters in raw SQL update expressions" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.filter(username: "abc").update("first_name = ?", "Updated").should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "allows to use named parameters in raw SQL update expressions" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.filter(username: "abc").update("first_name = :name", name: "Updated").should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "rejects an empty raw SQL update expression" do
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Raw updates cannot be empty") do
+        qset.update("")
+      end
+    end
+
     it "returns 0 if no rows were affected by the updated" do
       user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
       user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")

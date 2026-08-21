@@ -4,6 +4,7 @@ describe Marten::HTTP::Request do
   around_each do |t|
     original_allowed_hosts = Marten.settings.allowed_hosts
     original_debug = Marten.settings.debug
+    original_request_max_body_size = Marten.settings.request_max_body_size
     original_use_x_forwarded_host = Marten.settings.use_x_forwarded_host
 
     Marten.settings.allowed_hosts = %w(example.com)
@@ -12,6 +13,7 @@ describe Marten::HTTP::Request do
 
     Marten.settings.allowed_hosts = original_allowed_hosts
     Marten.settings.debug = original_debug
+    Marten.settings.request_max_body_size = original_request_max_body_size
     Marten.settings.use_x_forwarded_host = original_use_x_forwarded_host
   end
 
@@ -162,6 +164,100 @@ describe Marten::HTTP::Request do
         )
       )
       request.body.should eq ""
+    end
+  end
+
+  describe "#check_request_body_size" do
+    it "does not raise if the request body size is below the configured limit" do
+      Marten.settings.request_max_body_size = 10
+
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "POST",
+        resource: "/test/xyz",
+        body: "12345",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+
+      request.test_check_request_body_size
+      request.body.should eq "12345"
+    end
+
+    it "does not raise if the request body size is equal to the configured limit" do
+      Marten.settings.request_max_body_size = 5
+
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "POST",
+        resource: "/test/xyz",
+        body: "12345",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+
+      request.test_check_request_body_size
+      request.body.should eq "12345"
+    end
+
+    it "raises if the request body size is above the configured limit" do
+      Marten.settings.request_max_body_size = 5
+
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "POST",
+        resource: "/test/xyz",
+        body: "123456",
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+
+      expect_raises(Marten::HTTP::Errors::RequestBodyTooBig) do
+        request.test_check_request_body_size
+      end
+    end
+
+    it "raises if the Content-Length header exceeds the configured limit" do
+      Marten.settings.request_max_body_size = 5
+
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Length" => "10"},
+          body: IO::Memory.new("1")
+        )
+      )
+
+      expect_raises(Marten::HTTP::Errors::RequestBodyTooBig) do
+        request.test_check_request_body_size
+      end
+    end
+
+    it "raises if the request body size is above the configured limit when Content-Length is not set" do
+      Marten.settings.request_max_body_size = 5
+
+      http_request = ::HTTP::Request.new(
+        method: "POST",
+        resource: "/test/xyz",
+        headers: HTTP::Headers{"Host" => "example.com"},
+        body: IO::Memory.new("123456")
+      )
+      http_request.headers.delete("Content-Length")
+
+      request = Marten::HTTP::RequestSpec::TestRequest.new(http_request)
+
+      expect_raises(Marten::HTTP::Errors::RequestBodyTooBig) do
+        request.test_check_request_body_size
+      end
+    end
+
+    it "does not raise if the request max body size setting is disabled" do
+      Marten.settings.request_max_body_size = nil
+
+      request = Marten::HTTP::RequestSpec::TestRequest.new(
+        method: "POST",
+        resource: "/test/xyz",
+        body: "x" * 100,
+        headers: HTTP::Headers{"Host" => "example.com"}
+      )
+
+      request.test_check_request_body_size
+      request.body.should eq "x" * 100
     end
   end
 
@@ -1217,6 +1313,10 @@ module Marten::HTTP::RequestSpec
 
     def test_disable_request_forgery_protection?
       disable_request_forgery_protection?
+    end
+
+    def test_check_request_body_size
+      check_request_body_size
     end
 
     def test_scheme=(scheme)

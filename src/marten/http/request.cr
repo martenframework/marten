@@ -11,12 +11,13 @@ module Marten
       @disable_request_forgery_protection = false
       @flash : FlashStore?
       @host_and_port : NamedTuple(host: String, port: String)?
+      @request_body_too_big = false
       @scheme : String?
       @session : Session::Store::Base?
 
       def initialize(@request : ::HTTP::Request)
         # Overrides the request's body IO object so that it's possible to do seek/rewind operations on it if needed.
-        @request.body = IO::Memory.new((request.body || IO::Memory.new).gets_to_end)
+        @request.body = buffered_request_body(@request.body)
       end
 
       # Returns `true` if the passed media type is accepted by the request.
@@ -219,6 +220,12 @@ module Marten
       protected setter disable_request_forgery_protection
       protected setter scheme
 
+      protected def check_request_body_size : Nil
+        if @request_body_too_big
+          raise Errors::RequestBodyTooBig.new("The request body is too large")
+        end
+      end
+
       protected def method=(method)
         @request.method = method
       end
@@ -261,6 +268,28 @@ module Marten
         end
 
         allowed_hosts
+      end
+
+      private def buffered_request_body(source : IO?) : IO::Memory
+        return IO::Memory.new if source.nil?
+
+        max_size = Marten.settings.request_max_body_size
+        return IO::Memory.new(source.gets_to_end) if max_size.nil?
+
+        if (content_length = request_content_length) && content_length > max_size
+          @request_body_too_big = true
+          return IO::Memory.new
+        end
+
+        memory = IO::Memory.new
+        copied = IO.copy(source, memory, max_size)
+        if copied == max_size && source.read_byte
+          @request_body_too_big = true
+          return IO::Memory.new
+        end
+
+        memory.rewind
+        memory
       end
 
       private def content_type?(content_type)
@@ -367,6 +396,10 @@ module Marten
 
       private def host_and_port
         @host_and_port ||= extract_and_validate_host_and_port
+      end
+
+      private def request_content_length : Int64?
+        @request.headers["Content-Length"]?.try(&.to_i64?)
       end
     end
   end

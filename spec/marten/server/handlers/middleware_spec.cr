@@ -53,6 +53,29 @@ describe Marten::Server::Handlers::Middleware do
       output_io.rewind.gets.should eq "It works"
       ctx.response.headers["X-Middleware"].should eq "1,2"
     end
+
+    it "raises if the request body exceeds the configured maximum size" do
+      handler = Marten::Server::Handlers::Middleware.new
+      handler.next = HTTP::Handler::HandlerProc.new do |ctx|
+        ctx.marten.response = Marten::HTTP::Response.new("It works", status: 200)
+      end
+
+      ctx = HTTP::Server::Context.new(
+        request: ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"},
+          body: "123456"
+        ),
+        response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+      )
+
+      with_overridden_setting("request_max_body_size", 5) do
+        expect_raises(Marten::HTTP::Errors::RequestBodyTooBig) do
+          handler.call(ctx)
+        end
+      end
+    end
   end
 end
 

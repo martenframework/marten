@@ -31,6 +31,12 @@ module Marten
       # request. This is to to prevent large requests that could be used in the context of DOS attacks.
       class TooManyParametersReceived < SuspiciousOperation; end
 
+      # Represents an error raised when a request body is too large.
+      #
+      # This exception is raised when the size of a request body exceeds the configured maximum. This is to prevent
+      # large requests that could be used in the context of DOS attacks.
+      class RequestBodyTooBig < SuspiciousOperation; end
+
       # Represents an error raised when a condition is not met on a particular request, eg. because a middleware was not
       # applied as expected.
       class UnmetRequestCondition < Exception; end

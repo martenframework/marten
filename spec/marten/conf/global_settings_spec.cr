@@ -572,6 +572,33 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#request_max_body_size" do
+    it "returns 2621440 by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_body_size.should eq 2_621_440
+    end
+
+    it "returns the specific request max body size if explicitly set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_body_size = 500
+      global_settings.request_max_body_size.should eq 500
+    end
+  end
+
+  describe "#request_max_body_size=" do
+    it "allows to configure the allowed request max body size" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_body_size = 500
+      global_settings.request_max_body_size.should eq 500
+    end
+
+    it "can be set to nil to disable the protection" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.request_max_body_size = nil
+      global_settings.request_max_body_size.should be_nil
+    end
+  end
+
   describe "#request_max_parameters" do
     it "returns 1000 by default" do
       global_settings = Marten::Conf::GlobalSettings.new

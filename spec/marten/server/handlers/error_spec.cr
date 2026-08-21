@@ -119,6 +119,34 @@ describe Marten::Server::Handlers::Error do
       end
     end
 
+    it "calls the bad request handler when the request body is too large" do
+      output_io = IO::Memory.new
+      error_handler = Marten::Server::Handlers::Error.new
+      middleware_handler = Marten::Server::Handlers::Middleware.new
+      error_handler.next = middleware_handler
+      middleware_handler.next = HTTP::Handler::HandlerProc.new do |ctx|
+        ctx.marten.response = Marten::HTTP::Response.new("It works", status: 200)
+      end
+
+      ctx = HTTP::Server::Context.new(
+        request: ::HTTP::Request.new(
+          method: "POST",
+          resource: "",
+          headers: HTTP::Headers{"Host" => "example.com"},
+          body: "123456"
+        ),
+        response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+      )
+      ctx.response.output = output_io
+
+      with_overridden_setting("request_max_body_size", 5) do
+        error_handler.call(ctx)
+      end
+
+      ctx.response.status_code.should eq 400
+      output_io.rewind.gets.not_nil!.includes?("Bad Request")
+    end
+
     it "calls the permission denied handler in case of a Marten::HTTP::Errors::PermissionDenied error" do
       output_io = IO::Memory.new
       handler = Marten::Server::Handlers::Error.new

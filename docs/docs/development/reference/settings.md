@@ -222,6 +222,16 @@ Possible values for the Referrer-Policy header include:
 
 This setting will be used by the [`Marten::Middleware::ReferrerPolicy`](../../handlers-and-http/reference/middlewares.md#referrer-policy-middleware) middleware when inserting the Referrer-Policy header in HTTP responses. By configuring this setting, you can control how much referrer information is included with requests from your site to other origins.
 
+### `request_max_body_size`
+
+Default: `2_621_440` (2.5MB)
+
+The maximum allowed size of a request body in bytes.
+
+This setting is used to prevent large requests that could be used in the context of denial-of-service attacks. Incoming request bodies (including uploaded files) that exceed this limit result in a [`Marten::HTTP::Errors::RequestBodyTooBig`](pathname:///api/dev/Marten/HTTP/Errors/RequestBodyTooBig.html) exception, which produces a 400 Bad Request response. This protection can also be disabled by setting `request_max_body_size` to `nil`.
+
+Applications that need to accept larger uploads (such as images or documents) should increase this value accordingly.
+
 ### `request_max_parameters`
 
 Default: `1000`

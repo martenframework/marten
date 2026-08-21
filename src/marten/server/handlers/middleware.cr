@@ -10,6 +10,8 @@ module Marten
         @middleware_chain : Array(Marten::Middleware)?
 
         def call(context : ::HTTP::Server::Context)
+          context.marten.request.check_request_body_size
+
           # Call each middleware in order to let them process the incoming request and optionally bypass the routing
           # mechanism by returning an early response. Each middleware should have access to the final response in order
           # to process it if necessary (or to completely replace it!).

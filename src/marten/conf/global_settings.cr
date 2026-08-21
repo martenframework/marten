@@ -10,6 +10,7 @@ module Marten
       @handler404 : Handlers::Base.class
       @handler500 : Handlers::Base.class
       @log_backend : ::Log::Backend | Nil
+      @request_max_body_size : Nil | Int64
       @request_max_parameters : Nil | Int32
       @root_path : String?
       @socket : String?
@@ -88,6 +89,9 @@ module Marten
       # The value of this setting will be used by the `Marten::Middleware::ReferrerPolicy` middleware when inserting the
       # Referrer-Policy header in HTTP responses.
       getter referrer_policy
+
+      # Returns the maximum allowed size of a request body in bytes.
+      getter request_max_body_size
 
       # Returns the maximum number of allowed parameters per request (such as GET or POST parameters).
       getter request_max_parameters
@@ -295,6 +299,7 @@ module Marten
         @port = 8000
         @port_reuse = true
         @referrer_policy = "same-origin"
+        @request_max_body_size = 2_621_440
         @request_max_parameters = 1000
         @secret_key = ""
         @socket = nil
@@ -408,6 +413,14 @@ module Marten
       def middleware=(v)
         @middleware = Array(Marten::Middleware.class).new
         @middleware.concat(v)
+      end
+
+      # Allows to set the maximum allowed size of a request body in bytes.
+      #
+      # This maximum limit is used to prevent large requests that could be used in the context of DOS attacks. Setting
+      # this value to `nil` will disable this behaviour.
+      def request_max_body_size=(value : Int | Nil)
+        @request_max_body_size = value.try(&.to_i64)
       end
 
       # Allows to set the root path of the application.

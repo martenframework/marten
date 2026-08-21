@@ -31,6 +31,10 @@ end
 All uploaded files are automatically persisted to a temporary file in the system's temporary directory (usually this corresponds to the `/tmp` folder).
 :::
 
+:::info Maximum request body size
+The total size of incoming request bodies (including uploaded files) is limited by the [`request_max_body_size`](../development/reference/settings.md#request_max_body_size) setting, which defaults to 2.5MB. Requests exceeding this limit result in a 400 Bad Request. Increase this setting if your application needs to accept larger uploads.
+:::
+
 ## Expecting uploaded files with schemas
 
 If you use [schemas](../schemas/introduction.md) to validate input data (such as form data), then it's worth noting that you can explicitly define that you expect files in the validated data. The simplest way to do that is to make use of the [`file`](../schemas/reference/fields.md#file) or [`image`](../schemas/reference/fields.md#image) schema field.

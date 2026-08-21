@@ -36,6 +36,10 @@ To prevent this, Marten [templates](../templates.mdx) automatically escape HTML 
 
 It should be noted that this auto-escaping mechanism can be disabled using a specific [filter](../templates/reference/filters.md#safe) if needed, but you should be aware of the risks while doing so and ensure that your HTML contents are properly sanitized in order to avoid XSS vulnerabilities.
 
+Marten also comes with a dedicated middleware (the [X-Content-Type-Options middleware](../handlers-and-http/reference/middlewares.md#x-content-type-options-middleware)) that sets the `X-Content-Type-Options: nosniff` header. This prevents browsers from MIME-sniffing responses away from the declared `Content-Type`, which can otherwise lead to XSS when serving mislabeled or user-uploaded content. This middleware is automatically enabled for projects that are generated via the [`new`](../development/reference/management-commands.md#new) management command.
+
+You can disable this header on a per-handler basis by using the [`#exempt_from_x_content_type_options`](pathname:///api/dev/Marten/Handlers/XContentTypeOptions/ClassMethods.html#exempt_from_x_content_type_options(exempt%3ABool)%3ANil-instance-method) class method.
+
 ## HTTP Host Header attacks protection
 
 HTTP Host Header attacks happen when websites that handle the value of the Host header (eg. in order to generate fully qualified URLs) trust this header value implicitly and don't verify it.

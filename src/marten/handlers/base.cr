@@ -5,6 +5,7 @@ require "./concerns/exception_handling"
 require "./concerns/flash"
 require "./concerns/request_forgery_protection"
 require "./concerns/session"
+require "./concerns/x_content_type_options"
 require "./concerns/x_frame_options"
 
 module Marten
@@ -22,6 +23,7 @@ module Marten
       include RequestForgeryProtection
       include Session
       include ContentSecurityPolicy
+      include XContentTypeOptions
       include XFrameOptions
 
       HTTP_METHOD_NAMES = [

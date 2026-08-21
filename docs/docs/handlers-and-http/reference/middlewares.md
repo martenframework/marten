@@ -132,6 +132,34 @@ When enabling this middleware, you should probably start with small values for t
 This is why the value of the [`strict_security_policy.max_age`](../../development/reference/settings.md#max_age) setting is `nil` by default: this prevents the middleware from inserting the Strict-Transport-Security response header until you actually specify a max age.
 :::
 
+## X-Content-Type-Options middleware
+
+**Class:** [`Marten::Middleware::XContentTypeOptions`](pathname:///api/dev/Marten/Middleware/XContentTypeOptions.html)
+
+Sets the [X-Content-Type-Options](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options) header in the response if it wasn't already set.
+
+When this middleware is used, an `X-Content-Type-Options: nosniff` header is inserted into the HTTP response. This instructs browsers to always use the declared `Content-Type` instead of MIME-sniffing the response body, which helps mitigate certain cross-site scripting attacks involving mislabeled or user-uploaded content.
+
+It should be noted that you can decide to disable or enable the use of this middleware on a per-handler basis. To do so, you can simply make use of the [`#exempt_from_x_content_type_options`](pathname:///api/dev/Marten/Handlers/XContentTypeOptions/ClassMethods.html#exempt_from_x_content_type_options(exempt%3ABool)%3ANil-instance-method) class method, which takes a single boolean as argument:
+
+```crystal
+class ProtectedHandler < Marten::Handler
+  exempt_from_x_content_type_options false
+
+  # [...]
+end
+
+class UnprotectedHandler < Marten::Handler
+  exempt_from_x_content_type_options true
+
+  # [...]
+end
+```
+
+:::note
+This header only applies to responses served by your Marten application. If user-uploaded files are served directly by a web server or a CDN, you should configure `X-Content-Type-Options: nosniff` there as well.
+:::
+
 ## X-Frame-Options middleware
 
 **Class:** [`Marten::Middleware::XFrameOptions`](pathname:///api/dev/Marten/Middleware/XFrameOptions.html)

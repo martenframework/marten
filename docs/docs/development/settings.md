@@ -26,6 +26,7 @@ Marten.configure do |config|
     Marten::Middleware::Flash,
     Marten::Middleware::GZip,
     Marten::Middleware::XFrameOptions,
+    Marten::Middleware::XContentTypeOptions,
   ]
 
   config.database do |db|

@@ -34,6 +34,21 @@ This setting allows to configure the cache store returned by the [`Marten#cache`
 
 By default, the global cache store is set to be an in-memory cache (instance of [`Marten::Cache::Store::Memory`](pathname:///api/dev/Marten/Cache/Store/Memory.html)). In test environments you might want to use the "null store" by assigning an instance of the [`Marten::Cache::Store::Null](pathname:///api/dev/Marten/Cache/Store/Null.html) to this setting. Additional caching store shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your caching requirements. These backends are listed in the [caching stores backend reference](../../caching/reference/stores.md).
 
+### `cross_origin_opener_policy`
+
+Default: `"same-origin"`
+
+The value to use for the [Cross-Origin-Opener-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) header when the associated middleware is used. This header allows browsers to isolate a top-level window from other documents by putting them in a different browsing context group, which mitigates cross-origin attacks that rely on `window.opener`.
+
+Possible values for the Cross-Origin-Opener-Policy header include:
+
+- `unsafe-none`: Allows the document to be added to its opener's browsing context group unless the opener itself has a COOP of `same-origin` or `same-origin-allow-popups`.
+- `same-origin-allow-popups`: Isolates the browsing context to same-origin documents or those which either don't set COOP or which opt out of isolation by setting a COOP of `unsafe-none`.
+- `same-origin`: Isolates the browsing context exclusively to same-origin documents. This is the default and most secure option.
+- `noopener-allow-popups`: Isolates the browsing context and always sets `window.opener` to `null` for opened documents.
+
+This setting will be used by the [`Marten::Middleware::CrossOriginOpenerPolicy`](../../handlers-and-http/reference/middlewares.md#cross-origin-opener-policy-middleware) middleware when inserting the Cross-Origin-Opener-Policy header in HTTP responses.
+
 ### `date_input_formats`
 
 Default:

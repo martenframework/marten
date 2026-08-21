@@ -25,6 +25,12 @@ module Marten
       # Returns the global cache store.
       getter cache_store
 
+      # Returns the default value to use for the Cross-Origin-Opener-Policy header.
+      #
+      # The value of this setting will be used by the `Marten::Middleware::CrossOriginOpenerPolicy` middleware when
+      # inserting the Cross-Origin-Opener-Policy header in HTTP responses.
+      getter cross_origin_opener_policy
+
       # Returns the application database configurations.
       getter databases
 
@@ -264,6 +270,7 @@ module Marten
       def initialize
         @allowed_hosts = [] of String
         @cache_store = Cache::Store::Memory.new
+        @cross_origin_opener_policy = "same-origin"
         @databases = [] of Database
         @date_input_formats = [
           "%Y-%m-%d",  # '2024-10-25'
@@ -463,6 +470,14 @@ module Marten
         yield self
       ensure
         @target_env = current_target_env
+      end
+
+      # Allows to set the value to use for the Cross-Origin-Opener-Policy header when the associated middleware is used.
+      #
+      # This value will be used by the `Marten::Middleware::CrossOriginOpenerPolicy` middleware when inserting the
+      # Cross-Origin-Opener-Policy header in HTTP responses.
+      def cross_origin_opener_policy=(cross_origin_opener_policy : String | Symbol)
+        @cross_origin_opener_policy = cross_origin_opener_policy.to_s
       end
 
       # Allows to set the value to use for the X-Frame-Options header when the associated middleware is used.

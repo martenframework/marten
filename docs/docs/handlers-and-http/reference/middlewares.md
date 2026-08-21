@@ -33,6 +33,38 @@ By default, the middleware will include a Content-Security-Policy header that co
 
 Please refer to [Content Security Policy](../../security/content-security-policy.md) to learn more about the Content-Security-Policy header and how to configure it.
 
+## Cross-Origin-Opener-Policy middleware
+
+**Class:** [`Marten::Middleware::CrossOriginOpenerPolicy`](pathname:///api/dev/Marten/Middleware/CrossOriginOpenerPolicy.html)
+
+Sets the [Cross-Origin-Opener-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) header in the response if it wasn't already set.
+
+When this middleware is used, a Cross-Origin-Opener-Policy header will be inserted into the HTTP response. The value for this header is configurable via the [`cross_origin_opener_policy`](../../development/reference/settings.md#cross_origin_opener_policy) setting (whose default value is `same-origin`). This header allows browsers to isolate a top-level window from other documents by putting them in a different browsing context group, which mitigates cross-origin attacks that rely on `window.opener`.
+
+You can also define a custom header value on a per-handler basis by using the [`#cross_origin_opener_policy`](pathname:///api/dev/Marten/Handlers/CrossOriginOpenerPolicy/ClassMethods.html#cross_origin_opener_policy(value%3AString%7CSymbol)%3ANil-instance-method) class method:
+
+```crystal
+class PopupHandler < Marten::Handler
+  cross_origin_opener_policy :same_origin_allow_popups
+
+  # [...]
+end
+```
+
+It is also possible to disable the header entirely on a per-handler basis by using the [`#exempt_from_cross_origin_opener_policy`](pathname:///api/dev/Marten/Handlers/CrossOriginOpenerPolicy/ClassMethods.html#exempt_from_cross_origin_opener_policy(exempt%3ABool)%3ANil-instance-method) class method:
+
+```crystal
+class UnprotectedHandler < Marten::Handler
+  exempt_from_cross_origin_opener_policy true
+
+  # [...]
+end
+```
+
+:::note
+Cross-origin flows that rely on `window.opener` (for example some OAuth or payment popups) may need `same-origin-allow-popups` or a per-handler exemption.
+:::
+
 ## Flash middleware
 
 **Class:** [`Marten::Middleware::Flash`](pathname:///api/dev/Marten/Middleware/Flash.html)

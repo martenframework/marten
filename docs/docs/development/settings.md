@@ -27,6 +27,7 @@ Marten.configure do |config|
     Marten::Middleware::GZip,
     Marten::Middleware::XFrameOptions,
     Marten::Middleware::XContentTypeOptions,
+    Marten::Middleware::CrossOriginOpenerPolicy,
   ]
 
   config.database do |db|

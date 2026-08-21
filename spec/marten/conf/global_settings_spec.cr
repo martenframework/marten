@@ -572,6 +572,33 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#cross_origin_opener_policy" do
+    it "returns same-origin by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.cross_origin_opener_policy.should eq "same-origin"
+    end
+
+    it "returns the specified Cross-Origin-Opener-Policy if explicitly set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.cross_origin_opener_policy = "same-origin-allow-popups"
+      global_settings.cross_origin_opener_policy.should eq "same-origin-allow-popups"
+    end
+  end
+
+  describe "#cross_origin_opener_policy=" do
+    it "allows to configure the Cross-Origin-Opener-Policy" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.cross_origin_opener_policy = "unsafe-none"
+      global_settings.cross_origin_opener_policy.should eq "unsafe-none"
+    end
+
+    it "allows to configure the Cross-Origin-Opener-Policy using a symbol" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.cross_origin_opener_policy = :"same-origin-allow-popups"
+      global_settings.cross_origin_opener_policy.should eq "same-origin-allow-popups"
+    end
+  end
+
   describe "#request_max_body_size" do
     it "returns 2621440 by default" do
       global_settings = Marten::Conf::GlobalSettings.new

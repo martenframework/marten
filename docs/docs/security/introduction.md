@@ -28,6 +28,14 @@ Marten comes with a built-in [clickjacking protection mechanism](./clickjacking.
 
 You can learn about the clickjacking protection provided by Marten and the associated tools in the [dedicated documentation](./clickjacking.md).
 
+## Cross-Origin-Opener-Policy
+
+The [Cross-Origin-Opener-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cross-Origin-Opener-Policy) (COOP) header allows browsers to isolate a top-level window from other documents by putting them in a different browsing context group. If a document protected by COOP opens a cross-origin popup, the popup's `window.opener` property will be `null`. This is a defense-in-depth protection against cross-origin attacks.
+
+Marten comes with a dedicated middleware (the [Cross-Origin-Opener-Policy middleware](../handlers-and-http/reference/middlewares.md#cross-origin-opener-policy-middleware)) that sets this header. The value that is used depends on the [`cross_origin_opener_policy`](../development/reference/settings.md#cross_origin_opener_policy) setting (whose default value is `same-origin`). This middleware is automatically enabled for projects that are generated via the [`new`](../development/reference/management-commands.md#new) management command.
+
+You can define a custom header value on a per-handler basis by using the [`#cross_origin_opener_policy`](pathname:///api/dev/Marten/Handlers/CrossOriginOpenerPolicy/ClassMethods.html#cross_origin_opener_policy(value%3AString%7CSymbol)%3ANil-instance-method) class method, or disable the header entirely with [`#exempt_from_cross_origin_opener_policy`](pathname:///api/dev/Marten/Handlers/CrossOriginOpenerPolicy/ClassMethods.html#exempt_from_cross_origin_opener_policy(exempt%3ABool)%3ANil-instance-method).
+
 ## Cross Site Scripting protection
 
 Cross Site Scripting (XSS) attacks involve a malicious user injecting client-side scripts into the browser of another user. This usually happens when rendering database-stored HTML data or when generating HTML contents and displaying it in a browser: if these HTML contents are not properly sanitized, then this can allow an attacker's JavaScript to be executed in the browser.

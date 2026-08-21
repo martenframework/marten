@@ -1,6 +1,7 @@
 require "./concerns/callbacks"
 require "./concerns/content_security_policy"
 require "./concerns/cookies"
+require "./concerns/cross_origin_opener_policy"
 require "./concerns/exception_handling"
 require "./concerns/flash"
 require "./concerns/request_forgery_protection"
@@ -23,6 +24,7 @@ module Marten
       include RequestForgeryProtection
       include Session
       include ContentSecurityPolicy
+      include CrossOriginOpenerPolicy
       include XContentTypeOptions
       include XFrameOptions
 

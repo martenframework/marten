@@ -2779,6 +2779,17 @@ describe Marten::DB::Query::Set do
       qset.none.size.should eq 0
       qset.none.should be_empty
     end
+
+    it "does not update anything when using a raw SQL expression" do
+      tag = Tag.create!(name: "crystal", is_active: true)
+
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.none.update("name = ?", "updated").should eq 0
+
+      tag.reload
+      tag.name.should eq "crystal"
+    end
   end
 
   describe "#offset" do
@@ -3727,6 +3738,61 @@ describe Marten::DB::Query::Set do
       expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Raw updates cannot be empty") do
         qset.update("")
       end
+    end
+
+    it "allows to use an array of positional parameters in raw SQL update expressions" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.filter(username: "abc").update("first_name = ?", ["Updated"]).should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "allows to use a hash of named parameters in raw SQL update expressions" do
+      user = TestUser.create!(
+        username: "abc",
+        email: "abc@example.com",
+        first_name: "John",
+        last_name: "Doe"
+      )
+
+      qset = Marten::DB::Query::Set(TestUser).new
+
+      qset.filter(username: "abc").update("first_name = :name", {name: "Updated"}).should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "allows to update records using a raw SQL expression on a filtered query involving joins" do
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "fix", email: "fix@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_3, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      qset = Marten::DB::Query::Set(Post).new
+
+      qset.filter(author__username__startswith: "f").update("published = ?", false).should eq 2
+
+      post_1.reload
+      post_1.published.should be_false
+
+      post_2.reload
+      post_2.published.should be_true
+
+      post_3.reload
+      post_3.published.should be_false
     end
 
     it "returns 0 if no rows were affected by the updated" do

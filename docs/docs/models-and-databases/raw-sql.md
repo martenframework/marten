@@ -145,6 +145,62 @@ article = Article.get!(
 )
 ```
 
+## Updating with raw SQL expressions
+
+Marten provides a feature to update query set records using raw SQL expressions within the `#update` method. This is useful when you need to perform updates where the new value is computed at the SQL level (eg. copying one column into another) but still want Marten to handle the query building for the rest of the update statement.
+
+Using raw SQL update expressions involves specifying a string containing the actual `SET` clause and optional parameters to the `#update` query set method. For example:
+
+```crystal
+Invoice.filter(number__isnull: true).update("number = id")
+Invoice.filter(status: "draft").update("label = ?", "default")
+```
+
+Column names should refer to database column names.
+
+### Specifying parameters
+
+You can "inject" parameters into your SQL raw update expressions when using the `#update` method. To do so you have two options: either you specify these parameters as positional arguments, or you specify them as named arguments. Positional parameters must be specified using the `?` syntax while named parameters must be specified using the `:param` format.
+
+For example, the following query uses positional parameters:
+
+```crystal
+Invoice.filter(status: "draft").update("label = ?", "default")
+```
+
+And the following one uses named parameters:
+
+```crystal
+Invoice.filter(
+  status: "draft"
+).update(
+  "label = :label",
+  label: "default"
+)
+```
+
+:::caution
+**Do not use string interpolations in your raw SQL update expressions!**
+
+You should never use string interpolations in your raw SQL update expressions as this would expose your code to SQL injection attacks (where attackers can inject and execute arbitrary SQL into your database).
+
+As such, never - ever - do something like that:
+
+```crystal
+Invoice.update("label = '#{label}'")
+```
+
+And instead, do something like that:
+
+```crystal
+Invoice.update("label = ?", label)
+```
+
+Also, note that the parameters are left **unquoted** in the raw SQL update expressions: this is very important as not doing it would expose your code to SQL injection vulnerabilities as well. Parameters are quoted automatically by the underlying database backend.
+:::
+
+It should be noted that raw updates follow the same semantics as regular `#update` calls: no validation and no callbacks are executed. Developers are responsible for ensuring that the specified SQL is valid and safe.
+
 ## Executing other SQL statements
 
 If it is necessary to execute other SQL statements that don't fall into the scope of what's provided by the [`#raw`](./reference/query-set.md#raw) query set method, then it's possible to rely on the low-level DB connection capabilities.

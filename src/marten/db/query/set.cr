@@ -1536,21 +1536,48 @@ module Marten
         end
 
         # Updates all the records matched by the current query set using the passed raw SQL expression.
+        #
+        # This method allows to update all the records that are matched by the current query set using a raw SQL
+        # expression that will be used as the `SET` clause of the produced `UPDATE` statement. Column names should refer
+        # to database column names. It returns the number of records that were updated:
+        #
+        # ```
+        # query_set = Invoice.filter(number__isnull: true)
+        # query_set.update("number = id")
+        # ```
+        #
+        # Positional (`?`) and named (`:param`) parameters are also supported:
+        #
+        # ```
+        # query_set.update("label = ?", "default")
+        # query_set.update("label = :label", label: "default")
+        # ```
+        #
+        # It should be noted that this method results in a regular `UPDATE` SQL statement. As such, the records that
+        # are updated through the use of this method won't be validated, and no callbacks will be executed for them
+        # either. Developers are responsible for ensuring that the specified SQL is valid and safe (parameters should
+        # always be used instead of string interpolations).
         def update(raw_update : String)
           update(raw_update, [] of ::DB::Any)
         end
 
         # Updates all the records matched by the current query set using a raw SQL expression and positional parameters.
+        #
+        # See `#update(raw_update : String)` for more information about raw SQL updates.
         def update(raw_update : String, *args)
           update(raw_update, args.to_a)
         end
 
         # Updates all the records matched by the current query set using a raw SQL expression and named parameters.
+        #
+        # See `#update(raw_update : String)` for more information about raw SQL updates.
         def update(raw_update : String, **kwargs)
           update(raw_update, kwargs.to_h)
         end
 
         # Updates all the records matched by the current query set using a raw SQL expression and positional parameters.
+        #
+        # See `#update(raw_update : String)` for more information about raw SQL updates.
         def update(raw_update : String, params : Array)
           raise_empty_raw_update if raw_update.empty?
 
@@ -1566,6 +1593,8 @@ module Marten
         end
 
         # Updates all the records matched by the current query set using a raw SQL expression and named parameters.
+        #
+        # See `#update(raw_update : String)` for more information about raw SQL updates.
         def update(raw_update : String, params : Hash | NamedTuple)
           raise_empty_raw_update if raw_update.empty?
 

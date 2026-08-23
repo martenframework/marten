@@ -923,6 +923,17 @@ query_set.update(title: "Updated") # => 42
 
 It should be noted that this method results in a regular `UPDATE` SQL statement. As such, the records that are updated through the use of this method won't be instantiated nor validated, and no callbacks will be executed for them either.
 
+This method can also be called with a raw SQL expression that will be used as the `SET` clause of the produced `UPDATE` statement. For example:
+
+```crystal
+query_set = Invoice.filter(number__isnull: true)
+query_set.update("number = id") # => 42
+query_set.update("label = ?", "default")
+query_set.update("label = :label", label: "default")
+```
+
+Please refer to [Updating with raw SQL expressions](../raw-sql.md#updating-with-raw-sql-expressions) to learn more about this capability.
+
 ## Field predicates
 
 Below are listed all the available [field predicates](../queries.md#field-predicates) that can be used when filtering query sets. Implementing custom field predicates is also a possibility that is documented in [Create custom field predicates](../how-to/create-custom-field-predicates.md).

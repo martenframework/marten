@@ -35,5 +35,10 @@ describe Marten::DB::Query::SQL::EmptyQuery do
       Marten::DB::Query::SQL::EmptyQuery(Tag).new.update_with({"name" => "updated"}).should eq 0
       Tag.filter(name: "updated").size.should eq 0
     end
+
+    it "returns 0 and does not update anything when using a raw SQL expression" do
+      Marten::DB::Query::SQL::EmptyQuery(Tag).new.update_with("name = ?", ["updated"]).should eq 0
+      Tag.filter(name: "updated").size.should eq 0
+    end
   end
 end

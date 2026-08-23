@@ -3735,6 +3735,91 @@ describe Marten::DB::Query::SQL::Query do
       end
     end
   end
+
+  describe "#update_with with a raw SQL expression" do
+    it "allows to update the records matching a given query and returns the number of affected rows" do
+      user_1 = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "ghi", email: "ghi@example.com", first_name: "John", last_name: "Bar")
+      user_3 = TestUser.create!(username: "def", email: "def@example.com", first_name: "Bob", last_name: "Abc")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(first_name: "John"))
+      query.update_with("last_name = first_name").should eq 2
+
+      user_1.reload
+      user_1.last_name.should eq "John"
+
+      user_2.reload
+      user_2.last_name.should eq "John"
+
+      user_3.reload
+      user_3.last_name.should eq "Abc"
+    end
+
+    it "allows to use positional parameters in raw SQL update expressions" do
+      user = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(username: "abc"))
+      query.update_with("first_name = ?", "Updated").should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "allows to use named parameters in raw SQL update expressions" do
+      user = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(username: "abc"))
+      query.update_with("first_name = :name", {name: "Updated"}).should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "preserves parameter offsets when filters also use parameters" do
+      user = TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new("username = ?", ["abc"] of ::DB::Any))
+      query.update_with("first_name = ?", "Updated").should eq 1
+
+      user.reload
+      user.first_name.should eq "Updated"
+    end
+
+    it "allows to update records matching a filtered query involving joins" do
+      TestUser.create!(username: "foo", email: "foo@example.com", first_name: "John", last_name: "Doe")
+      user_2 = TestUser.create!(username: "bar", email: "bar@example.com", first_name: "John", last_name: "Doe")
+      user_3 = TestUser.create!(username: "fix", email: "fix@example.com", first_name: "John", last_name: "Doe")
+
+      post_1 = Post.create!(author: user_3, title: "Post 1")
+      post_2 = Post.create!(author: user_2, title: "Post 2")
+      post_3 = Post.create!(author: user_3, title: "Post 3")
+
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.add_query_node(Marten::DB::Query::Node.new(author__username__startswith: "f"))
+      query.update_with("published = ?", false).should eq 2
+
+      post_1.reload
+      post_1.published.should be_false
+
+      post_2.reload
+      post_2.published.should be_true
+
+      post_3.reload
+      post_3.published.should be_false
+    end
+
+    it "returns 0 if no rows are updated" do
+      TestUser.create!(username: "abc", email: "abc@example.com", first_name: "John", last_name: "Doe")
+
+      query = Marten::DB::Query::SQL::Query(TestUser).new
+      query.add_query_node(Marten::DB::Query::Node.new(first_name: "Unknown"))
+      query.update_with("last_name = ?", "Updated").should eq 0
+    end
+  end
 end
 
 class Post

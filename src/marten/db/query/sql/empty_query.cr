@@ -24,6 +24,14 @@ module Marten
           def update_with(values : Hash(String | Symbol, Field::Any | DB::Model))
             0_i64
           end
+
+          def update_with(raw_update : String)
+            0_i64
+          end
+
+          def update_with(raw_update : String, params : Array(::DB::Any) | Hash(String, ::DB::Any))
+            0_i64
+          end
         end
       end
     end

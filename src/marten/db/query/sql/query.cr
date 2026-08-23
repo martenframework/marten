@@ -525,15 +525,32 @@ module Marten
             rows_affected.not_nil!
           end
 
-          def update_with(raw_update : String, params : Array(::DB::Any) | Hash(String, ::DB::Any))
-            sql, parameters = build_raw_update_query(raw_update, params)
+          def update_with(raw_update : String)
+            update_with_raw(raw_update, [] of ::DB::Any)
+          end
 
-            connection.open do |db|
-              result = db.exec(sql, args: parameters)
-              result.rows_affected
-            end
-          rescue Errors::EmptyResults
-            0
+          def update_with(raw_update : String, *args)
+            raw_params = [] of ::DB::Any
+            args.each { |arg| raw_params << arg }
+            update_with_raw(raw_update, raw_params)
+          end
+
+          def update_with(raw_update : String, **kwargs)
+            raw_params = {} of String => ::DB::Any
+            kwargs.each { |k, v| raw_params[k.to_s] = v }
+            update_with_raw(raw_update, raw_params)
+          end
+
+          def update_with(raw_update : String, params : Array)
+            raw_params = [] of ::DB::Any
+            raw_params += params
+            update_with_raw(raw_update, raw_params)
+          end
+
+          def update_with(raw_update : String, params : Hash | NamedTuple)
+            raw_params = {} of String => ::DB::Any
+            params.each { |k, v| raw_params[k.to_s] = v }
+            update_with_raw(raw_update, raw_params)
           end
 
           private MATCH_ALL_PREDICATE = "1=1"
@@ -883,6 +900,9 @@ module Marten
             final_parameters += filter_parameters if !filter_parameters.nil?
 
             sql = if !filter_parameters.nil? && (!@joins.empty? || !parent_model_joins.empty?)
+                    # Construct an update query involving subqueries in order to counteract the fact that we have to
+                    # rely on joined tables. The extra subquery is necessary because MySQL doesn't allow to reference
+                    # update tables in a where clause.
                     build_sql do |s|
                       s << "UPDATE"
                       s << table_name
@@ -1384,6 +1404,17 @@ module Marten
 
           private def table_name
             quote(Model.db_table)
+          end
+
+          private def update_with_raw(raw_update : String, params : Array(::DB::Any) | Hash(String, ::DB::Any))
+            sql, parameters = build_raw_update_query(raw_update, params)
+
+            connection.open do |db|
+              result = db.exec(sql, args: parameters)
+              result.rows_affected
+            end
+          rescue Errors::EmptyResults
+            0_i64
           end
 
           private def verify_field(

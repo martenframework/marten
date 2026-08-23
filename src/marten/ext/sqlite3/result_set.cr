@@ -15,5 +15,28 @@ __marten_defined?(::SQLite3::ResultSet) do
         end
       end
     end
+
+    def read(t : BigDecimal.class) : BigDecimal
+      read(BigDecimal | Nil).not_nil!
+    end
+
+    def read(t : (BigDecimal | Nil).class) : BigDecimal?
+      case value = read
+      when Nil
+        nil
+      when BigDecimal
+        value
+      when ::String, Float64, Float32, Int64, Int32, Int16, Int8
+        BigDecimal.new(value.to_s)
+      else
+        raise ::DB::ColumnTypeMismatchError.new(
+          context: "#{self.class}#read",
+          column_index: @column_index - 1,
+          column_name: column_name(@column_index - 1),
+          column_type: value.class.to_s,
+          expected_type: BigDecimal.to_s
+        )
+      end
+    end
   end
 end

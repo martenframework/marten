@@ -47,12 +47,24 @@ en:
         uuid:
           errors:
             invalid: "A valid UUID must be provided"
+        decimal:
+          errors:
+            invalid: "Enter a valid number."
+            max_digits: "Ensure that there are no more than %{max_digits} digits in total."
+            max_decimal_places: "Ensure that there are no more than %{decimal_places} decimal places."
+            max_whole_digits: "Ensure that there are no more than %{max_whole_digits} digits before the decimal point."
     schema:
       field:
         base:
           errors:
             invalid: "The provided value is invalid."
             required: "This field is required."
+        decimal:
+          errors:
+            invalid: "Enter a valid number."
+            max_digits: "Ensure that there are no more than %{max_digits} digits in total."
+            max_decimal_places: "Ensure that there are no more than %{decimal_places} decimal places."
+            max_whole_digits: "Ensure that there are no more than %{max_whole_digits} digits before the decimal point."
         date:
           errors:
             invalid: "Enter a valid date."

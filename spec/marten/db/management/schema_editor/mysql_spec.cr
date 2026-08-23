@@ -27,6 +27,12 @@ for_mysql do
         schema_editor.column_type_for_built_in_column(column).should eq "datetime(6)"
       end
 
+      it "returns the expected column type for a decimal column" do
+        column = Marten::DB::Management::Column::Decimal.new("test", max_digits: 10, decimal_places: 2)
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+        schema_editor.column_type_for_built_in_column(column).should eq "numeric(%{max_digits},%{decimal_places})"
+      end
+
       it "returns the expected column type for a float column" do
         column = Marten::DB::Management::Column::Float.new("test")
         schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)

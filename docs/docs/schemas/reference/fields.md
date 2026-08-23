@@ -103,6 +103,33 @@ en:
 If none of the localized input formats can successfully parse the incoming raw date time value, `date_time` fields will fall back to the formats specified in the [`date_time_input_formats`](../../development/reference/settings.md#date_time_input_formats) setting.
 :::
 
+### `decimal`
+
+A `decimal` field allows validating fixed-precision decimal values. Fields using this type are converted to [`BigDecimal`](https://crystal-lang.org/api/BigDecimal.html) objects in Crystal. This is the right choice for monetary amounts and other values that must not lose precision (unlike [`float`](#float) fields).
+
+Both [`max_digits`](#max_digits) and [`decimal_places`](#decimal_places) are required:
+
+```crystal
+class ProductSchema < Marten::Schema
+  field :price, :decimal, max_digits: 10, decimal_places: 2
+end
+
+schema = ProductSchema.new(Marten::HTTP::Params::Data{"price" => ["19.99"]})
+
+schema.valid? # => true
+schema.price  # => 19.99
+```
+
+In addition to the [common field options](#common-field-options), such fields support the following arguments:
+
+#### `max_digits`
+
+The `max_digits` argument **is required** and defines the maximum number of digits allowed in the number, including digits on both sides of the decimal point.
+
+#### `decimal_places`
+
+The `decimal_places` argument **is required** and defines the number of decimal places allowed in the number. It must be less than or equal to [`max_digits`](#max_digits).
+
 ### `duration`
 
 A `duration` field allows validating duration values, which map to [`Time::Span`](https://crystal-lang.org/api/Time/Span.html) objects in Crystal. `duration` fields expect serialized values to be in the `DD.HH:MM:SS.nnnnnnnnn` format (with `n` corresponding to nanoseconds) or in the [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601#Durations) format (eg. `P3DT2H15M20S`, which corresponds to a `3.2:15:20` time span).

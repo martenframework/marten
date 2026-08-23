@@ -84,6 +84,43 @@ The `auto_now` argument allows ensuring that the corresponding field value is au
 
 The `auto_now_add` argument allows ensuring that the corresponding field value is automatically set to the current time every time a record is created. This provides a convenient way to define `created_at` fields. Defaults to `false`.
 
+### `decimal`
+
+A `decimal` field allows persisting fixed-precision decimal numbers, which map to [`BigDecimal`](https://crystal-lang.org/api/BigDecimal.html) objects in Crystal. This is the right choice for monetary amounts and other values that must not lose precision (unlike [`float`](#float) fields).
+
+Both [`max_digits`](#max_digits) and [`decimal_places`](#decimal_places) are required:
+
+```crystal
+class Product < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :price, :decimal, max_digits: 10, decimal_places: 2
+end
+
+product = Product.create!(price: BigDecimal.new("19.99"))
+product.price # => 19.99
+
+# Float, Int, and String values are also accepted and converted to BigDecimal
+product.price = 19.99
+product.price = 20
+product.price = "19.99"
+```
+
+:::info
+`decimal` fields are mapped to:
+
+* `numeric(max_digits, decimal_places)` columns in PostgreSQL databases
+* `numeric(max_digits, decimal_places)` columns in MySQL databases
+* `decimal(max_digits, decimal_places)` columns in SQLite databases
+:::
+
+#### `max_digits`
+
+The `max_digits` argument **is required** and defines the maximum number of digits allowed in the number, including digits on both sides of the decimal point.
+
+#### `decimal_places`
+
+The `decimal_places` argument **is required** and defines the number of decimal places to store with the number. It must be less than or equal to [`max_digits`](#max_digits).
+
 ### `duration`
 
 A `duration` field allows persisting duration values, which map to [`Time::Span`](https://crystal-lang.org/api/Time/Span.html) objects in Crystal. `duration` fields are persisted as big integer values (number of nanoseconds) at the database level.

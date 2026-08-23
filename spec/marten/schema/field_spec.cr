@@ -3,11 +3,12 @@ require "./spec_helper"
 describe Marten::Schema::Field do
   describe "#registry" do
     it "returns the expected field abstractions" do
-      Marten::Schema::Field.registry.size.should eq 16
+      Marten::Schema::Field.registry.size.should eq 17
       Marten::Schema::Field.registry["array"].should eq Marten::Schema::Field::Array
       Marten::Schema::Field.registry["bool"].should eq Marten::Schema::Field::Bool
       Marten::Schema::Field.registry["date"].should eq Marten::Schema::Field::Date
       Marten::Schema::Field.registry["date_time"].should eq Marten::Schema::Field::DateTime
+      Marten::Schema::Field.registry["decimal"].should eq Marten::Schema::Field::Decimal
       Marten::Schema::Field.registry["duration"].should eq Marten::Schema::Field::Duration
       Marten::Schema::Field.registry["email"].should eq Marten::Schema::Field::Email
       Marten::Schema::Field.registry["enum"].should eq Marten::Schema::Field::Enum

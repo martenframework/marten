@@ -1,5 +1,6 @@
 # Marten - The pragmatic web framework.
 
+require "big"
 require "compress/gzip"
 require "compress/zlib"
 require "crypto/subtle"

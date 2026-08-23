@@ -10,7 +10,7 @@
 
 ---
 
-**Marten** is a batteries-included web framework for Crystal. It provides a consistent and extensible set of tools that developers can leverage to build complete web applications without reinventing the wheel.
+**Marten** is a batteries-included web framework for Crystal. It provides a consistent and extensible set of tools for building complete web applications without reinventing the wheel.
 
 ## Overview
 

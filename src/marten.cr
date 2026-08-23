@@ -1,4 +1,4 @@
-# Marten - The pragmatic web framework.
+# Marten - The batteries-included web framework for Crystal.
 
 require "big"
 require "compress/gzip"

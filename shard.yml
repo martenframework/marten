@@ -5,7 +5,7 @@ authors:
   - Morgan Aubert <me@morganaubert.name>
 
 description: |
-  The pragmatic web framework.
+  The batteries-included web framework for Crystal.
 
 crystal: ">= 1.6.0"
 

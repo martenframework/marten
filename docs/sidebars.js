@@ -290,8 +290,9 @@ module.exports = {
       label: 'The Marten project',
       link: {type: 'doc', id: 'the-marten-project'},
       items: [
-        'the-marten-project/contributing',
+        'the-marten-project/why-marten',
         'the-marten-project/design-philosophies',
+        'the-marten-project/contributing',
         'the-marten-project/acknowledgments',
         {
           type: 'category',

@@ -11,7 +11,11 @@ Marten tries to ensure that everything it enables is as simple as possible and t
 
 ## Full-featured
 
-Marten adheres to the "batteries included" philosophy. Out of the box, it provides the tools and features that are commonly required by web applications: [ORM](../models-and-databases/introduction.md), [migrations](../models-and-databases/migrations.md), [translations](../i18n/introduction.md), [templating engine](../templates/introduction.md), [sessions](../handlers-and-http/sessions.md), [emailing](../emailing/introduction.md), and [authentication](../authentication/introduction.md).
+Marten adheres to the "batteries included" philosophy. Out of the box, it provides the tools and features that are commonly required by web applications: [ORM](../models-and-databases/introduction.md), [migrations](../models-and-databases/migrations.md), [schemas](../schemas/introduction.md) and [validation](../schemas/validations.md), [translations](../i18n/introduction.md), [templating engine](../templates/introduction.md), [sessions](../handlers-and-http/sessions.md), [emailing](../emailing/introduction.md), [authentication](../authentication/introduction.md), and [caching](../caching/introduction.md).
+
+## Consistent
+
+Marten aims to provide consistent conventions and predictable APIs across its different components. As applications grow and make use of more of the framework, the same concepts and patterns should remain familiar instead of requiring entirely different approaches for each new concern. The framework is intended to be understood as a whole rather than as a collection of unrelated libraries.
 
 ## Extensible
 

@@ -392,6 +392,10 @@ The double underscores notations can also be used when pre-fetching relations. I
 Author.prefetch(:books__genres)
 ```
 
+:::info
+When [`#join`](./reference/query-set.md#join) or [`#prefetch`](./reference/query-set.md#prefetch) find no related record for a reverse one-to-one relation, that absence is kept on the record: a related record created afterwards is only visible after calling [`#reload`](pathname:///api/dev/Marten/DB/Model/Persistence.html#reload-instance-method). A related record excluded by a custom query set passed to [`#prefetch`](./reference/query-set.md#prefetch) is considered absent too, and such a query set is ignored if the relation was already loaded by [`#join`](./reference/query-set.md#join).
+:::
+
 Finally, it is worth mentioning that multiple relations can be specified to [`#prefetch`](./reference/query-set.md#prefetch). For example:
 
 ```crystal

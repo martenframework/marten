@@ -2712,6 +2712,32 @@ describe Marten::DB::Query::Set do
       qset[1].__set_spec_profile.should be_nil
     end
 
+    it "does not trigger additional queries when a joined one-to-one reverse relation has no related record" do
+      user_1 = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_profile_1 = TestUserProfile.create!(user: user_1)
+      TestUser.create!(username: "jd2", email: "jd2@example.com", first_name: "John", last_name: "Doe")
+
+      records = Marten::DB::Query::Set(TestUser).new.order(:id).join(:profile).to_a
+
+      expect_db_query_count(0) do
+        records[0].profile.should eq user_profile_1
+        records[1].profile.should be_nil
+        records[1].profile.should be_nil
+      end
+    end
+
+    it "assigns a joined one-to-one reverse relation whose related record has a primary key of 0" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      user_profile = TestUserProfile.create!(user: user)
+      TestUserProfile.filter(pk: user_profile.pk).update(id: 0)
+
+      record = Marten::DB::Query::Set(TestUser).new.filter(pk: user.pk).join(:profile).to_a.first
+
+      expect_db_query_count(0) do
+        record.profile.not_nil!.pk.should eq 0
+      end
+    end
+
     it "raises if the specified relation is not a single record relation" do
       expect_raises(Marten::DB::Errors::InvalidField, /Unable to resolve 'tags' as a relation field/) do
         Marten::DB::Query::Set(Post).new.join(:tags)

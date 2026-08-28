@@ -2136,6 +2136,10 @@ The double underscores notations can also be used when pre-fetching relations. I
 Author.prefetch(:books__genres)
 ```
 
+:::info
+When [`#join`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#join) or [`#prefetch`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#prefetch) find no related record for a reverse one-to-one relation, that absence is kept on the record: a related record created afterwards is only visible after calling [`#reload`](https://martenframework.com/docs/api/dev/Marten/DB/Model/Persistence.html#reload-instance-method). A related record excluded by a custom query set passed to [`#prefetch`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#prefetch) is considered absent too, and such a query set is ignored if the relation was already loaded by [`#join`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#join).
+:::
+
 Finally, it is worth mentioning that multiple relations can be specified to [`#prefetch`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#prefetch). For example:
 
 ```crystal
@@ -17999,6 +18003,7 @@ _Under development._
 
 * Fix the debug logger raising unexpectedly when request data cannot be parsed and [debug mode](https://martenframework.com/docs/next/development/reference/settings#debug) is enabled.
 * Fix request data parsing for malformed `application/json` bodies. A body that is not valid JSON now raises a bad request (`Marten::HTTP::Errors::InvalidRequestParameters`) instead of `JSON::ParseException`.
+* Fix [`#join`](https://martenframework.com/docs/next/models-and-databases/queries#pre-selecting-relations-with-joins) and [`#prefetch`](https://martenframework.com/docs/next/models-and-databases/queries#pre-fetching-relations) having no effect on reverse one-to-one relations for records without a related object, which resulted in a query on every access. These methods now record that absence, which has a few consequences: a related record created afterwards is only visible after calling [`#reload`](https://martenframework.com/docs/api/dev/Marten/DB/Model/Persistence.html#reload-instance-method), a related record excluded by a custom [`#prefetch`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#prefetch) query set is considered absent, and such a query set is ignored if the relation was already loaded by [`#join`](https://martenframework.com/docs/next/models-and-databases/reference/query-set#join), like for other single-valued relations.
 
 # Marten 1.0.0 release notes
 

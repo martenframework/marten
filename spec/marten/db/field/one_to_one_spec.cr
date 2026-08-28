@@ -253,6 +253,96 @@ describe Marten::DB::Field::OneToOne do
       TestUser.new.profile.should be_nil
     end
 
+    it "finds a reverse related object that was created after a lookup that found nothing" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      user.profile.should be_nil
+
+      user_profile = TestUserProfile.create!(user: user)
+
+      user.profile.should eq user_profile
+      user.profile!.should eq user_profile
+    end
+
+    it "finds a reverse related object that was created after a lookup made before the record was saved" do
+      user = TestUser.new(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      user.profile.should be_nil
+
+      user.save!
+      user_profile = TestUserProfile.create!(user: user)
+
+      user.profile.should eq user_profile
+    end
+
+    it "keeps the absence of a reverse related object found through a join until the record is reloaded" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      joined_user = TestUser.filter(pk: user.pk).join(:profile).to_a.first
+
+      user_profile = TestUserProfile.create!(user: user)
+
+      expect_db_query_count(0) { joined_user.profile.should be_nil }
+
+      joined_user.reload
+
+      joined_user.profile.should eq user_profile
+    end
+
+    it "raises with a single query from the bang getter when a lookup finds no reverse related object" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+
+      expect_db_query_count(1) do
+        expect_raises(Marten::DB::Errors::RecordNotFound, "TestUserProfile query didn't return any results") do
+          user.profile!
+        end
+      end
+    end
+
+    it "raises without a query from the bang getter when a join found no reverse related object" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      joined_user = TestUser.filter(pk: user.pk).join(:profile).to_a.first
+
+      expect_db_query_count(0) do
+        expect_raises(Marten::DB::Errors::RecordNotFound, "TestUserProfile query didn't return any results") do
+          joined_user.profile!
+        end
+      end
+    end
+
+    it "considers a reverse related object excluded by a custom prefetch query set as absent" do
+      user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+      TestUserProfile.create!(user: user, bio: "inactive")
+
+      prefetched_user = TestUser
+        .filter(pk: user.pk)
+        .prefetch(:profile, TestUserProfile.filter(bio: "active"))
+        .to_a
+        .first
+
+      expect_db_query_count(0) do
+        prefetched_user.profile.should be_nil
+
+        expect_raises(Marten::DB::Errors::RecordNotFound) do
+          prefetched_user.profile!
+        end
+      end
+    end
+
+    it "prefetches reverse related objects when the target model doesn't involve an integer pk field" do
+      article_1 = Marten::DB::Field::OneToOneSpec::Article.create!(title: "Article 1", body: "This is a test")
+      article_2 = Marten::DB::Field::OneToOneSpec::Article.create!(title: "Article 2", body: "This is a test")
+      comment = Marten::DB::Field::OneToOneSpec::Comment.create!(article: article_1, text: "This article is dope")
+
+      articles = Marten::DB::Field::OneToOneSpec::Article.all.prefetch(:comment).to_a
+      prefetched_article_1 = articles.find! { |article| article.pk == article_1.pk }
+      prefetched_article_2 = articles.find! { |article| article.pk == article_2.pk }
+
+      expect_db_query_count(0) do
+        prefetched_article_1.comment.should eq comment
+        prefetched_article_2.comment.should be_nil
+      end
+    end
+
     it "properly generates a bang getter method for the reverse relation" do
       user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
       user_profile = TestUserProfile.create!(user: user)

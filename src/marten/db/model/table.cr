@@ -553,6 +553,7 @@ module Marten
               )
             end
             @{{ relation_var.name }} = related_object.as({{ ann[:related_model] }}?)
+            @{{ relation_var.name }}_loaded = true
           {% end %}
           {% end %}
 
@@ -587,8 +588,8 @@ module Marten
                                    .select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
           {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
           {% if ann && !ann[:many] && ann[:reverse] && ann[:relation_name] %}
-          when {{ relation_var.name.stringify }}
-            !@{{ relation_var.name }}.nil?
+          when {{ ann[:relation_name].stringify }}
+            @{{ relation_var.name }}_loaded
           {% end %}
           {% end %}
           else
@@ -715,8 +716,13 @@ module Marten
               related_object = reverse_relation.model.from_db_row_iterator(relation_row_iterator, using)
 
               # Only assign the retrieved object if it is persisted (ie. if it has a primary key value). If that's not
-              # then case, then this means that current record does not have a reverse related object.
-              assign_reverse_related_object(related_object, reverse_relation.id) if related_object.pk?
+              # the case, then this means that current record does not have a reverse related object: nil is assigned
+              # in that case so that this absence is recorded too. #pk? can't be used here because it is false for
+              # legitimate primary key values such as 0.
+              assign_reverse_related_object(
+                related_object.pk.nil? ? nil : related_object,
+                reverse_relation.id,
+              )
             end
           end
 
@@ -800,7 +806,11 @@ module Marten
 
         private def reset_relation_instance_variables : Nil
           {% for relation_var in @type.instance_vars.select { |ivar| ivar.annotation(Marten::DB::Model::Table::RelationInstanceVariable) } %} # ameba:disable Layout/LineLength
+            {% ann = relation_var.annotation(Marten::DB::Model::Table::RelationInstanceVariable) %}
             @{{ relation_var.id }} = nil
+            {% if ann && !ann[:many] && ann[:reverse] %}
+              @{{ relation_var.id }}_loaded = false
+            {% end %}
           {% end %}
         end
 

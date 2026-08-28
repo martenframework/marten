@@ -212,7 +212,17 @@ module Marten
                     )]
                     @_reverse_o2o_{{ related_field_name.id }} : {{ model_klass }}?
 
+                    # Whether #join or #prefetch resolved this relation. This is tracked separately from the object
+                    # itself because a nil object is a legitimate outcome of these methods, and must not be looked up
+                    # again. A plain lookup deliberately doesn't set this flag: a related object that is created after
+                    # a lookup that found nothing must still be found by the next one.
+                    @_reverse_o2o_{{ related_field_name.id }}_loaded : ::Bool = false
+
                     def {{ related_field_name.id }}
+                      if @_reverse_o2o_{{ related_field_name.id }}_loaded
+                        return @_reverse_o2o_{{ related_field_name.id }}
+                      end
+
                       @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}
                         .get({{ field_id }}: pk)
                         .tap do |obj|
@@ -223,11 +233,9 @@ module Marten
                     end
 
                     def {{ related_field_name.id }}!
-                      @_reverse_o2o_{{ related_field_name.id }} ||= {{ model_klass }}
-                        .get!({{ field_id }}: pk)
-                        .tap do |obj|
-                          obj.{{ relation_attribute_name }} ||= self
-                        end
+                      {{ related_field_name.id }} || raise Marten::DB::Errors::RecordNotFound.new(
+                        "#{ {{ model_klass }}.name } query didn't return any results"
+                      )
                     end
                   end
                 end

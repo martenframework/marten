@@ -469,6 +469,28 @@ describe Marten::DB::Query::Prefetcher do
 
       records[0].get_reverse_related_object_variable(:pseudonym).should eq pseudonym_1
       records[1].get_reverse_related_object_variable(:pseudonym).should be_nil
+
+      expect_db_query_count(0) do
+        records[1].pseudonym.should be_nil
+        records[1].pseudonym.should be_nil
+      end
+    end
+
+    it "does not prefetch a reverse one-to-one relation that was already loaded through a join" do
+      author_1 = Marten::DB::Query::PrefetcherSpec::Author.create!(name: "Abc Doe")
+      Marten::DB::Query::PrefetcherSpec::Author.create!(name: "Def Doe")
+
+      Marten::DB::Query::PrefetcherSpec::Pseudonym.create!(author: author_1, name: "Abc")
+
+      records = Marten::DB::Query::PrefetcherSpec::Author.order(:pk).join(:pseudonym).to_a
+
+      prefetcher = Marten::DB::Query::Prefetcher.new(
+        records: Array(Marten::DB::Model).new.concat(records),
+        relations: ["pseudonym"],
+        using: nil
+      )
+
+      expect_db_query_count(0) { prefetcher.execute }
     end
 
     it "allows to prefetch a one-to-one relation followed by another one-to-one relation" do

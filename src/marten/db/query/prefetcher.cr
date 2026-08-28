@@ -284,10 +284,12 @@ module Marten
             end
 
             records_to_decorate.each do |record_to_decorate|
-              next if !prefetched_records_by_related_object_pk.has_key?(record_to_decorate.pk)
-
+              # Records without a prefetched object are assigned nil explicitly, so that the absence of a reverse
+              # related object is recorded as well and doesn't result in an additional query later on. The primary key
+              # must be converted because the index keys are database values (eg. a hex string for a UUID primary key).
+              related_object_pk = context.reverse_relation.field.to_db(record_to_decorate.pk).as(Field::Any)
               record_to_decorate.assign_reverse_related_object(
-                prefetched_records_by_related_object_pk[record_to_decorate.pk],
+                prefetched_records_by_related_object_pk[related_object_pk]?,
                 context.reverse_relation.id,
               )
             end

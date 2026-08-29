@@ -8,6 +8,8 @@ module.exports = {
       items: [
         'getting-started/installation',
         'getting-started/tutorial',
+        'getting-started/from-django',
+        'getting-started/from-rails',
       ],
     },
     {

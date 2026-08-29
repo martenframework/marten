@@ -5,6 +5,10 @@ description: Learn how to use Marten by creating a simple web application.
 
 This guide will walk you through the creation of a simple weblog application, which will help you learn the basics of the Marten web framework. It is designed for beginners who want to get started by creating a Marten web project, so no prior experience with the framework is required.
 
+:::tip
+Already familiar with Django or Rails? You may find it helpful to skim [Coming from Django?](./from-django.md) or [Coming from Rails?](./from-rails.md) first, then come back here to build something hands-on.
+:::
+
 ## Requirements
 
 This guide assumes that [Crystal and the Marten CLI are properly installed already](./installation.md). You can verify that the Marten CLI is properly installed by running the following command:

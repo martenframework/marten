@@ -50,7 +50,7 @@ class MyHandler < Marten::Handler
 end
 ```
 
-When one of the defined `before_dispatch` callbacks returns a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object (like this is the case in the above example), this response is always used instead of calling the handler's `#dispatch` method (the latest is thus completely bypassed).
+When one of the defined `before_dispatch` callbacks returns a [`Marten::HTTP::Response`](pathname:///api/0.6/Marten/HTTP/Response.html) object (like this is the case in the above example), this response is always used instead of calling the handler's `#dispatch` method (the latest is thus completely bypassed).
 
 ### `after_dispatch`
 
@@ -70,7 +70,7 @@ class MyHandler < Marten::Handler
 end
 ```
 
-Similarly to `#before_dispatch` callbacks, `#after_dispatch` callbacks can return a brand new [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When this is the case, this response is always used instead of the one that was returned by the handler's `#dispatch` method.
+Similarly to `#before_dispatch` callbacks, `#after_dispatch` callbacks can return a brand new [`Marten::HTTP::Response`](pathname:///api/0.6/Marten/HTTP/Response.html) object. When this is the case, this response is always used instead of the one that was returned by the handler's `#dispatch` method.
 
 ### `before_render`
 
@@ -89,13 +89,13 @@ class MyHandler < Marten::Handlers::Template
 end
 ```
 
-Note that `before_render` callbacks can technically be used to return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When this situation arises, this response always takes precedence over the one that would've been returned following the rendering of the template.
+Note that `before_render` callbacks can technically be used to return a [`Marten::HTTP::Response`](pathname:///api/0.6/Marten/HTTP/Response.html) object. When this situation arises, this response always takes precedence over the one that would've been returned following the rendering of the template.
 
 ## Schema handler callbacks
 
-The following callbacks are only available for handlers that inherit from the [schema handler](./reference/generic-handlers.md#processing-a-schema). That is, handlers that inherit from [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html), but also handlers that inherit from [`Marten::Handlers::RecordCreate`](pathname:///api/dev/Marten/Handlers/RecordCreate.html) and [`Marten::Handlers::RecordUpdate`](pathname:///api/dev/Marten/Handlers/RecordUpdate.html).
+The following callbacks are only available for handlers that inherit from the [schema handler](./reference/generic-handlers.md#processing-a-schema). That is, handlers that inherit from [`Marten::Handlers::Schema`](pathname:///api/0.6/Marten/Handlers/Schema.html), but also handlers that inherit from [`Marten::Handlers::RecordCreate`](pathname:///api/0.6/Marten/Handlers/RecordCreate.html) and [`Marten::Handlers::RecordUpdate`](pathname:///api/0.6/Marten/Handlers/RecordUpdate.html).
 
-These callbacks let you define logics that are triggered before or after the validation of the schema. This allows you to easily intercept validation and handle the response independently of the schema validity. All these callbacks can optionally return a [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) object. When an HTTP response is returned,
+These callbacks let you define logics that are triggered before or after the validation of the schema. This allows you to easily intercept validation and handle the response independently of the schema validity. All these callbacks can optionally return a [`Marten::HTTP::Response`](pathname:///api/0.6/Marten/HTTP/Response.html) object. When an HTTP response is returned,
 all following callbacks are skipped and the obtained response is returned directly, thus bypassing responses that might have been returned after by the handler.
 
 ### `before_schema_validation`

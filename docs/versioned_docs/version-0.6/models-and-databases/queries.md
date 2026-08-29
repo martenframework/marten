@@ -380,7 +380,7 @@ Author.prefetch(:books__genres, :publisher)
 
 ### Pagination
 
-Marten provides a pagination mechanism that you can leverage in order to easily iterate over records that are split across several pages of data. This works as follows: each query set object lets you generate a "paginator" (instance of [`Marten::DB::Query::Paginator`](pathname:///api/dev/Marten/DB/Query/Paginator.html)) from a given page size (the number of records you would like on each page). You can then use this paginator in order to request specific pages, which gives you access to the corresponding records and to some additional pagination metadata.
+Marten provides a pagination mechanism that you can leverage in order to easily iterate over records that are split across several pages of data. This works as follows: each query set object lets you generate a "paginator" (instance of [`Marten::DB::Query::Paginator`](pathname:///api/0.6/Marten/DB/Query/Paginator.html)) from a given page size (the number of records you would like on each page). You can then use this paginator in order to request specific pages, which gives you access to the corresponding records and to some additional pagination metadata.
 
 For example:
 
@@ -403,7 +403,7 @@ page.next_page_number     # => 2
 page.total_count          # => 60
 ```
 
-As you can see, paginator objects let you request specific pages by providing a page number (1-indexed!) to the [`#page`](pathname:///api/dev/Marten/DB/Query/Paginator.html#page(number%3AInt)-instance-method) method. Such pages are instances of [`Marten::DB::Query::Page`](pathname:///api/dev/Marten/DB/Query/Page.html) and give you the ability to easily iterate over the corresponding records. They also give you the ability to retrieve some pagination-related information (eg. about the previous and next pages by leveraging the [`#previous_page?`](pathname:///api/dev/Marten/DB/Query/Page.html#previous_page%3F-instance-method), [`#previous_page_number`](pathname:///api/dev/Marten/DB/Query/Page.html#previous_page_number-instance-method), [`#next_page?`](pathname:///api/dev/Marten/DB/Query/Page.html#next_page%3F-instance-method), and [`#next_page_number`](pathname:///api/dev/Marten/DB/Query/Page.html#next_page_number-instance-method) methods).
+As you can see, paginator objects let you request specific pages by providing a page number (1-indexed!) to the [`#page`](pathname:///api/0.6/Marten/DB/Query/Paginator.html#page(number%3AInt)-instance-method) method. Such pages are instances of [`Marten::DB::Query::Page`](pathname:///api/0.6/Marten/DB/Query/Page.html) and give you the ability to easily iterate over the corresponding records. They also give you the ability to retrieve some pagination-related information (eg. about the previous and next pages by leveraging the [`#previous_page?`](pathname:///api/0.6/Marten/DB/Query/Page.html#previous_page%3F-instance-method), [`#previous_page_number`](pathname:///api/0.6/Marten/DB/Query/Page.html#previous_page_number-instance-method), [`#next_page?`](pathname:///api/0.6/Marten/DB/Query/Page.html#next_page%3F-instance-method), and [`#next_page_number`](pathname:///api/0.6/Marten/DB/Query/Page.html#next_page_number-instance-method) methods).
 
 ## Updating records
 
@@ -446,7 +446,7 @@ Scopes allow for the pre-definition of specific filtered query sets, which can b
 
 ### Defining scopes
 
-Scopes can be defined through the use of the [`#scope`](pathname:///api/dev/Marten/DB/Model/Querying.html#scope(name%2C%26block)-macro) macro. This macro expects a scope name (string literal or symbol) as first argument and requires a block where the query set filtering logic is defined.
+Scopes can be defined through the use of the [`#scope`](pathname:///api/0.6/Marten/DB/Model/Querying.html#scope(name%2C%26block)-macro) macro. This macro expects a scope name (string literal or symbol) as first argument and requires a block where the query set filtering logic is defined.
 
 For example:
 
@@ -515,7 +515,7 @@ query_set.by_author_id(42) # => Post::QuerySet [...]>
 
 By default, querying all model records returns unfiltered query sets. However, you can define a default scope to automatically apply a specific filter to all queries for that model. This ensures that certain criteria are consistently enforced without the need to explicitly include a specific filter in every query.
 
-Default scopes can be defined through the use of the [`#default_scope`](pathname:///api/dev/Marten/DB/Model/Querying.html#default_scope-macro) macro. This macro requires a block where the query set filtering logic is defined.
+Default scopes can be defined through the use of the [`#default_scope`](pathname:///api/0.6/Marten/DB/Model/Querying.html#default_scope-macro) macro. This macro requires a block where the query set filtering logic is defined.
 
 For example:
 
@@ -533,7 +533,7 @@ end
 
 ### Disabling scoping
 
-It is worth mentioning that unscoped model records are always accessible through the use of the [`#unscoped`](pathname:///api/dev/Marten/DB/Model/Querying/ClassMethods.html#unscoped-instance-method) class method. This is especially useful if your model defines a default scope and you need to override it for certain queries.
+It is worth mentioning that unscoped model records are always accessible through the use of the [`#unscoped`](pathname:///api/0.6/Marten/DB/Model/Querying/ClassMethods.html#unscoped-instance-method) class method. This is especially useful if your model defines a default scope and you need to override it for certain queries.
 
 For example:
 
@@ -641,7 +641,7 @@ Author.all.annotate { maximum(:articles__score) }
 
 #### Accessing annotated values
 
-Once an annotated query set has been retrieved, it is possible to access the annotated values for each record by using the [`#annotations`](pathname:///api/dev/Marten/DB/Model.html#annotations%3AHash(String%2CBool|File|Float32|Float64|Int32|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3ADB%3A%3AField%3A%3AFile%3A%3AFile|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Symbol|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method. This method returns a hash where the keys are the names of the annotated fields and the values are the annotated values.
+Once an annotated query set has been retrieved, it is possible to access the annotated values for each record by using the [`#annotations`](pathname:///api/0.6/Marten/DB/Model.html#annotations%3AHash(String%2CBool|File|Float32|Float64|Int32|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3ADB%3A%3AField%3A%3AFile%3A%3AFile|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Symbol|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method. This method returns a hash where the keys are the names of the annotated fields and the values are the annotated values.
 
 For example:
 

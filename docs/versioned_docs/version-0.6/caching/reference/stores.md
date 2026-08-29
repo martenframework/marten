@@ -10,7 +10,7 @@ sidebar_label: Stores
 
 This is the default store used as part of the [`cache_store`](../../development/reference/settings.md#cache_store) setting.
 
-This cache store is implemented as part of the [`Marten::Cache::Store::Memory`](pathname:///api/dev/Marten/Cache/Store/Memory.html) class. This cache stores all data in memory within the same process, making it a fast and reliable option for caching in single process environments. However, it's worth noting that if you're running multiple instances of your application, the cache data will not be shared between them.
+This cache store is implemented as part of the [`Marten::Cache::Store::Memory`](pathname:///api/0.6/Marten/Cache/Store/Memory.html) class. This cache stores all data in memory within the same process, making it a fast and reliable option for caching in single process environments. However, it's worth noting that if you're running multiple instances of your application, the cache data will not be shared between them.
 
 For example:
 
@@ -24,7 +24,7 @@ end
 
 A cache store implementation doesn't store any data.
 
-This cache store is implemented as part of the [`Marten::Cache::Store::Null`](pathname:///api/dev/Marten/Cache/Store/Null.html) class. This cache store does not store any data, but provides a way to go through the caching interface. This can be useful in development and testing environments when caching is not desired.
+This cache store is implemented as part of the [`Marten::Cache::Store::Null`](pathname:///api/0.6/Marten/Cache/Store/Null.html) class. This cache store does not store any data, but provides a way to go through the caching interface. This can be useful in development and testing environments when caching is not desired.
 
 For example:
 

@@ -1,0 +1,176 @@
+---
+title: Contributing to the Marten project
+description: Learn how you can start contributing to the Marten project.
+sidebar_label: Contributing
+---
+
+Marten is a big project that will keep evolving over time. If you want to, there are many ways to get involved!
+
+## First things first...
+
+The Marten project adheres to the [Contributor Covenant Code of Conduct](https://github.com/martenframework/marten/blob/main/CODE_OF_CONDUCT.md). Everyone contributing to the Marten project is expected to follow this code.
+
+## Reporting issues
+
+You should use the [project's issue tracker](https://github.com/martenframework/marten/issues) that is hosted on GitHub if you've found a bug or if you want to propose a new feature.
+
+### About bug reports
+
+If you've found a bug related to the Marten web framework **that is not a security issue**, then you should (i) search the [existing issues](https://github.com/martenframework/marten/issues) to verify that it hasn't been reported yet and (ii) [create a new issue](https://github.com/martenframework/marten/issues/new) if that's not the case. Don't forget to include as many details as possible in your tickets: an explanatory description of the issue at hand and how to reproduce it, snippets and/or tracebacks if this is appropriate, etc.
+
+### About security issues
+
+If you've found a security issue please **do not open a GitHub issue**. Instead, send an email to `security@martenframework.com`. We'll then investigate together to resolve the problem so we can make an announcement about a solution along with the vulnerability.
+
+## Contributing code
+
+The preferred way to contribute to the Marten framework is to submit pull requests to the project's [GitHub repository](https://github.com/martenframework/marten). If you don't know where to start and would like to start contributing code to the Marten framework, you can have a look at the [Good first issues](https://github.com/martenframework/marten/issues?q=is%3Aissue+is%3Aopen+label%3A%22Good+first+issue%22).
+
+Below are provided some general tips regarding contributing code: development environments, running tests, etc.
+
+### Development environment
+
+:::info
+The following steps assume that you have at least [git](https://git-scm.com/), [Crystal](https://crystal-lang.org/), [Node.js](https://nodejs.org), and [libvips](https://www.libvips.org/) (required to compile the spec suite) installed on your system. See the [release notes](./release-notes.md) of the version currently under development for the list of supported Crystal versions.
+:::
+
+First, you should [fork](https://github.com/martenframework/marten/fork) the Marten git repository. Then you can get a local copy of the project using the following command:
+
+```bash
+git clone git@github.com:<username>/marten.git
+```
+
+Once this is done you should change into the `marten` repository and install the framework dependencies by running the following command:
+
+```bash
+make
+```
+
+This will install a bunch of Crystal shards and some Node.js dependencies (which are required to work on the [Docusaurus](https://docusaurus.io/)-powered documentation).
+
+### Setting up a test project with Marten
+
+This section dives into creating and configuring a test project using the Marten development environment. This allows you to experiment and develop features in isolation, ensuring everything works smoothly before committing changes to the main codebase.
+
+#### Creating a new test project
+
+Start by building the Marten CLI from your local checkout:
+
+```bash
+crystal build src/marten_cli.cr -o bin/marten
+```
+
+Then create a new test project:
+
+```bash
+./bin/marten new project test-project [options]
+```
+
+Replace `test-project` with your desired project name. After creating the project, change into its directory.
+
+#### Configuring the Test Environment
+
+To use the development marten project instead of the one provided by `shard.yml`, you need to create a `shard.override.yml`.
+
+```yaml
+name: test-project
+version: 0.1.0
+
+dependencies:
+  marten:
+    path: /path/to/development/marten
+```
+
+Run `shards install`. Now, your test project is configured to use your local Marten development environment.
+
+### Coding style
+
+Overall, Marten tries to comply with Crystal's [style guide](https://crystal-lang.org/reference/conventions/coding_style.html) and you should ensure that your changes comply with it as well if you are contributing code to the project.
+
+In addition to that, Marten's codebase is checked using [ameba](https://github.com/crystal-ameba/ameba), the standard [`crystal tool format`](https://crystal-lang.org/reference/man/crystal/index.html#crystal-tool-format) command, and [typos](https://github.com/crate-ci/typos). Every pull request opened on [Marten's GitHub repository](https://github.com/martenframework/marten) will be checked using these tools automatically. If needed, you can verify that these checks are passing locally by running the following commands:
+
+```bash
+make qa            # Run ameba, Crystal formatting, and spelling checks
+make lint          # Run ameba checks only
+make format_checks # Run Crystal formatting checks only
+make typos         # Run spelling checks only
+```
+
+The spelling checks require the [typos](https://github.com/crate-ci/typos) CLI to be installed on your system.
+
+Additionally, you can also apply Crystal's default formatting to the codebase by running:
+
+```bash
+make format
+```
+
+### Tests
+
+You should not submit pull requests without providing tests. Marten uses the standard [spec module](https://crystal-lang.org/reference/guides/testing.html) and comes with an extensive spec suite.
+
+Specs must be defined in the `spec` folder, at the root of the project's repository. You can run the whole spec suite by using the following command (which is equivalent to running `crystal spec`):
+
+```bash
+make tests
+```
+
+When iterating on a change, you can also run a subset of the spec suite by passing specific files or directories to `crystal spec`:
+
+```bash
+crystal spec spec/marten/template/tag_spec.cr
+crystal spec spec/marten/db/
+```
+
+By default, specs will be executed using an in-memory SQLite database. If you wish to, you can configure additional databases by updating the `.spec.env.json` file that should've been automatically generated by the `make` command earlier (cf. [Development environment](#development-environment)). This file defines a bunch of "environment" setting values that are automatically leveraged to configure the test project that is used when running specs. It looks something like this:
+
+```json title=.spec.env.json
+{
+  "MARIADB_DEFAULT_DB_NAME": "example",
+  "MARIADB_OTHER_DB_NAME": "other_example",
+  "MARIADB_DB_USER": "example",
+  "MARIADB_DB_PASSWORD": "",
+  "MARIADB_DB_HOST": "",
+  "MYSQL_DEFAULT_DB_NAME": "example",
+  "MYSQL_OTHER_DB_NAME": "other_example",
+  "MYSQL_DB_USER": "example",
+  "MYSQL_DB_PASSWORD": "",
+  "MYSQL_DB_HOST": "",
+  "POSTGRESQL_DEFAULT_DB_NAME": "example",
+  "POSTGRESQL_OTHER_DB_NAME": "other_example",
+  "POSTGRESQL_DB_USER": "example",
+  "POSTGRESQL_DB_PASSWORD": "",
+  "POSTGRESQL_DB_HOST": ""
+}
+```
+
+As you can see, you have to specify two databases for each database backend (MariaDB, MySQL, and PostgreSQL). This is mandatory because Marten's specs are also testing cases where multiple databases are configured and used simultaneously for the same project.
+
+Specs are always executed using a _single_ database backend. As mentioned previously this database backend is the SQLite one by default, but you can specify the one to use when running specs by setting the `MARTEN_SPEC_DB_CONNECTION` environment variable. For example:
+
+```bash
+MARTEN_SPEC_DB_CONNECTION=mariadb make tests    # Will run specs using the MariaDB DB backend
+MARTEN_SPEC_DB_CONNECTION=mysql make tests      # Will run specs using the MySQL DB backend
+MARTEN_SPEC_DB_CONNECTION=postgresql make tests # Will run specs using the PostgreSQL DB backend
+```
+
+Compiling the full spec suite in a single process can require a lot of memory. If that happens, or if you want to run specs the same way CI does, you can run them in batches:
+
+```bash
+scripts/run_batched_specs
+```
+
+This splits spec files into several batches, runs `crystal spec` on each of them, and prints an aggregated summary at the end. The `MARTEN_SPEC_DB_CONNECTION` environment variable can be used with this script as well.
+
+### Documentation
+
+Marten's documentation is written using Markdown. It is powered by [Docusaurus](https://docusaurus.io/) and lives under the `docs` folder.
+
+To run the documentation live server locally, you can change into `docs` and make use of the following command:
+
+```bash
+npm run start
+```
+
+This will start the Docusaurus server at [http://localhost:3000/docs/](http://localhost:3000/docs/) and you will be able to easily see and test the changes you are making to the documentation source files.
+
+If you are contributing a new feature or a user-facing change, please update the relevant documentation guides and the [release notes](./release-notes.md) of the version currently under development.

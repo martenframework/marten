@@ -86,7 +86,7 @@ The `auth` application defines a single `Auth::User` model that inherits its fie
 
 ### Retrieving the current user
 
-Projects that are generated with the `auth` application automatically make use of a middleware (`MartenAuth::Middleware`) that ensures that the currently authenticated user ID is associated with the current request. This means that given a specific HTTP request (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html)), it is possible to identify which user is signed-in or not. Concretely, the following methods are made available on the standard [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html) object in order to interact with the currently signed-in user:
+Projects that are generated with the `auth` application automatically make use of a middleware (`MartenAuth::Middleware`) that ensures that the currently authenticated user ID is associated with the current request. This means that given a specific HTTP request (instance of [`Marten::HTTP::Request`](pathname:///api/0.6/Marten/HTTP/Request.html)), it is possible to identify which user is signed-in or not. Concretely, the following methods are made available on the standard [`Marten::HTTP::Request`](pathname:///api/0.6/Marten/HTTP/Request.html) object in order to interact with the currently signed-in user:
 
 | Method | Description |
 | --- | --- |
@@ -162,7 +162,7 @@ The `MartenAuth#authenticate` method is automatically used by the handlers that 
 
 ### Signing in users
 
-Signing in a user is the act of attaching it to the current session - after having verified that the associated credentials are valid (see [Authenticating users](#authenticating-users)). This capability is provided by the [`marten-auth`](https://github.com/martenframework/marten-auth) shard through the use of the `MartenAuth#sign_in` method: This method takes a request object (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html)) and a user record as arguments and ensures that the user ID is attached to the current session so that they do not have to reauthenticate for every request.
+Signing in a user is the act of attaching it to the current session - after having verified that the associated credentials are valid (see [Authenticating users](#authenticating-users)). This capability is provided by the [`marten-auth`](https://github.com/martenframework/marten-auth) shard through the use of the `MartenAuth#sign_in` method: This method takes a request object (instance of [`Marten::HTTP::Request`](pathname:///api/0.6/Marten/HTTP/Request.html)) and a user record as arguments and ensures that the user ID is attached to the current session so that they do not have to reauthenticate for every request.
 
 For example:
 
@@ -187,7 +187,7 @@ It is important to understand that this method is intended to be used for a user
 
 ### Signing out users
 
-The ability to sign out users is provided by the [`marten-auth`](https://github.com/martenframework/marten-auth) shard through the use of the `MartenAuth#sign_out` method: this method takes a request object (instance of [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html)) as argument, removes the authenticated user ID from the current request, and flushes the associated session data.
+The ability to sign out users is provided by the [`marten-auth`](https://github.com/martenframework/marten-auth) shard through the use of the `MartenAuth#sign_out` method: this method takes a request object (instance of [`Marten::HTTP::Request`](pathname:///api/0.6/Marten/HTTP/Request.html)) as argument, removes the authenticated user ID from the current request, and flushes the associated session data.
 
 For example:
 
@@ -220,7 +220,7 @@ As mentioned previously, you should not attempt to manipulate the `password` fie
 
 ### Limiting access to signed-in users
 
-Limiting access to signed-in users can easily be achieved by leveraging the `#user?` method that is available from [`Marten::HTTP::Request`](pathname:///api/dev/Marten/HTTP/Request.html) objects. Using this method, you can easily implement  [`#before_dispatch`](../handlers-and-http/callbacks.md#before_dispatch) handler callbacks in order to redirect anonymous users to a sign-in page or to an error page.
+Limiting access to signed-in users can easily be achieved by leveraging the `#user?` method that is available from [`Marten::HTTP::Request`](pathname:///api/0.6/Marten/HTTP/Request.html) objects. Using this method, you can easily implement  [`#before_dispatch`](../handlers-and-http/callbacks.md#before_dispatch) handler callbacks in order to redirect anonymous users to a sign-in page or to an error page.
 
 For example:
 

@@ -124,7 +124,7 @@ end
 
 ### Optional: set up the asset serving middleware
 
-In order to easily serve your application's assets in Fly.io, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares.md#asset-serving-middleware) middleware. Indeed, it won't be possible to configure a web server such as [Nginx](https://nginx.org) to serve your assets directly on Fly.io if you intend to use a "local file system" asset store (such as [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)).
+In order to easily serve your application's assets in Fly.io, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares.md#asset-serving-middleware) middleware. Indeed, it won't be possible to configure a web server such as [Nginx](https://nginx.org) to serve your assets directly on Fly.io if you intend to use a "local file system" asset store (such as [`Marten::Core::Store::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html)).
 
 To palliate this, you can make use of the [`Marten::Middleware::AssetServing`](../../handlers-and-http/reference/middlewares.md#asset-serving-middleware) middleware. Obviously, this is not necessary if you intend to leverage a cloud storage provider (like Amazon's S3 or GCS) to store and serve your collected assets (in this case, you can simply skip this section).
 

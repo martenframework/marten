@@ -7,14 +7,14 @@ Marten uses a file storage mechanism to perform file operations like saving file
 
 ## Basic file storage implementation
 
-File storages are implemented as subclasses of the [`Marten::Core::Storage::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html) abstract class. As such, they must implement a set of mandatory methods which provide the following functionalities:
+File storages are implemented as subclasses of the [`Marten::Core::Storage::Base`](pathname:///api/0.6/Marten/Core/Storage/Base.html) abstract class. As such, they must implement a set of mandatory methods which provide the following functionalities:
 
-* saving files ([`#save`](pathname:///api/dev/Marten/Core/Storage/Base.html#save(filepath%3AString%2Ccontent%3AIO)%3AString-instance-method))
-* deleting files ([`#delete`](pathname:///api/dev/Marten/Core/Storage/Base.html#delete(filepath%3AString)%3ANil-instance-method))
-* opening files ([`#open`](pathname:///api/dev/Marten/Core/Storage/Base.html#open(filepath%3AString)%3AIO-instance-method))
-* verifying that files exist ([`#exist?`](pathname:///api/dev/Marten/Core/Storage/Base.html#exists%3F(filepath%3AString)%3ABool-instance-method))
-* retrieving file sizes ([`#size`](pathname:///api/dev/Marten/Core/Storage/Base.html#size(filepath%3AString)%3AInt64-instance-method))
-* retrieving file URLs ([`#url`](pathname:///api/dev/Marten/Core/Storage/Base.html#url(filepath%3AString)%3AString-instance-method))
+* saving files ([`#save`](pathname:///api/0.6/Marten/Core/Storage/Base.html#save(filepath%3AString%2Ccontent%3AIO)%3AString-instance-method))
+* deleting files ([`#delete`](pathname:///api/0.6/Marten/Core/Storage/Base.html#delete(filepath%3AString)%3ANil-instance-method))
+* opening files ([`#open`](pathname:///api/0.6/Marten/Core/Storage/Base.html#open(filepath%3AString)%3AIO-instance-method))
+* verifying that files exist ([`#exist?`](pathname:///api/0.6/Marten/Core/Storage/Base.html#exists%3F(filepath%3AString)%3ABool-instance-method))
+* retrieving file sizes ([`#size`](pathname:///api/0.6/Marten/Core/Storage/Base.html#size(filepath%3AString)%3AInt64-instance-method))
+* retrieving file URLs ([`#url`](pathname:///api/0.6/Marten/Core/Storage/Base.html#url(filepath%3AString)%3AString-instance-method))
 
 Note that you can fully customize how file storage objects are initialized.
 

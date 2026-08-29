@@ -18,7 +18,7 @@ Another benefit of applications is that they can be packaged and reused across m
 
 The use of applications must be manually enabled within projects: this is done through the use of the [`installed_apps`](./reference/settings.md#installed_apps) setting.
 
-This setting corresponds to an array of installed app classes. Indeed, each Marten application must define a subclass of [`Marten::App`](pathname:///api/dev/Marten/App.html) to specify a few things such as the application label (see [Creating applications](#creating-applications) for more information about this). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project.
+This setting corresponds to an array of installed app classes. Indeed, each Marten application must define a subclass of [`Marten::App`](pathname:///api/0.6/Marten/App.html) to specify a few things such as the application label (see [Creating applications](#creating-applications) for more information about this). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project.
 
 For example:
 
@@ -102,7 +102,7 @@ The [`app`](./reference/generators.md#app) generator automatically ensures that:
 * The application's routes are included in the main routes map (which lives in the `config/routes.cr` file).
 :::
 
-The most important file of an application is the `app.cr` one. This file usually includes all the app requirements and defines the application configuration class itself, which must be a subclass of the [`Marten::App`](pathname:///api/dev/Marten/App.html) abstract class. This class allows mainly to define the "label" identifier of the application (through the use of the [`#label`](pathname:///api/dev/Marten/Apps/Config.html#label(label%3AString|Symbol)-class-method) class method): this identifier must be unique across all the installed applications of a project and is used to generate things like model table names or migration classes.
+The most important file of an application is the `app.cr` one. This file usually includes all the app requirements and defines the application configuration class itself, which must be a subclass of the [`Marten::App`](pathname:///api/0.6/Marten/App.html) abstract class. This class allows mainly to define the "label" identifier of the application (through the use of the [`#label`](pathname:///api/0.6/Marten/Apps/Config.html#label(label%3AString|Symbol)-class-method) class method): this identifier must be unique across all the installed applications of a project and is used to generate things like model table names or migration classes.
 
 Here is an example `app.cr` file content for a hypothetic "blog" app:
 
@@ -135,7 +135,7 @@ require "./migrations/**"
 
 Applications that you create as part of your projects or third-party libraries can have their own associated settings, configurable through the use of regular [settings files](./settings.md).
 
-In order to define settings for your applications, the simplest way is to create a `settings.cr` file containing a subclass of [`Marten::Conf::Settings`](pathname:///api/dev/Marten/Conf/Settings.html) in your application's folder. This subclass must make use of the [`#namespace`](pathname:///api/dev/Marten/Conf/Settings.html#namespace(ns)-macro) macro in order to define the setting "namespace" under which your application's settings will be accessible.
+In order to define settings for your applications, the simplest way is to create a `settings.cr` file containing a subclass of [`Marten::Conf::Settings`](pathname:///api/0.6/Marten/Conf/Settings.html) in your application's folder. This subclass must make use of the [`#namespace`](pathname:///api/0.6/Marten/Conf/Settings.html#namespace(ns)-macro) macro in order to define the setting "namespace" under which your application's settings will be accessible.
 
 For example:
 
@@ -160,6 +160,6 @@ Marten.configure do |config|
 end
 ```
 
-As you can see, the application's settings are configurable like any other built-in settings, but they are namespaced to the namespace value that was defined in the `Blog::Settings` class through the use of the [`#namespace`](pathname:///api/dev/Marten/Conf/Settings.html#namespace(ns)-macro) macro.
+As you can see, the application's settings are configurable like any other built-in settings, but they are namespaced to the namespace value that was defined in the `Blog::Settings` class through the use of the [`#namespace`](pathname:///api/0.6/Marten/Conf/Settings.html#namespace(ns)-macro) macro.
 
-It's important to note that [`Marten::Conf::Settings`](pathname:///api/dev/Marten/Conf/Settings.html) subclasses have the flexibility to define any necessary methods to facilitate user configuration for the considered application. While basic settings typically necessitate only getters and setters for configuration, more intricate scenarios may demand additional methods, the utilization of blocks, or other complexities.
+It's important to note that [`Marten::Conf::Settings`](pathname:///api/0.6/Marten/Conf/Settings.html) subclasses have the flexibility to define any necessary methods to facilitate user configuration for the considered application. While basic settings typically necessitate only getters and setters for configuration, more intricate scenarios may demand additional methods, the utilization of blocks, or other complexities.

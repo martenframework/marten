@@ -23,7 +23,7 @@ Finally, it should be noted that using generic handlers is totally optional. The
 
 ### Performing a redirect
 
-Having a handler that performs a redirect can be easily achieved by subclassing the [`Marten::Handlers::Redirect`](pathname:///api/dev/Marten/Handlers/Redirect.html) generic handler. For example, you could easily define a handler that redirects to a `articles:list` route with the following snippet:
+Having a handler that performs a redirect can be easily achieved by subclassing the [`Marten::Handlers::Redirect`](pathname:///api/0.6/Marten/Handlers/Redirect.html) generic handler. For example, you could easily define a handler that redirects to a `articles:list` route with the following snippet:
 
 ```crystal
 class ArticlesRedirectHandler < Marten::Handlers::Redirect
@@ -59,7 +59,7 @@ end
 
 ### Rendering a template
 
-One of the most frequent things you will want to do when writing handlers is to return HTML responses containing rendered [templates](../templates.mdx). To do so, you can obviously define a regular handler and make use of the [`#render`](./introduction.md#render) helper. But, you may also want to leverage the [`Marten::Handlers::Template`](pathname:///api/dev/Marten/Handlers/Template.html) generic handler.
+One of the most frequent things you will want to do when writing handlers is to return HTML responses containing rendered [templates](../templates.mdx). To do so, you can obviously define a regular handler and make use of the [`#render`](./introduction.md#render) helper. But, you may also want to leverage the [`Marten::Handlers::Template`](pathname:///api/0.6/Marten/Handlers/Template.html) generic handler.
 
 This generic handler will return a 200 OK HTTP response containing a rendered HTML template. To make use of it, you can simply define a subclass of it and ensure that you call the `#template_name` class method in order to define the template that will be rendered:
 
@@ -87,7 +87,7 @@ Variables that are added to the global template context will automatically be av
 
 ### Displaying a model record
 
-It is possible to render a template that showcases a specific model record by leveraging the [`Marten::Handlers::RecordDetail`](pathname:///api/dev/Marten/Handlers/RecordDetail.html) generic handler.
+It is possible to render a template that showcases a specific model record by leveraging the [`Marten::Handlers::RecordDetail`](pathname:///api/0.6/Marten/Handlers/RecordDetail.html) generic handler.
 
 For example, it would be possible to render an `articles/detail.html` template showcasing a specific `Article` model record with the following handler:
 
@@ -111,7 +111,7 @@ For example, the template associated with this handler could be something like t
 
 ### Processing a form
 
-It is possible to use the [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html) generic handler in order to process form data with a [schema](../schemas.mdx).
+It is possible to use the [`Marten::Handlers::Schema`](pathname:///api/0.6/Marten/Handlers/Schema.html) generic handler in order to process form data with a [schema](../schemas.mdx).
 
 To do so, it is necessary:
 
@@ -145,5 +145,5 @@ By default, such a handler will render the configured template when the incoming
 If the schema is valid, a temporary redirect is issued by using the URL corresponding to the `#success_route_name` value (although it should be noted that the way to generate this success URL can be overridden by defining a `#success_url` method). By default, the handler does nothing when the processed schema is valid (except redirecting to the success URL).
 
 :::tip
-Handlers making use of the [`Marten::Handlers::Schema`](pathname:///api/dev/Marten/Handlers/Schema.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](./callbacks.md#schema-handler-callbacks) to learn more about those.
+Handlers making use of the [`Marten::Handlers::Schema`](pathname:///api/0.6/Marten/Handlers/Schema.html) generic handler can leverage additional types of callbacks. Please head over to [Schema handler callbacks](./callbacks.md#schema-handler-callbacks) to learn more about those.
 :::

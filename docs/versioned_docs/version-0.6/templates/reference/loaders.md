@@ -7,7 +7,7 @@ This page provides a reference for all the available template loaders that can b
 
 ## FileSystem Loader
 
-**Class**: [`Marten::Template::Loader::FileSystem`](pathname:///api/dev/Marten/Template/Loader/FileSystem.html)
+**Class**: [`Marten::Template::Loader::FileSystem`](pathname:///api/0.6/Marten/Template/Loader/FileSystem.html)
 
 Loads templates directly from the file system.
 
@@ -19,7 +19,7 @@ loader = Marten::Template::Loader::FileSystem.new("/path/to/templates")
 
 ## AppDirs Loader
 
-**Class**: [`Marten::Template::Loader::AppDirs`](pathname:///api/dev/Marten/Template/Loader/AppDirs.html)
+**Class**: [`Marten::Template::Loader::AppDirs`](pathname:///api/0.6/Marten/Template/Loader/AppDirs.html)
 
 Coordinates template loading from application directories. Relies on instances of FileSystem.
 
@@ -31,7 +31,7 @@ loader = Marten::Template::Loader::AppDirs.new
 
 ## Cached Loader
 
-**Class**: [`Marten::Template::Loader::Cached`](pathname:///api/dev/Marten/Template/Loader/Cached.html)
+**Class**: [`Marten::Template::Loader::Cached`](pathname:///api/0.6/Marten/Template/Loader/Cached.html)
 
 Provides a caching layer for compiled templates. Can wrap other loaders to optimize retrieval.
 

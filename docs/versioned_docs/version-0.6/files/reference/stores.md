@@ -9,7 +9,7 @@ description: File storages reference.
 
 A basic file system storage that stores files locally.
 
-This file storage is implemented as part of the [`Marten::Core::Storage::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) class. It ensures that files are persisted in the local file system, where the Marten application is running.
+This file storage is implemented as part of the [`Marten::Core::Storage::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html) class. It ensures that files are persisted in the local file system, where the Marten application is running.
 
 For example:
 

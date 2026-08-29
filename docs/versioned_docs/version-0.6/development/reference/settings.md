@@ -30,9 +30,9 @@ Default: `Marten::Cache::Store::Memory.new`
 
 The global cache store instance.
 
-This setting allows to configure the cache store returned by the [`Marten#cache`](pathname:///api/dev/Marten.html#cache%3ACache%3A%3AStore%3A%3ABase-class-method) method (which can be used to perform low-level caching operations), and which is also leveraged for other caching features such as template fragment caching. Please refer to [Caching](../../caching.mdx) to learn more about the caching features provided by Marten.
+This setting allows to configure the cache store returned by the [`Marten#cache`](pathname:///api/0.6/Marten.html#cache%3ACache%3A%3AStore%3A%3ABase-class-method) method (which can be used to perform low-level caching operations), and which is also leveraged for other caching features such as template fragment caching. Please refer to [Caching](../../caching.mdx) to learn more about the caching features provided by Marten.
 
-By default, the global cache store is set to be an in-memory cache (instance of [`Marten::Cache::Store::Memory`](pathname:///api/dev/Marten/Cache/Store/Memory.html)). In test environments you might want to use the "null store" by assigning an instance of the [`Marten::Cache::Store::Null](pathname:///api/dev/Marten/Cache/Store/Null.html) to this setting. Additional caching store shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your caching requirements. These backends are listed in the [caching stores backend reference](../../caching/reference/stores.md).
+By default, the global cache store is set to be an in-memory cache (instance of [`Marten::Cache::Store::Memory`](pathname:///api/0.6/Marten/Cache/Store/Memory.html)). In test environments you might want to use the "null store" by assigning an instance of the [`Marten::Cache::Store::Null](pathname:///api/0.6/Marten/Cache/Store/Null.html) to this setting. Additional caching store shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your caching requirements. These backends are listed in the [caching stores backend reference](../../caching/reference/stores.md).
 
 ### `date_input_formats`
 
@@ -95,7 +95,7 @@ The host the HTTP server running the application will be listening on.
 
 Default: `[] of Marten::Apps::Config.class`
 
-An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/dev/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications.md) to learn more about applications.
+An array of the installed app classes. Each Marten application must define a subclass of [`Marten::Apps::Config`](pathname:///api/0.6/Marten/Apps/Config.html). When those subclasses are specified in the `installed_apps` setting, the applications' models, migrations, assets, and templates will be made available to the considered project. Please refer to [Applications](../applications.md) to learn more about applications.
 
 ### `log_backend`
 
@@ -324,9 +324,9 @@ This setting is only used if `assets.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/0.6/Marten/Core/Storage/Base.html). This storage object will be used when collecting asset files to persist them in a given location.
 
-By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `assets.root` and `assets.url` setting values: in this situation, asset files are collected and persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that collected assets are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `assets.root` and `assets.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -334,7 +334,7 @@ A specific storage can be set instead to ensure that collected assets are persis
 
 Default: `"/assets/"`
 
-The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
+The base URL to use when exposing asset URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html) storage to construct asset URLs. For example, requesting a `css/App.css` asset might generate a `/assets/css/App.css` URL by default.
 
 :::info
 This setting is only used if `assets.storage` is `nil`.
@@ -448,9 +448,9 @@ Default: `Marten::HTTP::ContentSecurityPolicy.new`
 
 The default Content-Security-Policy object.
 
-This [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object will be used to set the Content-Security-Policy header when the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares.md#content-security-policy-middleware) middleware is used.
+This [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/0.6/Marten/HTTP/ContentSecurityPolicy.html) object will be used to set the Content-Security-Policy header when the [`Marten::Middleware::ContentSecurityPolicy`](../../handlers-and-http/reference/middlewares.md#content-security-policy-middleware) middleware is used.
 
-All the attributes that can be set on this [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object through the use of methods such as [`#default_src=`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html#default_src%3D(value%3AArray|Nil|String|Symbol|Tuple)-instance-method) or [`#frame_src=`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html#frame_src%3D(value%3AArray|Nil|String|Symbol|Tuple)-instance-method) can also be used directly on the `content_security_policy` setting object. For example:
+All the attributes that can be set on this [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/0.6/Marten/HTTP/ContentSecurityPolicy.html) object through the use of methods such as [`#default_src=`](pathname:///api/0.6/Marten/HTTP/ContentSecurityPolicy.html#default_src%3D(value%3AArray|Nil|String|Symbol|Tuple)-instance-method) or [`#frame_src=`](pathname:///api/0.6/Marten/HTTP/ContentSecurityPolicy.html#frame_src%3D(value%3AArray|Nil|String|Symbol|Tuple)-instance-method) can also be used directly on the `content_security_policy` setting object. For example:
 
 ```crystal
 config.content_security_policy.default_src = [:self, "other"]
@@ -491,7 +491,7 @@ config.database :other do |db|
 end
 ```
 
-Configuring other database backends such as MariaDB, MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). As such, you must define a block to configure the appropriate database options when calling the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString|Nil%3Dnil%2C%26)-instance-method) method. For example:
+Configuring other database backends such as MariaDB, MySQL or PostgreSQL usually involves specifying more connection parameters (eg. user, password, etc). As such, you must define a block to configure the appropriate database options when calling the [`#database`](pathname:///api/0.6/Marten/Conf/GlobalSettings.html#database(id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString|Nil%3Dnil%2C%26)-instance-method) method. For example:
 
 ```crystal
 config.database do |db|
@@ -503,7 +503,7 @@ config.database do |db|
 end
 ```
 
-It is worth mentioning that some cloud providers only provide a connection string in order to connect to a specific database (usually in a `DATABASE_URL` environment variable). In this situation, it is possible to automatically configure the database backend by providing the connection URL to the [`#database`](pathname:///api/dev/Marten/Conf/GlobalSettings.html#database%28id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString%7CNil%3Dnil%29-instance-method) method as well. This technique can be used for configuring both the default database and additional databases too. For example:
+It is worth mentioning that some cloud providers only provide a connection string in order to connect to a specific database (usually in a `DATABASE_URL` environment variable). In this situation, it is possible to automatically configure the database backend by providing the connection URL to the [`#database`](pathname:///api/0.6/Marten/Conf/GlobalSettings.html#database%28id%3DDB%3A%3AConnection%3A%3ADEFAULT_CONNECTION_NAME%2Curl%3AString%7CNil%3Dnil%29-instance-method) method as well. This technique can be used for configuring both the default database and additional databases too. For example:
 
 ```crystal
 # Default database
@@ -647,7 +647,7 @@ Default: `Marten::Emailing::Backend::Development.new`
 
 The backend to use when it comes to send emails. Emailing backends define _how_ emails are actually sent.
 
-By default, a development backend (instance of [`Marten::Emailing::Backend::Dev`](pathname:///api/dev/Marten/Emailing/Backend/Development.html)) is used: this backend "collects" all the emails that are "delivered" by default (which can be used in specs in order to test sent emails), but it can also be configured to print email details to the standard output if necessary (see the [emailing backend reference](../../emailing/reference/backends.md) for more details about this capability).
+By default, a development backend (instance of [`Marten::Emailing::Backend::Dev`](pathname:///api/0.6/Marten/Emailing/Backend/Development.html)) is used: this backend "collects" all the emails that are "delivered" by default (which can be used in specs in order to test sent emails), but it can also be configured to print email details to the standard output if necessary (see the [emailing backend reference](../../emailing/reference/backends.md) for more details about this capability).
 
 Additional emailing backend shards are also maintained under the umbrella of the Marten project or by the community itself and can be used as part of your application depending on your specific email sending requirements. These backends are listed in the [emailing backend reference](../../emailing/reference/backends.md#other-backends).
 
@@ -655,7 +655,7 @@ Additional emailing backend shards are also maintained under the umbrella of the
 
 Default: `"webmaster@localhost"`
 
-The default from address used in emails. Email definitions that don't specify a "from" address explicitly will use this email address automatically for the sender email. It should be noted that this from email address can be defined as a string or as a [`Marten::Emailing::Address`](pathname:///api/dev/Marten/Emailing/Address.html) object (which allows to specify the name AND the address of the sender email).
+The default from address used in emails. Email definitions that don't specify a "from" address explicitly will use this email address automatically for the sender email. It should be noted that this from email address can be defined as a string or as a [`Marten::Emailing::Address`](pathname:///api/0.6/Marten/Emailing/Address.html) object (which allows to specify the name AND the address of the sender email).
 
 ## I18n settings
 
@@ -746,9 +746,9 @@ This setting is only used if `media_files.storage` is `nil`.
 
 Default: `nil`
 
-An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/dev/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
+An optional storage object, which must be an instance of a subclass of [`Marten::Core::Store::Base`](pathname:///api/0.6/Marten/Core/Storage/Base.html). This storage object will be used when uploading files to persist them in a given location.
 
-By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
+By default, this setting value is set to `nil`, which means that a [`Marten::Core::Store::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html) storage is automatically constructed by using the `media_files.root` and `media_files.url` setting values: in this situation, media files are persisted in a local directory, and it is expected that they will be served from this directory by the web server running the application.
 
 A specific storage can be set instead to ensure that uploaded files are persisted somewhere else in the cloud and served from there (for example in an Amazon's S3 bucket). When this is the case, the `media_files.root` and `media_files.url` setting values are basically ignored and are overridden by the use of the specified storage.
 
@@ -756,7 +756,7 @@ A specific storage can be set instead to ensure that uploaded files are persiste
 
 Default: `"/media/"`
 
-The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
+The base URL to use when exposing media files URLs. This base URL will be used by the default [`Marten::Core::Store::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html) storage to construct media files URLs. For example, requesting a `foo/bar.txt` file might generate a `/media/foo/bar.txt` URL by default.
 
 :::info
 This setting is only used if `media_files.storage` is `nil`.
@@ -962,4 +962,4 @@ config.templates.loaders = [Marten::Template::Loader::FileSystem.new("/path/to/t
 
 Default: `false`
 
-A boolean allowing to enable or disable the [strict variables](../../templates/introduction.md#strict-variables) for templates. When this setting is set to `true`, unknown variables encountered in templates will result in [`Marten::Template::Errors::UnknownVariable`](pathname:///api/dev/Marten/Template/Errors/UnknownVariable.html) exceptions to be raised. When set to `false`, unknown variables will simply be treated as `nil` values in templates.
+A boolean allowing to enable or disable the [strict variables](../../templates/introduction.md#strict-variables) for templates. When this setting is set to `true`, unknown variables encountered in templates will result in [`Marten::Template::Errors::UnknownVariable`](pathname:///api/0.6/Marten/Template/Errors/UnknownVariable.html) exceptions to be raised. When set to `false`, unknown variables will simply be treated as `nil` values in templates.

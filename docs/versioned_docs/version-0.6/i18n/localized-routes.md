@@ -13,7 +13,7 @@ The features described below require the correct locale to be automatically acti
 
 Prefixing routes with locales allows to activate specific locales based on the accessed route paths when the [I18n middleware](../handlers-and-http/reference/middlewares.md#i18n-middleware) is used.
 
-Defining localized routes involves wrapping route path definitions by a call to the [`#localized`](pathname:///api/dev/Marten/Routing/Map.html#localized(prefix_default_locale%3Dtrue%2C%26)%3ANil-instance-method) method. When such routes are defined, the current locale will be automatically prepended to the path of the localized routes and the routes map will be able to resolve paths in a locale-aware manner.
+Defining localized routes involves wrapping route path definitions by a call to the [`#localized`](pathname:///api/0.6/Marten/Routing/Map.html#localized(prefix_default_locale%3Dtrue%2C%26)%3ANil-instance-method) method. When such routes are defined, the current locale will be automatically prepended to the path of the localized routes and the routes map will be able to resolve paths in a locale-aware manner.
 
 For example:
 
@@ -34,7 +34,7 @@ Marten.routes.draw do
 end
 ```
 
-After defining these routes, Marten automatically prepends the locale prefix to the paths of all routes included within the [`#localized`](pathname:///api/dev/Marten/Routing/Map.html#localized(prefix_default_locale%3Dtrue%2C%26)%3ANil-instance-method) method block.
+After defining these routes, Marten automatically prepends the locale prefix to the paths of all routes included within the [`#localized`](pathname:///api/0.6/Marten/Routing/Map.html#localized(prefix_default_locale%3Dtrue%2C%26)%3ANil-instance-method) method block.
 
 ```crystal
 I18n.activate("en")
@@ -63,7 +63,7 @@ The `#localized` method can only be used within your root routes map, defined in
 
 You can translate route paths whether or not they use [locale prefixes](#prefixing-routes-with-locales). Indeed, it is possible to define routes whose paths reference specific translation keys that map to predefined translations (translations which store the actual route paths for each locale).
 
-To do so, instead of specifying the paths of your routes as regular strings, you need to use the [`#t`](pathname:///api/dev/Marten/Routing/Map.html#t(path%3AString)%3ATranslatedPath-instance-method) method to specify a translation key that will dynamically be used to generate a route's path for a given locale. This method takes a single argument: the translation key that should be used to dynamically determine the path of the considered route.
+To do so, instead of specifying the paths of your routes as regular strings, you need to use the [`#t`](pathname:///api/0.6/Marten/Routing/Map.html#t(path%3AString)%3ATranslatedPath-instance-method) method to specify a translation key that will dynamically be used to generate a route's path for a given locale. This method takes a single argument: the translation key that should be used to dynamically determine the path of the considered route.
 
 For example, let's consider the following [translation file](./introduction.md#defining-translations):
 
@@ -107,7 +107,7 @@ end
 ```
 
 :::warning
-When using translated paths, the entirety of the path **must** be defined in locale files (including [route parameters](../handlers-and-http/routing.md#specifying-route-parameters)). As such, interpolating the return values of the [`#t`](pathname:///api/dev/Marten/Routing/Map.html#t(path%3AString)%3ATranslatedPath-instance-method) method is not allowed and will result in `Marten::Routing::Errors::InvalidRouteMap` exceptions to be raised. For example, the following route is not permitted:
+When using translated paths, the entirety of the path **must** be defined in locale files (including [route parameters](../handlers-and-http/routing.md#specifying-route-parameters)). As such, interpolating the return values of the [`#t`](pathname:///api/0.6/Marten/Routing/Map.html#t(path%3AString)%3ATranslatedPath-instance-method) method is not allowed and will result in `Marten::Routing::Errors::InvalidRouteMap` exceptions to be raised. For example, the following route is not permitted:
 
 ```crystal
   path "#{t("routes.articles.detail")}/<pk:int>", ArticleDetailHandler, name: "detail"

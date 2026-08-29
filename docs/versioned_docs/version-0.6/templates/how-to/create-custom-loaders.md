@@ -8,7 +8,7 @@ Marten has built-in support for [common template loaders](../reference/loaders.m
 
 ## Defining a template loaders
 
-Template loaders are subclasses of the [`Marten::Template::Loader::Base`](pathname:///api/dev/Marten/Template/Loader/Base.html) abstract class. They must implement a single `#get_template_source` method: this method returns the raw content of a template from a provided template name.
+Template loaders are subclasses of the [`Marten::Template::Loader::Base`](pathname:///api/0.6/Marten/Template/Loader/Base.html) abstract class. They must implement a single `#get_template_source` method: this method returns the raw content of a template from a provided template name.
 
 For example, rendering the template `content.html` with a file system loader initialised with `Marten::Template::Loader::FileSystem.new("/app/custom_dir/templates")` would return the content defined in `/app/custom_dir/templates/content.html`.
 

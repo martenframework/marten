@@ -40,7 +40,7 @@ end
 
 ### `before_deliver`
 
-`before_deliver` callbacks are executed _before_ an email is delivered (as part of the email's [`#deliver`](pathname:///api/dev/Marten/Emailing/Email.html#deliver-instance-method) method). For example, this capability can be leveraged to mutate the considered email instance before the actual email gets delivered:
+`before_deliver` callbacks are executed _before_ an email is delivered (as part of the email's [`#deliver`](pathname:///api/0.6/Marten/Emailing/Email.html#deliver-instance-method) method). For example, this capability can be leveraged to mutate the considered email instance before the actual email gets delivered:
 
 ```crystal
 class WelcomeEmail < Marten::Email
@@ -62,7 +62,7 @@ end
 
 ### `after_deliver`
 
-`after_deliver` callbacks are executed _after_ an email is delivered (as part of the email's [`#deliver`](pathname:///api/dev/Marten/Emailing/Email.html#deliver-instance-method) method). For example, such callbacks can be leveraged to increment email-specific metrics:
+`after_deliver` callbacks are executed _after_ an email is delivered (as part of the email's [`#deliver`](pathname:///api/0.6/Marten/Emailing/Email.html#deliver-instance-method) method). For example, such callbacks can be leveraged to increment email-specific metrics:
 
 ```crystal
 require "statsd"
@@ -88,7 +88,7 @@ end
 
 ### `before_render`
 
-`before_render` callbacks are invoked prior to rendering a template when generating the HTML or text body of the email. This means that these callbacks are executed when calling either the [`#deliver`](pathname:///api/dev/Marten/Emailing/Email.html#deliver-instance-method), [`#html_body`](pathname:///api/dev/Marten/Emailing/Email.html#html_body%3AString|Nil-instance-method), or [`#text_body`](pathname:///api/dev/Marten/Emailing/Email.html#text_body%3AString|Nil-instance-method) methods.
+`before_render` callbacks are invoked prior to rendering a template when generating the HTML or text body of the email. This means that these callbacks are executed when calling either the [`#deliver`](pathname:///api/0.6/Marten/Emailing/Email.html#deliver-instance-method), [`#html_body`](pathname:///api/0.6/Marten/Emailing/Email.html#html_body%3AString|Nil-instance-method), or [`#text_body`](pathname:///api/0.6/Marten/Emailing/Email.html#text_body%3AString|Nil-instance-method) methods.
 
 Typically, these callbacks can be used to add new variables to the global email template context, in order to make them available to the template runtime. This can be useful if your email has some instance variables that you want to expose to your email template. For example:
 

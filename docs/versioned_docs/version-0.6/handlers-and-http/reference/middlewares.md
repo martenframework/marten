@@ -7,9 +7,9 @@ This page provides a reference for all the available [middlewares](../middleware
 
 ## Asset serving middleware
 
-**Class:** [`Marten::Middleware::AssetServing`](pathname:///api/dev/Marten/Middleware/AssetServing.html)
+**Class:** [`Marten::Middleware::AssetServing`](pathname:///api/0.6/Marten/Middleware/AssetServing.html)
 
-The purpose of this middleware is to handle the distribution of collected assets, which are stored under the configured assets root ([`assets.root`](../../development/reference/settings.md#root) setting). The assumption is that these assets have been "collected" using the [`collectassets`](../../development/reference/management-commands.md#collectassets) management command and that the file system storage ([`Marten::Core::Storage::FileSystem`](pathname:///api/dev/Marten/Core/Storage/FileSystem.html)) is being used.
+The purpose of this middleware is to handle the distribution of collected assets, which are stored under the configured assets root ([`assets.root`](../../development/reference/settings.md#root) setting). The assumption is that these assets have been "collected" using the [`collectassets`](../../development/reference/management-commands.md#collectassets) management command and that the file system storage ([`Marten::Core::Storage::FileSystem`](pathname:///api/0.6/Marten/Core/Storage/FileSystem.html)) is being used.
 
 Additionally, the [`assets.url`](../../development/reference/settings.md#url) setting must either align with the domain of your Marten application or correspond to a relative URL path, such as `/assets/`. This ensures proper mapping and accessibility of the assets within your application (so that they can be served by this middleware).
 
@@ -25,27 +25,27 @@ This middleware is provided to make it easy to serve assets in situations where 
 
 ## Content-Security-Policy middleware
 
-**Class:** [`Marten::Middleware::ContentSecurityPolicy`](pathname:///api/dev/Marten/Middleware/ContentSecurityPolicy.html)
+**Class:** [`Marten::Middleware::ContentSecurityPolicy`](pathname:///api/0.6/Marten/Middleware/ContentSecurityPolicy.html)
 
 This middleware guarantees the presence of the Content-Security-Policy header in the response's headers. This header provides clients with the ability to limit the allowed sources of different types of content.
 
-By default, the middleware will include a Content-Security-Policy header that corresponds to the policy defined in the [`content_security_policy`](../../development/reference/settings.md#content-security-policy-settings) settings. However, if a [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/dev/Marten/HTTP/ContentSecurityPolicy.html) object is explicitly assigned to the request object, it will take precedence over the default policy and be used instead.
+By default, the middleware will include a Content-Security-Policy header that corresponds to the policy defined in the [`content_security_policy`](../../development/reference/settings.md#content-security-policy-settings) settings. However, if a [`Marten::HTTP::ContentSecurityPolicy`](pathname:///api/0.6/Marten/HTTP/ContentSecurityPolicy.html) object is explicitly assigned to the request object, it will take precedence over the default policy and be used instead.
 
 Please refer to [Content Security Policy](../../security/content-security-policy.md) to learn more about the Content-Security-Policy header and how to configure it.
 
 ## Flash middleware
 
-**Class:** [`Marten::Middleware::Flash`](pathname:///api/dev/Marten/Middleware/Flash.html)
+**Class:** [`Marten::Middleware::Flash`](pathname:///api/0.6/Marten/Middleware/Flash.html)
 
 Enables the use of [flash messages](../introduction.md#using-the-flash-store).
 
 When this middleware is used, each request will have a flash store initialized and populated from the request's session store. This flash store is a hash-like object that allows to fetch or set values that are associated with specific keys, and that will only be available to the next request (after that they are cleared out).
 
-The flash store depends on the presence of a working session store. As such, the [Session middleware](#session-middleware) MUST be used along with this middleware. Moreover, this middleware must be placed _after_ the [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html) in the [`middleware`](../../development/reference/settings.md#middleware) setting.
+The flash store depends on the presence of a working session store. As such, the [Session middleware](#session-middleware) MUST be used along with this middleware. Moreover, this middleware must be placed _after_ the [`Marten::Middleware::Session`](pathname:///api/0.6/Marten/Middleware/Session.html) in the [`middleware`](../../development/reference/settings.md#middleware) setting.
 
 ## GZip middleware
 
-**Class:** [`Marten::Middleware::GZip`](pathname:///api/dev/Marten/Middleware/GZip.html)
+**Class:** [`Marten::Middleware::GZip`](pathname:///api/0.6/Marten/Middleware/GZip.html)
 
 Compresses the content of the response if the browser supports GZip compression.
 
@@ -59,7 +59,7 @@ The GZip middleware incorporates a mitigation strategy against the [BREACH attac
 
 ## I18n middleware
 
-**Class:** [`Marten::Middleware::I18n`](pathname:///api/dev/Marten/Middleware/I18n.html)
+**Class:** [`Marten::Middleware::I18n`](pathname:///api/0.6/Marten/Middleware/I18n.html)
 
 Activates the right I18n locale based on incoming requests.
 
@@ -69,7 +69,7 @@ Additionally, if (and only if) [localized routes](../../i18n/localized-routes.md
 
 ## Method Override middleware
 
-**Class:** [`Marten::Middleware::MethodOverride`](pathname:///api/dev/Marten/Middleware/MethodOverride.html)
+**Class:** [`Marten::Middleware::MethodOverride`](pathname:///api/0.6/Marten/Middleware/MethodOverride.html)
 
 This middleware enables support for overriding HTTP methods in HTML forms that natively only support GET and POST. It does this by inspecting requests and looking for a `_method` parameter, allowing to simulate methods like  PUT, DELETE, and others. It's also possible to change the parameter name and the allowed override methods in the [method override configuration](../../development/reference/settings.md#method-overriding-settings).
 
@@ -92,7 +92,7 @@ The middleware should be placed as far as possible at the beginning of the array
 
 ## Referrer-Policy middleware
 
-**Class:** [`Marten::Middleware::ReferrerPolicy`](pathname:///api/dev/Marten/Middleware/ReferrerPolicy.html)
+**Class:** [`Marten::Middleware::ReferrerPolicy`](pathname:///api/0.6/Marten/Middleware/ReferrerPolicy.html)
 
 Sets the [Referrer-Policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy) header in the response if it wasn't already set.
 
@@ -100,7 +100,7 @@ When this middleware is used, a Referrer-Policy header will be inserted into the
 
 ## Session middleware
 
-**Class:** [`Marten::Middleware::Session`](pathname:///api/dev/Marten/Middleware/Session.html)
+**Class:** [`Marten::Middleware::Session`](pathname:///api/0.6/Marten/Middleware/Session.html)
 
 Enables the use of [sessions](../sessions.md).
 
@@ -110,7 +110,7 @@ The session store is initialized from a session key that is stored as a regular 
 
 ## SSL redirect middleware
 
-**Class:** [`Marten::Middleware::SSLRedirect`](pathname:///api/dev/Marten/Middleware/SSLRedirect.html)
+**Class:** [`Marten::Middleware::SSLRedirect`](pathname:///api/0.6/Marten/Middleware/SSLRedirect.html)
 
 Redirects all non-HTTPS requests to HTTPS.
 
@@ -118,7 +118,7 @@ This middleware will permanently redirect all non-HTTP requests to HTTPS. By def
 
 ## Strict-Transport-Security middleware
 
-**Class:** [`Marten::Middleware::StrictTransportSecurity`](pathname:///api/dev/Marten/Middleware/StrictTransportSecurity.html)
+**Class:** [`Marten::Middleware::StrictTransportSecurity`](pathname:///api/0.6/Marten/Middleware/StrictTransportSecurity.html)
 
 Sets the Strict-Transport-Security header in the response if it wasn't already set.
 
@@ -134,7 +134,7 @@ This is why the value of the [`strict_security_policy.max_age`](../../developmen
 
 ## X-Frame-Options middleware
 
-**Class:** [`Marten::Middleware::XFrameOptions`](pathname:///api/dev/Marten/Middleware/XFrameOptions.html)
+**Class:** [`Marten::Middleware::XFrameOptions`](pathname:///api/0.6/Marten/Middleware/XFrameOptions.html)
 
 Sets the X-Frame-Options header in the response if it wasn't already set.
 

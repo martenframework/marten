@@ -145,7 +145,7 @@ other_query_set = Book.all.annotate do
 end
 ```
 
-Each of the specified annotations is then available for further use in the query set (in order to filter or order the records). The annotations are also available in retrieved model records via the [`#annotations`](pathname:///api/dev/Marten/DB/Model.html#annotations%3AHash(String%2CBool|File|Float32|Float64|Int32|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3ADB%3A%3AField%3A%3AFile%3A%3AFile|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Symbol|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method, which returns a hash containing the annotations as keys and their values as values.
+Each of the specified annotations is then available for further use in the query set (in order to filter or order the records). The annotations are also available in retrieved model records via the [`#annotations`](pathname:///api/0.6/Marten/DB/Model.html#annotations%3AHash(String%2CBool|File|Float32|Float64|Int32|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3ADB%3A%3AField%3A%3AFile%3A%3AFile|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Symbol|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method, which returns a hash containing the annotations as keys and their values as values.
 
 Those are the supported annotation types:
 
@@ -315,7 +315,7 @@ Author.prefetch(:books__genres, :publisher)
 
 Returns a raw query set for the passed SQL query and optional parameters.
 
-This method returns a [`Marten::DB::Query::RawSet`](pathname:///api/dev/Marten/DB/Query/RawSet.html) object, which allows to iterate over the model records matched by the passed SQL query. For example:
+This method returns a [`Marten::DB::Query::RawSet`](pathname:///api/0.6/Marten/DB/Query/RawSet.html) object, which allows to iterate over the model records matched by the passed SQL query. For example:
 
 ```crystal
 Article.all.raw("SELECT * FROM articles")

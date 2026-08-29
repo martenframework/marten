@@ -105,10 +105,10 @@ By leveraging the test client, you can easily simulate various requests (eg. GET
 
 #### A simple example
 
-To use the test client, you can either initialize a [`Marten::Spec::Client`](pathname:///api/dev/Marten/Spec/Client.html) object or make use of the per-spec test client that is provided by the [`Marten::Spec#client`](pathname:///api/dev/Marten/Spec.html#client%3AClient-class-method) method. Initializing new [`Marten::Spec::Client`](pathname:///api/dev/Marten/Spec.html#client%3AClient-class-method) objects allow you to set client-wide properties, like a default content type.
+To use the test client, you can either initialize a [`Marten::Spec::Client`](pathname:///api/0.6/Marten/Spec/Client.html) object or make use of the per-spec test client that is provided by the [`Marten::Spec#client`](pathname:///api/0.6/Marten/Spec.html#client%3AClient-class-method) method. Initializing new [`Marten::Spec::Client`](pathname:///api/0.6/Marten/Spec.html#client%3AClient-class-method) objects allow you to set client-wide properties, like a default content type.
 
 :::info
-Note that the client returned by the [`Marten::Spec#client`](pathname:///api/dev/Marten/Spec.html#client%3AClient-class-method) method is memoized and is reset after _each_ spec execution.
+Note that the client returned by the [`Marten::Spec#client`](pathname:///api/0.6/Marten/Spec.html#client%3AClient-class-method) method is memoized and is reset after _each_ spec execution.
 :::
 
 Let's have a look at a simple way to use the test client and verify the corresponding responses:
@@ -127,7 +127,7 @@ end
 ```
 
 :::tip
-In the above example we are simply specifying a "raw" path by hardcoding its value. In a real scenario, you will likely want to [resolve your handler URLs](../handlers-and-http/routing.md#reverse-url-resolutions) using the [`Marten::Routing::Map#reverse`](pathname:///api/dev/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method of the main routes map (that way, you don't hardcode route paths in your specs). For example
+In the above example we are simply specifying a "raw" path by hardcoding its value. In a real scenario, you will likely want to [resolve your handler URLs](../handlers-and-http/routing.md#reverse-url-resolutions) using the [`Marten::Routing::Map#reverse`](pathname:///api/0.6/Marten/Routing/Map.html#reverse(name%3AString|Symbol%2Cparams%3AHash(String|Symbol%2CParameter%3A%3ATypes))-instance-method) method of the main routes map (that way, you don't hardcode route paths in your specs). For example
 
 ```crystal
 url = Marten.routes.reverse("article_detail", pk: 42)
@@ -135,12 +135,12 @@ response = Marten::Spec.client.get(url, query_params: {"foo" => "bar"})
 ```
 :::
 
-Here we are simply issuing a GET request (by leveraging the [`#get`](pathname:///api/dev/Marten/Spec/Client.html#get(path%3AString%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method) test client method) and testing the obtained response. A few things can be noted:
+Here we are simply issuing a GET request (by leveraging the [`#get`](pathname:///api/0.6/Marten/Spec/Client.html#get(path%3AString%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method) test client method) and testing the obtained response. A few things can be noted:
 
 * The test client does not require your project's server to be running: internally it uses a lightweight server handlers chain that ensures that your project's middlewares are applied and that the URL you requested is resolved and mapped to the right handler
 * Only the path to the handler needs to be specified when issuing requests (eg. `/foo/bar`)
 
-Note that you can also issue other types of requests by leveraging methods like [`#post`](pathname:///api/dev/Marten/Spec/Client.html#post(path%3AString%2Cdata%3AHash|NamedTuple|Nil|String%3Dnil%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method), [`#put`](pathname:///api/dev/Marten/Spec/Client.html#put(path%3AString%2Cdata%3AHash|NamedTuple|Nil|String%3Dnil%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method), or [`#delete`](pathname:///api/dev/Marten/Spec/Client.html#delete(path%3AString%2Cdata%3AHash|NamedTuple|Nil|String%3Dnil%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method). For example:
+Note that you can also issue other types of requests by leveraging methods like [`#post`](pathname:///api/0.6/Marten/Spec/Client.html#post(path%3AString%2Cdata%3AHash|NamedTuple|Nil|String%3Dnil%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method), [`#put`](pathname:///api/0.6/Marten/Spec/Client.html#put(path%3AString%2Cdata%3AHash|NamedTuple|Nil|String%3Dnil%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method), or [`#delete`](pathname:///api/0.6/Marten/Spec/Client.html#delete(path%3AString%2Cdata%3AHash|NamedTuple|Nil|String%3Dnil%2Cquery_params%3AHash|NamedTuple|Nil%3Dnil%2Ccontent_type%3AString|Nil%3Dnil%2Cheaders%3AHash|NamedTuple|Nil%3Dnil%2Csecure%3Dfalse)%3AMarten%3A%3AHTTP%3A%3AResponse-instance-method). For example:
 
 ```crystal
 describe MySchemaHandler do
@@ -156,12 +156,12 @@ end
 ```
 
 :::info
-By default, CSRF checks are disabled for requests issued by the test client. If for some reasons you need to ensure that those are enabled, you can initialize a [`Marten::Spec::Client`](pathname:///api/dev/Marten/Spec/Client.html) object with `disable_request_forgery_protection: false`.
+By default, CSRF checks are disabled for requests issued by the test client. If for some reasons you need to ensure that those are enabled, you can initialize a [`Marten::Spec::Client`](pathname:///api/0.6/Marten/Spec/Client.html) object with `disable_request_forgery_protection: false`.
 :::
 
 #### Introspecting responses
 
-Responses returned by the test client are instances of the standard [`Marten::HTTP::Response`](pathname:///api/dev/Marten/HTTP/Response.html) class. As such you can easily access response attributes such as the status code, the content and content type, cookies, and headers in your specs in order to verify that the expected response was returned by your handler.
+Responses returned by the test client are instances of the standard [`Marten::HTTP::Response`](pathname:///api/0.6/Marten/HTTP/Response.html) class. As such you can easily access response attributes such as the status code, the content and content type, cookies, and headers in your specs in order to verify that the expected response was returned by your handler.
 
 #### Exceptions
 
@@ -169,9 +169,9 @@ It is important to note that exceptions raised in your handlers will be visible 
 
 #### Session and cookies
 
-Test clients are always stateful: if a handler sets a cookie in the returned response, then this cookie will be stored in the client's cookie store (available via the [`#cookies`](pathname:///api/dev/Marten/Spec/Client.html#cookies-instance-method) method) and will be automatically sent for subsequent requests issued by the client.
+Test clients are always stateful: if a handler sets a cookie in the returned response, then this cookie will be stored in the client's cookie store (available via the [`#cookies`](pathname:///api/0.6/Marten/Spec/Client.html#cookies-instance-method) method) and will be automatically sent for subsequent requests issued by the client.
 
-The same goes for session values: such values can be set using the session store returned by the [`#sessions`](pathname:///api/dev/Marten/Spec/Client.html#session-instance-method) client method. If you set session values in this store prior to any request, the matched handler will have access to them and the new values that are set by the handler will be available for further inspection once the response is returned. These session values are also maintained between requests issued by a single client.
+The same goes for session values: such values can be set using the session store returned by the [`#sessions`](pathname:///api/0.6/Marten/Spec/Client.html#session-instance-method) client method. If you set session values in this store prior to any request, the matched handler will have access to them and the new values that are set by the handler will be available for further inspection once the response is returned. These session values are also maintained between requests issued by a single client.
 
 For example:
 
@@ -232,7 +232,7 @@ Marten.configure :test do |config|
 end
 ```
 
-Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`Marten::Spec#delivered_emails`](pathname:///api/dev/Marten/Spec.html#delivered_emails%3AArray(Emailing%3A%3AEmail)-class-method) method, which returns an array of [`Marten::Email`](pathname:///api/dev/Marten/Emailing/Email.html) instances. For example:
+Doing so will ensure that all sent emails are "collected" for further inspection. You can easily retrieve collected emails by calling the [`Marten::Spec#delivered_emails`](pathname:///api/0.6/Marten/Spec.html#delivered_emails%3AArray(Emailing%3A%3AEmail)-class-method) method, which returns an array of [`Marten::Email`](pathname:///api/0.6/Marten/Emailing/Email.html) instances. For example:
 
 ```crystal
 describe MyObject do

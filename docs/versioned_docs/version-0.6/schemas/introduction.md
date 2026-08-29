@@ -10,7 +10,7 @@ Schemas are classes that define how input data should be serialized/deserialized
 
 ### The schema class
 
-A schema class describes an _expected_ set of data. It describes the logical structure of this data, what are its expected characteristics, and what are the rules to use in order to identify whether it is valid or not. Schemas classes must inherit from the [`Marten::Schema`](pathname:///api/dev/Marten/Schema.html) base class and they must define "fields" through the use of a `field` macro. These fields allow to define what data is expected by the schema, and how it is validated.
+A schema class describes an _expected_ set of data. It describes the logical structure of this data, what are its expected characteristics, and what are the rules to use in order to identify whether it is valid or not. Schemas classes must inherit from the [`Marten::Schema`](pathname:///api/0.6/Marten/Schema.html) base class and they must define "fields" through the use of a `field` macro. These fields allow to define what data is expected by the schema, and how it is validated.
 
 For example, the following snippet defines a simple `ArticleSchema` schema:
 
@@ -64,7 +64,7 @@ end
 Let's break it down a bit more:
 
 * when the incoming request is a `GET`, the handler will simply render the `article_create.html` template, and initialize the schema (instance of `ArticleSchema`) with any data currently present in the request object (which is returned by the `#request` method). This schema object is made available to the template context
-* when the incoming request is a `POST`, it will initialize the schema and try to see if it is valid considering the incoming data (using the [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) method). If it's valid, then a new `Article` record will be created using the schema's validated data ([`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method)), and the user will be redirect to a home page. Otherwise, the `article_create.html` template will be rendered again with the invalid schema in the associated context
+* when the incoming request is a `POST`, it will initialize the schema and try to see if it is valid considering the incoming data (using the [`#valid?`](pathname:///api/0.6/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) method). If it's valid, then a new `Article` record will be created using the schema's validated data ([`#validated_data`](pathname:///api/0.6/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method)), and the user will be redirect to a home page. Otherwise, the `article_create.html` template will be rendered again with the invalid schema in the associated context
 
 
 :::tip
@@ -212,13 +212,13 @@ class SignUpSchema < Marten::Schema
 end
 ```
 
-Schema validations are always triggered by the use of the [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/dev/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) methods: these methods return `true` or `false` depending on whether the data is valid or invalid.
+Schema validations are always triggered by the use of the [`#valid?`](pathname:///api/0.6/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/0.6/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) methods: these methods return `true` or `false` depending on whether the data is valid or invalid.
 
 Please head over to the [Schema validations](./validations.md) guide in order to learn more about schema validations and how to customize it.
 
 ## Accessing validated data
 
-After performing [schema validations](#validations) (ie. after calling [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/dev/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) on a schema object), accessing the validated data is often necessary. For instance, you may need to persist the validated data as part of a model record. To achieve this, you can make use of the [`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method, which is accessible in all schema instances.
+After performing [schema validations](#validations) (ie. after calling [`#valid?`](pathname:///api/0.6/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/0.6/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) on a schema object), accessing the validated data is often necessary. For instance, you may need to persist the validated data as part of a model record. To achieve this, you can make use of the [`#validated_data`](pathname:///api/0.6/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) method, which is accessible in all schema instances.
 
 This method provides access to a hash that contains the deserialized and validated field values of the schema. For instance, let's consider the example of the `ArticleSchema` schema [mentioned earlier](#the-schema-class):
 
@@ -230,7 +230,7 @@ schema.validated_data["title"]   # => "Test article"
 schema.validated_data["content"] # => "Test content"
 ```
 
-It is important to note that accessing values using [`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) as shown in the above example is not type-safe. The [`#validated_data`](pathname:///api/dev/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) hash can return any supported schema field values, and as a result, you may need to utilize the [`#as`](https://crystal-lang.org/reference/syntax_and_semantics/as.html) pseudo-method to handle the fetched validated data appropriately, depending on how and where you intend to use it.
+It is important to note that accessing values using [`#validated_data`](pathname:///api/0.6/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) as shown in the above example is not type-safe. The [`#validated_data`](pathname:///api/0.6/Marten/Schema.html#validated_data%3AHash(String%2CBool|Float64|Int64|JSON%3A%3AAny|JSON%3A%3ASerializable|Marten%3A%3AHTTP%3A%3AUploadedFile|String|Time|Time%3A%3ASpan|UUID|Nil)-instance-method) hash can return any supported schema field values, and as a result, you may need to utilize the [`#as`](https://crystal-lang.org/reference/syntax_and_semantics/as.html) pseudo-method to handle the fetched validated data appropriately, depending on how and where you intend to use it.
 
 To palliate this, Marten automatically defines type-safe methods that you can utilize to access your validated schema field values:
 
@@ -278,4 +278,4 @@ class ArticleSchema < Marten::Schema
 end
 ```
 
-The use of methods like [`#valid?`](pathname:///api/dev/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/dev/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) will trigger validation callbacks. See [Schema validations](./validations.md) for more details.
+The use of methods like [`#valid?`](pathname:///api/0.6/Marten/Core/Validation.html#valid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) or [`#invalid?`](pathname:///api/0.6/Marten/Core/Validation.html#invalid%3F(context%3ANil|String|Symbol%3Dnil)-instance-method) will trigger validation callbacks. See [Schema validations](./validations.md) for more details.

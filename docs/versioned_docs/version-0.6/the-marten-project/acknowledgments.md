@@ -27,7 +27,7 @@ The Marten web framework is also inspired by [Ruby on Rails](https://rubyonrails
 
 * The [generic validation DSL](../models-and-databases/validations.md)
 * Most [model callbacks](../models-and-databases/callbacks.md)
-* The idea of [message encryptors](pathname:///api/dev/Marten/Core/Encryptor.html) and [message signers](pathname:///api/dev/Marten/Core/Signer.html)
+* The idea of [message encryptors](pathname:///api/0.6/Marten/Core/Encryptor.html) and [message signers](pathname:///api/0.6/Marten/Core/Signer.html)
 
 ### But also...
 

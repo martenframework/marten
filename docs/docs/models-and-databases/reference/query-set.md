@@ -561,6 +561,24 @@ Post.all.each do |post|
 end
 ```
 
+### `each_batch`
+
+Iterates over the records targeted by the current query set in batches.
+
+This method allows processing large query sets without loading all the matching records into memory at once. Each batch is fetched from the database separately using a primary key cursor and passed to the provided block as an array of records. For example:
+
+```crystal
+Post.all.each_batch(500) do |posts|
+  posts.each do |post|
+    # Do something with the post
+  end
+end
+```
+
+An optional `batch_size` argument can be passed to specify the number of records that should be fetched per batch. It defaults to `1000`. Records are always processed in ascending primary key order, regardless of any existing query set ordering.
+
+Note that this method does not populate the query set's result cache.
+
 ### `exists?`
 
 Returns `true` if the current query set matches at least one record, or `false` otherwise.

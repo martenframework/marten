@@ -492,6 +492,57 @@ module Marten
           end
         end
 
+        # Iterates over the records targeted by the query set in batches.
+        #
+        # This method allows processing large query sets without loading all the matching records into memory at once.
+        # Each batch is fetched from the database separately using a primary key cursor and passed to the provided block
+        # as an array of records. Records are always processed in ascending primary key order, regardless of any
+        # existing query set ordering. For example:
+        #
+        # ```
+        # Post.all.each_batch(500) do |posts|
+        #   posts.each do |post|
+        #     # Do something with the post
+        #   end
+        # end
+        # ```
+        #
+        # By default, batches contain up to 1000 records.
+        #
+        # Note that this method does not populate the query set's result cache.
+        def each_batch(batch_size : Int32 = DEFAULT_BATCH_SIZE, &)
+          if batch_size < 1
+            raise ArgumentError.new("Batch size must be greater than 1")
+          end
+
+          if query.sliced?
+            raise Errors::UnmetQuerySetCondition.new("Batching sliced queries is not supported")
+          end
+
+          if !@result_cache.nil?
+            @result_cache.not_nil!.each_slice(batch_size) do |batch|
+              yield batch
+            end
+
+            return
+          end
+
+          last_pk = nil
+
+          loop do
+            batch_qs = last_pk.nil? ? self : filter(pk__gt: last_pk)
+            batch = batch_qs.order(Constants::PRIMARY_KEY_ALIAS).limit(batch_size).to_a
+
+            break if batch.empty?
+
+            yield batch
+
+            break if batch.size < batch_size
+
+            last_pk = batch.last.pk!
+          end
+        end
+
         # Returns a query set whose records do not match the given set of filters.
         #
         # This method returns a `Marten::DB::Query::Set` object. The filters passed to this method method must be
@@ -1781,8 +1832,9 @@ module Marten
           bulk_create(prepared_objects.as(Array(M)), batch_size)
         end
 
-        private INSPECT_RESULTS_LIMIT = 20
-        private GET_RESULTS_LIMIT     = 20
+        private DEFAULT_BATCH_SIZE    = 1000
+        private INSPECT_RESULTS_LIMIT =   20
+        private GET_RESULTS_LIMIT     =   20
 
         private def add_query_node(query_node)
           qs = clone

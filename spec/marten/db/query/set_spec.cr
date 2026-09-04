@@ -1191,6 +1191,94 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#each_batch" do
+    it "allows to iterate over the records targeted by the query set in batches if it wasn't already fetched" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+      tag_4 = Tag.create!(name: "tag-4", is_active: true)
+      tag_5 = Tag.create!(name: "tag-5", is_active: true)
+
+      batches = [] of Array(Tag)
+      qset = Marten::DB::Query::Set(Tag).new
+
+      qset.each_batch(2) do |batch|
+        batches << batch
+      end
+
+      batches.flatten.sort_by!(&.pk!.to_s).should eq [tag_1, tag_2, tag_3, tag_4, tag_5].sort_by(&.pk!.to_s)
+      batches.map(&.size).should eq [2, 2, 1]
+      qset.result_cache.should be_nil
+    end
+
+    it "allows to iterate over the records targeted by the query set in batches if it was already fetched" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      tag_2 = Tag.create!(name: "tag-2", is_active: true)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+
+      batches = [] of Array(Tag)
+      qset = Marten::DB::Query::Set(Tag).new.order(:id)
+      qset.to_a
+
+      qset.each_batch(2) do |batch|
+        batches << batch
+      end
+
+      batches.flatten.should eq [tag_1, tag_2, tag_3]
+      batches.map(&.size).should eq [2, 1]
+    end
+
+    it "processes records in primary key order regardless of the query set ordering" do
+      tag_1 = Tag.create!(name: "zebra", is_active: true)
+      tag_2 = Tag.create!(name: "alpha", is_active: true)
+      tag_3 = Tag.create!(name: "middle", is_active: true)
+
+      batches = [] of Array(Tag)
+
+      Marten::DB::Query::Set(Tag).new.order(:name).each_batch(2) do |batch|
+        batches << batch
+      end
+
+      batches.flatten.sort_by!(&.pk!.to_s).should eq [tag_1, tag_2, tag_3].sort_by(&.pk!.to_s)
+    end
+
+    it "respects the query set filters when batching" do
+      tag_1 = Tag.create!(name: "tag-1", is_active: true)
+      Tag.create!(name: "tag-2", is_active: false)
+      tag_3 = Tag.create!(name: "tag-3", is_active: true)
+
+      batches = [] of Array(Tag)
+
+      Marten::DB::Query::Set(Tag).new.filter(is_active: true).each_batch(1) do |batch|
+        batches << batch
+      end
+
+      batches.flatten.sort_by!(&.pk!.to_s).should eq [tag_1, tag_3].sort_by(&.pk!.to_s)
+    end
+
+    it "does not yield any batch if the query set is empty" do
+      batches = [] of Array(Tag)
+
+      Marten::DB::Query::Set(Tag).new.each_batch(2) do |batch|
+        batches << batch
+      end
+
+      batches.should be_empty
+    end
+
+    it "raises an error if the batch size is less than 1" do
+      expect_raises(ArgumentError, "Batch size must be greater than 1") do
+        Marten::DB::Query::Set(Tag).new.each_batch(0) { }
+      end
+    end
+
+    it "raises an error if the query set is sliced" do
+      expect_raises(Marten::DB::Errors::UnmetQuerySetCondition, "Batching sliced queries is not supported") do
+        Marten::DB::Query::Set(Tag).new.limit(10).each_batch(2) { }
+      end
+    end
+  end
+
   describe "#each" do
     it "allows to iterate over the records targeted by the query set if it wasn't already fetched" do
       Tag.create!(name: "ruby", is_active: true)

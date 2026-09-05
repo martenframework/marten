@@ -785,9 +785,9 @@ describe Marten::Conf::GlobalSettings do
   end
 
   describe "#trailing_slash" do
-    it "returns :do_nothing by default" do
+    it "returns :remove by default" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.trailing_slash.do_nothing?.should be_true
+      global_settings.trailing_slash.remove?.should be_true
     end
 
     it "returns the configured trailing slash behavior if explicitly set" do

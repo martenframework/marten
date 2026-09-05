@@ -224,7 +224,8 @@ module Marten
       # Allows to configure the trailing slash strategy.
       #
       # The trailing slash strategy is used to determine how the application should handle trailing slashes in URLs. The
-      # default strategy is `:do_nothing`, which means that the application will not enforce any trailing slash policy.
+      # default strategy is `:remove`, which means that the application will issue redirects for unresolved URLs ending
+      # with a trailing slash in order to remove it.
       # The other available strategies are `:add` and `:remove`, which will respectively add or remove trailing slashes
       # from URLs if they can't be found.
       setter trailing_slash
@@ -303,6 +304,7 @@ module Marten
         @log_level = ::Log::Severity::Info
         @main_app_label = Apps::MainConfig::DEFAULT_LABEL
         @middleware = Array(Marten::Middleware.class).new
+        @parallelism = ENV["MARTEN_PARALLELISM"]?.try(&.to_i?) || 1
         @port = 8000
         @port_reuse = true
         @referrer_policy = "same-origin"
@@ -311,12 +313,11 @@ module Marten
         @secret_key = ""
         @socket = nil
         @time_zone = Time::Location.load("UTC")
-        @trailing_slash = :do_nothing
+        @trailing_slash = :remove
         @unsupported_http_method_strategy = :deny
         @use_x_forwarded_host = false
         @use_x_forwarded_port = false
         @use_x_forwarded_proto = false
-        @parallelism = ENV["MARTEN_PARALLELISM"]?.try(&.to_i?) || 1
         @x_frame_options = "DENY"
       end
 

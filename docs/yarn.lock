@@ -3989,10 +3989,10 @@ dns-packet@^5.2.2:
   dependencies:
     "@leichtgewicht/ip-codec" "^2.0.1"
 
-docusaurus-plugin-sass@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/docusaurus-plugin-sass/-/docusaurus-plugin-sass-0.2.6.tgz#b4930a1fe1cc7bcead639bb1bee38bce0ffd073d"
-  integrity sha512-2hKQQDkrufMong9upKoG/kSHJhuwd+FA3iAe/qzS/BmWpbIpe7XKmq5wlz4J5CJaOPu4x+iDJbgAxZqcoQf0kg==
+docusaurus-plugin-sass@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/docusaurus-plugin-sass/-/docusaurus-plugin-sass-0.2.7.tgz#305d3399e331e11f02a0ab69800aa5ba13d5f406"
+  integrity sha512-v+XWW2BBlKiBfqNbDr8iF/DUcWIXDTsAVAfkbG0/pzCx9yV0zK6Qu0ZVFxpZXcMihokzl0zFD1HIN/M4TnzEwA==
   dependencies:
     sass-loader "^16.0.2"
 

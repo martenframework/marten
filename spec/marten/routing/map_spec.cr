@@ -96,6 +96,25 @@ describe Marten::Routing::Match do
       map.path(Marten::Routing::TranslatedPath.new("routes.foo_bar"), sub_map, name: "included")
 
       map.reverse("included:baz").should eq "/foo/bar/baz"
+
+      I18n.with_locale(:fr) do
+        map.reverse("included:baz").should eq "/foo-french/bar-french/baz"
+      end
+    end
+
+    it "can be used for an included route with a translated path when the map is mounted on a non-translated path" do
+      map = Marten::Routing::Map.new
+
+      sub_map = Marten::Routing::Map.draw do
+        path(Marten::Routing::TranslatedPath.new("routes.foo_bar"), Marten::Handlers::Base, name: "baz")
+      end
+      map.path("/included", sub_map, name: "included")
+
+      map.reverse("included:baz").should eq "/included/foo/bar"
+
+      I18n.with_locale(:fr) do
+        map.reverse("included:baz").should eq "/included/foo-french/bar-french"
+      end
     end
 
     it "raises if the inserted rule is an empty string" do
@@ -142,6 +161,42 @@ describe Marten::Routing::Match do
         I18n.with_locale(:fr) do
           map.reverse("foo_bar").should eq "/fr/foo-french/bar-french"
           map.reverse("foo_bar_with_args", param1: 42, param2: "hello-world").should eq "/fr/foo/42/bar/hello-world"
+        end
+      end
+
+      it "allows to define localized routes for an included map mounted on a translated path" do
+        map = Marten::Routing::Map.new
+        map.exposed_root = true
+
+        sub_map = Marten::Routing::Map.draw do
+          path("/baz", Marten::Handlers::Base, name: "baz")
+        end
+
+        map.localized do
+          path t("routes.foo_bar"), sub_map, name: "included"
+        end
+
+        map.reverse("included:baz").should eq "/en/foo/bar/baz"
+
+        I18n.with_locale(:fr) do
+          map.reverse("included:baz").should eq "/fr/foo-french/bar-french/baz"
+        end
+      end
+
+      it "ensures that localized routes of an included map resolve what they reverse" do
+        map = Marten::Routing::Map.new
+        map.exposed_root = true
+
+        sub_map = Marten::Routing::Map.draw do
+          path("/baz", Marten::Handlers::Base, name: "baz")
+        end
+
+        map.localized do
+          path t("routes.foo_bar"), sub_map, name: "included"
+        end
+
+        I18n.with_locale(:fr) do
+          map.resolve(map.reverse("included:baz")).handler.should eq Marten::Handlers::Base
         end
       end
     end

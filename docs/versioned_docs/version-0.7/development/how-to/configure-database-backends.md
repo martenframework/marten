@@ -36,7 +36,7 @@ This means that your `shard.yml` file should resemble one of the following examp
 
 ### MariaDB or MySQL
 
-```yaml
+```yaml title="shard.yml"
 name: myproject
 version: 0.1.0
 
@@ -51,7 +51,7 @@ dependencies:
 
 ### PostgreSQL
 
-```yaml
+```yaml title="shard.yml"
 name: myproject
 version: 0.1.0
 
@@ -66,7 +66,7 @@ dependencies:
 
 ### SQLite3
 
-```yaml
+```yaml title="shard.yml"
 name: myproject
 version: 0.1.0
 
@@ -87,7 +87,7 @@ Please consult the examples below to determine which requirement you should incl
 
 ### MariaDB or MySQL
 
-```crystal
+```crystal title="src/project.cr"
 # Third party requirements.
 require "marten"
 // highlight-next-line
@@ -102,7 +102,7 @@ require "mysql"
 
 ### PostgreSQL
 
-```crystal
+```crystal title="src/project.cr"
 # Third party requirements.
 require "marten"
 // highlight-next-line
@@ -111,7 +111,7 @@ require "pg"
 
 ### SQLite3
 
-```crystal
+```crystal title="src/project.cr"
 # Third party requirements.
 require "marten"
 // highlight-next-line
@@ -120,11 +120,11 @@ require "sqlite3"
 
 ## Configuring your database
 
-The last step involves configuring database settings so that they target the database you intend to use with your Marten project. While a comprehensive list of configuration options is available in the [Database settings reference](../reference/settings.md#database-settings), the following sections offer example configurations tailored to each supported database backend.
+The last step involves configuring database settings in one of your settings files (eg. `config/settings/base.cr`) so that they target the database you intend to use with your Marten project. While a comprehensive list of configuration options is available in the [Database settings reference](../reference/settings.md#database-settings), the following sections offer example configurations tailored to each supported database backend.
 
 ### MariaDB or MySQL
 
-```crystal
+```crystal title="config/settings/base.cr"
 # Using a block:
 config.database do |db|
   db.backend = :mysql
@@ -141,7 +141,7 @@ config.database url: "mysql://my_user:insecure@localhost:1234/my_db"
 
 ### PostgreSQL
 
-```crystal
+```crystal title="config/settings/base.cr"
 # Using a block:
 config.database do |db|
   db.backend = :postgresql
@@ -158,7 +158,7 @@ config.database url: "postgres://my_user:insecure@localhost:1234/my_db"
 
 ### SQLite3
 
-```crystal
+```crystal title="config/settings/base.cr"
 # Using a block:
 config.database do |db|
   db.backend = :sqlite

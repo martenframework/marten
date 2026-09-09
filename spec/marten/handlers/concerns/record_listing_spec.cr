@@ -5,7 +5,7 @@ describe Marten::Handlers::RecordListing do
     it "allows to configure the model used to retrieve the record" do
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
 
@@ -55,7 +55,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -82,7 +82,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -140,7 +140,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -214,7 +214,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -241,7 +241,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -258,7 +258,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -274,7 +274,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -291,7 +291,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -304,7 +304,7 @@ describe Marten::Handlers::RecordListing do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )

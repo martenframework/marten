@@ -21,7 +21,7 @@ describe Marten::HTTP::Request do
     it "allows to initialize a request by specifying a standard HTTP::Request object" do
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
       request.nil?.should be_false
@@ -30,7 +30,7 @@ describe Marten::HTTP::Request do
     it "overrides the request's body IO in order to use a memory IO" do
       request = Marten::HTTP::RequestSpec::TestRequest.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
 
@@ -674,7 +674,7 @@ describe Marten::HTTP::Request do
 
     it "raises UnexpectedHost if no host is specified in the headers" do
       expect_raises(Marten::HTTP::Errors::UnexpectedHost) do
-        Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "")).host
+        Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/")).host
       end
     end
 
@@ -683,7 +683,7 @@ describe Marten::HTTP::Request do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "foobar.com"}
           )
         ).host
@@ -695,7 +695,7 @@ describe Marten::HTTP::Request do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"X-Forwarded-Host" => "example.com"}
           )
         ).host
@@ -708,7 +708,7 @@ describe Marten::HTTP::Request do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"X-Forwarded-Host" => "foobar.com"}
           )
         ).host
@@ -720,7 +720,7 @@ describe Marten::HTTP::Request do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"X-Forwarded-Host" => "example.com"}
         )
       )
@@ -731,12 +731,12 @@ describe Marten::HTTP::Request do
       Marten.settings.allowed_hosts = ["example.com", "127.0.0.1"]
 
       request_1 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "example.com:8080"})
+        ::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers{"Host" => "example.com:8080"})
       )
       request_1.host.should eq "example.com:8080"
 
       request_2 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "127.0.0.1:8000"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "127.0.0.1:8000"})
       )
       request_2.host.should eq "127.0.0.1:8000"
     end
@@ -745,17 +745,17 @@ describe Marten::HTTP::Request do
       Marten.settings.allowed_hosts = [".example.com"]
 
       request_1 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "foo.example.com"})
+        ::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers{"Host" => "foo.example.com"})
       )
       request_1.host.should eq "foo.example.com"
 
       request_2 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "bar.xyz.example.com:8080"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "bar.xyz.example.com:8080"})
       )
       request_2.host.should eq "bar.xyz.example.com:8080"
 
       request_3 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "example.com"})
+        ::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers{"Host" => "example.com"})
       )
       request_3.host.should eq "example.com"
     end
@@ -764,12 +764,12 @@ describe Marten::HTTP::Request do
       Marten.settings.allowed_hosts = ["*"]
 
       request_1 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "foo.example.com"})
+        ::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers{"Host" => "foo.example.com"})
       )
       request_1.host.should eq "foo.example.com"
 
       request_2 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "dummy.com"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "dummy.com"})
       )
       request_2.host.should eq "dummy.com"
     end
@@ -778,12 +778,12 @@ describe Marten::HTTP::Request do
       Marten.settings.allowed_hosts = ["192.168.12.46"]
 
       request_1 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers{"Host" => "192.168.12.46"})
+        ::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers{"Host" => "192.168.12.46"})
       )
       request_1.host.should eq "192.168.12.46"
 
       request_2 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "192.168.12.46:8000"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "192.168.12.46:8000"})
       )
       request_2.host.should eq "192.168.12.46:8000"
     end
@@ -794,7 +794,7 @@ describe Marten::HTTP::Request do
       request_1 = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "[fedc:ba98:7654:3210:fedc:ba98:7654:3210]"}
         )
       )
@@ -803,7 +803,7 @@ describe Marten::HTTP::Request do
       request_2 = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "[fedc:ba98:7654:3210:fedc:ba98:7654:3210]:8000"}
         )
       )
@@ -814,7 +814,7 @@ describe Marten::HTTP::Request do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com."}
         )
       )
@@ -826,17 +826,17 @@ describe Marten::HTTP::Request do
       Marten.settings.debug = true
 
       request_1 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "127.0.0.1:8000"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "127.0.0.1:8000"})
       )
       request_1.host.should eq "127.0.0.1:8000"
 
       request_2 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "localhost:8000"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "localhost:8000"})
       )
       request_2.host.should eq "localhost:8000"
 
       request_3 = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers{"Host" => "[::1]:8000"})
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers{"Host" => "[::1]:8000"})
       )
       request_3.host.should eq "[::1]:8000"
     end
@@ -847,7 +847,7 @@ describe Marten::HTTP::Request do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -970,7 +970,7 @@ describe Marten::HTTP::Request do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "X-Forwarded-Port" => "8080"}
         )
       )
@@ -983,7 +983,7 @@ describe Marten::HTTP::Request do
       request_1 = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "X-Forwarded-Port" => ""}
         )
       )
@@ -992,7 +992,7 @@ describe Marten::HTTP::Request do
       request_2 = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )

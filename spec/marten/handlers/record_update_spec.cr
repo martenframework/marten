@@ -22,7 +22,7 @@ describe Marten::Handlers::RecordUpdate do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
           body: "name=updatedtag"
         )
@@ -44,7 +44,7 @@ describe Marten::Handlers::RecordUpdate do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
           body: "name=updatedtag"
         )
@@ -65,7 +65,7 @@ describe Marten::Handlers::RecordUpdate do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
           body: "name=updatedtag"
         )
@@ -89,7 +89,7 @@ describe Marten::Handlers::RecordUpdate do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
           body: "name=0"
         )
@@ -113,7 +113,7 @@ describe Marten::Handlers::RecordUpdate do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/x-www-form-urlencoded"},
           body: "name=updatedtag"
         )

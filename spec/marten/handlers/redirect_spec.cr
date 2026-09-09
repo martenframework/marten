@@ -69,14 +69,14 @@ describe Marten::Handlers::Redirect do
 
   describe "#get" do
     it "returns an HTTP Gone response if no redirect URL is configured" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::UselessRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 410
     end
 
     it "returns the expected HTTP response in case of a temporary redirect involving a static URL" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302
@@ -84,7 +84,7 @@ describe Marten::Handlers::Redirect do
     end
 
     it "returns the expected HTTP response in case of a permanent redirect involving a static URL" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::PermanentStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 301
@@ -92,7 +92,7 @@ describe Marten::Handlers::Redirect do
     end
 
     it "returns the expected HTTP response in case of a temporary redirect involving a dynamic URL" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::TemporaryDynamicRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302
@@ -100,7 +100,7 @@ describe Marten::Handlers::Redirect do
     end
 
     it "returns the expected HTTP response in case of a permanent redirect involving a dynamic URL" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::PermanentDynamicRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 301
@@ -108,7 +108,7 @@ describe Marten::Handlers::Redirect do
     end
 
     it "makes use of the handler params to perform the lookup of the dynamic redirect route" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "GET", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::DynamicRedirectWithParams.new(
         request,
         Marten::Routing::MatchParameters{"id" => 42}
@@ -138,7 +138,7 @@ describe Marten::Handlers::Redirect do
 
   describe "#head" do
     it "produces the same behaviour as GET requests" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "HEAD", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "HEAD", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302
@@ -148,7 +148,7 @@ describe Marten::Handlers::Redirect do
 
   describe "#post" do
     it "produces the same behaviour as GET requests" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "POST", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302
@@ -159,7 +159,7 @@ describe Marten::Handlers::Redirect do
   describe "#options" do
     it "produces the same behaviour as GET requests" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "OPTIONS", resource: "", headers: HTTP::Headers.new)
+        ::HTTP::Request.new(method: "OPTIONS", resource: "/", headers: HTTP::Headers.new)
       )
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
@@ -171,7 +171,7 @@ describe Marten::Handlers::Redirect do
   describe "#delete" do
     it "produces the same behaviour as GET requests" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "DELETE", resource: "", headers: HTTP::Headers.new)
+        ::HTTP::Request.new(method: "DELETE", resource: "/", headers: HTTP::Headers.new)
       )
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
@@ -182,7 +182,7 @@ describe Marten::Handlers::Redirect do
 
   describe "#put" do
     it "produces the same behaviour as GET requests" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "PUT", resource: "", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "PUT", resource: "/", headers: HTTP::Headers.new))
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302
@@ -193,7 +193,7 @@ describe Marten::Handlers::Redirect do
   describe "#patch" do
     it "produces the same behaviour as GET requests" do
       request = Marten::HTTP::Request.new(
-        ::HTTP::Request.new(method: "PATCH", resource: "", headers: HTTP::Headers.new)
+        ::HTTP::Request.new(method: "PATCH", resource: "/", headers: HTTP::Headers.new)
       )
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch

@@ -207,7 +207,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
           )
         ),
@@ -228,7 +228,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-CA,en;q=0.5"}
           )
         ),
@@ -249,7 +249,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-FR,en;q=0.5"}
           )
         ),
@@ -270,7 +270,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr;q=0.2,en;q=0.5,es;q=0.7"}
           )
         ),
@@ -291,7 +291,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "it-IT,it;q=0.5"}
           )
         ),
@@ -312,7 +312,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           )
         ),
@@ -333,7 +333,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
           )
         ),
@@ -354,7 +354,7 @@ describe Marten::Middleware::I18n do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr-FR,en;q=0.5"}
           )
         ),
@@ -373,7 +373,7 @@ describe Marten::Middleware::I18n do
 
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
       request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr"
@@ -395,7 +395,7 @@ describe Marten::Middleware::I18n do
 
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
       request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr-CA"
@@ -417,7 +417,7 @@ describe Marten::Middleware::I18n do
 
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
       request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr-FR"
@@ -439,7 +439,7 @@ describe Marten::Middleware::I18n do
 
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "es,en;q=0.5"}
       )
       request.cookies[Marten.settings.i18n.locale_cookie_name] = "fr"
@@ -462,7 +462,7 @@ describe Marten::Middleware::I18n do
       response = middleware.call(
         Marten::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
         ),
         -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
@@ -482,7 +482,7 @@ describe Marten::Middleware::I18n do
       response = middleware.call(
         Marten::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
         ),
         -> { Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200) }
@@ -502,7 +502,7 @@ describe Marten::Middleware::I18n do
       response = middleware.call(
         Marten::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "fr,en;q=0.5"}
         ),
         -> {

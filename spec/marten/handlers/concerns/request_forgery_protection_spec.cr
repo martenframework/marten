@@ -59,7 +59,7 @@ describe Marten::Handlers::RequestForgeryProtection do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: safe_method,
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -75,7 +75,7 @@ describe Marten::Handlers::RequestForgeryProtection do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: safe_method,
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -159,7 +159,7 @@ describe Marten::Handlers::RequestForgeryProtection do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -175,7 +175,7 @@ describe Marten::Handlers::RequestForgeryProtection do
       request = Marten::Handlers::RequestForgeryProtectionSpec::TestRequest.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )

@@ -9,7 +9,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -32,7 +32,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -59,7 +59,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -86,7 +86,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -109,7 +109,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "deflate, br",
@@ -132,7 +132,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -159,7 +159,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -186,7 +186,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",
@@ -210,7 +210,7 @@ describe Marten::Middleware::GZip do
         Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{
               "Host"            => "example.com",
               "Accept-Encoding" => "gzip, deflate, br",

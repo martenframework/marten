@@ -6,7 +6,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -19,7 +19,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -43,7 +43,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -88,7 +88,7 @@ describe Marten::Handlers::Base do
 
       request = Marten::HTTP::Request.new(
         method: "GET",
-        resource: "",
+        resource: "/",
         headers: HTTP::Headers{"Host" => "example.com"}
       )
       handler = Marten::Handlers::Base.new(request)
@@ -105,7 +105,7 @@ describe Marten::Handlers::Base do
       handler = Marten::Handlers::Base.new(
         Marten::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"},
         )
       )
@@ -122,7 +122,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -136,7 +136,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -151,7 +151,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -164,7 +164,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -177,7 +177,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "PUT",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -190,7 +190,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "PATCH",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -203,7 +203,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "DELETE",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -216,7 +216,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "HEAD",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -229,7 +229,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "TRACE",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -242,7 +242,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "OPTIONS",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -264,7 +264,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "HEAD",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -280,7 +280,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -296,7 +296,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "POST",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -312,7 +312,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "PUT",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -328,7 +328,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "PATCH",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -344,7 +344,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "DELETE",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -360,7 +360,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "HEAD",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -376,7 +376,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "OPTIONS",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -392,7 +392,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "TRACE",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -408,7 +408,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "PATCH",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -425,7 +425,7 @@ describe Marten::Handlers::Base do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "PATCH",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -443,7 +443,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -467,7 +467,7 @@ describe Marten::Handlers::Base do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -484,7 +484,7 @@ describe Marten::Handlers::Base do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -503,7 +503,7 @@ describe Marten::Handlers::Base do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -525,7 +525,7 @@ describe Marten::Handlers::Base do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )
@@ -545,7 +545,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -565,7 +565,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -582,7 +582,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -599,7 +599,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -616,7 +616,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -633,7 +633,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -649,7 +649,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -667,7 +667,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -682,7 +682,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -699,7 +699,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -713,7 +713,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -732,7 +732,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -748,7 +748,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -767,7 +767,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -784,7 +784,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -801,7 +801,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -818,7 +818,7 @@ describe Marten::Handlers::Base do
       handler = Marten::Handlers::BaseSpec::Test5Handler.new(
         Marten::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -836,7 +836,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -856,7 +856,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -874,7 +874,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -892,7 +892,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -909,7 +909,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -926,7 +926,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -947,7 +947,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -973,7 +973,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -995,7 +995,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1016,7 +1016,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1041,7 +1041,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1057,7 +1057,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1073,7 +1073,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1093,7 +1093,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1115,7 +1115,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -1137,7 +1137,7 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )

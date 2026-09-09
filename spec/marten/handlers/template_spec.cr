@@ -6,7 +6,7 @@ describe Marten::Handlers::Template do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
       )
@@ -24,7 +24,7 @@ describe Marten::Handlers::Template do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
             method: "GET",
-            resource: "",
+            resource: "/",
             headers: HTTP::Headers{"Host" => "example.com"}
           )
         )

@@ -6,7 +6,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         request: ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)
@@ -24,7 +24,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         request: ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)
@@ -45,7 +45,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         request: ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)
@@ -63,7 +63,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)
@@ -83,7 +83,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)
@@ -104,7 +104,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         request: ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)
@@ -125,7 +125,7 @@ describe Marten::Server::Handlers::HandlerResponseConverter do
       ctx = HTTP::Server::Context.new(
         request: ::HTTP::Request.new(
           method: "GET",
-          resource: "",
+          resource: "/",
           headers: HTTP::Headers{"Host" => "example.com", "Accept-Language" => "FR,en;q=0.5"}
         ),
         response: ::HTTP::Server::Response.new(io: IO::Memory.new)

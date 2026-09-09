@@ -138,7 +138,9 @@ describe Marten::Handlers::Redirect do
 
   describe "#head" do
     it "produces the same behaviour as GET requests" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "HEAD", resource: "/", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "HEAD", resource: "/", headers: HTTP::Headers.new)
+      )
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302
@@ -148,7 +150,9 @@ describe Marten::Handlers::Redirect do
 
   describe "#post" do
     it "produces the same behaviour as GET requests" do
-      request = Marten::HTTP::Request.new(::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers.new))
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(method: "POST", resource: "/", headers: HTTP::Headers.new)
+      )
       handler = Marten::Handlers::RedirectSpec::TemporaryStaticRedirect.new(request)
       response = handler.dispatch
       response.status.should eq 302

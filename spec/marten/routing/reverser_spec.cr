@@ -149,6 +149,58 @@ describe Marten::Routing::Reverser do
         }
       )
     end
+
+    it "keeps the localized paths when the other reverser is not associated with a translated path" do
+      reverser = Marten::Routing::Reverser.new(
+        "path:name",
+        {
+          nil  => "/test",
+          "en" => "/this-is-a-test",
+          "fr" => "/ceci-est-un-test",
+        } of String? => String
+      )
+
+      combined = reverser.combine(Marten::Routing::Reverser.new("other:name", "/other"))
+
+      combined.exposed_path_for_interpolations.should eq(
+        {
+          nil  => "/test/other",
+          "en" => "/this-is-a-test/other",
+          "fr" => "/ceci-est-un-test/other",
+        } of String? => String
+      )
+    end
+
+    it "keeps the localized paths when the current reverser is not associated with a translated path" do
+      reverser = Marten::Routing::Reverser.new("path:name", "/test")
+
+      combined = reverser.combine(
+        Marten::Routing::Reverser.new(
+          "other:name",
+          {
+            nil  => "/other",
+            "en" => "/this-is-another-test",
+            "fr" => "/ceci-est-un-autre-test",
+          } of String? => String
+        )
+      )
+
+      combined.exposed_path_for_interpolations.should eq(
+        {
+          nil  => "/test/other",
+          "en" => "/test/this-is-another-test",
+          "fr" => "/test/ceci-est-un-autre-test",
+        } of String? => String
+      )
+    end
+
+    it "returns the expected reverser when none of the reversers are associated with translated paths" do
+      reverser = Marten::Routing::Reverser.new("path:name", "/test")
+
+      combined = reverser.combine(Marten::Routing::Reverser.new("other:name", "/other"))
+
+      combined.exposed_path_for_interpolations.should eq({nil => "/test/other"} of String? => String)
+    end
   end
 
   describe "#name" do

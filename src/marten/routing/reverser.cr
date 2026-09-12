@@ -41,10 +41,14 @@ module Marten
         new_name = name.empty? ? other.name : "#{name}:#{other.name}"
 
         new_path_for_interpolations = Hash(String?, String).new
-        @path_for_interpolations.each do |locale, path_for_interpolation|
-          next if other.path_for_interpolations[locale]?.nil?
+        (@path_for_interpolations.keys | other.path_for_interpolations.keys).each do |locale|
+          # Reversers that are not associated with translated paths only carry a default locale path, so both sides
+          # fall back to it in order to not discard the locales contributed by the other side.
+          path_for_interpolation = @path_for_interpolations[locale]? || @path_for_interpolations[nil]?
+          other_path_for_interpolation = other.path_for_interpolations[locale]? || other.path_for_interpolations[nil]?
+          next if path_for_interpolation.nil? || other_path_for_interpolation.nil?
 
-          new_path_for_interpolations[locale] = path_for_interpolation + other.path_for_interpolations[locale]
+          new_path_for_interpolations[locale] = path_for_interpolation + other_path_for_interpolation
         end
 
         Reverser.new(

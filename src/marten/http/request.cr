@@ -62,7 +62,7 @@ module Marten
 
       # Returns the parsed request data.
       def data : Params::Data
-        @data ||= body.empty? ? Params::Data.new : Params::Data.new(extract_raw_data_params)
+        @data ||= Params::Data.new(extract_raw_data_params)
       end
 
       # Returns `true` if the request is a DELETE.
@@ -359,16 +359,25 @@ module Marten
             params[key].as(Params::Data::Values) << value
           end
         elsif content_type?(CONTENT_TYPE_MULTIPART_FORM)
-          # Rewind the request's body and parses multipart form data (both regular params and files).
-          @request.body.as(IO).rewind
-          ::HTTP::FormData.parse(@request) do |part|
-            next unless part
+          boundary = headers[:CONTENT_TYPE]?.try { |ct| MIME::Multipart.parse_boundary(ct) }
 
-            params[part.name] = [] of Params::Data::Value unless params.has_key?(part.name)
-            if !part.filename.nil? && !part.filename.not_nil!.empty?
-              params[part.name].as(Params::Data::Values) << UploadedFile.new(part)
-            else
-              params[part.name].as(Params::Data::Values) << part.body.gets_to_end
+          if boundary && !body.empty?
+            @request.body.as(IO).rewind
+            begin
+              ::HTTP::FormData.parse(@request) do |part|
+                next unless part
+
+                params[part.name] = [] of Params::Data::Value unless params.has_key?(part.name)
+                if !part.filename.nil? && !part.filename.not_nil!.empty?
+                  params[part.name].as(Params::Data::Values) << UploadedFile.new(part)
+                else
+                  params[part.name].as(Params::Data::Values) << part.body.gets_to_end
+                end
+              end
+            rescue ex : ::HTTP::FormData::Error | MIME::Multipart::Error
+              raise Errors::InvalidRequestParameters.new(
+                "Invalid multipart request parameters: #{ex.message}"
+              )
             end
           end
         elsif content_type?(CONTENT_TYPE_APPLICATION_JSON)

@@ -63,3 +63,57 @@ end
 
 transaction_committed # => false
 ```
+
+## Pessimistic locking
+
+Marten supports pessimistic row locking via `SELECT ... FOR UPDATE`. This is useful when you need to prevent concurrent updates to the same record (for example when adjusting a balance or inventory count).
+
+### Locking a query set
+
+The [`#lock`](./reference/query-set.md#lock) query set method appends a `FOR UPDATE` clause to the generated SQL query. On database backends that support row locking, locked query sets **must** be evaluated inside a transaction (otherwise a `Marten::DB::Errors::UnmetQuerySetCondition` exception is raised):
+
+```crystal
+Account.transaction do
+  account = Account.lock.get!(id: account_id)
+  account.balance -= 100
+  account.save!
+end
+```
+
+You can also request a custom locking clause (for example `FOR UPDATE NOWAIT` or `FOR SHARE`):
+
+```crystal
+Account.transaction do
+  account = Account.lock("FOR UPDATE NOWAIT").get!(id: account_id)
+  # ...
+end
+```
+
+### Locking a record
+
+If you already have a model instance, you can use [`#with_lock`](pathname:///api/dev/Marten/DB/Model/Persistence.html#with_lock(lock%3ABool%7CString%3Dtrue%2Cusing%3ANil%7CString%7CSymbol%3Dnil%2C%26block)-instance-method) to open a transaction, reload the record with a row lock, and then run your updates:
+
+```crystal
+account.with_lock do
+  account.balance -= 100
+  account.save!
+end
+```
+
+`#with_lock` discards any in-memory attribute changes when it reloads the record (the same way [`#reload`](pathname:///api/dev/Marten/DB/Model/Persistence.html#reload-instance-method) does). Apply your mutations inside the block after the lock has been acquired.
+
+If you are already inside a transaction, you can call [`#lock!`](pathname:///api/dev/Marten/DB/Model/Persistence.html#lock!(lock%3ABool%7CString%3Dtrue%2Cusing%3ANil%7CString%7CSymbol%3Dnil)-instance-method) instead:
+
+```crystal
+Account.transaction do
+  account.lock!
+  account.balance -= 100
+  account.save!
+end
+```
+
+Row locks are released automatically when the surrounding transaction is committed or rolled back. Both `#lock!` and `#with_lock` raise a `Marten::DB::Errors::UnmetSaveCondition` exception if they are called on a record that is not persisted.
+
+:::info
+SQLite does not support `SELECT ... FOR UPDATE`. On SQLite, the locking APIs still open a transaction and reload the record, but no database-level row lock is acquired.
+:::

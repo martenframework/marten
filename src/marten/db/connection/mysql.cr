@@ -116,6 +116,10 @@ module Marten
           true
         end
 
+        def supports_select_for_update? : Bool
+          true
+        end
+
         def update(
           table_name : String,
           values : Hash(String, ::DB::Any),

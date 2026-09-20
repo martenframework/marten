@@ -1961,6 +1961,134 @@ describe Marten::DB::Model::Persistence do
     end
   end
 
+  describe "#lock!" do
+    it "reloads the record using a FOR UPDATE lock inside a transaction" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object_alt = TestUser.get!(pk: object.pk)
+      object_alt.username = "jd2"
+      object_alt.save!
+
+      object.transaction do
+        object.lock!
+        object.username.should eq "jd2"
+      end
+    end
+
+    it "accepts a custom locking clause" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object.transaction do
+        object.lock!("FOR UPDATE")
+        object.username.should eq "jd"
+      end
+    end
+
+    it "raises if the record is new" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      expect_raises(Marten::DB::Errors::UnmetSaveCondition, "Cannot lock a new record") do
+        object.lock!
+      end
+    end
+
+    it "raises if the record was deleted" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.delete
+
+      expect_raises(Marten::DB::Errors::UnmetSaveCondition, "Cannot lock a deleted record") do
+        object.lock!
+      end
+    end
+
+    it "locks the record on the specified database" do
+      object = TestUser
+        .using(:other)
+        .create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object_alt = TestUser.using(:other).get!(pk: object.pk)
+      object_alt.username = "jd2"
+      object_alt.save!(using: :other)
+
+      object.transaction(using: :other) do
+        object.lock!(using: :other)
+        object.username.should eq "jd2"
+      end
+    end
+  end
+
+  describe "#with_lock" do
+    it "locks the record, yields the block, and persists changes" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object.with_lock do
+        object.username = "jd2"
+        object.save!
+      end
+
+      object.reload.username.should eq "jd2"
+    end
+
+    it "accepts a custom locking clause" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object.with_lock("FOR UPDATE") do
+        object.username = "jd2"
+        object.save!
+      end
+
+      object.reload.username.should eq "jd2"
+    end
+
+    it "reloads concurrent updates before yielding" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object_alt = TestUser.get!(pk: object.pk)
+      object_alt.username = "jd2"
+      object_alt.save!
+
+      object.with_lock do
+        object.username.should eq "jd2"
+      end
+    end
+
+    it "locks the record on the specified database" do
+      object = TestUser
+        .using(:other)
+        .create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      object_alt = TestUser.using(:other).get!(pk: object.pk)
+      object_alt.username = "jd2"
+      object_alt.save!(using: :other)
+
+      object.with_lock(using: :other) do
+        object.username.should eq "jd2"
+        object.username = "jd3"
+        object.save!(using: :other)
+      end
+
+      TestUser.all.size.should eq 0
+      TestUser.using(:other).get!(pk: object.pk).username.should eq "jd3"
+    end
+
+    it "raises if the record is new" do
+      object = TestUser.new(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+      expect_raises(Marten::DB::Errors::UnmetSaveCondition, "Cannot lock a new record") do
+        object.with_lock { }
+      end
+    end
+
+    it "raises if the record was deleted" do
+      object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+      object.delete
+
+      expect_raises(Marten::DB::Errors::UnmetSaveCondition, "Cannot lock a deleted record") do
+        object.with_lock { }
+      end
+    end
+  end
+
   describe "#new_record?" do
     it "returns true if the record does not exist in the database yet" do
       object = TestUser.new(username: "foobar")

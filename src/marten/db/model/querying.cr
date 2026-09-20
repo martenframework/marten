@@ -681,6 +681,30 @@ module Marten
             default_queryset.limit(value)
           end
 
+          # Returns a queryset that will lock selected rows using `SELECT ... FOR UPDATE`.
+          #
+          # By doing so it is possible to obtain a pessimistic lock on the records targeted by the queryset. This must
+          # be used inside a transaction on database backends that support row locking. For example:
+          #
+          # ```
+          # Post.transaction do
+          #   post = Post.lock.get!(id: 1)
+          #   post.title = "Updated"
+          #   post.save!
+          # end
+          # ```
+          #
+          # A custom locking clause can also be passed. For example:
+          #
+          # ```
+          # Post.transaction do
+          #   Post.lock("FOR UPDATE NOWAIT").get!(id: 1)
+          # end
+          # ```
+          def lock(lock : Bool | String = true)
+            default_queryset.lock(lock)
+          end
+
           # Returns the maximum value of a field for the current model.
           #
           # Finds the largest value within the specified field for the records targeted by the model. For example:

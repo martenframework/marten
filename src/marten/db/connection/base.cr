@@ -93,6 +93,9 @@ module Marten
         # Returns a boolean indicating whether the database supports the logical XOR operator.
         abstract def supports_logical_xor? : Bool
 
+        # Returns a boolean indicating whether the database supports `SELECT ... FOR UPDATE`.
+        abstract def supports_select_for_update? : Bool
+
         # Allows to update an existing row in a specific table.
         abstract def update(
           table_name : String,
@@ -115,6 +118,11 @@ module Marten
         # Returns the identifier of the connection.
         def id : String
           IMPLEMENTATIONS.key_for(self.class)
+        end
+
+        # Returns `true` if a transaction is currently open for the connection.
+        def in_transaction? : Bool
+          !current_transaction.nil?
         end
 
         # Registers a proc to be called when the current transaction is committed to the database.

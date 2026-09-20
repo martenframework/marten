@@ -65,6 +65,18 @@ describe Marten::DB::Connection::Base do
     end
   end
 
+  describe "#in_transaction?" do
+    it "returns false outside of a transaction" do
+      Marten::DB::Connection.default.in_transaction?.should be_false
+    end
+
+    it "returns true inside a transaction" do
+      Marten::DB::Connection.default.transaction do
+        Marten::DB::Connection.default.in_transaction?.should be_true
+      end
+    end
+  end
+
   describe "#insert" do
     it "inserts a new record in a specific table and returns nil if the new ID is not requested" do
       conn = Marten::DB::Connection.default

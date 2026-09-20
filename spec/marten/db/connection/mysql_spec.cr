@@ -161,5 +161,12 @@ for_mysql do
         conn.supports_logical_xor?.should be_true
       end
     end
+
+    describe "#supports_select_for_update?" do
+      it "returns true" do
+        conn = Marten::DB::Connection.default
+        conn.supports_select_for_update?.should be_true
+      end
+    end
   end
 end

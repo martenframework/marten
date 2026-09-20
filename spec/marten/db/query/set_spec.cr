@@ -1134,6 +1134,77 @@ describe Marten::DB::Query::Set do
     end
   end
 
+  describe "#lock" do
+    it "returns a query set configured for pessimistic locking" do
+      qs = Marten::DB::Query::Set(Tag).new.lock
+      qs.query.lock_clause.should eq "FOR UPDATE"
+
+      for_mysql do
+        qs.to_sql.should contain("FOR UPDATE")
+      end
+
+      for_postgresql do
+        qs.to_sql.should contain("FOR UPDATE")
+      end
+
+      for_sqlite do
+        qs.to_sql.should_not contain("FOR UPDATE")
+      end
+    end
+
+    it "returns a query set configured with a custom locking clause" do
+      qs = Marten::DB::Query::Set(Tag).new.lock("FOR UPDATE NOWAIT")
+      qs.query.lock_clause.should eq "FOR UPDATE NOWAIT"
+
+      for_mysql do
+        qs.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+
+      for_postgresql do
+        qs.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+    end
+
+    it "does not mutate the original query set" do
+      qs = Marten::DB::Query::Set(Tag).new
+      locked = qs.lock
+
+      qs.query.lock_clause.should be_nil
+      locked.query.lock_clause.should eq "FOR UPDATE"
+    end
+
+    it "allows retrieving locked records inside a transaction" do
+      tag = Tag.create!(name: "crystal", is_active: true)
+
+      Tag.transaction do
+        locked = Marten::DB::Query::Set(Tag).new.lock.get!(pk: tag.pk)
+        locked.name.should eq "crystal"
+      end
+    end
+
+    for_mysql do
+      it "raises when evaluated outside of a transaction" do
+        expect_raises(
+          Marten::DB::Errors::UnmetQuerySetCondition,
+          "Selecting for update is only allowed within a transaction"
+        ) do
+          Marten::DB::Query::Set(Tag).new.lock.to_a
+        end
+      end
+    end
+
+    for_postgresql do
+      it "raises when evaluated outside of a transaction" do
+        expect_raises(
+          Marten::DB::Errors::UnmetQuerySetCondition,
+          "Selecting for update is only allowed within a transaction"
+        ) do
+          Marten::DB::Query::Set(Tag).new.lock.to_a
+        end
+      end
+    end
+  end
+
   for_postgresql do
     describe "#distinct(*fields)" do
       it "allows to return non-duplicated rows based on a specific field expressed as a symbol" do

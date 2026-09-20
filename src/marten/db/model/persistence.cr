@@ -114,6 +114,44 @@ module Marten
           @deleted
         end
 
+        # Reloads the model instance and obtains a pessimistic row lock.
+        #
+        # This method reloads the record using `SELECT ... FOR UPDATE` and must be called inside a transaction on
+        # database backends that support row locking. For example:
+        #
+        # ```
+        # post.transaction do
+        #   post.lock!
+        #   post.title = "Updated"
+        #   post.save!
+        # end
+        # ```
+        #
+        # A custom locking clause can also be passed. For example:
+        #
+        # ```
+        # post.lock!("FOR UPDATE NOWAIT")
+        # post.lock!("FOR SHARE")
+        # ```
+        #
+        # An optional database alias can be specified with `using` in order to lock the record on a non-default
+        # connection.
+        #
+        # A `Marten::DB::Errors::UnmetSaveCondition` exception is raised if the record is not persisted.
+        def lock!(lock : Bool | String = true, using : Nil | String | Symbol = nil)
+          raise Errors::UnmetSaveCondition.new("Cannot lock a new record") if new_record?
+          raise Errors::UnmetSaveCondition.new("Cannot lock a deleted record") if deleted?
+
+          reloaded = self.class.lock(lock).using(using).get!(pk: pk)
+
+          assign_field_values(reloaded.field_values)
+          reset_relation_instance_variables
+
+          @new_record = false
+
+          self
+        end
+
         # Returns a boolean indicating if the record doesn't exist in the database yet.
         #
         # This methods returns `true` if the model instance hasn't been saved and doesn't exist in the database yet. In
@@ -279,6 +317,38 @@ module Marten
             pk_value: self.class.pk_field.to_db(pk)
           )
           true
+        end
+
+        # Wraps the block in a transaction and obtains a pessimistic row lock before yielding.
+        #
+        # This method opens a transaction (or joins an existing one), reloads the record with a `FOR UPDATE` lock, and
+        # then yields the block. For example:
+        #
+        # ```
+        # post.with_lock do
+        #   post.title = "Updated"
+        #   post.save!
+        # end
+        # ```
+        #
+        # A custom locking clause can also be passed. For example:
+        #
+        # ```
+        # post.with_lock("FOR UPDATE NOWAIT") do
+        #   post.title = "Updated"
+        #   post.save!
+        # end
+        # ```
+        #
+        # An optional database alias can be specified with `using` in order to open the transaction and lock the record
+        # on a non-default connection.
+        #
+        # A `Marten::DB::Errors::UnmetSaveCondition` exception is raised if the record is not persisted.
+        def with_lock(lock : Bool | String = true, using : Nil | String | Symbol = nil, &block)
+          transaction(using: using) do
+            lock!(lock, using: using)
+            block.call
+          end
         end
 
         protected setter new_record

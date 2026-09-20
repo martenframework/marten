@@ -255,6 +255,33 @@ query_set = Post.all.limit(10)
 
 In the above example, only the first 10 records will be returned.
 
+### `lock`
+
+Returns a query set that will lock selected rows using `SELECT ... FOR UPDATE`.
+
+This method allows obtaining a pessimistic lock on the records targeted by the query set. On database backends that support row locking, it must be used inside a [transaction](../transactions.md) (otherwise a `Marten::DB::Errors::UnmetQuerySetCondition` exception is raised). See [Pessimistic locking](../transactions.md#pessimistic-locking) for more details.
+
+```crystal
+Post.transaction do
+  post = Post.lock.get!(id: 1)
+  post.title = "Updated"
+  post.save!
+end
+```
+
+A custom locking clause can also be passed:
+
+```crystal
+Post.transaction do
+  post = Post.lock("FOR UPDATE NOWAIT").get!(id: 1)
+  post = Post.lock("FOR SHARE").get!(id: 1)
+end
+```
+
+:::info
+SQLite does not support `SELECT ... FOR UPDATE`. On SQLite, `#lock` still returns a query set that can be evaluated inside a transaction, but no database-level row lock is acquired.
+:::
+
 ### `none`
 
 Returns a query set that will always return an empty array of records, without querying the database.

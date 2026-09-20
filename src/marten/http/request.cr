@@ -62,7 +62,7 @@ module Marten
 
       # Returns the parsed request data.
       def data : Params::Data
-        @data ||= Params::Data.new(extract_raw_data_params)
+        @data ||= body.empty? ? Params::Data.new : Params::Data.new(extract_raw_data_params)
       end
 
       # Returns `true` if the request is a DELETE.

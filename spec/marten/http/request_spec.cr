@@ -383,6 +383,28 @@ describe Marten::HTTP::Request do
       request.data.fetch_all("file2").not_nil!.[1].should be_a Marten::HTTP::UploadedFile
     end
 
+    it "returns an object containing the params extracted from query and multipart/form-data type but no body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz?foo=bar&xyz=test&foo=baz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => "multipart/form-data",
+          },
+          body: ""
+        )
+      )
+
+      request.query_params.should be_a Marten::HTTP::Params::Query
+      request.query_params.size.should eq 3
+      request.query_params.fetch_all(:foo).should eq ["bar", "baz"]
+      request.query_params.fetch_all(:xyz).should eq ["test"]
+
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+
     it "returns an object containing the params extracted from application/json inputs" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

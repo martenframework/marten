@@ -11,6 +11,7 @@ module Marten
           @joins = [] of Join
           @having_predicate_node = nil
           @limit = nil
+          @lock_clause : String? = nil
           @offset = nil
           @order_clauses = [] of {String, Bool}
           @parent_model_joins : Array(Join)?
@@ -23,6 +24,7 @@ module Marten
           getter joins
           getter having_predicate_node
           getter limit
+          getter lock_clause
           getter offset
           getter order_clauses
           getter using
@@ -52,6 +54,7 @@ module Marten
             @joins : Array(Join),
             @having_predicate_node : PredicateNode?,
             @limit : Int64?,
+            @lock_clause : String?,
             @offset : Int64?,
             @order_clauses : Array({String, Bool}),
             @parent_model_joins : Array(Join)?,
@@ -140,6 +143,7 @@ module Marten
               joins: @joins,
               having_predicate_node: @having_predicate_node.nil? ? nil : @having_predicate_node.clone,
               limit: @limit,
+              lock_clause: @lock_clause,
               offset: @offset,
               order_clauses: @order_clauses,
               parent_model_joins: @parent_model_joins,
@@ -159,6 +163,10 @@ module Marten
 
             if distinct_columns != other.distinct_columns
               raise Errors::UnmetQuerySetCondition.new("Cannot combine queries with different distinct columns")
+            end
+
+            if lock_clause != other.lock_clause
+              raise Errors::UnmetQuerySetCondition.new("Cannot combine queries with different lock clauses")
             end
 
             if using != other.using
@@ -250,6 +258,7 @@ module Marten
           end
 
           def execute : Array(Model)
+            ensure_select_for_update_is_allowed
             execute_query(*build_query)
           rescue Errors::EmptyResults
             [] of Model
@@ -360,6 +369,7 @@ module Marten
           end
 
           def pluck(fields : Array(String)) : Array(Array(Field::Any))
+            ensure_select_for_update_is_allowed
             plucked_columns = solve_plucked_fields_and_columns(fields)
             execute_pluck_query(*build_pluck_query(plucked_columns), plucked_columns)
           rescue Errors::EmptyResults
@@ -387,6 +397,18 @@ module Marten
 
             @distinct = true
             @distinct_columns = distinct_columns
+          end
+
+          def setup_lock_clause(lock : Bool | String = true) : Nil
+            @lock_clause = case lock
+                           in true
+                             FOR_UPDATE_CLAUSE
+                           in false
+                             raise ArgumentError.new("lock must be true or a locking clause")
+                           in String
+                             raise ArgumentError.new("lock clause cannot be empty") if lock.empty?
+                             lock
+                           end
           end
 
           def slice(from, size = nil)
@@ -445,6 +467,7 @@ module Marten
               joins: @joins,
               having_predicate_node: @having_predicate_node.nil? ? nil : @having_predicate_node.clone,
               limit: @limit,
+              lock_clause: @lock_clause,
               offset: @offset,
               order_clauses: @order_clauses,
               parent_model_joins: @parent_model_joins,
@@ -553,6 +576,7 @@ module Marten
             update_with_raw(raw_update, raw_params)
           end
 
+          private FOR_UPDATE_CLAUSE   = "FOR UPDATE"
           private MATCH_ALL_PREDICATE = "1=1"
 
           private def build_annotations
@@ -783,6 +807,7 @@ module Marten
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
+              s << resolved_lock_clause if lock?
             end
 
             {sql, parameters}
@@ -804,6 +829,7 @@ module Marten
               s << order_by
               s << "LIMIT #{limit}" unless limit.nil?
               s << "OFFSET #{@offset}" unless @offset.nil?
+              s << resolved_lock_clause if lock?
             end
 
             {sql, parameters}
@@ -1052,6 +1078,16 @@ module Marten
             parent_join
           end
 
+          private def ensure_select_for_update_is_allowed
+            return unless lock?
+            return unless connection.supports_select_for_update?
+            return if connection.in_transaction?
+
+            raise Errors::UnmetQuerySetCondition.new(
+              "Selecting for update is only allowed within a transaction"
+            )
+          end
+
           private def execute_pluck_query(query, parameters, plucked_columns)
             results = [] of Array(Field::Any)
 
@@ -1216,6 +1252,10 @@ module Marten
             {clause, parameters}
           end
 
+          private def lock?
+            !@lock_clause.nil?
+          end
+
           private def order_by
             return if @order_clauses.empty?
             clauses = @order_clauses.map do |field, reversed|
@@ -1283,6 +1323,12 @@ module Marten
                 choices_string,
               ].compact.join(" ")
             )
+          end
+
+          private def resolved_lock_clause
+            return unless connection.supports_select_for_update?
+
+            @lock_clause
           end
 
           private def solve_field_and_column(raw_field)

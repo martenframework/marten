@@ -834,6 +834,39 @@ describe Marten::DB::Model::Querying do
     end
   end
 
+  describe "::lock" do
+    it "returns a queryset configured for pessimistic locking" do
+      qs = Tag.lock
+      qs.should be_a(Marten::DB::Query::Set(Tag))
+      qs.query.lock_clause.should eq "FOR UPDATE"
+
+      for_mysql do
+        qs.to_sql.should contain("FOR UPDATE")
+      end
+
+      for_postgresql do
+        qs.to_sql.should contain("FOR UPDATE")
+      end
+
+      for_sqlite do
+        qs.to_sql.should_not contain("FOR UPDATE")
+      end
+    end
+
+    it "accepts a custom locking clause" do
+      qs = Tag.lock("FOR UPDATE NOWAIT")
+      qs.query.lock_clause.should eq "FOR UPDATE NOWAIT"
+
+      for_mysql do
+        qs.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+
+      for_postgresql do
+        qs.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+    end
+  end
+
   describe "::offset" do
     it "allows to offset the records returned" do
       Tag.create!(name: "tag-1", is_active: true)

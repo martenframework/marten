@@ -1927,6 +1927,35 @@ describe Marten::DB::Query::SQL::Query do
       end
     end
 
+    it "raises if the lock clauses do not match between the combining query and the other query" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+      query.setup_lock_clause
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.setup_lock_clause("FOR UPDATE NOWAIT")
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries with different lock clauses",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
+    it "raises if a locked query is combined with a non-locked query" do
+      query = Marten::DB::Query::SQL::Query(Post).new
+
+      other_query = Marten::DB::Query::SQL::Query(Post).new
+      other_query.setup_lock_clause
+
+      expect_raises(
+        Marten::DB::Errors::UnmetQuerySetCondition,
+        "Cannot combine queries with different lock clauses",
+      ) do
+        query.combine(other_query, Marten::DB::Query::SQL::PredicateConnector::AND)
+      end
+    end
+
     it "raises if the two queries are not targeting the same database" do
       query = Marten::DB::Query::SQL::Query(Post).new
       query.using = "other"
@@ -3367,6 +3396,76 @@ describe Marten::DB::Query::SQL::Query do
     end
   end
 
+  describe "#setup_lock_clause" do
+    it "configures a FOR UPDATE lock by default" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.setup_lock_clause
+
+      query.lock_clause.should eq "FOR UPDATE"
+
+      for_mysql do
+        query.to_sql.should contain("FOR UPDATE")
+        query.to_sql.should_not contain("NOWAIT")
+      end
+
+      for_postgresql do
+        query.to_sql.should contain("FOR UPDATE")
+        query.to_sql.should_not contain("NOWAIT")
+      end
+
+      for_sqlite do
+        query.to_sql.should_not contain("FOR UPDATE")
+      end
+    end
+
+    it "configures a custom locking clause" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.setup_lock_clause("FOR UPDATE NOWAIT")
+
+      query.lock_clause.should eq "FOR UPDATE NOWAIT"
+
+      for_mysql do
+        query.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+
+      for_postgresql do
+        query.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+    end
+
+    it "raises if lock is false" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+
+      expect_raises(ArgumentError, "lock must be true or a locking clause") do
+        query.setup_lock_clause(false)
+      end
+    end
+
+    it "raises if the lock clause is empty" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+
+      expect_raises(ArgumentError, "lock clause cannot be empty") do
+        query.setup_lock_clause("")
+      end
+    end
+
+    it "is preserved when cloning the query" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.setup_lock_clause("FOR UPDATE NOWAIT")
+
+      cloned = query.clone
+      cloned.lock_clause.should eq "FOR UPDATE NOWAIT"
+
+      for_mysql do
+        cloned.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+
+      for_postgresql do
+        cloned.to_sql.should contain("FOR UPDATE NOWAIT")
+      end
+    end
+  end
+
   describe "#to_sql" do
     it "produces the expected output" do
       query = Marten::DB::Query::SQL::Query(Tag).new
@@ -3390,6 +3489,36 @@ describe Marten::DB::Query::SQL::Query do
           "SELECT app_tag.id, app_tag.name, app_tag.is_active " \
           "FROM \"app_tag\" WHERE app_tag.name LIKE ? ESCAPE '\\' LIMIT -1"
         )
+      end
+    end
+
+    it "appends FOR UPDATE when a lock is configured" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.setup_lock_clause
+
+      for_mysql do
+        query.to_sql.should end_with("FOR UPDATE")
+      end
+
+      for_postgresql do
+        query.to_sql.should end_with("FOR UPDATE")
+      end
+
+      for_sqlite do
+        query.to_sql.should_not contain("FOR UPDATE")
+      end
+    end
+
+    it "appends a custom locking clause when configured" do
+      query = Marten::DB::Query::SQL::Query(Tag).new
+      query.setup_lock_clause("FOR SHARE")
+
+      for_mysql do
+        query.to_sql.should end_with("FOR SHARE")
+      end
+
+      for_postgresql do
+        query.to_sql.should end_with("FOR SHARE")
       end
     end
   end

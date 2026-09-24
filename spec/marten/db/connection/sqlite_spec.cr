@@ -174,5 +174,12 @@ for_sqlite do
         conn.supports_logical_xor?.should be_false
       end
     end
+
+    describe "#supports_select_for_update?" do
+      it "returns false" do
+        conn = Marten::DB::Connection.default
+        conn.supports_select_for_update?.should be_false
+      end
+    end
   end
 end

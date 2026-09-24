@@ -476,6 +476,33 @@ module Marten
           qs
         end
 
+        # Returns a new query set that will lock selected rows using `SELECT ... FOR UPDATE`.
+        #
+        # By doing so it is possible to obtain a pessimistic lock on the records targeted by the query set. This must
+        # be used inside a transaction on database backends that support row locking. For example:
+        #
+        # ```
+        # Post.transaction do
+        #   post = Post.lock.get!(id: 1)
+        #   post.title = "Updated"
+        #   post.save!
+        # end
+        # ```
+        #
+        # A custom locking clause can also be passed. For example:
+        #
+        # ```
+        # Post.transaction do
+        #   Post.lock("FOR UPDATE NOWAIT").get!(id: 1)
+        #   Post.lock("FOR SHARE").get!(id: 1)
+        # end
+        # ```
+        def lock(lock : Bool | String = true)
+          qs = clone
+          qs.query.setup_lock_clause(lock)
+          qs
+        end
+
         # Allows to iterate over the records that are targeted by the current query set.
         #
         # This method can be used to define a block that iterates over the records that are targeted by a query set:

@@ -19,11 +19,18 @@ module Marten
       # can have security implications. Such exception results in a bad request response sent to the client.
       class SuspiciousOperation < Exception; end
 
-      # Represents an error raised when the host specified in the request doesn't match the list of allowed hosts.
+      # Represents an error raised when request parameters cannot be parsed.
       #
-      # Marten has to be explicitly configured to serve a list of allowed hosts. This is to mitigate HTTP Host header
-      # attacks.
-      class UnexpectedHost < SuspiciousOperation; end
+      # This exception is raised when the request body cannot be parsed according to its advertised content type (for
+      # example a malformed `multipart/form-data` payload). Such exception results in a bad request response sent to the
+      # client.
+      class InvalidRequestParameters < SuspiciousOperation; end
+
+      # Represents an error raised when a request body is too large.
+      #
+      # This exception is raised when the size of a request body exceeds the configured maximum. This is to prevent
+      # large requests that could be used in the context of DOS attacks.
+      class RequestBodyTooBig < SuspiciousOperation; end
 
       # Represents an error raised when too many parameters are received for a given request.
       #
@@ -31,11 +38,11 @@ module Marten
       # request. This is to to prevent large requests that could be used in the context of DOS attacks.
       class TooManyParametersReceived < SuspiciousOperation; end
 
-      # Represents an error raised when a request body is too large.
+      # Represents an error raised when the host specified in the request doesn't match the list of allowed hosts.
       #
-      # This exception is raised when the size of a request body exceeds the configured maximum. This is to prevent
-      # large requests that could be used in the context of DOS attacks.
-      class RequestBodyTooBig < SuspiciousOperation; end
+      # Marten has to be explicitly configured to serve a list of allowed hosts. This is to mitigate HTTP Host header
+      # attacks.
+      class UnexpectedHost < SuspiciousOperation; end
 
       # Represents an error raised when a condition is not met on a particular request, eg. because a middleware was not
       # applied as expected.

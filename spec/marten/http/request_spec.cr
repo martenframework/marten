@@ -383,6 +383,78 @@ describe Marten::HTTP::Request do
       request.data.fetch_all("file2").not_nil!.[1].should be_a Marten::HTTP::UploadedFile
     end
 
+    it "returns empty data when multipart/form-data has no boundary and an empty body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => "multipart/form-data",
+          },
+          body: ""
+        )
+      )
+
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+
+    it "returns empty data when multipart/form-data has no boundary and a non-empty body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => "multipart/form-data",
+          },
+          body: "not-valid-multipart"
+        )
+      )
+
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+
+    it "returns empty data when multipart/form-data has a boundary but an empty body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => "multipart/form-data; boundary=----boundary",
+          },
+          body: ""
+        )
+      )
+
+      request.data.should be_a Marten::HTTP::Params::Data
+      request.data.size.should eq 0
+    end
+
+    it "raises when multipart/form-data has a boundary but a malformed body" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "POST",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{
+            "Host"         => "example.com",
+            "Content-Type" => "multipart/form-data; boundary=----boundary",
+          },
+          body: "not-valid-multipart"
+        )
+      )
+
+      expect_raises(
+        Marten::HTTP::Errors::InvalidRequestParameters,
+        /Invalid multipart request parameters/
+      ) do
+        request.data
+      end
+    end
+
     it "returns an object containing the params extracted from application/json inputs" do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(

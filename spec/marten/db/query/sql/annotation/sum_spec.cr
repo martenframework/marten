@@ -18,7 +18,7 @@ describe Marten::DB::Query::SQL::Annotation::Sum do
         alias_prefix: Post.db_table,
       )
 
-      results = [] of Int64 | Int32 | Int16 | Int8 | Float64 | Float32 | Nil
+      results = [] of BigDecimal | Int64 | Int32 | Int16 | Int8 | Float64 | Float32 | Nil
 
       Marten::DB::Connection.default.open do |db|
         db.query(
@@ -37,6 +37,16 @@ describe Marten::DB::Query::SQL::Annotation::Sum do
       end
 
       results.should eq [30.0, nil, 30.0]
+    end
+
+    for_postgresql do
+      it "returns an exact value when summing a big integer field" do
+        Product.create!(sku: "SUM-1", name: "Product", price_cents: 19_99)
+
+        product = Product.annotate { sum(:price_cents) }.first!
+
+        product.annotations["price_cents_sum"].should eq BigDecimal.new("1999")
+      end
     end
   end
 

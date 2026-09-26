@@ -5,7 +5,11 @@ module Marten
         module Annotation
           class Sum < Base
             def from_db_result_set(result_set : ::DB::ResultSet)
-              result_set.read(Int64 | Int32 | Int16 | Int8 | Float64 | Float32 | Nil)
+              if field.is_a?(Field::BigInt) || field.is_a?(Field::Decimal)
+                result_set.read(BigDecimal?)
+              else
+                result_set.read(Int64 | Int32 | Int16 | Int8 | Float64 | Float32 | Nil)
+              end
             end
 
             def to_sql(with_alias : Bool = true) : String

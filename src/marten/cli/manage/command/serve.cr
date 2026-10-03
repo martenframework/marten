@@ -154,7 +154,10 @@ module Marten
           end
 
           private def stop_server_process
-            server_process.not_nil!.signal(:term) unless server_process.nil? || server_process.not_nil!.terminated?
+            return if (process = server_process).nil? || process.terminated?
+
+            process.signal(:term)
+            process.wait
           end
         end
       end

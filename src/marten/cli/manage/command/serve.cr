@@ -77,24 +77,39 @@ module Marten
               s << " --error-trace" if show_error_trace?
             end
 
-            stdout.print("⧖ Compiling...")
-
             tmp_stdout = IO::Memory.new
             tmp_stderr = IO::Memory.new
 
-            build_status = Spinner.start("Compiling...", stdout) do
-              Process.run(command, shell: true, input: STDIN, output: tmp_stdout, error: tmp_stderr)
+            build_status = nil.as(Process::Status?)
+            compile_time = Time::Span::ZERO
+            Spinner.start("Compiling...", stdout) do
+              compile_time = Time.measure do
+                build_status = Process.run(command, shell: true, input: STDIN, output: tmp_stdout, error: tmp_stderr)
+              end
             end
 
-            self.server_build_success = build_status.success?
+            self.server_build_success = build_status.not_nil!.success?
 
             # Prints the result of the server binary compilation.
             stdout.print(tmp_stdout.to_s)
             stderr.print(tmp_stderr.to_s)
+
+            if server_build_success
+              print("Compiled in #{format_compile_time(compile_time)}")
+            end
           end
 
           private def file_modification_timestamps
             @file_modification_timestamps ||= {} of String => String
+          end
+
+          private def format_compile_time(duration : Time::Span) : String
+            seconds = duration.total_seconds
+            if seconds < 1
+              "#{duration.total_milliseconds.round.to_i}ms"
+            else
+              "#{seconds.round(1)}s"
+            end
           end
 
           private def open_server

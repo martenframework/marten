@@ -43,12 +43,14 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v7
+    - name: Update packages
+      run: |
+        sudo apt-get update
     - uses: crystal-lang/install-crystal@v1
       with:
         crystal: ${{ matrix.crystal }}
     - name: Install packages required for MySQL
       run: |
-        sudo apt-get update
         sudo apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev lld --fix-missing
     - name: Create additional DB for MySQL
       run: |
@@ -94,12 +96,14 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v7
+    - name: Update packages
+      run: |
+        sudo apt-get update
     - uses: crystal-lang/install-crystal@v1
       with:
         crystal: ${{ matrix.crystal }}
     - name: Install packages required for MySQL
       run: |
-        sudo apt-get update
         sudo apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev lld --fix-missing
     - name: Create additional DB for MySQL
       run: |
@@ -144,12 +148,14 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v7
+    - name: Update packages
+      run: |
+        sudo apt-get update
     - uses: crystal-lang/install-crystal@v1
       with:
         crystal: ${{ matrix.crystal }}
     - name: Install packages required for PostgreSQL
       run: |
-        sudo apt-get update
         sudo apt-get -yqq install libpq-dev postgresql-client libsqlite3-dev libvips libvips-dev lld --fix-missing
     - name: Create additional DB for PostgreSQL
       run: |
@@ -179,12 +185,14 @@ jobs:
         ]
     steps:
     - uses: actions/checkout@v7
+    - name: Update packages
+      run: |
+        sudo apt-get update
     - uses: crystal-lang/install-crystal@v1
       with:
         crystal: ${{ matrix.crystal }}
     - name: Install packages required for SQLite
       run: |
-        sudo apt-get update
         sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev lld --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
@@ -200,12 +208,14 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v7
+    - name: Update packages
+      run: |
+        sudo apt-get update
     - uses: crystal-lang/install-crystal@v1
       with:
         crystal: '1.20.2'
     - name: Install packages required for SQLite
       run: |
-        sudo apt-get update
         sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables
@@ -230,12 +240,14 @@ jobs:
       fail-fast: false
     steps:
     - uses: actions/checkout@v7
+    - name: Update packages
+      run: |
+        sudo apt-get update
     - uses: crystal-lang/install-crystal@v1
       with:
         crystal: '1.20.2'
     - name: Install packages required for SQLite
       run: |
-        sudo apt-get update
         sudo apt-get -yqq install libsqlite3-dev libvips libvips-dev --fix-missing
     - name: Install shards
       run: shards install --ignore-crystal-version --skip-postinstall --skip-executables

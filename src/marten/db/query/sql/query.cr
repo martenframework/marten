@@ -239,8 +239,14 @@ module Marten
             @order_clauses = other.order_clauses.empty? ? @order_clauses : other.order_clauses
           end
 
-          def connection
-            @using.nil? ? Model.connection : Connection.get(@using.not_nil!)
+          # Returns the database connection to use for the query.
+          #
+          # By default the model's read connection is returned. Pass `write: true` for mutation operations so that
+          # database routers can resolve the write alias. Queries that use `SELECT ... FOR UPDATE` also automatically
+          # resolve the write connection.
+          def connection(*, write : Bool = false)
+            effective_write = write || lock?
+            @using.nil? ? Model.connection(write: effective_write) : Connection.get(@using.not_nil!)
           end
 
           def count(raw_field : String? = nil)
@@ -378,7 +384,7 @@ module Marten
 
           def raw_delete
             sql, parameters = build_delete_query
-            connection.open do |db|
+            connection(write: true).open do |db|
               result = db.exec(sql, args: parameters)
               result.rows_affected
             end
@@ -518,12 +524,12 @@ module Marten
 
             rows_affected = nil
 
-            connection.transaction do
+            connection(write: true).transaction do
               # First attempts to update the current model (only if local values need to be updated).
               rows_affected = if !values_to_update.empty?
                                 begin
                                   sql, parameters = build_update_query(values_to_update)
-                                  connection.open do |db|
+                                  connection(write: true).open do |db|
                                     result = db.exec(sql, args: parameters)
                                     result.rows_affected
                                   end
@@ -536,6 +542,7 @@ module Marten
               if !related_values_to_update.empty?
                 related_values_to_update.each do |model, v|
                   related_model_query = model._base_query
+                  related_model_query.using = @using
                   related_model_query.add_query_node(Node.new(pk__in: related_pks))
                   related_rows_affected = related_model_query.update_with(v)
 
@@ -1121,7 +1128,8 @@ module Marten
                       result_set: result_set,
                       joins: @joins + parent_model_joins,
                       annotations: @annotations.values,
-                    )
+                    ),
+                    @using
                   )
                 end
               end
@@ -1455,7 +1463,7 @@ module Marten
           private def update_with_raw(raw_update : String, params : Array(::DB::Any) | Hash(String, ::DB::Any))
             sql, parameters = build_raw_update_query(raw_update, params)
 
-            connection.open do |db|
+            connection(write: true).open do |db|
               result = db.exec(sql, args: parameters)
               result.rows_affected
             end

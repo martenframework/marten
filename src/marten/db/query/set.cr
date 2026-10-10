@@ -307,7 +307,7 @@ module Marten
             )
           end
 
-          query.connection.transaction do
+          query.connection(write: true).transaction do
             objects_with_pk, objects_without_pk = objects.partition(&.pk?)
 
             if !objects_with_pk.empty?
@@ -426,7 +426,9 @@ module Marten
           deleted_count = if raw
                             qs.query.raw_delete
                           else
-                            deletion = Deletion::Runner.new(qs.query.connection)
+                            write_connection = qs.query.connection(write: true)
+                            qs.query.using ||= write_connection.alias
+                            deletion = Deletion::Runner.new(write_connection)
                             deletion.add(qs)
                             deletion.execute
                           end
@@ -1870,7 +1872,9 @@ module Marten
         end
 
         private def perform_batched_insert(objects : Array(M), batch_size : Int32? = nil)
-          max_batch_size = @query.connection.bulk_batch_size(objects.size, M.local_fields.count(&.db_column?))
+          max_batch_size = @query
+            .connection(write: true)
+            .bulk_batch_size(objects.size, M.local_fields.count(&.db_column?))
           effective_batch_size = batch_size.nil? ? max_batch_size : [batch_size, max_batch_size].min
 
           inserted_pks = Array(::DB::Any).new
@@ -1887,7 +1891,7 @@ module Marten
               values
             end
 
-            result = @query.connection.bulk_insert(M.db_table, values_to_insert, pk_column_to_fetch)
+            result = @query.connection(write: true).bulk_insert(M.db_table, values_to_insert, pk_column_to_fetch)
 
             if result.is_a?(Array(::DB::Any))
               inserted_pks += result

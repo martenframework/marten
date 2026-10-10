@@ -132,6 +132,27 @@ describe Marten::Conf::GlobalSettings do
     end
   end
 
+  describe "#database_routers" do
+    it "returns an empty array by default" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.database_routers.empty?.should be_true
+    end
+
+    it "returns the list of database routers if explicitly set" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.database_routers = [Marten::Conf::GlobalSettingsSpec::TestRouter]
+      global_settings.database_routers.should eq [Marten::Conf::GlobalSettingsSpec::TestRouter]
+    end
+  end
+
+  describe "#database_routers=" do
+    it "allows to configure the list of database routers" do
+      global_settings = Marten::Conf::GlobalSettings.new
+      global_settings.database_routers = [Marten::Conf::GlobalSettingsSpec::TestRouter]
+      global_settings.database_routers.should eq [Marten::Conf::GlobalSettingsSpec::TestRouter]
+    end
+  end
+
   describe "#database" do
     it "allows to configure the default DB connection" do
       global_settings = Marten::Conf::GlobalSettings.new
@@ -1182,5 +1203,8 @@ module Marten::Conf::GlobalSettingsSpec
     def get
       Marten::HTTP::Response.new("It works!", content_type: "text/plain", status: 200)
     end
+  end
+
+  class TestRouter < Marten::DB::Router::Base
   end
 end

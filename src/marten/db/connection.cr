@@ -24,10 +24,18 @@ module Marten
         get(DEFAULT_CONNECTION_NAME)
       end
 
-      # Returns the connection to use for the passed `table_name`.
-      def self.for(table_name)
-        # TODO: implement mechanism like a database router allowing to pick a connection based on the table name.
-        default
+      # Returns the connection to use for the passed model.
+      #
+      # Configured database routers are consulted in order to determine which database alias should be used. The
+      # `write` argument indicates whether the connection is intended for a write operation (`true`) or a read
+      # operation (`false`). An optional model `instance` can be provided so that routers can take instance-level
+      # hints into account (such as a sticky database alias).
+      #
+      # If no router provides an opinion, the default database connection is returned.
+      def self.for(model : Model.class, *, write : Bool = false, instance : Model? = nil)
+        hints = Router::Hints.new(instance: instance)
+        db_alias = write ? Router.db_for_write(model, hints) : Router.db_for_read(model, hints)
+        db_alias.nil? ? default : get(db_alias)
       end
 
       # Returns the database connection configured for a given `db_alias`.

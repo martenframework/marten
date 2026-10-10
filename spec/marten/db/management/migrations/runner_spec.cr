@@ -352,6 +352,20 @@ describe Marten::DB::Management::Migrations::Runner do
       end
     end
 
+    it "excludes migrations that are not allowed by database routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Management::Migrations::RunnerSpec::FooOnlyRouter] of Marten::DB::Router::Base.class
+      ) do
+        runner = Marten::DB::Management::Migrations::Runner.new(Marten::DB::Connection.default)
+        plan = runner.plan
+
+        labels = plan.map(&.[0].class.app_config.label).uniq!
+        labels.should eq ["runner_spec_foo_app"]
+        plan.none? { |migration, _| migration.class.app_config.label == "runner_spec_bar_app" }.should be_true
+      end
+    end
+
     it "returns the expected migrations when applying specific app migrations up to a certain version" do
       bar_app = Marten::DB::Management::Migrations::RunnerSpec::BarApp.new
 
@@ -445,5 +459,16 @@ describe Marten::DB::Management::Migrations::Runner do
         name: "ghost_migration"
       ).exists?.should be_true
     end
+  end
+end
+
+class Marten::DB::Management::Migrations::RunnerSpec::FooOnlyRouter < Marten::DB::Router::Base
+  def allow_migrate?(
+    db : String,
+    app_label : String,
+    model_name : String? = nil,
+    hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+  ) : Bool?
+    app_label == "runner_spec_foo_app"
   end
 end

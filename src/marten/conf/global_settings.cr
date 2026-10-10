@@ -34,6 +34,9 @@ module Marten
       # Returns the application database configurations.
       getter databases
 
+      # Returns the list of database routers used by the application.
+      getter database_routers
+
       # Returns the list of default date input formats.
       #
       # The list of default date input formats is used by the `Marten::Schema::Field::Date` schema field to parse date
@@ -273,6 +276,7 @@ module Marten
         @cache_store = Cache::Store::Memory.new
         @cross_origin_opener_policy = "same-origin"
         @databases = [] of Database
+        @database_routers = Array(Marten::DB::Router::Base.class).new
         @date_input_formats = [
           "%Y-%m-%d",  # '2024-10-25'
           "%m/%d/%Y",  # '10/25/2024'
@@ -360,6 +364,15 @@ module Marten
           yield db_config_with_target_env
         end
         @databases << db_config if not_yet_defined
+      end
+
+      # Allows to define the list of database routers used by the application.
+      #
+      # Database routers are consulted in order when resolving which database should be used for a given model
+      # operation. Each router should inherit from `Marten::DB::Router::Base`.
+      def database_routers=(v)
+        @database_routers = Array(Marten::DB::Router::Base.class).new
+        @database_routers.concat(v)
       end
 
       # Provides access to emailing settings.

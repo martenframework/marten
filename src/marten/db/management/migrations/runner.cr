@@ -234,6 +234,7 @@ module Marten
             end
 
             plan
+              .select { |migration, _backward| migration_allowed?(migration) }
           end
 
           private def get_applied_migration_ids
@@ -242,10 +243,12 @@ module Marten
             end
           end
 
-          def mark_eligible_replacements_as_applied(&)
+          private def mark_eligible_replacements_as_applied(&)
             applied_migration_ids = get_applied_migration_ids
 
             @reader.replacements.each do |replacement_migration_id, replacement_migration|
+              next unless migration_allowed?(replacement_migration)
+
               # Only records the fact that the replacement migration has been applied when all the migrations it
               # replaces were already applied AND only if the replacement migration itself wasn't already recorded.
               next unless replacement_migration.class.replacement_ids.all? { |id| applied_migration_ids.includes?(id) }
@@ -283,6 +286,10 @@ module Marten
             end
 
             state
+          end
+
+          private def migration_allowed?(migration : Migration) : Bool
+            Router.allow_migrate?(@connection.alias, migration.class.app_config.label)
           end
 
           private def record_migration(migration)

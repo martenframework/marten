@@ -147,7 +147,7 @@ module Marten
               end
 
               def {{ relation_attribute_name }} : {{ related_model_klass }}?
-                @{{ relation_attribute_name }} ||= {{ related_model_klass }}.get(pk: @{{ field_id }})
+                @{{ relation_attribute_name }} ||= {{ related_model_klass }}.using(@using).get(pk: @{{ field_id }})
               end
 
               def {{ relation_attribute_name }}! : {{ related_model_klass }}
@@ -159,6 +159,10 @@ module Marten
               end
 
               def {{ relation_attribute_name }}=(related_object : {{ related_model_klass }}?)
+                if !related_object.nil?
+                  ensure_relation_allowed(related_object)
+                end
+
                 @{{ field_id }} = if related_object.nil?
                   nil
                 else

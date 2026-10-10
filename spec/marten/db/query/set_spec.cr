@@ -4332,6 +4332,81 @@ describe Marten::DB::Query::Set do
       qset.using(nil).to_a.should eq [tag_1]
     end
   end
+
+  describe "database routing" do
+    it "deletes records from the write database suggested by routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Query::SetSpec::PrimaryReplicaRouter] of Marten::DB::Router::Base.class
+      ) do
+        tag = Tag.create!(name: "coding", is_active: true)
+
+        Tag.all.delete
+
+        Tag.using(:default).filter(pk: tag.pk).exists?.should be_false
+      end
+    end
+
+    it "updates records on the write database suggested by routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Query::SetSpec::PrimaryReplicaRouter] of Marten::DB::Router::Base.class
+      ) do
+        tag = Tag.create!(name: "coding", is_active: true)
+
+        Tag.all.update(name: "crystal")
+
+        Tag.using(:default).get!(pk: tag.pk).name.should eq "crystal"
+      end
+    end
+
+    it "bulk creates records on the write database suggested by routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Query::SetSpec::PrimaryReplicaRouter] of Marten::DB::Router::Base.class
+      ) do
+        tags = Tag.all.bulk_create([
+          Tag.new(name: "coding", is_active: true),
+          Tag.new(name: "crystal", is_active: true),
+        ])
+
+        tags.size.should eq 2
+        Tag.using(:default).filter(name__in: ["coding", "crystal"]).size.should eq 2
+        Tag.all.size.should eq 0
+      end
+    end
+
+    it "uses the write connection for locked queries suggested by routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Query::SetSpec::PrimaryReplicaRouter] of Marten::DB::Router::Base.class
+      ) do
+        tag = Tag.create!(name: "coding", is_active: true)
+
+        Tag.transaction do
+          Tag.all.lock.to_a.should eq [tag]
+        end
+      end
+    end
+  end
+end
+
+module Marten::DB::Query::SetSpec
+  class PrimaryReplicaRouter < Marten::DB::Router::Base
+    def db_for_read(
+      model : Marten::DB::Model.class,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : String?
+      "other"
+    end
+
+    def db_for_write(
+      model : Marten::DB::Model.class,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : String?
+      "default"
+    end
+  end
 end
 
 class Post

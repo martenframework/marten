@@ -15,6 +15,7 @@ module Marten
         )
           @query = if query.nil?
                      q = SQL::Query(M).new
+                     q.using = @instance.using
                      q.add_query_node(effective_query_node)
                      q
                    else
@@ -30,6 +31,7 @@ module Marten
 
         protected def build_record(**kwargs)
           record = M.new(**kwargs)
+          record.using = @instance.using
           record.assign_related_object(@instance, @related_field_id)
           record
         end

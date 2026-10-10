@@ -18,6 +18,9 @@ module Marten
         end
       end
 
+      # Represents an error raised when a relation between two model instances is not allowed by database routers.
+      class InvalidRelation < Exception; end
+
       # Represents an error raised when a get query returned more than one result.
       class MultipleRecordsFound < Exception; end
 

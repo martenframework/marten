@@ -2101,4 +2101,128 @@ describe Marten::DB::Model::Persistence do
       object.new_record?.should be_false
     end
   end
+
+  describe "database routing" do
+    it "persists records to the database suggested by routers" do
+      tag_pk = nil
+
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Model::PersistenceSpec::OtherDBRouter] of Marten::DB::Router::Base.class
+      ) do
+        tag = Tag.create!(name: "coding", is_active: true)
+        tag_pk = tag.pk
+        Tag.using(:other).get!(pk: tag.pk).name.should eq "coding"
+      end
+
+      Tag.filter(pk: tag_pk).exists?.should be_false
+    end
+
+    it "keeps writing to the sticky database after an explicit using save" do
+      tag = Tag.new(name: "coding", is_active: true)
+      tag.save!(using: :other)
+      tag.name = "crystal"
+      tag.save!
+
+      Tag.all.size.should eq 0
+      Tag.using(:other).get!(pk: tag.pk).name.should eq "crystal"
+    end
+
+    it "raises when assigning a relation that is not allowed by database routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Model::PersistenceSpec::DenyRelationRouter] of Marten::DB::Router::Base.class
+      ) do
+        user = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+        post = Post.new(title: "Test")
+
+        expect_raises(Marten::DB::Errors::InvalidRelation) do
+          post.author = user
+        end
+      end
+    end
+
+    it "locks records on the write database suggested by routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Model::PersistenceSpec::PrimaryReplicaRouter] of Marten::DB::Router::Base.class
+      ) do
+        object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+        object_alt = TestUser.using(:default).get!(pk: object.pk)
+        object_alt.username = "jd2"
+        object_alt.save!(using: :default)
+
+        object.transaction do
+          object.lock!
+          object.username.should eq "jd2"
+        end
+      end
+    end
+
+    it "opens with_lock transactions and locks on the write database suggested by routers" do
+      with_overridden_setting(
+        :database_routers,
+        [Marten::DB::Model::PersistenceSpec::PrimaryReplicaRouter] of Marten::DB::Router::Base.class
+      ) do
+        object = TestUser.create!(username: "jd", email: "jd@example.com", first_name: "John", last_name: "Doe")
+
+        object_alt = TestUser.using(:default).get!(pk: object.pk)
+        object_alt.username = "jd2"
+        object_alt.save!(using: :default)
+
+        object.with_lock do
+          object.username.should eq "jd2"
+          object.username = "jd3"
+          object.save!
+        end
+
+        TestUser.using(:default).get!(pk: object.pk).username.should eq "jd3"
+      end
+    end
+  end
+end
+
+module Marten::DB::Model::PersistenceSpec
+  class OtherDBRouter < Marten::DB::Router::Base
+    def db_for_read(
+      model : Marten::DB::Model.class,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : String?
+      "other"
+    end
+
+    def db_for_write(
+      model : Marten::DB::Model.class,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : String?
+      "other"
+    end
+  end
+
+  class PrimaryReplicaRouter < Marten::DB::Router::Base
+    def db_for_read(
+      model : Marten::DB::Model.class,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : String?
+      "other"
+    end
+
+    def db_for_write(
+      model : Marten::DB::Model.class,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : String?
+      "default"
+    end
+  end
+
+  class DenyRelationRouter < Marten::DB::Router::Base
+    def allow_relation?(
+      obj1 : Marten::DB::Model,
+      obj2 : Marten::DB::Model,
+      hints : Marten::DB::Router::Hints = Marten::DB::Router::Hints.new,
+    ) : Bool?
+      false
+    end
+  end
 end

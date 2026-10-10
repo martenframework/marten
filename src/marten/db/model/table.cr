@@ -176,10 +176,11 @@ module Marten
             @@local_relation_fields_per_relation_name
           end
 
-          protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator)
+          protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator, using : String? = nil)
             obj = new
             obj.new_record = false
-            obj.from_db_row_iterator(row_iterator)
+            obj.using = using
+            obj.from_db_row_iterator(row_iterator, using)
             obj
           end
 
@@ -691,7 +692,7 @@ module Marten
           values
         end
 
-        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator) : Nil
+        protected def from_db_row_iterator(row_iterator : Query::SQL::RowIterator, using : String? = nil) : Nil
           row_iterator.each_local_column do |result_set, column_name|
             assign_local_field_from_db_result_set(result_set, column_name)
           end
@@ -707,11 +708,11 @@ module Marten
                 # "advance" the row cursor so that the next relation can be correctly picked up afterwards.
                 relation_row_iterator.advance
               else
-                related_object = relation_field.related_model.from_db_row_iterator(relation_row_iterator)
+                related_object = relation_field.related_model.from_db_row_iterator(relation_row_iterator, using)
                 assign_related_object(related_object, relation_field.id)
               end
             else
-              related_object = reverse_relation.model.from_db_row_iterator(relation_row_iterator)
+              related_object = reverse_relation.model.from_db_row_iterator(relation_row_iterator, using)
 
               # Only assign the retrieved object if it is persisted (ie. if it has a primary key value). If that's not
               # then case, then this means that current record does not have a reverse related object.

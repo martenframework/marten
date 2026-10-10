@@ -21,8 +21,12 @@ module Marten
             self.class.new(query: query, params: params, using: using)
           end
 
-          def connection
-            using.nil? ? Model.connection : Connection.get(using.not_nil!)
+          # Returns the database connection to use for the raw query.
+          #
+          # By default the model's read connection is returned. Pass `write: true` when the raw SQL performs a mutation
+          # so that database routers can resolve the write alias.
+          def connection(*, write : Bool = false)
+            using.nil? ? Model.connection(write: write) : Connection.get(using.not_nil!)
           end
 
           def execute : Array(Model)
@@ -60,7 +64,8 @@ module Marten
                       result_set: result_set,
                       joins: Array(Join).new,
                       annotations: Array(Annotation::Base).new,
-                    )
+                    ),
+                    using
                   )
                 end
               end

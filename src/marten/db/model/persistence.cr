@@ -79,7 +79,7 @@ module Marten
         def delete(using : Nil | String | Symbol = nil)
           deleted_count = 0
 
-          connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
+          connection = resolve_connection(using, write: true)
           connection.transaction do
             run_before_delete_callbacks
 
@@ -91,14 +91,13 @@ module Marten
               connection.observe_transaction_rollback(->run_after_delete_rollback_callbacks)
             end
 
-            deletion = Deletion::Runner.new(
-              using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
-            )
+            deletion = Deletion::Runner.new(connection)
 
             deletion.add(self)
             deleted_count = deletion.execute
 
             @deleted = true
+            @using = connection.alias unless using.nil?
 
             run_after_delete_callbacks
           end
@@ -142,12 +141,19 @@ module Marten
           raise Errors::UnmetSaveCondition.new("Cannot lock a new record") if new_record?
           raise Errors::UnmetSaveCondition.new("Cannot lock a deleted record") if deleted?
 
-          reloaded = self.class.lock(lock).using(using).get!(pk: pk)
+          previous_using = @using
+          connection = resolve_connection(using, write: true)
+          reloaded = self.class.lock(lock).using(connection.alias).get!(pk: pk)
 
           assign_field_values(reloaded.field_values)
           reset_relation_instance_variables
 
           @new_record = false
+          @using = if !using.nil?
+                     connection.alias
+                   else
+                     previous_using
+                   end
 
           self
         end
@@ -173,12 +179,13 @@ module Marten
         # This methods retrieves the record at the database level and updates the current model instance with the new
         # values.
         def reload
-          reloaded = self.class.get!(pk: pk)
+          reloaded = self.class.using(@using).get!(pk: pk)
 
           assign_field_values(reloaded.field_values)
           reset_relation_instance_variables
 
           @new_record = false
+          @using = reloaded.using || @using
 
           self
         end
@@ -193,9 +200,10 @@ module Marten
 
           # TODO: this block should probably be executed if the record is not persisted or if changes have been made
           # to the considered record (dirty changes mechanism).
-          connection = using.nil? ? self.class.connection : DB::Connection.get(using.to_s)
+          connection = resolve_connection(using, write: true)
           connection.transaction do
             insert_or_update(connection)
+            @using = connection.alias unless using.nil?
             true
           end
         end
@@ -251,17 +259,19 @@ module Marten
         # does not reload the record after the update, so any changes made to other fields by database
         # triggers or defaults will not be reflected in the model instance.
         #
+        # An optional database alias can be specified with `using` in order to target a non-default connection.
+        #
         # ```
         # user = User.get!(id: 42)
         # user.update_columns(last_login: Time.utc)                    # Updates only last_login
         # user.update_columns(username: "jd", email: "jd@example.com") # Updates multiple columns
         # ```
-        def update_columns(**values) : Bool
-          update_columns(values: values)
+        def update_columns(*, using : Nil | String | Symbol = nil, **values) : Bool
+          update_columns(values: values, using: using)
         end
 
         # :ditto:
-        def update_columns(values : Hash | NamedTuple) : Bool
+        def update_columns(values : Hash | NamedTuple, using : Nil | String | Symbol = nil) : Bool
           return false if !persisted?
 
           set_field_values(values)
@@ -269,13 +279,14 @@ module Marten
           keys = values.keys.map(&.to_s)
           fields.select!(keys)
 
-          connection = self.class.connection
+          connection = resolve_connection(using, write: true)
           connection.update(
             self.class.db_table,
             fields,
             pk_column_name: self.class.pk_field.db_column!,
             pk_value: self.class.pk_field.to_db(pk)
           )
+          @using = connection.alias unless using.nil?
           true
         end
 
@@ -288,6 +299,8 @@ module Marten
         # Like `#update_columns`, this method bypasses model validations and lifecycle callbacks, making it
         # suitable for performance-critical updates where these features are not needed.
         #
+        # An optional database alias can be specified with `using` in order to target a non-default connection.
+        #
         # ```
         # user = User.get!(id: 42)
         # user.update_columns!(last_login: Time.utc) # Updates only last_login
@@ -295,12 +308,12 @@ module Marten
         # new_user = User.new(username: "jd")
         # new_user.update_columns!(email: "jd@example.com") # Raises UnmetSaveCondition
         # ```
-        def update_columns!(**values) : Bool
-          update_columns!(values: values)
+        def update_columns!(*, using : Nil | String | Symbol = nil, **values) : Bool
+          update_columns!(values: values, using: using)
         end
 
         # :ditto:
-        def update_columns!(values : Hash | NamedTuple) : Bool
+        def update_columns!(values : Hash | NamedTuple, using : Nil | String | Symbol = nil) : Bool
           raise Errors::UnmetSaveCondition.new("Cannot update columns on a new record") if new_record?
           raise Errors::UnmetSaveCondition.new("Cannot update columns on a deleted record") if deleted?
 
@@ -309,13 +322,14 @@ module Marten
           keys = values.keys.map(&.to_s)
           fields.select!(keys)
 
-          connection = self.class.connection
+          connection = resolve_connection(using, write: true)
           connection.update(
             self.class.db_table,
             fields,
             pk_column_name: self.class.pk_field.db_column!,
             pk_value: self.class.pk_field.to_db(pk)
           )
+          @using = connection.alias unless using.nil?
           true
         end
 
@@ -366,7 +380,12 @@ module Marten
           self.class.fields.each do |field|
             next if !field.relation?
             related_obj = get_cached_related_object(field)
-            next if related_obj.nil? || related_obj.not_nil!.persisted?
+            next if related_obj.nil?
+
+            ensure_relation_allowed(related_obj.not_nil!)
+
+            next if related_obj.not_nil!.persisted?
+
             raise Errors::UnmetSaveCondition.new(
               "Save is prohibited because related object '#{field.relation_name}' is not persisted"
             )

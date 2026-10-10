@@ -21,6 +21,7 @@ module Marten
         )
           @query = if query.nil?
                      q = SQL::Query(M).new
+                     q.using = @instance.using
                      q.add_query_node(
                        Node.new({"#{@through_related_name}__#{@through_model_from_field_id}" => @instance})
                      )
@@ -39,7 +40,11 @@ module Marten
 
         # :ditto:
         def add(objs : Enumerable(M) | Iterable(M))
-          query.connection.transaction do
+          query.connection(write: true).transaction do
+            objs.each do |obj|
+              @instance.ensure_relation_allowed(obj)
+            end
+
             # Identify which objects are already added to the many to many relationship and skip them.
             existing_object_ids = m2m_field.as(Field::ManyToMany).through._base_queryset
               .using(query.using)
@@ -72,7 +77,7 @@ module Marten
 
         # Clears the many-to-many relationship.
         def clear : Nil
-          query.connection.transaction do
+          query.connection(write: true).transaction do
             deletion_qs = m2m_field.as(Field::ManyToMany).through._base_queryset
               .using(query.using)
               .filter(Query::Node.new({m2m_through_from_field.id => @instance.pk.as(Field::Any)}))
@@ -96,7 +101,7 @@ module Marten
 
         # :ditto:
         def remove(objs : Enumerable(M) | Iterable(M)) : Nil
-          query.connection.transaction do
+          query.connection(write: true).transaction do
             m2m_field.as(Field::ManyToMany).through._base_queryset
               .using(query.using)
               .filter(

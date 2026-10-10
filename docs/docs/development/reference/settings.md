@@ -180,6 +180,21 @@ config.middleware = [
 
 Middlewares are used to "hook" into Marten's request / response lifecycle. They can be used to alter or implement logics based on incoming HTTP requests and the resulting HTTP responses. Please refer to [Middlewares](../../handlers-and-http/middlewares.md) to learn more about middlewares.
 
+### `database_routers`
+
+Default: `[] of Marten::DB::Router::Base.class`
+
+An array of database router classes used to resolve which database should be used for model operations. For example:
+
+```crystal
+config.database_routers = [
+  AnalyticsRouter,
+  PrimaryReplicaRouter,
+]
+```
+
+Routers are consulted in order when resolving read/write connections, validating relations, and deciding which migrations may run on a given database. Each router must inherit from [`Marten::DB::Router::Base`](pathname:///api/dev/Marten/DB/Router/Base.html). Please refer to [Multiple databases](../../models-and-databases/multiple-databases.md#database-routers) to learn more about database routing.
+
 ### `parallelism`
 
 Default: `1` (or the value of the `MARTEN_PARALLELISM` environment variable when set)

@@ -83,7 +83,7 @@ describe Marten::DB::Query::ManyToManySet do
       user.tags.using(:other).add([tag_1, tag_2])
 
       qset_1 = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
-      qset_1.exists?.should be_false
+      qset_1.using(:default).exists?.should be_false
 
       qset_2 = Marten::DB::Query::ManyToManySet(Tag).new(user, "tags", "testuser_tags", "testuser", "tag")
       qset_2.using(:other).all.to_set.should eq(Set{tag_1, tag_2})

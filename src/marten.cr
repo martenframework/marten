@@ -42,7 +42,7 @@ require "./marten/server/**"
 require "./marten/template/**"
 
 module Marten
-  VERSION = "0.7.0"
+  VERSION = "0.7.1"
 
   Log = ::Log.for("marten")
 

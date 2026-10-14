@@ -87,7 +87,10 @@ The `MARTEN_SPEC_DB_CONNECTION` environment variable works with this script as w
   - `with_installed_apps(*apps) { ... }` — register additional apps for a spec
   - `with_main_app_location(location) { ... }` — override the main app location
 
-**Requires libvips** to compile the spec suite. Supported Crystal versions are listed in the [release notes for the version under development](docs/docs/the-marten-project/release-notes.md).
+### Compiler and native dependencies
+
+- **Crystal:** use the versions listed in the [release notes for the version under development](docs/docs/the-marten-project/release-notes.md). The compilers CI runs are the `crystal` matrix in `.github/workflows/specs.yml`.
+- **libvips** is required to compile the spec suite.
 
 ## Quality Assurance
 
@@ -115,14 +118,16 @@ Follow [Crystal's style guide](https://crystal-lang.org/reference/conventions/co
 When adding or changing user-visible behavior:
 
 1. Add specs in `spec/marten/<module>/`
-2. Update the relevant guide in `docs/docs/`
+2. Update the relevant guide in `docs/docs/` (that tree only; see Documentation below)
 3. Add an entry to the release notes file for the version under development (see [release notes index](docs/docs/the-marten-project/release-notes.md))
 
 ### Documentation
 
+The only docs tree to edit by hand is `docs/docs/`.
+
 - **User guides**: `docs/docs/` (Docusaurus, live preview via `cd docs && npm run start`)
 - **API reference**: generated with `make docs_api` → `docs/static/api/dev/`
-- **Versioned docs**: `docs/versioned_docs/` — update `docs/docs/` for the current development version; versioned snapshots are maintained separately
+- **Snapshots**: `docs/versioned_docs/` and `docs/static/api/0.5`, `docs/static/api/0.6`, and `docs/static/api/0.7` are published copies. Leave them unchanged.
 
 ## Common Development Workflows
 
@@ -140,6 +145,18 @@ When adding or changing user-visible behavior:
 | Middleware | `src/marten/middleware/` + `spec/marten/middleware/` |
 
 When fixing behavior in one area, grep for similar patterns in the same module directory before implementing.
+
+### Adding a built-in type
+
+Copy the closest existing implementation and its spec, then register it. The how-to guides for custom fields and custom tags describe application code. Built-in framework types follow the files below. Finish with the user-facing change checklist.
+
+**Model field.** Copy `src/marten/db/field/string.cr` and `spec/marten/db/field/string_spec.cr`. Add a `require` and a `register` call in `src/marten/db/field.cr` (see `register "string", String`). Document the field in `docs/docs/models-and-databases/reference/fields.md`. Validation copy goes in `src/marten/locales/en.yml` and the other locale files beside it.
+
+**Setting.** Copy `src/marten/conf/global_settings/method_override.cr` and `spec/marten/conf/global_settings/method_override_spec.cr`. `src/marten.cr` already requires `./marten/conf/**`. Add the accessor on `src/marten/conf/global_settings.cr` (see `#method_override`). Document it in `docs/docs/development/reference/settings.md`.
+
+**Template tag.** Copy `src/marten/template/tag/assign.cr` and `spec/marten/template/tag/assign_spec.cr`. `src/marten/template/tag.cr` requires `./tag/**`. Register the name in that file (see `register "assign", Assign`). Document it in `docs/docs/templates/reference/tags.md`.
+
+**Generator.** Copy `src/marten/cli/generator/email.cr`, the templates under `src/marten/cli/generator/email/`, and `spec/marten/cli/generator/email_spec.cr`. `src/marten/cli.cr` requires `./cli/**`, and subclasses of `Marten::CLI::Generator` register themselves through the `inherited` hook in `src/marten/cli/generator.cr`. Document the command in `docs/docs/development/reference/generators.md`.
 
 ### Local test project
 

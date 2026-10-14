@@ -1,0 +1,159 @@
+# Marten
+
+> Marten is a batteries-included web framework for Crystal. This file indexes the guides for the version under development.
+
+These URLs are the in-development guides at https://martenframework.com/docs/next/. The latest stable guides are at https://martenframework.com/docs/. The generated API reference for this version is at https://martenframework.com/docs/api/dev/.
+
+## Prologue
+
+- [Prologue](https://martenframework.com/docs/next/): What Marten is, and how the guides, how-tos, and reference pages differ.
+
+## Getting Started
+
+- [Getting Started](https://martenframework.com/docs/next/getting-started): Learn how to install Marten and create a first project.
+- [Installation](https://martenframework.com/docs/next/getting-started/installation): Get started by installing Marten and its dependencies.
+- [Tutorial](https://martenframework.com/docs/next/getting-started/tutorial): Learn how to use Marten by creating a simple web application.
+- [Coming from Django?](https://martenframework.com/docs/next/getting-started/from-django): A concept map for developers already familiar with Django.
+- [Coming from Rails?](https://martenframework.com/docs/next/getting-started/from-rails): A concept map for developers already familiar with Ruby on Rails.
+
+## Models and databases
+
+- [Models and databases](https://martenframework.com/docs/next/models-and-databases): Learn how models define and persist the data in a Marten application.
+- [Introduction to models](https://martenframework.com/docs/next/models-and-databases/introduction): Learn how to define models and interact with model records.
+- [Querying model records](https://martenframework.com/docs/next/models-and-databases/queries): Learn how to query model records.
+- [Relationships](https://martenframework.com/docs/next/models-and-databases/relationships): Learn how to define relationships in models.
+- [Model validations](https://martenframework.com/docs/next/models-and-databases/validations): Learn how to validate model records.
+- [Model callbacks](https://martenframework.com/docs/next/models-and-databases/callbacks): Learn how to define model callbacks.
+- [Model migrations](https://martenframework.com/docs/next/models-and-databases/migrations): Learn how to generate and work with model migrations.
+- [Database transactions](https://martenframework.com/docs/next/models-and-databases/transactions): Learn how to leverage database transactions.
+- [Performing raw SQL queries](https://martenframework.com/docs/next/models-and-databases/raw-sql): Learn how to perform raw SQL queries.
+- [Multiple databases](https://martenframework.com/docs/next/models-and-databases/multiple-databases): Learn how to leverage multiple databases in a Marten project.
+- [Create custom model fields](https://martenframework.com/docs/next/models-and-databases/how-to/create-custom-model-fields): How to create custom model fields.
+- [Create custom field predicates](https://martenframework.com/docs/next/models-and-databases/how-to/create-custom-field-predicates): How to create custom field predicates.
+- [Model fields](https://martenframework.com/docs/next/models-and-databases/reference/fields): Model fields reference.
+- [Table options](https://martenframework.com/docs/next/models-and-databases/reference/table-options): Table options reference.
+- [Query set](https://martenframework.com/docs/next/models-and-databases/reference/query-set): Query set reference.
+- [Migration operations](https://martenframework.com/docs/next/models-and-databases/reference/migration-operations): Migration operations reference.
+
+## Handlers and HTTP
+
+- [Handlers and HTTP](https://martenframework.com/docs/next/handlers-and-http): Learn how handlers process requests and return responses.
+- [Introduction to handlers](https://martenframework.com/docs/next/handlers-and-http/introduction): Learn how to define handlers and respond to HTTP requests.
+- [Routing](https://martenframework.com/docs/next/handlers-and-http/routing): Learn how to map handlers to routes.
+- [Generic handlers](https://martenframework.com/docs/next/handlers-and-http/generic-handlers): Learn how to leverage generic handlers to perform common tasks.
+- [Error handlers](https://martenframework.com/docs/next/handlers-and-http/error-handlers): Learn about the built-in error handlers and how to configure them.
+- [Sessions](https://martenframework.com/docs/next/handlers-and-http/sessions): Learn how to use sessions to persist data between requests.
+- [Cookies](https://martenframework.com/docs/next/handlers-and-http/cookies): Learn how to use cookies to persist data on the client.
+- [Handler callbacks](https://martenframework.com/docs/next/handlers-and-http/callbacks): Learn how to define handler callbacks.
+- [Middlewares](https://martenframework.com/docs/next/handlers-and-http/middlewares): Learn how to leverage middlewares to alter HTTP requests and responses.
+- [Customize handler template contexts](https://martenframework.com/docs/next/handlers-and-http/how-to/customize-handler-template-contexts): How to customize handler template contexts.
+- [Create custom route parameters](https://martenframework.com/docs/next/handlers-and-http/how-to/create-custom-route-parameters): How to create custom route parameters.
+- [Generic handlers](https://martenframework.com/docs/next/handlers-and-http/reference/generic-handlers): Generic handlers reference
+- [Middlewares](https://martenframework.com/docs/next/handlers-and-http/reference/middlewares): Middlewares reference
+
+## Templates
+
+- [Templates](https://martenframework.com/docs/next/templates): Learn how to write templates that render HTML dynamically.
+- [Introduction to templates](https://martenframework.com/docs/next/templates/introduction): Learn how to write templates and generate HTML dynamically.
+- [Create custom template filters](https://martenframework.com/docs/next/templates/how-to/create-custom-filters): How to create custom template filters.
+- [Create custom template tags](https://martenframework.com/docs/next/templates/how-to/create-custom-tags): How to create custom template tags.
+- [Create custom context producers](https://martenframework.com/docs/next/templates/how-to/create-custom-context-producers): How to create custom context producers.
+- [Create custom template loaders](https://martenframework.com/docs/next/templates/how-to/create-custom-loaders): How to create custom template loaders.
+- [Template filters](https://martenframework.com/docs/next/templates/reference/filters): Template filters reference.
+- [Template tags](https://martenframework.com/docs/next/templates/reference/tags): Template tags reference.
+- [Operators](https://martenframework.com/docs/next/templates/reference/operators): Operators reference.
+- [Context producers](https://martenframework.com/docs/next/templates/reference/context-producers): Context producers reference.
+- [Template loaders](https://martenframework.com/docs/next/templates/reference/loaders): Template loaders reference.
+
+## Schemas
+
+- [Schemas](https://martenframework.com/docs/next/schemas): Learn how schemas deserialize and validate input data.
+- [Introduction to schemas](https://martenframework.com/docs/next/schemas/introduction): Learn how to define schemas and use them in handlers.
+- [Schema validations](https://martenframework.com/docs/next/schemas/validations): Learn how to validate data with schemas.
+- [Create custom schema fields](https://martenframework.com/docs/next/schemas/how-to/create-custom-schema-fields): How to create custom schema fields.
+- [Schema fields](https://martenframework.com/docs/next/schemas/reference/fields): Schema fields reference.
+
+## Assets
+
+- [Assets](https://martenframework.com/docs/next/assets): Learn how to manage static files such as stylesheets, scripts, and images.
+- [Assets handling](https://martenframework.com/docs/next/assets/introduction): Learn how to handle assets.
+- [Serving assets](https://martenframework.com/docs/next/assets/serving-assets): Learn how to serve assets in development and production.
+
+## Files
+
+- [Files](https://martenframework.com/docs/next/files): Learn how to upload and manage files.
+- [Uploading files](https://martenframework.com/docs/next/files/uploading-files): Learn how to upload files.
+- [Managing files](https://martenframework.com/docs/next/files/managing-files): Learn how to manage uploaded files.
+- [Create custom file storages](https://martenframework.com/docs/next/files/how-to/create-custom-file-storages): Learn how to create custom file storages.
+- [File storages](https://martenframework.com/docs/next/files/reference/stores): File storages reference.
+
+## Development
+
+- [Development](https://martenframework.com/docs/next/development): Learn how to structure, configure, and test a Marten project.
+- [Settings](https://martenframework.com/docs/next/development/settings): Learn the basics of Marten settings.
+- [Applications](https://martenframework.com/docs/next/development/applications): Learn how to leverage applications to structure your projects.
+- [Management commands](https://martenframework.com/docs/next/development/management-commands): Learn the basics of the Marten management CLI tool.
+- [Generators](https://martenframework.com/docs/next/development/generators): Learn how to use generators in Marten.
+- [Testing](https://martenframework.com/docs/next/development/testing): Learn how to test your Marten project.
+- [Configure database backends](https://martenframework.com/docs/next/development/how-to/configure-database-backends): How to configure database backends.
+- [Create custom commands](https://martenframework.com/docs/next/development/how-to/create-custom-commands): How to create custom management commands.
+- [Settings](https://martenframework.com/docs/next/development/reference/settings): Settings reference.
+- [Management commands](https://martenframework.com/docs/next/development/reference/management-commands): Management commands reference.
+- [Generators](https://martenframework.com/docs/next/development/reference/generators): Generators reference.
+
+## Security
+
+- [Security](https://martenframework.com/docs/next/security): Learn about the security measures Marten provides.
+- [Security in Marten](https://martenframework.com/docs/next/security/introduction): Learn about the main security features provided by the Marten framework.
+- [Cross-Site Request Forgery protection](https://martenframework.com/docs/next/security/csrf): Learn about Cross-Site Request Forgeries (CSRF) attacks and how to protect your application from them.
+- [Clickjacking protection](https://martenframework.com/docs/next/security/clickjacking): Learn about clickjacking and how Marten helps protect against this type of attacks.
+- [Content Security Policy](https://martenframework.com/docs/next/security/content-security-policy): Learn how to configure the Content-Security-Policy (CSP) header.
+
+## Internationalization
+
+- [Internationalization](https://martenframework.com/docs/next/i18n): Learn how to translate content and localize routes.
+- [Introduction to internationalization](https://martenframework.com/docs/next/i18n/introduction): Learn how to leverage translations and localized contents in your Marten projects.
+- [Localized routes](https://martenframework.com/docs/next/i18n/localized-routes): Learn how to define localized routes.
+
+## Emailing
+
+- [Emailing](https://martenframework.com/docs/next/emailing): Learn how to define emails and deliver them.
+- [Introduction to emails](https://martenframework.com/docs/next/emailing/introduction): Learn how to define emails in a Marten project and how to deliver them.
+- [Email callbacks](https://martenframework.com/docs/next/emailing/callbacks): Learn how to define email callbacks.
+- [Create emailing backends](https://martenframework.com/docs/next/emailing/how-to/create-custom-emailing-backends): How to create custom emailing backends.
+- [Emailing backends](https://martenframework.com/docs/next/emailing/reference/backends): Emailing backends reference.
+
+## Authentication
+
+- [Authentication](https://martenframework.com/docs/next/authentication): Learn how to generate and extend the built-in authentication application.
+- [Introduction to authentication](https://martenframework.com/docs/next/authentication/introduction): Learn how to set up authentication for your Marten project.
+- [Generated files](https://martenframework.com/docs/next/authentication/reference/generated-files): Generated files reference.
+
+## Caching
+
+- [Caching](https://martenframework.com/docs/next/caching): Learn how to cache expensive work, including template fragments.
+- [Introduction to caching](https://martenframework.com/docs/next/caching/introduction): Learn how to leverage caching in a Marten project.
+- [Create cache stores](https://martenframework.com/docs/next/caching/how-to/create-custom-cache-stores): How to create custom cache stores.
+- [Caching stores](https://martenframework.com/docs/next/caching/reference/stores): Caching stores reference.
+
+## Deployment
+
+- [Deployment](https://martenframework.com/docs/next/deployment): Learn how to deploy a Marten project.
+- [Deploying Marten projects](https://martenframework.com/docs/next/deployment/introduction): Learn about the things to consider when deploying Marten web applications.
+- [Deploy to an Ubuntu server](https://martenframework.com/docs/next/deployment/how-to/deploy-to-an-ubuntu-server): Learn how to deploy a Marten project to an Ubuntu server.
+- [Deploy to Heroku](https://martenframework.com/docs/next/deployment/how-to/deploy-to-heroku): Learn how to deploy a Marten project to Heroku.
+- [Deploy to Fly.io](https://martenframework.com/docs/next/deployment/how-to/deploy-to-fly-io): Learn how to deploy a Marten project to Fly.io.
+
+## The Marten project
+
+- [The Marten project](https://martenframework.com/docs/next/the-marten-project): Background on the Marten project and how to contribute.
+- [Why Marten?](https://martenframework.com/docs/next/the-marten-project/why-marten): Learn why Marten is a good fit for your next web application.
+- [Design philosophies](https://martenframework.com/docs/next/the-marten-project/design-philosophies): Learn about the design philosophies behind the Marten web framework.
+- [Contributing to the Marten project](https://martenframework.com/docs/next/the-marten-project/contributing): Learn how you can start contributing to the Marten project.
+- [Acknowledgements](https://martenframework.com/docs/next/the-marten-project/acknowledgments): Thanks and attributions related to the projects and concepts that inspired the Marten web framework.
+- [Release notes](https://martenframework.com/docs/next/the-marten-project/release-notes): Find all the release notes of the Marten web framework.
+- [Marten 1.0.0 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/1.0): Release notes for Marten 1.0.
+
+## API
+
+- [API reference](https://martenframework.com/docs/api/dev/index.html): Generated API reference for the version under development.

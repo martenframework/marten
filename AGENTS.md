@@ -126,6 +126,7 @@ When adding or changing user-visible behavior:
 The only docs tree to edit by hand is `docs/docs/`.
 
 - **User guides**: `docs/docs/` (Docusaurus, live preview via `cd docs && npm run start`)
+- **Agent index**: `docs/static/llms.txt` is generated from `docs/sidebars.js` and each page's front matter (`node scripts/generate_llms_txt.js`). It is published at <https://martenframework.com/docs/llms.txt> and lists the guides for the version under development (`/docs/next/`). Regenerate it when a guide is added, renamed, removed, or its description changes. `make qa` checks that the committed file matches.
 - **API reference**: generated with `make docs_api` → `docs/static/api/dev/`
 - **Snapshots**: `docs/versioned_docs/` and `docs/static/api/0.5`, `docs/static/api/0.6`, and `docs/static/api/0.7` are published copies. Leave them unchanged.
 

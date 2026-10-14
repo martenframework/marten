@@ -36,6 +36,15 @@ jobs:
     - uses: actions/checkout@v7
     - name: Check spelling
       uses: crate-ci/typos@v1.50.3
+  llms-txt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22.x
+      - name: Check llms.txt
+        run: node scripts/generate_llms_txt.js --check
   generated-app:
     runs-on: ubuntu-latest
     strategy:

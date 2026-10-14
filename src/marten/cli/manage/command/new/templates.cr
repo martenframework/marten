@@ -74,6 +74,7 @@ module Marten
               }
 
               # Other files
+              files << {"AGENTS.md", ECR.render("#{__DIR__}/templates/project/AGENTS.md.ecr")}
               files << {".editorconfig", editorconfig}
               files << {".gitignore", gitignore}
               files << {"seed.cr", ECR.render("#{__DIR__}/templates/project/seed.cr.ecr")}

@@ -1,0 +1,46 @@
+# Marten project guide for coding agents
+
+This is a Marten web application. The guide index is at <https://martenframework.com/docs/llms.txt>.
+
+## Layout
+
+- `config/settings/` — settings, including `installed_apps`
+- `config/routes.cr` — routes
+- `src/models/` — models
+- `src/handlers/` — handlers
+- `src/schemas/` — schemas
+- `src/emails/` — emails
+- `src/templates/` — templates
+- `src/migrations/` — migrations
+- `src/project.cr` — requires project code (`./models/**`, `./handlers/**`, `./schemas/**`, `./emails/**`)
+- `src/cli.cr` — requires migrations (`./migrations/**`)
+- `spec/` — specs
+
+## Commands
+
+Prefer generators. Run `marten gen <name> --help` for options.
+
+```bash
+marten gen model Article title:string{128} author:many_to_one{User}
+marten gen handler ArticleListHandler
+marten gen schema ArticleSchema title:string body:string
+marten gen email WelcomeEmail
+marten gen app blog
+marten genmigrations
+marten migrate
+crystal spec
+marten serve
+```
+
+`marten gen app` adds the application to `installed_apps` and requires it from `src/project.cr` and `src/cli.cr`. An application added by hand needs those same edits.
+
+## Specs
+
+`spec/spec_helper.cr` sets `MARTEN_ENV=test` and requires `marten/spec`. Spec files require that helper.
+
+## Guides
+
+- [Routing](https://martenframework.com/docs/handlers-and-http/routing)
+- [Models](https://martenframework.com/docs/models-and-databases/introduction)
+- [Generators](https://martenframework.com/docs/development/reference/generators)
+- [Testing](https://martenframework.com/docs/development/testing)

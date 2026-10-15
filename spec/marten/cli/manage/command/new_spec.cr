@@ -10,7 +10,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the iterative mode when no structure type is specified" do
-      stdin = IO::Memory.new("project\ndummy_project\nsqlite3\nyes")
+      stdin = Marten::CLI::Manage::Command::NewSpec::TerminalInput.new("project\ndummy_project\nsqlite3\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -36,7 +36,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "properly takes into account the with auth question answer" do
-      stdin = IO::Memory.new("project\ndummy_project\nsqlite3\nno")
+      stdin = Marten::CLI::Manage::Command::NewSpec::TerminalInput.new("project\ndummy_project\nsqlite3\nno")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -61,12 +61,47 @@ describe Marten::CLI::Manage::Command::New do
       end
     end
 
+    it "exits with usage when arguments are missing and stdin is not a terminal" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: [] of String,
+        stdin: IO::Memory.new,
+        stdout: stdout,
+        stderr: stderr,
+        exit_raises: true
+      )
+
+      command.handle.should eq 1
+      stdout.rewind.gets_to_end.should contain "Usage:"
+      Dir.exists?("dummy_project").should be_false
+    end
+
+    it "exits with usage when the name is missing and stdin is not a terminal" do
+      stdout = IO::Memory.new
+      stderr = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project"],
+        stdin: IO::Memory.new,
+        stdout: stdout,
+        stderr: stderr,
+        exit_raises: true
+      )
+
+      command.handle.should eq 1
+      stdout.rewind.gets_to_end.should contain "Usage:"
+      Dir.exists?("dummy_project").should be_false
+    end
+
     it "prints an error if an invalid project type is specified" do
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
       command = Marten::CLI::Manage::Command::New.new(
         options: ["unknown"],
+        stdin: Marten::CLI::Manage::Command::NewSpec::TerminalInput.new,
         stdout: stdout,
         stderr: stderr
       )
@@ -77,7 +112,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the interactive mode to create a project when no name is specified" do
-      stdin = IO::Memory.new("dummy_project\nsqlite3\nyes")
+      stdin = Marten::CLI::Manage::Command::NewSpec::TerminalInput.new("dummy_project\nsqlite3\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -103,7 +138,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "uses the interactive mode to create an app when no name is specified" do
-      stdin = IO::Memory.new("dummy_app")
+      stdin = Marten::CLI::Manage::Command::NewSpec::TerminalInput.new("dummy_app")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -311,7 +346,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "prompts the user for the structure type again if the provided value is invalid" do
-      stdin = IO::Memory.new("bad\nproject\ndummy_project\nsqlite3\nyes")
+      stdin = Marten::CLI::Manage::Command::NewSpec::TerminalInput.new("bad\nproject\ndummy_project\nsqlite3\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -370,7 +405,7 @@ describe Marten::CLI::Manage::Command::New do
     end
 
     it "configures sqlite3 if no database value is provided in interactive mode" do
-      stdin = IO::Memory.new("bad\nproject\ndummy_project\n\nyes")
+      stdin = Marten::CLI::Manage::Command::NewSpec::TerminalInput.new("bad\nproject\ndummy_project\n\nyes")
       stdout = IO::Memory.new
       stderr = IO::Memory.new
 
@@ -585,4 +620,10 @@ module Marten::CLI::Manage::Command::NewSpec
     "manage.cr",
     "shard.yml",
   ]
+
+  class TerminalInput < IO::Memory
+    def tty? : Bool
+      true
+    end
+  end
 end

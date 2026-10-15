@@ -34,6 +34,11 @@ module Marten
           end
 
           def run
+            if !required_arguments_present? && !stdin.tty?
+              show_usage
+              do_exit(1)
+            end
+
             setup_interactive_mode
 
             print_welcome_message if interactive_mode? && (type.nil? || project? || app?)
@@ -221,6 +226,10 @@ module Marten
 
           private def project? : Bool
             type == TYPE_PROJECT
+          end
+
+          private def required_arguments_present? : Bool
+            !type.nil? && !type.not_nil!.empty? && !name.nil? && !name.not_nil!.empty?
           end
 
           private def setup_interactive_mode : Bool

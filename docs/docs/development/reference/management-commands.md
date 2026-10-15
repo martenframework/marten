@@ -215,7 +215,7 @@ The command allows you to fully define the name of your project or application, 
 * `name` - The name of the project or app to create
 
 :::tip
-The `type` and `name` arguments are optional: if they are not provided, an interactive mode will be used and the command will prompt the user for inputting the structure type, the app or project name, and whether the auth app should be generated.
+The `type` and `name` arguments are optional when the command runs in a terminal. Interactive mode then prompts for the structure type, the name, the database, and whether an auth app should be generated. When stdin is not a terminal, both arguments are required: otherwise the command prints its usage and exits with status 1.
 :::
 
 ### Examples

@@ -57,6 +57,16 @@ module Marten
           self[nil]
         end
 
+        # Serializes the error set to JSON.
+        #
+        # The generated value is an array of objects. Each object contains the `field`, `type`, and `message`
+        # attributes of one error. `field` is `null` when the error is global.
+        def to_json(json : JSON::Builder) : Nil
+          json.array do
+            each &.to_json(json)
+          end
+        end
+
         # Iterates over all the `Marten::Core::Validation::Error` objects in this error set.
         delegate each, to: @errors
 

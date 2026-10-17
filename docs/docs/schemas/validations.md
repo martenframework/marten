@@ -146,3 +146,22 @@ Global errors can be specified through the use of an alternative `#add` method t
 schema.errors.add("User is invalid")                      # error type is "invalid"
 schema.errors.add("User is invalid", type: :invalid_user) # error type is "invalid_user"
 ```
+
+### Serializing errors as JSON
+
+An error set, and each error it contains, can be serialized to JSON. This lets a [handler](../handlers-and-http/introduction.md) return validation errors from an API endpoint through the [`#json`](../handlers-and-http/introduction.md#json) helper:
+
+```crystal
+json({errors: schema.errors}, status: 422)
+```
+
+An error set is serialized as an array of objects. Each object contains the `field`, `type`, and `message` of one error. `field` is `null` when the error is global:
+
+```json
+[
+  {"field": "name", "type": "required", "message": "This field is required."},
+  {"field": null, "type": "invalid", "message": "User is invalid"}
+]
+```
+
+Model validation errors use the same representation, because models share this error set.

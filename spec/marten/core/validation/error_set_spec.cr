@@ -156,4 +156,31 @@ describe Marten::Core::Validation::ErrorSet do
       error_set.global.should be_empty
     end
   end
+
+  describe "#to_json" do
+    it "serializes an empty error set as an empty array" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.to_json.should eq "[]"
+    end
+
+    it "serializes field and global errors as an array of objects" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add("slug", "Too short", type: :too_short)
+      error_set.add("Invalid")
+
+      error_set.to_json.should eq(
+        %([{"field":"slug","type":"too_short","message":"Too short"},) +
+        %({"field":null,"type":"invalid","message":"Invalid"}])
+      )
+    end
+
+    it "serializes when embedded in a JSON object" do
+      error_set = Marten::Core::Validation::ErrorSet.new
+      error_set.add(:content, "This is invalid!", type: :blank)
+
+      {errors: error_set}.to_json.should eq(
+        %({"errors":[{"field":"content","type":"blank","message":"This is invalid!"}]})
+      )
+    end
+  end
 end

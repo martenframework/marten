@@ -188,6 +188,14 @@ json({ foo: "bar" }, status: :ok)
 ```
 :::
 
+:::tip
+Schema and model validation errors can be included in the payload. [`Marten::Core::Validation::ErrorSet`](pathname:///api/dev/Marten/Core/Validation/ErrorSet.html) serializes as an array of objects with `field`, `type`, and `message`. See [Serializing errors as JSON](../schemas/validations.md#serializing-errors-as-json).
+
+```crystal
+json({errors: schema.errors}, status: 422)
+```
+:::
+
 ### Callbacks
 
 It is possible to define callbacks in order to bind methods and logics to specific events in the lifecycle of your handlers. For example, it is possible to define callbacks that run before a handler's `#dispatch` method gets executed, or after it!

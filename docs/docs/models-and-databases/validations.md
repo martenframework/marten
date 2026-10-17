@@ -156,6 +156,8 @@ user.errors.add("User is invalid")                      # error type is "invalid
 user.errors.add("User is invalid", type: :invalid_user) # error type is "invalid_user"
 ```
 
+Validation errors can be serialized to JSON with the same representation used for [schema errors](../schemas/validations.md#serializing-errors-as-json). Passing `user.errors` to a handler's [`#json`](../handlers-and-http/introduction.md#json) helper returns an array of objects with `field`, `type`, and `message`. `field` is `null` when the error is global.
+
 ## Skipping validations
 
 Model validations can be explicitly skipped when using the `#save` or `#save!` methods. To do so, the `validate: false` argument can be used:

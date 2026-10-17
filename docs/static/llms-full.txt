@@ -3205,6 +3205,8 @@ user.errors.add("User is invalid")                      # error type is "invalid
 user.errors.add("User is invalid", type: :invalid_user) # error type is "invalid_user"
 ```
 
+Validation errors can be serialized to JSON with the same representation used for [schema errors](https://martenframework.com/docs/next/schemas/validations#serializing-errors-as-json). Passing `user.errors` to a handler's [`#json`](https://martenframework.com/docs/next/handlers-and-http/introduction#json) helper returns an array of objects with `field`, `type`, and `message`. `field` is `null` when the error is global.
+
 ## Skipping validations
 
 Model validations can be explicitly skipped when using the `#save` or `#save!` methods. To do so, the `validate: false` argument can be used:
@@ -6863,6 +6865,14 @@ json({ foo: "bar" }, status: :ok)
 ```
 :::
 
+:::tip
+Schema and model validation errors can be included in the payload. [`Marten::Core::Validation::ErrorSet`](https://martenframework.com/docs/api/dev/Marten/Core/Validation/ErrorSet.html) serializes as an array of objects with `field`, `type`, and `message`. See [Serializing errors as JSON](https://martenframework.com/docs/next/schemas/validations#serializing-errors-as-json).
+
+```crystal
+json({errors: schema.errors}, status: 422)
+```
+:::
+
 ### Callbacks
 
 It is possible to define callbacks in order to bind methods and logics to specific events in the lifecycle of your handlers. For example, it is possible to define callbacks that run before a handler's `#dispatch` method gets executed, or after it!
@@ -10327,21 +10337,21 @@ Note that schemas can be used for other things than processing form data. For ex
 ```crystal
 class API::ArticleCreateHandler < Marten::Handler
   def post
-    schema = ArticleCreateHandler.new(request.data)
+    schema = ArticleSchema.new(request.data)
 
     if schema.valid?
       article = Article.new(schema.validated_data)
       article.save!
 
-      created = true
+      json({id: article.id}, status: 201)
     else
-      created = false
+      json({errors: schema.errors}, status: 422)
     end
-
-    json({created: created})
   end
 end
 ```
+
+On failure, `schema.errors` is serialized as a list of objects with `field`, `type`, and `message`. See [Serializing errors as JSON](https://martenframework.com/docs/next/schemas/validations#serializing-errors-as-json).
 
 :::info
 The `#data` method of an HTTP request object returns a hash-like object containing the request data: this object is automatically initialized from any form data or JSON data contained in the request body.
@@ -10677,6 +10687,25 @@ Global errors can be specified through the use of an alternative `#add` method t
 schema.errors.add("User is invalid")                      # error type is "invalid"
 schema.errors.add("User is invalid", type: :invalid_user) # error type is "invalid_user"
 ```
+
+### Serializing errors as JSON
+
+An error set, and each error it contains, can be serialized to JSON. This lets a handler return validation errors from an API endpoint through the [`#json`](https://martenframework.com/docs/next/handlers-and-http/introduction#json) helper:
+
+```crystal
+json({errors: schema.errors}, status: 422)
+```
+
+An error set is serialized as an array of objects. Each object contains the `field`, `type`, and `message` of one error. `field` is `null` when the error is global:
+
+```json
+[
+  {"field": "name", "type": "required", "message": "This field is required."},
+  {"field": null, "type": "invalid", "message": "User is invalid"}
+]
+```
+
+Model validation errors use the same representation, because models share this error set.
 
 # Create custom schema fields
 
@@ -17759,6 +17788,10 @@ _Under development._
   * SQLite 3.37.0 and higher.
 
 ## New features
+
+### Schemas
+
+* [`Marten::Core::Validation::Error`](https://martenframework.com/docs/api/dev/Marten/Core/Validation/Error.html) and [`Marten::Core::Validation::ErrorSet`](https://martenframework.com/docs/api/dev/Marten/Core/Validation/ErrorSet.html) can now be serialized to JSON. An error set becomes a list of objects with `field`, `type`, and `message`, and `field` is `null` for global errors. Schema and model validation errors can therefore be returned from a JSON response through the [`#json`](https://martenframework.com/docs/next/handlers-and-http/introduction#json) handler helper. See [Serializing errors as JSON](https://martenframework.com/docs/next/schemas/validations#serializing-errors-as-json).
 
 ### Models and databases
 

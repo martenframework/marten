@@ -15,6 +15,18 @@ module Marten
           @type = type.to_s
           @field = field.to_s unless field.nil?
         end
+
+        # Serializes the error to JSON.
+        #
+        # The generated object contains the `field`, `type`, and `message` attributes. `field` is `null` when the error
+        # is global.
+        def to_json(json : JSON::Builder) : Nil
+          json.object do
+            json.field "field", @field
+            json.field "type", @type
+            json.field "message", @message
+          end
+        end
       end
     end
   end

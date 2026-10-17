@@ -48,6 +48,7 @@ The full text of these guides is at https://martenframework.com/docs/llms-full.t
 - [Middlewares](https://martenframework.com/docs/next/handlers-and-http/middlewares): Learn how to leverage middlewares to alter HTTP requests and responses.
 - [Customize handler template contexts](https://martenframework.com/docs/next/handlers-and-http/how-to/customize-handler-template-contexts): How to customize handler template contexts.
 - [Create custom route parameters](https://martenframework.com/docs/next/handlers-and-http/how-to/create-custom-route-parameters): How to create custom route parameters.
+- [Build a JSON API](https://martenframework.com/docs/next/handlers-and-http/how-to/build-a-json-api): How to build a JSON API.
 - [Generic handlers](https://martenframework.com/docs/next/handlers-and-http/reference/generic-handlers): Generic handlers reference
 - [Middlewares](https://martenframework.com/docs/next/handlers-and-http/reference/middlewares): Middlewares reference
 

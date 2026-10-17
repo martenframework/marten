@@ -189,7 +189,7 @@ json({ foo: "bar" }, status: :ok)
 :::
 
 :::tip
-Schema and model validation errors can be included in the payload. [`Marten::Core::Validation::ErrorSet`](pathname:///api/dev/Marten/Core/Validation/ErrorSet.html) serializes as an array of objects with `field`, `type`, and `message`. See [Serializing errors as JSON](../schemas/validations.md#serializing-errors-as-json).
+Schema and model validation errors can be included in the payload. [`Marten::Core::Validation::ErrorSet`](pathname:///api/dev/Marten/Core/Validation/ErrorSet.html) serializes as an array of objects with `field`, `type`, and `message`. See [Serializing errors as JSON](../schemas/validations.md#serializing-errors-as-json) and [Build a JSON API](./how-to/build-a-json-api.md).
 
 ```crystal
 json({errors: schema.errors}, status: 422)

@@ -65,6 +65,7 @@ module.exports = {
           items: [
             'handlers-and-http/how-to/customize-handler-template-contexts',
             'handlers-and-http/how-to/create-custom-route-parameters',
+            'handlers-and-http/how-to/build-a-json-api',
           ],
         },
         {

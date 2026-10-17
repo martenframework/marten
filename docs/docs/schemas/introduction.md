@@ -90,7 +90,7 @@ class API::ArticleCreateHandler < Marten::Handler
 end
 ```
 
-On failure, `schema.errors` is serialized as a list of objects with `field`, `type`, and `message`. See [Serializing errors as JSON](./validations.md#serializing-errors-as-json).
+In the above example, an invalid payload produces a JSON response containing the schema errors. Please refer to [Serializing errors as JSON](./validations.md#serializing-errors-as-json) to learn more about the shape of this payload, and to the [Build a JSON API](../handlers-and-http/how-to/build-a-json-api.md) guide to learn how to list, retrieve, create, update, and delete records.
 
 :::info
 The `#data` method of an HTTP request object returns a hash-like object containing the request data: this object is automatically initialized from any form data or JSON data contained in the request body.

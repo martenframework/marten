@@ -164,4 +164,4 @@ An error set is serialized as an array of objects. Each object contains the `fie
 ]
 ```
 
-Model validation errors use the same representation, because models share this error set.
+Model validation errors use the same representation, because models share this error set. The [Build a JSON API](../handlers-and-http/how-to/build-a-json-api.md) how-to uses this payload for create and update endpoints.

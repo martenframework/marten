@@ -43,7 +43,7 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 22.x
-      - name: Check llms.txt
+      - name: Check llms.txt and llms-full.txt
         run: node scripts/generate_llms_txt.js --check
   generated-app:
     runs-on: ubuntu-latest

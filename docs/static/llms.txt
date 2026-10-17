@@ -2,7 +2,7 @@
 
 > Marten is a batteries-included web framework for Crystal. This file indexes the guides for the version under development.
 
-These URLs are the in-development guides at https://martenframework.com/docs/next/. The latest stable guides are at https://martenframework.com/docs/. The generated API reference for this version is at https://martenframework.com/docs/api/dev/.
+The full text of these guides is at https://martenframework.com/docs/llms-full.txt. These URLs are the in-development guides at https://martenframework.com/docs/next/. The latest stable guides are at https://martenframework.com/docs/. The generated API reference for this version is at https://martenframework.com/docs/api/dev/.
 
 ## Prologue
 

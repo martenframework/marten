@@ -294,6 +294,7 @@ describe Marten::CLI::Manage::Command::New do
       agents.should contain "https://martenframework.com/docs/next/"
       agents.should contain "https://martenframework.com/docs/api/dev/index.html"
       agents.should contain "https://martenframework.com/docs/llms.txt"
+      agents.should contain "https://martenframework.com/docs/llms-full.txt"
       agents.should contain "https://martenframework.com/docs/next/getting-started/from-django"
     end
 

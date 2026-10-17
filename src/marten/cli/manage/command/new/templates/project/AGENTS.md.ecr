@@ -1,6 +1,13 @@
+<%- api_series = Marten::VERSION.split(".")[0..1].join(".") -%>
 # Marten project guide for coding agents
 
-This is a Marten web application. The guide index is at <https://martenframework.com/docs/llms.txt>.
+<%- if context.edge -%>
+This project uses Marten <%= Marten::VERSION %> from the development branch. Follow the guides at <https://martenframework.com/docs/next/> and the API reference at <https://martenframework.com/docs/api/dev/index.html>. The guide index is at <https://martenframework.com/docs/llms.txt>.
+<%- else -%>
+This project uses Marten <%= Marten::VERSION %>. Follow the guides at <https://martenframework.com/docs/> and the API reference at <https://martenframework.com/docs/api/<%= api_series %>/index.html>. These guide URLs track the latest stable release. The API URL is pinned to <%= api_series %>. When a guide and that API disagree, follow the API.
+<%- end -%>
+
+Handlers process requests. Schemas validate input. Models persist records. Templates render HTML. Arrivals from Django or Rails should start with the concept maps linked below and use these names.
 
 ## Layout
 
@@ -15,6 +22,14 @@ This is a Marten web application. The guide index is at <https://martenframework
 - `src/project.cr` — requires project code (`./models/**`, `./handlers/**`, `./schemas/**`, `./emails/**`)
 - `src/cli.cr` — requires migrations (`./migrations/**`)
 - `spec/` — specs
+
+## Requires
+
+`src/project.cr` requires `./emails/**`, `./handlers/**`, `./models/**`, and `./schemas/**`. A new file under one of those directories is compiled when its path matches the glob.
+
+`src/cli.cr` requires `./project` and then `./migrations/**`. Migration files are compiled through `src/cli.cr`.
+
+The `src/` tree is the main application. It is installed automatically and does not appear in `config.installed_apps`. An additional application must be listed in `config.installed_apps` in `config/settings/base.cr`, required from `src/project.cr`, and its CLI entry required from `src/cli.cr`. `marten gen app` makes those edits. An application added by hand needs the same ones.
 
 ## Commands
 
@@ -32,15 +47,34 @@ crystal spec
 marten serve
 ```
 
-`marten gen app` adds the application to `installed_apps` and requires it from `src/project.cr` and `src/cli.cr`. An application added by hand needs those same edits.
+After a model change, run `marten genmigrations`, read the file it writes, then run `marten migrate`. `genmigrations` sees the main application and the applications listed in `installed_apps`. Create a custom migration with `marten genmigrations <app> --empty`.
+
+## Requests
+
+Define routes in `config/routes.cr` with `path`. Prefer a generic handler when the handler lists, shows, creates, updates, or deletes a record.
+
+CSRF protection is enabled. A form that submits `POST`, `PUT`, `PATCH`, or `DELETE` includes `{% csrf_input %}`. Any other unsafe request sends the token in the `X-CSRF-Token` header.
 
 ## Specs
 
 `spec/spec_helper.cr` sets `MARTEN_ENV=test` and requires `marten/spec`. Spec files require that helper.
 
+`crystal spec` compiles the project before running examples. While iterating, pass one file:
+
+```bash
+crystal spec spec/models/article_spec.cr
+```
+
 ## Guides
 
-- [Routing](https://martenframework.com/docs/handlers-and-http/routing)
-- [Models](https://martenframework.com/docs/models-and-databases/introduction)
-- [Generators](https://martenframework.com/docs/development/reference/generators)
-- [Testing](https://martenframework.com/docs/development/testing)
+<%- docs_root = context.edge ? "https://martenframework.com/docs/next" : "https://martenframework.com/docs" -%>
+- [Routing](<%= docs_root %>/handlers-and-http/routing)
+- [Models](<%= docs_root %>/models-and-databases/introduction)
+- [Generic handlers](<%= docs_root %>/handlers-and-http/generic-handlers)
+- [Applications](<%= docs_root %>/development/applications)
+- [Migrations](<%= docs_root %>/models-and-databases/migrations)
+- [Generators](<%= docs_root %>/development/reference/generators)
+- [Cross-Site Request Forgery protection](<%= docs_root %>/security/csrf)
+- [Testing](<%= docs_root %>/development/testing)
+- [Coming from Django?](<%= docs_root %>/getting-started/from-django)
+- [Coming from Rails?](<%= docs_root %>/getting-started/from-rails)

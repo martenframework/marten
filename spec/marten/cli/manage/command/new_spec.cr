@@ -255,6 +255,48 @@ describe Marten::CLI::Manage::Command::New do
       end
     end
 
+    it "writes an agent guide pinned to the Marten version that created the project" do
+      stdout = IO::Memory.new
+      api_series = Marten::VERSION.split(".")[0..1].join(".")
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["project", "dummy_project"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      agents = File.read("./dummy_project/AGENTS.md")
+      agents.should contain "Marten #{Marten::VERSION}"
+      agents.should contain "https://martenframework.com/docs/api/#{api_series}/index.html"
+      agents.should contain "https://martenframework.com/docs/handlers-and-http/routing"
+      agents.should contain "https://martenframework.com/docs/getting-started/from-django"
+      agents.should contain "https://martenframework.com/docs/getting-started/from-rails"
+      agents.should contain "config.installed_apps"
+      agents.should contain "marten genmigrations"
+      agents.should contain "{% csrf_input %}"
+      agents.should contain "compiles the project before running examples"
+      agents.should_not contain "https://martenframework.com/docs/next/"
+    end
+
+    it "writes an agent guide for the development docs when using the --edge option" do
+      stdout = IO::Memory.new
+
+      command = Marten::CLI::Manage::Command::New.new(
+        options: ["--edge", "project", "dummy_project"],
+        stdout: stdout
+      )
+
+      command.handle
+
+      agents = File.read("./dummy_project/AGENTS.md")
+      agents.should contain "development branch"
+      agents.should contain "https://martenframework.com/docs/next/"
+      agents.should contain "https://martenframework.com/docs/api/dev/index.html"
+      agents.should contain "https://martenframework.com/docs/llms.txt"
+      agents.should contain "https://martenframework.com/docs/next/getting-started/from-django"
+    end
+
     it "creates a new app structure" do
       stdout = IO::Memory.new
 

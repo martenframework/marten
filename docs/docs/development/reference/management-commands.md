@@ -197,7 +197,7 @@ Initializes a new Marten project or application repository structure.
 
 The `new` management command can be used to create either a new project repository or a new [application](../applications.md) repository. This can be handy when creating new projects, or when creating new applications that are intended to be distributed as dedicated shards, as it ensures you are following Marten's best practices and conventions.
 
-New projects include an `AGENTS.md` file that describes the project layout, the generators, and how to run specs.
+New projects include an `AGENTS.md` file for coding agents. It records the Marten version, links to the matching guides and API, and states how requires, installed apps, migrations, CSRF, and specs work. Projects created with `--edge` link to the in-development guides.
 
 The command allows you to fully define the name of your project or application, and in which folder it should be created.
 

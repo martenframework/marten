@@ -10,18 +10,16 @@ extend-ignore-re = [
   "\\b(?:[0-9A-Fa-f]{1,4}:){1,7}[0-9A-Fa-f]{1,4}\\b",
   "\\b(?:[0-9A-Fa-f]{1,4}:){1,7}:\\b",
   "\\b:(?::[0-9A-Fa-f]{1,4}){1,7}\\b",
+
+  # CRUD acronym styling in models-and-databases/introduction.md.
+  # Also present in the generated docs/static/llms-full.txt, which is not Markdown.
+  "\\*\\*(?:C\\*\\*reate|R\\*\\*ead|U\\*\\*pdate|D\\*\\*elete)",
+  # UUID docs: "Universally Unique IDentifiers"
+  "IDentifiers",
 ]
 
 [files]
 extend-exclude = [
   "docs/node_modules",
   "src/marten/locales",
-]
-
-[type.md]
-extend-ignore-re = [
-  # CRUD acronym styling in models-and-databases/introduction.md
-  "\\*\\*(?:C\\*\\*reate|R\\*\\*ead|U\\*\\*pdate|D\\*\\*elete)",
-  # UUID docs: "Universally Unique IDentifiers"
-  "IDentifiers",
 ]

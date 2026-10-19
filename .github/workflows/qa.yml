@@ -35,7 +35,7 @@ jobs:
     steps:
     - uses: actions/checkout@v7
     - name: Check spelling
-      uses: crate-ci/typos@v1.50.3
+      uses: crate-ci/typos@v1.51.1
   llms-txt:
     runs-on: ubuntu-latest
     steps:

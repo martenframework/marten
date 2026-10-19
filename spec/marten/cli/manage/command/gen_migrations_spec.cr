@@ -7,6 +7,12 @@ describe Marten::CLI::Manage::Command::GenMigrations do
     Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp::App
   )
 
+  after_all do
+    # Reset local migration app configs to avoid them to be used elsewhere.
+    Marten::CLI::Manage::Command::GenMigrationsSpec::SyncedApp::V202108092226111.reset_app_config
+    Marten::CLI::Manage::Command::GenMigrationsSpec::SyncedApp::V202108092226112.reset_app_config
+  end
+
   describe "#run" do
     around_each do |t|
       unsynced_app_migrations_path = Marten::CLI::Manage::Command::GenMigrationsSpec::UnsyncedApp::App.new

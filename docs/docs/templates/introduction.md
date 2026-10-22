@@ -406,6 +406,8 @@ class Point
 end
 ```
 
+When a class defines `#[]`, `Object::Auto` tries it before looking for a public method with the same name. This includes values that are `nil`. If `#[]` raises `KeyError`, Marten falls back to the method lookup. For example, `{{ request.query_params.email_address }}` reads the `email_address` query parameter.
+
 Note that **all** "attribute-like" public methods will be made available to the template runtime when using the [`Marten::Template::Object::Auto`](pathname:///api/dev/Marten/Template/Object/Auto.html) module. This may be a good enough behavior, but if you want to have more control over what can be accessed in templates or not, you will likely end up using [`Marten::Template::Object`](pathname:///api/dev/Marten/Template/Object.html) and the [`#template_attributes`](pathname:///api/dev/Marten/Template/Object.html#template_attributes(*names)-macro) macro instead.
 
 ## Using context producers

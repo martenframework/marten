@@ -109,12 +109,12 @@ module Marten
             attempt_attribute_resolution_after_failed_collection_lookup = true
           end
         elsif object.responds_to?(:resolve_template_attribute)
-          return object.resolve_template_attribute(key.to_s)
+          return object.resolve_template_value(key.to_s)
         end
 
         if attempt_attribute_resolution_after_failed_collection_lookup
-          res = object.responds_to?(:resolve_template_attribute) ? object.resolve_template_attribute(key.to_s) : nil
-          return res if !res.nil?
+          res = object.responds_to?(:resolve_template_attribute) ? object.resolve_template_value(key.to_s) : nil
+          return res if !res.nil? && !res.raw.nil?
         end
 
         raise Errors::UnknownVariable.new

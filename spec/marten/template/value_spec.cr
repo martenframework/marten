@@ -218,6 +218,12 @@ describe Marten::Template::Value do
       expect_raises(Marten::Template::Errors::UnknownVariable) { value["unknown"] }
     end
 
+    it "raises an unknown variable error when an array method returns nil" do
+      value = Marten::Template::Value.from([nil] of String?)
+
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["first"] }
+    end
+
     it "raises an unknown variable error if the index does not exist for an array" do
       value = Marten::Template::Value.from(["foo", "bar"])
       expect_raises(Marten::Template::Errors::UnknownVariable) { value["4"] }

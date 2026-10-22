@@ -17,6 +17,13 @@ describe Marten::Template::Object::Auto do
       obj.resolve_template_attribute("attr").should eq "bar"
     end
 
+    it "returns nil when the indexed value is nil" do
+      obj = Marten::Template::Object::AutoSpec::NilTest.new
+
+      obj.resolve_template_attribute("attr").should be_nil
+      Marten::Template::Value.from(obj)["attr"].raw.should be_nil
+    end
+
     it "does not allow to resolve a method that takes arguments" do
       obj = Marten::Template::Object::AutoSpec::Test.new
       expect_raises(Marten::Template::Errors::UnknownVariable) do
@@ -83,6 +90,12 @@ module Marten::Template::Object::AutoSpec
 
     private def private_attr
       "hello"
+    end
+  end
+
+  class NilTest < Test
+    def [](key : String)
+      nil
     end
   end
 end

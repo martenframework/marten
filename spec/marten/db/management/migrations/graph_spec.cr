@@ -50,7 +50,6 @@ describe Marten::DB::Management::Migrations::Graph do
     end
 
     it "raises if the passed dependency ID does not correspond to any existing nodes" do
-      migration = Marten::DB::Management::Migrations::GraphSpec::TestMigration1.new
       migration = Marten::DB::Management::Migrations::GraphSpec::TestMigration2.new
 
       graph = Marten::DB::Management::Migrations::Graph.new

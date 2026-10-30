@@ -153,6 +153,7 @@ The full text of these guides is at https://martenframework.com/docs/llms-full.t
 - [Contributing to the Marten project](https://martenframework.com/docs/next/the-marten-project/contributing): Learn how you can start contributing to the Marten project.
 - [Acknowledgements](https://martenframework.com/docs/next/the-marten-project/acknowledgments): Thanks and attributions related to the projects and concepts that inspired the Marten web framework.
 - [Release notes](https://martenframework.com/docs/next/the-marten-project/release-notes): Find all the release notes of the Marten web framework.
+- [Marten 0.7.2 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.7.2): Release notes for Marten 0.7.2.
 - [Marten 1.0.0 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/1.0): Release notes for Marten 1.0.
 
 ## API

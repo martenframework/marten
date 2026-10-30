@@ -17932,6 +17932,7 @@ Here are listed the release notes for each version of the Marten web framework.
 
 ## Marten 0.7
 
+* [Marten 0.7.2 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.7.2) _(Under development)_
 * [Marten 0.7.1 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.7.1)
 * [Marten 0.7 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.7)
 
@@ -17987,6 +17988,16 @@ Here are listed the release notes for each version of the Marten web framework.
 * [Marten 0.1.2 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.1.2)
 * [Marten 0.1.1 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.1.1)
 * [Marten 0.1 release notes](https://martenframework.com/docs/next/the-marten-project/release-notes/0.1)
+
+# Marten 0.7.2 release notes
+
+Source: https://martenframework.com/docs/next/the-marten-project/release-notes/0.7.2
+
+_Under development._
+
+## Bug fixes
+
+* Fix the debug logger raising unexpectedly when request data cannot be parsed and [debug mode](https://martenframework.com/docs/next/development/reference/settings#debug) is enabled.
 
 # Marten 1.0.0 release notes
 

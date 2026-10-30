@@ -60,6 +60,35 @@ describe Marten::Server::Handlers::DebugLogger do
       end
     end
 
+    it "calls the next handler when the request data cannot be parsed" do
+      output_io = IO::Memory.new
+
+      ctx = HTTP::Server::Context.new(
+        request: ::HTTP::Request.new(
+          method: "POST",
+          resource: "/foo/bar",
+          headers: HTTP::Headers{"Host" => "example.com", "Content-Type" => "application/json"},
+          body: "just string"
+        ),
+        response: ::HTTP::Server::Response.new(io: IO::Memory.new)
+      )
+
+      handler = Marten::Server::Handlers::DebugLogger.new
+      handler.next = HTTP::Handler::HandlerProc.new do |handler_ctx|
+        handler_ctx.response.output = output_io
+        handler_ctx.response.print("It works")
+      end
+
+      Log.capture do |logs|
+        with_overridden_setting("debug", true) do
+          handler.call(ctx)
+        end
+
+        logs.check(:info, /Started \"POST \/foo\/bar\"/i)
+        logs.next(:info, /Completed with \"200\"/i)
+      end
+    end
+
     it "generates additional log entries when query params are present" do
       output_io = IO::Memory.new
 

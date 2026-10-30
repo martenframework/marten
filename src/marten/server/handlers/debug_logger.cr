@@ -10,8 +10,11 @@ module Marten
 
           Log.info { "\nStarted \"#{marten_request.method} #{marten_request.path}\" at #{Time.utc}..." }
 
-          if !marten_request.data.empty?
-            debug_mode_info_log("  ➜ Data: #{marten_request.data.to_h}")
+          begin
+            if !marten_request.data.empty?
+              debug_mode_info_log("  ➜ Data: #{marten_request.data.to_h}")
+            end
+          rescue JSON::ParseException | Marten::HTTP::Errors::InvalidRequestParameters
           end
 
           if !marten_request.query_params.empty?

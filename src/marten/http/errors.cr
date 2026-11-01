@@ -22,8 +22,8 @@ module Marten
       # Represents an error raised when request parameters cannot be parsed.
       #
       # This exception is raised when the request body cannot be parsed according to its advertised content type (for
-      # example a malformed `multipart/form-data` payload). Such exception results in a bad request response sent to the
-      # client.
+      # example a malformed `multipart/form-data` payload or an invalid `application/json` body). Such exception results
+      # in a bad request response sent to the client.
       class InvalidRequestParameters < SuspiciousOperation; end
 
       # Represents an error raised when a request body is too large.

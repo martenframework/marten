@@ -61,7 +61,7 @@ describe Marten::Handlers::Base do
 
   describe "::http_method_names" do
     it "returns all the HTTP method names unless explicitly set" do
-      Marten::Handlers::Base.http_method_names.should eq %w(GET POST PUT PATCH DELETE HEAD OPTIONS TRACE)
+      Marten::Handlers::Base.http_method_names.should eq %w(GET POST PUT PATCH DELETE HEAD OPTIONS TRACE QUERY)
     end
 
     it "returns the configured HTTP method names if explicitly set" do
@@ -216,6 +216,19 @@ describe Marten::Handlers::Base do
       request = Marten::HTTP::Request.new(
         ::HTTP::Request.new(
           method: "HEAD",
+          resource: "/",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      handler = Marten::Handlers::Base.new(request)
+      response = handler.dispatch
+      response.status.should eq 405
+    end
+
+    it "returns an HTTP Not Allowed responses for QUERY requests by default" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "QUERY",
           resource: "/",
           headers: HTTP::Headers{"Host" => "example.com"}
         )
@@ -386,6 +399,22 @@ describe Marten::Handlers::Base do
       response.status.should eq 200
       response.content_type.should eq "text/plain"
       response.content.should eq "OPTIONS processed"
+    end
+
+    it "is able to process QUERY requests" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "QUERY",
+          resource: "/",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+
+      handler = Marten::Handlers::BaseSpec::Test4Handler.new(request)
+      response = handler.dispatch
+      response.status.should eq 200
+      response.content_type.should eq "text/plain"
+      response.content.should eq "QUERY processed"
     end
 
     it "is able to process TRACE requests" do
@@ -1192,6 +1221,10 @@ module Marten::Handlers::BaseSpec
 
     def options
       Marten::HTTP::Response.new("OPTIONS processed", content_type: "text/plain", status: 200)
+    end
+
+    def query
+      Marten::HTTP::Response.new("QUERY processed", content_type: "text/plain", status: 200)
     end
 
     def trace

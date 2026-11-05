@@ -50,6 +50,8 @@ class FormHandler < Marten::Handler
 end
 ```
 
+Note that that this technique can be used for all the HTTP methods, which includes `#get`, `#post`, `#put`, `#patch`, `#delete`, `#options`, `#trace`, and `#query`.
+
 :::info
 If a handler's logic is defined like in the above example, trying to access such handler via another HTTP verb (eg. `DELETE`) will automatically result in a "Not allowed" response (405).
 :::

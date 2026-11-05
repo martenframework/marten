@@ -54,7 +54,7 @@ describe Marten::Handlers::RequestForgeryProtection do
   end
 
   describe "#process_dispatch" do
-    %w(GET HEAD OPTIONS TRACE).each do |safe_method|
+    %w(GET HEAD OPTIONS QUERY TRACE).each do |safe_method|
       it "allows #{safe_method} requests" do
         request = Marten::HTTP::Request.new(
           ::HTTP::Request.new(
@@ -905,6 +905,10 @@ module Marten::Handlers::RequestForgeryProtectionSpec
 
     def put
       respond "OK_PUT"
+    end
+
+    def query
+      respond "OK_QUERY"
     end
 
     def trace

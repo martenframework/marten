@@ -16,7 +16,7 @@ Marten comes with a built-in [CSRF protection mechanism](./csrf.md) that is auto
 You should be careful when tweaking those settings and avoid disabling this protection unless this is absolutely necessary.
 :::
 
-The CSRF protection provided by Marten is based on the verification of a token that must be provided for each unsafe HTTP request (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`). This token is stored in the client cookies and it must be specified when submitting unsafe requests (either in the data itself or using a specific header): if the tokens are not valid, or if the cookie-based token does not match the one provided in the data, then this means that the request is malicious and that it must be rejected.
+The CSRF protection provided by Marten is based on the verification of a token that must be provided for each unsafe HTTP request (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, `QUERY`, or `TRACE`). This token is stored in the client cookies and it must be specified when submitting unsafe requests (either in the data itself or using a specific header): if the tokens are not valid, or if the cookie-based token does not match the one provided in the data, then this means that the request is malicious and that it must be rejected.
 
 You can learn about the CSRF protection provided by Marten and the associated tools in the [dedicated documentation](./csrf.md).
 

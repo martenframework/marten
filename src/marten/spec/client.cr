@@ -174,6 +174,26 @@ module Marten
         )
       end
 
+      # Allows to issue a QUERY request to the server.
+      def query(
+        path : String,
+        data : Hash | NamedTuple | Nil | String = nil,
+        query_params : Hash | NamedTuple | Nil = nil,
+        content_type : String? = nil,
+        headers : Hash | NamedTuple | Nil = nil,
+        secure = false,
+      ) : Marten::HTTP::Response
+        perform_request(
+          method: "QUERY",
+          path: path,
+          data: data,
+          query_params: query_params,
+          content_type: content_type,
+          headers: headers,
+          secure: secure
+        )
+      end
+
       # Returns a session store object for the client.
       #
       # This method returns a session store object, initialized using the currently configured session store. The test
@@ -210,6 +230,7 @@ module Marten
         "PATCH"   => "application/octet-stream",
         "POST"    => "#{MULTIPART_CONTENT_TYPE_PREFIX} boundary=#{MULTIPART_BOUNDARY}",
         "PUT"     => "application/octet-stream",
+        "QUERY"   => "application/octet-stream",
       }
 
       private MULTIPART_BOUNDARY            = "B0UnDaRyUnIqU3"

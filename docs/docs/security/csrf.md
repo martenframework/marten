@@ -8,7 +8,7 @@ This document describes Marten's Cross-Site Request Forgery (CSRF) protection me
 
 ## Overview
 
-Cross-Site Request Forgery (CSRF) attacks generally involve a malicious website trying to perform actions on a web application on behalf of an already authenticated user. Marten provides a built-in mechanism in order to protect your applications from this kind of attack. This mechanism is useful for protecting endpoints that handle "unsafe" HTTP requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`).
+Cross-Site Request Forgery (CSRF) attacks generally involve a malicious website trying to perform actions on a web application on behalf of an already authenticated user. Marten provides a built-in mechanism in order to protect your applications from this kind of attack. This mechanism is useful for protecting endpoints that handle "unsafe" HTTP requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, `QUERY`, or `TRACE`).
 
 :::caution
 The CSRF protection ignores safe HTTP requests. As such, you should ensure that those are side effect free.

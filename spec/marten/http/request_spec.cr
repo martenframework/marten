@@ -1138,6 +1138,30 @@ describe Marten::HTTP::Request do
     end
   end
 
+  describe "#query?" do
+    it "returns true if the request is a QUERY" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "QUERY",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.query?.should be_true
+    end
+
+    it "returns false if the request is not a QUERY" do
+      request = Marten::HTTP::Request.new(
+        ::HTTP::Request.new(
+          method: "GET",
+          resource: "/test/xyz",
+          headers: HTTP::Headers{"Host" => "example.com"}
+        )
+      )
+      request.query?.should be_false
+    end
+  end
+
   describe "#query_params" do
     it "returns the request query parameters" do
       request = Marten::HTTP::Request.new(

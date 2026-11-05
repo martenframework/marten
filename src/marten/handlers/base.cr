@@ -37,6 +37,7 @@ module Marten
         METHOD_HEAD,
         METHOD_OPTIONS,
         METHOD_TRACE,
+        METHOD_QUERY,
       ]
 
       @@http_method_names : Array(String) = HTTP_METHOD_NAMES
@@ -99,6 +100,14 @@ module Marten
       #
       # The default implementation will return a 405 (not allowed) response.
       def get
+        handle_http_method_not_allowed
+      end
+
+      # Handles a `QUERY` HTTP request and returns a `Marten::HTTP::Response` object.
+      #
+      # The default implementation will return a 405 (not allowed) response. `QUERY` is a safe, idempotent method whose
+      # request body carries the query. That body is available through `Marten::HTTP::Request#data` and `#body`.
+      def query
         handle_http_method_not_allowed
       end
 
@@ -293,6 +302,7 @@ module Marten
       private METHOD_PATCH   = "PATCH"
       private METHOD_POST    = "POST"
       private METHOD_PUT     = "PUT"
+      private METHOD_QUERY   = "QUERY"
       private METHOD_TRACE   = "TRACE"
 
       private def call_http_method
@@ -313,6 +323,8 @@ module Marten
           options
         when METHOD_TRACE
           trace
+        when METHOD_QUERY
+          query
         else
           handle_http_method_not_allowed
         end

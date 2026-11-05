@@ -91,7 +91,7 @@ For example:
 
 The `csrf_input` template tag allows generating a hidden HTML input containing the CSRF token (computed for the request at hand). This tag can only be used in templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction.md#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers.md) involving rendered templates).
 
-This can be used to ensure the CSRF token gets inserted into a form so that it gets sent to the handler processing the form data for example. Indeed, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`):
+This can be used to ensure the CSRF token gets inserted into a form so that it gets sent to the handler processing the form data for example. Indeed, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, `QUERY`, or `TRACE`):
 
 ```html
 <form method="post" action="" enctype="multipart/form-data">
@@ -126,7 +126,7 @@ Optionally, the output of the `csrf_input` template tag can be assigned to a spe
 
 The `csrf_token` template tag allows to compute and insert the value of the CSRF token into a template. This tag can only be used in templates that are rendered as part of a handler (for example by leveraging [`#render`](../../handlers-and-http/introduction.md#render) or one of the [generic handlers](../../handlers-and-http/generic-handlers.md) involving rendered templates).
 
-This can be used to insert the CSRF token into a hidden form input so that it gets sent to the handler processing the form data for example. Indeed, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, or `TRACE`):
+This can be used to insert the CSRF token into a hidden form input so that it gets sent to the handler processing the form data for example. Indeed, handlers will automatically perform a CSRF check in order to protect unsafe requests (ie. requests whose methods are not `GET`, `HEAD`, `OPTIONS`, `QUERY`, or `TRACE`):
 
 ```html
 <form method="post" action="" enctype="multipart/form-data">

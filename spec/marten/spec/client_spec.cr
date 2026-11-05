@@ -374,6 +374,25 @@ describe Marten::Spec::Client do
     end
   end
 
+  describe "#query" do
+    it "returns the response returned by the handler matched by the specified path" do
+      client = Marten::Spec::Client.new
+
+      response = client.query(Marten.routes.reverse("request_method_respond"))
+
+      response.content.should eq "QUERY"
+    end
+
+    it "uses the expected content type by default" do
+      client = Marten::Spec::Client.new
+
+      response = client.query(Marten.routes.reverse("headers_respond"))
+
+      headers = JSON.parse(response.content)
+      headers["Content-Type"].should eq "application/octet-stream"
+    end
+  end
+
   describe "#session" do
     it "returns a session store and sets the associated session key in the cookies" do
       client = Marten::Spec::Client.new

@@ -9,16 +9,16 @@ module Marten
     # The protection provided by this module works as follows: a CSRF token cookie (generated from a random secret
     # value) is automatically prepared by a `before_dispatch` callback. This token cookie is then sent as part of every
     # HTTP response if the token value was explicitly requested through the use of the `#get_csrf_token` method
-    # (otherwise no cookie is set). For each unsafe HTTP method (ie. methods that are not `GET`, `HEAD`, `OPTIONS` or
-    # `TRACE`), the module will verify that the CSRF token cookie is available and that a `csrftoken` field is present
-    # in the request data hash, or that a `X-CSRF-Token` header is defined. These two token will be verified and they
-    # must match; otherwise a 403 error is returned to the user. In addition to that, the module will also verify that
-    # the HTTP request host is either part of the allowed hosts (`Marten.settings.allowed_hosts` setting) or that the
-    # value of the `Origin` header matches the configured trusted origins (`Marten.settings.csrf.trusted_origins`
-    # setting) - in order to protect against cross-subdomain attacks. The `Referer` header will also be checked for
-    # HTTPS request (if the `Origin` header is not set) in order to prevent subdomains to perform unsafe HTTP requests
-    # on the protected web applications (unless those subdomains are explicitly allowed as part of the
-    # `Marten.settings.csrf.trusted_origins` setting).
+    # (otherwise no cookie is set). For each unsafe HTTP method (ie. methods that are not `GET`, `HEAD`, `OPTIONS`,
+    # `QUERY`, or `TRACE`), the module will verify that the CSRF token cookie is available and that a `csrftoken` field
+    # is present in the request data hash, or that a `X-CSRF-Token` header is defined. These two token will be verified
+    # and they must match; otherwise a 403 error is returned to the user. In addition to that, the module will also
+    # verify that the HTTP request host is either part of the allowed hosts (`Marten.settings.allowed_hosts` setting) or
+    # that the value of the `Origin` header matches the configured trusted origins
+    # (`Marten.settings.csrf.trusted_origins` setting) - in order to protect against cross-subdomain attacks. The
+    # `Referer` header will also be checked for HTTPS request (if the `Origin` header is not set) in order to prevent
+    # subdomains to perform unsafe HTTP requests on the protected web applications (unless those subdomains are
+    # explicitly allowed as part of the `Marten.settings.csrf.trusted_origins` setting).
     #
     # By default, handlers will use the CSRF protection by complying with what is defined as part of the
     # `Marten.settings.csrf.protection_enabled` setting (whose value is `true` by default). It is also possible to
@@ -70,7 +70,7 @@ module Marten
         returned_csrf_token
       end
 
-      private CSRF_SAFE_HTTP_METHODS       = %w(get head options trace)
+      private CSRF_SAFE_HTTP_METHODS       = %w(get head options query trace)
       private CSRF_SECRET_SIZE             = 32
       private CSRF_TOKEN_ALLOWED_CHARS     = ["-", "_"] + ("a".."z").to_a + ("A".."Z").to_a + ("0".."9").to_a
       private CSRF_TOKEN_HEADER_NAME       = "X-CSRF-Token"

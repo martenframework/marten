@@ -159,6 +159,11 @@ module Marten
         method == METHOD_PUT
       end
 
+      # Returns `true` if the request is a QUERY.
+      def query?
+        method == METHOD_QUERY
+      end
+
       # Returns the HTTP GET parameters embedded in the request.
       def query_params : Params::Query
         @query_parans ||= Params::Query.new(extract_raw_query_params)
@@ -244,6 +249,7 @@ module Marten
       private METHOD_PATCH                  = "PATCH"
       private METHOD_POST                   = "POST"
       private METHOD_PUT                    = "PUT"
+      private METHOD_QUERY                  = "QUERY"
       private METHOD_TRACE                  = "TRACE"
       private PORT_HTTP                     = "80"
       private PORT_HTTPS                    = "443"

@@ -108,6 +108,16 @@ describe Marten::DB::Field::Date do
         field.from_db(true)
       end
     end
+
+    it "returns the stored date in the project time zone if the time zone has a negative UTC offset" do
+      los_angeles_time_zone = Time::Location.load("America/Los_Angeles")
+
+      with_overridden_setting("time_zone", los_angeles_time_zone) do
+        field = Marten::DB::Field::Date.new("my_field")
+
+        field.from_db(Time.utc(2026, 7, 31)).should eq Time.local(2026, 7, 31, location: los_angeles_time_zone)
+      end
+    end
   end
 
   describe "#from_db_result_set" do
@@ -176,7 +186,7 @@ describe Marten::DB::Field::Date do
 
       user.created_at.should be_nil
 
-      time = Time.local
+      time = Time.local(Marten.settings.time_zone)
       Timecop.freeze(time) do
         field.prepare_save(user, true)
       end
@@ -201,7 +211,7 @@ describe Marten::DB::Field::Date do
 
       user.updated_at.should be_nil
 
-      time = Time.local
+      time = Time.local(Marten.settings.time_zone)
       Timecop.freeze(time) do
         field.prepare_save(user, true)
       end
@@ -215,12 +225,27 @@ describe Marten::DB::Field::Date do
 
       user.updated_at.should be_nil
 
-      time = Time.local
+      time = Time.local(Marten.settings.time_zone)
       Timecop.freeze(time) do
         field.prepare_save(user, false)
       end
 
       user.updated_at.should eq time.at_beginning_of_day
+    end
+
+    it "sets the current date in the project time zone" do
+      los_angeles_time_zone = Time::Location.load("America/Los_Angeles")
+
+      with_overridden_setting("time_zone", los_angeles_time_zone) do
+        user = TestUser.new
+        field = Marten::DB::Field::Date.new("created_at", auto_now_add: true)
+
+        Timecop.freeze(Time.utc(2026, 11, 4, 3, 0, 0)) do
+          field.prepare_save(user, true)
+        end
+
+        user.created_at.should eq Time.local(2026, 11, 3, location: los_angeles_time_zone)
+      end
     end
 
     it "does not persist the current date if no auto option is used and the record is new" do
@@ -260,10 +285,10 @@ describe Marten::DB::Field::Date do
     end
 
     it "properly forwards the default value if applicable" do
-      default_dt = Time.local
+      default_dt = Time.local(2026, 7, 31, 14, 30, 0, location: Time::Location.load("Europe/Paris"))
       field = Marten::DB::Field::Date.new("my_field", db_column: "my_field_col", default: default_dt)
       column = field.to_column
-      column.default.should eq default_dt.at_beginning_of_day
+      column.default.should eq Time.utc(2026, 7, 31)
     end
   end
 
@@ -289,9 +314,18 @@ describe Marten::DB::Field::Date do
     it "returns a Time value if the initial value is a Time" do
       field = Marten::DB::Field::Date.new("my_field")
 
-      time = Time.local
-      Timecop.freeze(time) do |frozen_time|
-        field.to_db(frozen_time).should eq frozen_time.at_beginning_of_day
+      time = Time.local(2026, 7, 31, 14, 30, 0, location: Time::Location.load("Europe/Paris"))
+      field.to_db(time).should eq Time.utc(2026, 7, 31)
+    end
+
+    it "returns a value whose date is the local date if the time zone has a positive UTC offset" do
+      paris_time_zone = Time::Location.load("Europe/Paris")
+
+      with_overridden_setting("time_zone", paris_time_zone) do
+        field = Marten::DB::Field::Date.new("my_field")
+        time = Time.local(2026, 7, 31, 14, 30, 0, location: paris_time_zone)
+
+        field.to_db(time).as(Time).to_s("%F").should eq "2026-07-31"
       end
     end
 
@@ -300,6 +334,61 @@ describe Marten::DB::Field::Date do
 
       expect_raises(Marten::DB::Errors::UnexpectedFieldValue) do
         field.to_db(["foo", "bar"])
+      end
+    end
+  end
+
+  describe "date values persistence" do
+    ["Europe/Paris", "America/Los_Angeles", "Asia/Kolkata"].each do |time_zone_name|
+      it "preserves the local date across saves and reads in #{time_zone_name}" do
+        time_zone = Time::Location.load(time_zone_name)
+
+        with_overridden_setting("time_zone", time_zone) do
+          user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+          profile = TestUserProfile.create!(
+            user: user,
+            milestone_on: Time.local(2026, 7, 31, 22, 30, 0, location: time_zone)
+          )
+
+          2.times { TestUserProfile.get!(pk: profile.pk).save! }
+
+          milestone_on = TestUserProfile.get!(pk: profile.pk).milestone_on!
+          milestone_on.should eq Time.local(2026, 7, 31, location: time_zone)
+        end
+      end
+
+      it "matches a saved date in lookups in #{time_zone_name}" do
+        time_zone = Time::Location.load(time_zone_name)
+
+        with_overridden_setting("time_zone", time_zone) do
+          user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+          profile = TestUserProfile.create!(
+            user: user,
+            milestone_on: Time.local(2026, 7, 31, 22, 30, 0, location: time_zone)
+          )
+          date = Time.local(2026, 7, 31, location: time_zone)
+
+          TestUserProfile.filter(milestone_on: date).to_a.should eq [profile]
+          TestUserProfile.filter(milestone_on__in: [date]).to_a.should eq [profile]
+          TestUserProfile.filter(milestone_on__gt: date).exists?.should be_false
+          TestUserProfile.filter(milestone_on__lt: date).exists?.should be_false
+        end
+      end
+    end
+
+    it "preserves a date whose local midnight is skipped by a DST transition" do
+      santiago_time_zone = Time::Location.load("America/Santiago")
+
+      with_overridden_setting("time_zone", santiago_time_zone) do
+        user = TestUser.create!(username: "jd1", email: "jd1@example.com", first_name: "John", last_name: "Doe")
+        profile = TestUserProfile.create!(
+          user: user,
+          milestone_on: Time.local(2026, 9, 6, 12, 0, 0, location: santiago_time_zone)
+        )
+
+        2.times { TestUserProfile.get!(pk: profile.pk).save! }
+
+        TestUserProfile.get!(pk: profile.pk).milestone_on!.to_s("%F").should eq "2026-09-06"
       end
     end
   end

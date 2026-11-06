@@ -62,7 +62,7 @@ A `bool` field allows persisting booleans.
 
 ### `date`
 
-A `date` field allows persisting date values, which map to `Time` objects in Crystal. In addition to the [common field options](#common-field-options), such fields support the following arguments:
+A `date` field allows persisting date values, which map to `Time` objects in Crystal. Only the calendar date of a value is persisted, and values are read back at the start of that date in the configured [`time_zone`](../../development/reference/settings.md#time_zone). In addition to the [common field options](#common-field-options), such fields support the following arguments:
 
 #### `auto_now`
 

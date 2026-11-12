@@ -56,7 +56,7 @@ const {themes} = require('prism-react-renderer');
             dropdownActiveClassDisabled: true,
           },
           {
-            href: 'https://martenframework.com/docs/api/0.6/index.html',
+            href: 'https://martenframework.com/docs/api/0.7/index.html',
             label: 'API',
             position: 'right',
           },

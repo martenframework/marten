@@ -20,15 +20,15 @@ describe Marten::Schema::Field::Date do
     end
 
     it "returns a time object in the project time zone if the value is in another timezone" do
-      est_time_zone = Time::Location.load("EST")
+      project_time_zone = Time::Location.load("America/New_York")
 
-      with_overridden_setting("time_zone", est_time_zone) do
+      with_overridden_setting("time_zone", project_time_zone) do
         time = Time.local.in(Time::Location.load("Europe/Paris"))
-        expected_time = time.in(est_time_zone)
+        expected_time = time.in(project_time_zone)
 
         field = Marten::Schema::Field::Date.new("test_field")
         field.deserialize(time).should eq expected_time
-        field.deserialize(time).not_nil!.location.should eq est_time_zone
+        field.deserialize(time).not_nil!.location.should eq project_time_zone
       end
     end
 

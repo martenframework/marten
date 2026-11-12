@@ -800,8 +800,8 @@ describe Marten::Conf::GlobalSettings do
   describe "#time_zone=" do
     it "allows to configure the time zone of the application" do
       global_settings = Marten::Conf::GlobalSettings.new
-      global_settings.time_zone = Time::Location.load("EST")
-      global_settings.time_zone.should eq Time::Location.load("EST")
+      global_settings.time_zone = Time::Location.load("America/New_York")
+      global_settings.time_zone.should eq Time::Location.load("America/New_York")
     end
   end
 

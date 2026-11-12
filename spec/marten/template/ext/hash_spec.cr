@@ -46,5 +46,24 @@ describe Hash do
     it "returns the expected result when requesting the 'values' attribute" do
       ({"a" => 1, "b" => 2, "c" => 3} of String => Int32).resolve_template_attribute("values").should eq [1, 2, 3]
     end
+
+    it "returns the value for a hash key used as attribute" do
+      ({"type" => "abonnement", "montant" => "60.00"} of String => String)
+        .resolve_template_attribute("type").should eq "abonnement"
+    end
+
+    it "returns the value for a hash key with integer values" do
+      ({"count" => 42} of String => Int32).resolve_template_attribute("count").should eq 42
+    end
+
+    it "falls back to standard attributes when key does not exist" do
+      ({"a" => 1} of String => Int32).resolve_template_attribute("size").should eq 1
+    end
+
+    it "raises UnknownVariable for non-existent key and non-existent attribute" do
+      expect_raises(Marten::Template::Errors::UnknownVariable) do
+        ({"a" => 1} of String => Int32).resolve_template_attribute("xyz")
+      end
+    end
   end
 end

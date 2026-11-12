@@ -26,6 +26,34 @@ aside {
 
   nav.menu {
     padding: 1rem;
+    --ifm-menu-color-background-active: transparent;
+    --ifm-menu-color-background-hover: transparent;
+    --ifm-menu-color-active: var(--ifm-color-primary);
+  }
+
+  .menu__link,
+  .menu__caret {
+    border-radius: 0;
+  }
+
+  .menu__link:hover {
+    color: var(--ifm-color-primary);
+  }
+
+  .menu__link--active {
+    font-weight: 600;
+  }
+
+  .menu__list-item-collapsible,
+  .menu__list-item-collapsible:hover,
+  .menu__list-item-collapsible--active {
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .menu__link--sublist-caret:after,
+  .menu__caret:before {
+    opacity: 0.4;
   }
 
   .theme-doc-sidebar-item-link-level-1 {
@@ -50,6 +78,10 @@ aside {
     font-family: 'Inter';
     font-weight: 400;
     font-size: 0.875rem;
+
+    &.menu__link--active {
+      font-weight: 600;
+    }
   }
 
   .theme-doc-sidebar-item-category-level-2 {
@@ -59,6 +91,14 @@ aside {
     a {
       font-size: 0.875rem !important;
     }
+  }
+}
+
+// The doc row's negative margin cancels the container padding, so this
+// column padding is the gap between the sidebar and the page. 1rem is tight.
+@media (min-width: 997px) {
+  .theme-doc-sidebar-container + main .container > .row > .col:first-child {
+    padding-left: 3.5rem;
   }
 }
 

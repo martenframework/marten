@@ -6,6 +6,7 @@
 
 /* You can override the default Infima variables here. */
 
+@use './components/admonition';
 @use './components/category_index';
 @use './components/docsearch';
 @use './components/markdown';
@@ -18,32 +19,46 @@
 
 :root {
   --ifm-color-primary: #eb6864;
-  --ifm-color-primary-dark: rgb(33, 175, 144);
-  --ifm-color-primary-darker: rgb(31, 165, 136);
-  --ifm-color-primary-darkest: rgb(26, 136, 112);
-  --ifm-color-primary-light: rgb(70, 203, 174);
-  --ifm-color-primary-lighter: rgb(102, 212, 189);
-  --ifm-color-primary-lightest: rgb(146, 224, 208);
+  --ifm-color-primary-dark: #d35e5a;
+  --ifm-color-primary-darker: #c75855;
+  --ifm-color-primary-darkest: #a44946;
+  --ifm-color-primary-light: #ed7c79;
+  --ifm-color-primary-lighter: #ef918e;
+  --ifm-color-primary-lightest: #f5b4b2;
   --ifm-code-font-size: 90%;
   --ifm-code-padding-horizontal: 4px;
   --ifm-font-family-base: 'Inter';
   --ifm-font-color-base: #4a4a4a;
   --ifm-navbar-link-color: #fafafa;
+  --ifm-global-radius: 4px;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.08);
 }
 
 html[data-theme='light'] {
   --ifm-background-color: white;
-  --ifm-code-background: #eee;
-  --ifm-font-color-base: rgb(34, 45, 58);
-  --ifm-heading-color: rgb(3, 6, 11);
-  --ifm-menu-color: rgb(3, 6, 11);
-  --ifm-navbar-shadow: 0 1px 0 0 #eee;
-  --ifm-toc-border-color: #eee;
+  --ifm-code-background: #ececec;
+  --inline-code-border: #dbdbdb;
+  --ifm-font-color-base: #4a4a4a;
+  --ifm-heading-color: #363636;
+  --ifm-menu-color: #4a4a4a;
+  --ifm-navbar-shadow: 0 1px 0 0 #dbdbdb;
+  --ifm-toc-border-color: #dbdbdb;
 }
 
 html[data-theme='dark'] {
   --ifm-background-color: #04060b;
   --ifm-font-color-base: rgb(215, 221, 226);
+  --ifm-code-background: rgba(255, 255, 255, 0.14);
+  --inline-code-border: rgba(255, 255, 255, 0.24);
+}
+
+a,
+.menu__link,
+.menu__link:hover,
+.table-of-contents__link,
+.pagination-nav__link,
+.navbar__link {
+  transition: all 0.25s ease-in-out;
 }
 
 body {
@@ -58,11 +73,37 @@ body.dark, body[data-theme='dark'] {
   --aa-background-color-rgb: 19, 23, 28 !important;
 }
 
-.docusaurus-highlight-code-line {
-  background-color: rgba(0, 0, 0, 0.1);
-  display: block;
-  margin: 0 calc(-1 * var(--ifm-pre-padding));
-  padding: 0 var(--ifm-pre-padding);
+.theme-code-block {
+  border-radius: 4px;
+  box-shadow: none;
+
+  pre {
+    color: #f0f2f6;
+    text-shadow: none;
+  }
+
+  .token.plain,
+  .token.punctuation,
+  .token.entity {
+    color: #f0f2f6 !important;
+    text-shadow: none;
+  }
+
+  .token.comment,
+  .token.prolog,
+  .token.cdata {
+    color: #b3bac6 !important;
+  }
+
+  [class*='codeBlockTitle'] {
+    background: #21252b;
+    border-bottom: 1px solid #181a1f;
+    color: #abb2bf;
+    font-family: var(--ifm-font-family-base);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
 }
 
 .card {

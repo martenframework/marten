@@ -8,6 +8,25 @@
       border: none !important;
       background: transparent;
     }
+
+    .table-of-contents__left-border {
+      border-left: none;
+      padding-left: 0;
+    }
+
+    .table-of-contents__link {
+      padding: 0.15rem 0;
+    }
+
+    .table-of-contents__link:hover,
+    .table-of-contents__link--active,
+    .table-of-contents__link--active code {
+      color: var(--ifm-color-primary);
+    }
+
+    .table-of-contents__link--active {
+      font-weight: 600;
+    }
   }
 
   [class^='tocCollapsible_'] {

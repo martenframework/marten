@@ -1,3 +1,64 @@
 .category-index-row {
   max-width: inherit !important;
+
+  > .col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
+
+a.card.theme-doc-card-container {
+  --ifm-link-hover-decoration: none;
+
+  display: block;
+  margin-bottom: 0;
+  padding: 0.3rem 0 !important;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  color: var(--ifm-color-primary);
+  text-decoration: none;
+  transition: all 0.25s ease-in-out;
+
+  &:hover,
+  &:focus {
+    box-shadow: none;
+    color: var(--ifm-color-primary);
+    text-decoration: none;
+
+    .theme-doc-card-heading,
+    .theme-doc-card-description {
+      color: var(--ifm-color-primary);
+    }
+  }
+}
+
+.theme-doc-card-icon {
+  display: none;
+}
+
+.markdown .theme-doc-card-heading,
+.markdown .theme-doc-card-description {
+  display: inline;
+  transition: color 0.25s ease-in-out;
+}
+
+.markdown .theme-doc-card-heading {
+  margin: 0 0.75rem 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--ifm-color-primary);
+}
+
+.markdown .theme-doc-card-description {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #7a7a7a;
+}
+
+html[data-theme='dark'] .markdown .theme-doc-card-description {
+  color: #b5b5b5;
 }

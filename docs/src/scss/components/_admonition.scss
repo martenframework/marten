@@ -1,0 +1,89 @@
+.theme-admonition {
+  --ifm-alert-border-width: 0;
+  --ifm-alert-border-left-width: 3px;
+  --ifm-alert-border-radius: 4px;
+  --ifm-alert-foreground-color: var(--ifm-font-color-base);
+  --ifm-link-color: var(--ifm-color-primary);
+  --ifm-link-hover-color: var(--ifm-color-primary-dark);
+  box-shadow: none;
+  color: var(--ifm-font-color-base);
+
+  [class*='admonitionHeading'] {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--admonition-accent);
+  }
+
+  [class*='admonitionIcon'] svg {
+    width: 1.15em;
+    height: 1.15em;
+    fill: var(--admonition-accent);
+  }
+}
+
+html[data-theme='light'] {
+  .theme-admonition-note {
+    --admonition-accent: #7a7a7a;
+    --ifm-alert-background-color: #fafafa;
+    --ifm-alert-border-color: #b5b5b5;
+  }
+
+  .theme-admonition-info {
+    --admonition-accent: #904e95;
+    --ifm-alert-background-color: #f4eef6;
+    --ifm-alert-border-color: #904e95;
+  }
+
+  .theme-admonition-tip {
+    --admonition-accent: #22b24c;
+    --ifm-alert-background-color: #eef8f1;
+    --ifm-alert-border-color: #22b24c;
+  }
+
+  .theme-admonition-warning,
+  .theme-admonition-caution {
+    --admonition-accent: #f57a00;
+    --ifm-alert-background-color: #fff6eb;
+    --ifm-alert-border-color: #f57a00;
+  }
+
+  .theme-admonition-danger {
+    --admonition-accent: #ff2e12;
+    --ifm-alert-background-color: #fff1f0;
+    --ifm-alert-border-color: #ff2e12;
+  }
+}
+
+html[data-theme='dark'] {
+  .theme-admonition-note {
+    --admonition-accent: #b5b5b5;
+    --ifm-alert-background-color: rgba(255, 255, 255, 0.04);
+    --ifm-alert-border-color: #7a7a7a;
+  }
+
+  .theme-admonition-info {
+    --admonition-accent: #d7a4dc;
+    --ifm-alert-background-color: rgba(144, 78, 149, 0.16);
+    --ifm-alert-border-color: #904e95;
+  }
+
+  .theme-admonition-tip {
+    --admonition-accent: #5dce7a;
+    --ifm-alert-background-color: rgba(34, 178, 76, 0.14);
+    --ifm-alert-border-color: #22b24c;
+  }
+
+  .theme-admonition-warning,
+  .theme-admonition-caution {
+    --admonition-accent: #f57a00;
+    --ifm-alert-background-color: rgba(245, 122, 0, 0.14);
+    --ifm-alert-border-color: #f57a00;
+  }
+
+  .theme-admonition-danger {
+    --admonition-accent: #ff2e12;
+    --ifm-alert-background-color: rgba(255, 46, 18, 0.14);
+    --ifm-alert-border-color: #ff2e12;
+  }
+}

@@ -51,6 +51,11 @@ jobs:
         crystal: ${{ matrix.crystal }}
     - name: Install packages required for MySQL
       run: |
+        # ubuntu-latest preinstalls MySQL server. libmysqlclient-dev upgrades it in lockstep, and the
+        # server postinst restarts mysqld on port 3306. That fails when the MariaDB service already
+        # owns the port. Specs only need the client library.
+        sudo systemctl stop mysql || true
+        sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y mysql-server mysql-server-core
         sudo apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev lld --fix-missing
     - name: Create additional DB for MySQL
       run: |
@@ -104,6 +109,11 @@ jobs:
         crystal: ${{ matrix.crystal }}
     - name: Install packages required for MySQL
       run: |
+        # ubuntu-latest preinstalls MySQL server. libmysqlclient-dev upgrades it in lockstep, and the
+        # server postinst restarts mysqld on port 3306. That fails when the MariaDB service already
+        # owns the port. Specs only need the client library.
+        sudo systemctl stop mysql || true
+        sudo DEBIAN_FRONTEND=noninteractive apt-get remove -y mysql-server mysql-server-core
         sudo apt-get -yqq install mysql-client libmysqlclient-dev libvips libvips-dev lld --fix-missing
     - name: Create additional DB for MySQL
       run: |

@@ -1,39 +1,55 @@
 #__docusaurus {
+  .pagination-nav:not(:has(a)) {
+    display: none;
+  }
+
   .pagination-nav {
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--ifm-toc-border-color);
+
     &__link {
       border: none;
-    }
+      padding: 0;
 
-    &__label {
-      --icon-padding: 0.25rem;
+      &:hover,
+      &:focus {
+        text-decoration: none;
+
+        .pagination-nav__label {
+          color: var(--ifm-color-primary-dark);
+        }
+      }
     }
 
     &__sublabel {
-      margin-block-end: 1rem;
+      margin: 0 0 0.15rem;
+      font-size: 0.8125rem;
+      font-weight: 500;
+      color: #7a7a7a;
     }
 
-    > a.pagination-nav__link--prev {
-      padding-left: 0;
-
-      .pagination-nav__label {
-        &::before {
-          padding-inline-end: var(--icon-padding);
-          transform: translateX(calc(var(--icon-padding) * -1));
-          content: '←';
-        }
-      }
+    &__label {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.4;
+      transition: color 0.25s ease-in-out;
     }
 
-    > a.pagination-nav__link--next {
-      padding-right: 0;
+    > a.pagination-nav__link--prev .pagination-nav__label::before {
+      padding-inline-end: 0.4rem;
+      transform: none;
+      content: '←';
+    }
 
-      .pagination-nav__label {
-        &::after {
-          padding-inline-start: var(--icon-padding);
-          transform: translateX(calc(-100% + var(--icon-padding)));
-          content: '→';
-        }
-      }
+    > a.pagination-nav__link--next .pagination-nav__label::after {
+      padding-inline-start: 0.4rem;
+      transform: none;
+      content: '→';
     }
   }
+}
+
+html[data-theme='dark'] .pagination-nav__sublabel {
+  color: #b5b5b5;
 }

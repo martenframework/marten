@@ -29,7 +29,8 @@ module Marten
             __marten_defined?(::MySql) do
               value = case value
                       when Bytes
-                        "X'#{value.hexstring}'"
+                        # BLOB defaults are accepted only when written as expressions.
+                        "(X'#{value.hexstring}')"
                       when String, Time
                         "'#{::MySql::Type.to_mysql(value)}'"
                       else

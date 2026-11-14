@@ -159,7 +159,7 @@ for_mysql do
     describe "#quoted_default_value_for_built_in_column" do
       it "returns the expected string representation for a byte value" do
         schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
-        schema_editor.quoted_default_value_for_built_in_column(Bytes[255, 97]).should eq "X'ff61'"
+        schema_editor.quoted_default_value_for_built_in_column(Bytes[255, 97]).should eq "(X'ff61')"
       end
 
       it "returns the expected string representation for a string value" do

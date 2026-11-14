@@ -47,7 +47,7 @@ module Marten
             __marten_defined?(::PG) do
               value = case value
                       when Bytes
-                        "X'#{value.hexstring}'"
+                        "decode('#{value.hexstring}', 'hex')"
                       when String
                         PG::EscapeHelper.escape_literal(value)
                       when Time
@@ -62,6 +62,7 @@ module Marten
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Management::Column::BigInt"   => "bigint",
+            "Marten::DB::Management::Column::Binary"   => "bytea",
             "Marten::DB::Management::Column::Bool"     => "boolean",
             "Marten::DB::Management::Column::Date"     => "date",
             "Marten::DB::Management::Column::DateTime" => "timestamp with time zone",

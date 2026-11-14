@@ -56,6 +56,30 @@ class MyModel < Marten::Model
 end
 ```
 
+### `binary`
+
+A `binary` field allows persisting raw binary data. Values are exposed as [`Bytes`](https://crystal-lang.org/api/Bytes.html) objects:
+
+```crystal
+class Attachment < Marten::Model
+  field :id, :big_int, primary_key: true, auto: true
+  field :payload, :binary
+end
+
+attachment = Attachment.create!(payload: Bytes[0x89, 0x50, 0x4E, 0x47])
+attachment.payload # => Bytes[137, 80, 78, 71]
+```
+
+An empty `Bytes` value is treated as blank.
+
+:::info
+`binary` fields are mapped to:
+
+* `bytea` columns in PostgreSQL databases
+* `longblob` columns in MySQL databases
+* `blob` columns in SQLite databases
+:::
+
 ### `bool`
 
 A `bool` field allows persisting booleans.

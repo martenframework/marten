@@ -91,6 +91,7 @@ module Marten
 
           private BUILT_IN_COLUMN_TO_DB_TYPE_MAPPING = {
             "Marten::DB::Management::Column::BigInt"   => "integer",
+            "Marten::DB::Management::Column::Binary"   => "blob",
             "Marten::DB::Management::Column::Bool"     => "bool",
             "Marten::DB::Management::Column::Date"     => "date",
             "Marten::DB::Management::Column::DateTime" => "datetime",

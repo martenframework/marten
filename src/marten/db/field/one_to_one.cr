@@ -31,6 +31,8 @@ module Marten
 
         def from_db(value) : Marten::DB::Field::ReferenceDBTypes
           case value
+          when ::Bytes
+            value.dup
           when Marten::DB::Field::ReferenceDBTypes
             value
           when ::UUID

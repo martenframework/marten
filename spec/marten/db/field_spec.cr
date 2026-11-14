@@ -3,8 +3,9 @@ require "./spec_helper"
 describe Marten::DB::Field do
   describe "#registry" do
     it "returns the expected field abstractions" do
-      Marten::DB::Field.registry.size.should eq 23
+      Marten::DB::Field.registry.size.should eq 24
       Marten::DB::Field.registry["big_int"].should eq Marten::DB::Field::BigInt
+      Marten::DB::Field.registry["binary"].should eq Marten::DB::Field::Binary
       Marten::DB::Field.registry["bool"].should eq Marten::DB::Field::Bool
       Marten::DB::Field.registry["date"].should eq Marten::DB::Field::Date
       Marten::DB::Field.registry["date_time"].should eq Marten::DB::Field::DateTime

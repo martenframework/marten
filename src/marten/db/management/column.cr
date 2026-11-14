@@ -2,6 +2,7 @@ require "./column/concerns/**"
 
 require "./column/base"
 require "./column/big_int"
+require "./column/binary"
 require "./column/bool"
 require "./column/date"
 require "./column/date_time"
@@ -38,6 +39,7 @@ module Marten
         end
 
         register "big_int", BigInt
+        register "binary", Binary
         register "bool", Bool
         register "date", Date
         register "date_time", DateTime

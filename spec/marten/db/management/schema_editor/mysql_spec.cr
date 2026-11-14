@@ -15,6 +15,12 @@ for_mysql do
         schema_editor.column_type_for_built_in_column(column).should eq "bigint AUTO_INCREMENT"
       end
 
+      it "returns the expected column type for a binary column" do
+        column = Marten::DB::Management::Column::Binary.new("test")
+        schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)
+        schema_editor.column_type_for_built_in_column(column).should eq "longblob"
+      end
+
       it "returns the expected column type for a bool column" do
         column = Marten::DB::Management::Column::Bool.new("test")
         schema_editor = Marten::DB::Management::SchemaEditor.for(Marten::DB::Connection.default)

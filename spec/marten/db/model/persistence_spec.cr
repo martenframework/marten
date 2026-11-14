@@ -346,6 +346,40 @@ describe Marten::DB::Model::Persistence do
       TagWithUUID.get!(pk: obj.pk).should eq obj
     end
 
+    it "persists and reloads binary values" do
+      payload = Bytes[0, 255, 97]
+      obj = BinaryRecord.create!(payload: payload, optional_payload: Bytes.empty)
+
+      reloaded = BinaryRecord.get!(pk: obj.pk)
+      reloaded.payload.should eq payload
+      reloaded.optional_payload.should eq Bytes.empty
+    end
+
+    it "persists nil binary values" do
+      obj = BinaryRecord.create!(optional_payload: nil)
+      BinaryRecord.get!(pk: obj.pk).optional_payload.should be_nil
+    end
+
+    it "applies the configured binary default" do
+      obj = BinaryRecord.create!
+      BinaryRecord.get!(pk: obj.pk).payload.should eq Bytes[1, 2, 3]
+    end
+
+    it "filters records by a binary value" do
+      payload = Bytes[9, 8, 7]
+      obj = BinaryRecord.create!(payload: payload)
+      BinaryRecord.create!(payload: Bytes[4, 5, 6])
+
+      BinaryRecord.filter(payload: payload).map(&.pk).should eq [obj.pk]
+    end
+
+    it "rejects an empty binary value when the field cannot be blank" do
+      obj = BinaryRecord.new(payload: Bytes.empty)
+      obj.valid?.should be_false
+      obj.errors.first.field.should eq "payload"
+      obj.errors.first.type.should eq "blank"
+    end
+
     it "runs after_create_commit callbacks as expected for new records" do
       obj = Marten::DB::Model::PersistenceSpec::Record.new
       obj.save

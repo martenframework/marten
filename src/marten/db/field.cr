@@ -1,5 +1,6 @@
 require "./field/base"
 require "./field/big_int"
+require "./field/binary"
 require "./field/bool"
 require "./field/date"
 require "./field/date_time"
@@ -28,7 +29,7 @@ module Marten
   module DB
     module Field
       # :nodoc:
-      alias ReferenceDBTypes = ::Bool | Float32 | Float64 | Int32 | Int64 | Nil | ::String | Time
+      alias ReferenceDBTypes = ::Bool | ::Bytes | Float32 | Float64 | Int32 | Int64 | Nil | ::String | Time
 
       # :nodoc:
       annotation Registration
@@ -107,6 +108,7 @@ module Marten
       end
 
       register "big_int", BigInt
+      register "binary", Binary
       register "bool", Bool
       register "date", Date
       register "date_time", DateTime

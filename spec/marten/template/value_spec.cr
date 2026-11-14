@@ -117,6 +117,10 @@ describe Marten::Template::Value do
       Marten::Template::Value.from("foo bar").raw.should eq "foo bar"
     end
 
+    it "is able to initialize a new value value from a byte slice" do
+      Marten::Template::Value.from(Bytes[1, 2, 3]).raw.should eq Bytes[1, 2, 3]
+    end
+
     it "is able to initialize a new value value from a time" do
       time = Time.local
       Marten::Template::Value.from(time).raw.should eq time
@@ -231,6 +235,11 @@ describe Marten::Template::Value do
     it "raises an unknown variable error if the raw object does not allow attribute lookups" do
       value = Marten::Template::Value.from(42)
       expect_raises(Marten::Template::Errors::UnknownVariable) { value["unknown"] }
+    end
+
+    it "raises an unknown variable error if a string attribute is resolved on a byte slice" do
+      value = Marten::Template::Value.from(Bytes[1, 2, 3])
+      expect_raises(Marten::Template::Errors::UnknownVariable) { value["size"] }
     end
   end
 

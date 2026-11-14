@@ -95,7 +95,7 @@ module Marten
 
         attempt_attribute_resolution_after_failed_collection_lookup = false
 
-        if object.responds_to?(:[]) && !object.is_a?(Array) && !object.is_a?(String) &&
+        if object.responds_to?(:[]) && !object.is_a?(Array) && !object.is_a?(::Bytes) && !object.is_a?(String) &&
            !object.is_a?(Marten::Template::Object)
           begin
             return object[key.to_s]

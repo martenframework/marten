@@ -149,6 +149,8 @@ The Marten templating language supports making use of literal values as part of 
 | Single-quoted string | `{{ 'Hello World' }}` |
 | Double-quoted string | `{{ "Hello World" }}` |
 
+An integer literal is a 32-bit integer when the value fits in one, and a 64-bit integer otherwise. A whole number that does not fit in a 64-bit integer is interpreted as a float.
+
 ## Template inheritance
 
 Templates can inherit from each other: this allows you to easily define a "base" template containing the layout of your application so that you can reuse it in order to build other templates, which helps in keeping your codebase DRY.

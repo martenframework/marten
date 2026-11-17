@@ -9059,6 +9059,8 @@ The Marten templating language supports making use of literal values as part of 
 | Single-quoted string | `{{ 'Hello World' }}` |
 | Double-quoted string | `{{ "Hello World" }}` |
 
+An integer literal is a 32-bit integer when the value fits in one, and a 64-bit integer otherwise. A whole number that does not fit in a 64-bit integer is interpreted as a float.
+
 ## Template inheritance
 
 Templates can inherit from each other: this allows you to easily define a "base" template containing the layout of your application so that you can reuse it in order to build other templates, which helps in keeping your codebase DRY.
@@ -18073,6 +18075,7 @@ _Under development._
 
 ## Bug fixes
 
+* Fix integer literals in templates being parsed as floats when they do not fit in a 32-bit integer. Literals that fit in a 64-bit integer are now kept as integers.
 * Fix the debug logger raising unexpectedly when request data cannot be parsed and [debug mode](https://martenframework.com/docs/next/development/reference/settings#debug) is enabled.
 * Fix request data parsing for malformed `application/json` bodies. A body that is not valid JSON now raises a bad request (`Marten::HTTP::Errors::InvalidRequestParameters`) instead of `JSON::ParseException`.
 

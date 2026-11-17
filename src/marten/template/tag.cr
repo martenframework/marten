@@ -41,6 +41,7 @@ module Marten
       register "localize", Localize
       register "l", Localize
       register "method_input", MethodInput
+      register "querystring", QueryString
       register "reverse", Url
       register "spaceless", Spaceless
       register "super", Super

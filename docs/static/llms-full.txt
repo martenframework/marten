@@ -10218,6 +10218,56 @@ For example:
 -->
 ```
 
+## `querystring`
+
+The `querystring` template tag builds a URL-encoded query string. The result always starts with `?`, so it can be placed directly in a link. Without arguments, the tag starts from the query string of the current request.
+
+For example, if the current URL query string is `?color=green`, the following outputs `?color=green`:
+
+```html
+{% querystring %}
+```
+
+An empty query string still outputs `?`.
+
+Keyword arguments add or replace parameters:
+
+```html
+{% querystring color: "red", size: "S" %}
+```
+
+If the current query string is `?color=green`, the output is `?color=red&size=S`.
+
+Passing `nil` removes a parameter:
+
+```html
+{% querystring color: nil %}
+```
+
+If the current query string is `?color=green&size=M`, the output is `?size=M`.
+
+Array values are written as repeated parameters. `nil` entries in the array are skipped, and an array that is empty (or that only contains `nil`) removes the parameter:
+
+```html
+{% querystring color: my_list %}
+```
+
+If `my_list` is `["red", "blue"]`, the output is `?color=red&color=blue`. A hash used as a parameter value contributes its keys.
+
+Keyword argument values can be resolved as template variables, or defined as literal values. The current request is required. Templates rendered from a handler receive it through the [Request context producer](https://martenframework.com/docs/next/templates/reference/context-producers#request-context-producer). The query string written by the tag is escaped when [auto-escaping](https://martenframework.com/docs/next/templates/introduction#auto-escaping) is enabled. Assigning it with `as` stores the raw query string, which is escaped when that variable is later output:
+
+```html
+{% querystring page: records.next_page_number as next_page %}
+```
+
+A common use is a pagination link that keeps the other query parameters. When records are paginated, the [list handler](https://martenframework.com/docs/next/handlers-and-http/reference/generic-handlers#listing-records) exposes the current page as `records`:
+
+```html
+{% if records.next_page? %}
+  <a href="{% querystring page: records.next_page_number %}">Next</a>
+{% endif %}
+```
+
 ## `reverse`
 
 Alias for [`url`](#url).
@@ -18059,6 +18109,10 @@ _Under development._
 #### Schemas
 
 * [`Marten::Core::Validation::Error`](https://martenframework.com/docs/api/dev/Marten/Core/Validation/Error.html) and [`Marten::Core::Validation::ErrorSet`](https://martenframework.com/docs/api/dev/Marten/Core/Validation/ErrorSet.html) can now be serialized to JSON. An error set becomes a list of objects with `field`, `type`, and `message`, and `field` is `null` for global errors. Schema and model validation errors can therefore be returned from a JSON response through the [`#json`](https://martenframework.com/docs/next/handlers-and-http/introduction#json) handler helper. See [Serializing errors as JSON](https://martenframework.com/docs/next/schemas/validations#serializing-errors-as-json).
+
+#### Templates
+
+* A [`querystring`](https://martenframework.com/docs/next/templates/reference/tags#querystring) template tag was introduced to build URL-encoded query strings from the current request while adding, replacing, or removing parameters.
 
 #### Development
 

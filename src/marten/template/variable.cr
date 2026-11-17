@@ -14,10 +14,18 @@ module Marten
           set_literal(STATIC_LITERAL_MAPPING[raw])
         end
 
-        # First try to see if the raw variable is a literal integer.
+        # First try to see if the raw variable is a literal integer. Values that fit in an Int32 stay Int32.
+        # Larger values that fit in an Int64 stay Int64 so they are not silently parsed as floats.
         if !literal_set?
           begin
             set_literal(raw.to_i)
+          rescue ArgumentError
+          end
+        end
+
+        if !literal_set?
+          begin
+            set_literal(raw.to_i64)
           rescue ArgumentError
           end
         end

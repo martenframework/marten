@@ -71,6 +71,52 @@ describe Marten::Template::Variable do
       variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int32
     end
 
+    it "returns an Int32 for integer literals at the Int32 bounds" do
+      variable_1 = Marten::Template::Variable.new(Int32::MAX.to_s)
+      variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).should eq Int32::MAX
+      variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int32
+
+      variable_2 = Marten::Template::Variable.new(Int32::MIN.to_s)
+      variable_2.resolve(Marten::Template::Context{"foo" => "bar"}).should eq Int32::MIN
+      variable_2.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int32
+    end
+
+    it "returns an Int64 for integer literals that do not fit in an Int32" do
+      above_int32_max = Int32::MAX.to_i64 + 1
+      variable_1 = Marten::Template::Variable.new(above_int32_max.to_s)
+      variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).should eq above_int32_max
+      variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int64
+
+      below_int32_min = Int32::MIN.to_i64 - 1
+      variable_2 = Marten::Template::Variable.new(below_int32_min.to_s)
+      variable_2.resolve(Marten::Template::Context{"foo" => "bar"}).should eq below_int32_min
+      variable_2.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int64
+    end
+
+    it "returns an Int64 for integer literals at the Int64 bounds" do
+      variable_1 = Marten::Template::Variable.new(Int64::MAX.to_s)
+      variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).should eq Int64::MAX
+      variable_1.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int64
+
+      variable_2 = Marten::Template::Variable.new(Int64::MIN.to_s)
+      variable_2.resolve(Marten::Template::Context{"foo" => "bar"}).should eq Int64::MIN
+      variable_2.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int64
+    end
+
+    it "preserves integer literals that are not exactly representable as floats" do
+      literal = 9_007_199_254_740_993_i64
+      variable = Marten::Template::Variable.new(literal.to_s)
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).should eq literal
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Int64
+    end
+
+    it "returns a float for an integer literal that does not fit in an Int64" do
+      literal = "9223372036854775808"
+      variable = Marten::Template::Variable.new(literal)
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).raw.should be_a Float64
+      variable.resolve(Marten::Template::Context{"foo" => "bar"}).should eq literal.to_f
+    end
+
     it "returns the value of a float literal" do
       variable = Marten::Template::Variable.new("42.44")
       variable.resolve(Marten::Template::Context{"foo" => "bar"}).should eq 42.44
